@@ -89,6 +89,21 @@ public class MainMenuPanel extends JPanel {
                 String card = href == null ? null : parentWindow.aspectHoverHtml(href);
                 return card != null ? card : super.getToolTipText(event);
             }
+
+            /**
+             * Wrap to the panel instead of scrolling sideways.
+             *
+             * <b>The placements HTML sets no body width</b> - the hover cards next to it in
+             * SkymapPanel both pin 250px, this one does not - so the pane laid itself out at
+             * its natural width, overflowed the viewport and grew a horizontal scrollbar
+             * across the bottom of the sidebar. Tracking the viewport is the fix rather than
+             * hardcoding a width in the HTML, because the panel can be resized and a pinned
+             * pixel width would clip or gap the moment it is.
+             */
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return true;
+            }
         };
         placementsPane.setContentType("text/html");
         placementsPane.setEditable(false);
@@ -122,7 +137,13 @@ public class MainMenuPanel extends JPanel {
         });
 
         JScrollPane scrollPane = new JScrollPane(placementsPane);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(60, 120, 200)));
+        // One call rather than a hand-rolled border here: the pale stock scrollbars were
+        // the only light thing in this panel, and styling them per-screen is the defect
+        // this class documents at the top of Widgets.
+        Widgets.styleScrollPane(scrollPane);
+        // Belt and braces with getScrollableTracksViewportWidth above: nothing here should
+        // ever need to scroll sideways, so the bar is not merely dark, it is absent.
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(scrollPane);
     }

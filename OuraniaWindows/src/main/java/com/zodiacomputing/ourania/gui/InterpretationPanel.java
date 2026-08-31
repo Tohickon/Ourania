@@ -27,15 +27,64 @@ public class InterpretationPanel extends JPanel {
      * view. Ten call sites setting the text by hand is exactly how one of them ends up
      * showing a report layout to a Sabian symbol.
      */
+    /**
+     * Every reading passes through here, so the house style is applied here.
+     *
+     * <b>Twenty-eight callers, one seam.</b> Snapshot, Report, Synthesize, Predict and the
+     * per-placement panels all end at setHtml, so type scale and term colouring go in once
+     * rather than being threaded through five generators that would drift apart. That is the
+     * same argument Prose makes at the top of its own file.
+     *
+     * <b>Preformatted output is left alone.</b> The report pane is monospaced, column-aligned
+     * text; injecting a stylesheet or anchors into it would break the alignment it depends on.
+     */
     private void setHtml(String html, boolean pre) {
         preformatted = pre;
         setPreferredSize(new Dimension(pre ? REPORT_WIDTH : FLOW_WIDTH, 0));
-        editorPane.setText(html);
+        editorPane.setText(pre ? html : style(Prose.decorate(html)));
         editorPane.setCaretPosition(0);
         revalidate();
         if (getParent() != null) {
             getParent().revalidate();
         }
+    }
+
+
+    /**
+     * The reading type scale, injected once per document.
+     *
+     * <b>Headings were barely distinguishable from body text.</b> "Sun in Virgo" rendered at
+     * almost the same weight and size as the paragraph under it, so a 240,000-character
+     * synthesis read as one undifferentiated wall. Body drops to 12px, headings rise and go
+     * bold, and each level steps down clearly from the one above.
+     *
+     * Written as a style block rather than by editing five generators, because Swing HTML
+     * applies a document stylesheet to the whole pane and the generators disagree about
+     * inline colours - h2 is gold in one and blue in another. Element selectors here set the
+     * scale; the generators keep their own colours where they set them.
+     */
+    private static String style(String html) {
+        String css = "<style>"
+            + "body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.55;"
+            + "       color: #d8dae2; }"
+            + "h1 { font-size: 22px; font-weight: bold; color: #ffffff;"
+            + "     border-bottom: 1px solid #3a3f4c; padding-bottom: 4px; }"
+            + "h2 { font-size: 17px; font-weight: bold; margin-top: 18px; }"
+            + "h3 { font-size: 14px; font-weight: bold; margin-top: 14px; color: #e8eaf0; }"
+            + "p  { font-size: 12px; margin: 6px 0; }"
+            + "li { font-size: 12px; margin: 3px 0; }"
+            + "b  { color: #f2f4f8; }"
+            // Swing's HTMLEditorKit gives an inline anchor its own margin, which shows as a
+            // gap between a linked word and the comma after it - "Mercury , Virgo". The
+            // generated HTML is already tight (</a> immediately followed by the comma), so
+            // this is the renderer, not the markup.
+            + "a  { margin: 0; padding: 0; text-decoration: none; }"
+            + "</style>";
+        int head = html.indexOf("<body");
+        if (head < 0) {
+            return css + html;
+        }
+        return html.substring(0, head) + css + html.substring(head);
     }
 
     private static final int[] PLANETS = {

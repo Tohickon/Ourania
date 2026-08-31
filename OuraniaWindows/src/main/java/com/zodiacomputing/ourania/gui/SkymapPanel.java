@@ -833,9 +833,24 @@ extends JPanel {
         return nArray3;
     }
 
+    /**
+     * The colour a glyph is drawn in, by element.
+     *
+     * <b>The no-element fallback is BLACK, and that is a legibility choice, not a colour
+     * scheme.</b> Nine chart points carry no element - south_node, eris, eros, hygiea,
+     * nessus, pholus, fortune, spirit and lilith - because their elemental correspondence is
+     * genuinely contested and the registry declines to invent one. They were drawn in near
+     * white (220,220,220) on top of the metallic SILVER spheres, which is pale ink on a pale
+     * ground: Pholus, Nessus and the two lots were the hardest glyphs on the wheel to read.
+     * Black sits against the sphere instead of vanishing into it.
+     *
+     * <b>Not the same as the prose colour.</b> {@link #elementTextHex} keeps a LIGHT fallback
+     * for the same bodies, because a reading is light text on a dark panel and black there
+     * would be invisible. Two surfaces, two grounds, two answers - deliberately.
+     */
     private Color getElementColor(int n) {
         if (n < 0 || n >= ELEMENT_COLORS.length) {
-            return new Color(220, 220, 220);
+            return Color.BLACK;
         }
         return ELEMENT_COLORS[n];
     }
@@ -1630,41 +1645,43 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.updateChartData();
             this.chartPanel.repaint();
         });
-        jButton.setBackground(new Color(70, 130, 180));
-        jButton2.setBackground(new Color(90, 150, 200));
-        jButton3.setBackground(new Color(60, 179, 113));
-        jButton4.setBackground(new Color(90, 150, 200));
-        jButton5.setBackground(new Color(70, 130, 180));
-        jButton6.setBackground(new Color(205, 92, 92));
         JButton jButton7 = new JButton("Snapshot");
-        jButton7.setBackground(new Color(120, 90, 180));
         jButton7.setToolTipText("Read the natal chart as it currently stands");
         jButton7.addActionListener(actionEvent -> this.showReading(ReadingTier.PARAGRAPH));
         JButton jButton8 = new JButton("Report");
-        jButton8.setBackground(new Color(95, 70, 150));
         jButton8.setToolTipText("The full reading: shape, weights, repeated themes, tensions");
         jButton8.addActionListener(actionEvent -> this.showReading(ReadingTier.REPORT));
         JButton jButton9 = new JButton("Synthesize");
-        jButton9.setBackground(new Color(115, 60, 130));
         jButton9.setToolTipText("Generate a narrative reading based on the chart");
         jButton9.addActionListener(actionEvent -> this.showReading(ReadingTier.SYNTHESIZE));
         JButton jButton9_2 = new JButton("Predict");
-        jButton9_2.setBackground(new Color(105, 50, 110));
         jButton9_2.setToolTipText("Generate a timeline prediction based on the chart");
         jButton9_2.addActionListener(actionEvent -> this.showReading(ReadingTier.TIMELINE));
         JButton jButton10 = new JButton("Calendar");
-        jButton10.setBackground(new Color(70, 105, 145));
         jButton10.setToolTipText("Ingresses, stations, lunations and mundane aspects for the year");
         jButton10.addActionListener(actionEvent -> this.showAnnualCalendar());
+        // <b>Colour by role, not by button.</b> These were eleven hand-picked colours that
+        // encoded nothing - see Widgets.Role. Transport is quiet because it is used
+        // constantly and says little; Play/Pause is the control the row is built around; the
+        // five readings are peers and now look like peers. "Now" left red for months, which
+        // reads as destructive when jumping to the present is the safest thing here.
         JButton[] jButtonArray = new JButton[]{jButton, jButton2, jButton3, jButton4, jButton5, jButton6, jButton7, jButton8, jButton9, jButton9_2, jButton10};
-        for (JButton stringArray2 : jButtonArray) {
-            stringArray2.setFont(new Font("Arial", 1, 12));
-            stringArray2.setForeground(Color.WHITE);
-            stringArray2.setFocusPainted(false);
-            stringArray2.setCursor(new Cursor(12));
-            stringArray2.setContentAreaFilled(false);
-            stringArray2.setOpaque(true);
-            jPanel2.add(stringArray2);
+        Widgets.Role[] buttonRoles = {
+            Widgets.Role.TRANSPORT,  // Fast <<
+            Widgets.Role.TRANSPORT,  // < Slow
+            Widgets.Role.PRIMARY,    // Play / Pause
+            Widgets.Role.TRANSPORT,  // Slow >
+            Widgets.Role.TRANSPORT,  // Fast >>
+            Widgets.Role.TRANSPORT,  // Now
+            Widgets.Role.READING,    // Snapshot
+            Widgets.Role.READING,    // Report
+            Widgets.Role.READING,    // Synthesize
+            Widgets.Role.READING,    // Predict
+            Widgets.Role.READING,    // Calendar
+        };
+        for (int bi = 0; bi < jButtonArray.length; bi++) {
+            Widgets.styleButton(jButtonArray[bi], buttonRoles[bi]);
+            jPanel2.add(jButtonArray[bi]);
         }
         Object[] objectArray = new String[]{"Real Time", "1 Minute", "1 Hour", "1 Day", "1 Week", "1 Month", "1 Year"};
         JComboBox<Object> jComboBox = new JComboBox<Object>(objectArray);
@@ -3591,6 +3608,29 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return String.valueOf(n);
     }
 
+    /**
+     * The text-safe element palette, for surfaces outside this panel.
+     *
+     * <b>Package-private and static rather than a second copy.</b> Prose.decorate colours
+     * every body and sign it links, and it must use the SAME lightened element colours the
+     * wheel and the placements list use, or a reading would disagree with the chart beside
+     * it about what colour Water is.
+     */
+    static String elementTextHex(int elementIndex) {
+        if (elementIndex < 0 || elementIndex >= ELEMENT_TEXT_HEX.length) {
+            return "#e4e5ea";
+        }
+        return ELEMENT_TEXT_HEX[elementIndex];
+    }
+
+    /** Element index for a registry body, or -1. Same source the wheel colours from. */
+    static int elementOfBody(int bodyIndex) {
+        if (bodyIndex < 0 || bodyIndex >= BODY_ELEMENTS.length) {
+            return -1;
+        }
+        return BODY_ELEMENTS[bodyIndex];
+    }
+
     private String getElementColorHex(int n) {
         if (n < 0 || n >= ELEMENT_TEXT_HEX.length) {
             return "#ffffff";
@@ -3648,6 +3688,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int n8;
             int n9;
             super.paintComponent(graphics);
+            // <b>Jet black, deliberately flat.</b> A radial gradient was tried here on
+            // 2026-08-31 to suggest depth and removed the same day: against the muted
+            // element palette the lifted centre greyed the ground and the copper and sage
+            // glyphs lost contrast. Pure black is the strongest backing those colours have.
             graphics.setColor(Color.BLACK);
             graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
             if (SkymapPanel.this.sw == null || SkymapPanel.this.baseSd == null) {
