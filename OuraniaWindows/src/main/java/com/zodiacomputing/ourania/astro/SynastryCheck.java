@@ -876,13 +876,27 @@ public final class SynastryCheck {
 
         // Out of scope means null, so the panel falls back to the body framing rather than
         // printing a not-found string inside the highlighted box.
+        //
+        // <b>Re-pointed 2026-08-30, when the coverage boundary moved.</b> These probes used
+        // Vesta and the South Node, which had no planet-in-house prose at the time. They have
+        // it now - composite_placements_b.json filled in all thirteen remaining non-angle
+        // points - so those probes were asserting a gap that had been closed, and failed. The
+        // assertion being made has not changed: absent prose must return null so the fallback
+        // runs. Only the vehicle changed, to something still genuinely absent.
+        //
+        // The four ANGLES are that vehicle now. They carry body framing but have no
+        // planet-in-house reading, which is correct - "Ascendant in the 5th" is not a thing
+        // the technique says, because the Ascendant IS the first house cusp.
         ok("an out-of-scope body gives null",
-            svc.getCompositePlanetHouse("Vesta", 5) == null);
-        // The South Node is in scope for the framing and out of scope here, which is the pair
-        // most likely to be assumed symmetrical with the North Node and is not.
-        ok("the South Node is out of scope and has framing",
-            svc.getCompositePlanetHouse("South Node", 5) == null
-                && svc.getCompositeBody("south_node") != null);
+            svc.getCompositePlanetHouse("Ascendant", 5) == null);
+        ok("an out-of-scope body still has framing to fall back to",
+            svc.getCompositePlanetHouse("Descendant", 5) == null
+                && svc.getCompositeBody("descendant") != null);
+        // The North/South Node asymmetry this used to pin is closed: both now have house
+        // prose. Asserted so that a data loss on one side is a failure and not a silence.
+        ok("both nodes now have composite house prose",
+            svc.getCompositePlanetHouse("North Node", 5) != null
+                && svc.getCompositePlanetHouse("South Node", 5) != null);
         int fallback = 0;
         for (int i = 0; i < Bodies.count(); i++) {
             if (svc.getCompositePlanetHouse(Bodies.at(i).name, 5) == null) {
@@ -892,6 +906,11 @@ public final class SynastryCheck {
                     svc.getCompositeBody(Bodies.at(i).id) != null);
             }
         }
+        // <b>The size of the fallback set, pinned.</b> It is the four angles and nothing else
+        // since 2026-08-30. Stating the number means a data drop that covers the angles, or a
+        // regression that loses prose for a body that has it, both show up here instead of
+        // quietly changing how much of a reading is specific and how much is generic.
+        eq("the fallback set is exactly the four angles", 4, fallback);
 
         // ---- composite aspect frames (2026-08-24) ----
         for (Aspects.Type t : Aspects.Type.values()) {
@@ -946,8 +965,16 @@ public final class SynastryCheck {
             svc.getCompositeAspect("MC", "Venus", "Trine") != null);
 
         // Out of scope means null so the natal aspect reading is used instead.
+        //
+        // <b>Re-pointed 2026-08-30.</b> This probed Sun/Moon quintile, which had no composite
+        // prose until composite_minor_aspects.json added all six minors across the fourteen
+        // covered bodies. An asteroid at a minor aspect is still absent on both axes, so it
+        // tests the same fallback without asserting a gap that has been filled.
         ok("a minor aspect is out of scope",
-            svc.getCompositeAspect("Sun", "Moon", "Quintile") == null);
+            svc.getCompositeAspect("Vesta", "Sun", "Quintile") == null);
+        // And the newly covered half, so the boundary is pinned from both sides.
+        ok("a minor aspect between covered bodies now resolves",
+            svc.getCompositeAspect("Sun", "Moon", "Quintile") != null);
         ok("an asteroid is out of scope",
             svc.getCompositeAspect("Vesta", "Sun", "Trine") == null);
         ok("an unknown composite aspect gives null",

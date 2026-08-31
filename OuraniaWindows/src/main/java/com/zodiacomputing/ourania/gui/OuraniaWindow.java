@@ -109,6 +109,22 @@ public class OuraniaWindow extends JFrame {
         contentPanel.repaint();
     }
     
+    /**
+     * Set where a midpoint composite's houses are derived, or clear it back to the midpoint.
+     *
+     * Routed through here rather than handing ChartSetupPanel a SkymapPanel reference, which
+     * is how every other setting on that panel reaches the wheel.
+     */
+    public void applyCompositeReference(double lat, double lon, String name) {
+        if (skymapPanel != null) {
+            skymapPanel.setCompositeReferencePlace(lat, lon, name);
+        }
+    }
+
+    public String getCompositeReference() {
+        return skymapPanel == null ? null : skymapPanel.getCompositeReferencePlace();
+    }
+
     public void applyChartSettings(String bDate, String bTime, String bLoc, ChartMode mode, String tDate, String tTime, String tLoc, boolean transits) {
         if (skymapPanel != null) {
             skymapPanel.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc, transits);

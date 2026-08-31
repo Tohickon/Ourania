@@ -33,6 +33,11 @@ public class ChartSetupPanel extends JPanel {
     private JTextField transitDateField;
     private JTextField transitTimeField;
     private JTextField transitLocationField;
+    /**
+     * Where a midpoint composite's houses are derived. Blank means the couple's own
+     * geographic midpoint, which is the default and what the app did before this existed.
+     */
+    private JTextField compositeRefField;
 
     public ChartSetupPanel(OuraniaWindow parentWindow) {
         this.parentWindow = parentWindow;
@@ -206,6 +211,23 @@ public class ChartSetupPanel extends JPanel {
         transitDateField = createField(transitPanel, "Date (YYYY-MM-DD):", "");
         transitTimeField = createField(transitPanel, "Time (HH:MM):", "");
         transitLocationField = createField(transitPanel, "Location:", "");
+
+        // The reference place for a midpoint composite. Enabled only in that mode - see
+        // syncTransitsCheck - because it means nothing in any other, and a control that
+        // changes nothing is the defect this panel already had once with the Step dropdown.
+        compositeRefField = createField(transitPanel,
+            "Composite houses for (blank = midpoint):", "");
+        compositeRefField.setToolTipText("<html>Where the relationship happens. The composite's"
+            + " house cusps are derived at this place's LATITUDE.<br>Leave blank to use the"
+            + " midpoint of the two birthplaces.<br><i>Longitude has no effect on a midpoint"
+            + " composite - only latitude moves the cusps.</i></html>");
+        compositeRefField.addActionListener(e -> applyCompositeReference());
+        compositeRefField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                applyCompositeReference();
+            }
+        });
         
         // Load the home location from settings. It falls back to the old
         // default.transit.location key so an existing settings.properties still works.
@@ -422,6 +444,41 @@ public class ChartSetupPanel extends JPanel {
      *       in the tooltip rather than pretending.</li>
      * </ul>
      */
+    /**
+     * Resolve whatever is typed in the reference field and hand it to the wheel.
+     *
+     * <b>Blank clears back to the couple's midpoint</b> rather than being ignored, so there is
+     * a way back out of a choice once made.
+     *
+     * <b>A name that will not geocode leaves the previous setting alone and says so.</b> The
+     * alternative - silently falling back to the midpoint - would show a different chart from
+     * the one the field claims, which is the failure this whole setting exists to fix.
+     */
+    private void applyCompositeReference() {
+        String place = compositeRefField.getText().trim();
+        if (place.isEmpty()) {
+            parentWindow.applyCompositeReference(Double.NaN, Double.NaN, null);
+            compositeRefField.setToolTipText("Using the midpoint of the two birthplaces.");
+            return;
+        }
+        Geocoder.Result r = Geocoder.lookup(place);
+        if (r == null) {
+            compositeRefField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 80, 80)),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            compositeRefField.setToolTipText("Could not find \"" + place
+                + "\". The previous reference place is still in use.");
+            return;
+        }
+        compositeRefField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.GRAY),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        compositeRefField.setToolTipText(String.format(
+            "Houses derived at %.4f N latitude (%s). Longitude %.4f is recorded but does not "
+            + "affect a midpoint composite's cusps.", r.lat, r.name, r.lon));
+        parentWindow.applyCompositeReference(r.lat, r.lon, r.name);
+    }
+
     private void syncTransitsCheck() {
         ChartMode mode = (ChartMode) chartModeCombo.getSelectedItem();
         boolean composite = mode == ChartMode.COMPOSITE_MIDPOINT
@@ -443,6 +500,19 @@ public class ChartSetupPanel extends JPanel {
             transitsCheck.setSelected(false);
             transitsCheck.setEnabled(false);
             transitsCheck.setToolTipText("A single chart has no outer wheel.");
+        }
+
+        // The reference place derives the house frame of a MIDPOINT composite only. A Davison
+        // is a real chart of a real place and takes its houses from that; every other mode has
+        // its own location already. Enabling it elsewhere would be a control that changes
+        // nothing, which is the Step-dropdown defect this panel has had once before.
+        boolean refApplies = mode == ChartMode.COMPOSITE_MIDPOINT;
+        compositeRefField.setEnabled(refApplies);
+        if (!refApplies) {
+            compositeRefField.setToolTipText(mode == ChartMode.COMPOSITE_DAVISON
+                ? "A Davison is cast for a real place - its houses come from the midpoint "
+                    + "location itself, so there is nothing to choose here."
+                : "Only a midpoint composite derives its houses at a reference place.");
         }
     }
     

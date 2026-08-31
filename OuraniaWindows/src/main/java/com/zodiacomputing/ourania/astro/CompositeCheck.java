@@ -54,6 +54,16 @@ public final class CompositeCheck {
         equalHouseFallback();
         report("Part F", before);
 
+        System.out.println("=== Part G: the geographic midpoint is spherical, not a grid average ===");
+        before = failures.size();
+        geographicMidpoint();
+        report("Part G", before);
+
+        System.out.println("=== Part H: the composite reference place is settable and used ===");
+        before = failures.size();
+        referencePlaceIsSettable();
+        report("Part H", before);
+
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
@@ -337,6 +347,24 @@ public final class CompositeCheck {
             ChartFrame second = (ChartFrame) get.invoke(panel);
             near("Part C: composite survives frameForCurrentChart",
                 truthSun, second.body("Sun").lon, 1e-6);
+
+            // <b>What the reading actually reads.</b> Everything above proves the composite
+            // CACHE is intact; none of it proved the reading tiers use it, and until
+            // 2026-08-30 they did not - showReading called frameForCurrentChart and every
+            // reading in a composite mode described person A's natal chart. frameForReading
+            // is the seam showReading calls, so asserting it here asserts the binding rather
+            // than a restatement of it.
+            java.lang.reflect.Method reading = panelCls.getDeclaredMethod("frameForReading");
+            reading.setAccessible(true);
+            ChartFrame read = (ChartFrame) reading.invoke(panel);
+            near("Part C: the READING frame is the composite, not chart A",
+                truthSun, read.body("Sun").lon, 1e-6);
+            eq("Part C: the reading frame is marked synthetic",
+                Boolean.TRUE, read.syntheticMoment);
+            checks++;
+            if (Math.abs(read.body("Sun").lon - natalSun) < 1e-6) {
+                failures.add("Part C: the reading frame is person A's natal chart");
+            }
             eq("Part C: still synthetic afterwards", Boolean.TRUE, second.syntheticMoment);
             near("Part C: Ascendant survives too", first.asc, second.asc, 1e-6);
 
@@ -521,6 +549,142 @@ public final class CompositeCheck {
      * Verifies that computeMidpointComposite falls back gracefully to whole-sign-ish equal houses
      * from the midpoint MC when the quadrant house system has no solution or when sw is null.
      */
+    /**
+     * The midpoint place is on the great circle, not the average of the two coordinates.
+     *
+     * <b>The expected values were computed outside this codebase</b> - an independent
+     * implementation of the standard great-circle midpoint - so this verifies the formula
+     * rather than recording whatever the method currently returns. Averaging the coordinates
+     * separately treats the globe as a flat grid; great circles bow poleward, so the two
+     * answers separate as the pair spreads out, reaching 31 degrees of latitude for New
+     * York/Tokyo. That is house cusps for the wrong part of the world.
+     */
+    /**
+     * The reference place actually reaches the cusps, and reaches nothing else.
+     *
+     * <b>Two halves, and the second is the one that catches a wrong implementation.</b> It is
+     * easy to write a setting that changes the chart; the claim here is narrower - latitude
+     * moves the house frame and moves NOTHING else, because the bodies are midpoints of two
+     * charts and cannot depend on where you stand to look at them. A version that rebuilt the
+     * bodies from the reference place would pass a "does it change the chart" test and fail
+     * this one.
+     */
+    private static void referencePlaceIsSettable() {
+        SwissEph sw = new SwissEph(EPHE_PATH);
+        ChartFrame a = ChartFrame.compute(sw,
+            new SweDate(1984, 9, 8, 7 + 33.0 / 60.0).getJulDay(),
+            41.8781, -87.6298, 'P', false, 0.0);
+        ChartFrame b = ChartFrame.compute(sw,
+            new SweDate(1967, 4, 10, 19.0).getJulDay(), 34.05, -118.24, 'P', false, 0.0);
+
+        ChartFrame dflt = ChartFrame.computeMidpointComposite(sw, a, b);
+        double[] mid = ChartFrame.geographicMidpoint(a.geoLat, a.geoLon, b.geoLat, b.geoLon);
+
+        // 1. The no-argument form is exactly the great-circle midpoint form.
+        ChartFrame explicitMid = ChartFrame.computeMidpointComposite(sw, a, b, mid[0], mid[1]);
+        near("Part H: default equals the explicit midpoint (asc)", dflt.asc, explicitMid.asc, 1e-9);
+        near("Part H: default equals the explicit midpoint (lat)", mid[0], dflt.geoLat, 1e-9);
+
+        // 2. A different latitude derives a different house frame.
+        ChartFrame far = ChartFrame.computeMidpointComposite(sw, a, b, 12.0, 77.0);
+        near("Part H: the reference latitude is recorded", 12.0, far.geoLat, 1e-9);
+        near("Part H: the reference longitude is recorded", 77.0, far.geoLon, 1e-9);
+        checks++;
+        if (Math.abs(ChartFrame.separation(far.asc, dflt.asc)) < 1.0) {
+            failures.add("Part H: moving the reference place 26 degrees of latitude left the "
+                + "Ascendant within a degree - the setting is not reaching the house frame");
+        }
+        checks++;
+        boolean anyCuspMoved = false;
+        for (int i = 1; i <= 12; i++) {
+            if (Math.abs(ChartFrame.separation(far.cusps[i], dflt.cusps[i])) > 1e-6) {
+                anyCuspMoved = true;
+            }
+        }
+        if (!anyCuspMoved) {
+            failures.add("Part H: no house cusp moved with the reference place");
+        }
+
+        // 3. And it reaches NOTHING else. Bodies are midpoints of two charts; where you stand
+        //    cannot move them, and the MC comes from the two MCs, not from the reference place.
+        for (int i = 0; i < dflt.bodies.length; i++) {
+            ChartFrame.Body d = dflt.bodies[i];
+            ChartFrame.Body g = far.bodies[i];
+            if (d == null || g == null || !d.ok || !g.ok || Bodies.at(i).isAngle()) {
+                continue;
+            }
+            near("Part H: " + d.name + " is unmoved by the reference place", d.lon, g.lon, 1e-9);
+        }
+        near("Part H: the composite MC is unmoved by the reference place", dflt.mc, far.mc, 1e-9);
+
+        // 4. Longitude alone changes nothing - stated because the UI invites the opposite guess.
+        ChartFrame sameLatOtherLon =
+            ChartFrame.computeMidpointComposite(sw, a, b, mid[0], mid[1] + 40.0);
+        near("Part H: longitude alone does not move the Ascendant",
+            dflt.asc, sameLatOtherLon.asc, 1e-9);
+        for (int i = 1; i <= 12; i++) {
+            near("Part H: longitude alone does not move cusp " + i,
+                dflt.cusps[i], sameLatOtherLon.cusps[i], 1e-9);
+        }
+    }
+
+    private static void geographicMidpoint() {
+        // {lat1, lon1, lat2, lon2, expectedLat, expectedLon}
+        double[][] spec = {
+            // Philadelphia / Los Angeles - grid average would say 37.00, -96.70
+            {39.9526, -75.1652, 34.05, -118.24, 39.010, -97.581},
+            // Chicago / Los Angeles - grid average 37.96, -102.94
+            {41.8781, -87.6298, 34.05, -118.24, 38.969, -103.772},
+            // London / Sydney - grid average 8.82, 75.54
+            {51.5074, -0.1278, -33.8688, 151.2093, 28.672, 104.797},
+            // New York / Tokyo - grid average 38.20, -147.18, out by 31 degrees of latitude
+            {40.7128, -74.0060, 35.6762, 139.6503, 69.677, -153.704},
+            // Oslo / Vancouver - grid average 54.60, -56.18
+            {59.9139, 10.7522, 49.2827, -123.1207, 73.760, -73.275},
+        };
+        for (double[] r : spec) {
+            double[] got = ChartFrame.geographicMidpoint(r[0], r[1], r[2], r[3]);
+            near("Part G: midpoint lat of (" + r[0] + "," + r[1] + ")/(" + r[2] + "," + r[3] + ")",
+                r[4], got[0], 0.005);
+            near("Part G: midpoint lon of (" + r[0] + "," + r[1] + ")/(" + r[2] + "," + r[3] + ")",
+                r[5], got[1], 0.005);
+        }
+
+        // Symmetric: the midpoint cannot depend on which person is named first.
+        for (double[] r : spec) {
+            double[] ab = ChartFrame.geographicMidpoint(r[0], r[1], r[2], r[3]);
+            double[] ba = ChartFrame.geographicMidpoint(r[2], r[3], r[0], r[1]);
+            near("Part G: symmetric in lat", ab[0], ba[0], 1e-9);
+            near("Part G: symmetric in lon", ab[1], ba[1], 1e-9);
+        }
+
+        // A point with itself is itself.
+        double[] same = ChartFrame.geographicMidpoint(51.5074, -0.1278, 51.5074, -0.1278);
+        near("Part G: a place with itself is itself (lat)", 51.5074, same[0], 1e-9);
+        near("Part G: a place with itself is itself (lon)", -0.1278, same[1], 1e-9);
+
+        // Two points on the equator stay on the equator - the one case where the grid
+        // average is also right, so a broken implementation cannot hide here.
+        double[] eq = ChartFrame.geographicMidpoint(0.0, 10.0, 0.0, 50.0);
+        near("Part G: equator stays on the equator", 0.0, eq[0], 1e-9);
+        near("Part G: equator midpoint longitude", 30.0, eq[1], 1e-9);
+
+        // Across the dateline: 179E and 179W are 2 degrees apart, not 358.
+        double[] dl = ChartFrame.geographicMidpoint(0.0, 179.0, 0.0, -179.0);
+        near("Part G: dateline midpoint stays on the equator", 0.0, dl[0], 1e-9);
+        checks++;
+        if (Math.abs(Math.abs(dl[1]) - 180.0) > 1e-6) {
+            failures.add("Part G: dateline midpoint should be at +/-180, got " + dl[1]);
+        }
+
+        // Antipodal points have no unique midpoint. The contract is a defined number, not NaN.
+        double[] anti = ChartFrame.geographicMidpoint(45.0, 0.0, -45.0, 180.0);
+        checks++;
+        if (Double.isNaN(anti[0]) || Double.isNaN(anti[1])) {
+            failures.add("Part G: antipodal midpoint returned NaN instead of falling back");
+        }
+    }
+
     private static void equalHouseFallback() {
         SwissEph sw = new SwissEph(EPHE_PATH);
         ChartFrame a = ChartFrame.compute(sw, new SweDate(1980, 5, 15, 12.0).getJulDay(), LAT, LON, 'P', false, 0.0);

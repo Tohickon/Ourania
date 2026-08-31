@@ -22,7 +22,42 @@ import java.util.stream.Collectors;
 
 public class NarrativeSynthesizer {
 
+    /**
+     * The Sabian symbol for a degree, in the voice the chart calls for.
+     *
+     * One helper rather than the same ternary at four call sites - the angles section reads
+     * four degrees and the fork has to be identical at each, which is exactly the shape of
+     * thing that drifts when it is written out four times.
+     */
+    private static String sabian(InterpretationService svc, String sign, int deg, boolean rel) {
+        String s = rel ? svc.getCompositeSabian(sign, deg) : null;
+        return s != null ? s : svc.getSabianSymbol(sign, deg);
+    }
+
+    /** Natal voice. Kept so every pre-2026-08-31 caller compiles unchanged. */
     public static String generateReport(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked, Themes.Result t, ChartFrame tf, Profection prof, List<Transits.Hit> hits, YearScan scan, List<Convergence.Target> convergence, boolean withTime) {
+        return generateReport(f, g, ranked, t, tf, prof, hits, scan, convergence, withTime, false);
+    }
+
+    /**
+     * The narrative reading.
+     *
+     * <b>{@code relationship} changes which dataset is read and which sections run</b>, because
+     * a composite is a chart of a pairing and the natal prose speaks to a person. Before
+     * 2026-08-31 this method fetched getPlanetInSign / getPlanetInHouse / getAspect regardless
+     * of mode, so a composite reading described the couple's positions in the second person -
+     * "your identity", "your greatest ally" - while the composite datasets sat unread. It never
+     * called a single getComposite* method.
+     *
+     * <b>The age-keyed sections are suppressed for a relationship, not reworded.</b> Profection
+     * and the solar return are annual techniques keyed to a birthday: an age in years and a
+     * return of the Sun to its natal degree. A composite has no birthday - its Julian day is
+     * the midpoint of two BIRTHS - so "age" came out as the mean of the partners' ages and was
+     * printed as the age of the relationship. On the 1984/1967 fixture that is 41 and 59
+     * reported as 50. Transits are kept: they need only positions, and transits to the
+     * composite are the standard timing technique for a relationship chart.
+     */
+    public static String generateReport(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked, Themes.Result t, ChartFrame tf, Profection prof, List<Transits.Hit> hits, YearScan scan, List<Convergence.Target> convergence, boolean withTime, boolean relationship) {
         StringBuilder sb = new StringBuilder();
         InterpretationService svc = InterpretationService.getInstance();
         boolean isDiurnal = g.diurnal;
@@ -35,7 +70,7 @@ public class NarrativeSynthesizer {
         // 1. Core Architecture
         sb.append("<h2 style='color: #FFD700;'>1. Core Architecture: The Chart's Signature</h2>");
         String sectName = isDiurnal ? "diurnal (day)" : "nocturnal (night)";
-        sb.append("<p>This is a <b>").append(sectName).append("</b> chart, meaning the <b>").append(g.sectLight).append("</b> is the master of the sect, <b>").append(Sect.beneficOfSect(isDiurnal)).append("</b> is your greatest ally (the benefic of sect), and <b>").append(g.outOfSectMalefic).append("</b> is your primary friction point (the malefic contrary to sect).</p>");
+        sb.append("<p>This is a <b>").append(sectName).append("</b> chart, meaning the <b>").append(g.sectLight).append("</b> is the master of the sect, <b>").append(Sect.beneficOfSect(isDiurnal)).append("</b> is " + (relationship ? "the relationship's" : "your") + " greatest ally (the benefic of sect), and <b>").append(g.outOfSectMalefic).append("</b> is " + (relationship ? "its" : "your") + " primary friction point (the malefic contrary to sect).</p>");
         
         String leadBody = (g.shapeHandle != null && !g.shapeHandle.isEmpty()) ? g.shapeHandle : ranked.get(0).body;
         ChartFrame.Body leadPlanet = f.body(leadBody);
@@ -67,13 +102,22 @@ public class NarrativeSynthesizer {
             }
             
             String sign = Zodiac.signName(b.lon);
-            String signText = svc.getPlanetInSign(v.body, sign);
+            // Composite prose for a composite chart. The natal entry describes a person; the
+            // composite entry describes what the pairing does with that placement.
+            String signText = relationship ? svc.getCompositePlanetSign(v.body, sign) : null;
+            if (signText == null) {
+                signText = svc.getPlanetInSign(v.body, sign);
+            }
             if (!signText.startsWith("Interpretation not found")) {
                 sb.append("<p><b>In ").append(Character.toUpperCase(sign.charAt(0))).append(sign.substring(1)).append(":</b> ").append(signText).append("</p>");
             }
             
             if (v.house > 0) {
-                String houseText = svc.getPlanetInHouse(v.body, v.house);
+                String houseText = relationship
+                    ? svc.getCompositePlanetHouse(v.body, v.house) : null;
+                if (houseText == null) {
+                    houseText = svc.getPlanetInHouse(v.body, v.house);
+                }
                 if (!houseText.startsWith("Interpretation not found")) {
                     sb.append("<p><b>In House ").append(v.house).append(":</b> ").append(houseText).append("</p>");
                 }
@@ -81,7 +125,11 @@ public class NarrativeSynthesizer {
 
             // Angles
             if (v.nearestAngle != null && v.angularity > 0.5) {
-                String angleText = svc.getAngleInterpretation(v.nearestAngle, sign);
+                String angleText = relationship
+                    ? svc.getCompositeAngle(v.nearestAngle, sign) : null;
+                if (angleText == null) {
+                    angleText = svc.getAngleInterpretation(v.nearestAngle, sign);
+                }
                 if (angleText != null && !angleText.isEmpty() && !angleText.startsWith("Interpretation not found")) {
                     sb.append("<p><b>On the ").append(v.nearestAngle).append(":</b> ").append(angleText).append("</p>");
                 }
@@ -93,7 +141,11 @@ public class NarrativeSynthesizer {
                 for (int i = 0; i < Math.min(3, v.aspects.size()); i++) {
                     Aspects.Hit h = v.aspects.get(i);
                     String other = v.body.equals(h.a) ? h.b : h.a;
-                    String aspectText = svc.getAspect(v.body, other, h.type.label);
+                    String aspectText = relationship
+                        ? svc.getCompositeAspect(v.body, other, h.type.label) : null;
+                    if (aspectText == null) {
+                        aspectText = svc.getAspect(v.body, other, h.type.label);
+                    }
                     if (!aspectText.startsWith("Interpretation not found") && !aspectText.startsWith("General ")) {
                         sb.append("<li><b>").append(h.type.label).append(" to ").append(other).append(":</b> ").append(aspectText).append("</li>");
                     } else {
@@ -116,8 +168,10 @@ public class NarrativeSynthesizer {
 
         // 4. Current Chronometry
         sb.append("<h2 style='color: #FFD700;'>4. Current Chronometry</h2>");
-        if (withTime && prof != null) {
-            sb.append("<p>You are currently in a <b>House ").append(prof.house).append(" Profection (").append(prof.sign).append(")</b> at age ").append(String.format("%.0f", prof.age)).append(". ");
+        if (relationship) {
+            sb.append("<p><i>A profection year and a solar return are keyed to a birthday - an age in years, and the Sun's return to its natal degree. A composite has no birthday: its moment is the midpoint of two births, so an &quot;age&quot; here would be the average of the partners' ages rather than the age of the relationship. Transits to the composite are shown below instead, which is the standard timing technique for a relationship chart.</i></p>");
+        } else if (withTime && prof != null) {
+            sb.append("<p>You are currently in a <b>House ").append(prof.house).append(" Profection (").append(prof.sign).append(")</b> at age ").append(prof.age).append(". ");
             sb.append("The structural focus of your year shifts to the ").append(prof.house).append("th House, ruled by <b>").append(prof.lord).append("</b>. ");
             sb.append("As the 'Lord of the Year', themes surrounding this planet are paramount.</p>");
         } else {
@@ -133,15 +187,36 @@ public class NarrativeSynthesizer {
         if (patterns.isEmpty()) {
             sb.append("<p>No major closed-circuit aspect patterns (like Grand Trines or T-Squares) found.</p>");
         } else {
-            sb.append("<ul>");
+            // <b>A named pattern with no reading is not a mention.</b> Until 2026-08-31
+            // this printed one bare line per pattern - "T-square involving Chiron, Uranus,
+            // Venus (Apex: Venus)" - and stopped. pattern_detail.json has carried prose for
+            // all nine patterns the engine can emit, plus MODALITY-specific entries
+            // (tsquare_fixed, grandtrine_water, grandcross_cardinal), and the synthesis
+            // fetched none of it. A T-square is the loudest thing in a chart and it was
+            // reading as absent.
             for (AspectPatterns.Pattern p : patterns) {
-                sb.append("<li><b>").append(p.name).append("</b> involving ").append(String.join(", ", p.bodies));
+                sb.append("<h3 style='color:#FFD166;'>").append(p.name);
                 if (p.apex != null && !p.apex.isEmpty()) {
-                    sb.append(" (Apex: <b>").append(p.apex).append("</b>)");
+                    sb.append(" &mdash; apex <b>").append(p.apex).append("</b>");
                 }
-                sb.append("</li>");
+                sb.append("</h3>");
+                sb.append("<p><b>Involving:</b> ").append(String.join(", ", p.bodies)).append("</p>");
+
+                String slug = p.name.toLowerCase().replace("-", "").replace(" ", "");
+                String general = svc.getMacroDynamic("pattern_" + slug);
+                if (general != null && !general.isEmpty()) {
+                    sb.append("<p>").append(general).append("</p>");
+                }
+                // The modality entry is the specific one - a fixed T-square is a different
+                // animal from a cardinal one - so it follows the general reading.
+                if (p.modality != null && !p.modality.isEmpty()) {
+                    String byMode = svc.getMacroDynamic(slug + "_" + p.modality.toLowerCase());
+                    if (byMode != null && !byMode.isEmpty()) {
+                        sb.append("<p><b>As a ").append(p.modality).append(" ").append(p.name)
+                          .append(":</b> ").append(byMode).append("</p>");
+                    }
+                }
             }
-            sb.append("</ul>");
         }
 
         // 6. The Lunar Engine
@@ -178,29 +253,33 @@ public class NarrativeSynthesizer {
         if (f.asc != 0.0) {
             String ascSign = Zodiac.signName(f.asc);
             int ascDeg = (int) Math.floor(f.asc % 30) + 1;
-            sb.append("<li><b>Ascendant (").append(ascDeg).append("° ").append(ascSign).append("):</b> ").append(svc.getSabianSymbol(ascSign, ascDeg)).append("</li>");
+            sb.append("<li><b>Ascendant (").append(ascDeg).append("° ").append(ascSign).append("):</b> ").append(sabian(svc, ascSign, ascDeg, relationship)).append("</li>");
             
             double dsc = (f.asc + 180) % 360;
             String dscSign = Zodiac.signName(dsc);
             int dscDeg = (int) Math.floor(dsc % 30) + 1;
-            sb.append("<li><b>Descendant (").append(dscDeg).append("° ").append(dscSign).append("):</b> ").append(svc.getSabianSymbol(dscSign, dscDeg)).append("</li>");
+            sb.append("<li><b>Descendant (").append(dscDeg).append("° ").append(dscSign).append("):</b> ").append(sabian(svc, dscSign, dscDeg, relationship)).append("</li>");
         }
         
         if (f.mc != 0.0) {
             String mcSign = Zodiac.signName(f.mc);
             int mcDeg = (int) Math.floor(f.mc % 30) + 1;
-            sb.append("<li><b>Midheaven (").append(mcDeg).append("° ").append(mcSign).append("):</b> ").append(svc.getSabianSymbol(mcSign, mcDeg)).append("</li>");
+            sb.append("<li><b>Midheaven (").append(mcDeg).append("° ").append(mcSign).append("):</b> ").append(sabian(svc, mcSign, mcDeg, relationship)).append("</li>");
             
             double ic = (f.mc + 180) % 360;
             String icSign = Zodiac.signName(ic);
             int icDeg = (int) Math.floor(ic % 30) + 1;
-            sb.append("<li><b>IC (").append(icDeg).append("° ").append(icSign).append("):</b> ").append(svc.getSabianSymbol(icSign, icDeg)).append("</li>");
+            sb.append("<li><b>IC (").append(icDeg).append("° ").append(icSign).append("):</b> ").append(sabian(svc, icSign, icDeg, relationship)).append("</li>");
         }
         sb.append("</ul>");
 
         // 9. Specific Chronological Triggers
         sb.append("<h2 style='color: #FFD700;'>9. Specific Chronological Triggers</h2>");
-        if (withTime && scan != null && convergence != null) {
+        // Convergence is assembled from the profection year scan and the solar return, so it
+        // inherits the birthday problem described on section 4 and is suppressed with it.
+        if (relationship) {
+            sb.append("<p><i>Convergence is scanned across a profection year, which a composite does not have. See the note above.</i></p>");
+        } else if (withTime && scan != null && convergence != null) {
             sb.append("<p>Upcoming significant convergence events across the current profection year:</p><ul>");
             for (Convergence.Target target : convergence) {
                 if (target.score > 0.0) {
@@ -237,7 +316,11 @@ public class NarrativeSynthesizer {
                     sb.append("<li style='margin-bottom: 10px;'><b>").append(h.transiting).append(h.transitRetrograde ? " Rx" : "").append(" ")
                       .append(h.type.label).append(" Natal ").append(e.getKey()).append("</b>")
                       .append(" (").append(String.format("%.1f", h.offBy)).append("\u00B0 ").append(h.applying ? "applying" : "separating").append("):<br>");
-                    sb.append(svc.getTransitAspect(h.transiting, e.getKey(), h.type.label));
+                    String tAsp = relationship
+                        ? svc.getCompositeTransitAspect(h.transiting, e.getKey(), h.type.label)
+                        : null;
+                    sb.append(tAsp != null ? tAsp
+                        : svc.getTransitAspect(h.transiting, e.getKey(), h.type.label));
                     sb.append("</li>");
                 }
                 sb.append("</ul>");

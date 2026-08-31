@@ -260,7 +260,7 @@ public class InterpretationPanel extends JPanel {
 
     public String generatePlanetHtml(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects) {
         StringBuilder html = new StringBuilder();
-        appendRelationshipFrame(html, planetName, houseNum);
+        appendRelationshipFrame(html, planetName, signName, houseNum);
         
         boolean isTransit = planetName.toLowerCase().startsWith("transit_");
         String displayPlanetName = isTransit ? planetName.substring(8) : planetName; // remove transit_
@@ -1957,7 +1957,8 @@ public class InterpretationPanel extends JPanel {
      * cannot say is that this Venus belongs to a pairing rather than to a person, and that is
      * the whole of what this adds. Silent when the chart is a natal one or the key is absent.
      */
-    private void appendRelationshipFrame(StringBuilder html, String planetName, int houseNum) {
+    private void appendRelationshipFrame(StringBuilder html, String planetName,
+                                         String signName, int houseNum) {
         if (skymapPanel == null || !skymapPanel.isRelationshipChart() || planetName == null) {
             return;
         }
@@ -1981,6 +1982,15 @@ public class InterpretationPanel extends JPanel {
         String house = specific != null ? specific : svc.getCompositeHouse(houseNum);
         if (house != null) {
             html.append("<br><br>").append(house);
+        }
+
+        // <b>Sign after house, and only if the dataset has it.</b> The house reading is
+        // the one the technique leans on, so it leads; the sign says what character the
+        // placement has, which is the half a composite reading could not say at all
+        // until composite_signs.json landed on 2026-08-30.
+        String sign = svc.getCompositePlanetSign(planetName, signName);
+        if (sign != null) {
+            html.append("<br><br>").append(sign);
         }
         html.append("</div>");
     }

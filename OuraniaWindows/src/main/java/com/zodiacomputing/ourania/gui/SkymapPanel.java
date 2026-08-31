@@ -137,6 +137,64 @@ extends JPanel {
     }
 
     /**
+     * Choose where a midpoint composite's houses are derived, or clear it back to the default.
+     *
+     * <b>Pass NaN, or a null name, to go back to the couple's geographic midpoint.</b> Anything
+     * else pins the frame to that place. The relationship cache is dropped here rather than at
+     * the caller, because forgetting to do so is invisible: the setting changes, the wheel does
+     * not, and nothing reports an error.
+     *
+     * @param lat  latitude to derive at, or NaN for the midpoint default
+     * @param lon  recorded only; does not affect the cusps
+     * @param name what to show in the panel, or null for the default
+     */
+    public void setCompositeReferencePlace(double lat, double lon, String name) {
+        this.compositeRefLat = lat;
+        this.compositeRefLon = lon;
+        this.compositeRefPlace = (name == null || name.trim().isEmpty()) ? null : name.trim();
+        this.relationshipFrame = null;
+        this.relationshipCacheKey = null;
+        Settings.update(p -> {
+            if (Double.isNaN(lat)) {
+                p.remove("composite.reference.lat");
+                p.remove("composite.reference.lon");
+                p.remove("composite.reference.name");
+            } else {
+                p.setProperty("composite.reference.lat", String.valueOf(lat));
+                p.setProperty("composite.reference.lon", String.valueOf(lon));
+                p.setProperty("composite.reference.name",
+                    this.compositeRefPlace == null ? "" : this.compositeRefPlace);
+            }
+        });
+        this.repaint();
+    }
+
+    /** The reference place name, or null when the couple's midpoint is being used. */
+    public String getCompositeReferencePlace() {
+        return this.compositeRefPlace;
+    }
+
+    /** Restore a saved reference place. Silently keeps the default if the setting is absent. */
+    private void loadCompositeReferencePlace() {
+        String lat = Settings.get("composite.reference.lat", null);
+        String lon = Settings.get("composite.reference.lon", null);
+        if (lat == null || lon == null) {
+            return;
+        }
+        try {
+            this.compositeRefLat = Double.parseDouble(lat);
+            this.compositeRefLon = Double.parseDouble(lon);
+            String n = Settings.get("composite.reference.name", "");
+            this.compositeRefPlace = n.isEmpty() ? null : n;
+        } catch (NumberFormatException ex) {
+            // A corrupt setting is not worth refusing to start over.
+            this.compositeRefLat = Double.NaN;
+            this.compositeRefLon = Double.NaN;
+            this.compositeRefPlace = null;
+        }
+    }
+
+    /**
      * Whether a third (sky) ring is shown, given the mode and the user's transits box.
      *
      * Only SYNASTRY can have a tri-wheel: the outer ring is chart B and transits would
@@ -149,6 +207,23 @@ extends JPanel {
     private ZonedDateTime transitChartTime;
     private double transitLatitude = 51.4779;
     private double transitLongitude = 0.0;
+
+    /**
+     * Where the midpoint composite's house frame is derived, or NaN for the couple's own
+     * geographic midpoint.
+     *
+     * <b>NaN means "not chosen", not "zero".</b> Latitude 0 is the equator and a perfectly
+     * legitimate answer, so a sentinel that a user could also type would make "unset" and
+     * "on the equator" the same state.
+     *
+     * <b>Only the latitude changes the chart</b> - see the javadoc on the four-argument
+     * computeMidpointComposite. The longitude is carried so the frame can say where it was
+     * derived for, and for nothing else.
+     */
+    private double compositeRefLat = Double.NaN;
+    private double compositeRefLon = Double.NaN;
+    /** The name the user picked, for the panel to show. Null when using the midpoint. */
+    private String compositeRefPlace;
     private String transitLocationName = "Los Angeles, CA";
     private String transitTimeZoneId = ZoneId.systemDefault().getId();
     private String animateTarget = "Transit";
@@ -810,6 +885,9 @@ extends JPanel {
         this.window = ouraniaWindow;
         this.setLayout(new BorderLayout());
         this.setBackground(Color.BLACK);
+        // Before any chart is built, so a saved reference place is in force for the first
+        // composite rather than taking effect only after the user next touches the setting.
+        this.loadCompositeReferencePlace();
         try {
             this.sw = new SwissEph(EPHE_PATH);
         }
@@ -1333,6 +1411,24 @@ extends JPanel {
         return com.zodiacomputing.ourania.astro.Harmonics.of(radixChart(), this.harmonic);
     }
 
+    /**
+     * The chart a reading describes.
+     *
+     * <b>Named, so a check can assert it rather than a copy of it</b> - the same reason
+     * {@link #outerWheelShown} is a named function. Until 2026-08-30 {@code showReading} called
+     * {@link #frameForCurrentChart}, which knows nothing about composites: it recomputes a
+     * natal chart from the BASE date and place. So in either composite mode every reading tier
+     * - Paragraph, Report, Synthesize, Predict - described <b>person A's natal chart</b> while
+     * the wheel drew the composite, with nothing to say the two disagreed.
+     *
+     * <b>Part C of CompositeCheck was adjacent to this and missed it.</b> It calls
+     * frameForCurrentChart, commented "What the reading panel does", and then asserts only that
+     * the composite CACHE survives the call. What the reading went on to use was never checked.
+     */
+    ChartFrame frameForReading() {
+        return this.radixChart();
+    }
+
     /** The chart as cast, before any harmonic. The house frame the harmonic keeps. */
     public ChartFrame radixChart() {
         boolean composite = this.chartMode == ChartMode.COMPOSITE_MIDPOINT
@@ -1340,10 +1436,14 @@ extends JPanel {
         if (composite && this.baseSd != null && this.transitSd != null) {
             // Its own field and its own key. Sharing cachedFrame with frameForCurrentChart is
             // what made a composite silently become person A's natal chart - see the field.
+            // The reference place is part of the key. It changes the cusps, so leaving it out
+            // would serve the previous location's house frame from cache after the user
+            // changed it - visible only as houses that quietly disagree with the setting.
             String key = this.chartMode + "|" + SkymapPanel.frameKey(this.baseSd.getJulDay(),
                     this.baseLatitude, this.baseLongitude, this.houseSystem)
                 + "|" + SkymapPanel.frameKey(this.transitSd.getJulDay(),
-                    this.transitLatitude, this.transitLongitude, this.houseSystem);
+                    this.transitLatitude, this.transitLongitude, this.houseSystem)
+                + "|ref:" + this.compositeRefLat + "," + this.compositeRefLon;
             if (this.relationshipFrame != null && key.equals(this.relationshipCacheKey)) {
                 return this.relationshipFrame;
             }
@@ -1352,13 +1452,20 @@ extends JPanel {
             ChartFrame b = ChartFrame.compute(this.sw, this.transitSd.getJulDay(),
                 this.transitLatitude, this.transitLongitude, this.houseSystem, false, 0.0);
             this.relationshipFrame = this.chartMode == ChartMode.COMPOSITE_MIDPOINT
-                ? ChartFrame.computeMidpointComposite(this.sw, a, b)
+                ? (Double.isNaN(this.compositeRefLat)
+                    ? ChartFrame.computeMidpointComposite(this.sw, a, b)
+                    : ChartFrame.computeMidpointComposite(this.sw, a, b,
+                        this.compositeRefLat, this.compositeRefLon))
                 : ChartFrame.computeDavisonComposite(this.sw, a, b);
             this.relationshipCacheKey = key;
             return this.relationshipFrame;
         }
-        if (this.cachedFrame == null && this.baseSd != null) {
-            this.frameForCurrentChart(this.baseSd.getJulDay(), this.baseLatitude,
+        // Always through frameForCurrentChart, which compares the cache KEY. The previous
+        // form returned this.cachedFrame whenever it was non-null, so after the date or place
+        // changed it served the old chart - harmless while only the wheel called this, and not
+        // harmless now that readings do.
+        if (this.baseSd != null) {
+            return this.frameForCurrentChart(this.baseSd.getJulDay(), this.baseLatitude,
                 this.baseLongitude, this.houseSystem);
         }
         return this.cachedFrame;
@@ -1384,7 +1491,7 @@ extends JPanel {
             @Override
             protected String doInBackground() {
                 Object object;
-                ChartFrame chartFrame = SkymapPanel.this.frameForCurrentChart(d, d2, d3, c);
+                ChartFrame chartFrame = SkymapPanel.this.frameForReading();
                 Gestalt.Result result = Gestalt.compute(chartFrame);
                 List<BodyScore.Vector> list = BodyScore.rank(chartFrame, result);
                 Themes.Result result2 = Themes.extract(chartFrame, result, list);
@@ -1419,7 +1526,11 @@ if (readingTier == ReadingTier.TIMELINE) {
     return com.zodiacomputing.ourania.gui.TimelinePredictor.generate(chartFrame, chartFrame2);
 }
 if (readingTier == ReadingTier.SYNTHESIZE) {
-                    return NarrativeSynthesizer.generateReport(chartFrame, result, list, result2, chartFrame2, profection, list2, yearScan, list3, bl);
+                    // The mode decides which prose the reading speaks. Captured from the
+                    // panel rather than sniffed from the frame: syntheticMoment is true for
+                    // a midpoint composite and false for a Davison, so it cannot answer this.
+                    return NarrativeSynthesizer.generateReport(chartFrame, result, list, result2, chartFrame2, profection, list2, yearScan, list3, bl,
+                        SkymapPanel.this.isRelationshipChart());
                 }
                 object = PlainSnapshot.generate(chartFrame, result, list);
                 if (bl) {

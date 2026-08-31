@@ -5,6 +5,13 @@ import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.Synastry;
+import com.zodiacomputing.ourania.astro.AspectPatterns;
+import com.zodiacomputing.ourania.astro.Gestalt;
+import com.zodiacomputing.ourania.astro.BodyScore;
+import com.zodiacomputing.ourania.astro.Themes;
+import com.zodiacomputing.ourania.astro.Profection;
+import com.zodiacomputing.ourania.astro.Transits;
+import com.zodiacomputing.ourania.astro.Ephemeris;
 import de.thmac.swisseph.SweDate;
 import de.thmac.swisseph.SwissEph;
 
@@ -106,6 +113,10 @@ public final class AspectGridCheck {
         before = failures.size();
         triWheelSidePanel();
         report("Part P - the tri-wheel lists sky placements and parses sky body clicks", before);
+
+        before = failures.size();
+        readingsGenerate();
+        report("Part Q - every reading generates, for every mode, with and without time", before);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -764,6 +775,117 @@ public final class AspectGridCheck {
     /**
      * The tri-wheel surfaces the sky in the placements side panel and allows clicking sky bodies.
      */
+    /**
+     * The narrative reading actually produces output, for every chart mode.
+     *
+     * <b>Nothing covered NarrativeSynthesizer until 2026-08-31, and it was broken.</b> Line 120
+     * formatted {@code prof.age} - an int - with {@code %.0f}, which throws
+     * IllegalFormatConversionException. The Synthesize button therefore did nothing at all
+     * whenever transits were on, for natal charts as much as composites, because
+     * {@code showReading}'s done() catches Throwable and only prints the stack trace. A button
+     * that silently does nothing is indistinguishable from one that is not wired up, which is
+     * exactly how this survived: it was reported as "Synthesize doesn't work in composite mode"
+     * and the composite was never the cause.
+     *
+     * <b>withTime=true is the half that mattered.</b> The time branch - profection, solar
+     * return, transit hits - only runs when transits are on, so any check that omitted it
+     * would have passed against broken code. Both halves are swept here for that reason.
+     */
+    private static void readingsGenerate() throws Exception {
+        SwissEph sw = new SwissEph(Ephemeris.PATH);
+        double jdA = new SweDate(1984, 9, 8, 7 + 33.0 / 60.0).getJulDay();
+        double jdB = new SweDate(1967, 4, 10, 19.0).getJulDay();
+        double jdNow = new SweDate(2026, 8, 31, 12.0).getJulDay();
+        ChartFrame a = ChartFrame.compute(sw, jdA, 41.8781, -87.6298, 'P', false, 0.0);
+        ChartFrame b = ChartFrame.compute(sw, jdB, 34.05, -118.24, 'P', false, 0.0);
+
+        String[] modes = {"natal", "midpoint composite", "davison"};
+        for (int m = 0; m < modes.length; m++) {
+            ChartFrame f = m == 0 ? a
+                : m == 1 ? ChartFrame.computeMidpointComposite(sw, a, b)
+                : ChartFrame.computeDavisonComposite(sw, a, b);
+            double baseJd = m == 0 ? jdA : f.julianDayUt;
+
+            Gestalt.Result g = Gestalt.compute(f);
+            java.util.List<BodyScore.Vector> ranked = BodyScore.rank(f, g);
+            Themes.Result themes = Themes.extract(f, g, ranked);
+
+            for (boolean withTime : new boolean[]{false, true}) {
+                String label = modes[m] + (withTime ? " with transits" : " alone");
+                ChartFrame tf = null;
+                Profection prof = null;
+                java.util.List<Transits.Hit> hits = null;
+                if (withTime) {
+                    tf = ChartFrame.compute(sw, jdNow, 41.8781, -87.6298, 'P', false, 0.0);
+                    prof = Profection.at(baseJd, jdNow, f.asc);
+                    ChartFrame.Body sun = f.body("Sun");
+                    if (sun != null && sun.ok) {
+                        double sr = Profection.solarReturnJd(sw, baseJd, sun.lon, prof.age);
+                        prof.computeSubPeriods(jdNow, sr);
+                    }
+                    hits = Transits.toNatal(f, tf, ranked, prof.lord);
+                }
+                String html;
+                boolean rel = m > 0;
+                try {
+                    html = NarrativeSynthesizer.generateReport(
+                        f, g, ranked, themes, tf, prof, hits, null, null, withTime, rel);
+                } catch (Throwable ex) {
+                    failures.add("Part Q: synthesis threw for " + label + " - "
+                        + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+                    checks++;
+                    continue;
+                }
+                ok("Part Q: synthesis for " + label + " produced output",
+                    html != null && html.length() > 2000);
+                ok("Part Q: synthesis for " + label + " closes its document",
+                    html != null && html.contains("</body>"));
+
+                // <b>A named pattern must carry its reading.</b> Section 5 used to print one
+                // bare line per pattern and no prose, so a T-square - the loudest thing in a
+                // chart - read as absent. pattern_detail.json had the text all along, plus
+                // modality-specific entries the synthesis never touched.
+                for (AspectPatterns.Pattern pat : g.aspectPatterns) {
+                    String slug = pat.name.toLowerCase().replace("-", "").replace(" ", "");
+                    String general = InterpretationService.getInstance()
+                        .getMacroDynamic("pattern_" + slug);
+                    if (general != null && !general.isEmpty()) {
+                        ok("Part Q: " + label + " reads its " + pat.name + ", not just names it",
+                            html.contains(general.substring(0, Math.min(60, general.length()))));
+                    }
+                }
+                // The time layer must actually appear, or withTime is silently a no-op -
+                // and a no-op is what a swallowed exception looks like from out here.
+                //
+                // <b>Assert the positive marker, not the absence of the fallback text.</b>
+                // "Transit data not enabled" appears in three sections; two of them are the
+                // year-scan and transit lists, which this sweep deliberately passes null for
+                // and which are therefore correct to show it. Only the profection sentence
+                // proves the chronometry branch ran.
+                if (withTime && !rel) {
+                    ok("Part Q: " + label + " reaches the chronometry section",
+                        html.contains("Profection (") && html.contains("at age"));
+                }
+
+                // <b>A relationship reading must not invent an age.</b> A composite has no
+                // birthday, so a profection age is the mean of the partners' ages printed
+                // as the age of the pairing - 41 and 59 came out as 50. Transits stay: they
+                // need only positions, and transits to the composite are the standard
+                // timing technique for a relationship chart.
+                if (rel) {
+                    ok("Part Q: " + label + " reads the composite datasets, not the natal",
+                        html.contains("couple") || html.contains("the union"));
+                    ok("Part Q: " + label + " states no profection age",
+                        !html.contains("at age"));
+                    if (withTime) {
+                        ok("Part Q: " + label + " still shows transits to the composite",
+                            html.contains("10. Current Transits"));
+                    }
+                }
+            }
+        }
+    }
+
     private static void triWheelSidePanel() throws Exception {
         final Object[] out = new Object[2];
         javax.swing.SwingUtilities.invokeAndWait(() -> {

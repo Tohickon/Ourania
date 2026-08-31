@@ -84,6 +84,12 @@ public final class DataCheck {
         report("Part D", before);
 
         System.out.println();
+        System.out.println("=== Part E: composite prose answers every key the app can ask ===");
+        before = failures.size();
+        compositeCoverage();
+        report("Part E", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -381,6 +387,162 @@ public final class DataCheck {
     }
 
     // ---------------------------------------------------------------- plumbing
+
+    /**
+     * Every composite key the app can construct has prose behind it.
+     *
+     * <b>Driven from the registries, not from the data.</b> The body list comes from
+     * {@link Bodies}, the signs from {@link Zodiac#signName}, the aspects from
+     * {@code Aspects.Type} - so adding a chart point or an aspect type makes this part fail
+     * until its prose exists, which is the whole job. A version that read the JSON and checked
+     * it against itself would pass no matter what was missing.
+     *
+     * <b>Why exhaustive rather than sampled.</b> A missing composite key is invisible at
+     * runtime: the getter returns null, the panel appends nothing, and the reading is merely a
+     * paragraph shorter. There is no error to notice, so the only way to find it is to ask for
+     * every key.
+     *
+     * <b>The markdown assertion is a guard on the next data drop.</b> The prose datasets
+     * delivered on 2026-08-30 arrived using {@code **bold**}; the panel renders HTML, so that
+     * would have shown literal asterisks to the reader. It was converted on the way in, and
+     * this stops the raw form arriving again unnoticed.
+     */
+    private static void compositeCoverage() {
+        InterpretationService svc = InterpretationService.getInstance();
+
+        // 1. Planet in sign, and planet in house, for every non-angle chart point.
+        int signMissing = 0;
+        int houseMissing = 0;
+        for (int i = 0; i < Bodies.count(); i++) {
+            Bodies.Def d = Bodies.at(i);
+            if (d.isAngle()) {
+                continue;
+            }
+            for (int sIdx = 0; sIdx < 12; sIdx++) {
+                String sign = Zodiac.signName(sIdx * 30.0);
+                String prose = svc.getCompositePlanetSign(d.id, sign);
+                ok("composite sign prose for " + d.id + "_" + sign, prose != null);
+                if (prose == null) {
+                    signMissing++;
+                } else {
+                    ok("composite sign " + d.id + "_" + sign + " is not blank",
+                        !prose.trim().isEmpty());
+                    ok("composite sign " + d.id + "_" + sign + " is HTML, not markdown",
+                        !prose.contains("**"));
+                }
+            }
+            for (int h = 1; h <= 12; h++) {
+                String prose = svc.getCompositePlanetHouse(d.id, h);
+                ok("composite house prose for " + d.id + "_" + h, prose != null);
+                if (prose == null) {
+                    houseMissing++;
+                } else {
+                    ok("composite house " + d.id + "_" + h + " is not blank",
+                        !prose.trim().isEmpty());
+                    ok("composite house " + d.id + "_" + h + " is HTML, not markdown",
+                        !prose.contains("**"));
+                }
+            }
+        }
+
+        // 2. Every pair of the bodies the composite aspect set covers, against every aspect
+        //    type the engine can emit.
+        //
+        //    <b>This list is data, not a rule, so it is written down.</b> descendant and ic are
+        //    deliberately absent: they are the opposite points of ascendant and mc, and an
+        //    aspect to one is an aspect to the other, so prose for them would be a duplicate
+        //    the engine never asks for.
+        String[] aspectBodies = {
+            "sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus",
+            "neptune", "pluto", "north_node", "chiron", "ascendant", "mc"
+        };
+        int aspectMissing = 0;
+        for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+            for (int i = 0; i < aspectBodies.length; i++) {
+                for (int j = i + 1; j < aspectBodies.length; j++) {
+                    String a = aspectBodies[i];
+                    String b = aspectBodies[j];
+                    String prose = svc.getCompositeAspect(a, b, t.label);
+                    ok("composite aspect prose for " + a + "_" + t.label + "_" + b,
+                        prose != null);
+                    if (prose == null) {
+                        aspectMissing++;
+                    } else {
+                        ok("composite aspect " + a + "_" + t.label + "_" + b + " is not blank",
+                            !prose.trim().isEmpty());
+                        ok("composite aspect " + a + "_" + t.label + "_" + b
+                            + " is HTML, not markdown", !prose.contains("**"));
+                    }
+                }
+            }
+        }
+
+        System.out.printf("  signs missing %d, houses missing %d, aspect pairs missing %d%n",
+            signMissing, houseMissing, aspectMissing);
+
+        // 3b. Angles in sign, and the Sabian degrees. Both are small and exhaustive.
+        int angleMissing = 0;
+        for (String ang : new String[]{"ascendant", "descendant", "mc", "ic"}) {
+            for (int sIdx = 0; sIdx < 12; sIdx++) {
+                String sign = Zodiac.signName(sIdx * 30.0);
+                String prose = svc.getCompositeAngle(ang, sign);
+                ok("composite angle prose for " + ang + "_" + sign, prose != null);
+                if (prose == null) {
+                    angleMissing++;
+                } else {
+                    ok("composite angle " + ang + "_" + sign + " is HTML, not markdown",
+                        !prose.contains("**"));
+                }
+            }
+        }
+        int sabianMissing = 0;
+        for (int sIdx = 0; sIdx < 12; sIdx++) {
+            String sign = Zodiac.signName(sIdx * 30.0);
+            for (int deg = 1; deg <= 30; deg++) {
+                String prose = svc.getCompositeSabian(sign, deg);
+                ok("composite sabian for " + sign + "_" + deg, prose != null);
+                if (prose == null) {
+                    sabianMissing++;
+                }
+            }
+        }
+        System.out.printf("  angles missing %d, sabian missing %d%n", angleMissing, sabianMissing);
+
+        // 3c. Transits to the composite. <b>Not exhaustive, and deliberately so.</b> The domain
+        // is 28 transiting bodies x 29 targets x 11 aspects = 8,932; 8,613 of those have prose,
+        // and the remainder fall back to the natal transit reading rather than to nothing. So
+        // this asserts a FLOOR, not completeness - it catches a file that failed to load or a
+        // key format that stopped matching, which is what would actually break.
+        String[] tBodies = {"sun", "mercury", "venus", "mars", "jupiter", "saturn", "uranus",
+            "neptune", "pluto", "chiron", "north_node", "ceres", "ascendant", "mc"};
+        String[] tTargets = {"sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn",
+            "ascendant", "descendant", "mc", "ic"};
+        int tHave = 0, tAsked = 0;
+        for (String tb : tBodies) {
+            for (String tg : tTargets) {
+                for (com.zodiacomputing.ourania.astro.Aspects.Type ty
+                        : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+                    tAsked++;
+                    String prose = svc.getCompositeTransitAspect(tb, tg, ty.label);
+                    if (prose != null) {
+                        tHave++;
+                        ok("composite transit " + tb + "/" + tg + "/" + ty.label + " is not markdown",
+                            !prose.contains("**"));
+                    }
+                }
+            }
+        }
+        System.out.printf("  composite transits: %d of %d sampled keys resolve (%.1f%%)%n",
+            tHave, tAsked, 100.0 * tHave / tAsked);
+        ok("composite transit coverage is at least 90% of the sampled grid",
+            tHave >= (int) (tAsked * 0.90));
+
+        // 3. The lookup is order-insensitive, which the data relies on: each pair ships once.
+        ok("composite aspect lookup works in either order",
+            svc.getCompositeAspect("moon", "sun", "trine") != null
+                && svc.getCompositeAspect("sun", "moon", "trine") != null);
+    }
 
     private static void ok(String label, boolean condition) {
         checks++;

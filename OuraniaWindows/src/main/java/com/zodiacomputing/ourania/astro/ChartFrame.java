@@ -192,13 +192,64 @@ public final class ChartFrame {
     }
 
     /**
+     * The point halfway along the great circle between two places, as {@code {lat, lon}}.
+     *
+     * <b>Not the average of the coordinates, which is what this used to do.</b> Averaging
+     * latitude and longitude separately treats the globe as a flat grid, and great circles bow
+     * poleward, so the two answers separate as the pair spreads out. Measured 2026-08-30:
+     * Chicago/Los Angeles differ by 1.0 degrees of latitude, Philadelphia/Los Angeles by 2.0,
+     * Oslo/Vancouver by 19.2, and New York/Tokyo by <b>31.5</b> - which is not a rounding
+     * difference, it is a different hemisphere's worth of house cusps.
+     *
+     * <b>This matters more for Davison than for the composite.</b> A Davison chart IS the chart
+     * of the midpoint moment at the midpoint place, so an inaccurate midpoint is simply a wrong
+     * chart. The midpoint composite only uses the latitude as a reference place for deriving
+     * cusps, which is a free parameter either way.
+     *
+     * <b>Antipodal points have no unique midpoint</b> - every great circle through them is
+     * equally valid - so those fall back to the component-wise answer rather than returning a
+     * value the geometry does not define. The caller cannot tell, which is acceptable only
+     * because the alternative is NaN.
+     */
+    public static double[] geographicMidpoint(double lat1, double lon1,
+                                              double lat2, double lon2) {
+        double p1 = Math.toRadians(lat1);
+        double p2 = Math.toRadians(lat2);
+        double dLon = Math.toRadians(midpoint(lon1, lon2) - lon1) * 2.0;
+
+        double bx = Math.cos(p2) * Math.cos(dLon);
+        double by = Math.cos(p2) * Math.sin(dLon);
+        double cosSum = Math.cos(p1) + bx;
+        double horiz = Math.sqrt(cosSum * cosSum + by * by);
+
+        // Antipodal: the horizontal component vanishes and the midpoint is undefined.
+        if (horiz < 1e-12 && Math.abs(Math.sin(p1) + Math.sin(p2)) < 1e-12) {
+            return new double[] { (lat1 + lat2) / 2.0, midpoint(lon1, lon2) };
+        }
+
+        double lat = Math.toDegrees(Math.atan2(Math.sin(p1) + Math.sin(p2), horiz));
+        double lon = lon1 + Math.toDegrees(Math.atan2(by, cosSum));
+        // Longitudes are carried as -180..180 everywhere else in this class.
+        lon = ((lon + 540.0) % 360.0) - 180.0;
+        return new double[] { lat, lon };
+    }
+
+    /**
      * Midpoint composite: every point is the midpoint of the two charts' corresponding points.
      *
      * <b>Conventions settled with David on 2026-08-16.</b> This is one of two composite techniques
      * the app offers and they are never blended; see {@link #computeDavisonComposite}.
      *
-     * <b>Houses come from the midpoint MC at the midpoint latitude</b> (Rob Hand's method), not
-     * from midpointing the twelve cusps independently. The earlier version averaged each cusp
+     * <b>Houses come from the midpoint MC at the midpoint latitude</b> - Astrodienst's
+     * "reference place method" - not from midpointing the twelve cusps independently.
+     *
+     * <b>Corrected 2026-08-30: this is NOT Hand's method, though it said so for months.</b>
+     * Hand's default in Planets in Composite (1975) is the midpoint method throughout - the
+     * composite Ascendant is the midpoint of the two natal Ascendants, and the cusps are
+     * midpointed like the planets. That is precisely the approach the paragraph below argues
+     * against. So this implementation deliberately departs from Hand and then credited him for
+     * the departure. Hand remains the interpretive reference for what the placements MEAN; he
+     * is not the source of this house construction. The earlier version averaged each cusp
      * separately, which produced a plausible-looking chart in testing and exact oppositions by
      * construction - but nothing guaranteed the resulting ASC/MC pair corresponded to any real
      * latitude. Deriving through swe_houses_armc guarantees a chart that could exist, and
@@ -262,11 +313,45 @@ public final class ChartFrame {
         return d == Math.rint(d) ? String.valueOf((long) d) : String.valueOf(d);
     }
 
+    /**
+     * The composite at the couple's own midpoint place.
+     *
+     * <b>The default, not the only answer.</b> The reference place method wants the latitude
+     * of somewhere the relationship actually happens; the midpoint of two birthplaces is a
+     * defensible automatic choice and nothing more. Use
+     * {@link #computeMidpointComposite(SwissEph, ChartFrame, ChartFrame, double, double)} to
+     * say where.
+     */
     public static ChartFrame computeMidpointComposite(SwissEph sw, ChartFrame c1, ChartFrame c2) {
+        double[] mid = geographicMidpoint(c1.geoLat, c1.geoLon, c2.geoLat, c2.geoLon);
+        return computeMidpointComposite(sw, c1, c2, mid[0], mid[1]);
+    }
+
+    /**
+     * The composite with the reference place named.
+     *
+     * <b>Only the latitude changes the chart.</b> The cusps are derived by
+     * {@code swe_houses_armc}, which takes the ARMC and a latitude - and the ARMC here comes
+     * from the composite MC, not from geographic longitude. So {@code refLon} is recorded on
+     * the frame for display and provenance and has no effect on a single cusp. That is worth
+     * stating plainly because a user who types a city expects both halves to matter, and in a
+     * midpoint composite only one does. (A Davison is the opposite: it casts a real chart, so
+     * its longitude matters as much as its latitude.)
+     *
+     * <b>Latitude moves cusps a long way.</b> The same composite MC derived at 25 N and at
+     * 55 N produces Ascendants far enough apart to move most bodies between houses, so this
+     * is a substantive choice, not a cosmetic one.
+     *
+     * @param refLat latitude to derive the house frame at, degrees north positive
+     * @param refLon recorded on the frame; does not affect the cusps
+     */
+    public static ChartFrame computeMidpointComposite(SwissEph sw, ChartFrame c1, ChartFrame c2,
+                                                      double refLat, double refLon) {
         ChartFrame f = new ChartFrame();
         f.julianDayUt = (c1.julianDayUt + c2.julianDayUt) / 2.0;
-        f.geoLat = (c1.geoLat + c2.geoLat) / 2.0;
-        f.geoLon = midpoint(c1.geoLon, c2.geoLon);
+        double[] compPlace = new double[] { refLat, refLon };
+        f.geoLat = compPlace[0];
+        f.geoLon = compPlace[1];
         f.geoAltM = (c1.geoAltM + c2.geoAltM) / 2.0;
         f.hsys = c1.hsys;
         f.topocentric = c1.topocentric;
@@ -320,8 +405,9 @@ public final class ChartFrame {
         f.trueObliquity = (c1.trueObliquity + c2.trueObliquity) / 2.0;
         f.meanObliquity = (c1.meanObliquity + c2.meanObliquity) / 2.0;
 
-        // Houses by Hand's method: the composite MC is the midpoint of the two MCs, and the rest
-        // of the frame is DERIVED from it at the midpoint latitude rather than averaged. The
+        // Houses by the reference place method (NOT Hand's - see the javadoc): the composite MC
+        // is the midpoint of the two MCs, and the rest of the frame is DERIVED from it at the
+        // midpoint latitude rather than averaged. The
         // library wants the MC as right ascension, so convert: the MC is the ecliptic point on
         // the meridian, so RAMC = atan2(sin(lambda) cos(eps), cos(lambda)).
         double compMc = midpoint(c1.mc, c2.mc);
@@ -356,7 +442,7 @@ public final class ChartFrame {
         // <b>The four angles as registry bodies are the DERIVED angles, not midpoints.</b>
         //
         // The loop above midpointed every registry entry, the angles among them, and the
-        // houses were then derived from the composite MC by Hand's method - so until
+        // houses were then derived from the composite MC by the reference place method - so until
         // 2026-08-25 the same composite carried two different Ascendants and which one you
         // saw depended on whether you read the wheel's glyph or the house frame. On David's
         // reference pair they were <b>12.93 degrees apart</b>: 27 50' Capricorn as a body,
@@ -428,8 +514,10 @@ public final class ChartFrame {
      */
     public static ChartFrame computeDavisonComposite(SwissEph sw, ChartFrame c1, ChartFrame c2) {
         double davisonTjd = (c1.julianDayUt + c2.julianDayUt) / 2.0;
-        double davisonLat = (c1.geoLat + c2.geoLat) / 2.0;
-        double davisonLon = midpoint(c1.geoLon, c2.geoLon);
+        double[] davisonPlace =
+            geographicMidpoint(c1.geoLat, c1.geoLon, c2.geoLat, c2.geoLon);
+        double davisonLat = davisonPlace[0];
+        double davisonLon = davisonPlace[1];
         double davisonAlt = (c1.geoAltM + c2.geoAltM) / 2.0;
         return compute(sw, davisonTjd, davisonLat, davisonLon, c1.hsys, c1.topocentric, davisonAlt);
     }

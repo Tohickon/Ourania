@@ -99,6 +99,17 @@ public class InterpretationService {
         "composite_placements.json",
         "composite_aspects.json",
         "composite_aspect_pairs.json",
+        "composite_signs.json",
+        "composite_placements_b.json",
+        "composite_minor_aspects.json",
+        "composite_angles.json",
+        "composite_sabian.json",
+        "composite_transits_ptolemaic_t.json",
+        "composite_transit_angles.json",
+        "composite_minor_aspects_classical.json",
+        "composite_transit_everything_else.json",
+        "composite_transit_minor_aspects_asteroids_angles.json",
+        "composite_transit_ptolemaic_asteroids_angles_classical.json",
         "tarot_bodies.json"
     };
 
@@ -271,6 +282,12 @@ public class InterpretationService {
      * SynastryCheck Part G asserts that every one of those fallbacks exists.
      */
     private final Map<String, String> compositePlanetHouses = new HashMap<>();
+    /** Composite body in sign. Added 2026-08-30; the house map long predates it. */
+    private final Map<String, String> compositePlanetSigns = new HashMap<>();
+    /** Composite angle in sign, composite Sabian, composite transit. Added 2026-08-31. */
+    private final Map<String, String> compositeAngles = new HashMap<>();
+    private final Map<String, String> compositeSabian = new HashMap<>();
+    private final Map<String, String> compositeTransits = new HashMap<>();
 
     /**
      * What an aspect means when both ends belong to the relationship rather than to a person.
@@ -333,6 +350,10 @@ public class InterpretationService {
         if (line.startsWith("\"angle_contact\""))   return angleContacts;
         if (line.startsWith("\"synastry_interaspect\"")) return synastryInteraspects;
         if (line.startsWith("\"composite_planet_house\"")) return compositePlanetHouses;
+        if (line.startsWith("\"composite_planet_sign\"")) return compositePlanetSigns;
+        if (line.startsWith("\"composite_angle\"")) return compositeAngles;
+        if (line.startsWith("\"composite_sabian\"")) return compositeSabian;
+        if (line.startsWith("\"composite_transit_aspect\"")) return compositeTransits;
         if (line.startsWith("\"tarot_body\"")) return tarotBodies;
         if (line.startsWith("\"composite_aspect_frame\"")) return compositeAspectFrames;
         if (line.startsWith("\"composite_aspect\"")) return compositeAspects;
@@ -699,6 +720,52 @@ public class InterpretationService {
         String a = aspect.toLowerCase();
         String hit = compositeAspects.get(bodyKey(body1) + "_" + a + "_" + bodyKey(body2));
         return hit != null ? hit : compositeAspects.get(bodyKey(body2) + "_" + a + "_" + bodyKey(body1));
+    }
+
+    /**
+     * Composite body in sign, or null.
+     *
+     * <b>Mirrors {@link #getCompositePlanetHouse}</b> - same bodyKey normalisation, so a
+     * caller may pass a display name or a registry id. Sign names are lowercase, matching
+     * {@code Zodiac.signName}, which is what the JSON keys use.
+     */
+    public String getCompositePlanetSign(String bodyName, String sign) {
+        if (bodyName == null || sign == null) {
+            return null;
+        }
+        return compositePlanetSigns.get(bodyKey(bodyName) + "_" + sign.toLowerCase());
+    }
+
+    /** Composite angle in sign, or null. Keys are {angle}_{sign}, both lowercase. */
+    public String getCompositeAngle(String angleName, String sign) {
+        if (angleName == null || sign == null) {
+            return null;
+        }
+        return compositeAngles.get(bodyKey(angleName) + "_" + sign.toLowerCase());
+    }
+
+    /** Composite Sabian symbol, or null. Keys are {sign}_{degree}, degree 1-30. */
+    public String getCompositeSabian(String signName, int degree) {
+        if (signName == null || degree < 1 || degree > 30) {
+            return null;
+        }
+        return compositeSabian.get(signName.toLowerCase() + "_" + degree);
+    }
+
+    /**
+     * A transit to a composite point, or null.
+     *
+     * <b>Ordered, unlike the composite aspect getter.</b> Transiting Mars to a composite Venus
+     * is not the same event as transiting Venus to a composite Mars, so there is no reversed
+     * lookup here. The natal transit map keys on {@code transit_a_aspect_natal_b}; this one
+     * omits the "natal" segment because the target is a composite point, not a natal one.
+     */
+    public String getCompositeTransitAspect(String transiting, String target, String aspect) {
+        if (transiting == null || target == null || aspect == null) {
+            return null;
+        }
+        return compositeTransits.get("transit_" + bodyKey(transiting) + "_"
+            + aspect.toLowerCase() + "_" + bodyKey(target));
     }
 
     public String getCompositePlanetHouse(String bodyName, int house) {
