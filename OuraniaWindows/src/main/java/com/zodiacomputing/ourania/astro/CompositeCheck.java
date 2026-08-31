@@ -423,13 +423,20 @@ public final class CompositeCheck {
      * identifiable. A is the same synthetic reference chart the other suites share; B was
      * found by scanning candidate dates for one that reproduces the required geometry.
      *
-     * <b>If this pair ever needs replacing, it must be searched for, not guessed.</b> The
-     * condition is: {@code Part of Spirit} flagged {@code unstableMidpoint}, the Ascendant NOT
-     * flagged, and the derived angles equal to their registry bodies. B below puts Part of
-     * Spirit 178.45 degrees from A's - the original pair's figure was 178.4, so the assertions
-     * below are testing the same edge, not a weaker one.
+     * <b>If this pair ever needs replacing, it must be searched for, not guessed.</b> B was
+     * found by scanning ~65,000 candidates for one satisfying EVERY property this part
+     * asserts, so the replacement changed only the pinned longitudes and not the shape of the
+     * test. The search condition, worth reusing:
+     * <ul>
+     *   <li>{@code Part of Spirit} flagged {@code unstableMidpoint}, and the Sun NOT flagged -
+     *       otherwise the test would pass on a rule that flags everything;</li>
+     *   <li>a warning left on the frame;</li>
+     *   <li>the Ascendant not flagged, and the derived angles equal to their registry bodies;</li>
+     *   <li>a T-square with apex Venus and modality fixed, carrying a vacant empty leg.</li>
+     * </ul>
+     * Two candidates matched; this is the earlier of them.
      *
-     * A 1984-09-08 07:33 UT, 41.88 N 87.63 W; B 1971-10-04 21:00 UT, 34.05 N 118.24 W.
+     * A 1984-09-08 07:33 UT, 41.88 N 87.63 W; B 1967-04-10 19:00 UT, 34.05 N 118.24 W.
      */
     private static void referencePair() {
         SwissEph sw = new SwissEph(EPHE_PATH);
@@ -437,7 +444,7 @@ public final class CompositeCheck {
             new SweDate(1984, 9, 8, 7 + 33.0 / 60.0).getJulDay(),
             41.8781, -87.6298, 'W', false, 0.0);
         ChartFrame b = ChartFrame.compute(sw,
-            new SweDate(1971, 10, 4, 21.0).getJulDay(),
+            new SweDate(1967, 4, 10, 19.0).getJulDay(),
             34.05, -118.24, 'W', false, 0.0);
         ChartFrame c = ChartFrame.computeMidpointComposite(sw, a, b);
 
@@ -476,17 +483,15 @@ public final class CompositeCheck {
         // 3. The figure this pair actually has, so a change to pattern detection or to the
         //    empty leg shows up against known-good output rather than silently.
         //
-        //    <b>Regenerated 2026-08-30 when the fixture pair was replaced.</b> These are
-        //    characterization values - what a verified-green build produces for THIS pair -
+        //    <b>Regenerated 2026-08-30 when the fixture pair was replaced.</b> The longitudes
+        //    are characterization values - what a verified-green build produces for THIS pair -
         //    exactly as the previous set was for the previous pair. They catch a regression in
-        //    pattern detection; they are not an independent derivation, and re-pinning them is
-        //    only legitimate when the suite is otherwise green, as it was here.
+        //    pattern detection; they are not an independent derivation.
         //
-        //    The apex moved from Venus/fixed to Jupiter/mutable purely because the pair
-        //    changed. A search for a replacement that ALSO produced a Venus-apex fixed
-        //    T-square alongside the required near-opposition instability found none, so the
-        //    instability was kept - it is the property the pair exists to exercise - and the
-        //    T-square assertions were re-pinned around it.
+        //    <b>The apex and modality are NOT regenerated.</b> B was selected so the T-square
+        //    still comes out Venus/fixed, as it did on the original pair, which keeps these two
+        //    assertions verifying the same thing rather than whatever the new pair happened to
+        //    produce. Only the positions moved, because positions must.
         Gestalt.Result g = Gestalt.compute(c);
         AspectPatterns.Pattern t = null;
         for (AspectPatterns.Pattern p : g.aspectPatterns) {
@@ -498,14 +503,14 @@ public final class CompositeCheck {
         if (t == null) {
             failures.add("Part E: the reference composite's T-square has gone");
         } else {
-            eq("Part E: T-square apex", "Jupiter", t.apex);
-            eq("Part E: T-square modality", "mutable", t.modality);
-            near("Part E: composite Venus", 194.96, c.body("Venus").lon, 0.05);
-            near("Part E: composite Chiron", 40.07, c.body("Chiron").lon, 0.05);
-            near("Part E: composite Uranus", 221.74, c.body("Uranus").lon, 0.05);
+            eq("Part E: T-square apex", "Venus", t.apex);
+            eq("Part E: T-square modality", "fixed", t.modality);
+            near("Part E: composite Venus", 122.21, c.body("Venus").lon, 0.05);
+            near("Part E: composite Chiron", 32.84, c.body("Chiron").lon, 0.05);
+            near("Part E: composite Uranus", 210.48, c.body("Uranus").lon, 0.05);
             for (TensionRelease.Release r : g.releases) {
                 if (r.source.equals("T-square") && r.hasEmptyLeg) {
-                    near("Part E: empty leg opposite the apex", 78.42, r.emptyLegLon, 0.05);
+                    near("Part E: empty leg opposite the apex", 302.21, r.emptyLegLon, 0.05);
                     eq("Part E: empty leg is vacant", null, r.emptyLegOccupant);
                 }
             }
