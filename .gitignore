@@ -43,3 +43,17 @@ saved_transits.properties
 
 # --- backups ---
 *.orig
+
+# --- external tooling, kept locally, never committed ---
+# apktool.jar alone was 23.3 MB of a 27 MB repository. Ignore rules do not untrack
+# what is already in the index, so these were removed with `git rm --cached` on
+# 2026-08-31; the files stay on disk and the build pipeline still finds them.
+apktool.jar
+apktool.bat
+cfr-*.jar
+*.idsig
+*.keystore
+*.jks
+
+# --- logs ---
+*.log
