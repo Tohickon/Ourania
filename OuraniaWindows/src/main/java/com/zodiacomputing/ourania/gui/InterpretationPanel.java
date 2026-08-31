@@ -358,20 +358,76 @@ public class InterpretationPanel extends JPanel {
         }
 
         if (isTransit) {
-            // Transit Sign
-            html.append("<h2 style='color:#E0E0E0;'><b>Transiting ").append(displayPlanetName).append(" in ").append(signName).append("</b></h2>");
-            if (transitContext != null) {
-                html.append("<p style='font-weight:bold; color:#ffb366;'>").append(transitContext).append("</p>");
-            }
-            html.append("<p>").append(InterpretationService.getInstance().getTransit(displayPlanetName, signName)).append("</p>");
-            
-            // Transit House
-            html.append("<h3 style='color:#E0E0E0;'><b>In House ").append(houseNum).append("</b></h3>");
-            html.append("<p>").append(InterpretationService.getInstance().getTransitInHouse(displayPlanetName, houseNum)).append("</p>");
+            // <b>The outer ring is not always a transit.</b> handleChartClick prefixes every
+            // outer-ring body with "transit_" whatever the mode, and in SYNASTRY that ring is
+            // the second PERSON. Read as a transit, their Venus produced "Transiting Venus",
+            // transit-in-sign and transit-in-house prose, and aspect rows headed "to Natal
+            // Sun" - a passing event described where a standing relationship belongs.
+            //
+            // <b>The aspect grid already knew.</b> aspectSummary in SkymapPanel carries a
+            // comment about this exact confusion and routes to getSynastryInteraspect; the
+            // body click was never given the same treatment. One surface corrected, its
+            // neighbour left behind - which is the third instance of that shape found on
+            // 2026-08-31 alone.
+            boolean partner = skymapPanel != null && skymapPanel.isSynastryChart();
+            InterpretationService isvc = InterpretationService.getInstance();
 
-            // Transit Aspects
+            if (partner) {
+                // Their placement is their NATAL placement - Venus in Scorpio really is their
+                // natal Venus in Scorpio - so the sign prose is the natal entry, not a
+                // transit one. What changes is the frame around it and the house, which is
+                // yours rather than theirs.
+                html.append("<h2 style='color:#E0E0E0;'><b>Their ").append(displayPlanetName)
+                    .append(" in ").append(signName).append("</b></h2>");
+                html.append("<p>").append(isvc.getPlanetInSign(displayPlanetName, signName))
+                    .append("</p>");
+
+                html.append("<h3 style='color:#E0E0E0;'><b>Landing in your House ")
+                    .append(houseNum).append("</b></h3>");
+                String overlay = isvc.getOverlayPlanetHouse(displayPlanetName, houseNum);
+                if (overlay == null) {
+                    overlay = isvc.getOverlayHouse(houseNum);
+                }
+                if (overlay != null) {
+                    html.append("<p>").append(overlay).append("</p>");
+                }
+
+                // <b>An angle contact is additional, not instead.</b> A body landing on one of
+                // your corners is still in a house, and both readings are true at once - so
+                // this section appears beneath the overlay rather than replacing it, and only
+                // when Synastry.angleContacts says there is a contact at all.
+                String onAngle = skymapPanel.synastryAngleContact(displayPlanetName);
+                if (onAngle != null) {
+                    String angleProse = isvc.getOverlayPlanetAngle(displayPlanetName, onAngle);
+                    if (angleProse == null) {
+                        angleProse = isvc.getAngleContact(onAngle);
+                    }
+                    if (angleProse != null) {
+                        String shown = onAngle.length() <= 2 ? onAngle.toUpperCase()
+                            : Character.toUpperCase(onAngle.charAt(0)) + onAngle.substring(1);
+                        html.append("<h3 style='color:#E0E0E0;'><b>On your ").append(shown)
+                            .append("</b></h3>");
+                        html.append("<p>").append(angleProse).append("</p>");
+                    }
+                }
+            } else {
+                // Transit Sign
+                html.append("<h2 style='color:#E0E0E0;'><b>Transiting ").append(displayPlanetName).append(" in ").append(signName).append("</b></h2>");
+                if (transitContext != null) {
+                    html.append("<p style='font-weight:bold; color:#ffb366;'>").append(transitContext).append("</p>");
+                }
+                html.append("<p>").append(svc.getTransit(displayPlanetName, signName)).append("</p>");
+
+                // Transit House
+                html.append("<h3 style='color:#E0E0E0;'><b>In House ").append(houseNum).append("</b></h3>");
+                html.append("<p>").append(svc.getTransitInHouse(displayPlanetName, houseNum)).append("</p>");
+            }
+
+            // Aspects
             if (activeAspects != null && !activeAspects.isEmpty()) {
-                html.append("<h2 style='color:#E0E0E0; margin-top: 30px;'><b>Active Aspects</b></h2>");
+                html.append("<h2 style='color:#E0E0E0; margin-top: 30px;'><b>")
+                    .append(partner ? "Contacts to their chart" : "Active Aspects")
+                    .append("</b></h2>");
                 for (String[] aspectData : activeAspects) {
                     String otherPlanet = aspectData[0];
                     String aspectType = aspectData[1];
@@ -382,11 +438,21 @@ public class InterpretationPanel extends JPanel {
                     // rows render exactly as they always did. The tri-wheel is the first case
                     // with TWO people in one panel, where "Natal" would name neither of them.
                     // Display only - aspectData[0] stays the bare body name because it is the
-                    // key getTransitAspect looks the prose up by, and a decorated name misses.
+                    // key the prose is looked up by, and a decorated name misses.
                     String whoseChart = (aspectData.length > 3 && aspectData[3] != null
-                        && !aspectData[3].isEmpty()) ? aspectData[3] : "Natal";
-                    html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect).append("</i> to ").append(whoseChart).append(" ").append(otherPlanet).append("</h3>");
-                    html.append("<p>").append(InterpretationService.getInstance().getTransitAspect(displayPlanetName, otherPlanet, aspectType)).append("</p>");
+                        && !aspectData[3].isEmpty()) ? aspectData[3]
+                        : (partner ? "your" : "Natal");
+                    html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect)
+                        .append("</i> to ").append(whoseChart).append(" ").append(otherPlanet)
+                        .append("</h3>");
+                    // Between two people this is an interaspect, not a transit hit.
+                    String prose = partner
+                        ? svc.getSynastryInteraspect(displayPlanetName, otherPlanet, aspectType)
+                        : null;
+                    if (prose == null) {
+                        prose = svc.getTransitAspect(displayPlanetName, otherPlanet, aspectType);
+                    }
+                    html.append("<p>").append(prose).append("</p>");
                 }
             }
         } else {

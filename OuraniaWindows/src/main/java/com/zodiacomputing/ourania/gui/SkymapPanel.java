@@ -836,21 +836,36 @@ extends JPanel {
     /**
      * The colour a glyph is drawn in, by element.
      *
-     * <b>The no-element fallback is BLACK, and that is a legibility choice, not a colour
-     * scheme.</b> Nine chart points carry no element - south_node, eris, eros, hygiea,
-     * nessus, pholus, fortune, spirit and lilith - because their elemental correspondence is
-     * genuinely contested and the registry declines to invent one. They were drawn in near
-     * white (220,220,220) on top of the metallic SILVER spheres, which is pale ink on a pale
-     * ground: Pholus, Nessus and the two lots were the hardest glyphs on the wheel to read.
-     * Black sits against the sphere instead of vanishing into it.
+     * <b>The no-element fallback depends on what the glyph is drawn ON.</b> Nine chart points
+     * carry no element - south_node, eris, eros, hygiea, nessus, pholus, fortune, spirit and
+     * lilith - because their correspondence is genuinely contested and the registry declines
+     * to invent one. There is no single right colour for them, only a right contrast:
      *
-     * <b>Not the same as the prose colour.</b> {@link #elementTextHex} keeps a LIGHT fallback
-     * for the same bodies, because a reading is light text on a dark panel and black there
-     * would be invisible. Two surfaces, two grounds, two answers - deliberately.
+     * <ul>
+     *   <li>the natal ring draws on metallic SILVER spheres (192,192,192), so they take
+     *       black - near-white was pale ink on a pale ground and made Pholus, Nessus and the
+     *       two lots the hardest glyphs on the wheel to read;</li>
+     *   <li>the transit and sky rings draw on DARK cubes (62,66,76) and (20,50,80), so they
+     *       take near-white. Black there is the same mistake in reverse, and briefly was one:
+     *       this method returned a flat black on 2026-08-31 and those two rings rendered their
+     *       elementless glyphs as mid-grey on dark slate until it was corrected the same day.</li>
+     * </ul>
+     *
+     * <b>The prose colour is a third answer.</b> {@link #elementTextHex} keeps a light
+     * fallback, because a reading is light text on a dark panel. Three surfaces, three
+     * grounds - the element is the same, the legible ink is not.
      */
     private Color getElementColor(int n) {
+        return getElementColor(n, true);
+    }
+
+    /**
+     * @param lightBacking true when the glyph sits on the pale natal sphere, false when it
+     *                     sits on one of the dark transit or sky cubes
+     */
+    private Color getElementColor(int n, boolean lightBacking) {
         if (n < 0 || n >= ELEMENT_COLORS.length) {
-            return Color.BLACK;
+            return lightBacking ? Color.BLACK : new Color(226, 228, 234);
         }
         return ELEMENT_COLORS[n];
     }
@@ -1214,6 +1229,39 @@ extends JPanel {
      * {@link Synastry#angleContacts} - the difference is deliberate, recorded, and David's
      * to settle.
      */
+    /**
+     * Which of chart A's angles this chart-B body sits on, or null.
+     *
+     * <b>Uses {@link Synastry#angleContacts} rather than a threshold of its own.</b> A
+     * "contact" is already defined there - a conjunction inside the HALVED synastry orb, with
+     * opposite-pair bodies skipped so one placement is not counted twice against an axis. A
+     * second definition here would be the same rule implemented twice, which is the defect
+     * this codebase names most often.
+     *
+     * Note the orb caveat recorded on generateSynastryCrossHtml: these contacts read at the
+     * halved orb while the aspect grid reads at full natal orbs. That difference is open and
+     * David's to settle; this method inherits whichever answer angleContacts gives.
+     */
+    public String synastryAngleContact(String bodyName) {
+        if (bodyName == null || !this.isSynastryChart()
+                || this.sw == null || this.baseSd == null || this.transitSd == null) {
+            return null;
+        }
+        ChartFrame host = this.frameForCurrentChart(this.baseSd.getJulDay(),
+            this.baseLatitude, this.baseLongitude, this.houseSystem);
+        ChartFrame visitor = this.synastryChartB();
+        if (host == null || visitor == null) {
+            return null;
+        }
+        // Tightest first, so the first match for this body is its closest angle.
+        for (Synastry.AngleContact c : Synastry.angleContacts(visitor, host)) {
+            if (c.body != null && c.body.equalsIgnoreCase(bodyName)) {
+                return c.angle;
+            }
+        }
+        return null;
+    }
+
     private String generateSynastryCrossHtml() {
         if (this.sw == null || this.baseSd == null || this.transitSd == null) {
             return "";
@@ -3947,7 +3995,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                     GlyphSize glyphSize2 = SkymapPanel.transitSize(n7);
                     graphics2D.setFont(glyphSize2.font);
-                    object = SkymapPanel.lighten(SkymapPanel.this.getElementColor(BODY_ELEMENTS[n7]), 0.45);
+                    object = SkymapPanel.lighten(SkymapPanel.this.getElementColor(BODY_ELEMENTS[n7], false), 0.45);
                     this.drawMetallicCube(graphics2D, n4, n27, glyphSize2.radius, new Color(62, 66, 76));
                     if (n7 == MOON && SkymapPanel.this.tValid[SUN]) {
                         double d13 = (SkymapPanel.this.tLon[MOON] - SkymapPanel.this.tLon[SUN]) % 360.0;
@@ -3980,7 +4028,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                     GlyphSize glyphSize3 = SkymapPanel.transitSize(n7);
                     graphics2D.setFont(glyphSize3.font);
-                    Color cColor = SkymapPanel.lighten(SkymapPanel.this.getElementColor(BODY_ELEMENTS[n7]), 0.6);
+                    Color cColor = SkymapPanel.lighten(SkymapPanel.this.getElementColor(BODY_ELEMENTS[n7], false), 0.6);
                     this.drawMetallicCube(graphics2D, n4, n28, glyphSize3.radius, new Color(20, 50, 80));
                     if (n7 == MOON && SkymapPanel.this.cValid[SUN]) {
                         double d15 = (SkymapPanel.this.cLon[MOON] - SkymapPanel.this.cLon[SUN]) % 360.0;

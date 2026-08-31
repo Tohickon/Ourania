@@ -102,6 +102,8 @@ public class InterpretationService {
         "composite_signs.json",
         "composite_placements_b.json",
         "composite_minor_aspects.json",
+        "synastry_overlays.json",
+        "synastry_angle_contacts.json",
         "composite_angles.json",
         "composite_sabian.json",
         "composite_transits_ptolemaic_t.json",
@@ -288,6 +290,9 @@ public class InterpretationService {
     private final Map<String, String> compositeAngles = new HashMap<>();
     private final Map<String, String> compositeSabian = new HashMap<>();
     private final Map<String, String> compositeTransits = new HashMap<>();
+    /** Their body in your house, and their body on your angle. Added 2026-08-31. */
+    private final Map<String, String> overlayPlanetHouses = new HashMap<>();
+    private final Map<String, String> overlayPlanetAngles = new HashMap<>();
 
     /**
      * What an aspect means when both ends belong to the relationship rather than to a person.
@@ -347,6 +352,8 @@ public class InterpretationService {
         if (line.startsWith("\"composite_body\""))  return compositeBodies;
         if (line.startsWith("\"composite_house\"")) return compositeHouses;
         if (line.startsWith("\"overlay_house\""))   return overlayHouses;
+        if (line.startsWith("\"overlay_planet_house\"")) return overlayPlanetHouses;
+        if (line.startsWith("\"overlay_planet_angle\"")) return overlayPlanetAngles;
         if (line.startsWith("\"angle_contact\""))   return angleContacts;
         if (line.startsWith("\"synastry_interaspect\"")) return synastryInteraspects;
         if (line.startsWith("\"composite_planet_house\"")) return compositePlanetHouses;
@@ -649,6 +656,29 @@ public class InterpretationService {
     }
 
     /** One person&#39;s bodies landing in another&#39;s house. 1..12, else null. */
+    /**
+     * Their body in your house, or null.
+     *
+     * <b>Specific where {@link #getOverlayHouse} is generic.</b> That one returns the same
+     * paragraph for every body landing in a house - their Mars and their Neptune in your
+     * seventh read identically. This is the per-body entry; callers should try it first and
+     * fall back to the generic one, the same shape as composite placements.
+     */
+    public String getOverlayPlanetHouse(String bodyName, int house) {
+        if (bodyName == null || house < 1 || house > 12) {
+            return null;
+        }
+        return overlayPlanetHouses.get(bodyKey(bodyName) + "_" + house);
+    }
+
+    /** Their body on your angle, or null. Keys are {body}_{angle}, both lowercase. */
+    public String getOverlayPlanetAngle(String bodyName, String angle) {
+        if (bodyName == null || angle == null) {
+            return null;
+        }
+        return overlayPlanetAngles.get(bodyKey(bodyName) + "_" + bodyKey(angle));
+    }
+
     public String getOverlayHouse(int house) {
         return house < 1 || house > 12 ? null : overlayHouses.get(String.valueOf(house));
     }

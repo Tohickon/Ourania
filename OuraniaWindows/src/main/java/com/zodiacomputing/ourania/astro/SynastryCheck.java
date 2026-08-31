@@ -77,6 +77,11 @@ public final class SynastryCheck {
         relationshipProse();
         report("Part G", before);
 
+        System.out.println("=== Part H: The 0/360 seam ===");
+        before = failures.size();
+        seam();
+        report("Part H", before);
+
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
@@ -979,6 +984,65 @@ public final class SynastryCheck {
             svc.getCompositeAspect("Vesta", "Sun", "Trine") == null);
         ok("an unknown composite aspect gives null",
             svc.getCompositeAspectFrame("Novile") == null);
+        // ---- the body click reads person B as a person (2026-08-31) ----
+        //
+        // <b>This suite ran 41,196 checks and none of them covered what a click produces.</b>
+        // handleChartClick prefixes every outer-ring body with "transit_" whatever the mode,
+        // and in SYNASTRY that ring is the second PERSON - so their Venus was read as a
+        // transit: "Transiting Venus", transit-in-sign and transit-in-house prose, aspect rows
+        // headed "to Natal Sun". The aspect GRID knew the difference and routed to
+        // getSynastryInteraspect; the body click never did.
+        //
+        // The datasets that make the correct reading possible are asserted here, exhaustively,
+        // because a missing overlay key is invisible at runtime - the getter returns null, the
+        // panel falls back to the generic house paragraph, and the reading is merely blander.
+        int overlayMissing = 0;
+        for (int i = 0; i < Bodies.count(); i++) {
+            String body = Bodies.at(i).id;
+            for (int h = 1; h <= 12; h++) {
+                String prose = svc.getOverlayPlanetHouse(body, h);
+                ok("overlay prose for " + body + " in house " + h, prose != null);
+                if (prose == null) {
+                    overlayMissing++;
+                } else {
+                    ok("overlay " + body + "_" + h + " opens with a bold lead",
+                        prose.startsWith("<b>") && prose.contains("</b>"));
+                    ok("overlay " + body + "_" + h + " is HTML, not markdown",
+                        !prose.contains("**"));
+                }
+            }
+        }
+        int angleMissing = 0;
+        for (int i = 0; i < Bodies.count(); i++) {
+            String body = Bodies.at(i).id;
+            for (String ang : Synastry.ANGLES) {
+                String prose = svc.getOverlayPlanetAngle(body, ang);
+                ok("angle contact prose for " + body + " on " + ang, prose != null);
+                if (prose == null) {
+                    angleMissing++;
+                } else {
+                    ok("angle contact " + body + "_" + ang + " is HTML, not markdown",
+                        !prose.contains("**"));
+                }
+            }
+        }
+        System.out.printf("  overlays missing %d, angle contacts missing %d%n",
+            overlayMissing, angleMissing);
+
+        // The specific reading must differ from the generic one, or the new dataset is
+        // loading and changing nothing - which a null check alone would not catch.
+        // <b>Null-safe on purpose.</b> Written first as a bare .equals() on the getter, which
+        // throws when the entry is absent - so the mutation that made the getter return null
+        // crashed this suite instead of failing it, and a crash reports nothing useful about
+        // which assertion caught it. A check has to survive the defect it is testing for.
+        String mars7 = svc.getOverlayPlanetHouse("mars", 7);
+        String nep7 = svc.getOverlayPlanetHouse("neptune", 7);
+        String generic7 = svc.getOverlayHouse(7);
+        ok("a per-body overlay differs from the generic house paragraph",
+            mars7 != null && generic7 != null && !mars7.equals(generic7));
+        ok("two different bodies in the same house read differently",
+            mars7 != null && nep7 != null && !mars7.equals(nep7));
+
         ok("composite frames are case-insensitive",
             svc.getCompositeAspectFrame("SQUARE") != null);
 
@@ -1032,6 +1096,124 @@ public final class SynastryCheck {
             + (Bodies.count() - missing) + " of " + Bodies.count());
         System.out.println("  interaspect squares covered: " + covered
             + " ordered body pairs, " + asymmetric + " order-dependent");
+    }
+
+    // ------------------------------------------------------------------ Part H
+
+    /**
+     * The place where the zodiac joins itself.
+     *
+     * <b>Longitude is a circle stored as a number.</b> 359.5 and 1.0 are half a degree
+     * apart in the sky and 358.5 apart in arithmetic, so every angular measurement in
+     * this program has to fold the difference back onto the circle. {@link
+     * Aspects#separation} does that, and it is the single implementation - Part A leans
+     * on it, Part F leans on it, the grid and the wheel and the hit test all lean on it.
+     *
+     * <b>A second implementation was proposed on 2026-08-31</b> as a standalone test
+     * class, along with the reasonable worry that a body at 29 Pisces and an angle at 1
+     * Aries would be missed. The worry was worth having; the answer is that the seam
+     * already holds. What was missing was not the code but the proof, and a proof kept in
+     * a class outside the sweep would never have run. So it lives here.
+     *
+     * <b>Two things are asserted, and they are different things.</b> The first is that
+     * the arithmetic is right, checked against a trigonometric oracle that shares no code
+     * with it - {@code atan2(sin d, cos d)} folds the circle by a completely different
+     * route, so the two agreeing is evidence rather than a tautology. The second, and the
+     * one that would actually have caught a bug users could see, is that the <i>verdict</i>
+     * does not change across the seam: the same separation must produce the same aspect
+     * type whether it sits in the middle of the circle or straddles zero. That is the
+     * property the panel depends on, and it is not implied by the arithmetic alone -
+     * anything downstream that re-derived the difference itself would break it while
+     * {@code separation} stayed correct.
+     */
+    private static void seam() {
+        // The cases named in the 2026-08-31 proposal, kept verbatim so the record of what
+        // was doubted survives alongside the answer.
+        near("29 Aries to 1 Taurus is 2 degrees", 2.0, Aspects.separation(29.0, 31.0), 1e-12);
+        near("29.5 Pisces to 1 Aries is 1.5 degrees", 1.5, Aspects.separation(359.5, 1.0), 1e-12);
+        near("the same pair read backwards", 1.5, Aspects.separation(1.0, 359.5), 1e-12);
+        near("a fifth of a degree across zero", 0.2, Aspects.separation(0.1, 359.9), 1e-12);
+        near("a body against itself is zero", 0.0, Aspects.separation(12.3, 12.3), 1e-12);
+        near("half the circle is 180", 180.0, Aspects.separation(0.0, 180.0), 1e-12);
+
+        // Sweep the whole circle rather than the handful of places a hand-written case
+        // would land on. The offsets bracket the seam, the two right angles and both sides
+        // of the fold, because 180 is the other point where a folding bug hides.
+        //
+        // <b>179.5, 179.9, 180.1 and 180.5 are here because they were missing.</b> The
+        // first draft of this sweep jumped from 179.0 straight to 180.0, and a mutant
+        // that folded at 179 instead of 180 walked through Part H untouched - it was
+        // caught two sections away, by luck rather than by design. A band a degree wide
+        // is still a band, and this is the section that claims to own it.
+        double[] offsets = {0.5, 2.0, 5.0, 89.5, 90.0, 179.0, 179.5, 179.9, 180.0,
+                            180.1, 180.5, 181.0, 270.0, 359.5};
+        for (int x = 0; x < 360; x++) {
+            for (double off : offsets) {
+                double a = x;
+                double b = (x + off) % 360.0;
+                double sep = Aspects.separation(a, b);
+
+                // Independent oracle: same question, no shared arithmetic.
+                double d = Math.toRadians(a - b);
+                double oracle = Math.toDegrees(Math.abs(Math.atan2(Math.sin(d), Math.cos(d))));
+                near("separation matches the trigonometric oracle at " + x + "+" + off,
+                    oracle, sep, 1e-8);
+
+                near("separation is symmetric at " + x + "+" + off,
+                    sep, Aspects.separation(b, a), 1e-12);
+
+                checks++;
+                if (sep < 0.0 || sep > 180.0) {
+                    failures.add("separation left the circle at " + x + "+" + off + ": " + sep);
+                }
+            }
+        }
+
+        // <b>The verdict must not move.</b> Same gap, once in open zodiac and once
+        // straddling zero; the aspect engine has to call them the same thing. This is the
+        // assertion that stands between a user and an angle contact that silently vanishes
+        // because their partner's Venus sits at 29 Pisces.
+        String[] bodies = {"Sun", "Moon", "Venus", "Mars", "Saturn"};
+        String[] angles = {"Ascendant", "Descendant", "MC", "IC"};
+        double[] gaps = {0.0, 0.1, 1.0, 2.0, 3.5, 5.0, 7.5, 12.0, 60.0, 90.0, 120.0, 180.0};
+        for (String body : bodies) {
+            for (String angle : angles) {
+                for (double gap : gaps) {
+                    // Middle of the circle, nowhere near the join.
+                    Aspects.Type open = Aspects.typeOf(
+                        Aspects.separation(100.0, 100.0 + gap), body, angle, true);
+                    // The same gap laid across zero.
+                    Aspects.Type across = Aspects.typeOf(
+                        Aspects.separation(359.95, (359.95 + gap) % 360.0), body, angle, true);
+                    eq("the seam does not change the verdict for " + body + "/" + angle
+                        + " at " + gap + " degrees", open, across);
+
+                    // And it does not change when the pair is read the other way round
+                    // either, which is the order the two charts arrive in for the second
+                    // person rather than the first.
+                    Aspects.Type reversed = Aspects.typeOf(
+                        Aspects.separation((359.95 + gap) % 360.0, 359.95), body, angle, true);
+                    eq("argument order does not change the verdict for " + body + "/" + angle
+                        + " at " + gap + " degrees", across, reversed);
+                }
+
+                // The halved synastry orb is Part B's contract; here it is only used to
+                // place a probe safely inside and safely outside, so this stays a statement
+                // about the seam rather than a second copy of the orb rule.
+                double orb = Aspects.orbFor(body, angle, true);
+                eq("well inside the orb is a conjunction across the seam for "
+                    + body + "/" + angle,
+                    Aspects.Type.CONJUNCTION,
+                    Aspects.typeOf(Aspects.separation(359.9, (359.9 + orb * 0.5) % 360.0),
+                        body, angle, true));
+                checks++;
+                if (Aspects.typeOf(Aspects.separation(359.9, (359.9 + orb + 5.0) % 360.0),
+                        body, angle, true) == Aspects.Type.CONJUNCTION) {
+                    failures.add("a conjunction was found " + (orb + 5.0)
+                        + " degrees out across the seam for " + body + "/" + angle);
+                }
+            }
+        }
     }
 
     private static void ok(String label, boolean condition) {
