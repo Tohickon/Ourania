@@ -286,19 +286,36 @@ public final class Prose {
                 i++;
                 continue;
             }
-            // <b>No whitespace between the word and </a>.</b> Swing's HTML renderer treats a
-            // trailing space inside an anchor as part of the link box, which pushed the
-            // following comma away from the word and produced "Mercury , Virgo". The anchor
-            // now wraps exactly the matched characters and nothing else.
+            // <b>Trailing punctuation goes INSIDE the anchor.</b> Swing's HTMLEditorKit gives
+            // an inline anchor its own margin, so a link followed by a comma renders as
+            // "Mercury , Virgo" however tight the markup is. Two earlier attempts missed:
+            // closing the tag hard against the comma changed nothing, because the generated
+            // HTML was already tight; and a CSS margin/padding reset on `a` does not override
+            // the kit. Swallowing the punctuation moves the renderer's space to AFTER the
+            // comma, which is where a space belongs, so the artefact becomes correct spacing.
+            //
+            // Only closing punctuation, and only one character - enough for the comma and
+            // full stop that actually follow a body name in this prose, without absorbing a
+            // whole clause into a link the reader would then be able to click.
+            int wordEnd = i + hit.word.length();
+            int linkEnd = wordEnd;
+            if (linkEnd < text.length() && isTrailingPunctuation(text.charAt(linkEnd))) {
+                linkEnd++;
+            }
             seen.add(hit.word);
             sb.append("<a href='").append(hit.href)
               .append("' style='color:").append(hit.hex)
               .append("; text-decoration:none;'>")
-              .append(text, i, i + hit.word.length())
+              .append(text, i, linkEnd)
               .append("</a>");
-            i += hit.word.length();
+            i = linkEnd;
         }
         return sb.toString();
+    }
+
+    /** Punctuation that may be pulled inside a link to defeat the renderer's margin. */
+    private static boolean isTrailingPunctuation(char c) {
+        return c == ',' || c == '.' || c == ';' || c == ':' || c == '!' || c == '?';
     }
 
     /** A match must not sit inside a longer word: "Mars" yes, "Marshal" no. */
