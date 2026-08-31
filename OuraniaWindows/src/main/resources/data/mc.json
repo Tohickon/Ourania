@@ -1,0 +1,392 @@
+{
+  "mc_aries": {
+    "title": "MC in Aries",
+    "summary": "Your career is driven by a profound need for independence, pioneering action, and leadership.",
+    "fullText": "You project a courageous, assertive, and highly dynamic persona into the public sphere, often thriving in competitive environments. To achieve your highest ambitions, you must learn to balance your impulsive drive with strategic patience and self-discipline."
+  },
+  "mc_taurus": {
+    "title": "MC in Taurus",
+    "summary": "Your professional path is built upon a desire for stability, financial security, and tangible, enduring results.",
+    "fullText": "You cultivate a public reputation of reliability and patience, often excelling in finance, aesthetics, or nature-based careers. Success comes to you through slow, methodical effort, and your ultimate goal is to create a legacy of lasting material worth."
+  },
+  "mc_gemini": {
+    "title": "MC in Gemini",
+    "summary": "Communication, intellectual versatility, and networking are the cornerstones of your professional reputation and public life.",
+    "fullText": "You are recognized as an adaptable thinker, often pursuing multiple career paths simultaneously or excelling in writing, teaching, and media. To reach your highest potential, you must cultivate focus and prevent your scattered interests from diluting your public authority."
+  },
+  "mc_cancer": {
+    "title": "MC in Cancer",
+    "summary": "Your career is deeply intertwined with your emotional intuition and a psychological need to nurture or protect the public.",
+    "fullText": "You project a highly relatable, empathetic persona, naturally gravitating toward real estate, caretaking, psychology, or culinary arts. Your ultimate professional legacy is built upon providing security for others, though you must guard against taking professional criticisms too personally."
+  },
+  "mc_leo": {
+    "title": "MC in Leo",
+    "summary": "You are driven by a powerful ambition to shine, entertain, and be recognized as a charismatic leader in your chosen field.",
+    "fullText": "Your public image is dramatic, authoritative, and warm, naturally drawing the spotlight and the respect of your peers. True professional success requires you to balance your need for applause with genuine generosity and a willingness to uplift those around you."
+  },
+  "mc_virgo": {
+    "title": "MC in Virgo",
+    "summary": "Your professional reputation is defined by your meticulous attention to detail, analytical prowess, and a profound dedication to service.",
+    "fullText": "You are publicly recognized as highly reliable and hardworking, frequently excelling in administration, health, editing, or technical fields. To maximize your career potential, you must overcome the tendency toward perfectionism and learn to delegate without micromanaging."
+  },
+  "mc_libra": {
+    "title": "MC in Libra",
+    "summary": "Diplomacy, aesthetics, and the pursuit of fairness are the central themes of your public life and career trajectory.",
+    "fullText": "You project a charming, cooperative persona, making you a natural fit for law, public relations, design, or consulting. Your professional success relies heavily on your ability to form equitable partnerships while avoiding the trap of people-pleasing."
+  },
+  "mc_scorpio": {
+    "title": "MC in Scorpio",
+    "summary": "Your career is characterized by themes of profound transformation, investigation, and the mastery of complex or hidden resources.",
+    "fullText": "You command an intense, magnetic, and often formidable public reputation, excelling in research, psychology, finance, or crisis management. To achieve lasting authority, you must learn to navigate power dynamics ethically and release your fear of losing control."
+  },
+  "mc_sagittarius": {
+    "title": "MC in Sagittarius",
+    "summary": "You are recognized publicly as a visionary, philosopher, or explorer who seeks to expand the horizons of the collective.",
+    "fullText": "Your professional path thrives on freedom and meaning, naturally aligning with higher education, international travel, publishing, or spiritual leadership. Success comes when you ground your lofty ideals into practical applications rather than constantly chasing the next great adventure."
+  },
+  "mc_capricorn": {
+    "title": "MC in Capricorn",
+    "summary": "This is the natural home of the Medium Coeli, indicating a public life defined by supreme ambition, structure, and discipline.",
+    "fullText": "You are widely respected for your executive capabilities, patience, and unyielding drive to reach the pinnacle of professional authority. Your ultimate challenge is to build a lasting, tangible legacy without letting your career completely consume your personal life."
+  },
+  "mc_aquarius": {
+    "title": "MC in Aquarius",
+    "summary": "Your public reputation is built upon your progressive ideals, technological innovation, and a rebellious desire to reform society.",
+    "fullText": "You project an eccentric, highly objective persona, often finding success in the sciences, astrology, humanitarian work, or large organizations. To truly succeed, you must learn to integrate your radical visions with collaborative group efforts without alienating your colleagues."
+  },
+  "mc_pisces": {
+    "title": "MC in Pisces",
+    "summary": "Your career path is guided by deep intuition, universal compassion, and a profound connection to the spiritual or artistic realms.",
+    "fullText": "You possess a glamorous, elusive public image, naturally excelling in healing, film, music, or institutional work behind the scenes. You must establish firm professional boundaries to avoid disillusionment and prevent others from taking advantage of your empathetic nature."
+  },
+  "sun_conjunct_mc": {
+    "title": "MC Conjunction Sun",
+    "summary": "Your core identity and professional ambitions are completely intertwined, driving you to shine in the public eye.",
+    "fullText": "You naturally assume positions of leadership and authority, building a legacy that perfectly reflects your authentic self."
+  },
+  "moon_conjunct_mc": {
+    "title": "MC Conjunction Moon",
+    "summary": "Your career is deeply driven by your emotions, intuition, and an innate need to nurture the public.",
+    "fullText": "You have a highly visible, fluctuating public image that makes you easily relatable and endearing to the masses."
+  },
+  "mercury_conjunct_mc": {
+    "title": "MC Conjunction Mercury",
+    "summary": "Your career is built entirely upon your intellect, communication skills, and adaptability.",
+    "fullText": "You are publicly recognized as a thinker, writer, speaker, or analytical problem-solver who excels in sharing information."
+  },
+  "venus_conjunct_mc": {
+    "title": "MC Conjunction Venus",
+    "summary": "You project immense charm, beauty, and diplomacy into your public life, making you highly favored by colleagues and authority figures.",
+    "fullText": "Your career likely involves the arts, public relations, design, or the beauty industry, where aesthetics and relationships are paramount."
+  },
+  "mars_conjunct_mc": {
+    "title": "MC Conjunction Mars",
+    "summary": "You are fiercely ambitious, competitive, and driven to conquer your professional goals at all costs.",
+    "fullText": "You are recognized publicly as a pioneer, an initiator, and sometimes a combative or highly assertive executive leader."
+  },
+  "jupiter_conjunct_mc": {
+    "title": "MC Conjunction Jupiter",
+    "summary": "Your career is marked by massive expansion, luck, and a larger-than-life public presence.",
+    "fullText": "You are seen as a visionary, often finding immense success in education, travel, law, publishing, or spiritual leadership."
+  },
+  "saturn_conjunct_mc": {
+    "title": "MC Conjunction Saturn",
+    "summary": "Your public reputation is defined by supreme discipline, responsibility, and unwavering authority.",
+    "fullText": "You may experience delays in achieving your ultimate goals, but your hard-won success is built to last a lifetime."
+  },
+  "uranus_conjunct_mc": {
+    "title": "MC Conjunction Uranus",
+    "summary": "Your career path is highly unconventional, marked by sudden changes and a brilliant, rebellious public image.",
+    "fullText": "You are known as an innovator, a disruptor, or a genius in technology, science, or social reform."
+  },
+  "neptune_conjunct_mc": {
+    "title": "MC Conjunction Neptune",
+    "summary": "Your public image is glamorous, elusive, and deeply compassionate, often drawing you to the arts, healing, or spiritual leadership.",
+    "fullText": "You may struggle with concrete career direction, as your ultimate goal is to transcend mundane ambition and serve a higher calling."
+  },
+  "pluto_conjunct_mc": {
+    "title": "MC Conjunction Pluto",
+    "summary": "Your career is characterized by immense power, profound transformations, and a highly magnetic, intimidating public image.",
+    "fullText": "You are driven to uncover truths and wield influence, often excelling in research, politics, psychology, or crisis management."
+  },
+  "chiron_conjunct_mc": {
+    "title": "MC Conjunction Chiron",
+    "summary": "Your public reputation is intimately tied to your deepest wounds and your journey to heal them.",
+    "fullText": "You are often seen as a mentor or a \"wounded healer\" in your profession, helping others through the very traumas you have endured."
+  },
+  "sun_sextile_mc": {
+    "title": "MC Sextile Sun",
+    "summary": "Your natural vitality and self-expression easily support your career advancement and public recognition.",
+    "fullText": "Authority figures tend to look favorably upon you, facilitating a smooth and confident path to achieving your worldly goals."
+  },
+  "sun_square_mc": {
+    "title": "MC Square Sun",
+    "summary": "There is a constant tension between your authentic sense of self and the demands of your public reputation.",
+    "fullText": "You must work hard to prove yourself, often clashing with authority figures before finding your own confident executive voice."
+  },
+  "sun_trine_mc": {
+    "title": "MC Trine Sun",
+    "summary": "Success flows to you naturally as your personality perfectly aligns with your professional path.",
+    "fullText": "You easily project confidence and competence, earning the respect and support of the public without compromising who you are."
+  },
+  "sun_opposite_mc": {
+    "title": "MC Opposition Sun",
+    "summary": "Your deep need for private, domestic security often competes with your worldly career ambitions.",
+    "fullText": "You shine brightest when you have a solid home foundation, frequently prioritizing family life over public accolades."
+  },
+  "sun_quincunx_mc": {
+    "title": "MC Quincunx Sun",
+    "summary": "You frequently feel forced to adjust your core identity to fit your professional roles and public expectations.",
+    "fullText": "Finding a balance between who you are and what the public demands requires continuous refinement and compromise."
+  },
+  "moon_sextile_mc": {
+    "title": "MC Sextile Moon",
+    "summary": "Your emotional intelligence serves as a powerful, stabilizing asset in your professional life.",
+    "fullText": "You easily build supportive networks and intuitively understand what the public or your clients need from you."
+  },
+  "moon_square_mc": {
+    "title": "MC Square Moon",
+    "summary": "There is a persistent conflict between your private emotional needs and your demanding professional responsibilities.",
+    "fullText": "Navigating work-life balance is a major life theme, as career pressures frequently disrupt your domestic peace."
+  },
+  "moon_trine_mc": {
+    "title": "MC Trine Moon",
+    "summary": "Your public life and inner emotional world are in harmonious, supportive alignment.",
+    "fullText": "Your career provides emotional fulfillment, and you project a comforting, trustworthy image to the world."
+  },
+  "moon_opposite_mc": {
+    "title": "MC Opposition Moon",
+    "summary": "Your emotional energy is primarily directed toward your home, family, and inner sanctuary.",
+    "fullText": "While capable in your career, your true legacy is built upon the private, emotional foundations you create away from the spotlight."
+  },
+  "moon_quincunx_mc": {
+    "title": "MC Quincunx Moon",
+    "summary": "You often feel an awkward disconnect between your instinctual emotional reactions and your professional facade.",
+    "fullText": "Navigating career expectations requires you to compartmentalize your feelings, which can lead to subtle internal stress."
+  },
+  "mercury_sextile_mc": {
+    "title": "MC Sextile Mercury",
+    "summary": "You effortlessly use networking, logic, and clear communication to advance your professional goals.",
+    "fullText": "Opportunities for career growth frequently arrive through writing, teaching, commerce, or short-distance travel."
+  },
+  "mercury_square_mc": {
+    "title": "MC Square Mercury",
+    "summary": "Your ideas and speech may sometimes clash with your professional reputation or the expectations of authority figures.",
+    "fullText": "You must learn to carefully manage your public communications to avoid controversies or misunderstandings in your career."
+  },
+  "mercury_trine_mc": {
+    "title": "MC Trine Mercury",
+    "summary": "Your articulate nature and quick wit are major assets to your public standing and professional success.",
+    "fullText": "You effortlessly convey your ideas to large audiences, making you an excellent spokesperson, negotiator, or educator."
+  },
+  "mercury_opposite_mc": {
+    "title": "MC Opposition Mercury",
+    "summary": "Your mind is highly active in the private sphere, often leading to a career that involves working from home or delving into historical research.",
+    "fullText": "Your intellectual foundation is rooted deeply in your family or psychological origins."
+  },
+  "mercury_quincunx_mc": {
+    "title": "MC Quincunx Mercury",
+    "summary": "The way you communicate often requires adjustment to properly align with your professional goals.",
+    "fullText": "You may struggle to find the right words in public settings, requiring you to carefully refine your messaging and public relations."
+  },
+  "venus_sextile_mc": {
+    "title": "MC Sextile Venus",
+    "summary": "Your sociability and grace effortlessly attract lucrative professional opportunities and supportive mentors.",
+    "fullText": "You use diplomacy to build a strong, pleasant professional network, ensuring a harmonious trajectory to success."
+  },
+  "venus_square_mc": {
+    "title": "MC Square Venus",
+    "summary": "You may struggle with balancing your desire for pleasure and relationships with the hard work required for professional success.",
+    "fullText": "A tendency to coast on your charm must be overcome by developing true discipline and resilience in your career."
+  },
+  "venus_trine_mc": {
+    "title": "MC Trine Venus",
+    "summary": "Your public image is highly attractive and magnetic, effortlessly drawing success and financial reward toward you.",
+    "fullText": "You naturally harmonize your professional environment, bringing a sense of aesthetic and relational balance to your work."
+  },
+  "venus_opposite_mc": {
+    "title": "MC Opposition Venus",
+    "summary": "Your deepest affections, values, and aesthetic desires are centered around your home and family life.",
+    "fullText": "While you bring a peaceful energy to your private world, you may shy away from the competitive spotlight in your career."
+  },
+  "venus_quincunx_mc": {
+    "title": "MC Quincunx Venus",
+    "summary": "You frequently feel an awkward tension between your relational values and your demanding career requirements.",
+    "fullText": "You must constantly adjust your aesthetic or diplomatic approaches to suit an ever-changing professional environment."
+  },
+  "mars_sextile_mc": {
+    "title": "MC Sextile Mars",
+    "summary": "You naturally channel your high energy and courage into highly productive career advancement.",
+    "fullText": "You seize professional opportunities with healthy confidence, an entrepreneurial spirit, and an eagerness to take the initiative."
+  },
+  "mars_square_mc": {
+    "title": "MC Square Mars",
+    "summary": "Your ambition is intense, but you may frequently clash with authority figures or experience public conflicts.",
+    "fullText": "You must learn to channel your aggressive drive constructively to avoid sabotaging your own professional reputation."
+  },
+  "mars_trine_mc": {
+    "title": "MC Trine Mars",
+    "summary": "Your passion and drive flow smoothly into your career, allowing you to achieve remarkable goals without unnecessary friction.",
+    "fullText": "You are widely respected for your decisive action, strong work ethic, and ability to lead by example."
+  },
+  "mars_opposite_mc": {
+    "title": "MC Opposition Mars",
+    "summary": "Much of your dynamic energy is focused on your home, family, or psychological roots rather than worldly ambition.",
+    "fullText": "You may experience internal or domestic conflicts that occasionally distract from your public career goals."
+  },
+  "mars_quincunx_mc": {
+    "title": "MC Quincunx Mars",
+    "summary": "Your impulsive desires and anger often seem out of step with your long-term career strategies.",
+    "fullText": "You must learn to adjust your physical energy to avoid sudden disruptions or hasty mistakes in your public life."
+  },
+  "jupiter_sextile_mc": {
+    "title": "MC Sextile Jupiter",
+    "summary": "You attract professional mentors and opportunities for growth with remarkable ease and serendipity.",
+    "fullText": "Your optimism and generous nature make you a highly favored candidate for advancement in almost any field."
+  },
+  "jupiter_square_mc": {
+    "title": "MC Square Jupiter",
+    "summary": "Your immense ambition can sometimes lead to overextending yourself or making arrogant, risky career moves.",
+    "fullText": "You must temper your desire for rapid professional expansion with realistic planning, humility, and attention to detail."
+  },
+  "jupiter_trine_mc": {
+    "title": "MC Trine Jupiter",
+    "summary": "Professional success and public recognition seem to flow to you effortlessly throughout your life.",
+    "fullText": "You are viewed as wise, benevolent, and highly capable, naturally attracting wealth and high status positions."
+  },
+  "jupiter_opposite_mc": {
+    "title": "MC Opposition Jupiter",
+    "summary": "Your greatest source of joy, wealth, and philosophical expansion is found in your private life and family heritage.",
+    "fullText": "You have a rich inner world and may build a highly prosperous foundation working from within your home."
+  },
+  "jupiter_quincunx_mc": {
+    "title": "MC Quincunx Jupiter",
+    "summary": "You may struggle to integrate your grand philosophical visions with the practical realities of your career.",
+    "fullText": "Constant adjustments are required to ensure your profound optimism doesn't lead to professional miscalculations."
+  },
+  "saturn_sextile_mc": {
+    "title": "MC Sextile Saturn",
+    "summary": "Your patient, methodical approach to your career guarantees steady and secure advancement over time.",
+    "fullText": "You easily earn the respect of elders and authority figures through your proven reliability and strong work ethic."
+  },
+  "saturn_square_mc": {
+    "title": "MC Square Saturn",
+    "summary": "You face significant obstacles, delays, and heavy burdens on your path to professional success.",
+    "fullText": "Overcoming a deep fear of failure and clashes with rigid authorities is essential to building your ultimate legacy."
+  },
+  "saturn_trine_mc": {
+    "title": "MC Trine Saturn",
+    "summary": "You possess incredible organizational skills and an effortless ability to shoulder heavy professional responsibilities.",
+    "fullText": "Your path to executive leadership is smooth, supported by your natural respect for structure and tradition."
+  },
+  "saturn_opposite_mc": {
+    "title": "MC Opposition Saturn",
+    "summary": "You carry a heavy sense of duty and karmic responsibility toward your family and your roots.",
+    "fullText": "While this creates a very structured inner life, it can sometimes feel like an anchor holding back your public ambitions."
+  },
+  "saturn_quincunx_mc": {
+    "title": "MC Quincunx Saturn",
+    "summary": "You frequently feel an irritating friction between your professional responsibilities and your underlying insecurities.",
+    "fullText": "You must constantly adjust your work habits to meet the incredibly demanding standards of your career path."
+  },
+  "uranus_sextile_mc": {
+    "title": "MC Sextile Uranus",
+    "summary": "You easily integrate innovative ideas and progressive networking into your professional life.",
+    "fullText": "Your unique approach to your career brings you exciting, sudden opportunities for advancement and public recognition."
+  },
+  "uranus_square_mc": {
+    "title": "MC Square Uranus",
+    "summary": "Your deep need for freedom and rebellion frequently clashes with professional structures and traditional authority figures.",
+    "fullText": "You may experience sudden career changes or scandals if you cannot find a constructive outlet for your eccentricity."
+  },
+  "uranus_trine_mc": {
+    "title": "MC Trine Uranus",
+    "summary": "Your originality and futuristic vision are highly rewarded in your public life and career.",
+    "fullText": "You effortlessly break new ground in your field, gaining recognition for your unique and progressive contributions to society."
+  },
+  "uranus_opposite_mc": {
+    "title": "MC Opposition Uranus",
+    "summary": "Your private life and family background are marked by instability, unusual circumstances, or sudden changes.",
+    "fullText": "This erratic domestic foundation heavily influences your drive to find ultimate freedom away from the public eye."
+  },
+  "uranus_quincunx_mc": {
+    "title": "MC Quincunx Uranus",
+    "summary": "You often feel that your need to be entirely unique is at odds with what the professional world demands.",
+    "fullText": "Finding a way to introduce your radical ideas without alienating your colleagues requires careful, conscious adaptation."
+  },
+  "neptune_sextile_mc": {
+    "title": "MC Sextile Neptune",
+    "summary": "You successfully weave your intuition, creativity, and profound empathy into your professional life.",
+    "fullText": "Your gentle approach to your career allows you to subtly influence the public and inspire those around you."
+  },
+  "neptune_square_mc": {
+    "title": "MC Square Neptune",
+    "summary": "You may suffer from confusion, disillusionment, or deception regarding your career path and public reputation.",
+    "fullText": "It is vital to maintain strict professional boundaries and avoid unrealistic career fantasies or public scandals."
+  },
+  "neptune_trine_mc": {
+    "title": "MC Trine Neptune",
+    "summary": "Your profound creative and spiritual gifts flow effortlessly into your public achievements and worldly ambitions.",
+    "fullText": "You easily captivate the collective imagination, finding success in film, music, photography, or humanitarian work."
+  },
+  "neptune_opposite_mc": {
+    "title": "MC Opposition Neptune",
+    "summary": "Your home environment is highly sensitive, spiritual, or possibly chaotic and boundaryless.",
+    "fullText": "Your deep psychological roots are tied to a sense of sacrifice or mysticism that profoundly shapes your inner world."
+  },
+  "neptune_quincunx_mc": {
+    "title": "MC Quincunx Neptune",
+    "summary": "You often struggle to reconcile your spiritual or artistic ideals with the harsh, practical realities of the working world.",
+    "fullText": "You must constantly adjust your expectations to avoid feeling disillusioned or drained by your professional life."
+  },
+  "pluto_sextile_mc": {
+    "title": "MC Sextile Pluto",
+    "summary": "You strategically and quietly use your personal power to advance your professional goals.",
+    "fullText": "You have a profound ability to network with influential people and orchestrate successful career transformations behind the scenes."
+  },
+  "pluto_square_mc": {
+    "title": "MC Square Pluto",
+    "summary": "Your ambition can become an obsession, leading to intense power struggles and conflicts with authority figures.",
+    "fullText": "You must learn to release control and avoid ruthless tactics, lest your career undergo destructive public crises."
+  },
+  "pluto_trine_mc": {
+    "title": "MC Trine Pluto",
+    "summary": "You possess a natural, effortless ability to command authority and completely transform your professional sphere.",
+    "fullText": "Your public reputation is one of absolute resilience, allowing you to rise powerfully from any setback."
+  },
+  "pluto_opposite_mc": {
+    "title": "MC Opposition Pluto",
+    "summary": "Your deepest psychological foundations and family roots are marked by intensity, secrets, or intergenerational trauma.",
+    "fullText": "Your true power lies in exploring and healing your own subconscious before stepping fully into the public eye."
+  },
+  "pluto_quincunx_mc": {
+    "title": "MC Quincunx Pluto",
+    "summary": "You frequently experience uncomfortable power dynamics or hidden subversions in your professional life.",
+    "fullText": "You must constantly adjust your level of control and learn to trust the natural, unforced evolution of your career."
+  },
+  "chiron_sextile_mc": {
+    "title": "MC Sextile Chiron",
+    "summary": "You easily channel your personal healing journey into a supportive, mentoring role in your career.",
+    "fullText": "Your vulnerability becomes a powerful professional asset that earns you profound respect and public trust."
+  },
+  "chiron_square_mc": {
+    "title": "MC Square Chiron",
+    "summary": "There is a deep-seated pain or insecurity regarding your authority, competence, or public standing.",
+    "fullText": "You may experience highly visible failures or criticisms that force you to undergo profound professional healing."
+  },
+  "chiron_trine_mc": {
+    "title": "MC Trine Chiron",
+    "summary": "Your path to career success is beautifully intertwined with your ability to heal yourself and others.",
+    "fullText": "You effortlessly project empathy and wisdom, making you a trusted leader or guide in your chosen field."
+  },
+  "chiron_opposite_mc": {
+    "title": "MC Opposition Chiron",
+    "summary": "Your core wounds stem from your childhood, family roots, or private life, profoundly affecting your inner security.",
+    "fullText": "Healing these hidden foundational traumas is necessary before you can fully and confidently shine in the public world."
+  },
+  "chiron_quincunx_mc": {
+    "title": "MC Quincunx Chiron",
+    "summary": "You often feel an irritating disconnect between your unhealed insecurities and your professional persona.",
+    "fullText": "Finding a way to gracefully integrate your vulnerabilities into your public life requires constant, careful adjustment."
+  }
+}

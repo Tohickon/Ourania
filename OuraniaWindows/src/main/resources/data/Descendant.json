@@ -1,0 +1,392 @@
+{
+  "descendant_aries": {
+    "title": "Descendant in Aries",
+    "summary": "You seek dynamic, assertive, and highly independent partners who can bring excitement and initiative into your life.",
+    "fullText": "Because your Ascendant is in peace-loving Libra, you may unconsciously project your own unexpressed aggression or drive onto your significant other. You are drawn to relationships that are passionate and straightforward, but you must guard against attracting overly combative or self-centered individuals. Your relational growth depends on learning to own your personal power rather than expecting a partner to fight your battles for you."
+  },
+  "descendant_taurus": {
+    "title": "Descendant in Taurus",
+    "summary": "You are deeply attracted to stability, sensuality, and material security in your committed partnerships.",
+    "fullText": "With a Scorpio Ascendant, your intense inner world seeks a grounding, reliable, and consistent counterpart who can offer practical tranquility. You value loyalty above all else and look for a partner who builds rather than destroys. However, you may project your own stubbornness onto your mate, or find yourself locked into relationships out of a deep-seated resistance to change."
+  },
+  "descendant_gemini": {
+    "title": "Descendant in Gemini",
+    "summary": "Mental stimulation, lively communication, and versatility are the absolute cornerstones of what you seek in a partner.",
+    "fullText": "With a Sagittarius Ascendant, you view life as an adventure, and you need a mate who can keep up with your philosophical explorations through witty banter and shared curiosity. You may be drawn to younger, highly social, or intellectually dualistic individuals. The challenge of this placement is a tendency to project your own restlessness onto your partner, potentially leading to a fear of ultimate commitment."
+  },
+  "descendant_cancer": {
+    "title": "Descendant in Cancer",
+    "summary": "You seek a partnership that offers profound emotional security, nurturing, and a strong sense of family or home.",
+    "fullText": "With a Capricorn Ascendant, you present a highly capable, authoritative face to the world, but you secretly long for a safe harbor where you can expose your vulnerabilities. You are attracted to empathetic, protective, and domestic partners who can soften your rigid edges. Be careful not to project your own unacknowledged emotional neediness onto your partner, which can lead to codependent or parental relationship dynamics."
+  },
+  "descendant_leo": {
+    "title": "Descendant in Leo",
+    "summary": "You are drawn to charismatic, creative, and highly confident partners who know how to shine and take center stage.",
+    "fullText": "With an Aquarius Ascendant, you naturally approach the world with cool detachment, seeking a mate who brings warmth, romance, and dramatic flair into your life. You want a relationship that feels special, celebrated, and deeply passionate. You must ensure, however, that you are not simply using a luminous partner to compensate for your own suppressed need for recognition and applause."
+  },
+  "descendant_virgo": {
+    "title": "Descendant in Virgo",
+    "summary": "You seek practical, organized, and service-oriented partners who can bring order to your life.",
+    "fullText": "Because your Ascendant is in dreamy, boundless Pisces, you often look for a significant other who acts as an anchor, handling the mundane details you prefer to avoid. You value reliability, analytical intelligence, and a strong work ethic in relationships. The shadow side of this placement is a tendency to attract highly critical partners, or to project your own internal perfectionism onto the people you date."
+  },
+  "descendant_libra": {
+    "title": "Descendant in Libra",
+    "summary": "You are naturally oriented toward partnership, seeking harmony, aesthetic beauty, and absolute equality in your closest relationships.",
+    "fullText": "With a fiery Aries Ascendant, your fiercely independent nature unconsciously seeks a diplomatic, refining influence to balance your impulsiveness. You are drawn to charming, cooperative individuals who can act as a sounding board. Your primary relational challenge is learning to compromise without losing your identity, and avoiding partners who are overly passive or indecisive."
+  },
+  "descendant_scorpio": {
+    "title": "Descendant in Scorpio",
+    "summary": "You desire intense, transformative, and deeply intimate partnerships that bypass all superficiality.",
+    "fullText": "With a Taurus Ascendant, your calm, placid exterior masks a subconscious craving for a mate who brings psychological depth, power, and mystery into your life. You are attracted to strong-willed, magnetic individuals who challenge you to evolve. You must be wary of projecting your own repressed shadow traits onto others, which can result in relationships fraught with jealousy, control issues, or explosive power struggles."
+  },
+  "descendant_sagittarius": {
+    "title": "Descendant in Sagittarius",
+    "summary": "You seek freedom, philosophical alignment, and a sense of boundless adventure in your committed relationships.",
+    "fullText": "With a Gemini Ascendant, your busy, detail-oriented mind looks for a partner who can provide a grander vision and a sense of ultimate meaning. You are drawn to optimistic, expansive, and open-minded individuals, possibly from different cultural or educational backgrounds. You must guard against attracting partners who are unreliable or projecting your own fear of being tied down onto your significant other."
+  },
+  "descendant_capricorn": {
+    "title": "Descendant in Capricorn",
+    "summary": "You place a high value on structure, ambition, and mature responsibility within your partnerships.",
+    "fullText": "With a Cancer Ascendant, your emotionally sensitive nature seeks a rock-solid, authoritative partner who can provide worldly security and boundaries. You are often attracted to older, established, or highly disciplined individuals. The danger of this placement is treating the relationship too much like a business arrangement, or seeking a parental figure rather than an equal mate."
+  },
+  "descendant_aquarius": {
+    "title": "Descendant in Aquarius",
+    "summary": "You seek unconventional, intellectual, and highly egalitarian partnerships that are rooted in deep friendship.",
+    "fullText": "With a Leo Ascendant, you command the spotlight, but you want a partner who is wonderfully unique, independent, and perhaps a bit rebellious. You bristle at traditional relationship expectations, preferring a dynamic where both individuals have ample space to be themselves. You must be careful not to project your own emotional detachment onto your partner, resulting in a bond that feels too cool or aloof."
+  },
+  "descendant_pisces": {
+    "title": "Descendant in Pisces",
+    "summary": "You desire spiritual, compassionate, and deeply empathetic partnerships that transcend the ordinary world.",
+    "fullText": "With a highly analytical Virgo Ascendant, you are unconsciously drawn to artistic, sensitive, or mystical partners who help you access your own repressed imagination and emotional depths. You seek a soul-mate connection that offers unconditional love and healing. The major pitfall of this placement is a tendency to attract \"fixer-uppers\" or victims, projecting your own desire for escape onto complex, unavailable partners."
+  },
+  "sun_conjunct_descendant": {
+    "title": "Descendant Conjunction Sun",
+    "summary": "Your core identity is deeply intertwined with your partnerships and how you relate to others.",
+    "fullText": "You shine brightest when in a relationship, but you must guard against losing your individuality to your significant other. Your sense of purpose is largely defined by the quality of your one-on-one connections."
+  },
+  "sun_sextile_descendant": {
+    "title": "Descendant Sextile Sun",
+    "summary": "There is a natural harmony between your ego expression and your ability to form balanced partnerships.",
+    "fullText": "You easily attract supportive people who encourage your personal goals and validate your identity. Relationships tend to boost your confidence without requiring you to compromise who you are."
+  },
+  "sun_square_descendant": {
+    "title": "Descendant Square Sun",
+    "summary": "You often experience friction between your need for personal autonomy and the demands of significant relationships.",
+    "fullText": "Power struggles with partners can serve as challenging but necessary catalysts for your own self-development. You must consciously work to balance your ego with the necessity of compromise."
+  },
+  "sun_trine_descendant": {
+    "title": "Descendant Trine Sun",
+    "summary": "Your sense of self flows seamlessly into your relationships, allowing for mutual warmth, respect, and easy cooperation.",
+    "fullText": "Partnerships naturally boost your vitality, and you easily attract mates who appreciate your authentic identity. You possess a talent for making your significant other feel highly valued."
+  },
+  "sun_opposite_descendant": {
+    "title": "Descendant Opposition Sun",
+    "summary": "The Sun is conjunct your Ascendant, meaning your strong, radiant personality directly influences all your partnerships.",
+    "fullText": "You project a powerful aura that sets the tone for your relationships, often taking the lead. You must ensure you leave enough room for your partner's light to shine alongside your own."
+  },
+  "sun_quincunx_descendant": {
+    "title": "Descendant Quincunx Sun",
+    "summary": "You frequently find yourself making awkward adjustments between your personal desires and the expectations of your partners.",
+    "fullText": "Integrating your ego with the practical needs of a relationship requires conscious, ongoing effort. You may feel that being true to yourself somehow alienates the people you love."
+  },
+  "moon_conjunct_descendant": {
+    "title": "Descendant Conjunction Moon",
+    "summary": "Your emotional security is inextricably linked to your close partnerships and one-on-one connections.",
+    "fullText": "You seek deep emotional nurturing from a mate and may struggle with dependency or fear of abandonment. Relationships act as the primary container for your innermost feelings and domestic life."
+  },
+  "moon_sextile_descendant": {
+    "title": "Descendant Sextile Moon",
+    "summary": "You possess a natural emotional intelligence that helps you foster supportive, comforting, and sympathetic relationships.",
+    "fullText": "Your domestic life and your partnerships usually complement each other smoothly. You easily communicate your feelings to your partner, fostering a safe relational environment."
+  },
+  "moon_square_descendant": {
+    "title": "Descendant Square Moon",
+    "summary": "Internal emotional needs frequently clash with the reality of your partnerships, creating periodic tension and moodiness.",
+    "fullText": "You may unconsciously project unhealed family dynamics or childhood insecurities onto your significant other. Reconciling what you feel with what your relationship requires is an ongoing challenge."
+  },
+  "moon_trine_descendant": {
+    "title": "Descendant Trine Moon",
+    "summary": "There is an innate ease and emotional fluency in how you connect with your partners.",
+    "fullText": "You effortlessly create a nurturing, secure environment within your closest relationships, making others feel instantly at home. Your intuition serves as an excellent guide in choosing compatible mates."
+  },
+  "moon_opposite_descendant": {
+    "title": "Descendant Opposition Moon",
+    "summary": "The Moon is conjunct your Ascendant, meaning you wear your heart on your sleeve, and your shifting moods profoundly impact your partners.",
+    "fullText": "Relationships act as direct mirrors for your subconscious emotional state. You attract partners who respond strongly to your visible vulnerability and emotional transparency."
+  },
+  "moon_quincunx_descendant": {
+    "title": "Descendant Quincunx Moon",
+    "summary": "Your emotional needs and your relationship patterns often feel out of sync, requiring constant, delicate recalibration.",
+    "fullText": "You may repeatedly attract partners who challenge your emotional comfort zones or misunderstand your feelings. Finding emotional equilibrium within a partnership requires continuous conscious effort."
+  },
+  "mercury_conjunct_descendant": {
+    "title": "Descendant Conjunction Mercury",
+    "summary": "Communication is the absolute foundation of your partnerships; you fundamentally need a mate who stimulates your mind.",
+    "fullText": "You often seek out relationships that involve teaching, learning, or constant, lively dialogue. For you, intellectual rapport is synonymous with intimacy and connection."
+  },
+  "mercury_sextile_descendant": {
+    "title": "Descendant Sextile Mercury",
+    "summary": "You easily articulate your relationship needs and excel at negotiating compromises with others.",
+    "fullText": "Mental rapport, shared interests, and logical discussions naturally strengthen your interpersonal bonds. You approach relationship issues with a cool, problem-solving mindset that diffuses tension."
+  },
+  "mercury_square_descendant": {
+    "title": "Descendant Square Mercury",
+    "summary": "Misunderstandings and differences in communication styles frequently challenge your close relationships.",
+    "fullText": "You must learn to listen actively rather than just debating, criticizing, or intellectualizing your partner's feelings. Finding a shared language with your significant other often requires significant effort."
+  },
+  "mercury_trine_descendant": {
+    "title": "Descendant Trine Mercury",
+    "summary": "Conversations in your relationships flow with ease, fostering deep mutual understanding and intellectual harmony.",
+    "fullText": "You and your partner likely share similar perspectives, making collaborative decision-making a breeze. You find that talking things out naturally brings you closer together."
+  },
+  "mercury_opposite_descendant": {
+    "title": "Descendant Opposition Mercury",
+    "summary": "Mercury is conjunct your Ascendant, meaning you present yourself as highly communicative, which heavily shapes how others interact with you.",
+    "fullText": "Your active mind constantly analyzes your partnerships, sometimes overcomplicating simple interactions. You attract partners who are drawn to your wit, intellect, and expressive nature."
+  },
+  "mercury_quincunx_descendant": {
+    "title": "Descendant Quincunx Mercury",
+    "summary": "You often feel that you and your partner speak different languages, leading to periodic mental frustration.",
+    "fullText": "Adjusting your communication style to bridge this intellectual gap is a recurring theme in your relationships. You must learn to read between the lines when logical explanations fail."
+  },
+  "venus_conjunct_descendant": {
+    "title": "Descendant Conjunction Venus",
+    "summary": "You place an immense focus on love, harmony, and aesthetic beauty within your partnerships.",
+    "fullText": "You are naturally magnetic and seek relationships that are peaceful, romantic, and beautifully balanced. You may have a tendency to idealize your partners, avoiding conflict at all costs to maintain the peace."
+  },
+  "venus_sextile_descendant": {
+    "title": "Descendant Sextile Venus",
+    "summary": "Your natural charm and diplomacy make forming and maintaining relationships a smooth, enjoyable process.",
+    "fullText": "You easily attract partners who share your values, social graces, and desire for mutual affection. Love flows into your life through a balanced exchange of appreciation."
+  },
+  "venus_square_descendant": {
+    "title": "Descendant Square Venus",
+    "summary": "You may experience tension between your personal desires and what a healthy partnership actually requires.",
+    "fullText": "A tendency to over-compromise, or conversely, demand too much attention and luxury, can create relational friction. You must learn to navigate the difference between superficial attraction and deep relational value."
+  },
+  "venus_trine_descendant": {
+    "title": "Descendant Trine Venus",
+    "summary": "Love, partnership, and social grace flow into your life with remarkable ease and fluidity.",
+    "fullText": "You possess a natural talent for creating harmonious, affectionate, and mutually satisfying relationships. People are naturally drawn to the warmth and beauty you bring to one-on-one interactions."
+  },
+  "venus_opposite_descendant": {
+    "title": "Descendant Opposition Venus",
+    "summary": "Venus is conjunct your Ascendant, meaning your personal charm and physical attractiveness deeply influence the types of partners you draw to yourself.",
+    "fullText": "You project an aura of harmony and beauty that makes others want to connect with you intimately. Your self-image is highly dependent on feeling loved and appreciated by others."
+  },
+  "venus_quincunx_descendant": {
+    "title": "Descendant Quincunx Venus",
+    "summary": "You often find that your romantic ideals do not quite match the day-to-day reality of your partnerships.",
+    "fullText": "Navigating differences in values, aesthetics, or affection styles requires continuous, delicate adjustments. You must learn to love your partners for who they are, rather than the idealized version in your head."
+  },
+  "mars_conjunct_descendant": {
+    "title": "Descendant Conjunction Mars",
+    "summary": "You bring intense energy, passion, and sometimes conflict into your closest relationships.",
+    "fullText": "You are attracted to strong, assertive, and dynamic partners, but must watch out for competitive dynamics or open hostilities. Your relationships thrive on shared activities and overcoming challenges together."
+  },
+  "mars_sextile_descendant": {
+    "title": "Descendant Sextile Mars",
+    "summary": "You assert your relationship needs in a healthy, constructive manner that encourages mutual growth.",
+    "fullText": "Your partnerships are characterized by active cooperation, shared goals, and a healthy physical connection. You easily channel relational friction into positive, forward-moving momentum."
+  },
+  "mars_square_descendant": {
+    "title": "Descendant Square Mars",
+    "summary": "Frequent clashes of will, temperamental flare-ups, and impatience can destabilize your one-on-one relationships.",
+    "fullText": "You must learn to channel interpersonal friction into constructive passion rather than destructive arguments. Compromise feels difficult when you view your partner as an opponent."
+  },
+  "mars_trine_descendant": {
+    "title": "Descendant Trine Mars",
+    "summary": "Your personal drive and your relational needs work in perfect harmony, creating dynamic and exciting partnerships.",
+    "fullText": "You and your significant other easily unite forces to conquer shared goals and tackle life's obstacles. There is a natural, effortless flow of sexual and creative energy between you and your mate."
+  },
+  "mars_opposite_descendant": {
+    "title": "Descendant Opposition Mars",
+    "summary": "Mars is conjunct your Ascendant, meaning your bold, assertive personality sets a highly charged tone for all your partnerships.",
+    "fullText": "You may unconsciously provoke others or attract aggressive individuals who mirror your own intensity. Learning to temper your approach is vital to maintaining peaceful alliances."
+  },
+  "mars_quincunx_descendant": {
+    "title": "Descendant Quincunx Mars",
+    "summary": "The way you express anger, drive, or desire often feels at odds with what your relationships need to thrive.",
+    "fullText": "You frequently have to adjust your approach to conflict resolution to avoid alienating your partner. Finding a healthy outlet for relationship frustrations is a constant balancing act."
+  },
+  "jupiter_conjunct_descendant": {
+    "title": "Descendant Conjunction Jupiter",
+    "summary": "You seek partnerships that offer growth, philosophical meaning, and a sense of boundless adventure.",
+    "fullText": "You often attract generous, optimistic, and culturally diverse partners. While your relationships are characterized by abundance, you must guard against unrealistic expectations or a lack of boundaries in love."
+  },
+  "jupiter_sextile_descendant": {
+    "title": "Descendant Sextile Jupiter",
+    "summary": "Your optimistic approach to relationships brings in beneficial and expansive connections with ease.",
+    "fullText": "You naturally encourage your partners, creating a supportive dynamic built on shared faith and good humor. Luck often finds you through the people you choose to partner with."
+  },
+  "jupiter_square_descendant": {
+    "title": "Descendant Square Jupiter",
+    "summary": "You may struggle with over-promising, overextending yourself, or expecting too much freedom within your committed relationships.",
+    "fullText": "Balancing your desire for limitless expansion with the grounding realities of partnership requires discipline. You must ensure your relationship ideals do not overshadow practical commitments."
+  },
+  "jupiter_trine_descendant": {
+    "title": "Descendant Trine Jupiter",
+    "summary": "Luck, abundance, and mutual growth naturally flow through your one-on-one relationships.",
+    "fullText": "You and your partner likely share a grand vision for the future, easily supporting each other's educational or spiritual journeys. Your partnerships are marked by a deep, sustaining sense of joy and generosity."
+  },
+  "jupiter_opposite_descendant": {
+    "title": "Descendant Opposition Jupiter",
+    "summary": "Jupiter is conjunct your Ascendant, meaning your larger-than-life persona dramatically influences the dynamics of your relationships.",
+    "fullText": "You project immense enthusiasm and wisdom, but must ensure you don't overshadow your partner's contributions. You attract others through your natural joviality and expansive presence."
+  },
+  "jupiter_quincunx_descendant": {
+    "title": "Descendant Quincunx Jupiter",
+    "summary": "You often feel a disconnect between your grand relationship ideals and your actual, day-to-day interpersonal dynamics.",
+    "fullText": "You must frequently adjust your expectations to find meaning and joy in the everyday realities of partnership. Bridging the gap between your philosophical beliefs and your partner's worldview takes ongoing effort."
+  },
+  "saturn_conjunct_descendant": {
+    "title": "Descendant Conjunction Saturn",
+    "summary": "You take relationships very seriously, often seeking older, mature, or highly responsible partners.",
+    "fullText": "While partnerships may develop slowly or involve heavy obligations, they are usually built to endure. You may view marriage as a duty, and must work to ensure that romance is not completely replaced by practical routine."
+  },
+  "saturn_sextile_descendant": {
+    "title": "Descendant Sextile Saturn",
+    "summary": "You build solid, enduring relationships based on mutual respect, loyalty, and practical support.",
+    "fullText": "You have a natural ability to structure your partnerships in a way that provides long-term emotional and material security. You approach commitment with a healthy, realistic mindset."
+  },
+  "saturn_square_descendant": {
+    "title": "Descendant Square Saturn",
+    "summary": "Fear of commitment, feelings of inadequacy, or external obstacles frequently challenge your close relationships.",
+    "fullText": "You must work hard to overcome emotional walls and establish true vulnerability with significant others. Relationships may feel burdensome until you learn to dismantle your subconscious fears of rejection."
+  },
+  "saturn_trine_descendant": {
+    "title": "Descendant Trine Saturn",
+    "summary": "Your partnerships are characterized by profound stability, reliability, and a steady, mature love.",
+    "fullText": "You and your partner easily establish healthy boundaries and work together toward long-term security. You find great comfort in the predictability and loyalty of your committed relationships."
+  },
+  "saturn_opposite_descendant": {
+    "title": "Descendant Opposition Saturn",
+    "summary": "Saturn is conjunct your Ascendant, meaning your serious, reserved, or cautious demeanor heavily impacts how others relate to you.",
+    "fullText": "You may project an aura of authority or defense that either attracts highly mature partners or creates emotional distance. You must consciously work to let your guard down in intimate settings."
+  },
+  "saturn_quincunx_descendant": {
+    "title": "Descendant Quincunx Saturn",
+    "summary": "You often experience an awkward tension between your personal need for security and the natural flow of your relationships.",
+    "fullText": "Balancing relationship duties with your own boundaries requires careful, ongoing recalibration. You may frequently feel that your partner's expectations are a heavy, ill-fitting burden."
+  },
+  "uranus_conjunct_descendant": {
+    "title": "Descendant Conjunction Uranus",
+    "summary": "You require an immense amount of freedom, space, and unconventionality in your close partnerships.",
+    "fullText": "You are drawn to eccentric, brilliant, or unpredictable partners, and traditional marriage may feel stifling to you. Your relationships thrive on sudden changes, intellectual electricity, and absolute individuality."
+  },
+  "uranus_sextile_descendant": {
+    "title": "Descendant Sextile Uranus",
+    "summary": "You easily integrate excitement, individuality, and progressive ideas into your relationships.",
+    "fullText": "You and your partner naturally give each other the space needed to grow as independent people. Your partnerships are kept fresh through shared humanitarian goals or unconventional approaches to love."
+  },
+  "uranus_square_descendant": {
+    "title": "Descendant Square Uranus",
+    "summary": "Sudden disruptions, a fierce need for independence, or erratic behavior can frequently destabilize your partnerships.",
+    "fullText": "You must find a way to honor your need for freedom without completely alienating your significant other. Commitment may feel like a trap until you find a partner who truly honors your autonomy."
+  },
+  "uranus_trine_descendant": {
+    "title": "Descendant Trine Uranus",
+    "summary": "Your relationships thrive on a harmonious, easy blend of mutual freedom, innovation, and intellectual stimulation.",
+    "fullText": "You effortlessly attract unique individuals who respect your individuality and keep the relational spark alive. You navigate changes within your partnerships with an open, adaptable mindset."
+  },
+  "uranus_opposite_descendant": {
+    "title": "Descendant Opposition Uranus",
+    "summary": "Uranus is conjunct your Ascendant, meaning your highly independent and rebellious nature dramatically shapes your relationship dynamics.",
+    "fullText": "You project a restless energy that often attracts equally unconventional or unpredictable partners. You must learn to balance your radical self-expression with the stability required for partnership."
+  },
+  "uranus_quincunx_descendant": {
+    "title": "Descendant Quincunx Uranus",
+    "summary": "You constantly struggle to reconcile your need for personal liberation with the grounding, compromising nature of partnerships.",
+    "fullText": "Finding a rhythm that allows for both relational stability and sudden personal change requires continuous adjustment. You may frequently surprise your partner with unexpected shifts in your desires."
+  },
+  "neptune_conjunct_descendant": {
+    "title": "Descendant Conjunction Neptune",
+    "summary": "You seek a transcendent, highly spiritual, or soul-mate connection in your partnerships, often viewing love through rose-colored glasses.",
+    "fullText": "While capable of profound empathy, you must guard against attracting deceptive, unavailable, or deeply wounded partners who drain your energy. You must learn to set firm boundaries to avoid losing yourself in the other."
+  },
+  "neptune_sextile_descendant": {
+    "title": "Descendant Sextile Neptune",
+    "summary": "You bring a beautiful, compassionate, and deeply intuitive energy to your relationships.",
+    "fullText": "You naturally understand your partner's unspoken needs and offer unconditional, gentle support. Your partnerships benefit from a shared sense of spirituality, creativity, or artistic appreciation."
+  },
+  "neptune_square_descendant": {
+    "title": "Descendant Square Neptune",
+    "summary": "Disillusionment, codependency, or blurred boundaries frequently plague your one-on-one relationships.",
+    "fullText": "You must learn to see your partners clearly rather than projecting your spiritual fantasies or savior complexes onto them. Clarity and honest communication are essential to avoid deceit or confusion in love."
+  },
+  "neptune_trine_descendant": {
+    "title": "Descendant Trine Neptune",
+    "summary": "There is an almost telepathic, deeply empathetic bond that flows easily into your partnerships.",
+    "fullText": "You and your partner effortlessly create a sanctuary of healing, unconditional love, and spiritual merging. Romance and high ideals are naturally sustained without sacrificing the health of the relationship."
+  },
+  "neptune_opposite_descendant": {
+    "title": "Descendant Opposition Neptune",
+    "summary": "Neptune is conjunct your Ascendant, meaning your dreamy, highly sensitive, and chameleon-like persona profoundly influences who you attract.",
+    "fullText": "You act as a mirror for others' projections, which can confuse your own sense of identity within a relationship. You must actively ground yourself to maintain reality in your partnerships."
+  },
+  "neptune_quincunx_descendant": {
+    "title": "Descendant Quincunx Neptune",
+    "summary": "Your romantic ideals and the actual, flawed reality of your partnerships often feel confusingly mismatched.",
+    "fullText": "You frequently have to adjust your expectations to avoid feeling disillusioned, martyred, or misunderstood in love. Finding practical ways to express your spiritual love is a constant learning process."
+  },
+  "pluto_conjunct_descendant": {
+    "title": "Descendant Conjunction Pluto",
+    "summary": "Your partnerships are intense arenas for profound psychological transformation, power dynamics, and rebirth.",
+    "fullText": "You are drawn to magnetic, complex individuals, but must actively avoid possessiveness, jealousy, or manipulation. Relationships will relentlessly force you to confront your deepest psychological shadows."
+  },
+  "pluto_sextile_descendant": {
+    "title": "Descendant Sextile Pluto",
+    "summary": "You possess a natural ability to foster deep, empowering transformations within your close relationships.",
+    "fullText": "You and your partner easily support each other through psychological growth, crisis, and emotional rebirth. Your bonds are highly resilient, characterized by a healthy, penetrating intimacy."
+  },
+  "pluto_square_descendant": {
+    "title": "Descendant Square Pluto",
+    "summary": "Power struggles, control issues, or deep-seated fears of betrayal often surface in your significant relationships.",
+    "fullText": "You must confront your own shadow aspects to prevent destructive, obsessive patterns from ruining your partnerships. Learning to surrender control is your ultimate relational challenge."
+  },
+  "pluto_trine_descendant": {
+    "title": "Descendant Trine Pluto",
+    "summary": "Intense, soul-deep connections flow naturally into your life, bringing profound mutual empowerment.",
+    "fullText": "Your relationships are highly resilient, easily regenerating and growing stronger after periods of crisis or change. You and your partner share a formidable, unshakable loyalty."
+  },
+  "pluto_opposite_descendant": {
+    "title": "Descendant Opposition Pluto",
+    "summary": "Pluto is conjunct your Ascendant, meaning your powerful, penetrating presence immediately alters the dynamic of any one-on-one interaction.",
+    "fullText": "You may intimidate others or inadvertently attract partners who challenge your personal sovereignty. You must use your formidable personal power to uplift your partners rather than dominate them."
+  },
+  "pluto_quincunx_descendant": {
+    "title": "Descendant Quincunx Pluto",
+    "summary": "You often feel a frustrating tension between your need for control and the deep vulnerability required in partnership.",
+    "fullText": "Continual psychological adjustments are necessary to prevent hidden resentments or suspicions from poisoning your bonds. Learning to trust without holding back is a delicate, ongoing journey."
+  },
+  "chiron_conjunct_descendant": {
+    "title": "Descendant Conjunction Chiron",
+    "summary": "Your partnerships are intimately connected to your core wounds and your capacity for profound healing.",
+    "fullText": "You may attract wounded partners, or experience pain through relationships, which ultimately teaches you immense empathy. The key to your relational success is turning mutual vulnerability into a shared healing journey."
+  },
+  "chiron_sextile_descendant": {
+    "title": "Descendant Sextile Chiron",
+    "summary": "You have a natural ability to bring healing, understanding, and gentle acceptance into your partnerships.",
+    "fullText": "Your own experiences with pain allow you to deeply support your partner's emotional growth. Your relationships act as a soothing balm for both you and your mate."
+  },
+  "chiron_square_descendant": {
+    "title": "Descendant Square Chiron",
+    "summary": "Deep-seated insecurities, fears of rejection, and unhealed wounds frequently disrupt your ability to form healthy partnerships.",
+    "fullText": "You must actively work through your relationship triggers to avoid repeating painful, self-sabotaging cycles. Healing your own heart is a prerequisite to finding lasting peace with another."
+  },
+  "chiron_trine_descendant": {
+    "title": "Descendant Trine Chiron",
+    "summary": "Healing and partnership go hand in hand for you, with relationships offering a safe, effortless space for vulnerability.",
+    "fullText": "You and your partner naturally act as spiritual and emotional balms for one another. You easily transcend past relationship traumas through the love you share now."
+  },
+  "chiron_opposite_descendant": {
+    "title": "Descendant Opposition Chiron",
+    "summary": "Chiron is conjunct your Ascendant, meaning the visible wounds you carry in your own identity profoundly shape the partners you attract.",
+    "fullText": "Your personal healing journey acts as a powerful catalyst for transformation within your relationships. As you learn to accept yourself, your partnerships naturally become healthier."
+  },
+  "chiron_quincunx_descendant": {
+    "title": "Descendant Quincunx Chiron",
+    "summary": "You often struggle to reconcile your personal pain with the ongoing, practical demands of a partnership.",
+    "fullText": "Finding a way to heal without projecting your wounds onto your significant other requires constant, careful adjustment. You must be wary of viewing your partner as either a savior or the source of your pain."
+  }
+}

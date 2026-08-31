@@ -1,0 +1,62 @@
+{
+  "transit_house_1": {
+    "title": "Transit through the 1st House",
+    "summary": "Activates matters of the self, physical appearance, and personal identity.",
+    "fullText": "When a planet transits the first house, it brings energy to matters of an intimate personal nature, physical appearance, and first impressions [1, 2]. Known as the House of Self, it relates to the individual's life and vitality [3]. A slow-moving transit here, like Saturn, can initiate a period of serious personal focus or identity testing [4]."
+  },
+  "transit_house_2": {
+    "title": "Transit through the 2nd House",
+    "summary": "Focuses energy on financial gain, material possessions, and personal values.",
+    "fullText": "A transit through the second house energizes your personal resources, money, and values [2]. Also called the House of Possessions or Value, this transit period centers on financial gain or loss [1, 3]. For instance, a Saturn transit through this house often indicates a long-term phase of strict 'financial housekeeping' [5]."
+  },
+  "transit_house_3": {
+    "title": "Transit through the 3rd House",
+    "summary": "Highlights communication, sibling relationships, and short journeys.",
+    "fullText": "Transits in the third house activate matters concerning your near environment, including brothers and sisters, neighborhoods, and short journeys [1, 2]. Known as the House of Exchange, this transit period stimulates everyday thoughts, intellect, and the flow of communication [2, 3]."
+  },
+  "transit_house_4": {
+    "title": "Transit through the 4th House",
+    "summary": "Energizes themes of home, family, roots, and real estate.",
+    "fullText": "When a planet moves through the fourth house, it triggers events or feelings related to houses and lands, patrimony, removals, and your deep roots [1, 2]. As the House of Home and Family, transits here often reflect profound changes or activity involving motherhood, your childhood conditioning, and your private sanctuary [2, 3, 6]."
+  },
+  "transit_house_5": {
+    "title": "Transit through the 5th House",
+    "summary": "Stimulates creativity, romance, recreation, and children.",
+    "fullText": "A transit through the fifth house brings celestial energy to areas of creation, procreation, recreation, and romance [2]. Called the House of Expression or Pleasure, this period can highlight matters involving children, messengers, or the arts [1, 3]. It is a time when the desire for self-expression and joy is magnified."
+  },
+  "transit_house_6": {
+    "title": "Transit through the 6th House",
+    "summary": "Focuses on daily work, physical health, duty, and service.",
+    "fullText": "Transits in the sixth house bring attention to daily routines, work, duty, and responsibility [2]. Known as the House of Health and Service, planetary movements here can also highlight issues with illness, physical health, or interactions with servants and workers [1, 3]."
+  },
+  "transit_house_7": {
+    "title": "Transit through the 7th House",
+    "summary": "Activates one-on-one partnerships, marriage, and open enemies.",
+    "fullText": "When a planet transits the seventh house, the focus shifts to intimate relationships, marriages, and business partnerships [2]. Referred to as the House of Balance or Connections, transits here can also trigger law-suits or bring you face-to-face with open enemies and profound interpersonal dynamics [1, 3]."
+  },
+  "transit_house_8": {
+    "title": "Transit through the 8th House",
+    "summary": "Highlights profound transformation, shared resources, sex, and inheritances.",
+    "fullText": "A transit through the eighth house dives into the hidden or taboo, activating themes of sex, death, legacies, and other people's money [1, 2]. As the House of Transformation and Catharsis, this period often demands deep psychological processing, regeneration, and the handling of joint resources [2, 3]."
+  },
+  "transit_house_9": {
+    "title": "Transit through the 9th House",
+    "summary": "Stimulates higher education, philosophy, and long-distance travel.",
+    "fullText": "Transits in the ninth house expand your horizons, focusing on travel, your mental state, and capacity for higher education [1, 2]. Known as the House of Exploration, a transit here is an excellent time for writers or those in communications media to reach the world at large, as it governs publishing, religion, and the search for truth [3, 7]."
+  },
+  "transit_house_10": {
+    "title": "Transit through the 10th House",
+    "summary": "Energizes your career, public image, and social standing.",
+    "fullText": "When a planet transits the tenth house, it activates your ambition, career, status, and public image [2]. As the House of Enterprise and Achievements, transits here heavily impact your social honor [1, 3]. For example, Jupiter transiting here brings opportunities for social advancement, while Saturn may bring setbacks to overcome [8]."
+  },
+  "transit_house_11": {
+    "title": "Transit through the 11th House",
+    "summary": "Focuses on friendships, social groups, and long-term hopes.",
+    "fullText": "A transit through the eleventh house energizes your social networks, friends, hopes, and wishes [1, 2]. Called the House of Blessings and Community, this is an ideal time to become involved in consciousness-raising groups, human-potential efforts, or broader social causes [3, 7]."
+  },
+  "transit_house_12": {
+    "title": "Transit through the 12th House",
+    "summary": "Highlights the subconscious, solitude, psychic abilities, and hidden enemies.",
+    "fullText": "Transits in the twelfth house activate the hidden realms, focusing on psychic ability, the occult, and places of retreat [2]. Known as the House of Reflection and Sacrifice, planetary movements here can bring up hidden enemies, subconscious fears, or periods of trouble and self-undoing that require deep introspection [1, 3]."
+  }
+}

@@ -1,0 +1,447 @@
+{
+  "ascendant_aries": {
+    "title": "Ascendant in Aries",
+    "summary": "The individual meets the world with a pioneering, assertive, and highly energized physical presence.",
+    "fullText": "There is a natural impulsiveness to their initial reactions, as they prefer to tackle life head-on rather than wait for things to unfold. Their external persona is marked by courage, independence, and a need to be first, often presenting an aura of restless vitality. They must learn to balance their sheer forward momentum with patience, ensuring their direct approach does not alienate others."
+  },
+  "ascendant_taurus": {
+    "title": "Ascendant in Taurus",
+    "summary": "This placement bestows a calm, deliberate, and steadfast approach to new beginnings and external self-expression.",
+    "fullText": "The individual projects an aura of reliability, sensuality, and grounded patience, preferring to assess situations fully before committing to action. Their physical constitution is often robust, reflecting a deep-seated need for material and emotional security in their immediate environment. While highly enduring, they must guard against stubbornness or an overly cautious resistance to necessary changes."
+  },
+  "ascendant_gemini": {
+    "title": "Ascendant in Gemini",
+    "summary": "The external persona is characterized by intellectual curiosity, quick wit, and a highly adaptable, kinetic energy.",
+    "fullText": "They approach the world through the lens of data gathering and communication, eagerly engaging with their environment to satisfy a restless mind. Their physical presence is often lively and youthful, reflecting an inner need for constant mental stimulation and variety. The challenge for this placement lies in maintaining focus, as their varied interests can sometimes scatter their impressive communicative potential."
+  },
+  "ascendant_cancer": {
+    "title": "Ascendant in Cancer",
+    "summary": "This Ascendant creates a sensitive, protective, and emotionally attuned interface with the external world.",
+    "fullText": "The individual approaches new situations with caution, relying on intuition and a need for emotional safety before fully revealing their inner selves. They project an aura of nurturing warmth and empathy, often taking on the role of a caretaker in their immediate environment. Their challenge is to navigate their shifting moods and tendency to retreat into their shell when feeling overwhelmed by external pressures."
+  },
+  "ascendant_leo": {
+    "title": "Ascendant in Leo",
+    "summary": "The individual projects a radiant, confident, and highly expressive persona, demanding recognition and respect from their environment.",
+    "fullText": "They approach life with a sense of dramatic flair, creativity, and a natural regal bearing that easily draws the attention of others. Warm-hearted and fiercely loyal, their initial reactions are often magnanimous, though they possess a strong underlying need for validation and applause. They must be mindful of tipping into arrogance or an overly ego-centric view of their immediate surroundings."
+  },
+  "ascendant_virgo": {
+    "title": "Ascendant in Virgo",
+    "summary": "A practical, analytical, and modest approach characterizes this individual's interaction with the external world.",
+    "fullText": "They project an aura of quiet competence, often observing and assessing situations critically before deciding how to properly engage or be of service. Their physical presence is usually neat and purposeful, reflecting a nervous system that is highly sensitive to environmental chaos or inefficiency. To thrive, they must overcome a tendency toward perfectionism and self-criticism that can inhibit spontaneous self-expression."
+  },
+  "ascendant_libra": {
+    "title": "Ascendant in Libra",
+    "summary": "The individual meets the world with charm, diplomacy, and an innate desire to create harmony in their immediate environment.",
+    "fullText": "They project a socially graceful and aesthetically refined persona, often seeking balance and consensus before taking direct action. Relationships are the primary lens through which they understand themselves, making them highly attuned to the reactions and needs of others. Their main challenge is avoiding indecision or the loss of their own identity in the pursuit of keeping the peace."
+  },
+  "ascendant_scorpio": {
+    "title": "Ascendant in Scorpio",
+    "summary": "This Ascendant projects an aura of intense magnetism, psychological depth, and formidable emotional control.",
+    "fullText": "The individual approaches the world with caution and strategic observation, reading the hidden undercurrents of any room before revealing their own hand. Their external demeanor can be both captivating and intimidating, as they emanate a powerful capacity for transformation and resilience. They must guard against becoming overly suspicious or defensive, learning to trust their environment without needing to dominate it."
+  },
+  "ascendant_sagittarius": {
+    "title": "Ascendant in Sagittarius",
+    "summary": "A restless, optimistic, and deeply philosophical energy defines the individual's approach to new experiences.",
+    "fullText": "They project an aura of enthusiasm and a hunger for truth, always scanning the horizon for the next adventure or learning opportunity. Their physical presence is often expansive and buoyant, reflecting a blunt honesty and a profound need for personal freedom. To maximize their potential, they must learn to temper their restlessness and follow through on the grand visions they so easily inspire."
+  },
+  "ascendant_capricorn": {
+    "title": "Ascendant in Capricorn",
+    "summary": "The individual approaches the world with a serious, pragmatic, and highly disciplined demeanor.",
+    "fullText": "They project an aura of authority and responsibility, carefully calculating their steps to ensure long-term security and success. Their initial reactions are reserved and traditional, often appearing older or more mature than their years due to an ingrained sense of duty. Their challenge is to avoid becoming overly rigid or pessimistic, learning to incorporate warmth and spontaneity into their structured worldview."
+  },
+  "ascendant_aquarius": {
+    "title": "Ascendant in Aquarius",
+    "summary": "This placement creates an eccentric, progressive, and highly individualized interface with the external world.",
+    "fullText": "The individual projects an aura of intellectual detachment and originality, often approaching situations from an objective, humanitarian perspective. They are fiercely independent and naturally resist conventional expectations, preferring to establish their own unique rules for engagement. While they excel at group dynamics, they must be careful not to become emotionally aloof or overly contrarian just for the sake of rebellion."
+  },
+  "ascendant_pisces": {
+    "title": "Ascendant in Pisces",
+    "summary": "The external persona is marked by deep empathy, mystic sensitivity, and a highly mutable, fluid approach to life.",
+    "fullText": "They project an aura of gentle compassion and artistic imagination, often absorbing the emotional atmosphere of their environment like a sponge. Their initial reactions are intuitive rather than logical, leading them to navigate the world through feeling and spiritual connection. Their primary challenge is maintaining healthy personal boundaries and avoiding the urge to escape reality when the physical world becomes too harsh."
+  },
+  "sun_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Sun",
+    "summary": "This aspect seamlessly aligns the individual's core ego with their outward projection, creating a highly authentic and luminous physical presence.",
+    "fullText": "They express their life purpose directly and confidently, often naturally drawing attention and leadership opportunities. The challenge lies in maintaining objectivity, as they can easily become so self-identified that they struggle to see other perspectives."
+  },
+  "moon_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Moon",
+    "summary": "The individual's emotional nature is worn on their sleeve, making them highly receptive, sensitive, and visibly expressive of their moods.",
+    "fullText": "Their physical appearance and reactions to the world are deeply tied to their internal feeling states and early conditioning. They project a nurturing, empathetic aura, but must guard against being overly reactive or absorbing the emotional baggage of their environment."
+  },
+  "mercury_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Mercury",
+    "summary": "The individual's physical presence and initial reactions are characterized by mental agility, curiosity, and a constant need for communication.",
+    "fullText": "They approach the world highly analytically, projecting a youthful, restless, and articulate persona. Their challenge is to avoid intellectualizing their physical experiences, remembering to feel the world rather than just analyze it."
+  },
+  "venus_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Venus",
+    "summary": "The individual projects an aura of physical beauty, charm, and magnetic grace that effortlessly draws people toward them.",
+    "fullText": "Their approach to the world is diplomatic and aesthetically driven, seeking harmony and pleasant interactions above all else. They must be careful not to rely solely on their charm or appearance, ensuring they cultivate depth beneath their pleasing exterior."
+  },
+  "mars_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Mars",
+    "summary": "A dynamic, assertive, and highly energetic aura defines the individual's physical presence and initial reactions.",
+    "fullText": "They approach the world directly and courageously, often possessing a strong, athletic vitality and a pioneering spirit. They must consciously manage their impulsiveness and aggressive tendencies, ensuring they do not run roughshod over others."
+  },
+  "jupiter_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Jupiter",
+    "summary": "The individual projects an aura of overwhelming optimism, expansiveness, and philosophical curiosity.",
+    "fullText": "They approach the world with a sense of grand adventure, often possessing a larger-than-life physical presence or a jovial demeanor. They must guard against physical overindulgence and the tendency to promise more than they can realistically deliver."
+  },
+  "saturn_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Saturn",
+    "summary": "The individual projects an aura of seriousness, maturity, and strict self-discipline from a very young age.",
+    "fullText": "They approach the world with caution and a profound sense of responsibility, often possessing a highly structured physical presence. They must work to overcome deep-seated insecurities and learn to allow warmth and spontaneity into their rigid self-presentation."
+  },
+  "uranus_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Uranus",
+    "summary": "The individual's physical presence is electric, highly unconventional, and deeply individualized.",
+    "fullText": "They approach the world as a rebel or an innovator, projecting an aura of unpredictability and absolute independence. While they are compelling agents of change, they must be careful not to alienate others through sheer contrarianism or nervous volatility."
+  },
+  "neptune_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Neptune",
+    "summary": "The individual projects a highly sensitive, glamorous, and deeply mystic persona, often acting as a mirror for the projections of others.",
+    "fullText": "They approach the world with profound empathy and intuition, but their physical boundaries can be highly porous and easily overwhelmed. They must actively work to stay grounded in reality and avoid the temptation to escape through illusion or substance."
+  },
+  "pluto_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Pluto",
+    "summary": "The individual projects an aura of formidable intensity, psychological depth, and hidden power.",
+    "fullText": "They approach the world with a penetrating gaze, highly attuned to the undercurrents of control, crisis, and transformation in their environment. They must learn to wield their considerable personal magnetism responsibly, avoiding the urge to manipulate or dominate others out of fear."
+  },
+  "sun_square_ascendant": {
+    "title": "Ascendant Square Sun",
+    "summary": "This aspect generates internal friction between the core identity and how the individual is perceived by the external world.",
+    "fullText": "They may feel that their true self is often misunderstood, leading to defensive or overly assertive behavior to prove their worth. Growth comes from reconciling the inner ego with the outer mask, transforming this tension into a dynamic drive for self-realization."
+  },
+  "moon_square_ascendant": {
+    "title": "Ascendant Square Moon",
+    "summary": "The individual experiences ongoing tension between their conscious outward behavior and their subconscious emotional needs.",
+    "fullText": "They may often act in ways that contradict how they truly feel, leading to internal frustration and environmental misunderstandings. Integration requires consciously acknowledging their emotional vulnerabilities and allowing them to be safely expressed in their daily life."
+  },
+  "mercury_square_ascendant": {
+    "title": "Ascendant Square Mercury",
+    "summary": "The individual experiences a clash between their thought processes and how they present themselves to the world.",
+    "fullText": "Their communication style may come across as nervous, overly critical, or misunderstood by others. They must work to align their internal logic with their external delivery to avoid unnecessary misunderstandings."
+  },
+  "venus_square_ascendant": {
+    "title": "Ascendant Square Venus",
+    "summary": "The individual may experience friction between their desire for social approval and their authentic personal expression.",
+    "fullText": "They might overcompensate with charm to mask insecurities, or find their aesthetic tastes at odds with their physical reality. Growth comes from developing self-love that does not depend on the validation or admiration of others."
+  },
+  "mars_square_ascendant": {
+    "title": "Ascendant Square Mars",
+    "summary": "The individual experiences significant internal tension that often manifests as external defensiveness or combative behavior.",
+    "fullText": "They may feel constantly challenged by their environment, leading to a quick temper or impulsive physical reactions. Learning to channel this intense, fiery energy into constructive, disciplined action is crucial for their personal growth."
+  },
+  "jupiter_square_ascendant": {
+    "title": "Ascendant Square Jupiter",
+    "summary": "The individual may struggle with overconfidence, exaggeration, or a lack of physical and social boundaries.",
+    "fullText": "They often feel a restless urge to expand beyond their current circumstances, which can lead to reckless or impulsive behavior. They must learn to temper their grand visions with discipline and a realistic assessment of their capabilities."
+  },
+  "saturn_square_ascendant": {
+    "title": "Ascendant Square Saturn",
+    "summary": "The individual experiences significant friction between their authentic self-expression and their fear of judgment or restriction.",
+    "fullText": "They often feel blocked by external circumstances or plagued by feelings of inadequacy regarding their physical presence. Overcoming this requires breaking down internalized harsh criticism and learning to validate their own worth."
+  },
+  "uranus_square_ascendant": {
+    "title": "Ascendant Square Uranus",
+    "summary": "The individual experiences a volatile clash between their need for absolute freedom and their physical reality.",
+    "fullText": "They may present themselves in jarring or rebellious ways, leading to sudden disruptions in their environment and relationships. Integration requires finding constructive, stable outlets for their brilliant but chaotic revolutionary energy."
+  },
+  "neptune_square_ascendant": {
+    "title": "Ascendant Square Neptune",
+    "summary": "The individual struggles with confusion, idealization, or deception regarding their physical identity and presentation.",
+    "fullText": "They may feel deeply misunderstood by the world, or intentionally mask their true selves behind a confusing fa\u00e7ade. They must rigorously cultivate honesty and clear personal boundaries to avoid dissolving their identity into their environment."
+  },
+  "pluto_square_ascendant": {
+    "title": "Ascendant Square Pluto",
+    "summary": "The individual experiences intense internal friction between their need for control and how they are perceived by the world.",
+    "fullText": "This often manifests as power struggles, defensiveness, or a tendency to physically provoke crises to test their own strength. Growth requires surrendering the need to dominate their environment and embracing deep, internal psychological healing."
+  },
+  "sun_trine_ascendant": {
+    "title": "Ascendant Trine Sun",
+    "summary": "The individual possesses a natural, effortless magnetism, with their conscious goals flowing smoothly into their outward behavior.",
+    "fullText": "They project a confident and radiant aura that puts others at ease, often attracting favorable circumstances and helpful people. This easy alignment promotes physical vitality and a strong, unshakeable sense of personal identity."
+  },
+  "moon_trine_ascendant": {
+    "title": "Ascendant Trine Moon",
+    "summary": "This aspect bestows a fluid, natural emotional intelligence that is easily expressed through the individual's physical presence.",
+    "fullText": "They possess a comforting, maternal aura that naturally attracts others seeking support and understanding. Their inner emotional world and their outer environment exist in peaceful symbiosis, promoting psychological resilience."
+  },
+  "mercury_trine_ascendant": {
+    "title": "Ascendant Trine Mercury",
+    "summary": "A natural ease exists in how the individual communicates their identity to the world, making them highly persuasive and articulate.",
+    "fullText": "They project a bright, intelligent aura, processing environmental information quickly and accurately. This harmonious aspect strongly supports public speaking, writing, and any endeavor requiring intellectual agility."
+  },
+  "venus_trine_ascendant": {
+    "title": "Ascendant Trine Venus",
+    "summary": "A profound, effortless grace permeates the individual's physical presence and social interactions.",
+    "fullText": "They project warmth, beauty, and approachability, making it easy for them to form harmonious relationships and attract resources. This aspect reflects a deeply integrated sense of self-worth that radiates naturally into the environment."
+  },
+  "mars_trine_ascendant": {
+    "title": "Ascendant Trine Mars",
+    "summary": "A smooth, unhindered flow of vitality and assertiveness characterizes the individual's interaction with the world.",
+    "fullText": "They project a naturally confident and capable persona, easily taking action without self-doubt. This aspect bestows excellent physical stamina and the ability to lead others with inspiring enthusiasm."
+  },
+  "jupiter_trine_ascendant": {
+    "title": "Ascendant Trine Jupiter",
+    "summary": "An effortless flow of optimism, good fortune, and wisdom naturally emanates from the individual's physical presence.",
+    "fullText": "They possess a protective, buoyant aura that inspires confidence in others and attracts beneficial circumstances. This aspect indicates a harmonious alignment between their personal growth and their external environment."
+  },
+  "saturn_trine_ascendant": {
+    "title": "Ascendant Trine Saturn",
+    "summary": "A natural, unforced discipline and maturity effortlessly blend with the individual's outward persona.",
+    "fullText": "They project an aura of reliable authority and practical wisdom, navigating their environment with patience and endurance. This harmonious aspect ensures a strong constitution and the ability to steadily achieve long-term objectives."
+  },
+  "uranus_trine_ascendant": {
+    "title": "Ascendant Trine Uranus",
+    "summary": "A natural, effortless originality and brilliance emanate from the individual's physical presence.",
+    "fullText": "They possess a magnetic, forward-thinking aura, easily embracing change and innovation without destabilizing their lives. This aspect allows them to uniquely express their individuality while remaining harmoniously connected to the collective."
+  },
+  "neptune_trine_ascendant": {
+    "title": "Ascendant Trine Neptune",
+    "summary": "An effortless, ethereal grace and profound spiritual magnetism define the individual's physical presence.",
+    "fullText": "They naturally project compassion and artistic inspiration, drawing others toward their peaceful, mystical aura. This aspect creates a harmonious blend between their highest ideals and their daily physical reality."
+  },
+  "pluto_trine_ascendant": {
+    "title": "Ascendant Trine Pluto",
+    "summary": "A profound, effortless magnetism and regenerative power naturally emanate from the individual's physical presence.",
+    "fullText": "They possess an unshakeable inner resilience, allowing them to undergo massive personal transformations with grace. This aspect ensures they can wield personal power and influence others without inciting unnecessary conflict."
+  },
+  "sun_opposite_ascendant": {
+    "title": "Ascendant Opposition Sun",
+    "summary": "This aspect, essentially placing the Sun on the Descendant, tightly binds the individual's ego to their partnerships and interactions with others.",
+    "fullText": "They define themselves largely through the mirror of relationships, seeking validation and balance from external sources. To achieve true wholeness, they must cultivate a strong independent identity rather than solely living through their partners."
+  },
+  "moon_opposite_ascendant": {
+    "title": "Ascendant Opposition Moon",
+    "summary": "With the Moon on the Descendant, the individual projects their emotional needs onto their partners and the external world.",
+    "fullText": "They seek emotional security through relationships, often attracting highly sensitive or nurturing people into their lives. The challenge is to own their own emotional depth rather than relying on others to provide their emotional grounding."
+  },
+  "mercury_opposite_ascendant": {
+    "title": "Ascendant Opposition Mercury",
+    "summary": "With Mercury on the Descendant, the individual seeks intellectual stimulation primarily through one-on-one relationships.",
+    "fullText": "They are highly responsive to the ideas of others, often needing a conversational partner to help them clarify their own thoughts. They must ensure they do not become overly reliant on others' opinions to form their own identity."
+  },
+  "venus_opposite_ascendant": {
+    "title": "Ascendant Opposition Venus",
+    "summary": "With Venus on the Descendant, the individual's identity is heavily defined by their romantic and business partnerships.",
+    "fullText": "They project a strong need for harmony onto others, often attracting charming or aesthetically pleasing partners. They must learn to embody their own Venusian qualities rather than just seeking them out in the people they love."
+  },
+  "mars_opposite_ascendant": {
+    "title": "Ascendant Opposition Mars",
+    "summary": "With Mars on the Descendant, the individual often projects their own aggressive or assertive energy onto their partners.",
+    "fullText": "They may attract combative relationships or seek out highly dynamic, competitive people to interact with. To achieve balance, they must learn to own their personal power rather than fighting it externally in others."
+  },
+  "jupiter_opposite_ascendant": {
+    "title": "Ascendant Opposition Jupiter",
+    "summary": "With Jupiter on the Descendant, the individual seeks expansion, wisdom, and growth primarily through their relationships.",
+    "fullText": "They often attract larger-than-life, wealthy, or foreign partners who broaden their horizons. They must ensure they do not become overly dependent on others for their sense of meaning or adventure."
+  },
+  "saturn_opposite_ascendant": {
+    "title": "Ascendant Opposition Saturn",
+    "summary": "With Saturn on the Descendant, the individual often projects their fears, restrictions, or need for structure onto their relationships.",
+    "fullText": "They may attract older, serious, or demanding partners, seeking external stability at the cost of personal freedom. They must learn to develop their own internal authority rather than relying on others to set their boundaries."
+  },
+  "uranus_opposite_ascendant": {
+    "title": "Ascendant Opposition Uranus",
+    "summary": "With Uranus on the Descendant, the individual seeks freedom, excitement, and unconventionality primarily through their partnerships.",
+    "fullText": "They often attract eccentric or unstable partners, leading to relationships characterized by sudden changes. They must learn to own their own need for independence rather than forcing their partners to act out the rebellion."
+  },
+  "neptune_opposite_ascendant": {
+    "title": "Ascendant Opposition Neptune",
+    "summary": "With Neptune on the Descendant, the individual tends to over-idealize their partners or attract people who need saving.",
+    "fullText": "They project their own spiritual and compassionate qualities onto others, which can lead to disillusionment in relationships. They must learn to integrate their own divine nature rather than seeking a savior or victim in their partnerships."
+  },
+  "pluto_opposite_ascendant": {
+    "title": "Ascendant Opposition Pluto",
+    "summary": "With Pluto on the Descendant, the individual often projects their own power, intensity, or need for control onto their partners.",
+    "fullText": "They frequently attract intense, manipulative, or deeply transformative relationships that force them to confront their own shadows. They must learn to integrate their own power rather than constantly battling it in the people they love."
+  },
+  "sun_sextile_ascendant": {
+    "title": "Ascendant Sextile Sun",
+    "summary": "A harmonious flow of energy exists between the individual's inner will and their external persona, making self-expression natural and engaging.",
+    "fullText": "They easily project their creative vitality into their environment, which often garners positive support from others. This aspect brings a healthy level of self-confidence and a warm, inviting demeanor that facilitates personal success."
+  },
+  "moon_sextile_ascendant": {
+    "title": "Ascendant Sextile Moon",
+    "summary": "A gentle harmony exists between the individual's emotional needs and their external persona, allowing them to connect easily with others.",
+    "fullText": "They project a comforting and sympathetic presence, navigating their environment with intuitive grace. This aspect fosters healthy emotional boundaries and a natural ability to express vulnerability without feeling exposed."
+  },
+  "mercury_sextile_ascendant": {
+    "title": "Ascendant Sextile Mercury",
+    "summary": "This aspect promotes a smooth flow of communication, allowing the individual to express their ideas clearly and engagingly.",
+    "fullText": "They project a friendly, approachable, and intelligent demeanor that facilitates easy networking and learning. Their mind and their physical environment interact harmoniously, making them highly adaptable."
+  },
+  "venus_sextile_ascendant": {
+    "title": "Ascendant Sextile Venus",
+    "summary": "This aspect grants a naturally charming, sociable, and cooperative demeanor that makes the individual highly likable.",
+    "fullText": "They easily attract positive social interactions and possess a refined sense of personal style. Their ability to blend their identity with an appreciation for beauty creates a harmonious external environment."
+  },
+  "mars_sextile_ascendant": {
+    "title": "Ascendant Sextile Mars",
+    "summary": "This aspect provides a healthy, constructive flow of physical energy and confidence.",
+    "fullText": "The individual can easily assert themselves and take initiative without appearing overly aggressive or domineering. They possess a natural courage that allows them to actively pursue their goals and positively shape their environment."
+  },
+  "jupiter_sextile_ascendant": {
+    "title": "Ascendant Sextile Jupiter",
+    "summary": "This aspect brings a naturally cheerful, generous, and broad-minded approach to life.",
+    "fullText": "The individual easily attracts luck and opportunities through their positive, engaging interactions with their environment. Their physical vitality is supported by a healthy, philosophical perspective that encourages constant personal growth."
+  },
+  "saturn_sextile_ascendant": {
+    "title": "Ascendant Sextile Saturn",
+    "summary": "This aspect provides a steady, reliable, and pragmatic approach to the individual's interactions with the world.",
+    "fullText": "They project a sense of quiet competence, earning the respect of others through their consistent and responsible behavior. Their physical vitality is well-managed, allowing them to build solid, long-lasting foundations for their personal goals."
+  },
+  "uranus_sextile_ascendant": {
+    "title": "Ascendant Sextile Uranus",
+    "summary": "This aspect creates a smooth, engaging flow of progressive and original energy in the individual's presentation.",
+    "fullText": "They easily project their unique quirks and humanitarian ideals, attracting diverse and stimulating social interactions. They navigate change with intuitive grace, using their originality to positively influence their environment."
+  },
+  "neptune_sextile_ascendant": {
+    "title": "Ascendant Sextile Neptune",
+    "summary": "This aspect brings a gentle, artistic, and compassionate flow to the individual's interaction with the world.",
+    "fullText": "They project a soothing, imaginative presence, easily tuning into the subtle emotional undercurrents of their environment. Their natural spiritual awareness enhances their physical presentation without detaching them from reality."
+  },
+  "pluto_sextile_ascendant": {
+    "title": "Ascendant Sextile Pluto",
+    "summary": "This aspect provides a healthy, empowering flow of transformative energy in the individual's self-presentation.",
+    "fullText": "They project a quietly confident and resilient persona, easily navigating deep psychological waters and initiating positive change. Their physical presence commands respect, allowing them to influence their environment with strategic subtlety."
+  },
+  "sun_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Sun",
+    "summary": "A persistent, awkward disconnect exists between the individual's conscious will and the way they physically present themselves.",
+    "fullText": "They frequently feel misunderstood, requiring constant, minor adjustments to align their inner desires with their outer reactions. This dynamic fosters deep self-awareness over time as they learn to bridge their internal purpose with environmental expectations."
+  },
+  "moon_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Moon",
+    "summary": "The individual struggles to seamlessly integrate their subconscious emotional needs with their outward physical expression.",
+    "fullText": "They may feel that their emotional reactions are constantly at odds with the situations they find themselves in, requiring frequent psychological adjustments. This aspect demands ongoing self-reflection to align their inner emotional reality with their social presentation."
+  },
+  "mercury_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Mercury",
+    "summary": "There is an irritating disconnect between the individual's communication style and their physical presentation.",
+    "fullText": "They may frequently feel that their words do not accurately reflect their true persona, leading to awkward social adjustments. Overcoming this requires mindful practice to synchronize their internal thought processes with their outward expression."
+  },
+  "venus_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Venus",
+    "summary": "The individual experiences an awkward tension between their physical presentation and their desire for relational harmony.",
+    "fullText": "They may feel they have to compromise their true identity to be loved, or that their appearance doesn't match their inner values. Continuous, mindful adjustments are needed to authentically merge their self-expression with their aesthetic desires."
+  },
+  "mars_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Mars",
+    "summary": "A frustrating disconnect exists between the individual's aggressive drives and their physical presentation.",
+    "fullText": "They may struggle to assert themselves appropriately, either holding back their anger or releasing it in awkward, ill-timed bursts. They must learn to safely and consistently integrate their raw desires with their social persona."
+  },
+  "jupiter_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Jupiter",
+    "summary": "The individual experiences a persistent, uncomfortable friction between their desire for expansion and their physical reality.",
+    "fullText": "They may struggle to integrate their philosophical beliefs with their daily presentation, requiring constant adjustment of their expectations. Growth comes from finding practical ways to ground their lofty ideals in their immediate environment."
+  },
+  "saturn_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Saturn",
+    "summary": "An awkward tension exists between the individual's physical spontaneity and their internalized sense of duty.",
+    "fullText": "They may feel chronically burdened or restricted by their environment, requiring constant, minor adjustments to their physical routines. They must consciously work to release unnecessary guilt and align their responsibilities with their authentic identity."
+  },
+  "uranus_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Uranus",
+    "summary": "The individual experiences a persistent, irritating disconnect between their desire to be unique and their actual physical presentation.",
+    "fullText": "They may feel that their eccentricities are misunderstood or poorly timed, requiring constant social recalibration. Growth involves learning how to introduce their radical ideas into their environment with tact and practical awareness."
+  },
+  "neptune_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Neptune",
+    "summary": "An awkward, confusing tension exists between the individual's spiritual ideals and their physical presentation.",
+    "fullText": "They may struggle to clearly define their boundaries, leading to minor but persistent misunderstandings with their environment. They must consciously work to anchor their vast imagination into practical, tangible expressions of self."
+  },
+  "pluto_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Pluto",
+    "summary": "The individual experiences a persistent, uncomfortable tension between their conscious physical presentation and their deep, primal drives.",
+    "fullText": "They may feel that their true power is socially unacceptable, leading to awkward attempts to suppress or release their intensity. They must undergo ongoing psychological adjustments to authentically and safely express their transformative nature."
+  },
+  "sun_septile_ascendant": {
+    "title": "Sun Septile Ascendant",
+    "summary": "A time when your core identity undergoes hidden inner changes that manifest as spiritual lessons on the physical plane.",
+    "fullText": "During this transit, your core vitality and outward persona are subjected to hidden inner changes that often affect your psychological state. Because the septile has a \"hard\" testing quality, these spiritual lessons manifest on the physical plane in ways that are rarely pleasant but are highly necessary for growth. You may experience sudden moments of discovery regarding your true self, though you must ensure your new inspirations remain grounded in reality."
+  },
+  "moon_septile_ascendant": {
+    "title": "Moon Septile Ascendant",
+    "summary": "A highly sensitive period that profoundly impacts your fantasy life, emotions, and spiritual awareness.",
+    "fullText": "This transit brings a deeply romantic, emotional, and feeling quality to how you project yourself to the world. Your moods are guided by a mystical, hidden flow of energy, increasing your spiritual and energetic sensitivity to your immediate environment. While this is a powerful time for inspiration, you must guard against projecting fantasies onto others that have little basis in reality, as this aspect can have a dangerous, illusionary side."
+  },
+  "mercury_septile_ascendant": {
+    "title": "Mercury Septile Ascendant",
+    "summary": "A mentally stimulating transit marked by radical changes in perception and moments of brilliant discovery.",
+    "fullText": "Your communication style and daily interactions are colored by radical changes in perception and consciousness during this transit. The septile aspect abounds at moments of discovery, inspiring an inner awareness of a more subtle, hidden level of reality in your thoughts. You may find yourself expressing highly imaginative ideas, but you must ensure your mental inspirations do not completely lose touch with practical, physical facts."
+  },
+  "venus_septile_ascendant": {
+    "title": "Venus Septile Ascendant",
+    "summary": "A mystical, romantic transit that heightens your relational fantasies and energetic sensitivity to others.",
+    "fullText": "With Venus forming a septile to your Ascendant, a romantic, emotional, and highly inspirational quality enters your social interactions and outward persona. You may feel a mystical, hidden flow of energy connecting you to partners, giving you a deep inner awareness of subtle relationship dynamics. However, you must be extremely careful, as the fantasies you build around your relationships right now may have little basis in reality and carry a dangerous side if left unchecked."
+  },
+  "mars_septile_ascendant": {
+    "title": "Mars Septile Ascendant",
+    "summary": "A challenging period where your physical drive faces spiritual tests and hidden inner shifts.",
+    "fullText": "Your physical drive, assertiveness, and outward actions face a \"hard\" testing quality during this transit, as complex spiritual lessons are forced to manifest on the physical plane. Your typical methods of taking action are disrupted by hidden inner changes that radically affect your psychological state. Channeling this intense, subtle energy into creative discovery is crucial to avoid the more dangerous or ungrounded expressions of this aspect."
+  },
+  "jupiter_septile_ascendant": {
+    "title": "Jupiter Septile Ascendant",
+    "summary": "An expansive period of spiritual sensitivity where you are driven by high ideals and profound moments of discovery.",
+    "fullText": "Your desire for growth and expansion is channeled through a highly mystical lens, profoundly enhancing your spiritual and energetic sensitivity. You possess a strong ability to provide inspiration to others and are likely to experience significant moments of philosophical or personal discovery. Because this transit stimulates your fantasy life, you must remain cautious that your grand, expansive visions do not lose their basis in practical reality."
+  },
+  "saturn_septile_ascendant": {
+    "title": "Saturn Septile Ascendant",
+    "summary": "A heavy period where strict spiritual lessons and hidden psychological changes test your outward structures.",
+    "fullText": "This is a period where strict spiritual lessons manifest on the physical plane, often in a manner that is severely testing and rarely pleasant. The rigid structures of your outward persona undergo hidden inner changes, forcing a radical shift in your consciousness and psychological state. You are forced to confront the subtle, hidden levels of reality underlying your responsibilities, stripping away any fantasies that lack a concrete basis."
+  },
+  "uranus_septile_ascendant": {
+    "title": "Uranus Septile Ascendant",
+    "summary": "An electrifying transit bringing radical shifts in consciousness, sudden inspirations, and mystical discoveries.",
+    "fullText": "This transit represents a time of intense, sudden moments of discovery that radically change your perception and consciousness. Your outward persona may unexpectedly reflect a hidden flow of energy, causing you to rebel against standard reality to embrace a more subtle, mystical awareness. While your ability to inspire others is incredibly high, you must watch out for the dangerous side of pursuing eccentric fantasies that lack grounding."
+  },
+  "neptune_septile_ascendant": {
+    "title": "Neptune Septile Ascendant",
+    "summary": "A deeply mystical transit that immerses your persona in fantasy, requiring strict boundaries to avoid dangerous illusions.",
+    "fullText": "Your outward mask becomes deeply immersed in your fantasy life, giving you a romantic, emotional, and highly inspirational quality. Because both Neptune and the septile indicate a hidden flow of energy and a connection to subtle realities, you are highly spiritually sensitive right now. You must be extremely careful to stay grounded, as these powerful illusions and \"occult\" phenomena can have a dangerous side with very little basis in objective reality."
+  },
+  "pluto_septile_ascendant": {
+    "title": "Pluto Septile Ascendant",
+    "summary": "An intense transit where profound, hidden inner changes radically transform your psychological state and spiritual awareness.",
+    "fullText": "During this transit, profound, hidden inner changes radically affect your psychological state and how you project power to the world. This aspect brings intense spiritual lessons to the physical plane, manifesting through \"hard,\" testing encounters that force personal evolution. You are drawn toward exploring hidden levels of reality or \"occult\" phenomena, initiating a powerful period of discovery regarding your deepest, most buried psychological motivations."
+  },
+  "chiron_conjunct_ascendant": {
+    "title": "Ascendant Conjunction Chiron",
+    "summary": "The individual's physical presence and core identity are intimately bound to a deep, primal wound, often related to their right to exist.",
+    "fullText": "They project an aura of vulnerability and healing, often acting as a powerful physical catalyst for the healing of others. Their ultimate life task is to accept their own perceived physical or psychological flaws, turning their deepest insecurities into their greatest teachings."
+  },
+  "chiron_square_ascendant": {
+    "title": "Ascendant Square Chiron",
+    "summary": "The individual experiences acute tension between their outward presentation and their deep internal wounds.",
+    "fullText": "They may overcompensate for their insecurities by projecting a false bravado, or feel that their physical presence is constantly under attack. True healing requires them to drop their defensive masks and openly address the pain associated with their self-image."
+  },
+  "chiron_trine_ascendant": {
+    "title": "Ascendant Trine Chiron",
+    "summary": "A profound, effortless healing energy radiates from the individual's physical presence.",
+    "fullText": "They have naturally integrated their core wounds, projecting an aura of holistic acceptance and spiritual wisdom. This aspect makes them excellent physical healers or mentors, as they lead by authentic, vulnerable example."
+  },
+  "chiron_opposite_ascendant": {
+    "title": "Ascendant Opposition Chiron",
+    "summary": "With Chiron on the Descendant, the individual tends to project their deepest wounds onto their partnerships and interactions.",
+    "fullText": "They often attract wounded people who need saving, or partners who inadvertently trigger their deepest insecurities. They must learn to heal their own internal sense of rejection rather than seeking a savior or a patient in their relationships."
+  },
+  "chiron_sextile_ascendant": {
+    "title": "Ascendant Sextile Chiron",
+    "summary": "This harmonious aspect allows the individual to express their healing abilities and unique wisdom naturally through their physical presence.",
+    "fullText": "They easily integrate their past pains into their daily life, projecting a sympathetic and understanding persona. They navigate their environment with a gentle awareness of the vulnerabilities in themselves and others."
+  },
+  "chiron_quincunx_ascendant": {
+    "title": "Ascendant Quincunx Chiron",
+    "summary": "The individual experiences a persistent, awkward friction between their physical presentation and their unresolved pain.",
+    "fullText": "They may feel that their outward identity never quite aligns with the healing they need, requiring constant, uncomfortable adjustments. They must mindfully work to bridge the gap between their external persona and their internal need for holistic integration."
+  },
+  "chiron_septile_ascendant": {
+    "title": "Chiron Septile Ascendant",
+    "summary": "A fated quality to the link between identity and wounding.",
+    "fullText": "The septile lends an irrational, almost destined feeling to the relationship between who you appear to be and where you were hurt. Events touching this axis tend to arrive with a sense of inevitability and carry more weight than their scale suggests. This aspect is subtle and easily missed, but often marks the deepest thread of a life."
+  }
+}

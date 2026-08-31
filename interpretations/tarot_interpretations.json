@@ -1,0 +1,430 @@
+{
+  "major_0_fool": {
+    "title": "0. The Fool",
+    "astrological_association": "Uranus",
+    "summary": "The Fool is assigned to Uranus, the planet of rebellion and revolution [1].",
+    "fullText": "The Fool, who doesn’t care what society thinks, naturally aligns with Uranus, the planet of rebellion, revolution, and unpredictable change [1]. It represents an innocent wanderer stepping into a new reality."
+  },
+  "major_1_magician": {
+    "title": "I. The Magician",
+    "astrological_association": "Mercury",
+    "summary": "The Magician corresponds to Mercury, the planet of speed, intellect, and communication [1].",
+    "fullText": "As the master of banter and fast talk, The Magician is assigned to Mercury, the planet of speed and communication [1]. He is often depicted pointing heavenward, conveying messages from the heavens above to the Earth below [1]."
+  },
+  "major_2_high_priestess": {
+    "title": "II. The High Priestess",
+    "astrological_association": "The Moon",
+    "summary": "The High Priestess is governed by the Moon, representing the mystical, intuitive, and subconscious realms [2, 3].",
+    "fullText": "The High Priestess is inextricably linked to the Moon, acting as a channel for mystical, intuitive, and deeply subconscious energies [2, 3]. She embodies the divine feminine and the hidden mysteries of the psyche."
+  },
+  "major_3_empress": {
+    "title": "III. The Empress",
+    "astrological_association": "Venus",
+    "summary": "The Empress corresponds to Venus, the goddess of love, beauty, and creative attraction [2, 4].",
+    "fullText": "The Empress is the pure embodiment of constructive, creative energy [4, 5]. Assigned to Venus, she represents love, attraction, fertility, and the flourishing beauty of the natural world [2, 4]."
+  },
+  "major_4_emperor": {
+    "title": "IV. The Emperor",
+    "astrological_association": "Aries",
+    "summary": "The Emperor is assigned to Aries, the initiator of the zodiac ruled by Mars [6].",
+    "fullText": "Representing the ultimate authority figure, The Emperor corresponds to Aries, the ram [2, 6]. He acts as the initiator, bringing order, structure, and dynamic leadership, fueled by the assertive drive of his ruling planet, Mars [6]."
+  },
+  "major_5_hierophant": {
+    "title": "V. The Hierophant",
+    "astrological_association": "Taurus",
+    "summary": "The Hierophant is assigned to Taurus, seeking to maintain spiritual and material traditions [5, 6].",
+    "fullText": "The Hierophant acts as the maintainer, corresponding to Taurus, the bull [6]. Governed by Venus, he wants to preserve his traditions, the status quo, and the spiritual or material treasures he has accumulated over time [5, 6]."
+  },
+  "major_6_lovers": {
+    "title": "VI. The Lovers",
+    "astrological_association": "Gemini",
+    "summary": "The Lovers correspond to Gemini, the sign of thought, communication, and twin souls [6, 7].",
+    "fullText": "The Lovers are twin souls who think and speak as one, finding their natural home in Gemini [7]. As the questioners ruled by Mercury, they represent the duality of choices, partnership, and intellectual harmony [6]."
+  },
+  "major_7_chariot": {
+    "title": "VII. The Chariot",
+    "astrological_association": "Cancer",
+    "summary": "The Chariot is assigned to Cancer, the sign of motherhood, home, and family protection [6, 7].",
+    "fullText": "Just as the crab carries its home on its back, The Charioteer is safely ensconced in his protective shell [3, 7]. Ruled by the Moon, this card represents the emotional nurturer who balances opposing forces to move forward safely [6]."
+  },
+  "major_8_strength": {
+    "title": "VIII. Strength",
+    "astrological_association": "Leo",
+    "summary": "Strength corresponds to Leo, representing courage, the heart, and gentle force [7, 8].",
+    "fullText": "Strength is the master of gentle force and emotional control, assigned to Leo, the sign of lionesque courage and heart [7, 8]. Ruled by the Sun, it reflects the loyalist who seeks creative expression and play [3, 8]."
+  },
+  "major_9_hermit": {
+    "title": "IX. The Hermit",
+    "astrological_association": "Virgo",
+    "summary": "The Hermit is assigned to Virgo, representing quiet leadership, duty, and dedicated service [7, 8].",
+    "fullText": "The Hermit acts as the quiet leader and the modifier [7, 8]. Ruled by Mercury, this card corresponds perfectly to Virgo, the sign dedicated to responsibility, careful analysis, and selfless service to others [7, 8]."
+  },
+  "major_10_wheel_of_fortune": {
+    "title": "X. The Wheel of Fortune",
+    "astrological_association": "Jupiter",
+    "summary": "The Wheel of Fortune corresponds to Jupiter, the planet of luck, expansion, and cycles of growth [2].",
+    "fullText": "Assigned to the expansive planet Jupiter, The Wheel of Fortune represents the ever-turning cycles of fate, luck, and destiny [2]. It reflects philosophical growth and the opportunities brought by shifting cosmic tides."
+  },
+  "major_11_justice": {
+    "title": "XI. Justice",
+    "astrological_association": "Libra",
+    "summary": "Justice is assigned to Libra, the sign of the balanced scales and the fair judge [8].",
+    "fullText": "Representing the ultimate judge, Justice corresponds to Libra, the sign of the balanced scales [8]. Ruled by Venus, this card emphasizes equality, legal matters, harmonious partnerships, and weighing actions carefully [8]."
+  },
+  "major_12_hanged_man": {
+    "title": "XII. The Hanged Man",
+    "astrological_association": "Neptune",
+    "summary": "The Hanged Man corresponds to Neptune, representing spiritual sacrifice and mystical surrender [2, 9].",
+    "fullText": "As one of the spiritual 'Mother' cards of the Tarot, The Hanged Man is linked to the outer planet Neptune [2, 9]. It signifies a willing suspension of the ego, profound sacrifice, and tapping into the boundless spiritual realm."
+  },
+  "major_13_death": {
+    "title": "XIII. Death",
+    "astrological_association": "Scorpio",
+    "summary": "Death corresponds to Scorpio, the catalyst demanding transfiguration, endings, and change [5, 8].",
+    "fullText": "Death acts as the ultimate catalyst for rebirth, assigned to Scorpio and ruled by Pluto [5, 8]. The angel of Death demands transfiguration, stripping away the old to make room for profound, unavoidable psychological change [5]."
+  },
+  "major_14_temperance": {
+    "title": "XIV. Temperance",
+    "astrological_association": "Sagittarius",
+    "summary": "Temperance is assigned to Sagittarius, the adventurous alchemist seeking higher philosophy [10, 11].",
+    "fullText": "Temperance, often depicted as The Alchemist, corresponds to Sagittarius [10, 11]. Ruled by Jupiter, it reflects the adventurer's honest, optimistic spirit, blending elements together perfectly in the pursuit of travel, philosophy, and higher truth [10, 11]."
+  },
+  "major_15_devil": {
+    "title": "XV. The Devil",
+    "astrological_association": "Capricorn",
+    "summary": "The Devil corresponds to Capricorn, facing the material world in exchange for physical rewards [3, 10].",
+    "fullText": "The Devil, or the Dark Lord, is the ultimate pragmatist assigned to Capricorn [10]. Ruled by Saturn, this card represents facing the cold, cruel material world and grappling with the restrictions and worldly ambitions of physical existence [3, 10]."
+  },
+  "major_16_tower": {
+    "title": "XVI. The Tower",
+    "astrological_association": "Mars",
+    "summary": "The Tower corresponds to Mars, representing sudden, destructive, and forceful cosmic energy [2, 5].",
+    "fullText": "The lightning-struck Tower is ruled by Mars, the planet of forceful action and aggression [2, 5]. It channels a destructive but necessary cosmic energy that tears down false structures so truth can be rebuilt [5]."
+  },
+  "major_17_star": {
+    "title": "XVII. The Star",
+    "astrological_association": "Aquarius",
+    "summary": "The Star is assigned to Aquarius, the reformer focused on long-range vision and humanitarian hope [3, 10].",
+    "fullText": "The Star is the progressive reformer of the deck, assigned to Aquarius and ruled by Uranus [10]. She wants to be part of a larger constellation, focusing her healing energies on tomorrow's children and long-range, visionary planning [3]."
+  },
+  "major_18_moon": {
+    "title": "XVIII. The Moon",
+    "astrological_association": "Pisces",
+    "summary": "The Moon card is assigned to Pisces, representing the visionary, dreams, and psychic depths [10].",
+    "fullText": "The Moon card corresponds to Pisces, the visionary fish ruled by Neptune [10]. It plunges into the murky, intuitive depths of the subconscious, navigating through dreams, illusions, and profound psychic sensitivity [10]."
+  },
+  "major_19_sun": {
+    "title": "XIX. The Sun",
+    "astrological_association": "The Sun",
+    "summary": "The Sun card corresponds to the Sun itself, the source of enlightenment, life, and ego [12].",
+    "fullText": "The Sun, the sustainer of life, naturally corresponds with the astrological Sun [12]. It acts as the ultimate source of vital energy, clarity, enlightenment, and the joyous expression of the self [12]."
+  },
+  "major_20_judgment": {
+    "title": "XX. Judgment",
+    "astrological_association": "Pluto",
+    "summary": "Judgment corresponds to Pluto, signaling a final call for resurrection and deep understanding [12].",
+    "fullText": "Assigned to Pluto, Judgment represents a last call for awareness, understanding, and acceptance [12]. It is a spiritual awakening tied to the planet of death, resurrection, and unavoidable, total life transformation [12]."
+  },
+  "major_21_world": {
+    "title": "XXI. The World",
+    "astrological_association": "Saturn",
+    "summary": "The World corresponds to Saturn, representing physical boundaries, structure, and completion [12].",
+    "fullText": "The World represents our earthly home and is assigned to Saturn, the ringed planet of boundaries, limitations, restrictions, and ultimate structure [12]. It signifies the completion of a major karmic or material cycle [12]."
+  }
+}
+```json
+{
+  "minor_2_wands": {
+    "title": "Two of Wands",
+    "astrological_association": "Aries Decan 1 (Mars)",
+    "summary": "The Two of Wands corresponds to the first decan of Aries, sub-ruled by Mars.",
+    "fullText": "As a cardinal fire sign, Aries is assigned to the first three numbered cards of the fiery Wands suit. The Two of Wands specifically aligns with the first decan (0°–10°) of Aries, which is sub-ruled by Mars in the Chaldean order. This integrates the aggressive, action-oriented influence of Mars with the passionate, spiritual energy of the Wands."
+  },
+  "minor_3_wands": {
+    "title": "Three of Wands",
+    "astrological_association": "Aries Decan 2 (Sun)",
+    "summary": "The Three of Wands corresponds to the second decan of Aries, sub-ruled by the Sun.",
+    "fullText": "As a cardinal fire sign, Aries is assigned to the first three numbered cards of the fiery Wands suit. The Three of Wands specifically aligns with the second decan (10°–20°) of Aries, which is sub-ruled by the Sun in the Chaldean order. This integrates the Sun's vital, enlightening influence with the passionate, spiritual energy of the Wands."
+  },
+  "minor_4_wands": {
+    "title": "Four of Wands",
+    "astrological_association": "Aries Decan 3 (Venus)",
+    "summary": "The Four of Wands corresponds to the third decan of Aries, sub-ruled by Venus.",
+    "fullText": "As a cardinal fire sign, Aries is assigned to the first three numbered cards of the fiery Wands suit. The Four of Wands specifically aligns with the third decan (20°–30°) of Aries, which is sub-ruled by Venus in the Chaldean order. This integrates the attractive, harmonious influence of Venus with the passionate, spiritual energy of the Wands."
+  },
+  "minor_5_pentacles": {
+    "title": "Five of Pentacles",
+    "astrological_association": "Taurus Decan 1 (Mercury)",
+    "summary": "The Five of Pentacles corresponds to the first decan of Taurus, sub-ruled by Mercury.",
+    "fullText": "As a fixed earth sign, Taurus is assigned to the middle three numbered cards of the earthy Pentacles suit. The Five of Pentacles specifically aligns with the first decan (0°–10°) of Taurus, which is sub-ruled by Mercury in the Chaldean order. This integrates Mercury's communicative influence with the tangible, material reality of the Pentacles."
+  },
+  "minor_6_pentacles": {
+    "title": "Six of Pentacles",
+    "astrological_association": "Taurus Decan 2 (Moon)",
+    "summary": "The Six of Pentacles corresponds to the second decan of Taurus, sub-ruled by the Moon.",
+    "fullText": "As a fixed earth sign, Taurus is assigned to the middle three numbered cards of the earthy Pentacles suit. The Six of Pentacles specifically aligns with the second decan (10°–20°) of Taurus, which is sub-ruled by the Moon in the Chaldean order. This integrates the intuitive, reflective influence of the Moon with the tangible, material reality of the Pentacles."
+  },
+  "minor_7_pentacles": {
+    "title": "Seven of Pentacles",
+    "astrological_association": "Taurus Decan 3 (Saturn)",
+    "summary": "The Seven of Pentacles corresponds to the third decan of Taurus, sub-ruled by Saturn.",
+    "fullText": "As a fixed earth sign, Taurus is assigned to the middle three numbered cards of the earthy Pentacles suit. The Seven of Pentacles specifically aligns with the third decan (20°–30°) of Taurus, which is sub-ruled by Saturn in the Chaldean order. This integrates Saturn's structured, restrictive influence with the tangible, material reality of the Pentacles."
+  },
+  "minor_8_swords": {
+    "title": "Eight of Swords",
+    "astrological_association": "Gemini Decan 1 (Jupiter)",
+    "summary": "The Eight of Swords corresponds to the first decan of Gemini, sub-ruled by Jupiter.",
+    "fullText": "As a mutable air sign, Gemini is assigned to the final three numbered cards of the airy Swords suit. The Eight of Swords specifically aligns with the first decan (0°–10°) of Gemini, which is sub-ruled by Jupiter in the Chaldean order. This integrates Jupiter's expansive growth with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_9_swords": {
+    "title": "Nine of Swords",
+    "astrological_association": "Gemini Decan 2 (Mars)",
+    "summary": "The Nine of Swords corresponds to the second decan of Gemini, sub-ruled by Mars.",
+    "fullText": "As a mutable air sign, Gemini is assigned to the final three numbered cards of the airy Swords suit. The Nine of Swords specifically aligns with the second decan (10°–20°) of Gemini, which is sub-ruled by Mars in the Chaldean order. This integrates the aggressive, forceful influence of Mars with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_10_swords": {
+    "title": "Ten of Swords",
+    "astrological_association": "Gemini Decan 3 (Sun)",
+    "summary": "The Ten of Swords corresponds to the third decan of Gemini, sub-ruled by the Sun.",
+    "fullText": "As a mutable air sign, Gemini is assigned to the final three numbered cards of the airy Swords suit. The Ten of Swords specifically aligns with the third decan (20°–30°) of Gemini, which is sub-ruled by the Sun in the Chaldean order. This integrates the Sun's illuminating ego with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_2_cups": {
+    "title": "Two of Cups",
+    "astrological_association": "Cancer Decan 1 (Venus)",
+    "summary": "The Two of Cups corresponds to the first decan of Cancer, sub-ruled by Venus.",
+    "fullText": "As a cardinal water sign, Cancer is assigned to the first three numbered cards of the watery Cups suit. The Two of Cups specifically aligns with the first decan (0°–10°) of Cancer, which is sub-ruled by Venus in the Chaldean order. This integrates the loving, attractive influence of Venus with the deep, emotional, and fertile realm of the Cups."
+  },
+  "minor_3_cups": {
+    "title": "Three of Cups",
+    "astrological_association": "Cancer Decan 2 (Mercury)",
+    "summary": "The Three of Cups corresponds to the second decan of Cancer, sub-ruled by Mercury.",
+    "fullText": "As a cardinal water sign, Cancer is assigned to the first three numbered cards of the watery Cups suit. The Three of Cups specifically aligns with the second decan (10°–20°) of Cancer, which is sub-ruled by Mercury in the Chaldean order. This integrates Mercury's communicative speed with the deep, emotional, and fertile realm of the Cups."
+  },
+  "minor_4_cups": {
+    "title": "Four of Cups",
+    "astrological_association": "Cancer Decan 3 (Moon)",
+    "summary": "The Four of Cups corresponds to the third decan of Cancer, sub-ruled by the Moon.",
+    "fullText": "As a cardinal water sign, Cancer is assigned to the first three numbered cards of the watery Cups suit. The Four of Cups specifically aligns with the third decan (20°–30°) of Cancer, which is sub-ruled by the Moon in the Chaldean order. This integrates the Moon's reflective intuition with the deep, emotional, and fertile realm of the Cups."
+  },
+  "minor_5_wands": {
+    "title": "Five of Wands",
+    "astrological_association": "Leo Decan 1 (Saturn)",
+    "summary": "The Five of Wands corresponds to the first decan of Leo, sub-ruled by Saturn.",
+    "fullText": "As a fixed fire sign, Leo is assigned to the middle three numbered cards of the fiery Wands suit. The Five of Wands specifically aligns with the first decan (0°–10°) of Leo, which is sub-ruled by Saturn in the Chaldean order. This integrates the restrictive, structural influence of Saturn with the passionate, spiritual energy of the Wands."
+  },
+  "minor_6_wands": {
+    "title": "Six of Wands",
+    "astrological_association": "Leo Decan 2 (Jupiter)",
+    "summary": "The Six of Wands corresponds to the second decan of Leo, sub-ruled by Jupiter.",
+    "fullText": "As a fixed fire sign, Leo is assigned to the middle three numbered cards of the fiery Wands suit. The Six of Wands specifically aligns with the second decan (10°–20°) of Leo, which is sub-ruled by Jupiter in the Chaldean order. This integrates Jupiter's expansive, victorious growth with the passionate, spiritual energy of the Wands."
+  },
+  "minor_7_wands": {
+    "title": "Seven of Wands",
+    "astrological_association": "Leo Decan 3 (Mars)",
+    "summary": "The Seven of Wands corresponds to the third decan of Leo, sub-ruled by Mars.",
+    "fullText": "As a fixed fire sign, Leo is assigned to the middle three numbered cards of the fiery Wands suit. The Seven of Wands specifically aligns with the third decan (20°–30°) of Leo, which is sub-ruled by Mars in the Chaldean order. This integrates the aggressive, assertive influence of Mars with the passionate, spiritual energy of the Wands."
+  },
+  "minor_8_pentacles": {
+    "title": "Eight of Pentacles",
+    "astrological_association": "Virgo Decan 1 (Sun)",
+    "summary": "The Eight of Pentacles corresponds to the first decan of Virgo, sub-ruled by the Sun.",
+    "fullText": "As a mutable earth sign, Virgo is assigned to the final three numbered cards of the earthy Pentacles suit. The Eight of Pentacles specifically aligns with the first decan (0°–10°) of Virgo, which is sub-ruled by the Sun in the Chaldean order. This integrates the Sun's vital illumination with the tangible, material reality of the Pentacles."
+  },
+  "minor_9_pentacles": {
+    "title": "Nine of Pentacles",
+    "astrological_association": "Virgo Decan 2 (Venus)",
+    "summary": "The Nine of Pentacles corresponds to the second decan of Virgo, sub-ruled by Venus.",
+    "fullText": "As a mutable earth sign, Virgo is assigned to the final three numbered cards of the earthy Pentacles suit. The Nine of Pentacles specifically aligns with the second decan (10°–20°) of Virgo, which is sub-ruled by Venus in the Chaldean order. This integrates the beautiful, attractive influence of Venus with the tangible, material reality of the Pentacles."
+  },
+  "minor_10_pentacles": {
+    "title": "Ten of Pentacles",
+    "astrological_association": "Virgo Decan 3 (Mercury)",
+    "summary": "The Ten of Pentacles corresponds to the third decan of Virgo, sub-ruled by Mercury.",
+    "fullText": "As a mutable earth sign, Virgo is assigned to the final three numbered cards of the earthy Pentacles suit. The Ten of Pentacles specifically aligns with the third decan (20°–30°) of Virgo, which is sub-ruled by Mercury in the Chaldean order. This integrates Mercury's quick intellect with the tangible, material reality of the Pentacles."
+  },
+  "minor_2_swords": {
+    "title": "Two of Swords",
+    "astrological_association": "Libra Decan 1 (Moon)",
+    "summary": "The Two of Swords corresponds to the first decan of Libra, sub-ruled by the Moon.",
+    "fullText": "As a cardinal air sign, Libra is assigned to the first three numbered cards of the airy Swords suit. The Two of Swords specifically aligns with the first decan (0°–10°) of Libra, which is sub-ruled by the Moon in the Chaldean order. This integrates the Moon's reflective, intuitive tides with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_3_swords": {
+    "title": "Three of Swords",
+    "astrological_association": "Libra Decan 2 (Saturn)",
+    "summary": "The Three of Swords corresponds to the second decan of Libra, sub-ruled by Saturn.",
+    "fullText": "As a cardinal air sign, Libra is assigned to the first three numbered cards of the airy Swords suit. The Three of Swords specifically aligns with the second decan (10°–20°) of Libra, which is sub-ruled by Saturn in the Chaldean order. This integrates Saturn's harsh structure and limits with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_4_swords": {
+    "title": "Four of Swords",
+    "astrological_association": "Libra Decan 3 (Jupiter)",
+    "summary": "The Four of Swords corresponds to the third decan of Libra, sub-ruled by Jupiter.",
+    "fullText": "As a cardinal air sign, Libra is assigned to the first three numbered cards of the airy Swords suit. The Four of Swords specifically aligns with the third decan (20°–30°) of Libra, which is sub-ruled by Jupiter in the Chaldean order. This integrates Jupiter's expansive growth with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_5_cups": {
+    "title": "Five of Cups",
+    "astrological_association": "Scorpio Decan 1 (Mars)",
+    "summary": "The Five of Cups corresponds to the first decan of Scorpio, sub-ruled by Mars.",
+    "fullText": "As a fixed water sign, Scorpio is assigned to the middle three numbered cards of the watery Cups suit. The Five of Cups specifically aligns with the first decan (0°–10°) of Scorpio, which is sub-ruled by Mars in the Chaldean order. This integrates the forceful, aggressive nature of Mars with the deep, emotional, and fertile realm of the Cups."
+  },
+  "minor_6_cups": {
+    "title": "Six of Cups",
+    "astrological_association": "Scorpio Decan 2 (Sun)",
+    "summary": "The Six of Cups corresponds to the second decan of Scorpio, sub-ruled by the Sun.",
+    "fullText": "As a fixed water sign, Scorpio is assigned to the middle three numbered cards of the watery Cups suit. The Six of Cups specifically aligns with the second decan (10°–20°) of Scorpio, which is sub-ruled by the Sun in the Chaldean order. This integrates the radiant, sustaining life force of the Sun with the deep, emotional, and fertile realm of the Cups."
+  },
+  "minor_7_cups": {
+    "title": "Seven of Cups",
+    "astrological_association": "Scorpio Decan 3 (Venus)",
+    "summary": "The Seven of Cups corresponds to the third decan of Scorpio, sub-ruled by Venus.",
+    "fullText": "As a fixed water sign, Scorpio is assigned to the middle three numbered cards of the watery Cups suit. The Seven of Cups specifically aligns with the third decan (20°–30°) of Scorpio, which is sub-ruled by Venus in the Chaldean order. This integrates the beautiful, attractive influence of Venus with the deep, emotional, and fertile realm of the Cups."
+  },
+  "minor_8_wands": {
+    "title": "Eight of Wands",
+    "astrological_association": "Sagittarius Decan 1 (Mercury)",
+    "summary": "The Eight of Wands corresponds to the first decan of Sagittarius, sub-ruled by Mercury.",
+    "fullText": "As a mutable fire sign, Sagittarius is assigned to the final three numbered cards of the fiery Wands suit. The Eight of Wands specifically aligns with the first decan (0°–10°) of Sagittarius, which is sub-ruled by Mercury in the Chaldean order. This integrates Mercury's speed and communicative agility with the passionate, spiritual energy of the Wands."
+  },
+  "minor_9_wands": {
+    "title": "Nine of Wands",
+    "astrological_association": "Sagittarius Decan 2 (Moon)",
+    "summary": "The Nine of Wands corresponds to the second decan of Sagittarius, sub-ruled by the Moon.",
+    "fullText": "As a mutable fire sign, Sagittarius is assigned to the final three numbered cards of the fiery Wands suit. The Nine of Wands specifically aligns with the second decan (10°–20°) of Sagittarius, which is sub-ruled by the Moon in the Chaldean order. This integrates the reflective, intuitive power of the Moon with the passionate, spiritual energy of the Wands."
+  },
+  "minor_10_wands": {
+    "title": "Ten of Wands",
+    "astrological_association": "Sagittarius Decan 3 (Saturn)",
+    "summary": "The Ten of Wands corresponds to the third decan of Sagittarius, sub-ruled by Saturn.",
+    "fullText": "As a mutable fire sign, Sagittarius is assigned to the final three numbered cards of the fiery Wands suit. The Ten of Wands specifically aligns with the third decan (20°–30°) of Sagittarius, which is sub-ruled by Saturn in the Chaldean order. This integrates Saturn's limiting structure with the passionate, spiritual energy of the Wands, representing the weight of responsibilities."
+  },
+  "minor_2_pentacles": {
+    "title": "Two of Pentacles",
+    "astrological_association": "Capricorn Decan 1 (Jupiter)",
+    "summary": "The Two of Pentacles corresponds to the first decan of Capricorn, sub-ruled by Jupiter.",
+    "fullText": "As a cardinal earth sign, Capricorn is assigned to the first three numbered cards of the earthy Pentacles suit. The Two of Pentacles specifically aligns with the first decan (0°–10°) of Capricorn, which is sub-ruled by Jupiter in the Chaldean order. This integrates Jupiter's expansive nature with the tangible, material reality of the Pentacles."
+  },
+  "minor_3_pentacles": {
+    "title": "Three of Pentacles",
+    "astrological_association": "Capricorn Decan 2 (Mars)",
+    "summary": "The Three of Pentacles corresponds to the second decan of Capricorn, sub-ruled by Mars.",
+    "fullText": "As a cardinal earth sign, Capricorn is assigned to the first three numbered cards of the earthy Pentacles suit. The Three of Pentacles specifically aligns with the second decan (10°–20°) of Capricorn, which is sub-ruled by Mars in the Chaldean order. This integrates the energetic, forceful drive of Mars with the tangible, material reality of the Pentacles."
+  },
+  "minor_4_pentacles": {
+    "title": "Four of Pentacles",
+    "astrological_association": "Capricorn Decan 3 (Sun)",
+    "summary": "The Four of Pentacles corresponds to the third decan of Capricorn, sub-ruled by the Sun.",
+    "fullText": "As a cardinal earth sign, Capricorn is assigned to the first three numbered cards of the earthy Pentacles suit. The Four of Pentacles specifically aligns with the third decan (20°–30°) of Capricorn, which is sub-ruled by the Sun in the Chaldean order. This integrates the illuminating, vital ego of the Sun with the tangible, material reality of the Pentacles."
+  },
+  "minor_5_swords": {
+    "title": "Five of Swords",
+    "astrological_association": "Aquarius Decan 1 (Venus)",
+    "summary": "The Five of Swords corresponds to the first decan of Aquarius, sub-ruled by Venus.",
+    "fullText": "As a fixed air sign, Aquarius is assigned to the middle three numbered cards of the airy Swords suit. The Five of Swords specifically aligns with the first decan (0°–10°) of Aquarius, which is sub-ruled by Venus in the Chaldean order. This integrates Venus's relational grace with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_6_swords": {
+    "title": "Six of Swords",
+    "astrological_association": "Aquarius Decan 2 (Mercury)",
+    "summary": "The Six of Swords corresponds to the second decan of Aquarius, sub-ruled by Mercury.",
+    "fullText": "As a fixed air sign, Aquarius is assigned to the middle three numbered cards of the airy Swords suit. The Six of Swords specifically aligns with the second decan (10°–20°) of Aquarius, which is sub-ruled by Mercury in the Chaldean order. This integrates Mercury's quick intellect and communication with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_7_swords": {
+    "title": "Seven of Swords",
+    "astrological_association": "Aquarius Decan 3 (Moon)",
+    "summary": "The Seven of Swords corresponds to the third decan of Aquarius, sub-ruled by the Moon.",
+    "fullText": "As a fixed air sign, Aquarius is assigned to the middle three numbered cards of the airy Swords suit. The Seven of Swords specifically aligns with the third decan (20°–30°) of Aquarius, which is sub-ruled by the Moon in the Chaldean order. This integrates the reflective, emotional tides of the Moon with the intellectual, thought-driven patterns of the Swords."
+  },
+  "minor_8_cups": {
+    "title": "Eight of Cups",
+    "astrological_association": "Pisces Decan 1 (Saturn)",
+    "summary": "The Eight of Cups corresponds to the first decan of Pisces, sub-ruled by Saturn.",
+    "fullText": "As a mutable water sign, Pisces is assigned to the final three numbered cards of the watery Cups suit. The Eight of Cups specifically aligns with the first decan (0°–10°) of Pisces, which is sub-ruled by Saturn in the Chaldean order. This integrates Saturn's limits and structure with the deep, emotional, and fertile realm of the Cups."
+  },
+  "minor_9_cups": {
+    "title": "Nine of Cups",
+    "astrological_association": "Pisces Decan 2 (Jupiter)",
+    "summary": "The Nine of Cups corresponds to the second decan of Pisces, sub-ruled by Jupiter.",
+    "fullText": "As a mutable water sign, Pisces is assigned to the final three numbered cards of the watery Cups suit. The Nine of Cups specifically aligns with the second decan (10°–20°) of Pisces, which is sub-ruled by Jupiter in the Chaldean order. This integrates the abundant, expansive growth of Jupiter with the deep, emotional, and fertile realm of the Cups."
+  },
+  "minor_10_cups": {
+    "title": "Ten of Cups",
+    "astrological_association": "Pisces Decan 3 (Mars)",
+    "summary": "The Ten of Cups corresponds to the third decan of Pisces, sub-ruled by Mars.",
+    "fullText": "As a mutable water sign, Pisces is assigned to the final three numbered cards of the watery Cups suit. The Ten of Cups specifically aligns with the third decan (20°–30°) of Pisces, which is sub-ruled by Mars in the Chaldean order. This integrates the dynamic, driving force of Mars with the deep, emotional, and fertile realm of the Cups."
+  }
+}
+Here is the JSON database mapping the 12 astrological houses to their Tarot correspondences, zodiac signs, and ruling planets.
+
+```json
+{
+  "house_1": {
+    "title": "First House (The Front Entry)",
+    "astrological_association": "Aries (The Emperor) & Mars (The Tower)",
+    "summary": "Represents the self, physical appearance, and first impressions.",
+    "fullText": "Visualized as the front entry to a home, the First House describes your physical appearance, first impressions, and the public face you show the world. It is naturally ruled by Aries (represented by The Emperor) and the planet Mars (represented by The Tower), lending it an assertive, independent, and action-oriented energy."
+  },
+  "house_2": {
+    "title": "Second House (The Living Room)",
+    "astrological_association": "Taurus (The Hierophant) & Venus (The Empress)",
+    "summary": "Represents personal resources, money, material possessions, and values.",
+    "fullText": "Acting as the living room of the chart, the Second House describes material possessions, personal wealth, property, and the values that make us comfortable. It is ruled by Taurus (The Hierophant) and Venus (The Empress), bringing a focus to traditional styles, physical stability, luxury, and comfort."
+  },
+  "house_3": {
+    "title": "Third House (The Communications Center)",
+    "astrological_association": "Gemini (The Lovers) & Mercury (The Magician)",
+    "summary": "Represents the near environment, everyday communication, siblings, and short trips.",
+    "fullText": "The Third House serves as the communications center, covering everyday thoughts, interactions with siblings, neighbors, and the local community. Governed by Gemini (The Lovers) and Mercury (The Magician), this house highlights the intellectual realm, fast-paced logic, and the daily exchange of information."
+  },
+  "house_4": {
+    "title": "Fourth House (The Kitchen)",
+    "astrological_association": "Cancer (The Chariot) & The Moon (The High Priestess)",
+    "summary": "Represents the foundation of your life, roots, home, and family.",
+    "fullText": "Representing the heart of the home, the Fourth House describes caregivers, deep roots, ancestry, and the family foundation. It is ruled by Cancer (The Chariot) and the Moon (The High Priestess), focusing on emotional nurturing, protection, intuition, and establishing a safe sanctuary."
+  },
+  "house_5": {
+    "title": "Fifth House (The Rec Room)",
+    "astrological_association": "Leo (Strength) & The Sun (The Sun)",
+    "summary": "Represents self-expression, creativity, romance, and children.",
+    "fullText": "The Fifth House is the chart's recreation room, governing play, romance, procreation, hobbies, and the arts. Ruled by Leo (Strength) and the Sun (The Sun), it channels life-giving energy, courage, showmanship, and joy into childlike pleasures and creative pursuits."
+  },
+  "house_6": {
+    "title": "Sixth House (The Workspace)",
+    "astrological_association": "Virgo (The Hermit) & Mercury (The Magician)",
+    "summary": "Represents health, daily routines, chores, and service to others.",
+    "fullText": "Operating as a home office or workspace, the Sixth House manages duties, responsibilities, physical health, and daily service to others. Ruled by Virgo (The Hermit) and Mercury (The Magician), it emphasizes quiet leadership, dedication, simple living, and conscientious work."
+  },
+  "house_7": {
+    "title": "Seventh House (The Back Door)",
+    "astrological_association": "Libra (Justice) & Venus (The Empress)",
+    "summary": "Represents one-on-one relationships, marriage, partnerships, and open enemies.",
+    "fullText": "The Seventh House is the 'friends and family' entrance, focused on marriages, lifelong attachments, business partnerships, and open enemies. It is ruled by Libra (Justice) and Venus (The Empress), bringing themes of equality, careful balancing of needs, and respectful affection."
+  },
+  "house_8": {
+    "title": "Eighth House (The Bedroom)",
+    "astrological_association": "Scorpio (Death) & Pluto (Judgment)",
+    "summary": "Represents profound transformation, sex, death, inheritances, and shared resources.",
+    "fullText": "The Eighth House handles shared resources, inheritances, sex, and deep mysteries. Ruled by Scorpio (Death) and Pluto (Judgment), it represents the dark, transformative catalyst of endings and rebirth, constantly demanding psychological transfiguration and unavoidable change."
+  },
+  "house_9": {
+    "title": "Ninth House (The Library)",
+    "astrological_association": "Sagittarius (Temperance) & Jupiter (The Wheel of Fortune)",
+    "summary": "Represents higher knowledge, philosophy, religion, and long-distance travel.",
+    "fullText": "Serving as the library of the chart, the Ninth House rules over philosophy, religion, publishing, and higher education. Ruled by Sagittarius (Temperance) and Jupiter (The Wheel of Fortune), it represents the urge to explore, expand horizons, and test the boundaries of human imagination."
+  },
+  "house_10": {
+    "title": "Tenth House (The Exterior)",
+    "astrological_association": "Capricorn (The Devil) & Saturn (The World)",
+    "summary": "Represents your life task, career, social status, and public image.",
+    "fullText": "The Tenth House is the visible exterior, showcasing your ambition, public image, career success, and authority. Governed by Capricorn (The Devil) and Saturn (The World), it highlights the costs of worldly power, material limitations, structure, and intense dedication to status."
+  },
+  "house_11": {
+    "title": "Eleventh House (The Dining Room)",
+    "astrological_association": "Aquarius (The Star) & Uranus (The Fool)",
+    "summary": "Represents friendships, social groups, hopes, and utopian visions for the future.",
+    "fullText": "Acting as the dining or club room, the Eleventh House is where kindred spirits share hopes, dreams, and long-term goals. Ruled by Aquarius (The Star) and Uranus (The Fool), it embodies progressive rebellion, social causes, and pulling diverse groups together for a utopian future."
+  },
+  "house_12": {
+    "title": "Twelfth House (The Locked Room)",
+    "astrological_association": "Pisces (The Moon) & Neptune (The Hanged Man)",
+    "summary": "Represents the hidden realm, secrets, fears, psychic abilities, and the subconscious.",
+    "fullText": "The Twelfth House is the secluded room of the chart, holding secret fears, hidden enemies, psychic abilities, and deep spirituality. Governed by Pisces (The Moon) and Neptune (The Hanged Man), it is a world submerged in intuition, mystic surrender, and profound, watery depths."
+  }
+}

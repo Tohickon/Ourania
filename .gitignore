@@ -1,0 +1,45 @@
+# Rewritten 2026-08-28 as UTF-8. The previous version switched to UTF-16 partway
+# through, so every pattern after the first few was stored with a null byte between
+# each character and matched nothing. *.apk and *.zip were both inert - `git status`
+# listed three APKs and jadx.zip as untracked, and a `git add -A` would have swept in
+# ~274 MB. This repo has already been through one emergency history purge for exactly
+# that (20,000+ decompiled files plus a leaked API key); do not rewrite this file with
+# a tool that emits a BOM or UTF-16.
+
+# --- build output ---
+out/
+out-*/
+target/
+build/
+*.class
+
+# --- decompiled / reverse-engineering artefacts ---
+decompiled_source/
+decoded_apk/
+jadx/
+jadx.zip
+com.zodiacomputing.ourania*/
+*.apk
+*.zip
+
+# --- IDE ---
+.idea/
+
+# --- python (langgraph_agents): 218 MB of venv around a few KB of source ---
+.venv/
+__pycache__/
+*.pyc
+
+# --- local per-user state ---
+# saved_charts.properties and saved_transits.properties are the app's saved charts. They
+# carried real, NAMED birth records - the operator's and a third party's - and were tracked
+# and public until 2026-08-30. Runtime state, never source. Untracked, kept on disk.
+# settings.properties holds the operator's real natal date, time and birthplace.
+# The repo is public. It is tracked from the initial commit with placeholder values;
+# untrack it with `git rm --cached` rather than committing the real ones.
+settings.properties
+saved_charts.properties
+saved_transits.properties
+
+# --- backups ---
+*.orig

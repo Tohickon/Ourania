@@ -1,0 +1,1029 @@
+CALIBRATION WORKSHEET - Brennan chart passages
+
+Read each passage. Write the planets Brennan names AS BEING IN THAT CHART.
+Then copy them into the picks column of calibration-corpus.tsv.
+
+RULES - fix these before you start, apply identically to all:
+  1. Record a planet only if he says it is in THIS chart. Skip planets named
+     purely as theory ("the out-of-sect malefic usually...") unless he then
+     says which planet that is here.
+  2. Named by house or sign counts. Record the planet.
+  3. An angle alone does not count unless he names its ruler.
+  4. Cap at 4. If more, take those named first.
+  5. Cannot tell? LEAVE BLANK and skip. A skipped chart costs one row;
+     a guessed one corrupts the result.
+
+Exact names: Sun Moon Mercury Venus Mars Jupiter Saturn Uranus Neptune Pluto
+==========================================================================
+
+## Chart 3 - Che Guevara
+   planets appearing in this passage: Mars
+
+Chart 3 - Che Guevara THE DOMICILE LORD IN THE TWELVE PLACES 421 become the longest-reigning 
+British monarch in history. This has led to some frustration on his part that his reign has 
+not yet begun. Although the Queen is the Head of State, Charles will often travel for other 
+official business on behalf of his mother, or on behalf of the United Kingdom. Sometimes 
+when the ruler of the Ascendant is located in one of the more difficult places, the topics 
+that the native's life is directed towards can be more challenging or problematic. For example, 
+Che Guevara was born with Aries rising, and Mars in Pisces in the twelfth place. When he 
+was in college he took two long journeys across South America that had a major impact on 
+his life direction. After witnessing widespread poverty, illness, exploitation, and disenfranchisement 
+throughout Latin America, he decided that the only solution was armed revolution. He subsequently 
+became a major figure in the Cuban Revolution, and later traveled the world attempting to 
+foment revolutions in other countries, but was eventually captured and executed by foreign 
+enemies while fighting in Bolivia. Here we see some of the major themes of the twelfth place 
+becoming prominent in his life, such as suffering, enemies, and travel. In different ways 
+each of these became important factors in shaping his life direction in a very unique way. 
+Another example of difficulties manifesting in connection with the placement of the ruler 
+of the rising sign is F
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 4 - Franklin D Roosevelt
+   planets appearing in this passage: Sun, Venus, Saturn
+
+Chart 4 - Franklin D. Roosevelt Chart 5 - Christopher Reeve 422 CHAPTER 12: DOMICILE LORD 
+OF THE HOUR-MARKER but since people with disabilities were looked down upon at that time 
+in history, he kept his condition a secret. He was the first President of the United States 
+with a significant physical disability. For the rest of his life he was committed to finding 
+a way to rehabilitate himself as well as others afflicted with polio. The foundation that 
+he established eventually went on to fund the development of the polio vaccine, which led 
+to the near eradication of polio as a disease only a few decades later. In this way the domicile 
+lord of the Hour-Marker can show themes and struggles that are prominent in the native's 
+personal life, but sometimes it can also indicate areas where the native's life has a broader 
+or more lasting impact on the world around them. Sometimes the positive or negative themes 
+that a native encounters within the context of the place arise from the presence of benefics 
+or malefics in that place, copresent with the domicile lord of the Hour-Marker. For example, 
+Christopher Reeve, a famous actor best known for having played Superman in movies in the 
+1970s and 80s, was born with Leo rising and the Sun in the third place (Libra). He had a 
+night chart, and his Sun was copresent with both Venus (benefic of the sect) and Saturn (malefic 
+contrary to the sect). With the domicile lord of the Hour- Marker in the third, themes involving 
+travel seem to have been pr
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 6 - Judy Blume
+   planets appearing in this passage: Venus
+
+Chart 6 - Judy Blume THE DOMICILE LORD IN THE TWELVE PLACES 423 he founded the Christopher 
+and Dana Reeve Foundation, which is dedicated to curing spinal cord injuries by funding research, 
+as well as improving the quality oflife for people living with paralysis. In the years following 
+his injury, Reeve did much to promote research on spinal cord injury, as well as other neurological 
+disorders. Here the symbolic theme of travel associated with the third place seems to have 
+been extended to broader themes of mobility in general, as well as his physical health in 
+connection with the ruler of the Ascendant. The ability of the placements to have very literal 
+personal meanings to the native as well as broader symbolic meanings pertaining to the world 
+at large comes up in just about every place. For example, oftentimes placements in the fifth 
+can indicate circumstances surrounding the native's own children or the subject of childbirth, 
+but sometimes these placements can relate more broadly to themes surrounding the topic of 
+children in general in the native's life. A good example of this is Judy Blume, who is a 
+famous author who writes books for children and teenagers. She was born with Libra rising, 
+and Venus in Aquarius in the fifth place in a night chart. In 1996 she won the prestigious 
+Margaret A. Edwards Award from the American Library Association, and her books have sold 
+over eighty million copies and have been translated into more than thirty languages. She 
+began writing chil
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 8 - Carl Sagan
+   planets appearing in this passage: Venus, Saturn
+
+Chart 8 - Carl Sagan 424 CHAPTER 12: DOMICILE LORD OF THE HOUR-MARKER of his own premature 
+death at the age of 53, his book The Astrology of Death ended up representing a large part 
+of his legacy in the astrological community. The ruler of the Ascendant can also reveal areas 
+or people in the native's life that are somehow necessary to work with in order to arrive 
+at their intended destination in life, or that can help the native accomplish whatever their 
+life's focus is. For example, scientist Carl Sagan was born with Taurus rising and Venus 
+in Scorpio in the seventh place. He was married three times, first to Lynn Margulis from 
+1957-1963, then to Linda Salzman from 1968-1981, and finally to Ann Druyan from 1981-1996. 
+His focus on his career was a contributing factor to the breakup of his first two marriages, 
+with Saturn in Aquarius in the tenth place squaring the Scorpio stellium in the seventh. 
+His second two marriages became more tied in with his career and overall life direction. 
+He collaborated with Margulis on the design of the plaques on the Pioneer 10 and 11 space 
+probes (she did the artwork). He was able to find a way to compromise by the time of his 
+third marriage by working together with his wife on professional projects. They co- wrote 
+a few books together, and also worked together on the Cosmos television series, which he 
+hosted and became well known for around the world. She carried on some of his work after 
+he died in 1996, becoming a producer on the movie Cont
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 10 - Joseph Ratzinger
+   planets appearing in this passage: Mercury, Venus, Jupiter
+
+Chart 10 - Pope Benedict XVI Chart 11 - William Rehnquist RULER OF THE HOUR-MARKER IN THE 
+FIRST PLACE 427 Church. This clearly matches one of the significations that Valens gives 
+for Jupiter, which signifies "heads of holy places."2° Another example is William Rehnquist, 
+who had Sagittarius rising, with Jupiter in Sagittarius in the first place in a day chart. 
+He was an American lawyer, jurist, and political figure who served as an Associate Justice 
+of the Supreme Court of the United States, and later became the sixteenth Chief Justice. 
+He was the head of the Supreme Court for about nineteen years, which is the highest court 
+in the United States. According to Valens, Jupiter also signifies "justice, authorities, 
+governments, honors [ ... ] and the arbitration of trials."21 Moving on to other planets, 
+the American poet T. S. Eliot was born with Libra rising and Venus ruling the Hour-Marker, 
+copresent with Mercury in the first place. In this instance, the combination of Venus and 
+Mercury results in poetry, or aesthetically pleasing speech. The favorable placement of Venus 
+in its own domicile indicated that he would excel in the arts; he won the Nobel Prize for 
+Literature in 1948 for his pioneering contributions to contemporary poetry. Filmmaker George 
+Lucas was born with Taurus rising and Venus ruling the Hour-Marker in the first 20 Valens, 
+Anthology, 1, 1: 17. 21 Valens, Anthology, 1, 1: 17. Chart 12 - T. S. Eliot -- 454 of 698 
+-- Chart 13 - George Lucas Chart 14 - Steve Wozni
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 11 - William Rehnquist
+   planets appearing in this passage: Mercury, Venus, Jupiter
+
+Chart 11 - William Rehnquist RULER OF THE HOUR-MARKER IN THE FIRST PLACE 427 Church. This 
+clearly matches one of the significations that Valens gives for Jupiter, which signifies 
+"heads of holy places."2° Another example is William Rehnquist, who had Sagittarius rising, 
+with Jupiter in Sagittarius in the first place in a day chart. He was an American lawyer, 
+jurist, and political figure who served as an Associate Justice of the Supreme Court of the 
+United States, and later became the sixteenth Chief Justice. He was the head of the Supreme 
+Court for about nineteen years, which is the highest court in the United States. According 
+to Valens, Jupiter also signifies "justice, authorities, governments, honors [ ... ] and 
+the arbitration of trials."21 Moving on to other planets, the American poet T. S. Eliot was 
+born with Libra rising and Venus ruling the Hour-Marker, copresent with Mercury in the first 
+place. In this instance, the combination of Venus and Mercury results in poetry, or aesthetically 
+pleasing speech. The favorable placement of Venus in its own domicile indicated that he would 
+excel in the arts; he won the Nobel Prize for Literature in 1948 for his pioneering contributions 
+to contemporary poetry. Filmmaker George Lucas was born with Taurus rising and Venus ruling 
+the Hour-Marker in the first 20 Valens, Anthology, 1, 1: 17. 21 Valens, Anthology, 1, 1: 
+17. Chart 12 - T. S. Eliot -- 454 of 698 -- Chart 13 - George Lucas Chart 14 - Steve Wozniak 
+428 CHAPTER 12: DOMICILE L
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 13 - George Lucas
+   planets appearing in this passage: Mercury, Venus
+
+Chart 13 - George Lucas Chart 14 - Steve Wozniak 428 CHAPTER 12: DOMICILE LORD OF THE HOUR-MARKER 
+place. He became interested in making movies while in college, and received a Bachelor of 
+Fine Arts in film. He went on to become a director, being most well known for his role in 
+creating the Star Wars and Indiana Jones films. An interesting additional Venusian theme 
+with Lucas is that his movies incorporated many themes, ideas, and aesthetics from other 
+earlier films and shows, perhaps due to the unifying principle of Venus. Steve Wozniak provides 
+a good example of Mercury rising while in its domicile and thus ruling the Hour- Marker (Mercury 
+in Virgo in the first place). Wozniak is a computer programmer who co-founded Apple Computer, 
+Inc. with Steve Jobs. He was the programmer and technical genius, while Jobs was the visionary 
+and marketing guru. According to Rhetorius, "Mercury in the Hour- Marker makes the natives 
+intelligent, prudent, [and] ingenious."22 Mercury in Virgo especially tends to excel at technical 
+activities, which in a modern context can include things such as programming and computers. 
+One of the general points here is that there are a range of different ways in which the archetype 
+of a planet can manifest as a specific career or focus in life, although in each instance 
+the life focus does end up being directed towards something that is under the general dominion 
+of that specific planet. Planets in the First and Physical Appearance or Character Planets 
+in the 
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 14 - Steve Wozniak
+   planets appearing in this passage: Mercury, Venus
+
+Chart 14 - Steve Wozniak 428 CHAPTER 12: DOMICILE LORD OF THE HOUR-MARKER place. He became 
+interested in making movies while in college, and received a Bachelor of Fine Arts in film. 
+He went on to become a director, being most well known for his role in creating the Star 
+Wars and Indiana Jones films. An interesting additional Venusian theme with Lucas is that 
+his movies incorporated many themes, ideas, and aesthetics from other earlier films and shows, 
+perhaps due to the unifying principle of Venus. Steve Wozniak provides a good example of 
+Mercury rising while in its domicile and thus ruling the Hour- Marker (Mercury in Virgo in 
+the first place). Wozniak is a computer programmer who co-founded Apple Computer, Inc. with 
+Steve Jobs. He was the programmer and technical genius, while Jobs was the visionary and 
+marketing guru. According to Rhetorius, "Mercury in the Hour- Marker makes the natives intelligent, 
+prudent, [and] ingenious."22 Mercury in Virgo especially tends to excel at technical activities, 
+which in a modern context can include things such as programming and computers. One of the 
+general points here is that there are a range of different ways in which the archetype of 
+a planet can manifest as a specific career or focus in life, although in each instance the 
+life focus does end up being directed towards something that is under the general dominion 
+of that specific planet. Planets in the First and Physical Appearance or Character Planets 
+in the first can sometimes desc
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 15 - Angelina Jolie
+   planets appearing in this passage: Venus, Mars, Saturn
+
+Chart 15 - Angelina Jolie Chart 16 - Paul Newman RULER OF THE HOUR-MARKER IN THE FIRST PLACE 
+429 For example, Venus in the first is sometimes associated with people who are particularly 
+physically attractive, since the first place represents the body and physical appearance, 
+while Venus represents beauty and things that are aesthetically appealing. Angelina Jolie, 
+for example, was born with 28° Cancer rising, with Venus conjunct the degree of the Hour-Marker, 
+also at 28° Cancer. In 2006 she was listed as the most beautiful person in the world in People 
+magazine's "100 Most Beautiful People" issue. Another example is Paul Newman, who was born 
+with 13° Capricorn rising, with Venus at 14° Capricorn in a night chart. In his obituary, 
+the New York Times described him as "a strikingly handsome figure of animal high spirits 
+and blue-eyed candor whose magnetism was almost impossible to resist."24 Conversely, malefics 
+in the first place can sometimes indicate ailments or injuries to the body.25 For example, 
+Mars can indicate cuts or scars, while Saturn can indicate chronic illness. Planets in the 
+first place can also indicate or modify the native's character or behavior. Since these planets 
+are in the Helm, they can sometimes take a more significant contributing role in helping 
+to direct the native's life, for better or worse. Apotelesmatika, 2, 12: 1. 24 Aljean Harmetz, 
+"Paul Newman, a Magnetic Titan of Hollywood, Is Dead at 83," New York Times, September 28, 
+2008. 25 Ptolemy mention
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 16 - Paul Newman
+   planets appearing in this passage: Venus, Mars, Saturn
+
+Chart 16 - Paul Newman RULER OF THE HOUR-MARKER IN THE FIRST PLACE 429 For example, Venus 
+in the first is sometimes associated with people who are particularly physically attractive, 
+since the first place represents the body and physical appearance, while Venus represents 
+beauty and things that are aesthetically appealing. Angelina Jolie, for example, was born 
+with 28° Cancer rising, with Venus conjunct the degree of the Hour-Marker, also at 28° Cancer. 
+In 2006 she was listed as the most beautiful person in the world in People magazine's "100 
+Most Beautiful People" issue. Another example is Paul Newman, who was born with 13° Capricorn 
+rising, with Venus at 14° Capricorn in a night chart. In his obituary, the New York Times 
+described him as "a strikingly handsome figure of animal high spirits and blue-eyed candor 
+whose magnetism was almost impossible to resist."24 Conversely, malefics in the first place 
+can sometimes indicate ailments or injuries to the body.25 For example, Mars can indicate 
+cuts or scars, while Saturn can indicate chronic illness. Planets in the first place can 
+also indicate or modify the native's character or behavior. Since these planets are in the 
+Helm, they can sometimes take a more significant contributing role in helping to direct the 
+native's life, for better or worse. Apotelesmatika, 2, 12: 1. 24 Aljean Harmetz, "Paul Newman, 
+a Magnetic Titan of Hollywood, Is Dead at 83," New York Times, September 28, 2008. 25 Ptolemy 
+mentions the Ascendant as one of 
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 17 - Ted Kennedy
+   planets appearing in this passage: Saturn
+
+Chart 17- Ted Kennedy Chart 18 - Financial Anxieties 430 CHAPTER 12: DOMICILE LORD OF THE 
+HOUR-MARKER The Sect of the Ruler The malefic that is contrary to the sect is usually the 
+most difficult planet in the chart, and it tends to work against the interests of the native. 
+When this planet is also the domicile lord of the Hour-Marker, sometimes the native takes 
+on the role or agency of the malefic, since the first place is the part of the chart that 
+represents the self. I have observed that people who have the malefic that is contrary to 
+the sect as the ruler of the Hour-Marker sometimes tend to undermine themselves or work against 
+their own best interests. In other words, instead of difficulties coming from other people 
+or situations in the native's life, sometimes the difficulties come from within. An example 
+ofthis is Ted Kennedy, who was born with Capricorn rising, and Saturn in late Capricorn in 
+the first place in a night chart. He was the younger brother of U.S. President John F. Kennedy 
+and Robert F. Kennedy, and he was expected to succeed his brothers in becoming President 
+of the United States after they were both assassinated in the 1960s. However, his opportunity 
+to become President was ruined due to his involvement in a car accident, possibly while intoxicated, 
+which resulted in the death of a woman who was with him at the time. He still went on to 
+have a long and successful career in the United States Senate, but he never became President, 
+largely due to this spec
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 20 - Queen Elizabeth II
+   planets appearing in this passage: (none)
+
+Chart 20 - Queen Elizabeth II Chart 21 - Prince William Chart 22 - Prince Henry -- 459 of 
+698 -- THE DEGREE OF THE MIDHEAVEN IN OTHER PLACES 433 These examples underscore the importance 
+of paying attention to the degree of the quadrant Midheaven, and both the topical and dynamic 
+qualities that it can import into whatever sign in which it falls. This concept also extends 
+to the degree of the quadrant IC, both in terms of the topical and dynamic qualities that 
+it can import into the sign in which it falls. In this way we can start to see how the quadrant 
+and whole sign house systems can be integrated or reconciled in some way, as well as why 
+it is important to do so. Chart 23 - Prince Andrea Casiraghi -- 460 of 698 -- -- 461 of 698 
+-- CHAPTER 13 RULERS OF THE PLACES In book two of the Anthology, Valens outlines an important 
+interpretive principle in connection with the rulers of the twelve places: If anyone researches 
+thoroughly the places and the rulers, he will determine quite easily the area in which the 
+nativity is fortunate and the area in which it is unfortunate. Whenever any star that has 
+a relationship with the nativity (i.e. one that controls livelihood, life, injury, disease, 
+occupation, or any of the other areas of concern) is afflicted in one respect, in that respect 
+it will harm the nativity.' Each of the planets becomes the "ruler" or "lord" of the place 
+that coincides with the sign of the zodiac that it rules as domicile lord. For example, if 
+Gemini coincides wit
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 21 - Prince William
+   planets appearing in this passage: (none)
+
+Chart 21 - Prince William Chart 22 - Prince Henry -- 459 of 698 -- THE DEGREE OF THE MIDHEAVEN 
+IN OTHER PLACES 433 These examples underscore the importance of paying attention to the degree 
+of the quadrant Midheaven, and both the topical and dynamic qualities that it can import 
+into whatever sign in which it falls. This concept also extends to the degree of the quadrant 
+IC, both in terms of the topical and dynamic qualities that it can import into the sign in 
+which it falls. In this way we can start to see how the quadrant and whole sign house systems 
+can be integrated or reconciled in some way, as well as why it is important to do so. Chart 
+23 - Prince Andrea Casiraghi -- 460 of 698 -- -- 461 of 698 -- CHAPTER 13 RULERS OF THE PLACES 
+In book two of the Anthology, Valens outlines an important interpretive principle in connection 
+with the rulers of the twelve places: If anyone researches thoroughly the places and the 
+rulers, he will determine quite easily the area in which the nativity is fortunate and the 
+area in which it is unfortunate. Whenever any star that has a relationship with the nativity 
+(i.e. one that controls livelihood, life, injury, disease, occupation, or any of the other 
+areas of concern) is afflicted in one respect, in that respect it will harm the nativity.' 
+Each of the planets becomes the "ruler" or "lord" of the place that coincides with the sign 
+of the zodiac that it rules as domicile lord. For example, if Gemini coincides with the fifth 
+place in a chart, 
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 24 - Maurizio Gucci
+   planets appearing in this passage: Moon, Venus, Jupiter
+
+Chart 24 - Maurizio Gucci Chart 25 - Steve Wozniak 442 CHAPTER 13: RULERS OF THE PLACES the 
+second place of livelihood in the fourth place of parents and family. The native's grandfather 
+was Guccio Gucci, the founder of the Gucci fashion empire. The native inherited a fifty percent 
+stake in the family business when his father died of cancer on May 16, 1983. During the 1980s, 
+he engaged in a hostile takeover of the business, eventually ousting his uncle and three 
+cousins from the board. He was notorious for his lavish spending, and in 1993 he sold his 
+stock in the company for $170 million. Here the delineation of the ruler of the second place 
+in the fourth might be: "the native makes their money through their family" or "inherits 
+money from their family" His personal finances and livelihood became wrapped up in the family 
+business, and the paternal inheritance, which is signified by the fourth place. STEVE WOZNIAK 
+Another example. A day chart with Virgo rising, and Libra on the second place. Venus is the 
+lady of the second place, located in Cancer (eleventh place), copresent with the Moon and 
+overcome by a superior trine from Jupiter. The chart belongs to Apple Computer co-founder, 
+Steve Wozniak, who is an excellent example of someone born with the ruler of the second place 
+in the eleventh place. Wozniak started out as friends with Steve Jobs around the time they 
+finished high school, and eventually he became rich as a result of this friendship. The essential 
+delineation of th
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 27 - Vincent van Gogh
+   planets appearing in this passage: Mercury, Mars
+
+Chart 27 - Vincent van Gogh 444 CHAPTER 13: RULERS OF THE PLACES the sect, and opposed by 
+Mars. Not only did he have the ruler of the third place in the eighth, but also the ruler 
+of the eighth place in the third. He was the brother of U.S. President John F. Kennedy. With 
+the ruler of the third in the eighth, he experienced the death of his siblings, and these 
+events became some of the most notable turning points in his life. When he was younger, his 
+oldest brother, Joseph P. Kennedy Jr., died fighting in World War II. A few years later his 
+sister Kathleen died in an airplane crash. Later, in 1963, his brother, President John F. 
+Kennedy, was assassinated. In 1968, his brother Robert F. Kennedy was also assassinated shortly 
+after entering the presidential race that year. Thus, the ruler of the third place of siblings 
+in the eighth place of death indicated some major and recurring themes in Ted Kennedy's life. 
+VINCENT VAN GOGH A diurnal chart with Cancer rising, Virgo on the third place, and Mercury 
+(ruler of the third) in Aries (tenth place). Vincent van Gogh was a famous Dutch painter. 
+Although he was not very successful during his lifetime, his younger brother, Theo van Gogh, 
+supported Vincent's work and made it possible, both financially and emotionally. With the 
+ruler of the third place of siblings in the tenth place of career, the most general statement 
+we could make is that the siblings will be involved in the native's occupation or career, 
+which in this case is true in 
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 32 - Ernest Hemingway
+   planets appearing in this passage: Mars, Saturn
+
+Chart 32 - Ernest Hemingway Chart 33 - Michel Foucault THE RULER OF THE SIXTH PLACE 449 ERNEST 
+HEMINGWAY The famous American writer Ernest Hemingway was born with a day chart, Virgo rising, 
+Aquarius as the sixth place, and Saturn in Sagittarius. With the ruler of the sixth place 
+in the fourth place, he inherited a genetic disorder from his father that later contributed 
+to his suicide. His father may have had the same disease (hemochromatosis), and he also committed 
+suicide. Hemochromatosis stops the body from metabolizing iron, which results in mental and 
+physical deterioration, and Hemingway's behavior before he died was evidently similar to 
+his father's. In this instance the delineation of the ruler of the sixth in the fourth is: 
+inheriting an illness or disease from the father. The association of the fourth with the 
+end of life and death is also relevant, as this illness contributed to his eventual demise. 
+MICHEL FOUCAULT The prominent French philosopher, Michel Foucault, was born with a day chart, 
+Scorpio rising, Aries on the sixth place, and Mars in Taurus in the seventh. He died in 1984 
+due to complications related to HIV/AIDS, which he contracted sexually while he was a visiting 
+professor in California in the early 1980s. His longtime partner Daniel Defert founded the 
+first national HIV/AIDS organization in France shortly after Foucault's death, and subsequently 
+became a well-known AIDS activist. On the one hand the ruler of the sixth in the seventh 
+seems to indicate c
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 33 - Michel Foucault
+   planets appearing in this passage: Mars, Saturn
+
+Chart 33 - Michel Foucault THE RULER OF THE SIXTH PLACE 449 ERNEST HEMINGWAY The famous American 
+writer Ernest Hemingway was born with a day chart, Virgo rising, Aquarius as the sixth place, 
+and Saturn in Sagittarius. With the ruler of the sixth place in the fourth place, he inherited 
+a genetic disorder from his father that later contributed to his suicide. His father may 
+have had the same disease (hemochromatosis), and he also committed suicide. Hemochromatosis 
+stops the body from metabolizing iron, which results in mental and physical deterioration, 
+and Hemingway's behavior before he died was evidently similar to his father's. In this instance 
+the delineation of the ruler of the sixth in the fourth is: inheriting an illness or disease 
+from the father. The association of the fourth with the end of life and death is also relevant, 
+as this illness contributed to his eventual demise. MICHEL FOUCAULT The prominent French 
+philosopher, Michel Foucault, was born with a day chart, Scorpio rising, Aries on the sixth 
+place, and Mars in Taurus in the seventh. He died in 1984 due to complications related to 
+HIV/AIDS, which he contracted sexually while he was a visiting professor in California in 
+the early 1980s. His longtime partner Daniel Defert founded the first national HIV/AIDS organization 
+in France shortly after Foucault's death, and subsequently became a well-known AIDS activist. 
+On the one hand the ruler of the sixth in the seventh seems to indicate contracting an illness 
+from a
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 34 - Johnny Carson
+   planets appearing in this passage: Saturn
+
+Chart 34 - Johnny Carson 16 There might be some corruption here because the interpretation 
+of the ruler of the seventh in tenth is more positive later on in Rhetorius' text. -- 477 
+of 698 -- Chart 35 - Steven Spielberg Chart 36 - Adolf Hitler THE RULER OF THE SEVENTH PLACE 
+451 wife received $500,000 in cash and art when they were divorced, and lifetime alimony 
+payments of $100,000 a year. His third wife filed for divorce in 1983, and since they were 
+married in California she was entitled to fifty percent of all the assets accumulated during 
+their marriage. She ended up receiving $20 million in cash and property after the settlement. 
+Before marrying his fourth wife, he is reported to have said "Look, I'm not going through 
+this bullshit again. If I ever get married again, put a .38 to my head, and if we don't have 
+a prenup, pull the damn trigger."17 Thus the ruler of the seventh in the second clearly shows 
+a recurring theme surrounding marriage and personal finances in Carson's life. STEVEN SPIELBERG 
+The director Steven Spielberg was born with a nocturnal chart, Cancer rising, Capricorn on 
+the seventh place, and Saturn in Leo. Thus, he had a similar placement as Carson, with the 
+ruler of the seventh in the second, although the difference is that in this case the ruler 
+is Saturn in a night chart and in a fixed sign. When he was in the process of getting a divorce 
+from his first wife, the judge voided their prenuptial agreement because it was written on 
+a napkin. As a result, she
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 35 - Steven Spielberg
+   planets appearing in this passage: Saturn
+
+Chart 35 - Steven Spielberg Chart 36 - Adolf Hitler THE RULER OF THE SEVENTH PLACE 451 wife 
+received $500,000 in cash and art when they were divorced, and lifetime alimony payments 
+of $100,000 a year. His third wife filed for divorce in 1983, and since they were married 
+in California she was entitled to fifty percent of all the assets accumulated during their 
+marriage. She ended up receiving $20 million in cash and property after the settlement. Before 
+marrying his fourth wife, he is reported to have said "Look, I'm not going through this bullshit 
+again. If I ever get married again, put a .38 to my head, and if we don't have a prenup, 
+pull the damn trigger."17 Thus the ruler of the seventh in the second clearly shows a recurring 
+theme surrounding marriage and personal finances in Carson's life. STEVEN SPIELBERG The director 
+Steven Spielberg was born with a nocturnal chart, Cancer rising, Capricorn on the seventh 
+place, and Saturn in Leo. Thus, he had a similar placement as Carson, with the ruler of the 
+seventh in the second, although the difference is that in this case the ruler is Saturn in 
+a night chart and in a fixed sign. When he was in the process of getting a divorce from his 
+first wife, the judge voided their prenuptial agreement because it was written on a napkin. 
+As a result, she received around $100 million dollars in the settlement, which was half of 
+his fortune. At the time, this was reported as one of the most costly celebrity divorces 
+in history. ADOLF HITLER Ad
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 36 - Adolf Hitler
+   planets appearing in this passage: Saturn
+
+Chart 36 - Adolf Hitler THE RULER OF THE SEVENTH PLACE 451 wife received $500,000 in cash 
+and art when they were divorced, and lifetime alimony payments of $100,000 a year. His third 
+wife filed for divorce in 1983, and since they were married in California she was entitled 
+to fifty percent of all the assets accumulated during their marriage. She ended up receiving 
+$20 million in cash and property after the settlement. Before marrying his fourth wife, he 
+is reported to have said "Look, I'm not going through this bullshit again. If I ever get 
+married again, put a .38 to my head, and if we don't have a prenup, pull the damn trigger."17 
+Thus the ruler of the seventh in the second clearly shows a recurring theme surrounding marriage 
+and personal finances in Carson's life. STEVEN SPIELBERG The director Steven Spielberg was 
+born with a nocturnal chart, Cancer rising, Capricorn on the seventh place, and Saturn in 
+Leo. Thus, he had a similar placement as Carson, with the ruler of the seventh in the second, 
+although the difference is that in this case the ruler is Saturn in a night chart and in 
+a fixed sign. When he was in the process of getting a divorce from his first wife, the judge 
+voided their prenuptial agreement because it was written on a napkin. As a result, she received 
+around $100 million dollars in the settlement, which was half of his fortune. At the time, 
+this was reported as one of the most costly celebrity divorces in history. ADOLF HITLER Adolf 
+Hitler was born with a d
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 42 - Eleanor Roosevelt
+   planets appearing in this passage: Mercury, Venus, Jupiter
+
+Chart 42 - Eleanor Roosevelt 456 CHAPTER 13: RULERS OF THE PLACES ANONYMOUS (DOCTOR) A native 
+who was born at night with Pisces rising, Sagittarius coinciding with the tenth place, and 
+Jupiter in Leo in the sixth. Jupiter is configured to the degree of the quadrant Midheaven 
+within three degrees, and is overcome by Venus (benefic of the sect), which is a condition 
+of bonification, which will be discussed in the next chapter. With the ruler of the tenth 
+place well-situated in the sixth place, the native is a doctor, and later became the head 
+of a hospital. Chart 41 - Doctor ELEANOR ROOSEVELT Eleanor Roosevelt, the wife of U.S. President 
+Franklin D. Roosevelt and First Lady of the United States, was born during the day with Sagittarius 
+rising, Virgo occupying the tenth place, and Mercury in Libra. Having the ruler of the tenth 
+in the eleventh place seems to have emphasized themes related to friends and alliances within 
+the context of her career. Both before and after Roosevelt's death she was deeply involved 
+in politics, with a strong focus on social issues (which might be broadly connected to the 
+eleventh house as the place of friends and alliances). She was a key figure in several of 
+the most important social reform movements of the twentieth century in the U.S., including 
+the Progressive Movement, the New Deal, the Women's Movement, the Civil Rights Movement, 
+and the United Nations. She was appointed as a delegate to the United Nations General Assembly 
+shortly after the crea
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 43 - Tiger Woods
+   planets appearing in this passage: (none)
+
+Chart 43 - Tiger Woods THE RULER OF THE ELEVENTH PLACE 457 The Ruler of the Eleventh Place 
+Rhetorius has the following delineations for the ruler of the eleventh place: Every ruler 
+in the eleventh signifies good things; Unless it is afflicted or poorly-situated in some 
+way, in which case the positive indications are weakened. Ruler of the eleventh in the first 
+and ruler of twelfth in the seventh: It makes the native's life easy or smooth in his youth, 
+but then more moderate circumstances in old age. Ruler of eleventh in seventh and ruler of 
+twelfth in first: Moderate circumstances in youth, and then smoother ones in old age. The 
+topic of friends is often very closely associated with the ruler of the eleventh in contemporary 
+charts, and sometimes this can describe the unique role that friendship plays in different 
+parts of the native's life. TIGER WOODS The eminent golfer, Tiger Woods, has the ruler of 
+the eleventh in the fourth. His father played a very influential and supportive role in shaping 
+his life and career, and Tiger considered him to be his best friend. When his father died 
+in 2006, Tiger wrote: "My dad was my best friend and greatest role model, and I will miss 
+him deeply [ ] I'm overwhelmed when I think of all of the great things he accomplished in 
+his life. He was an amazing dad, coach, mentor, soldier, husband and friend. I wouldn't be 
+where I am today without him, and I'm honored to continue his legacy of sharing and caring."21 
+Tiger's birth name is actually El
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 51 - Philippe Pozzo di Borgo
+   !! no in-text reference - SKIP
+--------------------------------------------------------------------------
+
+## Chart 52 - Michael Patrick MacDonald
+   planets appearing in this passage: Mars
+
+Chart 52 - Michael Patrick MacDonald 472 CHAPTER 14: BONIFICATION AND MALTREATMENT a building. 
+A sister was pushed off a building due to a dispute over drugs; although she survived the 
+fall, she suffered brain damage and paralysis. Another brother was shot during a bank robbery, 
+and then subsequently strangled to death by his partners in crime in order to protect their 
+identities. Another brother was hung in jail, which may have been a murder or a suicide. 
+Finally, another younger brother was implicated in the murder of a friend at the age of thirteen. 
+Thus, with the ruler of the third in the sixth, maltreated by an opposition from Mars in 
+a day chart, the native's siblings were involved in injuries, accidents, and general misfortunes. 
+Counteraction The last condition mentioned in the definition of maltreatment is a planet 
+being ruled by a poorly-situated malefic. This is defined earlier in the Antiochus Summary 
+and in Porphyry as "counteraction" (antanalusis)." Counteraction is defined in the following 
+way by Porphyry: It is called counteraction whenever the diurnal stars occupy the domiciles 
+or exaltations of the nocturnal stars or the nocturnal stars occupy the domiciles or exaltations 
+of the diurnal stars, or whenever stars that lie upon zodiacal signs operate advantageously, 
+but the rulers of those signs are in a state of maltreatment, being disadvantageous (achrematistoi).12 
+The second part of this explanation, which focuses on the domicile lord of the sign being 
+locate
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 54 - Chris Farley
+   planets appearing in this passage: Sun, Mars, Saturn
+
+Chart 54 - Chris Farley 476 CHAPTER 14: BONIFICATION AND MALTREATMENT ray), or if it should 
+be restricted to seven degrees on either side. It is also unclear if sign boundaries are 
+a factor that should be taken into account here, although it seems likely that they would 
+have been, and that most of these configurations were assumed to be taking place in the same 
+sign. CHRIS FARLEY There is an example of enclosure in the birth chart of Chris Farley, who 
+was a comedian and actor popular in the early 1990s. He was born with a day chart, the Ascendant 
+at 5° Leo, and the Sun at 26°14' Aquarius. The Sun is enclosed bodily between Saturn at 25° 
+Aquarius and Mars at 26°30' Aquarius. The malefic enclosure in his chart is exacerbated because 
+it is a day chart, and the Sun—the domicile lord of the Hour- Marker—is applying to Mars, 
+which means that the Sun is also in an adherence with the malefic contrary to sect, with 
+no interventions present. Farley was a regular on the weekly television comedy show Saturday 
+Night Live, and played the lead role in comedies that grew in popularity by the mid-1990s. 
+However, he struggled with drug and alcohol abuse, and died on December 18, 1997 at the age 
+of thirty-three due to a cocaine and morphine overdose. ROBIN WILLIAMS Another example of 
+enclosure occurs in the birth chart of Robin Williams, who was a famous actor and comedian. 
+His chart provides an interesting case because there is a benefic enclosure that mitigates 
+and improves the condition of t
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 55 - Robin Williams
+   planets appearing in this passage: Moon, Venus, Mars, Jupiter
+
+Chart 55 - Robin Williams ADHERENCE 477 Mars is at 11° Cancer, while Venus is at 10° Virgo 
+and Jupiter is at 13° Aries. Venus sends a sextile ray to 10° Cancer, which lands just before 
+Mars, while Jupiter sends a square ray to 13° Cancer, which falls just after Mars. Thus, 
+Mars is enclosed by the rays of both benefics, within seven degrees on each side, and as 
+a result Mars is bonified. This mitigation seems to have allowed him to manage and overcome 
+many of the issues that he struggled with for years. However, in his final years he began 
+experiencing the effects of Lewy body dementia and Parkinson's disease. In the end he committed 
+suicide by hanging at the age of sixty-three. Despite his personal struggles, he is generally 
+regarded as having had a positive influence on many people. While in some sense it is true 
+that the malefic qualities of Mars expressed themselves through his internal struggles and 
+illnesses, the point of this example is that the enclosure from the benefics seems to have 
+moderated the severity of some of these issues, and given him the help and support necessary 
+to lead a largely successful and happy life. Adherence Adherence (kollesis) is defined in 
+the Antiochus Summary and Rhetorius as an applying bodily conjunction that is within three 
+degrees of being exact.21 Porphyry adds that for the Moon, the range is thirteen degrees, 
+which is the average distance it will travel in a twenty-four-hour period.22 The definition 
+of maltreatment says that a planet i
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 57 - Maya Angelou
+   planets appearing in this passage: Sun, Mercury, Venus, Jupiter
+
+Chart 57 - Maya Angelou Chart 58 - James Eagan Holmes 480 CHAPTER 14: BONIFICATION AND MALTREATMENT 
+MAYA ANGELOU Eminent American writer and poet Maya Angelou had two instances of bonification 
+via adherence in her chart. She was born with a day chart, Leo rising, and the Sun at 14° 
+Aries in the ninth place in an adherence with Jupiter at 16° Aries. In addition to the Sun 
+and Jupiter, she also had Mercury at 20° Pisces in an adherence with Venus at 21° Pisces. 
+Thus both the domicile lord of the Hour-Marker and Mercury were bonified. As with the earlier 
+example of T. S. Eliot, whose success in the field of poetry was indicated by his Mercury- 
+Venus conjunction in Libra on the degree of the Ascendant, Maya Angelou provides a parallel 
+example of another successful poet with that combination prominent in her chart. In her case 
+Venus is the ruler of the tenth place of career and reputation, and it is exalted in Pisces, 
+with Mercury in an adherence with it. During the course of her life she received many awards 
+and honors for her writings, including the Presidential Medal of Freedom from President Obama 
+in 2011, which is the highest award that a civilian can receive in the United States. JAMES 
+EAGAN HOLMES James Eagan Holmes was a mass murderer who killed twelve people and injured 
+seventy others in a gun massacre at a theater in Aurora, Colorado, on July 20, 2012. At the 
+trial he pled not guilty by reason of insanity, although the shooting had been meticulously 
+planned out, and he w
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 58 - James Eagan Holmes
+   planets appearing in this passage: Sun, Mercury, Venus, Jupiter
+
+Chart 58 - James Eagan Holmes 480 CHAPTER 14: BONIFICATION AND MALTREATMENT MAYA ANGELOU 
+Eminent American writer and poet Maya Angelou had two instances of bonification via adherence 
+in her chart. She was born with a day chart, Leo rising, and the Sun at 14° Aries in the 
+ninth place in an adherence with Jupiter at 16° Aries. In addition to the Sun and Jupiter, 
+she also had Mercury at 20° Pisces in an adherence with Venus at 21° Pisces. Thus both the 
+domicile lord of the Hour-Marker and Mercury were bonified. As with the earlier example of 
+T. S. Eliot, whose success in the field of poetry was indicated by his Mercury- Venus conjunction 
+in Libra on the degree of the Ascendant, Maya Angelou provides a parallel example of another 
+successful poet with that combination prominent in her chart. In her case Venus is the ruler 
+of the tenth place of career and reputation, and it is exalted in Pisces, with Mercury in 
+an adherence with it. During the course of her life she received many awards and honors for 
+her writings, including the Presidential Medal of Freedom from President Obama in 2011, which 
+is the highest award that a civilian can receive in the United States. JAMES EAGAN HOLMES 
+James Eagan Holmes was a mass murderer who killed twelve people and injured seventy others 
+in a gun massacre at a theater in Aurora, Colorado, on July 20, 2012. At the trial he pled 
+not guilty by reason of insanity, although the shooting had been meticulously planned out, 
+and he was eventually convicted 
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 61 - Albert Einstein
+   planets appearing in this passage: Moon, Venus
+
+Chart 61 - Albert Einstein 488 CHAPTER 14: BONIFICATION AND MALTREATMENT ALBERT EINSTEIN 
+An example of bonification occurs in the chart of the scientist Albert Einstein. He was born 
+with a day chart, Cancer rising, and the Moon at 14° Sagittarius in the sixth place, applying 
+to a trine with Venus at 16° Aries in the tenth place. His Moon is thus being bonified by 
+Venus through striking with a ray. This bonification, combined with the configuration of 
+the Moon to the degree of the quadrant Midheaven at 12° Pisces, heavily mitigated the otherwise 
+potentially challenging placement of having the domicile lord of the Hour- Marker in the 
+sixth place. This resulted in a lifetime devoted to his successful work in the field of scientific 
+research. Engagement The final condition of maltreatment to address is called "joining together," 
+"union," or "engagement" (sunaphe). According to the Antiochus Summary: Engagement (sunaphe) 
+is whenever the stars join together (sunapto) by degree or are about to join within three 
+degrees. The engagement of the Moon is said to be whenever it is about to join within thirteen 
+degrees.32 Engagement is thus an applying degree-based aspect that is within three degrees 
+ofbeing exact. In my reconstruction, I have made this the final condition, because it is 
+simply a more intense version of some of the other sign-based conditions of maltreatment. 
+From this perspective, maltreatment through engagement occurs when a planet applies to a 
+malefic within three degre
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 63 - Andre Romelle Young
+   planets appearing in this passage: Moon, Venus, Mars, Jupiter, Saturn
+
+Chart 63 - Dr. Dre Chart 64 - Jacqueline Kennedy Onassis 490 CHAPTER 14: BONIFICATION AND 
+MALTREATMENT and Venus at 16° Aquarius. In his chart the Moon rules the second place of financial 
+matters, and it is located in the fifth place of Good Fortune, while applying to a trine 
+with Venus within thirteen degrees (while being received in the domicile of Venus, which 
+will be discussed below). The ruler of the second is thus being bonified by Venus via striking 
+with a ray. Interestingly, Venus herself applies to a square with Jupiter at 18° Taurus within 
+three degrees, also with reception, and thus Venus is also being bonified via striking with 
+a ray. In 2014, the sale of a company he co- founded, Beats Electronics, made him one of 
+the richest rappers in the world. JACQUELINE KENNEDY ONASSIS An example of maltreatment through 
+engagement in an opposition occurs in the chart of Jacqueline Kennedy Onassis. She was born 
+with a day chart, Scorpio rising, and Taurus occupying the seventh place of marriage. The 
+ruler of the seventh is Venus, which is located at 21° Gemini, in the eighth place of death. 
+Venus is applying to an opposition with Saturn at 24° Sagittarius, and thus the ruler of 
+the seventh is being maltreated via engagement with a malefic. Her husband, U.S. President 
+John F. Kennedy, was assassinated while they were riding in the same car together, and she 
+held him as he died. This instance is worsened by the fact that Mars is located at 14° Virgo, 
+so that Venus is also enclo
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 73 - Kurt Cobain
+   planets appearing in this passage: Sun, Moon, Venus, Mars, Jupiter, Saturn
+
+Chart 73 - Kurt Cobain MODERN EXAMPLES SOS and died in infancy. Saturn, the primary lord, 
+is declining, retrograde, has Mars overcoming it through a superior sign-based square in 
+a day chart, and is thus maltreated. The inferior trine from Jupiter in Capricorn to Saturn 
+offers some mitigation, but evidently not enough. The native died by choking on a piece of 
+food shortly before his second birthday. ROBERT DOWNEY JR. The actor Robert Downey Jr. was 
+born with a day chart, Leo rising, and the Sun in Aries. The Sun is the primary triplicity 
+ruler and is exalted, in its own triplicity, and in an adherence with a benefic, but declining. 
+Jupiter is the secondary triplicity ruler, angular, and the benefic of the sect. The cooperating 
+lord is Saturn, which is succedent. His early life and career was filled with many ups and 
+downs, largely due to issues with drug abuse, which resulted in much instability. Later in 
+life, he was able to get his addiction issues under control, and he became more stable and 
+eminent, eventually becoming one of the highest-paid actors in Hollywood. KURT COBAIN The 
+musician and songwriter Kurt Cobain was born with a night chart, Virgo rising, and the Moon 
+in Cancer. The primary triplicity lord is Mars, which is declining in Scorpio, in its own 
+domicile and triplicity. The secondary triplicity lord is Venus, which is angular and exalted 
+in Pisces. The cooperating lord is the Moon in Cancer in the eleventh. All three triplicity 
+rulers are well-situated by sign
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 75 - Whitney Houston
+   planets appearing in this passage: Sun, Moon, Venus, Mars, Jupiter, Saturn
+
+Chart 75 - Whitney Houston 506 CHAPTER 15: TRIPLICITY RULERS OF THE SECT LIGHT suicide due 
+to depression and substance abuse issues at the age of twenty-seven. BILL CLINTON U.S. President 
+Bill Clinton was born with a day chart, Libra rising, and the Sun in Leo. The Sun is the 
+primary triplicity lord, is in a succedent place, in its own domicile, triplicity, and of 
+the sect in favor. The secondary triplicity lord is Jupiter, which is angular, and copresent 
+with Venus and Mars. The cooperating triplicity lord is Saturn, which is succedent. His primary 
+lord is middling in terms of angularity, but otherwise well- situated by sign. The second 
+lord is very well-placed in terms of angularity, but there is some discord due to its copresence 
+with Mars. Note however that Mars isn't capable of fully maltreating Jupiter, since there 
+is no adherence, which implies that it is not the worst-case scenario. He became the forty-second 
+President of the United States at the age of forty-six years old, and while scandals nearly 
+brought him down, he ultimately served two complete four-year terms in office. WHITNEY HOUSTON 
+The singer Whitney Houston was born at night, with Pisces rising and the Moon in Aries. Jupiter 
+is the primary triplicity lord, in a succedent place, and in its own triplicity. The Sun 
+is the secondary triplicity lord, in its own domicile, but in a decline, and applying to 
+an exact opposition with Saturn in about three degrees. Saturn is the cooperating lord, and 
+it is in its own
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 76 - Hans Christian Andersen
+   planets appearing in this passage: (none)
+
+Chart 76 - Hans Christian Andersen Timing the Changeover Between Triplicity Lords Valens 
+says that you can time the changeover between the primary and secondary triplicity ruler 
+by using what is known as planetary periods and ascensional times of the zodiacal signs: 
+For nativities which are badly situated (whether day or night births), if the predominant 
+triplicity ruler is unfavorably located, but its successor is at an angle or otherwise configured 
+well, the native will experience ups and downs during his early years until the ascensional 
+time of the sign or until the cyclical return of the chronocrator, but will afterwards be 
+vigorous and effective—except for being unsteady and anxious. If the preceding triplicity 
+ruler is favorably situated and the succeeding one unfavorably, the native will fulfill his 
+promise well at first, but afterwards will be brought low, starting at the time of the ascension 
+of the sign in which the succeeding triplicity ruler is unfavorably situated." The "cyclical 
+return of the chronocrator" or "circular period" of the planet that Valens refers to above 
+is probably what is known elsewhere as the "minor," "lesser," or "least years" of the planets. 
+These associate a specific number of years with each of the planets.23 The periods are mostly 
+derived from synodic or 22 Valens, Anthology, 2, 2: 6-8, trans. Riley, p. 25, modified. 23 
+The lesser years of the planets are outlined in Valens, Anthology, 3, 11: 6, Rhetorius, Compendium, 
+49, and Balbillus (C
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 77 - Lisa Marie Presley
+   planets appearing in this passage: (none)
+
+Chart 77 - Lisa Marie Presley Chart 78 - Robert F. Kennedy ACTIVATION OF THE PLACES 539 LISA 
+MARIE PRESLEY Lisa Marie Presley is a good example of a second place profection year. She 
+is the daughter of the famous singer Elvis Presley, who died when she was nine. Her inheritance 
+was held in a trust until she turned twenty-five. On the day she turned twenty-five she inherited 
+her father's estate, which was estimated to be worth around $100 million. Thus, when she 
+moved into a second place profection year, financial matters became the focus. ROBERT F. 
+KENNEDY Robert F. Kennedy, the brother of U.S. President John F. Kennedy, turned thirty-eight 
+on November 20, 1963, thus moving into a third place profection year. His brother, John, 
+was assassinated two days later on November 22, 1963. Thus, shortly after he moved into a 
+third place profection year, the focus of the year became one of his siblings, and the aftermath 
+of his assassination. RECONCILIATION WITH MOTHER A native who turned fifty-one and moved 
+into a fourth place profection year suddenly felt the need to reconcile with her mother, 
+from whom she had been estranged for some time. This estrangement commenced during her previous 
+fourth place profection year twelve years earlier. The native sought outside help from a 
+mediator, and the mother eventually embraced her Chart 79 - Reconciliation with Mother -- 
+566 of 698 -- Chart 80 - Birth of Child Chart 81 - Michael J. Fox 540 CHAPTER 17: ANNUAL 
+PROFECTIONS with open arms. She f
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 84 - Amanda Knox
+   planets appearing in this passage: (none)
+
+Chart 84 - Amanda Knox Chart 85 - Carl Sagan -- 568 of 698 -- Chart 86 - Anthony Louis Chart 
+87 - Rudolf Hess 542 CHAPTER 17: ANNUAL PROFECTIONS than half a billion people in sixty countries, 
+subsequently making him one of the most famous scientists in the world in the 1980s and early 
+1990s. ANTHONY LOUIS The astrologer Anthony Louis published a book on traditional interrogational 
+astrology in 1991. It was one of the first books to come out of the early revival of traditional 
+astrology that began to take root in the late 1980s and early 1990s. In April of 1992, he 
+unexpectedly received a Regulus Award for the book at the United Astrology Conference in 
+Washington D.C. He was forty-six years old, and thus in an eleventh place profection year. 
+The award was sponsored by three major astrological organizations. It was the first time 
+he attended a major national astrological conference, and he said that he met many people 
+at that conference that became lasting friends for decades. It is worth noting that the book 
+was published the previous year, in 1991, during a tenth place profection. RUDOLF HESS Rudolf 
+Hess was a high ranking Nazi official before and during World War II. He was essentially 
+Hitler's second in command. On May 10, 1941, he flew a solo mission from Germany to the U.K. 
+to negotiate a peace deal with the British. He was apprehended and imprisoned, and he spent 
+the next forty-six years of his life behind bars; he died on August 17, 1987, apparently 
+by hanging himself. 
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 86 - Anthony Louis
+   planets appearing in this passage: (none)
+
+Chart 86 - Anthony Louis Chart 87 - Rudolf Hess 542 CHAPTER 17: ANNUAL PROFECTIONS than half 
+a billion people in sixty countries, subsequently making him one of the most famous scientists 
+in the world in the 1980s and early 1990s. ANTHONY LOUIS The astrologer Anthony Louis published 
+a book on traditional interrogational astrology in 1991. It was one of the first books to 
+come out of the early revival of traditional astrology that began to take root in the late 
+1980s and early 1990s. In April of 1992, he unexpectedly received a Regulus Award for the 
+book at the United Astrology Conference in Washington D.C. He was forty-six years old, and 
+thus in an eleventh place profection year. The award was sponsored by three major astrological 
+organizations. It was the first time he attended a major national astrological conference, 
+and he said that he met many people at that conference that became lasting friends for decades. 
+It is worth noting that the book was published the previous year, in 1991, during a tenth 
+place profection. RUDOLF HESS Rudolf Hess was a high ranking Nazi official before and during 
+World War II. He was essentially Hitler's second in command. On May 10, 1941, he flew a solo 
+mission from Germany to the U.K. to negotiate a peace deal with the British. He was apprehended 
+and imprisoned, and he spent the next forty-six years of his life behind bars; he died on 
+August 17, 1987, apparently by hanging himself. He was born April 26, 1894, and had just 
+turned forty-seven tw
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 102 - George W Bush
+   planets appearing in this passage: (none)
+
+Chart 102 - George W. Bush of Fortune in Scorpio. Since Fortune is in Scorpio, we know that 
+his peak periods will coincide with the four fixed signs: Scorpio (sign of Fortune), Leo 
+(tenth from Fortune), Taurus (seventh from Fortune), and Aquarius (fourth from Fortune). 
+If we start the releasing from the Lot of Spirit in order to study his career periods, Bush 
+started off in an eight year Taurus period (1946-1954). This is a peak period, since it is 
+angular from Fortune, but he is too young to accomplish anything significant. After that 
+he moves into a twenty-year Gemini period (1954-1974). This period is not angular from Fortune, 
+thus it is not a peak period. Next he moved into a twenty-five year Cancer period (1974-1998). 
+Then in 1998 he started a new nineteen-year Leo period, which is the tenth sign relative 
+to the Lot of Fortune, and thus a peak period. A few months after this period began, he launched 
+his presidential campaign in June of 1999, and was inaugurated as the forty-third President 
+of the United States in January of 2001. He served out two four-year -- 588 of 698 -- 562 
+CHAPTER 18: ZODIACAL RELEASING Al Gore - Spirit Periods 111, L1/L2 - 3/31/1948 / L2 - 6/24/1949 
+VS L2 - 6/19/1950 • L2 - 9/6/1952 )( L2 - 2/23/1955 91' L2 - 2/18/1956 O L2 - 5/13/1957 11 
+L2 - 1/8/1958 CP L2 - 8/31/1959 -2, L2 - 9/19/1961 L1/L2 - 1/12/1963 VS L2 - 1/7/1964 • L2 
+- 3/27/1966 )4 L2 - 9/12/1968 91' L2 - 9/7/1969 O L2 - 12/1/1970 11 L2 - 7/29/1971 CP L2 
+- 3/20/1973 VS L1/L2 - 11/10/197
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 103 - Al Gore
+   planets appearing in this passage: (none)
+
+Chart 103 -Al Gore terms before stepping down in 2009 due to term limits. Thus, Valens' statement 
+about the native coming into power and eminence when the releasing periods from the Lot of 
+Spirit come to the tenth sign relative to the Lot of Fortune would be quite accurate in this 
+instance. Bush's opponent during the 2000 presidential election in the United States was 
+Al Gore. Gore was born with the Lot of Spirit in Scorpio and the Lot of Fortune in Aries. 
+The Fortune angles in his chart will be the four movable signs: Aries, Capricorn, Libra, 
+and Cancer. The releasing begins from Spirit in Scorpio, starting with a fifteen-year period 
+which lasts from his birth in 1948 until 1963. Once that period was completed, the releasing 
+periods moved to Sagittarius for about twelve years (1963-1974). In 1974 he moved into a 
+twenty-seven-year- long Capricorn period, which is important because it is the tenth sign 
+relative to Fortune, and thus a peak period. Gore began his political career not long after 
+this general period began, when he was elected to the -- 589 of 698 -- PEAK PERIODS 563 United 
+States Congress in late 1976. In 1992 Bill Clinton selected him as his running mate during 
+that year's U.S. presidential election, and a few months later he became the Vice President 
+of the United States, which is likely the highest political appointment that he will attain 
+in his lifetime. Gore was still in his twenty-seven-year Capricorn peak period during the 
+presidential race in the year 200
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 106 - Chris Brennan
+   planets appearing in this passage: (none)
+
+Chart 106 - Chris Brennan that twelve-year Sagittarius period, I entered a twelve-month Sagittarius 
+period from August 1999 to August 2000, followed by twenty-seven months in Capricorn until 
+October 2002, and thirty months in Aquarius until April 2005. In April 2005 I entered a twelve-month 
+Pisces period, which is the tenth sign from Fortune, and thus a major peak period. In May 
+2005 I was invited to live at Project Hindsight in order to help with a library they were 
+building. That summer I was able to start reading all of the translations of Hellenistic 
+texts that they had made until that point, and I began studying Valens and zodiacal releasing. 
+Thus, I was in one of my highest peak periods when I discovered this very technique. One 
+could say that an astrologer knows that they have found a powerful technique when the technique 
+itself tells them that they have found it.' Interestingly, I am in the same major peak period 
+in Pisces again this year as I finish writing this book. 20 There is a passage in Valens 
+where he tells a story about finding a time-lord technique, and it was originally interpreted 
+by Schmidt to mean that Valens was saying that he could only discover the technique when 
+the technique itself said he would discover it, and that is how he knew that he had found 
+a valid technique. See Valens, Anthology, 4, 11: 7-10, trans. Schmidt, p. 23, fn. 6. However, 
+others have interpreted the passage as Valens instead saying that he was led to the technique 
+by providence a
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 108 - Vanessa L Williams
+   planets appearing in this passage: Jupiter
+
+Chart 108 - Vanessa Williams months later, however, she entered into a nineteen-month Leo 
+subperiod starting in July 1984, activating the sign of the malefic contrary to the sect, 
+and around this time she was forced to resign as Miss America after a magazine published 
+nude photographs of her. A year later, the Leo subperiod and also the entire general period 
+ended, and she moved into a new twelve-year Sagittarius period, which is angular to her natal 
+Jupiter in Pisces. She hired a new manager who helped her reinvent herself, and shortly thereafter 
+became a successful singer, releasing her first album in February 1988 under a twenty-seven-month 
+Capricorn peak period (on level two). A few years later, in August of 1991, she released 
+her second and most successful album during a level two Pisces period, the sign that contains 
+her Jupiter. In this way we can clearly contrast one of the most difficult events that occurred 
+in her career, which happened when the sign containing the malefic contrary to the sect was 
+activated, with one of the most positive times in her career, which occurred when the sign 
+containing the benefic of the sect was activated.24 24 This is also a good example of a rule 
+that I have found to be useful in practice, where sometimes the focal point or most important 
+events in a general period will occur when the sign that contains the ruler of the general 
+period is activated on the subperiod level. In this instance the defining event of the fifteen-year 
+Scorpio 
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 109 - Nicole Brown Simpson
+   planets appearing in this passage: Saturn
+
+Chart 109 - Nicole Brown Simpson NICOLE BROWN SIMPSON This is a night chart, with Saturn 
+in Capricorn, Fortune in Libra. The native began in an eight-year Libra period (1959- 1967), 
+followed by Scorpio for fifteen years (1967-1982), and Sagittarius for twelve years (1982-1993). 
+In November of 1993 she began a twenty-seven-year Capricorn period. This is the sign that 
+contains Saturn in a night chart, so we would expect it to be her most difficult. A few months 
+later, in June of 1994, she was murdered. to the sign that contains the lord of the year, 
+that will indicate the most important month in the native's life in that particular year. 
+25 Valens, Anthology, 4, 8: 1-13. O L1/L2 - 5/19/1959 111, L2 - 1/14/1960 / L2 - 4/8/1961 
+VS L2 - 4/3/1962 Nvn,' L2 - 6/21/1964 )4 L2 - 12/8/1966 111, L1/L2 - 4/7/1967 / L2 - 6/30/1968 
+VS L2 - 6/25/1969 Nvn,' L2 - 9/13/1971 )4 L2 - 3/1/1974 91' L2 - 2/24/1975 O L2 - 5/19/1976 
+II L2 - 1/14/1977 e? L2 - 9/6/1978 st L2 - 9/25/1980 / L1/L2 - 1/18/1982 VS L2 - 1/13/1983 
+Nvn,' L2 - 4/2/1985 )4 L2 - 9/19/1987 91' L2 - 9/13/1988 O L2 - 12/7/1989 II L2 - 8/4/1990 
+e? L2 - 3/26/1992 VS L1/L2 - 11/16/1993 Nvn,' L2 - 2/4/1996 )4 L2 - 7/23/1998 91' L2 - 7/18/1999 
+o L2 - 10/10/2000 II L2 - 6/7/2001 -- 599 of 698 -- ANGULAR TRIADS RELATIVE TO FORTUNE 573 
+Chart 110 - Car Accident CAR ACCIDENT The native had a night chart, with Saturn in Sagittarius, 
+and Fortune in Scorpio. She started with a fifteen-year Scorpio period (1987-2002), followed 
+by a twelve-year Sag
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 114 - Linda Goodman
+   planets appearing in this passage: (none)
+
+Chart 114 - Linda Goodman when Aquarius was eventually activated again on level two between 
+2011 and 2014, his time as governor came to an end, and he made a transition back to acting. 
+Thus, things came full circle in some sense, and he found himself doing what he had been 
+doing at the start of the general period in the mid-1980s, and which he had stopped doing 
+when Aquarius was skipped at the loosing of the bond. Peak periods like Schwarzenegger's 
+that jump to signs that are angular from the Lot of Fortune also tend to represent the native's 
+hitting a high point in their career field. An example of this is Al Gore, who had been a 
+politician since the mid- 1970s when he began his twenty-seven-year Capricorn peak period 
+on level 1 (see the list of periods outlined for him earlier in this chapter). When he reached 
+the loosing of the bond on level 2 in 1992, however, he achieved his highest political appointment, 
+becoming Vice President of the United States. Similarly, the astrologer Linda Goodman was 
+in a twenty-seven-year Capricorn peak period, which was the fourth sign from Fortune, starting 
+in -- 607 of 698 -- LOOSING OF THE BOND 581 Chart 115 - Bill Gates Bill Gates - Spirit Periods 
+VS L1/L2 - 10/29/1955 NYtk: L2 - 1/16/1958 )4 L2 - 7/4/1960 91' L2 - 6/29/1961 O L2 - 9/22/1962 
+11 L2 - 5/20/1963 C? L2 - 1/9/1965 5/ L2 - 1/29/1967 11) L2 - 8/21/1968 • L2 - 4/13/1970 
+111, L2 - 12/9/1970 / L2 - 3/3/1972 e? L2 - 2/26/1973 - LB 5/ L2 - 3/18/1975 11) L2 - 10/8/1976 
+• L2 - 5/31/197
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------
+
+## Chart 118 - Barack Obama
+   planets appearing in this passage: (none)
+
+Chart 118 - Barack Obama term of office later that year, because it was clear that the loosing 
+of the bond indicated a career transition in early 2017, and thus it seemed likely that he 
+would be completing a second term of office at that time.32 The second typical scenario for 
+a loosing of the bond is the person who is established in a specific career field early in 
+the general period who hits the high point of their chosen field when they reach the loosing 
+of the bond. Examples of this that we have reviewed so far include Al Gore and Linda Goodman. 
+Finally, a third scenario that we have not reviewed is one in which the person took one step 
+towards a specific career field earlier in the general period, prior to the loosing of the 
+bond, but then once they reach the loosing of the bond they take the final step and fully 
+dive into the field. Instances of this that I've seen come up a few times in client charts 
+receive their master's degree earlier in the general period, and complete their PhD once 
+they reach the loosing of the bond, at which point they transition fully into their career 
+field. 32 Brennan, 'An Introduction to Hellenistic Astrology, Part 2," pp. 79-80, which was 
+published by The Mountain Astrologer magazine in April of 2012. -- 611 of 698 -- LOOSING 
+OF THE BOND 585 One thing that seems to be helpful for determining which scenario will play 
+out in a given instance is to pay attention to the location of the loosing of the bond within 
+the overall context of the angul
+
+PICKS: ________________________________________
+--------------------------------------------------------------------------

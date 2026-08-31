@@ -1,0 +1,88 @@
+# Calibration corpus - birth data from the appendix of
+# Chris Brennan, Hellenistic Astrology: The Study of Fate and Fortune (2017).
+# Only entries Brennan rates AA are included. His 23 anonymous/private-data
+# entries are excluded, as are his A, B and C rated charts.
+#
+# GENERATED - fields 1-9 are filled, PICKS IS EMPTY AND IS YOURS TO FILL.
+#
+# name | date | local time | utc offset | lat | lon | rodden | school | source | picks
+#
+# CODING PROTOCOL - decide this before you look at a single chart, then
+# apply it identically to all 43. Suggested:
+#   'The bodies named in the passage where Brennan introduces this chart.'
+# Brennan uses example charts to demonstrate a technique rather than to read
+# the whole chart, so the pick is usually whatever the surrounding section is
+# teaching. BE AWARE this carries a selection effect: he chose each chart
+# BECAUSE that factor is loud in it, which biases toward apparent agreement.
+# Treat a good score here as weaker evidence than it looks.
+#
+# Code BLIND. Do not run the engine on a chart before writing its picks.
+#
+# Protocol actually used: ..............................................
+#
+Che Guevara | 1928-05-14 | 03:05 | -4.0000 | -32.9468 | -60.6393 | AA | brennan | Brennan, Hellenistic Astrology, Chart 3 | Mars
+Franklin D Roosevelt | 1882-01-30 | 20:45 | -4.9289 | 41.7845 | -73.9332 | AA | brennan | Brennan, Hellenistic Astrology, Chart 4 (LMT from own meridian) | Sun
+Judy Blume | 1938-02-12 | 21:59 | -5.0000 | 40.6639 | -74.2107 | AA | brennan | Brennan, Hellenistic Astrology, Chart 6 | Venus
+Carl Sagan | 1934-11-09 | 17:05 | -5.0000 | 40.7128 | -74.0060 | AA | brennan | Brennan, Hellenistic Astrology, Chart 8 | Venus,Saturn
+Joseph Ratzinger | 1927-04-16 | 04:15 | 1.0000 | 48.2500 | 12.8500 | AA | brennan | Brennan, Hellenistic Astrology, Chart 10 | Venus,Jupiter
+William Rehnquist | 1924-10-01 | 11:32 | -6.0000 | 43.0389 | -87.9065 | AA | brennan | Brennan, Hellenistic Astrology, Chart 11 | Venus,Jupiter
+George Lucas | 1944-05-14 | 05:40 | -7.0000 | 37.6391 | -120.9969 | AA | brennan | Brennan, Hellenistic Astrology, Chart 13 | Mercury
+Steve Wozniak | 1950-08-11 | 09:45 | -7.0000 | 37.3382 | -121.8863 | AA | brennan | Brennan, Hellenistic Astrology, Chart 14 | Mercury
+Angelina Jolie | 1975-06-04 | 09:09 | -7.0000 | 34.0522 | -118.2437 | AA | brennan | Brennan, Hellenistic Astrology, Chart 15 | Venus
+Paul Newman | 1925-01-26 | 06:30 | -5.0000 | 41.4993 | -81.6944 | AA | brennan | Brennan, Hellenistic Astrology, Chart 16 | Venus
+Ted Kennedy | 1932-02-22 | 03:58 | -5.0000 | 42.3001 | -71.0662 | AA | brennan | Brennan, Hellenistic Astrology, Chart 17 | Saturn
+Queen Elizabeth II | 1926-04-21 | 02:40 | 1.0000 | 51.5074 | -0.1278 | AA | brennan | Brennan, Hellenistic Astrology, Chart 20 | 
+Prince William | 1982-06-21 | 21:03 | 1.0000 | 51.5154 | -0.1755 | AA | brennan | Brennan, Hellenistic Astrology, Chart 21 | 
+Maurizio Gucci | 1948-09-26 | 01:10 | 2.0000 | 43.7696 | 11.2558 | AA | brennan | Brennan, Hellenistic Astrology, Chart 24 | Moon,Venus
+Vincent van Gogh | 1853-03-30 | 11:00 | 0.3111 | 51.4670 | 4.6670 | AA | brennan | Brennan, Hellenistic Astrology, Chart 27 (LMT from own meridian) | Mercury
+Ernest Hemingway | 1899-07-21 | 08:00 | -6.0000 | 41.8850 | -87.7845 | AA | brennan | Brennan, Hellenistic Astrology, Chart 32 | Mars,Saturn
+Michel Foucault | 1926-10-15 | 07:30 | 0.0000 | 46.5802 | 0.3404 | AA | brennan | Brennan, Hellenistic Astrology, Chart 33 | Mars,Saturn
+Johnny Carson | 1925-10-23 | 07:15 | -6.0000 | 40.9917 | -94.7333 | AA | brennan | Brennan, Hellenistic Astrology, Chart 34 | Saturn
+Steven Spielberg | 1946-12-18 | 18:16 | -5.0000 | 39.1031 | -84.5120 | AA | brennan | Brennan, Hellenistic Astrology, Chart 35 | Saturn
+Adolf Hitler | 1889-04-20 | 18:30 | 0.8696 | 48.2563 | 13.0434 | AA | brennan | Brennan, Hellenistic Astrology, Chart 36 (LMT from own meridian) | Saturn
+Eleanor Roosevelt | 1884-10-11 | 11:00 | -5.0000 | 40.7128 | -74.0060 | AA | brennan | Brennan, Hellenistic Astrology, Chart 42 | Mercury,Jupiter
+Tiger Woods | 1975-12-30 | 22:50 | -8.0000 | 33.7701 | -118.1937 | AA | brennan | Brennan, Hellenistic Astrology, Chart 43 | 
+Philippe Pozzo di Borgo | 1951-02-14 | 14:45 | 1.0000 | 36.8065 | 10.1815 | AA | brennan | Brennan, Hellenistic Astrology, Chart 51 | 
+Michael Patrick MacDonald | 1966-03-09 | 08:35 | -5.0000 | 42.3601 | -71.0589 | AA | brennan | Brennan, Hellenistic Astrology, Chart 52 | 
+Chris Farley | 1964-02-15 | 15:34 | -6.0000 | 43.0731 | -89.4012 | AA | brennan | Brennan, Hellenistic Astrology, Chart 54 | Sun,Mars,Saturn
+Robin Williams | 1951-07-21 | 13:34 | -5.0000 | 41.8781 | -87.6298 | AA | brennan | Brennan, Hellenistic Astrology, Chart 55 | Venus,Mars,Jupiter
+Maya Angelou | 1928-04-04 | 14:10 | -6.0000 | 38.6270 | -90.1994 | AA | brennan | Brennan, Hellenistic Astrology, Chart 57 | Sun,Mercury,Venus,Jupiter
+James Eagan Holmes | 1987-12-13 | 21:04 | -8.0000 | 32.8328 | -117.2713 | AA | brennan | Brennan, Hellenistic Astrology, Chart 58 | Sun,Mercury,Venus,Jupiter
+Albert Einstein | 1879-03-14 | 11:30 | 0.6661 | 48.3986 | 9.9911 | AA | brennan | Brennan, Hellenistic Astrology, Chart 61 (LMT from own meridian) | Moon,Venus
+Andre Romelle Young | 1965-02-18 | 10:56 | -8.0000 | 34.0522 | -118.2437 | AA | brennan | Brennan, Hellenistic Astrology, Chart 63 | Moon,Venus,Mars,Jupiter
+Kurt Cobain | 1967-02-20 | 19:38 | -8.0000 | 46.9754 | -123.8157 | AA | brennan | Brennan, Hellenistic Astrology, Chart 73 | Sun,Moon,Venus,Mars
+Whitney Houston | 1963-08-09 | 20:55 | -4.0000 | 40.7357 | -74.1724 | AA | brennan | Brennan, Hellenistic Astrology, Chart 75 | Sun,Moon,Jupiter
+Hans Christian Andersen | 1805-04-02 | 01:00 | 0.6926 | 55.3959 | 10.3883 | AA | brennan | Brennan, Hellenistic Astrology, Chart 76 (LMT from own meridian) | 
+Lisa Marie Presley | 1968-02-01 | 17:01 | -6.0000 | 35.1495 | -90.0490 | AA | brennan | Brennan, Hellenistic Astrology, Chart 77 | 
+Amanda Knox | 1987-07-09 | 02:47 | -7.0000 | 47.6062 | -122.3321 | AA | brennan | Brennan, Hellenistic Astrology, Chart 84 | 
+Anthony Louis | 1945-09-03 | 09:05 | -4.0000 | 41.5582 | -73.0515 | AA | brennan | Brennan, Hellenistic Astrology, Chart 86 | 
+George W Bush | 1946-07-06 | 07:26 | -4.0000 | 41.3083 | -72.9279 | AA | brennan | Brennan, Hellenistic Astrology, Chart 102 | 
+Al Gore | 1948-03-31 | 12:53 | -5.0000 | 38.9072 | -77.0369 | AA | brennan | Brennan, Hellenistic Astrology, Chart 103 | 
+Chris Brennan | 1984-11-01 | 13:28 | -7.0000 | 39.7294 | -104.8319 | AA | brennan | Brennan, Hellenistic Astrology, Chart 106 | 
+Vanessa L Williams | 1963-03-18 | 11:28 | -5.0000 | 41.2043 | -73.7993 | AA | brennan | Brennan, Hellenistic Astrology, Chart 108 | Jupiter
+Nicole Brown Simpson | 1959-05-19 | 02:00 | 1.0000 | 50.1109 | 8.6821 | AA | brennan | Brennan, Hellenistic Astrology, Chart 109 | Saturn
+Linda Goodman | 1925-04-09 | 06:05 | -5.0000 | 39.6295 | -79.9559 | AA | brennan | Brennan, Hellenistic Astrology, Chart 114 | 
+Barack Obama | 1961-08-04 | 19:24 | -10.0000 | 21.3069 | -157.8583 | AA | brennan | Brennan, Hellenistic Astrology, Chart 118 | 
+
+# ---------------------------------------------------------------------
+# NOTES
+#
+# Offsets come from Java's IANA timezone database, not from memory, so
+# adoption dates, war time and pre-1966 local DST are handled.
+#
+# 5 charts predate standard time in their country and use Local Mean
+# Time computed from the birth city's own longitude. The tzdb's LMT is keyed
+# to the zone's reference city - Europe/Berlin means Berlin, and Ulm is 13.5
+# minutes of time from Berlin, which would break the chart.
+#
+# COORDINATES TO SPOT-CHECK - taken from memory, not a source:
+#   Anthony Louis
+#   Vanessa L Williams
+#
+# Rodden ratings are Brennan's claims, not independently verified against
+# Astro-Databank. AA certifies the source, not that the time is exact.
+#
+# Some of these charts belong to people associated with violence or crime.
+# They are here because Brennan used them to teach technique. Do NOT reuse
+# this corpus to correlate placements with outcomes - that needs matched
+# controls and pre-registration, and is a different project entirely.

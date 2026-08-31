@@ -1,0 +1,662 @@
+{
+  "sun_aries": {
+    "title": "Sun in Aries",
+    "summary": "The Sun in Aries is a blazing spark of raw vitality, driven by a pioneering, courageous spirit.",
+    "fullText": "As a cardinal fire sign ruled by Mars, Aries embodies the courage and impulsivity of the ancient warrior. Like the mythical ram of the Golden Fleece, your core identity is wrapped in a bold, restless desire to leap into the unknown. You approach the world with a dynamic, self-motivated energy, stepping into leadership roles effortlessly. Your magnetism lies in your optimism and pure, unharnessed enthusiasm. However, this intense focus on self-expression can sometimes blind you to the needs of the collective. True strength for you requires tempering the fires of action with patience, ensuring that your quick-burning passions mature into lasting achievements."
+  },
+  "sun_taurus": {
+    "title": "Sun in Taurus",
+    "summary": "The Sun in Taurus grounds the spark of life into tangible reality, building steadfast value with enduring grace.",
+    "fullText": "As a fixed earth sign ruled by Venus, your ego is expressed through sensuality, practicality, and an appreciation for physical beauty. Echoing the myth of the great white bull who carried Europa across the sea, you possess a quiet, unshakeable strength and a profound capacity for devotion. You are a builder at heart, preferring methodical progress over rushed ventures. Your calm exterior and loyal nature make you a rock for others, yet this fixity can manifest as deep-seated stubbornness. Growth comes when you learn to embrace the inevitable changing tides of life, allowing your soul to detach its worth from purely material possessions."
+  },
+  "sun_gemini": {
+    "title": "Sun in Gemini",
+    "summary": "The Sun in Gemini shines through an insatiable curiosity and a quicksilver mind, forever seeking connection.",
+    "fullText": "Ruled by the messenger god Hermes, this mutable air sign thrives on versatility and the continuous flow of information. Like the immortal twins Castor and Pollux, your identity dances between different worlds, intrinsically linked to learning and sharing ideas. You adapt effortlessly to new social landscapes, charming others with your wit and mental agility. Because you crave constant stimulation, you naturally juggle multiple interests, which can scatter your focus into superficial waters. Your highest expression involves gathering these diverse experiences and mastering the art of communication, transforming endless fascinating distractions into a unified, brilliant intellect."
+  },
+  "sun_cancer": {
+    "title": "Sun in Cancer",
+    "summary": "The Sun in Cancer reflects a deeply intuitive and protective core, navigating life through powerful tides of feeling.",
+    "fullText": "As a cardinal water sign ruled by the ever-changing Moon, you experience the world through instinct and profound empathy. Like the loyal crab that bravely faced Hercules, your life force is dedicated to fiercely protecting your loved ones and creating a safe emotional harbor. You possess a vivid imagination and an innate ability to sense unspoken needs. Yet, this extreme sensitivity makes you highly vulnerable, often prompting a retreat into your armored shell or the safety of the past when threatened. Real emotional security is found by anchoring your roots within yourself, empowering you to nurture the world without draining your own well."
+  },
+  "sun_leo": {
+    "title": "Sun in Leo",
+    "summary": "The Sun in Leo radiates warmth and dramatic flair, driven by a noble desire for authentic self-expression.",
+    "fullText": "As a fixed fire sign ruled by the Sun itself, Leo is the natural home of vital, life-enhancing energy. Echoing the legendary might of the Nemean Lion, your core identity seeks to shine brightly, lead generously, and receive appreciation for your unique creative gifts. You approach life with a big heart, unwavering loyalty, and an innate sense of nobility, easily uplifting those who bask in your light. Because you thrive in the spotlight, this powerful need for validation can occasionally drift into pride or vanity. You reach your highest potential when you share your warmth unconditionally, leading with magnanimity and quiet confidence."
+  },
+  "sun_virgo": {
+    "title": "Sun in Virgo",
+    "summary": "The Sun in Virgo embodies a sharp, analytical spirit dedicated to perfection, healing, and the refinement of reality.",
+    "fullText": "As a mutable earth sign ruled by Mercury, Virgo combines intellectual agility with a deeply grounded work ethic. Recalling Astraea, the goddess of purity who lingered on Earth to guide humanity, your ego finds fulfillment in service, problem-solving, and creating order out of chaos. You possess a discriminating eye and an unparalleled talent for organization. While this drive for excellence makes you incredibly reliable, it can also manifest as debilitating perfectionism, anxiety, or harsh criticism. By recognizing the inherent beauty in life's imperfections, you can balance your desire to heal the world with profound self-compassion."
+  },
+  "sun_libra": {
+    "title": "Sun in Libra",
+    "summary": "The Sun in Libra seeks identity through relationship, diplomacy, and an aesthetic appreciation for justice.",
+    "fullText": "As a cardinal air sign ruled by Venus, your life force thrives on partnership and the pursuit of fairness. Inspired by Themis and her scales of justice, you have an inherent charm and a talent for seeing every side of an issue, making you a master of equilibrium and mediation. You are driven to connect with others and create harmony in the social sphere. However, your deep-seated desire to avoid conflict can lead to indecisiveness or the compromising of your own boundaries to keep the peace. True balance is achieved when you assert your individuality while maintaining your natural grace and cooperative spirit."
+  },
+  "sun_scorpio": {
+    "title": "Sun in Scorpio",
+    "summary": "The Sun in Scorpio represents a magnetic, transformative force that seeks to uncover the deepest truths of existence.",
+    "fullText": "As a fixed water sign ruled by Pluto and Mars, you operate on a level of profound psychological depth. Like the mythical Phoenix rising from its own ashes, your identity is forged in the fires of crisis, regeneration, and intense passion. You possess an uncanny ability to see beneath the surface, fiercely protecting your vulnerability behind an enigmatic, powerful exterior. While you are relentlessly determined and fiercely loyal, your absolute need for control can twist into possessiveness or an inability to let go of betrayals. By embracing vulnerability, you allow your ego to undergo necessary deaths, rising reborn and truly empowered."
+  },
+  "sun_sagittarius": {
+    "title": "Sun in Sagittarius",
+    "summary": "The Sun in Sagittarius is a restless, optimistic seeker driven by a thirst for truth and expansive adventure.",
+    "fullText": "As a mutable fire sign ruled by Jupiter, you aim your arrows high, forever looking toward the horizon of meaning. Embodying the wisdom of the centaur Chiron, your core identity is enthusiastic, independent, and relentlessly curious about the universe. You are an honest visionary, thriving on freedom and the exploration of new cultures and philosophies. Your boundless optimism is a magnetic gift, but your resistance to limitation can make you commitment-shy, overly blunt, or prone to overlooking crucial everyday details. Integrating your lofty, soaring ideals with practical reality allows you to discover profound wisdom in both grand adventures and quiet moments."
+  },
+  "sun_capricorn": {
+    "title": "Sun in Capricorn",
+    "summary": "The Sun in Capricorn signifies an ambitious, pragmatic drive to build enduring structures and master the material world.",
+    "fullText": "As a cardinal earth sign ruled by Saturn, you channel your initiatory energy into tangible success and societal responsibility. Reflecting the ancient Sea-Goat climbing the highest peaks from the ocean's depths, you define your identity through hard work, persistence, and ascending to positions of authority. You are highly organized and capable of immense self-discipline. Yet, this relentless pursuit of security and excellence can sometimes make you appear cold, overly serious, or consumed by status. Balancing your formidable worldly ambitions with emotional fulfillment teaches you that true authority stems from inner wisdom rather than external validation."
+  },
+  "sun_aquarius": {
+    "title": "Sun in Aquarius",
+    "summary": "The Sun in Aquarius shines with a visionary light, dedicated to intellectual independence and humanitarian progress.",
+    "fullText": "As a fixed air sign ruled by Uranus, you merge steadfast conviction with revolutionary ideas. Much like Ganymede pouring out the waters of life and truth, your ego is expressed through your uniqueness and a dedication to collective ideals over personal gain. You are an objective, forward-thinking innovator who fiercely values friendship, freedom, and societal reform. Because you operate on a highly mental plane, you can sometimes appear emotionally aloof or stubbornly attached to your eccentric theories. Recognizing the individual human heart within the group you seek to uplift allows your brilliant mind to enact truly lasting, compassionate change."
+  },
+  "sun_pisces": {
+    "title": "Sun in Pisces",
+    "summary": "The Sun in Pisces embodies a mystical, profoundly empathetic spirit that seeks to connect with the universal whole.",
+    "fullText": "As a mutable water sign ruled by Neptune, Pisces swims in the boundless ocean of imagination. Recalling Aphrodite and Eros transforming into fish to escape the monster Typhon, your identity is highly fluid, absorbing the feelings of others and expressing itself through artistry and spiritual devotion. You possess a gentle, self-sacrificing nature that intuitively grasps the pain of the world. This extreme permeability, however, can lead to escapism, illusion, or the adoption of a victim mentality when reality becomes harsh. Developing healthy emotional boundaries ensures your immense creative and healing gifts can flow safely and powerfully into the world."
+  },
+  "moon_aries": {
+    "title": "Moon in Aries",
+    "summary": "The Moon in Aries reacts with a blazing, spontaneous intensity, seeking emotional security through direct action and fierce independence.",
+    "fullText": "Ruled by Mars, this cardinal fire placement gives your inner world the courage and impulsivity of the ancient warrior. Like the mythical ram of the Golden Fleece, your emotional instincts are bold, restless, and quick to ignite. You process feelings through immediate action, often responding to life's challenges with a dynamic, self-motivated surge of energy. While you are fiercely protective of your loved ones and exude an infectious enthusiasm, your need for instant emotional gratification can sometimes manifest as impatience or volatility. Your deepest comfort comes from autonomy and the freedom to express your passions authentically. By learning to pause and temper your rapid-fire reactions, you allow your quick-burning passions to mature into enduring emotional strength and confident leadership."
+  },
+  "moon_taurus": {
+    "title": "Moon in Taurus",
+    "summary": "Exalted in Taurus, the Moon finds profound emotional security in sensual comforts, enduring loyalty, and unshakeable stability.",
+    "fullText": "Exalted in this fixed earth sign ruled by Venus, your emotional nature echoes the quiet, devoted strength of the great white bull who carried Europa across the sea. You process the world through your physical senses, finding profound comfort in nature, beauty, and the tangible rewards of a peaceful life. Because your instincts are steady and methodical, you are a rock of reliability for those you love, rarely losing your temper or acting on a whim. Yet, this intense need for predictability can occasionally harden into stubbornness or an over-attachment to material possessions. True inner peace blossoms when you recognize that genuine security is cultivated from within, allowing you to embrace life’s inevitable changes while maintaining your characteristic grace and steadfast devotion."
+  },
+  "moon_gemini": {
+    "title": "Moon in Gemini",
+    "summary": "The Moon in Gemini processes emotions through a quicksilver intellect, seeking comfort in endless curiosity and lively communication.",
+    "fullText": "Ruled by the messenger god Hermes, this mutable air placement infuses your inner world with versatility and an insatiable thirst for information. Like the immortal twins Castor and Pollux, your emotional nature dances between different perspectives, instinctively rationalizing feelings rather than simply experiencing them. You find security in mental stimulation, easily adapting to new social landscapes and charming others with your bright, articulate wit. Because you crave constant variety, your moods can shift rapidly, sometimes causing your emotional energy to scatter into superficial anxieties or restless distraction. Your deepest fulfillment is found when you gather your diverse experiences and harness your brilliant mental agility, allowing open, honest communication to anchor your ever-curious heart."
+  },
+  "moon_cancer": {
+    "title": "Moon in Cancer",
+    "summary": "In its natural home of Cancer, the Moon flows with profound intuition, navigating life through powerful tides of empathy and protective devotion.",
+    "fullText": "Residing in its own domicile, this cardinal water sign connects your subconscious directly to the ever-changing rhythms of the lunar cycle. Embodying the fierce loyalty of the crab that bravely faced Hercules, your deepest instincts are dedicated to nurturing your loved ones and creating a safe, impenetrable sanctuary. You possess a vivid imagination and an innate, almost psychic ability to sense the unspoken needs of others. Because your emotional permeability makes you highly vulnerable, you may instinctively retreat into your armored shell or cling to the past when threatened. You find your greatest strength when you realize that true safety originates in your own self-nurturance, empowering you to care for the world without draining your own profound emotional reservoir."
+  },
+  "moon_leo": {
+    "title": "Moon in Leo",
+    "summary": "The Moon in Leo radiates a warm, theatrical light, finding emotional security through authentic self-expression and the adoration of others.",
+    "fullText": "Nourished by the radiant energy of the Sun, this fixed fire placement gives your inner life the noble, dramatic flair of the legendary Nemean Lion. You process your feelings with a big heart and unwavering loyalty, instinctively seeking to uplift those around you while secretly yearning for their validation and applause. Your emotional world is colorful and passionate; you feel safest when you are recognized, respected, and allowed to shine brightly. Because your pride is intimately tied to your feelings, you can be deeply wounded by indifference, sometimes reacting with vanity or melodramatic displays. You reach your highest emotional octave when you share your abundant warmth unconditionally, discovering that your quiet, inner confidence is far more magnetic than any external praise."
+  },
+  "moon_virgo": {
+    "title": "Moon in Virgo",
+    "summary": "The Moon in Virgo processes feelings through a sharp, analytical lens, seeking inner peace through practical service and the creation of order.",
+    "fullText": "Ruled by Mercury, this mutable earth placement blends emotional sensitivity with a deeply grounded, meticulous work ethic. Recalling Astraea, the goddess of purity who lingered on Earth to guide humanity, your instincts are devoted to healing, problem-solving, and organizing the chaos of everyday life. You find your deepest comfort in being useful and maintaining a structured, reliable routine. While your discriminating eye makes you an unparalleled caretaker, your intense need to perfect your environment can easily spiral into debilitating anxiety, hypochondria, or harsh self-criticism. By learning to quiet your restless mind and accepting the inherent beauty in life's imperfections, you transform your nervous worry into a profound, practical compassion for yourself and the world."
+  },
+  "moon_libra": {
+    "title": "Moon in Libra",
+    "summary": "The Moon in Libra seeks emotional equilibrium through harmonious relationships, diplomacy, and an aesthetic appreciation for justice.",
+    "fullText": "Guided by Venus, this cardinal air placement ensures your inner world thrives on partnership, beauty, and the pursuit of fairness. Inspired by Themis and her scales of justice, you possess an inherent charm and a subconscious drive to mediate conflict, instinctively sensing how to bring equilibrium to any social sphere. You feel most secure when your environment is peaceful, refined, and shared with a devoted companion. However, your deep-seated aversion to discord can lead to indecisiveness, passive-aggression, or the compromising of your own emotional boundaries just to keep the peace. True inner harmony is achieved when you learn to assert your own needs alongside those of your partner, blending your natural diplomatic grace with the courage to stand alone."
+  },
+  "moon_scorpio": {
+    "title": "Moon in Scorpio",
+    "summary": "The Moon in Scorpio operates as a magnetic, transformative force, navigating the emotional realm with profound psychological depth and fierce passion.",
+    "fullText": "In this fixed water sign ruled by Pluto and Mars, your subconscious is forged in the fires of crisis, regeneration, and intense desire. Like the mythical Phoenix rising from its own ashes, your emotional instincts are uncompromising, piercing beneath surface illusions to uncover the deepest truths. You protect your extreme vulnerability behind an enigmatic, powerful exterior, offering absolute loyalty to those who earn your trust. Yet, your fear of betrayal and desperate need for emotional control can easily twist into possessiveness, brooding jealousy, or an inability to forgive. By courageously embracing your own vulnerability, you allow your protective ego to undergo necessary deaths, rising reborn and wielding your immense emotional power to heal rather than destroy."
+  },
+  "moon_sagittarius": {
+    "title": "Moon in Sagittarius",
+    "summary": "The Moon in Sagittarius is a restless, optimistic seeker, finding emotional comfort in boundless freedom, philosophy, and expansive adventure.",
+    "fullText": "Ruled by expansive Jupiter, this mutable fire placement aims your emotional arrows high, forever looking toward the horizon of meaning. Embodying the wisdom of the centaur Chiron, your inner nature is enthusiastic, independent, and relentlessly curious. You process your feelings by searching for the ultimate truth, finding security in open spaces, new cultures, and the freedom to roam without restriction. While your boundless optimism is a magnetic gift, your resistance to emotional limitation can make you commitment-shy, overly blunt, or quick to flee when feelings become too heavy or complex. Integrating your lofty, soaring ideals with the practical realities of intimacy allows you to discover profound emotional wisdom in both grand adventures and quiet, committed moments."
+  },
+  "moon_capricorn": {
+    "title": "Moon in Capricorn",
+    "summary": "The Moon in Capricorn signifies a pragmatic, disciplined emotional core that seeks security through enduring achievement and material mastery.",
+    "fullText": "In this cardinal earth sign ruled by Saturn, your subconscious channels its energy into tangible success and societal responsibility. Reflecting the ancient Sea-Goat climbing the highest peaks from the ocean's depths, you define your emotional security through hard work, stoic persistence, and the building of unshakeable foundations. You process feelings cautiously, often delaying immediate gratification to ensure long-term stability. Yet, this relentless pursuit of excellence can sometimes make you appear emotionally cold, overly serious, or consumed by the need for control, masking a deep inner sensitivity. Balancing your formidable worldly ambitions with gentle self-acceptance teaches you that true security stems from inner wisdom and vulnerability, rather than mere external authority or material accomplishment."
+  },
+  "moon_aquarius": {
+    "title": "Moon in Aquarius",
+    "summary": "The Moon in Aquarius shines with a visionary light, processing emotions through objective logic, intellectual independence, and humanitarian ideals.",
+    "fullText": "Guided by unpredictable Uranus, this fixed air placement merges steadfast conviction with a revolutionary, forward-thinking spirit. Much like Ganymede pouring out the waters of life and truth, your inner world is devoted to collective ideals, universal friendship, and progressive reform. You find comfort in the unconventional, instinctively rationalizing your feelings to maintain a cool, objective perspective on the world. Because you operate on such a highly mental plane, your fierce need for personal freedom can sometimes make you appear emotionally aloof or stubbornly detached from the messy realities of intimacy. Recognizing the tender, individual human heart within the grand collective you seek to uplift allows your brilliant mind to enact truly lasting, compassionate emotional connections."
+  },
+  "moon_pisces": {
+    "title": "Moon in Pisces",
+    "summary": "The Moon in Pisces embodies a mystical, profoundly empathetic spirit, navigating life through boundless imagination and deep, universal compassion.",
+    "fullText": "Ruled by Neptune, this mutable water sign plunges your subconscious into the limitless ocean of emotion and spiritual devotion. Recalling Aphrodite and Eros transforming into fish to escape the monster Typhon, your emotional boundaries are highly fluid, allowing you to instinctively absorb the feelings of others and express yourself through artistry and romance. You possess a gentle, self-sacrificing nature that acutely grasps the pain and beauty of the world. This extreme permeability, however, can lead to escapism, illusion, or the adoption of a victim mentality when the harshness of reality becomes overwhelming. Developing healthy emotional boundaries ensures your immense creative and empathetic gifts can flow safely and powerfully, offering profound healing to yourself and others."
+  },
+  "mercury_aries": {
+    "title": "Mercury in Aries",
+    "summary": "Mercury in Aries communicates with blazing speed, pioneering intellect, and fearless honesty.",
+    "fullText": "Ruled by Mars, this cardinal fire placement gives the mind a sharp, impulsive edge. Like Hermes darting across the battlefield, your thoughts are quick, decisive, and often incredibly blunt. You process information with rapid intuition, preferring direct action over endless debate. While your intellectual courage and original ideas make you a brilliant trailblazer, your impatience can manifest as tactless or argumentative speech. By learning to pause and listen, you can transform your combative mental energy into inspiring, dynamic leadership."
+  },
+  "mercury_taurus": {
+    "title": "Mercury in Taurus",
+    "summary": "Mercury in Taurus processes the world with deliberate, practical logic and a deep appreciation for tangible facts.",
+    "fullText": "In this fixed earth sign ruled by Venus, the quicksilver messenger slows down to build ideas of lasting value. Your intellect is methodical, grounded, and highly sensuous, absorbing information best when it has practical application. You speak with a calm, melodious authority and possess immense mental endurance. However, this steady focus can sometimes harden into intellectual stubbornness or a reluctance to embrace new perspectives. True mental mastery comes when you allow your steadfast thoughts to adapt to life's inevitable changes."
+  },
+  "mercury_gemini": {
+    "title": "Mercury in Gemini",
+    "summary": "Residing in its natural home, Mercury in Gemini thrives on boundless curiosity, dual perspectives, and lightning-fast communication.",
+    "fullText": "As the ruler of this mutable air sign, Mercury operates at peak agility. Like the immortal twins Castor and Pollux, your mind constantly dances between differing viewpoints, eagerly gathering and dispensing information. You possess a sparkling wit, a talent for language, and an insatiable need for mental stimulation. Because you absorb data so rapidly, your focus can sometimes scatter, leading to nervous restlessness or superficial understanding. Harnessing your brilliance requires finding a unifying philosophy to anchor your endless stream of brilliant ideas."
+  },
+  "mercury_cancer": {
+    "title": "Mercury in Cancer",
+    "summary": "Mercury in Cancer filters intellect through profound intuition, utilizing a deeply empathetic and protective communication style.",
+    "fullText": "Guided by the Moon, this cardinal water placement weaves logic inextricably with emotion. You do not just think about the world; you feel your way through it. Your memory is formidable, often retaining the emotional imprint of past conversations long after the words are forgotten. You communicate with gentle sympathy, instinctively knowing what others need to hear. Yet, this extreme mental sensitivity can lead to defensive subjectivity or unspoken resentments. By trusting your profound intuition, your mind becomes a powerful tool for healing."
+  },
+  "mercury_leo": {
+    "title": "Mercury in Leo",
+    "summary": "Mercury in Leo speaks with dramatic flair, warmth, and an unwavering intellectual pride that seeks to inspire others.",
+    "fullText": "Nourished by the Sun, this fixed fire placement gives your intellect the regal, commanding presence of the lion. You express your ideas with theatrical creativity, confidence, and a deep desire to be heard and respected. You are a natural storyteller, capable of captivating an audience with your grand visions. Because your ego is closely tied to your intellect, you can be fiercely opinionated or prone to intellectual arrogance. You achieve your highest mental potential when you use your powerful voice to uplift and generously educate others."
+  },
+  "mercury_virgo": {
+    "title": "Mercury in Virgo",
+    "summary": "Exalted and ruling in Virgo, Mercury wields a razor-sharp, analytical mind dedicated to practical service and flawless precision.",
+    "fullText": "In this mutable earth sign, the messenger god becomes the ultimate craftsman. Your intellect is highly discriminating, structured, and capable of organizing chaotic data into flawless systems. You possess an unparalleled eye for detail and find immense satisfaction in solving complex, real-world problems. While your analytical brilliance makes you incredibly useful, your drive for mental perfection can easily spiral into relentless criticism or nervous worry. Embracing the beauty of imperfection allows your brilliant mind to heal rather than dissect."
+  },
+  "mercury_libra": {
+    "title": "Mercury in Libra",
+    "summary": "Mercury in Libra seeks intellectual equilibrium, using diplomacy, charm, and objective logic to bridge opposing viewpoints.",
+    "fullText": "Guided by Venus, this cardinal air placement demands fairness and aesthetic beauty in all communication. Like the scales of Themis, your mind naturally weighs every side of an argument, making you a gifted mediator and a graceful conversationalist. You thrive on intellectual partnership and seek to harmonize conflicting ideas. However, your intense desire to keep the peace can lead to indecisiveness or intellectual compromise. True wisdom emerges when you blend your natural diplomatic grace with the courage to assert your own independent truth."
+  },
+  "mercury_scorpio": {
+    "title": "Mercury in Scorpio",
+    "summary": "Mercury in Scorpio possesses a piercing, investigative intellect that relentlessly uncovers the hidden truths of the human psyche.",
+    "fullText": "In this fixed water sign ruled by Pluto and Mars, the mind acts as a profound psychological detective. You are entirely uninterested in superficial chatter; your communication is intense, secretive, and magnetically powerful. You possess an uncanny ability to read between the lines, using your sharp intuition to dissect complex mysteries. While your intellectual focus is formidable, your suspicion can twist into paranoia or a tendency to use words as weapons. By embracing vulnerability, your intense mental power becomes an instrument for profound transformation."
+  },
+  "mercury_sagittarius": {
+    "title": "Mercury in Sagittarius",
+    "summary": "Mercury in Sagittarius is a philosophical explorer, driven by an optimistic, blunt, and boundless quest for ultimate meaning.",
+    "fullText": "Ruled by expansive Jupiter, this mutable fire placement aims the intellect toward the furthest horizons. You are a visionary thinker, far more interested in grand concepts, foreign cultures, and absolute truths than in mundane details. Your communication style is enthusiastic, honest, and fiercely independent. Because you speak your truth so directly, you can sometimes be remarkably tactless or overlook crucial facts in your rush toward the big picture. Grounding your lofty ideals in practical reality turns your restless curiosity into genuine, inspiring wisdom."
+  },
+  "mercury_capricorn": {
+    "title": "Mercury in Capricorn",
+    "summary": "Mercury in Capricorn employs a disciplined, structured, and ambitious intellect focused on achieving tangible, long-term success.",
+    "fullText": "Under the stern rulership of Saturn, this cardinal earth placement gives the mind a serious, pragmatic, and highly organized character. You think in terms of architecture and endurance, communicating with authority and a dry, cautious realism. You excel at taking abstract ideas and engineering them into workable, real-world systems. However, your intense focus on practicality can sometimes make your thinking overly rigid, pessimistic, or bound by tradition. Allowing your structured mind to occasionally entertain the unorthodox will unlock your true executive brilliance."
+  },
+  "mercury_aquarius": {
+    "title": "Mercury in Aquarius",
+    "summary": "Mercury in Aquarius operates with a brilliant, objective, and revolutionary intellect dedicated to futuristic ideas and collective progress.",
+    "fullText": "Guided by Uranus, this fixed air placement merges steadfast logic with startling innovation. Your mind operates on a highly original frequency, allowing you to grasp complex, abstract concepts that elude others. You communicate with cool detachment, valuing absolute truth and egalitarian ideals over emotional sentiment. Because you are fiercely independent in your thinking, you can appear intellectually aloof or stubbornly eccentric. By recognizing the human heart within the collective you seek to awaken, your visionary ideas can spark profound and lasting social reform."
+  },
+  "mercury_pisces": {
+    "title": "Mercury in Pisces",
+    "summary": "Mercury in Pisces thinks in symbols and dreams, navigating the world through boundless empathy, poetry, and psychic intuition.",
+    "fullText": "In this mutable water sign ruled by Neptune, the logical mind dissolves into the vast ocean of the collective unconscious. You process information through feeling and imagination rather than hard facts, making you a gifted artist, musician, or spiritual channel. Your communication is gentle, elusive, and deeply compassionate. However, this lack of mental boundaries can lead to confusion, scattered focus, or an inability to articulate your profound inner visions. Trusting your intuition while practicing mental discipline allows your poetic mind to safely inspire the world."
+  },
+  "venus_aries": {
+    "title": "Venus in Aries",
+    "summary": "Venus in Aries loves fiercely and impulsively, finding romance in the thrill of the chase and the assertion of independence.",
+    "fullText": "In this cardinal fire sign ruled by Mars, the goddess of love dons the armor of a warrior. Your approach to relationships is passionate, direct, and unashamedly bold. You crave excitement and are often the initiator in romance, thriving on the exhilarating spark of new attraction. While your enthusiastic affection is deeply magnetic, your need for constant stimulation can make you impatient or competitive with your partners. True romantic fulfillment comes when you learn to balance your fierce independence with the gentle art of compromise."
+  },
+  "venus_taurus": {
+    "title": "Venus in Taurus",
+    "summary": "Residing in its natural home, Venus in Taurus seeks enduring love, finding profound comfort in loyalty, sensuality, and material beauty.",
+    "fullText": "As the ruler of this fixed earth sign, Venus operates with unparalleled stability and grace. You express affection through physical touch, steadfast devotion, and the creation of a beautiful, comfortable environment. In romance, you are a builder, preferring slow, reliable growth over fleeting, chaotic passion. Your loyalty is absolute, but your intense need for security can sometimes manifest as stubborn possessiveness or a reluctance to let go of outgrown attachments. Embracing life’s inevitable changes allows your deep, sensual love to flourish eternally."
+  },
+  "venus_gemini": {
+    "title": "Venus in Gemini",
+    "summary": "Venus in Gemini loves through the mind, seeking romantic connection through sparkling conversation, variety, and endless intellectual curiosity.",
+    "fullText": "Guided by quicksilver Mercury, this mutable air placement demands mental stimulation above all else. For you, a meeting of the minds is the ultimate aphrodisiac. You are flirtatious, charming, and highly adaptable, requiring a partner who can keep pace with your ever-shifting interests. Because you abhor boredom, you may struggle with commitment or scatter your affections to avoid emotional heaviness. Your deepest relationships are forged when you find a companion who shares your insatiable curiosity, allowing your dual nature to communicate openly and honestly."
+  },
+  "venus_cancer": {
+    "title": "Venus in Cancer",
+    "summary": "Venus in Cancer seeks a soulful, nurturing romance, expressing love through fierce protection and the creation of emotional sanctuary.",
+    "fullText": "In this cardinal water sign ruled by the Moon, love is inextricably linked to safety, memory, and profound empathy. You possess a gentle, maternal approach to romance, showering your loved ones with devotion and domestic care. You give your heart completely, but only after carefully testing the waters, as your emotional vulnerability is extreme. This intense sensitivity can lead to clinging behavior or retreating into a protective shell when hurt. True intimacy blossoms when you build an unbreakable foundation of self-love first."
+  },
+  "venus_leo": {
+    "title": "Venus in Leo",
+    "summary": "Venus in Leo loves with theatrical warmth and regal pride, demanding loyalty, grand romance, and absolute adoration.",
+    "fullText": "Illuminated by the Sun, this fixed fire placement brings dramatic flair and immense generosity to the realm of relationships. You love with your whole heart, treating your partners like royalty and expecting to be worshipped in return. Your romantic style is demonstrative, passionate, and fiercely loyal. However, your intense need for validation and the spotlight can sometimes result in vanity, jealousy, or turning love into a performance. You achieve true romantic majesty when you give your abundant warmth unconditionally, without demanding applause."
+  },
+  "venus_virgo": {
+    "title": "Venus in Virgo",
+    "summary": "Venus in Virgo expresses love through practical devotion and meticulous service, seeking a relationship built on purity, improvement, and reliability.",
+    "fullText": "Guided by analytical Mercury, this mutable earth placement shows affection in the details. You are the partner who remembers how they take their coffee and quietly solves their problems. You seek a love that makes practical sense, valuing integrity and hard work over grand, chaotic declarations. While your devotion is unmatched, your quest for the perfect relationship can lead to debilitating perfectionism or overly critical behavior toward yourself and your partner. Discovering the beauty in human flaws allows your healing love to truly shine."
+  },
+  "venus_libra": {
+    "title": "Venus in Libra",
+    "summary": "In its ruling sign, Venus in Libra elevates love to an art form, seeking absolute harmony, aesthetic beauty, and intellectual partnership.",
+    "fullText": "As the ruler of this cardinal air sign, Venus is graceful, diplomatic, and deeply devoted to the ideal of union. You possess immense charm and a natural ability to create balance and refinement in your relationships. You thrive in partnerships, feeling most complete when sharing your life with an equal. However, your intense aversion to conflict can lead to suppressing your own needs or maintaining superficial peace at the cost of authentic intimacy. True harmony requires the courage to assert your own independent truth."
+  },
+  "venus_scorpio": {
+    "title": "Venus in Scorpio",
+    "summary": "Venus in Scorpio demands a love that is transformative, passionate, and absolutely consuming, settling for nothing less than a soul-deep bond.",
+    "fullText": "In this fixed water sign ruled by Pluto and Mars, love is an intense, all-or-nothing emotional crucible. You are drawn to the hidden depths of your partners, seeking a level of psychological intimacy that transcends the physical realm. Your loyalty is fierce and unwavering, but your absolute need for control and fear of betrayal can easily twist into jealousy, suspicion, or possessiveness. By courageously embracing vulnerability and releasing the need to dominate, your powerful love becomes a profound force for spiritual rebirth."
+  },
+  "venus_sagittarius": {
+    "title": "Venus in Sagittarius",
+    "summary": "Venus in Sagittarius loves with a restless, optimistic spirit, seeking a romantic partner who doubles as a fellow adventurer and philosopher.",
+    "fullText": "Guided by expansive Jupiter, this mutable fire placement requires freedom, growth, and endless horizons in love. You approach romance with cheerful honesty and a spirited sense of play, refusing to be bogged down by heavy, restrictive emotional demands. You are attracted to people of different cultures and diverse beliefs. While your boundless enthusiasm is highly attractive, your fear of confinement can make you commitment-shy or prone to fleeing when relationships require deep, emotional work. True love for you is a shared, ever-expanding journey."
+  },
+  "venus_capricorn": {
+    "title": "Venus in Capricorn",
+    "summary": "Venus in Capricorn seeks a love that is enduring, structured, and materially secure, expressing affection through loyalty and shared ambition.",
+    "fullText": "Under the stern rulership of Saturn, this cardinal earth placement views relationships as serious, long-term investments. You are cautious with your heart, demanding respect, reliability, and tangible proof of devotion before fully committing. Once won, your loyalty is absolute and unshakeable. However, your intense focus on status and security can sometimes make your approach to love appear cold, calculating, or overly concerned with public image. By allowing yourself to be emotionally vulnerable, you build a legacy of love that is both powerful and deeply fulfilling."
+  },
+  "venus_aquarius": {
+    "title": "Venus in Aquarius",
+    "summary": "Venus in Aquarius approaches romance with objective detachment, seeking a partner who is, above all, a brilliant and fiercely independent friend.",
+    "fullText": "Guided by revolutionary Uranus, this fixed air placement rebels against traditional romantic norms. You value intellectual freedom and egalitarian ideals, expressing love by giving your partner the absolute space to be themselves. Your affections are unconventional, and you are often attracted to eccentric, brilliant minds. Because you operate on such a highly mental plane, you can sometimes appear emotionally aloof or stubbornly resistant to deep intimacy. Recognizing the unique emotional heartbeat of your partner allows your progressive, visionary love to forge true, lasting connection."
+  },
+  "venus_pisces": {
+    "title": "Venus in Pisces",
+    "summary": "Exalted in Pisces, Venus offers a love that is mystical, boundless, and profoundly compassionate, seeking ultimate spiritual union.",
+    "fullText": "In this mutable water sign ruled by Neptune, the goddess of love swims in the ocean of divine romance. Your capacity for empathy and self-sacrifice is immense; you love without boundaries, often seeking to rescue or heal your partners. You are deeply romantic, artistic, and instinctively tuned to the pain of the world. However, this extreme emotional permeability can lead to illusions, codependency, or falling for those who drain your spirit. Developing firm emotional boundaries ensures your exquisite, unconditional love is both safe and deeply appreciated."
+  },
+  "mars_aries": {
+    "title": "Mars in Aries",
+    "summary": "In its ruling sign, Mars in Aries is an explosive force of pure willpower, acting with raw courage, speed, and absolute independence.",
+    "fullText": "As the ruler of this cardinal fire sign, the warrior god is in his absolute element. Your drive is impulsive, pioneering, and intensely self-motivated. You possess a brilliant, spark-like energy that thrives on overcoming obstacles and leading the charge. You fight directly and honestly, expressing anger like a sudden thunderstorm that quickly passes. However, your intense desire for immediate results can make you reckless, competitive, or blind to the needs of the collective. Channeling your fiery zeal into disciplined action makes you an unstoppable, heroic force."
+  },
+  "mars_taurus": {
+    "title": "Mars in Taurus",
+    "summary": "Mars in Taurus utilizes a slow, unrelenting, and incredibly stubborn force, achieving its goals through sheer physical endurance and patience.",
+    "fullText": "In this fixed earth sign ruled by Venus, the warrior’s raw fire is grounded into steadfast, deliberate action. You are not quick to start, but once set in motion, your determination is absolute and unbreakable. You build your empire methodically, motivated by a desire for tangible security and sensual comfort. While you are generally peaceful, your anger, when finally provoked, is like a slow-moving, devastating earthquake. Learning to adapt to changing circumstances allows your immense, quiet strength to build legacies that last forever."
+  },
+  "mars_gemini": {
+    "title": "Mars in Gemini",
+    "summary": "Mars in Gemini fights with words and wit, using a restless, versatile energy to conquer intellectual challenges and gather information.",
+    "fullText": "Guided by quicksilver Mercury, this mutable air placement turns the mind into a battlefield. Your drive is scattered, curious, and constantly seeking new mental stimulation. You assert yourself through debate, persuasion, and a brilliant, sometimes biting, sense of humor. Because you are so easily bored, you excel at juggling multiple projects but may struggle with follow-through or physical stamina. Your anger is nervous and verbal, quickly expressed and quickly forgotten. Harnessing your intellectual agility allows you to outmaneuver any opponent with brilliant strategic speed."
+  },
+  "mars_cancer": {
+    "title": "Mars in Cancer",
+    "summary": "Mars in Cancer asserts itself through emotional tenacity and fierce protection, utilizing a defensive, sideways strategy to achieve its desires.",
+    "fullText": "In this cardinal water sign ruled by the Moon, the warrior’s sword is replaced by the crab’s protective shell. Your drive is deeply tied to your moods and your need for domestic security. You fight fiercely for those you love, but your personal ambition often operates indirectly, relying on subtle emotional manipulation rather than direct confrontation. Your anger is defensive, often simmering as silent resentment before boiling over. By acknowledging and directly expressing your own needs, your protective strength becomes a profound, nurturing power."
+  },
+  "mars_leo": {
+    "title": "Mars in Leo",
+    "summary": "Mars in Leo operates with dramatic flair and immense pride, driven by a noble desire to lead, create, and be recognized.",
+    "fullText": "Illuminated by the Sun, this fixed fire placement gives your willpower the radiant, commanding presence of royalty. You act with courage, warmth, and an unwavering belief in your own creative potential. Your ambition is grand; you want to leave a lasting, brilliant mark on the world. Because your ego is intensely tied to your actions, you can be stubbornly proud, quick to take offense, or prone to domineering behavior. You achieve true greatness when you lead with magnanimity, fighting honorably for the benefit of all."
+  },
+  "mars_virgo": {
+    "title": "Mars in Virgo",
+    "summary": "Mars in Virgo channels its energy into precise, analytical action, driven by an unparalleled work ethic and a desire for flawless perfection.",
+    "fullText": "Guided by Mercury, this mutable earth placement turns raw aggression into meticulous craftsmanship. Your drive is disciplined, practical, and heavily focused on service and problem-solving. You fight not with brute force, but with strategy, organization, and a razor-sharp critical eye. While your efficiency is unmatched, your intense need to perfect every detail can lead to nervous exhaustion, microscopic focus, or irritable, fault-finding behavior. By accepting that perfection is an illusion, your dedicated, healing energy can be applied to truly masterful, real-world accomplishments."
+  },
+  "mars_libra": {
+    "title": "Mars in Libra",
+    "summary": "Mars in Libra asserts itself through diplomacy and partnership, driven to fight for justice, equality, and aesthetic harmony.",
+    "fullText": "In this cardinal air sign ruled by Venus, the warrior is forced to lay down his sword and pick up the scales. Your drive is highly social; you find it easier to take action when partnered with another or when defending a matter of principle. You abhor crude confrontation, preferring to resolve conflict through charm, debate, and strategic compromise. However, this intense desire for peace can manifest as chronic indecision or passive-aggressive behavior. True balance is achieved when you find the courage to fight directly for your own desires."
+  },
+  "mars_scorpio": {
+    "title": "Mars in Scorpio",
+    "summary": "In its traditional home, Mars in Scorpio wields a magnetic, intensely focused power, driven by an absolute need for transformation and control.",
+    "fullText": "As the co-ruler of this fixed water sign, Mars operates with stealth, strategy, and unparalleled emotional endurance. Your ambition is relentless; you possess a quiet, penetrating power that works tirelessly beneath the surface until you strike with deadly accuracy. You are fiercely protective and capable of surviving incredible psychological extremes. However, your demand for absolute control can lead to brooding jealousy, vindictiveness, or a refusal to forgive. By surrendering your need to dominate, your profound strength becomes a powerful instrument for healing and rebirth."
+  },
+  "mars_sagittarius": {
+    "title": "Mars in Sagittarius",
+    "summary": "Mars in Sagittarius is an optimistic, restless crusader, driven by a philosophical thirst for adventure, truth, and absolute freedom.",
+    "fullText": "Ruled by expansive Jupiter, this mutable fire placement aims its physical and mental arrows toward the furthest horizons. You act with immense enthusiasm, honesty, and a daring sense of play. Your energy is spontaneous and athletic, always seeking the thrill of a new journey or a vigorous debate. Because you abhor limitation, your drive can be scattered, tactless, or prone to abandoning projects when the mundane details emerge. Grounding your lofty visions in practical discipline turns your restless crusades into genuine, inspiring conquests."
+  },
+  "mars_capricorn": {
+    "title": "Mars in Capricorn",
+    "summary": "Exalted in Capricorn, Mars channels its force into disciplined, authoritative ambition, achieving mastery through calculated, unyielding perseverance.",
+    "fullText": "Under the strict rulership of Saturn, this cardinal earth placement represents the warrior functioning as a masterful general. Your drive is phenomenally organized, patient, and focused entirely on tangible, long-term success. You possess the emotional control to delay immediate gratification in order to build enduring structures of power. While your capacity for hard work is legendary, your intense ambition can sometimes make you appear cold, ruthless, or overly materialistic. Balancing your formidable worldly drive with emotional compassion ensures your ultimate victory is both respected and fulfilling."
+  },
+  "mars_aquarius": {
+    "title": "Mars in Aquarius",
+    "summary": "Mars in Aquarius asserts itself through radical intellect and eccentric rebellion, driven to shatter the status quo for the sake of humanity.",
+    "fullText": "Guided by revolutionary Uranus, this fixed air placement fights the battles of the future. Your energy is highly mental, objective, and fiercely independent. You are a natural reformer, motivated by collective ideals and a deep-seated hatred of unjust authority. You take action in sudden, unpredictable flashes of brilliance. Because you operate on such a detached level, your anger can be coldly rational, and your absolute refusal to conform can manifest as stubborn contrariness. Harnessing your visionary genius allows you to engineer truly lasting, progressive change."
+  },
+  "mars_pisces": {
+    "title": "Mars in Pisces",
+    "summary": "Mars in Pisces utilizes a subtle, imaginative, and deeply empathetic energy, driven to fight for the underdog and dissolve spiritual boundaries.",
+    "fullText": "In this mutable water sign ruled by Neptune, the warrior’s blade is softened by the ocean of compassion. Your drive is highly intuitive, artistic, and often directed toward healing or self-sacrifice. You abhor direct confrontation, preferring to navigate conflict through evasion, adaptation, or passive resistance. While your sensitivity is a profound creative gift, your lack of firm boundaries can lead to scattered energy, escapism, or adopting a victim mentality when overwhelmed. Learning to assert your own needs directly ensures your profound spiritual strength is never depleted."
+  },
+  "jupiter_aries": {
+    "title": "Jupiter in Aries",
+    "summary": "Jupiter in Aries expands through bold action and absolute self-belief, finding luck in pioneering independence and courageous leadership.",
+    "fullText": "In this cardinal fire sign, the planet of abundance operates with enthusiastic, blazing speed. You grow spiritually and materially by trusting your instincts and fearlessly forging your own path. Your optimism is infectious, making you a natural, charismatic leader who inspires others to take risks. However, this intense self-focus can sometimes blind you to details, leading to reckless gambles, arrogance, or a tendency to abandon projects once the initial thrill fades. By cultivating patience, your bold initiatives will mature into lasting, magnificent successes."
+  },
+  "jupiter_taurus": {
+    "title": "Jupiter in Taurus",
+    "summary": "Jupiter in Taurus finds faith and expansion through material stability, discovering profound abundance in sensual comfort and patient, methodical growth.",
+    "fullText": "In this fixed earth sign, the expansive energy of Jupiter is grounded into tangible, enduring reality. You attract good fortune by acting with practical deliberation and an unwavering appreciation for the beauty of the physical world. You are a natural builder, capable of steadily accumulating wealth and resources over time. While your steadfast nature brings incredible security, an over-attachment to comfort can lead to stubbornness, laziness, or excessive materialism. Recognizing that true abundance resides within the soul ensures your material wealth brings genuine, lasting joy."
+  },
+  "jupiter_gemini": {
+    "title": "Jupiter in Gemini",
+    "summary": "Jupiter in Gemini expands through an insatiable curiosity, seeking ultimate truth by gathering diverse ideas and mastering the art of communication.",
+    "fullText": "In this mutable air sign (its traditional detriment), the planet of the 'big picture' is forced to focus on endless, fascinating details. You find your luck through networking, writing, and maintaining a brilliant, quicksilver intellect. Your mind is broad and tolerant, eager to learn from every passing conversation. Because you see validity in every perspective, you may struggle to commit to a single, unifying philosophy, scattering your energy across superficial pursuits. Synthesizing your vast collection of facts into a cohesive worldview unlocks your true visionary brilliance."
+  },
+  "jupiter_cancer": {
+    "title": "Jupiter in Cancer",
+    "summary": "Exalted in Cancer, Jupiter finds supreme abundance in emotional connection, expanding through profound empathy, family bonds, and nurturing the world.",
+    "fullText": "In this cardinal water sign, the planet of faith operates with an open, fiercely protective heart. You attract incredible fortune when you trust your powerful intuition and create a safe, supportive sanctuary for others. Your generosity is boundless, often extending your concept of 'family' to encompass the entire community. While your compassionate nature is a magnificent gift, your extreme sensitivity can sometimes lead to emotional hoarding, codependency, or a fear of leaving your comfort zone. By nurturing your own spirit first, your healing love becomes truly limitless."
+  },
+  "jupiter_leo": {
+    "title": "Jupiter in Leo",
+    "summary": "Jupiter in Leo expands through dramatic self-expression, finding profound luck in creative leadership, noble generosity, and a joyful, radiant heart.",
+    "fullText": "In this fixed fire sign, the planet of abundance operates with the magnificent, theatrical flair of a sovereign. You grow by stepping confidently into the spotlight, inspiring others with your warmth, loyalty, and unwavering belief in your own unique talents. You possess a natural affinity for grandeur and romance. However, your intense desire for admiration can sometimes inflate into excessive pride, vanity, or a tendency to make promises you cannot keep. True spiritual majesty is achieved when you share your radiant light with unconditional, quiet grace."
+  },
+  "jupiter_virgo": {
+    "title": "Jupiter in Virgo",
+    "summary": "Jupiter in Virgo seeks expansion through practical service and meticulous analysis, finding faith in the perfection of the everyday world.",
+    "fullText": "In this mutable earth sign (its traditional detriment), the planet of boundless vision is grounded into the microscopic details of daily life. You attract success through an unparalleled work ethic, precise organization, and a humble dedication to healing or helping others. You possess an intensely analytical mind that excels at solving practical problems. Because you focus so heavily on the flawed details, you may struggle with pessimism, anxiety, or missing the grand, optimistic overview. Discovering the divine order within life’s imperfections unlocks your true, practical wisdom."
+  },
+  "jupiter_libra": {
+    "title": "Jupiter in Libra",
+    "summary": "Jupiter in Libra expands through harmonious partnerships, finding luck and spiritual growth in diplomacy, aesthetic beauty, and the pursuit of justice.",
+    "fullText": "In this cardinal air sign, the planet of abundance operates with supreme social grace. You attract good fortune by cultivating balanced relationships and seeking fair, equitable solutions to conflict. You possess a refined, artistic sensibility and a deep, philosophical belief in the power of equality. Because you are so focused on the needs of the 'other,' your desire to keep the peace can sometimes lead to indecisiveness, superficiality, or compromising your own moral center. True expansion requires the courage to assert your own independent truth alongside your partner."
+  },
+  "jupiter_scorpio": {
+    "title": "Jupiter in Scorpio",
+    "summary": "Jupiter in Scorpio expands through intense psychological transformation, finding profound faith by fearlessly exploring the hidden depths of the human soul.",
+    "fullText": "In this fixed water sign, the planet of optimism plunges into the dark, powerful mysteries of existence. You grow by confronting crisis, utilizing an uncanny, magnetic intuition to uncover secrets and facilitate deep healing. You are fiercely loyal and possess an uncompromising willpower that can rebuild life from the ashes. However, your absolute intensity can sometimes warp into obsession, secrecy, or a destructive hunger for absolute control. By embracing vulnerability and releasing the need to dominate, your profound emotional power becomes a miraculous force for rebirth."
+  },
+  "jupiter_sagittarius": {
+    "title": "Jupiter in Sagittarius",
+    "summary": "In its ruling sign, Jupiter in Sagittarius is a joyful, restless visionary, finding ultimate abundance in philosophy, long-distance travel, and absolute freedom.",
+    "fullText": "As the ruler of this mutable fire sign, the planet of expansion is in its absolute element. You grow by aiming your arrows toward the furthest horizons, driven by an unshakeable optimism and a profound thirst for universal truth. You are an adventurous, honest teacher who inspires others with your sweeping, global perspective. Because you abhor limitation, your boundless confidence can sometimes manifest as arrogance, tactlessness, or a refusal to deal with practical realities. Grounding your lofty ideals allows your brilliant visions to truly manifest in the world."
+  },
+  "jupiter_capricorn": {
+    "title": "Jupiter in Capricorn",
+    "summary": "Jupiter in Capricorn seeks expansion through disciplined ambition and societal responsibility, finding faith by building enduring, practical structures of authority.",
+    "fullText": "In this cardinal earth sign (its traditional fall), the planet of boundless optimism is restricted by the heavy demands of time and duty. You attract success not through blind luck, but through relentless hard work, strategic planning, and unyielding perseverance. You possess a masterful ability to manifest your goals in the physical world. However, your intense focus on status and security can sometimes lead to pessimism, emotional coldness, or a belief that the universe is fundamentally harsh. Integrating spiritual compassion with your worldly ambition ensures your magnificent achievements bring true joy."
+  },
+  "jupiter_aquarius": {
+    "title": "Jupiter in Aquarius",
+    "summary": "Jupiter in Aquarius expands through visionary intellect and humanitarian rebellion, finding profound luck in progressive ideals and universal brotherhood.",
+    "fullText": "In this fixed air sign, the planet of faith operates with brilliant, objective detachment. You grow by challenging the status quo, utilizing a highly original mind to champion equality, scientific innovation, and radical social reform. You believe fiercely in the power of the collective and attract good fortune through vast, unconventional networks of friends. Because your focus is so broad and theoretical, you can sometimes appear emotionally aloof, stubbornly eccentric, or disconnected from individual human needs. Infusing your brilliant social blueprints with personal warmth unlocks your true revolutionary power."
+  },
+  "jupiter_pisces": {
+    "title": "Jupiter in Pisces",
+    "summary": "In its traditional home, Jupiter in Pisces expands through boundless compassion and mystical intuition, finding ultimate faith in the spiritual unity of all creation.",
+    "fullText": "As the ancient co-ruler of this mutable water sign, Jupiter operates with profound, poetic empathy. You grow by surrendering to the flow of the universe, utilizing an immensely powerful imagination to heal, create, and comfort those in pain. You possess a gentle, self-sacrificing spirit that intuitively understands the interconnectedness of all life. However, this extreme permeability can lead to escapism, illusion, or an inability to maintain healthy personal boundaries. Trusting your profound inner vision while remaining anchored in reality allows your immense spiritual gifts to truly bless the world."
+  },
+  "saturn_aries": {
+    "title": "Saturn in Aries",
+    "summary": "Saturn in Aries faces profound lessons around courage and self-assertion, learning to build true, disciplined strength by overcoming the fear of independence.",
+    "fullText": "In this cardinal fire sign (its traditional fall), the planet of restriction clashes with the sign of impulsive action. You may struggle deeply with feelings of inadequacy regarding your leadership abilities, often oscillating between hesitation and forced, overly aggressive behavior. Your early life may have suppressed your natural willpower, leaving you fearful of taking bold risks. However, as you mature, Saturn demands that you meticulously engineer your own courage. By facing your fears directly and mastering self-discipline, you transform your initial insecurity into an unshakeable, pioneering, and highly respected authority."
+  },
+  "saturn_taurus": {
+    "title": "Saturn in Taurus",
+    "summary": "Saturn in Taurus confronts deep-seated fears regarding material security, demanding the patient, structured building of enduring self-worth and tangible resources.",
+    "fullText": "In this fixed earth sign, the taskmaster planet focuses its heavy lessons on the physical plane. You may experience intense anxiety surrounding money, possessions, and sensual comfort, often feeling that you must work twice as hard to achieve financial stability. You possess an incredible, unrelenting stamina and a profound respect for the slow, methodical accumulation of value. The danger lies in becoming overly rigid, miserly, or defining your soul's worth entirely by your bank account. By cultivating inner spiritual security, your massive practical efforts yield a legacy of true, unshakable abundance."
+  },
+  "saturn_gemini": {
+    "title": "Saturn in Gemini",
+    "summary": "Saturn in Gemini faces rigorous tests regarding communication and intellect, learning to transform mental anxiety into profound, disciplined, and authoritative thought.",
+    "fullText": "In this mutable air sign, the planet of limitation forces the quicksilver mind to slow down and focus. You may struggle with self-doubt regarding your intelligence or speaking abilities, perhaps experiencing early educational delays or a fear of being misunderstood. Consequently, you approach learning with intense seriousness, meticulously organizing facts and striving for absolute clarity. While this can make your thinking rigid or overly skeptical, your dedication eventually turns you into a master of precise, profound communication, capable of giving enduring structure to the most complex, abstract ideas."
+  },
+  "saturn_cancer": {
+    "title": "Saturn in Cancer",
+    "summary": "Saturn in Cancer confronts profound lessons surrounding emotional vulnerability and family, building true inner security by overcoming the fear of rejection.",
+    "fullText": "In this cardinal water sign (its traditional detriment), the stern taskmaster resides in the sensitive realm of the Moon. You may carry deep, unconscious fears of abandonment, often experiencing early life as emotionally cold or overly burdened with familial responsibility. To protect yourself, you may build formidable defensive walls, appearing stoic while hiding a profoundly tender heart. The karmic task is to stop seeking parental nurturing from the outside world and learn to fiercely, consistently mother yourself. Mastering your own emotional foundations transforms your painful sensitivity into a protective, enduring wisdom."
+  },
+  "saturn_leo": {
+    "title": "Saturn in Leo",
+    "summary": "Saturn in Leo faces agonizing lessons surrounding pride and creative expression, learning to build genuine self-confidence by overcoming the fear of mediocrity.",
+    "fullText": "In this fixed fire sign (its traditional detriment), the planet of restriction suppresses the natural, joyful exuberance of the Sun. You may harbor a deep-seated fear of being ignored or ridiculed, making it incredibly difficult to relax, play, or spontaneously share your heart. You demand absolute perfection from your own creative efforts, often working tirelessly behind the scenes rather than risking public failure. By dismantling your rigid ego defenses and realizing that true authority requires no applause, you forge a dignified, masterful, and profoundly authentic creative power."
+  },
+  "saturn_virgo": {
+    "title": "Saturn in Virgo",
+    "summary": "Saturn in Virgo is tested through meticulous duty and practical service, learning to conquer crippling perfectionism by finding order within the flawed human experience.",
+    "fullText": "In this mutable earth sign, the planet of discipline amplifies the analytical, critical nature of Mercury. You possess an unparalleled work ethic and a brilliant capacity for organizing the chaotic details of reality. However, your intense fear of making a mistake can lead to hypochondria, nervous exhaustion, or a paralyzing inability to delegate tasks. You may feel that if you do not control every variable, disaster will strike. By learning to accept the beautiful imperfections of life, your rigorous, healing discipline becomes a masterful instrument for genuine, large-scale service."
+  },
+  "saturn_libra": {
+    "title": "Saturn in Libra",
+    "summary": "Exalted in Libra, Saturn masters the architecture of human relationships, building enduring partnerships by overcoming the fear of intimacy and confronting absolute justice.",
+    "fullText": "In this cardinal air sign, the planet of responsibility operates with supreme, balanced grace. You approach commitment, marriage, and social contracts with profound seriousness, instinctively understanding the weight of mutual obligation. Early in life, you may experience painful rejections or feel deeply inadequate in social situations, prompting you to build careful, diplomatic walls. The lesson is to move beyond superficial harmony and embrace the hard, authentic work required for true equality. By mastering your fear of the 'other,' you become an unshakeable pillar of fairness, loyalty, and exquisite aesthetic judgment."
+  },
+  "saturn_scorpio": {
+    "title": "Saturn in Scorpio",
+    "summary": "Saturn in Scorpio faces brutal, transformative tests regarding power and emotional control, forging unbreakable resilience by plunging into the darkest fears of the psyche.",
+    "fullText": "In this fixed water sign, the taskmaster planet operates with terrifying intensity. You may harbor profound, unconscious anxieties regarding betrayal, death, or financial dependency, leading you to exert iron-clad control over your intense passions. You are capable of enduring unimaginable psychological pressure, fiercely protecting your vulnerability behind an enigmatic, stoic fortress. The danger lies in becoming ruthlessly unforgiving or paralyzed by paranoia. Your ultimate karmic triumph requires surrendering your desperate need to control the uncontrollable, allowing your profound emotional endurance to guide you through a truly masterful, spiritual rebirth."
+  },
+  "saturn_sagittarius": {
+    "title": "Saturn in Sagittarius",
+    "summary": "Saturn in Sagittarius is tested through the search for absolute truth, learning to build a structured, enduring philosophy by overcoming the fear of meaninglessness.",
+    "fullText": "In this mutable fire sign, the planet of limitation seeks to define and categorize the boundless, expansive energy of Jupiter. You approach religion, higher education, and morality with intense, scholarly seriousness. You may struggle deeply with crises of faith, demanding tangible proof before trusting the universe. This rigorous skepticism can sometimes harden into dogmatic rigidity, cynicism, or a fear of exploring foreign concepts. By allowing your structured intellect to embrace the mystery of the unknown, you become a profound, highly respected teacher capable of grounding the highest spiritual ideals into practical reality."
+  },
+  "saturn_capricorn": {
+    "title": "Saturn in Capricorn",
+    "summary": "In its ruling sign, Saturn in Capricorn is the ultimate architect of worldly ambition, achieving absolute mastery through grueling discipline and an unyielding respect for authority.",
+    "fullText": "As the sovereign of this cardinal earth sign, the Lord of Karma is operating at peak, formidable efficiency. You define your existence through tangible achievement, shouldering immense responsibility with a stoic, cautious realism. You may have experienced a childhood heavily burdened by duty or strict parental figures, teaching you early that survival depends entirely on your own relentless hard work. While your capacity for executive leadership is unmatched, you must guard against ruthless materialism, depression, or an inability to enjoy the fruits of your labor. True mastery includes the wisdom of the open heart."
+  },
+  "saturn_aquarius": {
+    "title": "Saturn in Aquarius",
+    "summary": "In its traditional home, Saturn in Aquarius structures the progressive ideals of the future, building enduring humanitarian networks by overcoming the fear of social alienation.",
+    "fullText": "As the ancient ruler of this fixed air sign, the planet of discipline applies logical, scientific rigor to the chaotic realm of human society. You possess a brilliant, objective mind capable of engineering profound, systemic reform. However, you may struggle with a deep-seated feeling of being an outsider, often building intellectual walls to protect yourself from the messy emotional realities of the crowd. You demand absolute integrity from your friends and your causes. By recognizing the individual human heartbeat within your grand utopian blueprints, your visionary leadership yields truly permanent, compassionate change."
+  },
+  "saturn_pisces": {
+    "title": "Saturn in Pisces",
+    "summary": "Saturn in Pisces confronts the terrifying dissolution of boundaries, learning to build structured, practical compassion by overcoming the profound fear of emotional chaos.",
+    "fullText": "In this mutable water sign, the planet of hard reality dissolves into the boundless ocean of the collective unconscious. You may harbor a paralyzing, irrational anxiety of being overwhelmed by the suffering of the world, leading you to either rigidly repress your own immense psychic sensitivity or retreat into crippling self-doubt and victimhood. You are asked to give practical form to the ethereal, often through artistic discipline or highly structured spiritual service. By forging healthy, realistic emotional boundaries, your profound, mystical empathy becomes a safe, reliable, and incredibly powerful instrument for universal healing."
+  },
+  "uranus_aries": {
+    "title": "Uranus in Aries",
+    "summary": "Uranus in Aries operates as a sudden, explosive spark of liberation, demanding absolute individual freedom and pioneering a radical, fearless approach to the future.",
+    "fullText": "In this cardinal fire sign, the planet of revolution acts with aggressive, lightning-fast speed. This generational placement shatters the status quo through bold, uncompromising assertions of independence. You possess an electrifying, warrior-like energy that refuses to be held back by tradition, often acting as a fearless trailblazer for new technology or social reform. However, this raw, rebellious drive can manifest as chaotic impatience, selfishness, or a tendency to destroy structures without a plan to rebuild. Harnessing this brilliant, restless fire allows you to heroically spearhead entirely new paradigms of human courage."
+  },
+  "uranus_taurus": {
+    "title": "Uranus in Taurus",
+    "summary": "Uranus in Taurus triggers a revolution of values, radically disrupting the material world to force sudden, innovative approaches to wealth, nature, and physical security.",
+    "fullText": "In this fixed earth sign (its traditional fall), the planet of sudden change violently shakes the most stubborn, stable foundations of society. This generation is tasked with completely reinventing our relationship to money, resources, and the Earth itself. You possess a brilliant, pragmatic ingenuity, capable of designing sustainable, futuristic economic systems. Yet, because the Uranian impulse clashes with Taurus’s need for predictability, these changes often arrive as shocking financial or environmental upheavals. By learning to detach your self-worth from outdated material structures, you become a master of visionary, enduring, real-world innovation."
+  },
+  "uranus_gemini": {
+    "title": "Uranus in Gemini",
+    "summary": "Uranus in Gemini electrifies the intellect, triggering brilliant, erratic flashes of insight and radically reinventing the ways humanity communicates and processes information.",
+    "fullText": "In this mutable air sign, the planet of revolution finds a highly receptive, quicksilver host. This generational placement shatters old paradigms of education and media, championing absolute freedom of speech and groundbreaking technological networks. Your mind operates on a frequency of pure, nervous genius, capable of synthesizing abstract, futuristic concepts with astonishing speed. However, this restless mental energy can also lead to scattered focus, intellectual arrogance, or a constant craving for nervous stimulation. By grounding your erratic brilliance, you become an unparalleled conduit for the most progressive, transformative ideas of your era."
+  },
+  "uranus_cancer": {
+    "title": "Uranus in Cancer",
+    "summary": "Uranus in Cancer revolutionizes the concept of home, bringing sudden, emotional awakenings and radically altering traditional definitions of family, nurturing, and domestic security.",
+    "fullText": "In this cardinal water sign, the planet of shock waves disrupts the deepest, most sensitive roots of the human psyche. This generation is driven to dismantle outdated, suffocating family structures, seeking emotional liberation and entirely new ways of creating sanctuary. You possess a brilliant, highly unconventional intuition, often experiencing sudden psychic insights. Because Uranus is inherently detached and Cancer deeply feeling, this placement can manifest as emotional erraticism or a profound sense of rootlessness. By embracing non-traditional support systems, you redefine universal empathy and forge a wildly inclusive, futuristic global family."
+  },
+  "uranus_leo": {
+    "title": "Uranus in Leo",
+    "summary": "Uranus in Leo demands absolute creative liberation, expressing its revolutionary spirit through eccentric, dramatic pride and a radical reinvention of art, romance, and leadership.",
+    "fullText": "In this fixed fire sign (its traditional detriment), the planet of rebellion clashes spectacularly with the ego of the Sun. This generation seeks to overthrow absolute monarchs and outdated social hierarchies, demanding that individual brilliance be recognized on its own wildly unconventional terms. You possess a magnetic, theatrical genius, completely unconcerned with societal approval. However, this fierce demand for independence can warp into arrogant contrariness, a refusal to compromise, or incredibly sudden, explosive romantic severances. By using your radiant, rebellious light to empower the collective, your unique creativity becomes a beacon of true, liberating majesty."
+  },
+  "uranus_virgo": {
+    "title": "Uranus in Virgo",
+    "summary": "Uranus in Virgo revolutionizes the practical world, applying brilliant, erratic genius to radical advancements in health, technology, and the meticulous systems of daily service.",
+    "fullText": "In this mutable earth sign, the planet of sudden change electrifies the realm of logic and routine. This generation is tasked with entirely reinventing the workplace, championing efficiency through groundbreaking computers, holistic medicine, and ecological reform. You possess an unparalleled, highly analytical intuition, capable of solving the most complex mechanical or social problems in a flash. Because Uranian energy is so disruptive, this placement can also trigger severe nervous tension or erratic physical health. By allowing flexibility into your rigid pursuit of perfection, your practical genius becomes an unstoppable force for planetary healing."
+  },
+  "uranus_libra": {
+    "title": "Uranus in Libra",
+    "summary": "Uranus in Libra radicalizes the concept of partnership, seeking absolute equality by suddenly and decisively shattering outdated social contracts and traditional marital structures.",
+    "fullText": "In this cardinal air sign, the planet of liberation targets the most fundamental human bonds. This generation is driven to revolutionize justice, demanding unconventional, highly independent relationships based on intellectual freedom rather than romantic possession. You possess a brilliant, objective diplomatic grace, capable of envisioning completely new, egalitarian societal blueprints. However, this intense need for personal space can lead to a fear of deep emotional commitment, resulting in sudden divorces or a chronic inability to settle down. True harmony is found when your visionary independence is balanced with profound, authentic, and equal connection."
+  },
+  "uranus_scorpio": {
+    "title": "Uranus in Scorpio",
+    "summary": "Uranus in Scorpio operates as a terrifying, magnetic force for rebirth, completely destroying psychological taboos and revolutionizing our understanding of sex, death, and absolute power.",
+    "fullText": "In this fixed water sign (its exalted placement), the planet of shock waves dives into the deepest, darkest trenches of the human soul. This generation forces society to confront its ultimate fears, pioneering radical psychotherapy, sexual liberation, and transformative scientific research. You possess a piercing, ruthless intuition that instantly sees through superficial lies. Because this energy is so profoundly intense, it can manifest as destructive obsession, violent emotional upheavals, or a dark fascination with the occult. By bravely harnessing this explosive, regenerative power, you become an unstoppable agent of ultimate, global healing."
+  },
+  "uranus_sagittarius": {
+    "title": "Uranus in Sagittarius",
+    "summary": "Uranus in Sagittarius expands the mind through sudden, visionary flashes, radically disrupting orthodox religion, higher education, and global borders in a relentless quest for ultimate truth.",
+    "fullText": "In this mutable fire sign, the planet of rebellion joins forces with the planet of boundless optimism. This generation is driven to completely reinvent philosophy, championing absolute freedom of belief and pioneering new, unconventional methods of global travel and communication. You possess a brilliant, prophetic intuition, often acting as an erratic but inspiring teacher of universal concepts. However, this intense ideological independence can easily warp into dogmatic fanaticism, tactless bluntness, or an inability to commit to practical reality. Grounding your electrifying, far-reaching visions allows you to truly enlighten and liberate the world."
+  },
+  "uranus_capricorn": {
+    "title": "Uranus in Capricorn",
+    "summary": "Uranus in Capricorn shatters the oldest, most rigid foundations of society, revolutionizing the global economy, government structures, and the very concept of corporate authority.",
+    "fullText": "In this cardinal earth sign, the planet of sudden change clashes violently with the sign of ultimate tradition. This generation is tasked with tearing down corrupt, outdated hierarchies to build entirely new, highly efficient, and technologically advanced systems of power. You possess a brilliant, calculating executive genius, capable of manifesting radical reforms in the physical world. Because Uranian energy is inherently anti-establishment, this placement often triggers spectacular, unexpected crashes of status or economic reality. By blending progressive, humanitarian ideals with your formidable ambition, you become the architect of a truly liberated, functional future."
+  },
+  "uranus_aquarius": {
+    "title": "Uranus in Aquarius",
+    "summary": "In its ruling sign, Uranus in Aquarius is the ultimate, electrifying visionary, demanding absolute intellectual freedom, technological supremacy, and radical humanitarian brotherhood.",
+    "fullText": "As the sovereign of this fixed air sign, the planet of revolution operates at its absolute, unhindered peak. This generation is the vanguard of the future, driven to completely reinvent human society through the internet, space exploration, and fiercely egalitarian utopian ideals. You possess a mind of pure, objective genius, operating on a frequency far ahead of your time. Because this energy is so incredibly detached, it can sometimes manifest as emotional coldness, stubborn eccentricity, or a blinding intellectual arrogance. By connecting your brilliant, global blueprints to the individual human heart, you will truly save the world."
+  },
+  "uranus_pisces": {
+    "title": "Uranus in Pisces",
+    "summary": "Uranus in Pisces triggers sudden, overwhelming spiritual awakenings, revolutionizing art, mysticism, and the collective unconscious by completely dissolving the boundaries of reality.",
+    "fullText": "In this mutable water sign, the planet of shock waves plunges into the boundless ocean of dreams and empathy. This generation is tasked with entirely reinventing our connection to the divine, championing radical compassion, psychedelic exploration, and highly unconventional, intuitive healing arts. You possess a brilliant, highly porous psychic sensitivity, capable of channeling profound, ethereal visions. However, because this energy lacks any solid grounding, it can easily lead to erratic emotional escapism, mass delusion, or severe nervous exhaustion. By anchoring your electrifying spiritual insights in daily discipline, your mystical genius becomes a profound instrument for universal grace."
+  },
+  "neptune_aries": {
+    "title": "Neptune in Aries",
+    "summary": "Neptune in Aries spiritualizes the warrior archetype, seeking ultimate transcendence through glamorous, visionary crusades and a highly idealized, often illusionary, assertion of courage.",
+    "fullText": "In this cardinal fire sign, the planet of dreams and deception merges with the sign of absolute self-will. This generational placement is driven by a romanticized desire to conquer the unknown, often mistaking impulsive aggression for divine inspiration. You possess a deeply intuitive, pioneering spirit, capable of heroically fighting for the underdog or launching visionary new artistic movements. However, this lack of boundaries around the ego can lead to a savior complex, blind fanaticism, or a devastating loss of identity when your glamorous crusades crash into hard reality. True spiritual bravery requires absolute, honest self-reflection."
+  },
+  "neptune_taurus": {
+    "title": "Neptune in Taurus",
+    "summary": "Neptune in Taurus dissolves the boundaries of material reality, seeking spiritual transcendence through a profound, highly idealized connection to wealth, nature, and physical beauty.",
+    "fullText": "In this fixed earth sign, the planet of illusion casts a glamorous, intoxicating fog over the realm of money and possessions. This generation possesses an incredibly refined, almost magical aesthetic sense, capable of creating sublime art and deeply spiritualizing the physical senses. You yearn for an earthly paradise. However, this placement also brings a profound vulnerability to financial deception, as the desire for material comfort can easily warp into greed, laziness, or completely unrealistic economic fantasies. Finding true, enduring security requires realizing that the most valuable treasures of the universe can never be bought or held."
+  },
+  "neptune_gemini": {
+    "title": "Neptune in Gemini",
+    "summary": "Neptune in Gemini spiritualizes the intellect, navigating the world through a highly poetic, imaginative mind that excels at symbolic communication but struggles with hard, factual truth.",
+    "fullText": "In this mutable air sign, the planet of dreams dissolves the strict boundaries of logic and reason. This generational placement possesses a brilliant, almost telepathic capacity for language, capable of channeling profound artistic, literary, and philosophical visions. You absorb information through osmosis rather than study. Yet, because the mind is so permeable, you are highly susceptible to mass media illusions, gossip, deceptive marketing, and nervous anxiety. The challenge is learning to distinguish between a beautiful, inspiring story and absolute, undeniable reality. Grounding your quicksilver imagination allows you to become a true, visionary messenger."
+  },
+  "neptune_cancer": {
+    "title": "Neptune in Cancer",
+    "summary": "Neptune in Cancer seeks ultimate spiritual union through profound, boundless empathy, deeply idealizing the concepts of home, motherhood, and emotional sanctuary.",
+    "fullText": "In this cardinal water sign, the planet of mysticism is incredibly potent, merging seamlessly with the realm of profound feeling and memory. This generation possesses an immense, psychic sensitivity, driven by a deeply romanticized yearning for a perfect, unconditionally loving family. You are fiercely protective and capable of tremendous, healing self-sacrifice. However, this extreme emotional permeability makes you highly vulnerable to absorbing the pain of your ancestors, leading to crippling nostalgia, codependency, or retreating into a fantasy past when reality becomes too harsh. True sanctuary is forged by establishing firm, healthy emotional boundaries."
+  },
+  "neptune_leo": {
+    "title": "Neptune in Leo",
+    "summary": "Neptune in Leo spiritualizes the ego, seeking divine transcendence through highly glamorous, dramatic creativity, and an absolute, romanticized ideal of love and leadership.",
+    "fullText": "In this fixed fire sign, the planet of illusion casts a dazzling, cinematic spotlight on the desire for recognition. This generational placement is defined by a passionate, theatrical imagination, heavily influencing the golden ages of film, art, and charismatic political saviors. You possess a magnificent, warm-hearted desire to bring joy and beauty to the masses. However, this intense need for admiration can easily lead to blinding vanity, falling victim to manipulative flattery, or a devastating crisis of identity when the applause inevitably stops. True spiritual majesty is found in quiet, unconditional generosity."
+  },
+  "neptune_virgo": {
+    "title": "Neptune in Virgo",
+    "summary": "Neptune in Virgo dissolves the boundaries of practical reality, seeking spiritual perfection through meticulous, idealized service and a profound, highly sensitive connection to health and nature.",
+    "fullText": "In this mutable earth sign (its traditional detriment), the planet of boundless chaos clashes deeply with the sign of critical order. This generation is driven by a passionate, often exhausting desire to heal the physical world, pioneering alternative medicine, psychiatric care, and ecological awareness. You possess an uncanny, intuitive understanding of the body-mind connection. However, your desperate need for perfection can manifest as severe hypochondria, crippling psychosomatic illnesses, or an obsessive, deluded devotion to deeply flawed work routines. Learning to accept the divine beauty of human imperfection allows your immense, practical compassion to truly shine."
+  },
+  "neptune_libra": {
+    "title": "Neptune in Libra",
+    "summary": "Neptune in Libra spiritualizes the concept of partnership, seeking ultimate transcendence through an exquisite, highly romanticized ideal of justice, peace, and absolute aesthetic harmony.",
+    "fullText": "In this cardinal air sign, the planet of dreams casts a beautiful, seductive fog over the realm of marriage and social contracts. This generation possesses an unparalleled artistic refinement, driven by a deeply ingrained, utopian desire for absolute global equality. You are a natural, empathetic peacemaker. However, your desperate craving for harmony makes you incredibly vulnerable to toxic, codependent relationships, often projecting savior or victim roles onto your partners. You may sacrifice your own identity entirely to maintain an illusion of peace. True, lasting love requires the courage to face conflict and assert your own reality."
+  },
+  "neptune_scorpio": {
+    "title": "Neptune in Scorpio",
+    "summary": "Neptune in Scorpio dives into the deepest, darkest waters of the soul, seeking profound spiritual regeneration by dissolving the ultimate taboos of sex, death, and absolute power.",
+    "fullText": "In this fixed water sign, the planet of mysticism operates with terrifying, magnetic intensity. This generation is drawn to the most profound psychological and occult mysteries, utilizing an uncanny, piercing intuition to uncover the hidden rot within society. You possess an immense capacity for emotional healing and spiritual rebirth. However, this dark glamour can easily warp into destructive obsessions with control, toxic sexual entanglements, paranoia, or falling prey to dark, manipulative cults of personality. By courageously surrendering your need to dominate the unknown, your profound psychic depth becomes an instrument for ultimate, global purification."
+  },
+  "neptune_sagittarius": {
+    "title": "Neptune in Sagittarius",
+    "summary": "Neptune in Sagittarius spiritualizes the quest for meaning, seeking ultimate truth through a highly idealized, boundless optimism and a romanticized vision of philosophy, religion, and global travel.",
+    "fullText": "In this mutable fire sign, the planet of illusion merges with the planet of expansion, creating a generation driven by profound, visionary faith. You possess an immense, restless imagination, constantly seeking a higher, utopian purpose that transcends mundane reality. This era births powerful new spiritual movements and sweeping, inspirational ideologies. However, this absolute lack of boundaries can easily lead to blind dogmatism, deceptive gurus, religious fanaticism, or a complete inability to deal with practical, everyday responsibilities. Grounding your lofty, mystical visions in rigorous discipline allows your profound hope to truly enlighten the world."
+  },
+  "neptune_capricorn": {
+    "title": "Neptune in Capricorn",
+    "summary": "Neptune in Capricorn dissolves the rigid structures of society, seeking to spiritualize authority and worldly ambition while exposing the deep illusions of absolute material power.",
+    "fullText": "In this cardinal earth sign, the planet of chaos slowly erodes the formidable, traditional walls of the establishment. This generational placement experiences a profound disillusionment with government, corporate hierarchy, and the promise of endless economic growth. You possess a unique, pragmatic intuition, capable of infusing practical business structures with deep, humanitarian compassion. However, the clash between dreams and hard reality can manifest as deep-seated cynicism, political scandals, or a paralyzing fear that all worldly effort is ultimately meaningless. By building your ambitions on a foundation of absolute spiritual integrity, you construct a truly enduring, enlightened society."
+  },
+  "neptune_aquarius": {
+    "title": "Neptune in Aquarius",
+    "summary": "Neptune in Aquarius spiritualizes the intellect, seeking ultimate transcendence through a highly idealized, utopian vision of technology, absolute equality, and universal human brotherhood.",
+    "fullText": "In this fixed air sign, the planet of dreams casts a glamorous, intoxicating fog over the realm of science and social rebellion. This generation is driven by a brilliant, telepathic intuition, capable of envisioning entirely new, interconnected realities like the internet. You possess a profound, objective compassion for the collective. However, your desperate yearning for a perfect society can lead to blind faith in flawed technology, dangerous political fanaticism, or a complete detachment from the messy, emotional reality of individual human beings. Infusing your brilliant, futuristic blueprints with personal, intimate warmth unlocks your true visionary power."
+  },
+  "neptune_pisces": {
+    "title": "Neptune in Pisces",
+    "summary": "In its ruling sign, Neptune in Pisces is the ultimate expression of boundless, mystical compassion, dissolving all earthly boundaries to merge completely with the divine universal soul.",
+    "fullText": "As the sovereign of this mutable water sign, the planet of illusion operates at its absolute, most profound peak. This generation is tasked with healing the deepest wounds of humanity through unparalleled artistic genius, psychedelic exploration, and a terrifyingly porous, absolute empathy. You intuitively understand that separation is a lie. However, this supreme lack of boundaries makes you incredibly vulnerable to mass hysteria, crippling escapism, severe addiction, and the overwhelming pain of the world. By forging strong, healthy spiritual anchors, your immense, poetic grace becomes the ultimate instrument for universal redemption and profound, lasting peace."
+  },
+  "pluto_aries": {
+    "title": "Pluto in Aries",
+    "summary": "Pluto in Aries triggers an explosive, ruthless era of rebirth, demanding absolute transformation through fierce, pioneering courage and the total destruction of individual limitation.",
+    "fullText": "In this cardinal fire sign, the Lord of the Underworld acts with terrifying, volcanic speed. This generation is driven by an intense, obsessive need to assert their independence, often spearheading violent revolutions or pioneering radically aggressive new paradigms of survival. You possess an uncompromising, warrior-like willpower that thrives in crisis. However, this raw, explosive drive for power can easily manifest as ruthless selfishness, brutal conflict, or a tendency to burn everything to the ground just to prove you exist. By mastering your own immense rage, you forge a profound, heroic strength capable of leading humanity into entirely new frontiers."
+  },
+  "pluto_taurus": {
+    "title": "Pluto in Taurus",
+    "summary": "Pluto in Taurus forces a relentless, agonizing transformation of the material world, completely destroying and rebuilding our fundamental relationship to wealth, resources, and physical security.",
+    "fullText": "In this fixed earth sign (its traditional detriment), the planet of death and rebirth operates with a slow, immensely heavy, and unstoppable momentum. This generational placement is defined by an obsessive, primal hunger to control the physical environment, often correlating with periods of massive economic upheaval, industrialization, or intense struggles over territory. You possess an incredible, enduring stamina. However, the absolute terror of losing control can lead to extreme, ruthless materialism, destructive greed, or a terrifyingly stubborn resistance to necessary change. True empowerment is found when you realize that profound spiritual security can never be bought or destroyed."
+  },
+  "pluto_gemini": {
+    "title": "Pluto in Gemini",
+    "summary": "Pluto in Gemini triggers a relentless, penetrating transformation of the intellect, destroying outdated paradigms by exposing the absolute, often terrifying power of communication and ideas.",
+    "fullText": "In this mutable air sign, the Lord of the Underworld turns the mind into a battlefield of profound psychological depth. This generation is driven by an obsessive, insatiable curiosity, radically reinventing transportation, media, and the way humanity processes information. You possess a piercing, incredibly perceptive intellect that instantly sees through superficial lies. However, this intense mental energy can also manifest as manipulative propaganda, deep-seated nervous paranoia, or using words as deadly, destructive weapons. By embracing absolute intellectual honesty, your profound analytical power becomes a brilliant instrument for uncovering the ultimate, healing truths of the universe."
+  },
+  "pluto_cancer": {
+    "title": "Pluto in Cancer",
+    "summary": "Pluto in Cancer forces a devastating, deeply emotional transformation of the soul, destroying and rebuilding the fundamental concepts of home, family, and national security.",
+    "fullText": "In this cardinal water sign, the planet of absolute power plunges into the most sensitive, vulnerable roots of the human psyche. This generation is defined by intense, global upheavals involving homeland, patriotism, and the primal need for emotional sanctuary (often correlating with world wars or great depressions). You possess a fierce, violently protective intuition and an unmatched emotional resilience. Yet, your profound fear of abandonment can lead to xenophobia, toxic emotional manipulation, or an obsessive clinging to an idealized past. By courageously facing your deepest internal insecurities, you forge a truly unshakeable, profoundly nurturing global strength."
+  },
+  "pluto_leo": {
+    "title": "Pluto in Leo",
+    "summary": "Pluto in Leo demands an explosive, absolute transformation of the ego, expressing its dark, intense power through a ruthless, highly dramatic reinvention of creativity, romance, and leadership.",
+    "fullText": "In this fixed fire sign, the Lord of the Underworld clashes spectacularly with the radiant pride of the Sun. This generation is driven by an obsessive, burning need to be recognized, often birthing larger-than-life dictators, radical artistic movements, and a complete destruction of traditional morality. You possess a magnificent, fiercely magnetic charisma and an unparalleled willpower. However, this absolute demand for the spotlight can warp into tyrannical arrogance, destructive narcissism, or a terrifying misuse of personal power. True, lasting majesty is achieved only when you surrender your ego and use your profound creative fire to empower the collective."
+  },
+  "pluto_virgo": {
+    "title": "Pluto in Virgo",
+    "summary": "Pluto in Virgo forces a meticulous, agonizing transformation of the practical world, utterly destroying and rebuilding our systems of health, labor, and daily, critical service.",
+    "fullText": "In this mutable earth sign, the planet of death and rebirth operates with a razor-sharp, obsessive focus on detail and purity. This generational placement is defined by a ruthless, intense drive to analyze and perfect the physical environment, pioneering radical medical advancements, labor movements, and ecological crises. You possess a profound, incredibly perceptive analytical mind. However, your absolute terror of chaos can manifest as crippling hypochondria, severe psychosomatic illness, or a destructive, hyper-critical obsession with perfection. By accepting the messy, divine reality of human flaws, your intense, practical discipline becomes a miraculous engine for global healing."
+  },
+  "pluto_libra": {
+    "title": "Pluto in Libra",
+    "summary": "Pluto in Libra demands a relentless, profound transformation of human relationships, utterly destroying and rebuilding the concepts of justice, marriage, and absolute social equality.",
+    "fullText": "In this cardinal air sign (its traditional detriment), the Lord of the Underworld plunges into the delicate, aesthetic realm of partnership. This generation is tasked with exposing the dark, ugly truths hidden beneath superficial diplomacy, completely revolutionizing gender roles, divorce laws, and the balance of global power. You possess a fierce, piercing intuition regarding the hidden dynamics of relationships. However, your intense, obsessive need for harmony can easily warp into toxic codependency, bitter legal warfare, or passive-aggressive manipulation. True, enduring balance is found only by courageously facing conflict and forging bonds based on absolute, brutal honesty."
+  },
+  "pluto_scorpio": {
+    "title": "Pluto in Scorpio",
+    "summary": "In its ruling sign, Pluto in Scorpio wields absolute, terrifying power, forcing a profound, collective rebirth by completely destroying the ultimate taboos of sex, death, and psychological control.",
+    "fullText": "As the sovereign of this fixed water sign, the planet of transformation operates at its absolute, most devastating peak. This generation is driven by a primal, obsessive hunger to uncover the deepest, darkest secrets of existence, revolutionizing psychotherapy, finance, and our understanding of mortality. You possess an intensely magnetic, fiercely resilient soul, capable of surviving unimaginable emotional extremes. However, this raw, explosive power can easily manifest as ruthless vindictiveness, paranoia, or a destructive, absolute addiction to control. By willingly surrendering to the fires of vulnerability, you become an unstoppable, miraculous force for ultimate, global regeneration."
+  },
+  "pluto_sagittarius": {
+    "title": "Pluto in Sagittarius",
+    "summary": "Pluto in Sagittarius forces a relentless, explosive transformation of belief systems, completely destroying and rebuilding our fundamental understanding of religion, philosophy, and global borders.",
+    "fullText": "In this mutable fire sign, the Lord of the Underworld merges with the boundless, restless energy of Jupiter. This generational placement is defined by an obsessive, passionate quest for absolute truth, often correlating with intense religious wars, radical shifts in higher education, and the destruction of geographic isolation. You possess a profound, piercing intuition and a fiercely independent, visionary spirit. However, your intense ideological drive can easily warp into brutal dogmatism, self-righteous fanaticism, or a destructive lack of moral boundaries. By grounding your electrifying, global visions in deep, compassionate wisdom, you truly enlighten and transform the world."
+  },
+  "pluto_capricorn": {
+    "title": "Pluto in Capricorn",
+    "summary": "Pluto in Capricorn demands the absolute, agonizing destruction of corrupt earthly power, ruthlessly dismantling and rebuilding the global economy, government, and the very concept of authority.",
+    "fullText": "In this cardinal earth sign, the planet of death and rebirth operates with a cold, terrifying, and unstoppable efficiency. This generation is tasked with exposing the toxic rot hidden within the most elite, traditional foundations of society, forcing massive corporate crashes and the complete restructuring of executive power. You possess a profound, incredibly formidable ambition and an unyielding, stoic endurance. However, the absolute obsession with status and control can manifest as ruthless materialism, tyrannical oppression, or a crushing, pessimistic depression. By building your worldly empires upon a foundation of absolute spiritual integrity, you construct a truly enduring, enlightened reality."
+  },
+  "pluto_aquarius": {
+    "title": "Pluto in Aquarius",
+    "summary": "Pluto in Aquarius forces a terrifying, radical transformation of the collective, completely destroying outdated social structures to birth a fierce, highly technological, and absolute egalitarian future.",
+    "fullText": "In this fixed air sign, the Lord of the Underworld applies his explosive, regenerative power to the realm of science, rebellion, and human brotherhood. This generation is driven by an obsessive, brilliant need to completely reinvent society, often correlating with violent social revolutions, breathtaking technological leaps, and the destruction of the individual ego for the sake of the group. You possess a piercing, objective, and profoundly visionary intellect. However, your absolute utopian ideals can easily warp into cold, detached fanaticism, scientific atrocities, or a terrifying mob mentality. True liberation requires recognizing the sacred, individual human heart."
+  },
+  "pluto_pisces": {
+    "title": "Pluto in Pisces",
+    "summary": "Pluto in Pisces brings the ultimate, profound dissolution of all earthly boundaries, forcing a terrifying and ecstatic spiritual rebirth by completely destroying the illusion of separation.",
+    "fullText": "In this mutable water sign, the planet of absolute power plunges into the boundless, mystical ocean of the collective unconscious. This generation marks the end of a massive karmic cycle, driven by an obsessive, unconscious yearning to merge completely with the divine. You possess a terrifyingly porous, profound psychic sensitivity and an immense capacity for self-sacrifice. However, this supreme lack of boundaries can manifest as devastating mass delusion, severe global addictions, or a complete, chaotic dissolution of societal structure. By forging unbreakable spiritual anchors, your profound, poetic grace becomes the ultimate instrument for universal redemption."
+  },
+  "chiron_aries": {
+    "title": "Chiron in Aries",
+    "summary": "Chiron in Aries carries a profound wound surrounding the right to exist, learning to heal others by overcoming a deep-seated fear of self-assertion and individual action.",
+    "fullText": "In this cardinal fire sign, the Wounded Healer struggles intensely with the concept of identity and courage. You may feel that your very presence is a burden or that your desires are inherently selfish, leading to either a crippling lack of initiative or a highly reactive, over-aggressive defensiveness. You often feel blocked when trying to start new projects or assert your independence. By bravely acknowledging your own right to take up space and act on your own behalf, you transform your agonizing self-doubt into a profound, inspiring ability to empower others to find their true, heroic strength."
+  },
+  "chiron_taurus": {
+    "title": "Chiron in Taurus",
+    "summary": "Chiron in Taurus carries a deep wound regarding self-worth and material security, finding profound healing by decoupling the soul's value from physical possessions and financial success.",
+    "fullText": "In this fixed earth sign, the Wounded Healer struggles intensely with the physical realm and the concept of 'enough.' You may harbor a chronic, agonizing fear of poverty or physical deprivation, leading you to either hoard resources obsessively or unconsciously sabotage your own financial stability. You often feel a profound, unshakeable sense of being inherently unworthy of comfort or love. By learning to trust in the abundant, intrinsic value of your own spirit—regardless of your bank account—you develop a masterful, incredibly grounding ability to help others find true, lasting peace and material sanity."
+  },
+  "chiron_gemini": {
+    "title": "Chiron in Gemini",
+    "summary": "Chiron in Gemini carries a profound wound surrounding intellect and communication, learning to heal by overcoming intense self-doubt regarding intelligence and the ability to be understood.",
+    "fullText": "In this mutable air sign, the Wounded Healer struggles deeply with the realm of the mind. You may have experienced early educational trauma, feeling that you were stupid, unheard, or that your ideas were constantly invalidated. This can lead to either a paralyzing fear of speaking your truth or a nervous, obsessive over-compensation, constantly accumulating facts to prove your worth. You often feel profoundly misunderstood by your peers. By embracing your unique, perhaps unconventional, way of processing the world, your intense intellectual sensitivity becomes a brilliant, empathetic gift for teaching and bridging the deepest communication gaps."
+  },
+  "chiron_cancer": {
+    "title": "Chiron in Cancer",
+    "summary": "Chiron in Cancer carries a devastating wound regarding emotional security and family, finding profound healing by learning to unconditionally mother and protect the self.",
+    "fullText": "In this cardinal water sign, the Wounded Healer struggles intensely with feelings of abandonment, safety, and the concept of 'home.' You may have experienced a deeply unstable or emotionally cold childhood, leaving you with a chronic, agonizing fear of being unloved or rejected. You often project this lack by fiercely, almost suffocatingly, nurturing others while completely neglecting your own profound emotional needs. You may feel like a perpetual orphan in the universe. By bravely turning your immense, protective empathy inward and building an unbreakable inner sanctuary, you become a masterful, universally comforting source of deep psychological healing."
+  },
+  "chiron_leo": {
+    "title": "Chiron in Leo",
+    "summary": "Chiron in Leo carries a profound wound surrounding ego, pride, and creative expression, learning to heal by overcoming a crushing fear of being unseen or unappreciated.",
+    "fullText": "In this fixed fire sign, the Wounded Healer struggles intensely with the need for validation and the ability to simply play. You may have experienced early trauma where your natural, joyful self-expression was mocked or ignored, leaving you with a deep, secret belief that your unique talents are worthless. This can manifest as either crippling stage fright and a refusal to shine, or a desperate, narcissistic craving for constant attention. By detaching your self-worth from external applause and creating purely for the joy of your own heart, you develop a profound, radiant ability to awaken the creative spirit in others."
+  },
+  "chiron_virgo": {
+    "title": "Chiron in Virgo",
+    "summary": "Chiron in Virgo carries an agonizing wound regarding perfection and service, finding profound healing by learning to accept the divine beauty within flawed, messy human reality.",
+    "fullText": "In this mutable earth sign, the Wounded Healer struggles deeply with the concepts of purity, health, and control. You may harbor a relentless, critical inner voice that constantly tells you that you are physically or morally defective. This can lead to severe hypochondria, obsessive-compulsive routines, or a paralyzing fear of failure that prevents you from finishing any practical task. You often feel deeply inadequate despite your grueling, dedicated service. By surrendering the illusion of absolute control and embracing self-compassion, your intense, analytical pain transforms into a masterful, incredibly precise ability to heal the physical and psychological wounds of others."
+  },
+  "chiron_libra": {
+    "title": "Chiron in Libra",
+    "summary": "Chiron in Libra carries a profound wound regarding partnership and balance, learning to heal by overcoming codependency and the intense fear of interpersonal conflict.",
+    "fullText": "In this cardinal air sign, the Wounded Healer struggles intensely with the realm of relationships. You may have a history of painful, imbalanced partnerships, constantly feeling that you must sacrifice your own identity to maintain peace and be loved. This agonizing fear of rejection can lead you to tolerate toxic behavior or completely avoid intimate commitment altogether. You often feel profoundly incomplete when alone. By courageously asserting your own boundaries and realizing that true harmony requires absolute, authentic equality, your deep relational pain becomes a masterful, diplomatic gift for counseling and restoring justice in the lives of others."
+  },
+  "chiron_scorpio": {
+    "title": "Chiron in Scorpio",
+    "summary": "Chiron in Scorpio carries a devastating wound regarding power, trust, and intimacy, finding profound healing by fearlessly navigating the darkest, most terrifying depths of the human psyche.",
+    "fullText": "In this fixed water sign, the Wounded Healer struggles intensely with the concepts of betrayal, control, and transformation. You may have experienced severe early psychological trauma, leaving you with a chronic, agonizing fear of being powerless or emotionally destroyed by others. This can manifest as intense paranoia, a refusal to forgive, or a destructive, obsessive need to dominate your intimate partners. You often feel completely alone in your emotional extremes. By bravely surrendering your defensive walls and embracing vulnerability, your immense, agonizing pain transforms into an incredibly powerful, magnetic ability to guide others through their own ultimate spiritual rebirth."
+  },
+  "chiron_sagittarius": {
+    "title": "Chiron in Sagittarius",
+    "summary": "Chiron in Sagittarius carries a profound wound surrounding meaning, faith, and truth, learning to heal by overcoming dogmatism and a deep, existential despair.",
+    "fullText": "In this mutable fire sign, the Wounded Healer struggles intensely with the big picture. You may have experienced a crushing crisis of faith early in life, leaving you feeling profoundly disconnected from any higher universal purpose. This agonizing search for meaning can lead to either a cynical, restless atheism where nothing matters, or a fierce, intolerant dogmatism where you aggressively force your beliefs onto others to quiet your own doubts. By accepting that absolute truth is a constantly evolving journey rather than a fixed destination, your deep philosophical pain becomes a profound, inspiring gift for guiding others toward genuine spiritual wisdom."
+  },
+  "chiron_capricorn": {
+    "title": "Chiron in Capricorn",
+    "summary": "Chiron in Capricorn carries an agonizing wound regarding authority, status, and responsibility, finding profound healing by decoupling personal worth from worldly achievement.",
+    "fullText": "In this cardinal earth sign, the Wounded Healer struggles deeply with the heavy burdens of ambition and societal expectation. You may have had a very demanding or emotionally absent father figure, leaving you with a chronic fear of failure or a belief that you must carry the weight of the world alone. This can manifest as either a ruthless, exhausting obsession with career success or a paralyzing inability to take control of your own life. By learning that true respect and authority come from inner integrity rather than external validation, your intense structural pain transforms into masterful, deeply compassionate executive leadership."
+  },
+  "chiron_aquarius": {
+    "title": "Chiron in Aquarius",
+    "summary": "Chiron in Aquarius carries a profound wound regarding alienation and the collective, learning to heal by overcoming the agonizing feeling of being a perpetual outsider.",
+    "fullText": "In this fixed air sign, the Wounded Healer struggles intensely with the concept of belonging. You may have always felt profoundly different, weird, or fundamentally disconnected from the rest of humanity, leaving you with a deep, secret loneliness. This agonizing fear of rejection can lead you to either aggressively rebel against all social norms, isolating yourself further, or desperately conform, completely suppressing your brilliant, original genius. By courageously embracing your unique eccentricity and finding your true, unconventional tribe, your deep social pain becomes a profound, visionary gift for engineering incredibly inclusive, progressive, and deeply healing humanitarian networks."
+  },
+  "chiron_pisces": {
+    "title": "Chiron in Pisces",
+    "summary": "Chiron in Pisces carries a devastating, universal wound regarding ultimate spiritual separation, finding profound healing by establishing boundaries and overcoming the urge to be a perpetual victim.",
+    "fullText": "In this mutable water sign, the Wounded Healer absorbs the agonizing sorrow of the entire world. You possess a terrifyingly porous emotional boundary, often unable to distinguish your own pain from the suffering of others. This immense, crushing sensitivity can lead to severe escapism, addiction, or a chronic martyr complex, where you constantly sacrifice yourself to 'save' toxic people. You often feel profoundly overwhelmed by existence itself. By learning the absolute necessity of psychological grounding and saying 'no,' your immense, universal grief transforms into an exquisitely beautiful, masterful ability to channel true, divine compassion and profound spiritual grace."
+  }
+}

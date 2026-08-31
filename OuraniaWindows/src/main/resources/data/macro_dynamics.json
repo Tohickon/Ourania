@@ -1,0 +1,16 @@
+{
+  "macro_dynamics": {
+    "Bundle": "<b>Your whole chart occupies about a third of the sky.</b><br><br>The Bundle pattern indicates an intense, highly concentrated psychological focal point. You are a specialist, driven by a deep, singular motivation.",
+    "Bowl": "<b>Half your chart is empty, and you spend your life reaching toward it.</b><br><br>The Bowl pattern suggests a highly self-contained nature, often driven by a perceived inner void. You tend to focus your energy toward the empty hemisphere.",
+    "Bucket": "<b>Everything the chart holds funnels through a single planet.</b><br><br>The Bucket pattern concentrates energy in one hemisphere, but channels it intensely through a single opposing planet (the 'handle').",
+    "Locomotive": "<b>One planet rides at the front and the rest of the chart pushes behind it.</b><br><br>The Locomotive pattern reveals a driven, structured, relentless personality, led by a specific cutting planet (the 'engine').",
+    "Seesaw": "<b>You are built to weigh one side against the other, permanently.</b><br><br>The Seesaw pattern indicates a polarized nature, constantly weighing alternatives and caught in dualities.",
+    "Splash": "<b>Your energy is spread across the whole sky rather than gathered anywhere.</b><br><br>The Splash pattern suggests a scattered, multi-talented, highly versatile individual, though sometimes lacking a singular focus.",
+    "Splay": "<b>You concentrate hard in a few unconnected places and nowhere else.</b><br><br>The Splay pattern indicates an individualistic and eccentric approach, operating in highly specialized but disconnected areas of life.",
+    
+    "Grand Trine": "<b>Three talents that support each other and ask almost nothing of you.</b><br><br>A Grand Trine represents closed-circuit talent, self-containment, and spiritual ease, though it can sometimes lead to complacency.",
+    "T-Square": "<b>Two planets pull against each other and a third takes the strain.</b><br><br>A T-Square generates intense dynamic drive, pointing toward a primary area of stress and accomplishment.",
+    "Yod": "<b>Two awkward angles converge on one planet, and it carries the assignment.</b><br><br>The Yod, or 'Finger of Fate', indicates a highly specialized, fated developmental path requiring significant shifts in perspective.",
+    "Stellium": "<b>Several planets pile into one place and that place runs the chart.</b><br><br>A Stellium indicates an intense, highly concentrated psychological focal point where multiple planetary energies fuse."
+  }
+}

@@ -1,0 +1,1362 @@
+{
+  "sun_conjunction_moon": {
+    "title": "Sun Conjunct Moon",
+    "summary": "Fuses ego and emotion, creating a highly self-willed and focused nature.",
+    "fullText": "This aspect blends the core identity (Sun) with emotional needs (Moon). It creates a powerful focal point in the chart, leading to a stubborn and self-willed nature. You may have a somewhat one-sided personality driven by very deep-rooted habits."
+  },
+  "sun_opposition_moon": {
+    "title": "Sun Opposite Moon",
+    "summary": "Brings internal strain and polarity between the ego and emotional comforts.",
+    "fullText": "The opposition brings strain and discordance, pitting your conscious will against your unconscious emotional needs. It highlights inner conflicts and contradictory actions, but acts as a powerful challenge to achieve personal growth and psychological balance."
+  },
+  "sun_square_moon": {
+    "title": "Sun Square Moon",
+    "summary": "Creates stressful inner conflicts and emotional oversensitivity.",
+    "fullText": "This challenging aspect places obstacles between your ego and your feelings. It brings inner conflicts about the self and deep insecurity. Your actions are often contradictory, and you may be emotionally oversensitive as you learn to reconcile these tense energies."
+  },
+  "sun_trine_moon": {
+    "title": "Sun Trine Moon",
+    "summary": "Indicates a well-integrated personality and a harmonious, flowing life.",
+    "fullText": "This harmonious aspect represents an easy, flowing energy between the conscious identity and unconscious emotions. It creates a well-integrated personality that is adaptable to others. It often brings a harmonious home life and innate creative talents."
+  },
+  "sun_sextile_moon": {
+    "title": "Sun Sextile Moon",
+    "summary": "Brings opportunities for emotional and personal balance through effort.",
+    "fullText": "The sextile is a favorable aspect that indicates harmony and compatibility between your ego and feelings. It brings opportunities for a well-rounded life, provided you make the conscious effort to act on your potential."
+  },
+  "sun_quincunx_moon": {
+    "title": "Sun Quincunx Moon",
+    "summary": "Requires continual adjustment between identity and emotional needs.",
+    "fullText": "This aspect connects incompatible signs, causing unpredictable strain. You must make continual, uncomfortable adjustments between what your ego demands and what your heart needs for comfort, often impacting your physical vitality or health."
+  },
+  "sun_conjunction_mercury": {
+    "title": "Sun Conjunct Mercury",
+    "summary": "Fuses identity with intellect, creating a strong but potentially rigid mind.",
+    "fullText": "Because the Sun and Mercury are never more than 28 degrees apart, this is their primary aspect. It blends the ego and the mind perfectly. If very tight (under 5 degrees), you are apt to be highly intelligent but rigid and dogmatic in your opinions."
+  },
+  "sun_semisextile_mercury": {
+    "title": "Sun Semisextile Mercury",
+    "summary": "A mildly favorable blend of ego and communication.",
+    "fullText": "This minor aspect brings slight opportunities to align your core identity with your communication style. It indicates a mental interaction that requires subtle adjustments to fully express your ideas."
+  },
+  "sun_conjunction_venus": {
+    "title": "Sun Conjunct Venus",
+    "summary": "A harmonious blend bringing charm, sociability, and warm-heartedness.",
+    "fullText": "The Sun and Venus are never more than 48 degrees apart, making the conjunction their most critical aspect. It is extremely harmonious, bringing a warm-hearted, sociable, and deeply charming personality focused on love and aesthetics."
+  },
+  "sun_semisquare_venus": {
+    "title": "Sun Semisquare Venus",
+    "summary": "Creates mild inner friction between the ego and the desire for pleasure.",
+    "fullText": "This mildly adverse minor aspect introduces small but persistent tensions between your core identity and your values. It precipitates minor events that force you to address how you seek romance and comfort."
+  },
+  "sun_conjunction_mars": {
+    "title": "Sun Conjunct Mars",
+    "summary": "Fuses ego and action, creating a highly energetic and assertive nature.",
+    "fullText": "This dynamic aspect blends your core identity with raw passion and drive. It indicates a high energy level, making you an assertive, enterprising, and highly creative individual who readily takes initiative."
+  },
+  "sun_opposition_mars": {
+    "title": "Sun Opposite Mars",
+    "summary": "Creates intense confrontations and external challenges to your willpower.",
+    "fullText": "This hard aspect brings your ego into direct confrontation with assertive energy. You may face opposition from others or struggle with impulsive actions, forcing you to find balance between personal desires and external conflicts."
+  },
+  "sun_square_mars": {
+    "title": "Sun Square Mars",
+    "summary": "A highly stressful aspect that generates intense drive through conflict.",
+    "fullText": "This challenging configuration places your core identity at cross-purposes with your aggressive drive. It places obstacles in your path, teaching you lessons in patience while developing immense drive and strength of character."
+  },
+  "sun_trine_mars": {
+    "title": "Sun Trine Mars",
+    "summary": "A harmonious flow of vital energy, courage, and creative action.",
+    "fullText": "This highly favorable aspect brings an easy flow between your will and your actions. It naturally enhances your courage, enterprise, and creative self-expression without requiring exhausting effort."
+  },
+  "sun_sextile_mars": {
+    "title": "Sun Sextile Mars",
+    "summary": "Provides opportunities to channel your assertive energy constructively.",
+    "fullText": "This harmonious aspect connects your identity and passion comfortably. It brings excellent opportunities for enterprise and leadership, provided you take the initiative to act upon them."
+  },
+  "sun_quincunx_mars": {
+    "title": "Sun Quincunx Mars",
+    "summary": "Causes unpredictable tension between your goals and your impulses.",
+    "fullText": "This aspect demands continual adjustments between your core identity and how you assert yourself. The incompatible energies can cause sudden impulsive actions or unpredictable strains on your physical vitality."
+  },
+  "sun_conjunction_jupiter": {
+    "title": "Sun Conjunct Jupiter",
+    "summary": "Fuses identity with expansion, bringing luck, optimism, and broad vision.",
+    "fullText": "This powerful aspect blends the ego with the planet of luck and philosophy. It creates an inherently optimistic, generous personality. You possess a broad outlook on life and a natural ability to attract good fortune."
+  },
+  "sun_opposition_jupiter": {
+    "title": "Sun Opposite Jupiter",
+    "summary": "Brings strain through over-expansion or conflicting philosophical ideals.",
+    "fullText": "This aspect pits your personal identity against the urge to expand. It can indicate a tendency to overextend yourself or face ideological conflicts with others, challenging you to moderate your boundless enthusiasm."
+  },
+  "sun_square_jupiter": {
+    "title": "Sun Square Jupiter",
+    "summary": "Creates friction between your ego and your desire for growth and abundance.",
+    "fullText": "This stressful aspect challenges you to overcome overconfidence or excessive risk-taking. It places obstacles in your path that force you to develop discipline and refine your philosophical outlook."
+  },
+  "sun_trine_jupiter": {
+    "title": "Sun Trine Jupiter",
+    "summary": "A highly fortunate aspect bringing innate luck and a flowing, expansive life.",
+    "fullText": "This is one of the most fortunate aspects in astrology. It indicates an easy, natural flow of abundance, worldly inspiration, and optimism. However, it can sometimes make you overly relaxed or prone to laziness due to sheer good luck."
+  },
+  "sun_sextile_jupiter": {
+    "title": "Sun Sextile Jupiter",
+    "summary": "Offers excellent opportunities for growth, education, and worldly success.",
+    "fullText": "This favorable aspect opens doors for expansion and exploration. It requires you to make a conscious effort to utilize your natural optimism and philosophical insights to achieve your goals."
+  },
+  "sun_conjunction_saturn": {
+    "title": "Sun Conjunct Saturn",
+    "summary": "Fuses ego with discipline, creating a serious, hard-working, and responsible nature.",
+    "fullText": "This conjunction blends your core identity with the taskmaster planet. It brings immense discipline, maturity, and a strong sense of duty. You may be highly ambitious but could struggle with feelings of restriction or heavy responsibility."
+  },
+  "sun_opposition_saturn": {
+    "title": "Sun Opposite Saturn",
+    "summary": "Creates profound strain between your personal desires and external duties.",
+    "fullText": "This hard aspect places your identity in direct conflict with limitations and rules. It often manifests as obstacles from authority figures or heavy obligations that challenge your personal growth and demand immense patience."
+  },
+  "sun_square_saturn": {
+    "title": "Sun Square Saturn",
+    "summary": "A difficult aspect that builds intense character through overcoming obstacles.",
+    "fullText": "This challenging aspect pits your willpower against severe restrictions. It creates internal frustration and inhibition, forcing you to develop tremendous drive and maturity by overcoming life's hardest lessons."
+  },
+  "sun_trine_saturn": {
+    "title": "Sun Trine Saturn",
+    "summary": "Brings a natural, easy flow of discipline, maturity, and structural success.",
+    "fullText": "This harmonious aspect ensures your ego and your responsibilities work perfectly together. You possess innate practical endurance, reliable ambition, and the ability to build a secure, structured life with relative ease."
+  },
+  "sun_sextile_saturn": {
+    "title": "Sun Sextile Saturn",
+    "summary": "Offers opportunities to achieve long-term goals through patient effort.",
+    "fullText": "This favorable aspect allows you to communicate and coordinate your personal goals with practical duties. It brings opportunities for steady advancement if you are willing to apply hard work and discipline."
+  },
+  "sun_conjunction_uranus": {
+    "title": "Sun Conjunct Uranus",
+    "summary": "Fuses identity with rebellion, creating a highly independent, innovative personality.",
+    "fullText": "This powerful aspect blends the ego with the planet of sudden change. You possess a strong sense of independence, originality, and a revolutionary spirit. Your life path may be marked by sudden breakthroughs and unconventional choices."
+  },
+  "sun_opposition_uranus": {
+    "title": "Sun Opposite Uranus",
+    "summary": "Creates erratic tension between your core self and the need for absolute freedom.",
+    "fullText": "This aspect pits your ego against sudden disruptions. It indicates unpredictable conflicts, sudden separations, and a restless urge to rebel against anything that threatens your individuality or traditions."
+  },
+  "sun_square_uranus": {
+    "title": "Sun Square Uranus",
+    "summary": "A highly stressful aspect bringing sudden changes and internal nervous tension.",
+    "fullText": "This challenging aspect forces your identity to constantly adapt to erratic, revolutionary energy. It causes internal friction and sudden breakdowns, teaching you to channel your rebellious nature productively."
+  },
+  "sun_trine_uranus": {
+    "title": "Sun Trine Uranus",
+    "summary": "A harmonious flow of innovation, original thinking, and easy breakthroughs.",
+    "fullText": "This flowing aspect allows you to integrate sudden changes and unconventional ideas with incredible ease. You possess natural visionary talents and an independent spirit that easily attracts unique opportunities."
+  },
+  "sun_sextile_uranus": {
+    "title": "Sun Sextile Uranus",
+    "summary": "Offers exciting opportunities for growth through unconventional approaches.",
+    "fullText": "This favorable aspect brings chances to express your unique individuality. By putting in effort, you can use your innovative and rebellious ideas to create sudden, positive advancements in your life."
+  },
+  "sun_conjunction_neptune": {
+    "title": "Sun Conjunct Neptune",
+    "summary": "Fuses ego with mysticism, creating powerful artistic expression and psychic ability.",
+    "fullText": "This aspect blends your core identity with imagination and spirituality. It brings fine esthetic taste, psychic potential, and a highly sensitive nature. You may struggle with boundaries but possess a profound creative vision."
+  },
+  "sun_opposition_neptune": {
+    "title": "Sun Opposite Neptune",
+    "summary": "Creates confusing strain between your identity and deceptive or mystical forces.",
+    "fullText": "This hard aspect places your ego at odds with illusions. It can bring unbalanced emotions, making you susceptible to treachery, deceit, or escapism. It challenges you to find clarity amidst psychological fog."
+  },
+  "sun_square_neptune": {
+    "title": "Sun Square Neptune",
+    "summary": "A challenging aspect that brings vagueness of mind and emotional vulnerability.",
+    "fullText": "This stressful aspect causes friction between your conscious will and your spiritual or escapist tendencies. It teaches hard lessons about boundaries, illusion, and overcoming self-deception in your life."
+  },
+  "sun_trine_neptune": {
+    "title": "Sun Trine Neptune",
+    "summary": "A harmonious flow of deep imagination and creative self-expression.",
+    "fullText": "This easy aspect allows your ego and intuition to work in perfect tandem. You possess innate artistic talent, deep compassion, and a natural connection to the spiritual or mystical realms."
+  },
+  "sun_sextile_neptune": {
+    "title": "Sun Sextile Neptune",
+    "summary": "Offers opportunities to channel your imagination into tangible artistic pursuits.",
+    "fullText": "This favorable aspect brings subtle opportunities for spiritual and creative growth. By actively engaging your intuition, you can successfully express your deeply sensitive and mystical nature."
+  },
+  "sun_conjunction_pluto": {
+    "title": "Sun Conjunct Pluto",
+    "summary": "Fuses ego with profound transformation, indicating a powerful, intense character.",
+    "fullText": "This aspect blends your core identity with the planet of power and rebirth. It makes you deeply self-confident but potentially egotistical or dictatorial. You possess an intense drive to start afresh and control your environment."
+  },
+  "sun_opposition_pluto": {
+    "title": "Sun Opposite Pluto",
+    "summary": "Creates severe strain through power struggles and intense psychological clashes.",
+    "fullText": "This hard aspect pits your ego against forces of destruction and control. It indicates intense confrontations with authority or manipulative individuals, challenging you to completely transform your approach to power."
+  },
+  "sun_square_pluto": {
+    "title": "Sun Square Pluto",
+    "summary": "A highly stressful aspect indicating selfishness or antisocial tendencies to overcome.",
+    "fullText": "This challenging aspect brings friction between your conscious will and your deepest obsessive drives. It places heavy obstacles in your path, forcing you to refine your intense power and eliminate manipulative behaviors."
+  },
+  "sun_trine_pluto": {
+    "title": "Sun Trine Pluto",
+    "summary": "A harmonious flow of intense regenerative power and strong self-confidence.",
+    "fullText": "This excellent aspect grants you a naturally strong character. Your ego easily harmonizes with the forces of transformation, giving you an innate ability to regenerate your life and lead with profound psychological insight."
+  },
+  "sun_sextile_pluto": {
+    "title": "Sun Sextile Pluto",
+    "summary": "Offers opportunities to harness deep psychological power for personal growth.",
+    "fullText": "This favorable aspect brings chances for profound transformation. By applying your willpower, you can effectively utilize your intense focus and resilience to achieve your core goals."
+  },
+  "sun_conjunction_chiron": {
+    "title": "Sun Conjunct Chiron",
+    "summary": "Fuses the core identity with deep spiritual wounding and the capacity to heal.",
+    "fullText": "This powerful aspect ties your ego directly to the archetype of the Wounded Healer. Your sense of self is inextricably linked to early psychological pain, but you possess an immense, focalized potential to guide and heal others through your own experiences."
+  },
+  "sun_opposition_chiron": {
+    "title": "Sun Opposite Chiron",
+    "summary": "Creates profound strain between your identity and unhealed psychological wounds.",
+    "fullText": "This aspect places your conscious will in direct confrontation with your deepest insecurities. You may experience discordance by projecting your wounds onto partners, challenging you to achieve profound inner integration."
+  },
+  "sun_square_chiron": {
+    "title": "Sun Square Chiron",
+    "summary": "A challenging aspect that forces you to overcome deep-seated feelings of inadequacy.",
+    "fullText": "This stressful aspect causes intense friction between your ego and your spiritual wounds. It places obstacles in your path regarding self-worth, teaching you harsh but vital lessons about self-acceptance and healing."
+  },
+  "sun_trine_chiron": {
+    "title": "Sun Trine Chiron",
+    "summary": "A harmonious flow of healing energy that naturally supports your core identity.",
+    "fullText": "This easy aspect allows you to instinctively integrate your past wounds into a healthy sense of self. You possess an innate, flowing talent for mentoring, teaching, and offering spiritual comfort to others."
+  },
+  "moon_conjunction_mercury": {
+    "title": "Moon Conjunct Mercury",
+    "summary": "Fuses emotions and intellect, bringing high intelligence and vivid imagination.",
+    "fullText": "This aspect perfectly blends your subconscious feelings with your logical mind. It creates a focal point of high intelligence, deep sensitivity, and a very active imagination. You naturally process emotions through conversation and thought."
+  },
+  "moon_opposition_mercury": {
+    "title": "Moon Opposite Mercury",
+    "summary": "Creates internal strain between what you feel and what you logically think.",
+    "fullText": "This hard aspect brings discordance between your emotional comforts and your intellectual reasoning. You may struggle to communicate your true feelings, creating tension that challenges you to find mental and emotional balance."
+  },
+  "moon_square_mercury": {
+    "title": "Moon Square Mercury",
+    "summary": "A stressful aspect indicating a high-strung, anxious, and frenetic nature.",
+    "fullText": "This challenging aspect causes intense friction between your mind and your moods. The native is inclined to be anxious and nervous, facing constant obstacles in trying to rationalize their shifting feelings."
+  },
+  "moon_trine_mercury": {
+    "title": "Moon Trine Mercury",
+    "summary": "A harmonious flow indicating common sense, shrewdness, and a witty personality.",
+    "fullText": "This extremely favorable aspect allows your emotions and intellect to work together seamlessly. You possess innate common sense, an entertaining personality, and the ability to articulate your feelings with ease."
+  },
+  "moon_sextile_mercury": {
+    "title": "Moon Sextile Mercury",
+    "summary": "Offers excellent opportunities to bridge emotional intelligence with communication.",
+    "fullText": "This harmonious aspect creates a clear channel between your mind and your heart. By applying a little effort, you can become a highly persuasive, empathetic speaker and writer."
+  },
+  "moon_quincunx_mercury": {
+    "title": "Moon Quincunx Mercury",
+    "summary": "Requires continual adjustment between your nervous intellect and emotional needs.",
+    "fullText": "This minor but stressful aspect connects incompatible energies. You must constantly adjust your communication style to match your inner moods, which can sometimes manifest as unpredictable nervous tension or health strains."
+  },
+  "moon_conjunction_venus": {
+    "title": "Moon Conjunct Venus",
+    "summary": "Fuses emotional security with love, bringing a friendly, tranquil nature.",
+    "fullText": "This beautiful aspect blends your deepest comforts with your aesthetic values. It makes you naturally friendly and brings a tranquil nature with a strong love for luxury, romance, and artistic pursuits."
+  },
+  "moon_opposition_venus": {
+    "title": "Moon Opposite Venus",
+    "summary": "Creates strain and discordance between your emotional needs and romantic desires.",
+    "fullText": "This hard aspect pits your subconscious habits against your urge for partnership. It can indicate a tendency to seek comfort through careless self-indulgence or attract relationships that challenge your inner security."
+  },
+  "moon_square_venus": {
+    "title": "Moon Square Venus",
+    "summary": "A challenging aspect that can make you moody, careless, or self-indulgent.",
+    "fullText": "This stressful aspect generates friction between your feelings and your values. It often brings disappointments in love affairs and requires you to overcome deep-seated moodiness and a tendency to overindulge."
+  },
+  "moon_trine_venus": {
+    "title": "Moon Trine Venus",
+    "summary": "A highly harmonious aspect bringing an affectionate, lighthearted personality.",
+    "fullText": "This flowing aspect allows your emotional core and your romantic desires to support each other effortlessly. You possess a natural love of beauty, artistic talent, and an incredibly affectionate nature."
+  },
+  "moon_sextile_venus": {
+    "title": "Moon Sextile Venus",
+    "summary": "Offers wonderful opportunities for artistic expression and emotional harmony.",
+    "fullText": "This favorable aspect opens doors for deeply fulfilling relationships and creative success. By putting your feelings into action, you can easily manifest beauty and charm in your daily life."
+  },
+  "moon_conjunction_mars": {
+    "title": "Moon Conjunct Mars",
+    "summary": "Fuses emotion with action, creating a generous, protective, but impulsive nature.",
+    "fullText": "This dynamic conjunction blends your inner feelings with raw assertiveness. You are fiercely protective and need constant change. However, this intense emotional energy can sometimes make you vain or overly reactive."
+  },
+  "moon_opposition_mars": {
+    "title": "Moon Opposite Mars",
+    "summary": "Brings intense strain, emotional volatility, and conflicts with others.",
+    "fullText": "This hard aspect pits your emotional security directly against aggressive impulses. It often manifests as sudden quarrels, extreme hypersensitivity, and defensive reactions that challenge your personal growth."
+  },
+  "moon_square_mars": {
+    "title": "Moon Square Mars",
+    "summary": "A stressful aspect causing friction, quick temper, and emotional outbursts.",
+    "fullText": "This challenging aspect places obstacles between your feelings and your actions. It generates high inner tension, making you easily provoked and forcing you to learn patience and emotional self-control."
+  },
+  "moon_trine_mars": {
+    "title": "Moon Trine Mars",
+    "summary": "A harmonious flow of vital emotional energy and courageous action.",
+    "fullText": "This easy aspect ensures your passions and your instincts work in perfect alignment. You possess innate courage, a strong constitution, and can easily express your feelings through dynamic, creative action."
+  },
+  "moon_sextile_mars": {
+    "title": "Moon Sextile Mars",
+    "summary": "Offers excellent opportunities to channel your emotions into productive enterprise.",
+    "fullText": "This favorable aspect brings an active, spirited nature. By applying conscious effort, you can effectively defend your beliefs and use your emotional intuition to succeed in competitive environments."
+  },
+  "moon_conjunction_jupiter": {
+    "title": "Moon Conjunct Jupiter",
+    "summary": "Fuses emotion with expansion, bringing deep optimism and a protective nature.",
+    "fullText": "This aspect blends your subconscious with the planet of abundance. It creates an incredibly generous, protective personality that constantly seeks new challenges. It acts as a focal point for inner faith and emotional luck."
+  },
+  "moon_opposition_jupiter": {
+    "title": "Moon Opposite Jupiter",
+    "summary": "Creates strain between emotional comfort and the urge for boundless expansion.",
+    "fullText": "This hard aspect places your domestic security at odds with your desire to explore the world. It can indicate a tendency toward emotional extravagance or overindulgence that challenges your inner balance."
+  },
+  "moon_square_jupiter": {
+    "title": "Moon Square Jupiter",
+    "summary": "A stressful aspect that can lead to vanity, emotional gambling, or excess.",
+    "fullText": "This challenging aspect causes friction between your feelings and your philosophical ideals. It forces you to overcome a tendency to be overly dramatic or careless with your emotional and material resources."
+  },
+  "moon_trine_jupiter": {
+    "title": "Moon Trine Jupiter",
+    "summary": "A highly harmonious aspect bringing innate emotional ease and good fortune.",
+    "fullText": "This flowing aspect allows your inner needs and your desire for growth to support one another effortlessly. You possess a naturally joyous heart, deep empathy, and an inherent ability to attract luck."
+  },
+  "moon_sextile_jupiter": {
+    "title": "Moon Sextile Jupiter",
+    "summary": "Offers wonderful opportunities for spiritual growth and emotional abundance.",
+    "fullText": "This favorable aspect brings an open, philosophical approach to your feelings. By making an effort to explore your inner world, you can easily turn your emotional generosity into tangible rewards."
+  },
+  "moon_conjunction_saturn": {
+    "title": "Moon Conjunct Saturn",
+    "summary": "Fuses emotion with duty, creating a thrifty, stable, but perfectionist nature.",
+    "fullText": "This conjunction ties your deepest emotional needs to structure and discipline. It brings profound stability to the emotions, making you thrifty and responsible, though you may struggle with being overly critical of yourself."
+  },
+  "moon_opposition_saturn": {
+    "title": "Moon Opposite Saturn",
+    "summary": "Creates severe strain between your feelings and your obligations.",
+    "fullText": "This hard aspect pits your need for nurturing against cold, practical realities. It often manifests as deep shyness, relationship blockages, or emotional isolation that forces you to build profound internal resilience."
+  },
+  "moon_square_saturn": {
+    "title": "Moon Square Saturn",
+    "summary": "A highly challenging aspect bringing shyness, money problems, and self-doubt.",
+    "fullText": "This stressful aspect places heavy obstacles in the way of your emotional fulfillment. It requires you to overcome a chronic lack of self-confidence, potential material hardships, and trouble in early partnerships."
+  },
+  "moon_trine_saturn": {
+    "title": "Moon Trine Saturn",
+    "summary": "A harmonious flow indicating a diplomatic, ambitious, and conservative nature.",
+    "fullText": "This easy aspect allows your emotions and responsibilities to work together perfectly. You possess innate patience, immense practical thoroughness, and the emotional maturity needed to achieve your ambitions."
+  },
+  "moon_sextile_saturn": {
+    "title": "Moon Sextile Saturn",
+    "summary": "Offers excellent opportunities to build enduring emotional security through effort.",
+    "fullText": "This favorable aspect brings a disciplined approach to your feelings. By patiently applying yourself, you can establish strong, stable foundations in both your personal relationships and your career."
+  },
+  "moon_quincunx_saturn": {
+    "title": "Moon Quincunx Saturn",
+    "summary": "Requires continual, stressful adjustments between your feelings and your duties.",
+    "fullText": "This minor but difficult aspect connects fundamentally incompatible energies. You may feel a persistent, uncomfortable strain where your need for comfort is constantly interrupted by heavy responsibilities, often affecting your health."
+  },
+  "moon_conjunction_uranus": {
+    "title": "Moon Conjunct Uranus",
+    "summary": "Fuses emotion with rebellion, creating strong intuition but sudden mood changes.",
+    "fullText": "This powerful aspect blends your inner security with the planet of sudden shocks. You are open to the future and possess brilliant intuition, but your emotional life is prone to highly erratic, unpredictable shifts."
+  },
+  "moon_opposition_uranus": {
+    "title": "Moon Opposite Uranus",
+    "summary": "Creates intense, erratic strain between your need for comfort and absolute freedom.",
+    "fullText": "This hard aspect pits your domestic stability against a rebellious urge for independence. It often indicates sudden separations, unpredictable relationship dynamics, and a strong inner tension that challenges your emotional grounding."
+  },
+  "moon_square_uranus": {
+    "title": "Moon Square Uranus",
+    "summary": "A challenging aspect that brings high nervous tension and emotional instability.",
+    "fullText": "This stressful aspect causes severe friction between your feelings and sudden changes. It places obstacles in your path, forcing you to cope with a highly temperamental nature and unpredictable domestic upheavals."
+  },
+  "moon_trine_uranus": {
+    "title": "Moon Trine Uranus",
+    "summary": "A harmonious flow of brilliant intuition and progressive emotional openness.",
+    "fullText": "This easy aspect allows your subconscious to effortlessly integrate unconventional ideas. You possess an innate, forward-thinking emotional nature that embraces change and naturally attracts unique, exciting experiences."
+  },
+  "moon_sextile_uranus": {
+    "title": "Moon Sextile Uranus",
+    "summary": "Offers opportunities to revitalize your emotional life through innovative changes.",
+    "fullText": "This favorable aspect brings flashes of brilliant insight. By making a conscious effort to break old habits, you can successfully harness your strong intuition to create a highly progressive, liberated life."
+  },
+  "moon_conjunction_neptune": {
+    "title": "Moon Conjunct Neptune",
+    "summary": "Fuses emotion with mysticism, creating an incredibly sensitive, artistic nature.",
+    "fullText": "This conjunction completely dissolves the boundaries of the subconscious. It acts as a powerful focal point for psychic sensitivity, deep compassion, and profound artistic talent, though it can also bring a desire for seclusion."
+  },
+  "moon_opposition_neptune": {
+    "title": "Moon Opposite Neptune",
+    "summary": "Creates strain between your true feelings and powerful illusions or escapism.",
+    "fullText": "This hard aspect pits your emotional security against confusing, deceptive forces. It challenges you to navigate through emotional vagueness and a susceptibility to being easily led astray by others or by your own fantasies."
+  },
+  "moon_square_neptune": {
+    "title": "Moon Square Neptune",
+    "summary": "A stressful aspect that can lead to extreme emotional vulnerability and deceit.",
+    "fullText": "This challenging aspect causes intense friction between your reality and your dreams. It places psychological obstacles in your path, requiring you to learn hard lessons about boundaries, escapism, and unbalanced emotions."
+  },
+  "moon_trine_neptune": {
+    "title": "Moon Trine Neptune",
+    "summary": "A harmonious flow of pure empathy, psychic ability, and creative imagination.",
+    "fullText": "This flowing aspect allows your subconscious and your spiritual ideals to work together perfectly. You possess innate artistic potential, gentle compassion, and an ethereal emotional nature that deeply comforts others."
+  },
+  "moon_sextile_neptune": {
+    "title": "Moon Sextile Neptune",
+    "summary": "Offers subtle opportunities for spiritual and artistic emotional expression.",
+    "fullText": "This favorable aspect creates a gentle connection between your feelings and your intuition. By actively utilizing your sensitivity, you can successfully channel your vivid imagination into beautiful, creative works."
+  },
+  "moon_conjunction_pluto": {
+    "title": "Moon Conjunct Pluto",
+    "summary": "Fuses emotion with absolute transformation, leading to intense, impulsive changes.",
+    "fullText": "This intense aspect blends your deepest security needs with the forces of death and rebirth. You possess a magnetically powerful emotional core, but are prone to sudden eruptions and making thoughtless, drastic moves."
+  },
+  "moon_opposition_pluto": {
+    "title": "Moon Opposite Pluto",
+    "summary": "Creates terrifying emotional strain, power struggles, and psychological extremes.",
+    "fullText": "This hard aspect pits your vulnerability directly against destructive or controlling forces. It indicates intense relationship crises and a tendency toward brooding jealousy that forces profound emotional regeneration."
+  },
+  "moon_square_pluto": {
+    "title": "Moon Square Pluto",
+    "summary": "A highly challenging aspect causing extreme mood swings and prominent jealousy.",
+    "fullText": "This stressful aspect generates severe friction in your subconscious. It brings unpleasant, sudden changes to your domestic life and requires you to completely overhaul obsessive, manipulative, or intensely jealous emotional patterns."
+  },
+  "moon_trine_pluto": {
+    "title": "Moon Trine Pluto",
+    "summary": "A harmonious flow of intense emotional resilience and shrewd instinct.",
+    "fullText": "This easy aspect allows you to navigate profound transformations with incredible ease. You possess naturally strong, deeply probing emotions and an innate, shrewd business ability that protects your personal security."
+  },
+  "moon_sextile_pluto": {
+    "title": "Moon Sextile Pluto",
+    "summary": "Offers powerful opportunities for emotional rebirth and psychological insight.",
+    "fullText": "This favorable aspect connects your feelings with your regenerative power. By making a conscious effort to explore your hidden depths, you can successfully transform your emotional life and empower those around you."
+  },
+  "moon_conjunction_chiron": {
+    "title": "Moon Conjunct Chiron",
+    "summary": "Fuses emotional security with deep spiritual wounding and profound empathy.",
+    "fullText": "This aspect ties your subconscious directly to the archetype of the Wounded Healer. Your sense of safety is intensely linked to early emotional trauma, creating a focal point of immense, maternal compassion for the suffering of others."
+  },
+  "moon_opposition_chiron": {
+    "title": "Moon Opposite Chiron",
+    "summary": "Creates profound strain between your need for comfort and unhealed psychological pain.",
+    "fullText": "This hard aspect places your inner feelings in direct conflict with your spiritual wounds. You may experience discordance by projecting your insecurities onto your family or partners, challenging you to find true internal sanctuary."
+  },
+  "moon_square_chiron": {
+    "title": "Moon Square Chiron",
+    "summary": "A challenging aspect that forces you to confront deep-seated feelings of emotional inadequacy.",
+    "fullText": "This stressful aspect causes intense friction in your domestic and emotional life. It places obstacles in your path regarding nurturing and safety, teaching you vital lessons about completely mothering and healing yourself."
+  },
+  "moon_trine_chiron": {
+    "title": "Moon Trine Chiron",
+    "summary": "A harmonious flow of protective healing energy that naturally stabilizes your emotions.",
+    "fullText": "This easy aspect allows your subconscious to effortlessly integrate past traumas. You possess an innate, flowing talent for empathetic counseling and providing a deeply comforting, secure environment for those in pain."
+  },
+  "mercury_conjunction_venus": {
+    "title": "Mercury Conjunct Venus",
+    "summary": "Fuses intellect with aesthetics, bringing immense charm of speech.",
+    "fullText": "This aspect perfectly blends your logical mind with your capacity for love. It creates a focal point of absolute diplomatic grace, ensuring a beautiful balance between mental activities and a deep appreciation for art."
+  },
+  "mercury_sextile_venus": {
+    "title": "Mercury Sextile Venus",
+    "summary": "Offers wonderful opportunities for cheerful, artistic communication.",
+    "fullText": "This highly favorable aspect connects your intellect and values harmoniously. By applying effort, you can easily utilize your cheerful, lighthearted nature to succeed in literary, artistic, and social pursuits."
+  },
+  "mercury_conjunction_mars": {
+    "title": "Mercury Conjunct Mars",
+    "summary": "Fuses the intellect with aggressive drive, creating a sharp, highly expressive mind.",
+    "fullText": "This dynamic aspect blends your communication style with raw passion. It acts as a focal point for high intellectualism, giving you a brilliant flair for writing, speaking, and incredibly witty, fast-paced thought."
+  },
+  "mercury_opposition_mars": {
+    "title": "Mercury Opposite Mars",
+    "summary": "Creates intense strain and discordance in communication and debate.",
+    "fullText": "This hard aspect pits your logical mind directly against your temper. It often manifests as belligerent arguments or tactless bluntness, challenging you to reconcile your quick thoughts with your aggressive impulses."
+  },
+  "mercury_square_mars": {
+    "title": "Mercury Square Mars",
+    "summary": "A stressful aspect causing fault-finding, irritability, and disputatious behavior.",
+    "fullText": "This challenging aspect brings severe friction between how you think and how you act. It places mental obstacles in your path, forcing you to learn patience and overcome a tendency to verbally attack others."
+  },
+  "mercury_trine_mars": {
+    "title": "Mercury Trine Mars",
+    "summary": "A harmonious flow of practical intelligence and courageous mental energy.",
+    "fullText": "This easy aspect ensures your intellect and your drive work perfectly together. You possess an innate, active, and highly practical mind, making you a forceful debater and granting natural literary ability."
+  },
+  "mercury_sextile_mars": {
+    "title": "Mercury Sextile Mars",
+    "summary": "Offers excellent opportunities to communicate your ideas with bold enthusiasm.",
+    "fullText": "This favorable aspect links your mind and your courage effectively. By taking the initiative, you can successfully express your sharp thoughts and win debates without alienating your audience."
+  },
+  "mercury_conjunction_jupiter": {
+    "title": "Mercury Conjunct Jupiter",
+    "summary": "Fuses the intellect with broad philosophy, creating a highly optimistic mind.",
+    "fullText": "This aspect blends your daily communication with the planet of expansive vision. It acts as a powerful focal point for an active mind with a broad outlook, deeply interested in understanding essential universal meanings."
+  },
+  "mercury_opposition_jupiter": {
+    "title": "Mercury Opposite Jupiter",
+    "summary": "Creates strain between practical logic and boundless philosophical ideals.",
+    "fullText": "This hard aspect pits your attention to detail against sweeping, grandiose concepts. It can indicate a tendency toward intellectual arrogance or scattering your mental energy, challenging you to ground your grand theories."
+  },
+  "mercury_square_jupiter": {
+    "title": "Mercury Square Jupiter",
+    "summary": "A stressful aspect that can bring dogmatism or careless communication.",
+    "fullText": "This challenging aspect causes friction between your intellect and your desire for growth. It places obstacles in your educational path, forcing you to overcome tactlessness and learn to synthesize facts carefully."
+  },
+  "mercury_trine_jupiter": {
+    "title": "Mercury Trine Jupiter",
+    "summary": "A highly harmonious flow of intellectual optimism and broad comprehension.",
+    "fullText": "This flowing aspect allows your logical mind and philosophical faith to work together effortlessly. You possess innate teaching abilities, a tolerant intellect, and naturally attract good fortune through writing or speaking."
+  },
+  "mercury_sextile_jupiter": {
+    "title": "Mercury Sextile Jupiter",
+    "summary": "Offers wonderful opportunities for learning, networking, and mental expansion.",
+    "fullText": "This favorable aspect links your curiosity with higher knowledge. By putting effort into your studies, you can easily grasp complex concepts and successfully communicate your broad, optimistic vision to others."
+  },
+  "mercury_conjunction_saturn": {
+    "title": "Mercury Conjunct Saturn",
+    "summary": "Fuses the intellect with strict discipline, creating a serious, profound mind.",
+    "fullText": "This conjunction ties your communication directly to the taskmaster planet. It brings intense mental rigor, creating a highly organized, cautious, and authoritative intellect, though it may also induce nervous worry or pessimism."
+  },
+  "mercury_opposition_saturn": {
+    "title": "Mercury Opposite Saturn",
+    "summary": "Creates severe strain between your ideas and rigid, limiting structures.",
+    "fullText": "This hard aspect pits your quicksilver mind against heavy, practical realities. It often manifests as deep self-doubt regarding your intelligence or harsh criticism from others, challenging you to build unshakeable mental focus."
+  },
+  "mercury_square_saturn": {
+    "title": "Mercury Square Saturn",
+    "summary": "A highly challenging aspect causing mental blockages, anxiety, and rigid thinking.",
+    "fullText": "This stressful aspect places formidable obstacles in your communication. It requires you to overcome a paralyzing fear of making mistakes, forcing you to transform deep intellectual insecurity into masterful, precise logic."
+  },
+  "mercury_trine_saturn": {
+    "title": "Mercury Trine Saturn",
+    "summary": "A harmonious flow of disciplined thought and excellent concentration.",
+    "fullText": "This easy aspect ensures your intellect and your responsibilities work in perfect alignment. You possess innate common sense, a highly structured memory, and the natural ability to engineer abstract ideas into reality."
+  },
+  "mercury_sextile_saturn": {
+    "title": "Mercury Sextile Saturn",
+    "summary": "Offers excellent opportunities to achieve mental mastery through patient study.",
+    "fullText": "This favorable aspect brings a methodical approach to your learning. By applying dedicated effort, you can successfully organize chaotic data and communicate with profound, respected authority."
+  },
+  "mercury_quincunx_saturn": {
+    "title": "Mercury Quincunx Saturn",
+    "summary": "Requires continual, stressful adjustments between your ideas and your duties.",
+    "fullText": "This minor but difficult aspect connects incompatible mental and structural energies. You may feel a persistent, uncomfortable strain where your need to communicate is constantly hindered by heavy, restrictive obligations or rules."
+  },
+  "mercury_conjunction_uranus": {
+    "title": "Mercury Conjunct Uranus",
+    "summary": "Fuses the intellect with radical innovation, creating a brilliant, erratic mind.",
+    "fullText": "This powerful aspect blends your communication with sudden flashes of genius. It creates a highly original, objective intellect capable of grasping futuristic concepts, though you may struggle with nervous tension or scattered focus."
+  },
+  "mercury_opposition_uranus": {
+    "title": "Mercury Opposite Uranus",
+    "summary": "Creates intense, erratic strain between your logic and rebellious ideas.",
+    "fullText": "This hard aspect pits your daily thoughts against sudden, shocking disruptions. It often indicates highly unconventional opinions and a stubborn contrariness that challenges you to balance brilliance with practical communication."
+  },
+  "mercury_square_uranus": {
+    "title": "Mercury Square Uranus",
+    "summary": "A challenging aspect that brings high mental anxiety and erratic, blunt speech.",
+    "fullText": "This stressful aspect causes severe friction in your nervous system. It places mental obstacles in your path, forcing you to cope with exhausting mental restlessness and a tendency to alienate others with your intellect."
+  },
+  "mercury_trine_uranus": {
+    "title": "Mercury Trine Uranus",
+    "summary": "A harmonious flow of brilliant intuition and highly progressive logic.",
+    "fullText": "This easy aspect allows your mind to effortlessly process complex, abstract data. You possess innate visionary talents, a quicksilver wit, and naturally communicate entirely new, liberating paradigms to the world."
+  },
+  "mercury_sextile_uranus": {
+    "title": "Mercury Sextile Uranus",
+    "summary": "Offers opportunities to revolutionize your thinking and share unique insights.",
+    "fullText": "This favorable aspect connects your intellect with your originality. By making a conscious effort to break old mental habits, you can successfully utilize your erratic genius for groundbreaking technological or social advancements."
+  },
+  "mercury_conjunction_neptune": {
+    "title": "Mercury Conjunct Neptune",
+    "summary": "Fuses the intellect with mysticism, creating a highly poetic, telepathic mind.",
+    "fullText": "This conjunction dissolves the strict boundaries of logic. It acts as a powerful focal point for immense artistic imagination and psychic sensitivity, though it can make grasping hard, factual truths incredibly difficult."
+  },
+  "mercury_opposition_neptune": {
+    "title": "Mercury Opposite Neptune",
+    "summary": "Creates confusing strain between factual logic and deceptive illusions.",
+    "fullText": "This hard aspect pits your rational mind against emotional vagueness. It challenges you to navigate through mental fog, severe misunderstandings, and a susceptibility to mass media illusions or deceptive gossip."
+  },
+  "mercury_square_neptune": {
+    "title": "Mercury Square Neptune",
+    "summary": "A stressful aspect that can lead to chaotic thinking and self-deception.",
+    "fullText": "This challenging aspect causes intense friction between your intellect and your dreams. It places psychological obstacles in your path, requiring you to learn hard lessons about distinguishing between inspiring stories and undeniable reality."
+  },
+  "mercury_trine_neptune": {
+    "title": "Mercury Trine Neptune",
+    "summary": "A harmonious flow of pure inspiration, poetic speech, and deep compassion.",
+    "fullText": "This flowing aspect allows your mind and your spiritual ideals to work together perfectly. You possess innate literary or musical talent, absorbing information through profound feeling and communicating with gentle, healing grace."
+  },
+  "mercury_sextile_neptune": {
+    "title": "Mercury Sextile Neptune",
+    "summary": "Offers subtle opportunities for spiritual and artistic intellectual expression.",
+    "fullText": "This favorable aspect creates a gentle connection between your thoughts and your intuition. By actively utilizing your sensitivity, you can successfully channel your vivid imagination into beautiful, symbolic communication."
+  },
+  "mercury_conjunction_pluto": {
+    "title": "Mercury Conjunct Pluto",
+    "summary": "Fuses the intellect with absolute transformation, leading to a piercing, obsessive mind.",
+    "fullText": "This intense aspect blends your logic with the forces of death and rebirth. You possess a magnetically powerful, investigative intellect that instantly sees through superficial lies, often using words with devastating, absolute authority."
+  },
+  "mercury_opposition_pluto": {
+    "title": "Mercury Opposite Pluto",
+    "summary": "Creates terrifying mental strain, power struggles, and psychological paranoia.",
+    "fullText": "This hard aspect pits your communication directly against destructive or controlling forces. It indicates intense intellectual confrontations and a tendency toward deep-seated suspicion that forces you to completely overhaul your mental habits."
+  },
+  "mercury_square_pluto": {
+    "title": "Mercury Square Pluto",
+    "summary": "A highly challenging aspect causing extreme mental obsessions and harsh speech.",
+    "fullText": "This stressful aspect generates severe friction in your psyche. It brings unpleasant, sudden changes to your ideas and requires you to overcome manipulative propaganda or the destructive urge to use words as weapons."
+  },
+  "mercury_trine_pluto": {
+    "title": "Mercury Trine Pluto",
+    "summary": "A harmonious flow of intense analytical resilience and profound insight.",
+    "fullText": "This easy aspect allows you to navigate complex psychological mysteries with incredible ease. You possess naturally strong, deeply probing thoughts and an innate ability to uncover the hidden, ultimate truths of the universe."
+  },
+  "mercury_sextile_pluto": {
+    "title": "Mercury Sextile Pluto",
+    "summary": "Offers powerful opportunities for mental rebirth and strategic research.",
+    "fullText": "This favorable aspect connects your intellect with your regenerative power. By making a conscious effort to explore taboo subjects, you can successfully transform your communication style and gain immense influence over others."
+  },
+  "mercury_conjunction_chiron": {
+    "title": "Mercury Conjunct Chiron",
+    "summary": "Fuses the intellect with deep spiritual wounding and profound teaching ability.",
+    "fullText": "This aspect ties your mind directly to the archetype of the Wounded Healer. Your communication is intensely linked to early educational trauma or feeling unheard, creating a focal point for brilliant, empathetic teaching."
+  },
+  "mercury_opposition_chiron": {
+    "title": "Mercury Opposite Chiron",
+    "summary": "Creates profound strain between your logic and unhealed intellectual insecurities.",
+    "fullText": "This hard aspect places your daily thoughts in direct conflict with your spiritual wounds. You may experience discordance by feeling profoundly misunderstood by peers, challenging you to embrace your unconventional way of processing reality."
+  },
+  "mercury_square_chiron": {
+    "title": "Mercury Square Chiron",
+    "summary": "A challenging aspect that forces you to confront a paralyzing fear of speaking your truth.",
+    "fullText": "This stressful aspect causes intense friction in your mental life. It places obstacles in your path regarding your intelligence, teaching you vital lessons about overcoming nervous over-compensation and accepting your unique voice."
+  },
+  "mercury_trine_chiron": {
+    "title": "Mercury Trine Chiron",
+    "summary": "A harmonious flow of healing communication that naturally stabilizes your mind.",
+    "fullText": "This easy aspect allows your intellect to effortlessly integrate past misunderstandings. You possess an innate, flowing talent for counseling and bridging the deepest communication gaps for those who are suffering."
+  },
+  "venus_conjunction_mars": {
+    "title": "Venus Conjunct Mars",
+    "summary": "Fuses affection with aggressive drive, creating a sensuous, highly passionate nature.",
+    "fullText": "This intense aspect perfectly blends your romantic values with raw action. It acts as a powerful focal point for intense physical attraction, creating a charismatic personality with an excellent balance between charm and assertiveness."
+  },
+  "venus_opposition_mars": {
+    "title": "Venus Opposite Mars",
+    "summary": "Creates intense strain and discordance between your desire for peace and your passions.",
+    "fullText": "This hard aspect pits your diplomatic needs against your fiery impulses. It often brings thrilling but highly volatile relationships, challenging you to reconcile deep romantic discontentment with aggressive sexual desires."
+  },
+  "venus_square_mars": {
+    "title": "Venus Square Mars",
+    "summary": "A stressful aspect causing impulsive, quarrelsome behavior in relationships.",
+    "fullText": "This challenging aspect brings severe friction between love and action. It places emotional obstacles in your path, forcing you to manage extreme hypersensitivity and overcome severe strain in your intimate partnerships."
+  },
+  "venus_trine_mars": {
+    "title": "Venus Trine Mars",
+    "summary": "A harmonious flow of warmth, enthusiasm, and romantic passion.",
+    "fullText": "This highly favorable aspect ensures your affections and your drive work together seamlessly. You possess innate sensuality, and your feelings of warmth and love are easily, naturally expressed to others."
+  },
+  "venus_sextile_mars": {
+    "title": "Venus Sextile Mars",
+    "summary": "Offers excellent opportunities to cultivate vibrant, exciting romantic connections.",
+    "fullText": "This favorable aspect links your aesthetic values with your courage. By taking the initiative, you can successfully balance your need for harmony with thrilling, passionate self-expression."
+  },
+  "venus_quincunx_mars": {
+    "title": "Venus Quincunx Mars",
+    "summary": "Requires continual, stressful adjustments between romance and personal drive.",
+    "fullText": "This minor but difficult aspect connects incompatible relational and aggressive energies. You may feel a persistent, uncomfortable strain where your need to please others is constantly interrupted by your own impatient, independent desires."
+  },
+  "venus_conjunction_jupiter": {
+    "title": "Venus Conjunct Jupiter",
+    "summary": "Fuses love with expansion, bringing massive generosity and good fortune.",
+    "fullText": "This aspect perfectly blends your affections with the planet of luck. It creates a powerful focal point for a joyous, dramatic love life, bringing immense charm, financial abundance, and a deeply optimistic spirit."
+  },
+  "venus_opposition_jupiter": {
+    "title": "Venus Opposite Jupiter",
+    "summary": "Creates strain between your values and the urge for boundless indulgence.",
+    "fullText": "This hard aspect pits your romantic security against a restless desire for more. It can indicate a tendency toward reckless financial or emotional extravagance, challenging you to ground your grand romantic ideals."
+  },
+  "venus_square_jupiter": {
+    "title": "Venus Square Jupiter",
+    "summary": "A stressful aspect that can lead to vanity, laziness, or blindly idealizing toxic partners.",
+    "fullText": "This challenging aspect causes friction between your capacity for love and your philosophical faith. It forces you to overcome a lack of boundaries and learn hard lessons about over-promising in your relationships."
+  },
+  "venus_trine_jupiter": {
+    "title": "Venus Trine Jupiter",
+    "summary": "A highly harmonious flow bringing beautiful partnerships and excellent money luck.",
+    "fullText": "This incredibly flowing aspect allows your affections and your growth to support each other effortlessly. You possess an innate grace that naturally attracts wealthy, beneficial alliances and profound romantic joy."
+  },
+  "venus_sextile_jupiter": {
+    "title": "Venus Sextile Jupiter",
+    "summary": "Offers wonderful opportunities for financial success and expansive love.",
+    "fullText": "This favorable aspect links your values with higher meaning. By putting effort into your social connections, you can easily cultivate a refined, globally-minded approach to romance and material abundance."
+  },
+  "venus_conjunction_saturn": {
+    "title": "Venus Conjunct Saturn",
+    "summary": "Fuses affection with strict duty, creating a cautious, extremely loyal heart.",
+    "fullText": "This conjunction ties your capacity for pleasure directly to the taskmaster planet. It brings intense emotional rigor, making you serious and steadfast in love, though you may struggle with feelings of inadequacy or coldness."
+  },
+  "venus_opposition_saturn": {
+    "title": "Venus Opposite Saturn",
+    "summary": "Creates severe strain between your desire for romance and rigid, limiting fears.",
+    "fullText": "This hard aspect pits your need for harmony against heavy, practical realities. It often manifests as painful rejections or attracting heavily burdened partners, challenging you to build unshakeable self-worth."
+  },
+  "venus_square_saturn": {
+    "title": "Venus Square Saturn",
+    "summary": "A highly challenging aspect causing relationship blockages, anxiety, and harsh self-criticism.",
+    "fullText": "This stressful aspect places formidable obstacles in your romantic life. It requires you to overcome a paralyzing fear of intimacy, forcing you to transform deep emotional insecurity into masterful, enduring loyalty."
+  },
+  "venus_trine_saturn": {
+    "title": "Venus Trine Saturn",
+    "summary": "A harmonious flow of disciplined love and excellent financial endurance.",
+    "fullText": "This easy aspect ensures your affections and your responsibilities work in perfect alignment. You possess innate practical devotion, a structured aesthetic sense, and the natural ability to build deeply secure partnerships."
+  },
+  "venus_sextile_saturn": {
+    "title": "Venus Sextile Saturn",
+    "summary": "Offers excellent opportunities to achieve romantic mastery through patient commitment.",
+    "fullText": "This favorable aspect brings a methodical approach to your relationships. By applying dedicated effort, you can successfully navigate the hard work required for true, lasting equality in marriage."
+  },
+  "venus_conjunction_uranus": {
+    "title": "Venus Conjunct Uranus",
+    "summary": "Fuses affection with radical innovation, creating a brilliant, erratic approach to love.",
+    "fullText": "This powerful aspect blends your romantic values with sudden flashes of independence. It creates a highly original, objective charm, though you may struggle with nervous tension or a terrifying need for personal space."
+  },
+  "venus_opposition_uranus": {
+    "title": "Venus Opposite Uranus",
+    "summary": "Creates intense, erratic strain between your partnerships and rebellious freedom.",
+    "fullText": "This hard aspect pits your intimate bonds against sudden, shocking disruptions. It often indicates highly unconventional relationships and a stubborn contrariness that challenges you to balance commitment with absolute autonomy."
+  },
+  "venus_square_uranus": {
+    "title": "Venus Square Uranus",
+    "summary": "A challenging aspect that brings high romantic anxiety and sudden, explosive severances.",
+    "fullText": "This stressful aspect causes severe friction in your love life. It places emotional obstacles in your path, forcing you to cope with exhausting restlessness and a tendency to flee when heavy emotional demands arise."
+  },
+  "venus_trine_uranus": {
+    "title": "Venus Trine Uranus",
+    "summary": "A harmonious flow of brilliant intuition and highly progressive, exciting romance.",
+    "fullText": "This easy aspect allows your heart to effortlessly process unconventional affection. You possess innate visionary charm, a quicksilver wit, and naturally attract unique, liberating relationships to your life."
+  },
+  "venus_sextile_uranus": {
+    "title": "Venus Sextile Uranus",
+    "summary": "Offers opportunities to revolutionize your values and share unique, egalitarian love.",
+    "fullText": "This favorable aspect connects your aesthetics with your originality. By making a conscious effort to break old relationship habits, you can successfully build beautifully independent and progressive alliances."
+  },
+  "venus_conjunction_neptune": {
+    "title": "Venus Conjunct Neptune",
+    "summary": "Fuses affection with mysticism, creating a highly poetic, unconditionally loving heart.",
+    "fullText": "This conjunction dissolves the strict boundaries of romance. It acts as a powerful focal point for immense artistic imagination and psychic sensitivity, though it can make grasping hard, factual truths about partners incredibly difficult."
+  },
+  "venus_opposition_neptune": {
+    "title": "Venus Opposite Neptune",
+    "summary": "Creates confusing strain between real partnerships and deceptive romantic illusions.",
+    "fullText": "This hard aspect pits your desire for harmony against emotional vagueness. It challenges you to navigate through a seductive fog, severe misunderstandings, and a desperate craving for a perfect, impossible soulmate."
+  },
+  "venus_square_neptune": {
+    "title": "Venus Square Neptune",
+    "summary": "A stressful aspect that can lead to toxic codependency and romantic self-deception.",
+    "fullText": "This challenging aspect causes intense friction between your values and your dreams. It places psychological obstacles in your path, requiring you to learn hard lessons about emotional boundaries and rescuing broken partners."
+  },
+  "venus_trine_neptune": {
+    "title": "Venus Trine Neptune",
+    "summary": "A harmonious flow of pure inspiration, exquisite beauty, and deep compassion.",
+    "fullText": "This flowing aspect allows your affections and your spiritual ideals to work together perfectly. You possess innate artistic or musical talent, absorbing love through profound feeling and communicating with gentle, healing grace."
+  },
+  "venus_sextile_neptune": {
+    "title": "Venus Sextile Neptune",
+    "summary": "Offers subtle opportunities for spiritual and deeply artistic romantic expression.",
+    "fullText": "This favorable aspect creates a gentle connection between your values and your intuition. By actively utilizing your sensitivity, you can successfully channel your vivid imagination into beautiful, harmonious relationships."
+  },
+  "venus_conjunction_pluto": {
+    "title": "Venus Conjunct Pluto",
+    "summary": "Fuses affection with absolute transformation, leading to a piercing, obsessive love.",
+    "fullText": "This intense aspect blends your values with the forces of death and rebirth. You possess a magnetically powerful, fiercely loyal heart that instantly sees through superficial romance, demanding absolute, soul-deep intimacy."
+  },
+  "venus_opposition_pluto": {
+    "title": "Venus Opposite Pluto",
+    "summary": "Creates terrifying romantic strain, power struggles, and psychological paranoia.",
+    "fullText": "This hard aspect pits your relationships directly against destructive or controlling forces. It indicates intense emotional confrontations and a tendency toward brooding jealousy that forces you to completely overhaul your approach to love."
+  },
+  "venus_square_pluto": {
+    "title": "Venus Square Pluto",
+    "summary": "A highly challenging aspect causing extreme romantic obsessions and ruthless possessiveness.",
+    "fullText": "This stressful aspect generates severe friction in your psyche. It brings unpleasant, sudden changes to your partnerships and requires you to overcome toxic sexual entanglements or the destructive urge to control your lovers."
+  },
+  "venus_trine_pluto": {
+    "title": "Venus Trine Pluto",
+    "summary": "A harmonious flow of intense emotional resilience and profound romantic insight.",
+    "fullText": "This easy aspect allows you to navigate complex psychological relationship mysteries with incredible ease. You possess naturally strong, deeply probing affections and an innate ability to heal others through profound bonding."
+  },
+  "venus_sextile_pluto": {
+    "title": "Venus Sextile Pluto",
+    "summary": "Offers powerful opportunities for romantic rebirth and uncovering hidden wealth.",
+    "fullText": "This favorable aspect connects your values with your regenerative power. By making a conscious effort to explore vulnerability, you can successfully transform your partnerships and gain immense, transformative intimacy."
+  },
+  "venus_conjunction_chiron": {
+    "title": "Venus Conjunct Chiron",
+    "summary": "Fuses affection with deep spiritual wounding and profound relational healing.",
+    "fullText": "This aspect ties your heart directly to the archetype of the Wounded Healer. Your sense of beauty and love is intensely linked to early relationship trauma, creating a focal point for brilliant, empathetic counseling."
+  },
+  "venus_opposition_chiron": {
+    "title": "Venus Opposite Chiron",
+    "summary": "Creates profound strain between your desire for peace and unhealed relational insecurities.",
+    "fullText": "This hard aspect places your partnerships in direct conflict with your spiritual wounds. You may experience discordance by constantly sacrificing your own identity to maintain peace, challenging you to assert your authentic boundaries."
+  },
+  "venus_square_chiron": {
+    "title": "Venus Square Chiron",
+    "summary": "A challenging aspect that forces you to confront a paralyzing fear of interpersonal conflict.",
+    "fullText": "This stressful aspect causes intense friction in your love life. It places obstacles in your path regarding self-worth, teaching you vital lessons about overcoming codependency and accepting your right to equal partnership."
+  },
+  "venus_trine_chiron": {
+    "title": "Venus Trine Chiron",
+    "summary": "A harmonious flow of healing love that naturally stabilizes your relationships.",
+    "fullText": "This easy aspect allows your affections to effortlessly integrate past betrayals. You possess an innate, flowing talent for restoring justice and bridging the deepest emotional gaps for those who are suffering."
+  },
+  "mars_conjunction_jupiter": {
+    "title": "Mars Conjunct Jupiter",
+    "summary": "Fuses aggressive drive with broad expansion, creating immense, optimistic energy.",
+    "fullText": "This aspect perfectly blends your willpower with the planet of luck. It creates a powerful focal point for an incredibly enthusiastic, adventurous spirit, making you a fiercely independent pioneer driven to conquer massive goals."
+  },
+  "mars_opposition_jupiter": {
+    "title": "Mars Opposite Jupiter",
+    "summary": "Creates strain between impulsive action and boundless philosophical ideals.",
+    "fullText": "This hard aspect pits your aggressive energy against sweeping, grandiose concepts. It can indicate a tendency toward brutal dogmatism or scattering your physical energy, challenging you to ground your restless crusades."
+  },
+  "mars_square_jupiter": {
+    "title": "Mars Square Jupiter",
+    "summary": "A stressful aspect that can bring tactless fanaticism or reckless physical gambling.",
+    "fullText": "This challenging aspect causes friction between your temper and your desire for growth. It places obstacles in your path, forcing you to overcome overconfidence and learn to direct your vast enthusiasm with practical discipline."
+  },
+  "mars_trine_jupiter": {
+    "title": "Mars Trine Jupiter",
+    "summary": "A highly harmonious flow of courageous optimism and broad, successful action.",
+    "fullText": "This flowing aspect allows your drive and philosophical faith to work together effortlessly. You possess innate athletic abilities, an honest, daring nature, and naturally attract good fortune through your bold, physical endeavors."
+  },
+  "mars_sextile_jupiter": {
+    "title": "Mars Sextile Jupiter",
+    "summary": "Offers wonderful opportunities for exploration, leadership, and expansive energy.",
+    "fullText": "This favorable aspect links your courage with higher knowledge. By putting effort into your actions, you can easily grasp complex physical challenges and successfully communicate your inspiring, optimistic vision to the world."
+  },
+  "mars_conjunction_saturn": {
+    "title": "Mars Conjunct Saturn",
+    "summary": "Fuses aggressive drive with strict discipline, creating a ruthless, organized ambition.",
+    "fullText": "This conjunction ties your raw passion directly to the taskmaster planet. It brings intense physical rigor, creating a highly organized, cautious, and authoritative general, though it may also induce severe frustration or repressed anger."
+  },
+  "mars_opposition_saturn": {
+    "title": "Mars Opposite Saturn",
+    "summary": "Creates severe strain between your impulsive actions and rigid, limiting structures.",
+    "fullText": "This hard aspect pits your fiery drive against heavy, practical realities. It often manifests as deep conflicts with authority or crushing external blockages, challenging you to build unshakeable patience and endurance."
+  },
+  "mars_square_saturn": {
+    "title": "Mars Square Saturn",
+    "summary": "A highly challenging aspect causing brutal blockages, anxiety, and harsh cruelty.",
+    "fullText": "This stressful aspect places formidable obstacles in front of your goals. It requires you to overcome a paralyzing fear of failure or deep-seated resentment, forcing you to transform raw anger into masterful, precise execution."
+  },
+  "mars_trine_saturn": {
+    "title": "Mars Trine Saturn",
+    "summary": "A harmonious flow of disciplined action and excellent physical concentration.",
+    "fullText": "This easy aspect ensures your drive and your responsibilities work in perfect alignment. You possess innate stamina, a highly structured approach to conflict, and the natural ability to engineer long-term success."
+  },
+  "mars_sextile_saturn": {
+    "title": "Mars Sextile Saturn",
+    "summary": "Offers excellent opportunities to achieve mastery through patient, grueling effort.",
+    "fullText": "This favorable aspect brings a methodical approach to your ambitions. By applying dedicated physical effort, you can successfully organize chaotic situations and act with profound, respected authority."
+  },
+  "mars_conjunction_uranus": {
+    "title": "Mars Conjunct Uranus",
+    "summary": "Fuses aggressive drive with radical innovation, creating explosive, erratic energy.",
+    "fullText": "This powerful aspect blends your willpower with sudden flashes of rebellion. It creates a highly original, fearless trailblazer capable of breaking the status quo, though you may struggle with shocking impatience or physical recklessness."
+  },
+  "mars_opposition_uranus": {
+    "title": "Mars Opposite Uranus",
+    "summary": "Creates intense, erratic strain between your actions and sudden, disruptive forces.",
+    "fullText": "This hard aspect pits your daily drive against shocking, uncontrollable upheavals. It often indicates highly unconventional tactics and a stubborn refusal to conform that challenges you to balance explosive anger with practical strategy."
+  },
+  "mars_square_uranus": {
+    "title": "Mars Square Uranus",
+    "summary": "A challenging aspect that brings high physical anxiety and sudden, violent outbursts.",
+    "fullText": "This stressful aspect causes severe friction in your nervous and muscular systems. It places dangerous obstacles in your path, forcing you to cope with exhausting restlessness and a tendency to destroy structures without a plan."
+  },
+  "mars_trine_uranus": {
+    "title": "Mars Trine Uranus",
+    "summary": "A harmonious flow of brilliant intuition and highly progressive, electrifying courage.",
+    "fullText": "This easy aspect allows your drive to effortlessly process complex, rapid changes. You possess innate visionary tactics, lightning-fast reflexes, and naturally engineer completely new, liberating paradigms for humanity."
+  },
+  "mars_sextile_uranus": {
+    "title": "Mars Sextile Uranus",
+    "summary": "Offers opportunities to revolutionize your actions and share unique physical insights.",
+    "fullText": "This favorable aspect connects your courage with your originality. By making a conscious effort to break old combative habits, you can successfully utilize your erratic genius for groundbreaking technological or social reform."
+  },
+  "mars_conjunction_neptune": {
+    "title": "Mars Conjunct Neptune",
+    "summary": "Fuses aggressive drive with mysticism, creating a highly poetic, evasive willpower.",
+    "fullText": "This conjunction dissolves the strict boundaries of your physical energy. It acts as a powerful focal point for immense artistic imagination and a desire to fight for the underdog, though it can make direct confrontation incredibly difficult."
+  },
+  "mars_opposition_neptune": {
+    "title": "Mars Opposite Neptune",
+    "summary": "Creates confusing strain between factual action and deceptive, draining illusions.",
+    "fullText": "This hard aspect pits your rational drive against emotional vagueness. It challenges you to navigate through a fog of hidden enemies, severe misunderstandings, and a susceptibility to becoming a victim of your own escapism."
+  },
+  "mars_square_neptune": {
+    "title": "Mars Square Neptune",
+    "summary": "A stressful aspect that can lead to chaotic actions and physical self-deception.",
+    "fullText": "This challenging aspect causes intense friction between your energy and your dreams. It places psychological obstacles in your path, requiring you to learn hard lessons about asserting boundaries and overcoming severe nervous exhaustion."
+  },
+  "mars_trine_neptune": {
+    "title": "Mars Trine Neptune",
+    "summary": "A harmonious flow of pure inspiration, poetic movement, and deep compassion.",
+    "fullText": "This flowing aspect allows your drive and your spiritual ideals to work together perfectly. You possess innate artistic or healing talent, absorbing energy through profound feeling and acting with gentle, miraculous grace."
+  },
+  "mars_sextile_neptune": {
+    "title": "Mars Sextile Neptune",
+    "summary": "Offers subtle opportunities for spiritual and artistic physical expression.",
+    "fullText": "This favorable aspect creates a gentle connection between your actions and your intuition. By actively utilizing your sensitivity, you can successfully channel your vivid imagination into beautiful, structured spiritual service."
+  },
+  "mars_conjunction_pluto": {
+    "title": "Mars Conjunct Pluto",
+    "summary": "Fuses aggressive drive with absolute transformation, leading to terrifying, obsessive willpower.",
+    "fullText": "This intense aspect blends your physical energy with the forces of death and rebirth. You possess a magnetically powerful, ruthless drive that instantly attacks superficial obstacles, often acting with devastating, absolute authority and resilience."
+  },
+  "mars_opposition_pluto": {
+    "title": "Mars Opposite Pluto",
+    "summary": "Creates terrifying physical strain, brutal power struggles, and psychological paranoia.",
+    "fullText": "This hard aspect pits your actions directly against destructive or controlling forces. It indicates intense, violent confrontations and a tendency toward deep-seated suspicion that forces you to completely overhaul your survival instincts."
+  },
+  "mars_square_pluto": {
+    "title": "Mars Square Pluto",
+    "summary": "A highly challenging aspect causing extreme physical obsessions and ruthless cruelty.",
+    "fullText": "This stressful aspect generates severe friction in your psyche. It brings unpleasant, sudden crises to your ambitions and requires you to overcome toxic power dynamics or the destructive urge to dominate your environment entirely."
+  },
+  "mars_trine_pluto": {
+    "title": "Mars Trine Pluto",
+    "summary": "A harmonious flow of intense physical resilience and profound strategic insight.",
+    "fullText": "This easy aspect allows you to navigate complex, dangerous situations with incredible ease. You possess naturally strong, deeply probing instincts and an innate ability to survive unimaginable extremes to achieve your ultimate goals."
+  },
+  "mars_sextile_pluto": {
+    "title": "Mars Sextile Pluto",
+    "summary": "Offers powerful opportunities for physical rebirth and strategic conquest.",
+    "fullText": "This favorable aspect connects your courage with your regenerative power. By making a conscious effort to face your fears, you can successfully transform your actions and gain immense, healing influence over your reality."
+  },
+  "mars_conjunction_chiron": {
+    "title": "Mars Conjunct Chiron",
+    "summary": "Fuses aggressive drive with deep spiritual wounding and profound teaching ability.",
+    "fullText": "This aspect ties your willpower directly to the archetype of the Wounded Healer. Your actions are intensely linked to an early fear of self-assertion, creating a focal point for brilliantly empowering others to find their true strength."
+  },
+  "mars_opposition_chiron": {
+    "title": "Mars Opposite Chiron",
+    "summary": "Creates profound strain between your courage and unhealed physical insecurities.",
+    "fullText": "This hard aspect places your daily actions in direct conflict with your spiritual wounds. You may experience discordance by projecting your lack of initiative onto others, challenging you to bravely acknowledge your right to exist."
+  },
+  "mars_square_chiron": {
+    "title": "Mars Square Chiron",
+    "summary": "A challenging aspect that forces you to confront a paralyzing fear of taking action.",
+    "fullText": "This stressful aspect causes intense friction in your physical life. It places obstacles in your path regarding your independence, teaching you vital lessons about overcoming reactive defensiveness and accepting your unique warrior spirit."
+  },
+  "mars_trine_chiron": {
+    "title": "Mars Trine Chiron",
+    "summary": "A harmonious flow of healing energy that naturally stabilizes your willpower.",
+    "fullText": "This easy aspect allows your drive to effortlessly integrate past traumas of inadequacy. You possess an innate, flowing talent for inspiring action and bridging the deepest physical gaps for those who feel powerless."
+  },
+  "jupiter_conjunction_saturn": {
+    "title": "Jupiter Conjunct Saturn",
+    "summary": "Fuses boundless expansion with strict limitation, creating profound, structured ambition.",
+    "fullText": "This powerful conjunction perfectly blends the planet of luck with the planet of karma. It creates a massive focal point for disciplined growth, requiring you to carefully engineer your grand philosophical ideals into workable, enduring societal structures."
+  },
+  "jupiter_opposition_saturn": {
+    "title": "Jupiter Opposite Saturn",
+    "summary": "Creates immense strain and polarity between optimism and harsh reality.",
+    "fullText": "This hard aspect pits your desire to expand directly against heavy, practical restrictions. It often manifests as a deep crisis of faith or financial blockages, challenging you to find the exact balance between risk and responsibility."
+  },
+  "jupiter_square_saturn": {
+    "title": "Jupiter Square Saturn",
+    "summary": "A highly stressful aspect causing friction between growth and duty.",
+    "fullText": "This challenging aspect brings severe internal conflict regarding your ambitions. It places formidable obstacles in your path, forcing you to overcome alternating periods of reckless over-expansion and crippling, pessimistic depression."
+  },
+  "jupiter_trine_saturn": {
+    "title": "Jupiter Trine Saturn",
+    "summary": "A harmonious flow of practical optimism and extremely reliable success.",
+    "fullText": "This highly favorable aspect ensures your vision and your discipline work together seamlessly. You possess innate executive ability, immense patience, and naturally build enduring, profitable empires without suffering chaotic setbacks."
+  },
+  "jupiter_sextile_saturn": {
+    "title": "Jupiter Sextile Saturn",
+    "summary": "Offers excellent opportunities to achieve long-term mastery through calculated risks.",
+    "fullText": "This favorable aspect links your faith with your realism. By taking calculated, disciplined initiative, you can successfully navigate complex societal rules and slowly but surely manifest your highest ideals."
+  },
+  "jupiter_conjunction_uranus": {
+    "title": "Jupiter Conjunct Uranus",
+    "summary": "Fuses expansion with sudden rebellion, creating a wildly progressive, visionary mind.",
+    "fullText": "This conjunction blends your optimism with the planet of sudden shock. It acts as a powerful focal point for radical humanitarian ideals, granting you an electrifying intuition and a relentless drive to shatter outdated philosophies."
+  },
+  "jupiter_opposition_uranus": {
+    "title": "Jupiter Opposite Uranus",
+    "summary": "Creates intense strain between your beliefs and erratic, revolutionary forces.",
+    "fullText": "This hard aspect pits your grand visions against sudden, uncontrollable disruptions. It often indicates a profound abhorrence of limitation and a dogmatic fanaticism that challenges you to ground your brilliant, sweeping ideas."
+  },
+  "jupiter_square_uranus": {
+    "title": "Jupiter Square Uranus",
+    "summary": "A challenging aspect that brings ideological tension and shocking, tactless behavior.",
+    "fullText": "This stressful aspect causes severe friction between your faith and your need for absolute freedom. It places obstacles in your educational path, forcing you to cope with exhausting restlessness and a tendency to completely abandon practical reality."
+  },
+  "jupiter_trine_uranus": {
+    "title": "Jupiter Trine Uranus",
+    "summary": "A harmonious flow of brilliant intuition and incredibly progressive luck.",
+    "fullText": "This easy aspect allows your broad mind to effortlessly process futuristic, abstract concepts. You possess innate prophetic talents, a fiercely independent spirit, and naturally attract completely new, liberating experiences."
+  },
+  "jupiter_sextile_uranus": {
+    "title": "Jupiter Sextile Uranus",
+    "summary": "Offers exciting opportunities to revolutionize your philosophy and share unique wisdom.",
+    "fullText": "This favorable aspect connects your optimism with your originality. By making a conscious effort to explore foreign concepts, you can successfully utilize your erratic genius to enlighten and liberate your community."
+  },
+  "jupiter_conjunction_neptune": {
+    "title": "Jupiter Conjunct Neptune",
+    "summary": "Fuses broad faith with boundless mysticism, creating a highly poetic, compassionate soul.",
+    "fullText": "This conjunction dissolves the strict boundaries of your ideology. It acts as a powerful focal point for immense artistic imagination, religious devotion, and a desperate yearning for a perfect, unconditionally loving universe."
+  },
+  "jupiter_opposition_neptune": {
+    "title": "Jupiter Opposite Neptune",
+    "summary": "Creates confusing strain between your grand beliefs and deceptive, draining illusions.",
+    "fullText": "This hard aspect pits your search for truth against emotional vagueness. It challenges you to navigate through a fog of blind dogmatism, deceptive gurus, and a terrifying inability to deal with mundane, everyday responsibilities."
+  },
+  "jupiter_square_neptune": {
+    "title": "Jupiter Square Neptune",
+    "summary": "A stressful aspect that can lead to chaotic fanaticism and severe self-deception.",
+    "fullText": "This challenging aspect causes intense friction between your optimism and your dreams. It places psychological obstacles in your path, requiring you to learn hard lessons about asserting boundaries and overcoming religious or financial escapism."
+  },
+  "jupiter_trine_neptune": {
+    "title": "Jupiter Trine Neptune",
+    "summary": "A harmonious flow of pure spiritual inspiration, poetic grace, and deep empathy.",
+    "fullText": "This flowing aspect allows your faith and your spiritual ideals to work together perfectly. You possess innate artistic or healing talent, absorbing universal truths through profound feeling and acting with gentle, miraculous generosity."
+  },
+  "jupiter_sextile_neptune": {
+    "title": "Jupiter Sextile Neptune",
+    "summary": "Offers subtle opportunities for spiritual, philosophical, and artistic expression.",
+    "fullText": "This favorable aspect creates a gentle connection between your optimism and your intuition. By actively utilizing your sensitivity, you can successfully channel your vivid imagination into beautiful, sweeping global ideologies."
+  },
+  "jupiter_conjunction_pluto": {
+    "title": "Jupiter Conjunct Pluto",
+    "summary": "Fuses expansion with absolute transformation, leading to terrifying, obsessive ambitions.",
+    "fullText": "This intense aspect blends your philosophical drive with the forces of death and rebirth. You possess a magnetically powerful, ruthless optimism that instantly attacks superficial obstacles, often pushing you toward immense wealth or power."
+  },
+  "jupiter_opposition_pluto": {
+    "title": "Jupiter Opposite Pluto",
+    "summary": "Creates terrifying philosophical strain, brutal power struggles, and ideological paranoia.",
+    "fullText": "This hard aspect pits your expansive visions directly against destructive or controlling forces. It indicates intense, violent ideological confrontations and a tendency toward deep-seated dogmatism that forces you to completely overhaul your belief systems."
+  },
+  "jupiter_square_pluto": {
+    "title": "Jupiter Square Pluto",
+    "summary": "A highly challenging aspect causing extreme obsessive beliefs and ruthless fanaticism.",
+    "fullText": "This stressful aspect generates severe friction in your psyche. It brings unpleasant, sudden crises to your worldview and requires you to overcome toxic power dynamics or the destructive urge to force your absolute truth onto others."
+  },
+  "jupiter_trine_pluto": {
+    "title": "Jupiter Trine Pluto",
+    "summary": "A harmonious flow of intense philosophical resilience and profound regenerative wealth.",
+    "fullText": "This easy aspect allows you to navigate complex, transformative global shifts with incredible ease. You possess naturally strong, deeply probing instincts and an innate ability to rebuild massive empires or belief systems from the ashes."
+  },
+  "jupiter_sextile_pluto": {
+    "title": "Jupiter Sextile Pluto",
+    "summary": "Offers powerful opportunities for ideological rebirth and strategic expansion.",
+    "fullText": "This favorable aspect connects your optimism with your regenerative power. By making a conscious effort to face your deepest fears, you can successfully transform your philosophy and gain immense, healing influence over your reality."
+  },
+  "jupiter_conjunction_chiron": {
+    "title": "Jupiter Conjunct Chiron",
+    "summary": "Fuses broad faith with deep spiritual wounding, creating a profound, empathetic teacher.",
+    "fullText": "This aspect ties your optimism directly to the archetype of the Wounded Healer. Your beliefs are intensely linked to an early crisis of faith, creating a focal point for brilliantly guiding others toward genuine, hard-won wisdom."
+  },
+  "jupiter_opposition_chiron": {
+    "title": "Jupiter Opposite Chiron",
+    "summary": "Creates profound strain between your expansive vision and unhealed existential despair.",
+    "fullText": "This hard aspect places your grand philosophy in direct conflict with your spiritual wounds. You may experience discordance by projecting your dogmatism onto others to quiet your own doubts, challenging you to embrace an evolving journey."
+  },
+  "jupiter_square_chiron": {
+    "title": "Jupiter Square Chiron",
+    "summary": "A challenging aspect that forces you to confront a paralyzing lack of universal meaning.",
+    "fullText": "This stressful aspect causes intense friction in your ideological life. It places obstacles in your path regarding your faith, teaching you vital lessons about overcoming cynical atheism or intolerant fanaticism to find true inner peace."
+  },
+  "jupiter_trine_chiron": {
+    "title": "Jupiter Trine Chiron",
+    "summary": "A harmonious flow of healing energy that naturally stabilizes your sweeping faith.",
+    "fullText": "This easy aspect allows your optimism to effortlessly integrate past philosophical traumas. You possess an innate, flowing talent for inspiring higher education and bridging the deepest existential gaps for those who feel lost."
+  },
+  "saturn_conjunction_uranus": {
+    "title": "Saturn Conjunct Uranus",
+    "summary": "Fuses strict limitation with radical rebellion, creating immense, erratic structural tension.",
+    "fullText": "This generational conjunction perfectly blends the planet of karma with the planet of shock. It acts as a powerful focal point for tearing down corrupt, outdated hierarchies to build entirely new, highly efficient, and technologically advanced systems of power."
+  },
+  "saturn_opposition_uranus": {
+    "title": "Saturn Opposite Uranus",
+    "summary": "Creates intense strain and discordance between heavy traditions and absolute freedom.",
+    "fullText": "This hard aspect pits your need for security directly against sudden, uncontrollable disruptions. It often brings thrilling but highly volatile clashes with authority, challenging you to reconcile deep conservatism with an explosive urge to rebel."
+  },
+  "saturn_square_uranus": {
+    "title": "Saturn Square Uranus",
+    "summary": "A highly stressful aspect causing sudden crashes of status and severe internal anxiety.",
+    "fullText": "This challenging aspect brings severe friction between structure and revolution. It places formidable obstacles in your path, forcing you to manage extreme, erratic physical tension and overcome spectacular, unexpected downfalls from grace."
+  },
+  "saturn_trine_uranus": {
+    "title": "Saturn Trine Uranus",
+    "summary": "A harmonious flow of brilliant, progressive discipline and enduring technological innovation.",
+    "fullText": "This highly favorable aspect ensures your responsibilities and your originality work together seamlessly. You possess an innate, calculating executive genius, capable of manifesting radical reforms safely in the physical world without destroying your foundations."
+  },
+  "saturn_sextile_uranus": {
+    "title": "Saturn Sextile Uranus",
+    "summary": "Offers excellent opportunities to cultivate vibrant, structural changes.",
+    "fullText": "This favorable aspect links your discipline with your futuristic vision. By taking the initiative, you can successfully balance your need for order with thrilling, progressive social or scientific advancements."
+  },
+  "saturn_conjunction_neptune": {
+    "title": "Saturn Conjunct Neptune",
+    "summary": "Fuses strict duty with boundless mysticism, creating structured compassion or crippling fear.",
+    "fullText": "This conjunction dissolves the strict boundaries of your ambitions. It acts as a powerful focal point for giving practical form to the ethereal, though it can easily induce a paralyzing, irrational anxiety of being overwhelmed by the suffering of the world."
+  },
+  "saturn_opposition_neptune": {
+    "title": "Saturn Opposite Neptune",
+    "summary": "Creates severe strain between harsh reality and deceptive, draining illusions.",
+    "fullText": "This hard aspect pits your discipline against emotional vagueness. It challenges you to navigate through a fog of deep-seated cynicism, severe self-doubt, and a terrifying fear that all worldly effort is ultimately meaningless."
+  },
+  "saturn_square_neptune": {
+    "title": "Saturn Square Neptune",
+    "summary": "A stressful aspect that can lead to chaotic responsibilities and psychological martyrdom.",
+    "fullText": "This challenging aspect causes intense friction between your duties and your dreams. It places psychological obstacles in your path, requiring you to learn hard lessons about asserting boundaries and overcoming hidden fears and victimhood."
+  },
+  "saturn_trine_neptune": {
+    "title": "Saturn Trine Neptune",
+    "summary": "A harmonious flow of practical empathy, structured art, and deep spiritual service.",
+    "fullText": "This flowing aspect allows your discipline and your spiritual ideals to work together perfectly. You possess innate artistic or healing talent, absorbing pain through profound feeling and acting with highly organized, miraculous grace."
+  },
+  "saturn_sextile_neptune": {
+    "title": "Saturn Sextile Neptune",
+    "summary": "Offers subtle opportunities for spiritual and artistic structural expression.",
+    "fullText": "This favorable aspect creates a gentle connection between your karma and your intuition. By actively utilizing your sensitivity, you can successfully channel your vivid imagination into beautiful, enduring, and pragmatic compassion."
+  },
+  "saturn_conjunction_pluto": {
+    "title": "Saturn Conjunct Pluto",
+    "summary": "Fuses strict limitation with absolute transformation, leading to terrifying, obsessive endurance.",
+    "fullText": "This intense aspect blends your karma with the forces of death and rebirth. You possess a magnetically powerful, ruthless stamina that instantly attacks superficial obstacles, often acting with devastating, cold, and unstoppable executive efficiency."
+  },
+  "saturn_opposition_pluto": {
+    "title": "Saturn Opposite Pluto",
+    "summary": "Creates terrifying structural strain, brutal power struggles, and psychological paranoia.",
+    "fullText": "This hard aspect pits your duties directly against destructive or controlling forces. It indicates intense, violent confrontations with elite traditions and a tendency toward deep-seated suspicion that forces you to completely overhaul your worldly ambitions."
+  },
+  "saturn_square_pluto": {
+    "title": "Saturn Square Pluto",
+    "summary": "A highly challenging aspect causing extreme material obsessions and ruthless cruelty.",
+    "fullText": "This stressful aspect generates severe friction in your psyche. It brings unpleasant, sudden crises to your status and requires you to overcome toxic power dynamics or the destructive urge to dominate the global economy entirely."
+  },
+  "saturn_trine_pluto": {
+    "title": "Saturn Trine Pluto",
+    "summary": "A harmonious flow of intense physical resilience and profound structural insight.",
+    "fullText": "This easy aspect allows you to navigate complex, dangerous power shifts with incredible ease. You possess naturally strong, deeply probing instincts and an innate ability to survive unimaginable extremes to build enduring empires."
+  },
+  "saturn_sextile_pluto": {
+    "title": "Saturn Sextile Pluto",
+    "summary": "Offers powerful opportunities for material rebirth and strategic conquest.",
+    "fullText": "This favorable aspect connects your discipline with your regenerative power. By making a conscious effort to face your deepest fears, you can successfully transform your ambitions and gain immense, healing influence over society."
+  },
+  "saturn_conjunction_chiron": {
+    "title": "Saturn Conjunct Chiron",
+    "summary": "Fuses strict limitation with deep spiritual wounding and profound, structured teaching.",
+    "fullText": "This aspect ties your karma directly to the archetype of the Wounded Healer. Your duties are intensely linked to an early burden of responsibility, creating a focal point for brilliantly empowering others to find true, internal authority."
+  },
+  "saturn_opposition_chiron": {
+    "title": "Saturn Opposite Chiron",
+    "summary": "Creates profound strain between your ambitions and unhealed feelings of inadequacy.",
+    "fullText": "This hard aspect places your worldly status in direct conflict with your spiritual wounds. You may experience discordance by projecting your fear of failure onto others, challenging you to decouple personal worth from external achievement."
+  },
+  "saturn_square_chiron": {
+    "title": "Saturn Square Chiron",
+    "summary": "A challenging aspect that forces you to confront a paralyzing fear of responsibility.",
+    "fullText": "This stressful aspect causes intense friction in your professional life. It places obstacles in your path regarding your career, teaching you vital lessons about overcoming a ruthless obsession with success and accepting your own limitations."
+  },
+  "saturn_trine_chiron": {
+    "title": "Saturn Trine Chiron",
+    "summary": "A harmonious flow of healing energy that naturally stabilizes your worldly ambitions.",
+    "fullText": "This easy aspect allows your discipline to effortlessly integrate past traumas of inadequacy. You possess an innate, flowing talent for inspiring leadership and bridging the deepest structural gaps for those who feel crushed by duty."
+  },
+  "uranus_conjunction_neptune": {
+    "title": "Uranus Conjunct Neptune",
+    "summary": "Fuses radical innovation with mysticism, creating a highly prophetic, eccentric visionary.",
+    "fullText": "This generational conjunction (occurring roughly every 171 years) dissolves the strict boundaries of reality. It acts as a powerful focal point for immense artistic imagination, bizarre scientific exploration, and a deep yearning for a highly unconventional, utopian universe."
+  },
+  "uranus_opposition_neptune": {
+    "title": "Uranus Opposite Neptune",
+    "summary": "Creates confusing strain between electrifying change and deceptive, draining illusions.",
+    "fullText": "This hard aspect pits your rebellious urge for freedom against emotional vagueness. It challenges you to navigate through a fog of erratic escapism, severe mass delusion, and a terrifying inability to ground your spiritual awakenings."
+  },
+  "uranus_square_neptune": {
+    "title": "Uranus Square Neptune",
+    "summary": "A stressful aspect that can lead to chaotic fanaticism and severe nervous exhaustion.",
+    "fullText": "This challenging aspect causes intense friction between your originality and your dreams. It places psychological obstacles in your path, requiring you to learn hard lessons about asserting boundaries and overcoming dangerous political or religious illusions."
+  },
+  "uranus_trine_neptune": {
+    "title": "Uranus Trine Neptune",
+    "summary": "A harmonious flow of pure spiritual inspiration, prophetic brilliance, and deep empathy.",
+    "fullText": "This flowing aspect allows your genius and your spiritual ideals to work together perfectly. You possess innate artistic or musical talent, absorbing universal truths through profound intuition and acting with highly progressive, miraculous compassion."
+  },
+  "uranus_sextile_neptune": {
+    "title": "Uranus Sextile Neptune",
+    "summary": "Offers subtle opportunities for spiritual, technological, and artistic expression.",
+    "fullText": "This favorable aspect creates a gentle connection between your eccentricity and your intuition. By actively utilizing your sensitivity, you can successfully channel your vivid imagination into beautiful, sweeping humanitarian reforms."
+  },
+  "uranus_conjunction_pluto": {
+    "title": "Uranus Conjunct Pluto",
+    "summary": "Fuses radical change with absolute transformation, leading to terrifying, explosive revolutions.",
+    "fullText": "This intense generational aspect (occurring roughly every 115 years) blends your urge for freedom with the forces of death and rebirth. You possess a magnetically powerful, ruthless independence that instantly attacks the status quo, often acting with devastating, absolute rebellion."
+  },
+  "uranus_opposition_pluto": {
+    "title": "Uranus Opposite Pluto",
+    "summary": "Creates terrifying societal strain, brutal power struggles, and explosive paranoia.",
+    "fullText": "This hard aspect pits your progressive visions directly against destructive or controlling forces. It indicates intense, violent ideological confrontations and a tendency toward deep-seated radicalism that forces society to completely overhaul its understanding of power."
+  },
+  "uranus_square_pluto": {
+    "title": "Uranus Square Pluto",
+    "summary": "A highly challenging aspect causing extreme obsessive beliefs and ruthless technological destruction.",
+    "fullText": "This stressful aspect generates severe friction in the collective psyche. It brings unpleasant, sudden crises to the world order and requires humanity to overcome toxic scientific atrocities or the destructive urge to shatter society entirely."
+  },
+  "uranus_trine_pluto": {
+    "title": "Uranus Trine Pluto",
+    "summary": "A harmonious flow of intense visionary resilience and profound regenerative reform.",
+    "fullText": "This easy aspect allows you to navigate complex, transformative global shifts with incredible ease. You possess naturally strong, deeply probing progressive instincts and an innate ability to rebuild advanced, egalitarian societies from the ashes."
+  },
+  "uranus_sextile_pluto": {
+    "title": "Uranus Sextile Pluto",
+    "summary": "Offers powerful opportunities for societal rebirth and strategic scientific expansion.",
+    "fullText": "This favorable aspect connects your originality with your regenerative power. By making a conscious effort to face collective fears, you can successfully transform technology and gain immense, liberating influence over the future."
+  },
+  "uranus_conjunction_chiron": {
+    "title": "Uranus Conjunct Chiron",
+    "summary": "Fuses radical innovation with deep spiritual wounding, creating a brilliant, eccentric healer.",
+    "fullText": "This aspect ties your originality directly to the archetype of the Wounded Healer. Your genius is intensely linked to an early feeling of alienation, creating a focal point for brilliantly guiding others toward genuine, unconventional acceptance."
+  },
+  "uranus_opposition_chiron": {
+    "title": "Uranus Opposite Chiron",
+    "summary": "Creates profound strain between your progressive vision and unhealed social isolation.",
+    "fullText": "This hard aspect places your absolute independence in direct conflict with your spiritual wounds. You may experience discordance by projecting your eccentricities onto others to quiet your own loneliness, challenging you to embrace true belonging."
+  },
+  "uranus_square_chiron": {
+    "title": "Uranus Square Chiron",
+    "summary": "A challenging aspect that forces you to confront a paralyzing fear of rejection.",
+    "fullText": "This stressful aspect causes intense friction in your social life. It places obstacles in your path regarding your friendships, teaching you vital lessons about overcoming aggressive rebellion or desperate conformity to find your true tribe."
+  },
+  "uranus_trine_chiron": {
+    "title": "Uranus Trine Chiron",
+    "summary": "A harmonious flow of healing energy that naturally stabilizes your eccentric genius.",
+    "fullText": "This easy aspect allows your originality to effortlessly integrate past social traumas. You possess an innate, flowing talent for inspiring humanitarian networks and bridging the deepest existential gaps for those who feel like outsiders."
+  },
+  "neptune_conjunction_pluto": {
+    "title": "Neptune Conjunct Pluto",
+    "summary": "Fuses mysticism with absolute transformation, leading to profound, terrifying psychic depth.",
+    "fullText": "This incredibly rare generational aspect blends the collective unconscious with the forces of death and rebirth. It acts as a focal point for immense spiritual regeneration, uncovering the darkest occult secrets and dissolving the ultimate taboos of existence."
+  },
+  "neptune_opposition_pluto": {
+    "title": "Neptune Opposite Pluto",
+    "summary": "Creates terrifying spiritual strain, brutal psychological struggles, and mass paranoia.",
+    "fullText": "This hard aspect pits your boundless empathy directly against destructive or controlling forces. It indicates intense, violent occult confrontations and a tendency toward deep-seated mass delusion that forces humanity to completely overhaul its connection to the divine."
+  },
+  "neptune_square_pluto": {
+    "title": "Neptune Square Pluto",
+    "summary": "A highly challenging aspect causing extreme obsessive fantasies and ruthless spiritual destruction.",
+    "fullText": "This stressful aspect generates severe friction in the collective soul. It brings unpleasant, sudden crises to the spiritual order and requires society to overcome toxic sexual or financial deception and the destructive urge to dominate the unknown."
+  },
+  "neptune_trine_pluto": {
+    "title": "Neptune Trine Pluto",
+    "summary": "A harmonious flow of intense psychic resilience and profound regenerative healing.",
+    "fullText": "This easy aspect allows you to navigate complex, transformative occult mysteries with incredible ease. You possess naturally strong, deeply probing mystical instincts and an innate ability to rebuild shattered psyches from the ashes."
+  },
+  "neptune_sextile_pluto": {
+    "title": "Neptune Sextile Pluto",
+    "summary": "Offers powerful opportunities for spiritual rebirth and uncovering hidden mystical wealth.",
+    "fullText": "This favorable aspect connects your compassion with your regenerative power. By making a conscious effort to face your deepest fears, you can successfully transform your intuition and gain immense, purifying influence over reality."
+  },
+  "neptune_conjunction_chiron": {
+    "title": "Neptune Conjunct Chiron",
+    "summary": "Fuses mysticism with deep spiritual wounding, creating a profoundly empathetic, sacrificial healer.",
+    "fullText": "This aspect ties your boundless empathy directly to the archetype of the Wounded Healer. Your dreams are intensely linked to an early feeling of universal sorrow, creating a focal point for brilliantly guiding others toward divine grace."
+  },
+  "neptune_opposition_chiron": {
+    "title": "Neptune Opposite Chiron",
+    "summary": "Creates profound strain between your spiritual ideals and unhealed emotional boundaries.",
+    "fullText": "This hard aspect places your absolute compassion in direct conflict with your spiritual wounds. You may experience discordance by absorbing the pain of others to quiet your own grief, challenging you to embrace psychological grounding."
+  },
+  "neptune_square_chiron": {
+    "title": "Neptune Square Chiron",
+    "summary": "A challenging aspect that forces you to confront a paralyzing fear of worldly suffering.",
+    "fullText": "This stressful aspect causes intense friction in your spiritual life. It places obstacles in your path regarding your boundaries, teaching you vital lessons about overcoming severe escapism, addiction, or a chronic martyr complex."
+  },
+  "neptune_trine_chiron": {
+    "title": "Neptune Trine Chiron",
+    "summary": "A harmonious flow of healing energy that naturally stabilizes your mystical empathy.",
+    "fullText": "This easy aspect allows your imagination to effortlessly integrate past collective traumas. You possess an innate, flowing talent for inspiring divine compassion and bridging the deepest existential gaps for those who feel completely lost."
+  },
+  "pluto_conjunction_chiron": {
+    "title": "Pluto Conjunct Chiron",
+    "summary": "Fuses absolute transformation with deep spiritual wounding, creating a terrifyingly resilient healer.",
+    "fullText": "This aspect ties your regenerative power directly to the archetype of the Wounded Healer. Your survival instincts are intensely linked to early betrayal or trauma, creating a focal point for brilliantly guiding others through ultimate psychological rebirth."
+  },
+  "pluto_opposition_chiron": {
+    "title": "Pluto Opposite Chiron",
+    "summary": "Creates profound strain between your need for control and unhealed psychological terror.",
+    "fullText": "This hard aspect places your absolute power in direct conflict with your spiritual wounds. You may experience discordance by projecting your paranoia onto others to quiet your own fears, challenging you to embrace complete vulnerability."
+  },
+  "pluto_square_chiron": {
+    "title": "Pluto Square Chiron",
+    "summary": "A challenging aspect that forces you to confront a paralyzing fear of betrayal or death.",
+    "fullText": "This stressful aspect causes intense friction in your psychological life. It places obstacles in your path regarding your trust, teaching you vital lessons about overcoming destructive obsession, vindictiveness, and the urge to dominate your intimate partners."
+  },
+  "pluto_trine_chiron": {
+    "title": "Pluto Trine Chiron",
+    "summary": "A harmonious flow of healing energy that naturally stabilizes your profound regenerative power.",
+    "fullText": "This easy aspect allows your survival instincts to effortlessly integrate past psychological traumas. You possess an innate, flowing talent for inspiring ultimate transformation and bridging the deepest existential gaps for those who feel emotionally destroyed."
+  },
+  "sun_sextile_chiron": {
+    "title": "Sun Sextile Chiron",
+    "summary": "Opportunity to integrate the core identity with the wounded healer's gift.",
+    "fullText": "The sextile between Sun and Chiron offers a workable channel between who you are and where you have been hurt. Identity is not defined by the wound, but the wound becomes usable material — often the basis of a vocation in which your own history qualifies you to help. The aspect requires deliberate effort; it opens a door rather than pushing you through it."
+  },
+  "moon_sextile_chiron": {
+    "title": "Moon Sextile Chiron",
+    "summary": "A gentle opening between emotional life and the capacity to heal others.",
+    "fullText": "Feelings and old injury sit at a productive angle here. You register other people's pain accurately without being flooded by it, which makes you unusually useful in situations of distress. The opportunity is to let emotional memory inform care rather than dictate mood. Left unused, it simply remains latent sensitivity."
+  },
+  "mercury_sextile_chiron": {
+    "title": "Mercury Sextile Chiron",
+    "summary": "The ability to put difficult experience into words that help others.",
+    "fullText": "This aspect connects thought and articulation to the place where you were wounded, producing a real talent for describing pain precisely — in conversation, teaching, writing, or counsel. What was inarticulate becomes communicable. The effort required is willingness to speak about the injury at all; the aspect rewards that choice rather than forcing it."
+  },
+  "venus_sextile_chiron": {
+    "title": "Venus Sextile Chiron",
+    "summary": "Relationship and creative work opened as routes to repair.",
+    "fullText": "Venus sextile Chiron offers healing through connection and through making things. Affection given and received acts on old injury without either party needing to name the process, and creative work frequently carries the same function. The aspect inclines you toward partners and friendships in which vulnerability is workable rather than dangerous."
+  },
+  "mars_sextile_chiron": {
+    "title": "Mars Sextile Chiron",
+    "summary": "Constructive action available as the answer to old injury.",
+    "fullText": "Here the drive to act finds a productive angle to the wound, so that effort becomes remedial rather than merely compensatory. You can fight for causes connected to your own history without the fight being purely a re-enactment. The opportunity is deliberate, applied courage; the aspect does not supply the initiative, only the opening."
+  },
+  "jupiter_sextile_chiron": {
+    "title": "Jupiter Sextile Chiron",
+    "summary": "Meaning and perspective offered as the frame that makes the wound bearable.",
+    "fullText": "Jupiter sextile Chiron makes it possible to place personal injury inside a larger philosophical or spiritual account, which is often what converts pain into something teachable. Generosity increases as a direct result of what you have survived. The risk of the easy aspect is complacent explanation rather than genuine integration."
+  },
+  "saturn_sextile_chiron": {
+    "title": "Saturn Sextile Chiron",
+    "summary": "Patient structure made available for the long work of repair.",
+    "fullText": "This aspect supplies discipline and realistic timeframes to healing that cannot be rushed. You are able to build durable practices — routines, commitments, professional structures — that hold the wound steadily rather than resolving it dramatically. Slow, unglamorous, and genuinely effective when the effort is actually made."
+  },
+  "uranus_sextile_chiron": {
+    "title": "Uranus Sextile Chiron",
+    "summary": "Unconventional approaches opened toward what conventional means could not reach.",
+    "fullText": "Uranus sextile Chiron favours the unorthodox remedy: the method, community, or insight arrived at sideways rather than through established channels. Sudden reframings can relieve long-standing injury. The aspect asks you to try the approach others consider improbable, and rewards experiment over orthodoxy."
+  },
+  "neptune_sextile_chiron": {
+    "title": "Neptune Sextile Chiron",
+    "summary": "Compassion and imagination offered as instruments of healing.",
+    "fullText": "Here the boundary between your own pain and others' becomes usefully porous rather than dissolving entirely. Art, music, contemplative practice, and straightforward mercy all become available as means of repair. The caution is that Neptune can substitute consolation for change; the sextile works when the softness is paired with something concrete."
+  },
+  "pluto_sextile_chiron": {
+    "title": "Pluto Sextile Chiron",
+    "summary": "Access to deep transformation of what was injured.",
+    "fullText": "Pluto sextile Chiron offers a workable route into material most people cannot face directly, allowing genuine reconstruction rather than management. You can go to the root of an old injury and survive the descent. The opportunity is real depth work, undertaken by choice rather than forced by crisis."
+  }
+}

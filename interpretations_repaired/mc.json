@@ -1,0 +1,117 @@
+{
+  "mc_aries": {
+    "title": "MC in Aries",
+    "summary": "A public identity built on initiative, courage, and going first.",
+    "fullText": "With Aries on the Midheaven the world sees a starter — someone who moves before consensus and is willing to take the first risk. Reputation is made through decisive action and lost through impatience. Career satisfaction requires genuine autonomy; roles that demand waiting for permission will not hold this person long."
+  },
+  "mc_taurus": {
+    "title": "MC in Taurus",
+    "summary": "A public identity built on steadiness, quality, and tangible results.",
+    "fullText": "Taurus on the Midheaven projects reliability. Advancement comes slowly and holds, and the reputation earned is one of substance rather than flash. There is strong attraction to work with material outcomes — land, money, craft, food, sound. The liability is inertia: staying too long in a position that has stopped growing."
+  },
+  "mc_gemini": {
+    "title": "MC in Gemini",
+    "summary": "A public identity built on communication, versatility, and information.",
+    "fullText": "Gemini on the Midheaven presents someone quick, articulate, and plural — often visibly doing several things at once. Careers involving writing, teaching, brokering, or translating suit this placement. Reputation rests on being interesting and current; the risk is being thought clever rather than substantial."
+  },
+  "mc_cancer": {
+    "title": "MC in Cancer",
+    "summary": "A public identity built on care, protection, and emotional intelligence.",
+    "fullText": "With Cancer on the Midheaven the professional face is nurturing, and others instinctively bring their needs to it. Work connected to home, family, food, history, or care fits naturally. The private and public spheres blur more than most, and the challenge is maintaining boundaries where the vocation is itself a form of mothering."
+  },
+  "mc_leo": {
+    "title": "MC in Leo",
+    "summary": "A public identity built on visibility, creativity, and personal authority.",
+    "fullText": "Leo on the Midheaven wants to be seen, and generally is. There is real talent for occupying centre stage and for lending warmth to whatever is led. Recognition matters genuinely, not merely vainly — this placement does its best work when appreciated. The risk is requiring an audience in order to function."
+  },
+  "mc_virgo": {
+    "title": "MC in Virgo",
+    "summary": "A public identity built on competence, precision, and useful service.",
+    "fullText": "Virgo on the Midheaven earns standing through demonstrable skill and attention to what others overlook. Craft, analysis, health, editing, and systems work all suit it. Reputation is built quietly and reliably. The characteristic difficulty is undervaluing the contribution and waiting to be noticed rather than claiming ground."
+  },
+  "mc_libra": {
+    "title": "MC in Libra",
+    "summary": "A public identity built on fairness, diplomacy, and relationship.",
+    "fullText": "With Libra on the Midheaven the professional gift is mediation — the capacity to hold opposing parties in the same room. Work in law, design, negotiation, or partnership suits it well. Reputation depends on being seen as even-handed, which creates real pressure to avoid necessary conflict and to defer decisions too long."
+  },
+  "mc_scorpio": {
+    "title": "MC in Scorpio",
+    "summary": "A public identity built on depth, intensity, and the handling of hidden things.",
+    "fullText": "Scorpio on the Midheaven projects gravity; people sense that this person can be trusted with what is difficult. Research, therapy, finance, investigation, and crisis work all fit. Career often proceeds through periods of complete reinvention. Power dynamics are an unavoidable theme and must be handled consciously."
+  },
+  "mc_sagittarius": {
+    "title": "MC in Sagittarius",
+    "summary": "A public identity built on breadth, conviction, and the search for meaning.",
+    "fullText": "Sagittarius on the Midheaven presents a teacher, traveller, or advocate — someone whose professional face is bound up with belief. Work involving distance, higher learning, publishing, or persuasion suits it. Reputation rests on vision and honesty; the risk is promising a larger horizon than can actually be delivered."
+  },
+  "mc_capricorn": {
+    "title": "MC in Capricorn",
+    "summary": "A public identity built on authority, structure, and the long climb.",
+    "fullText": "Capricorn on the Midheaven is the most straightforwardly career-identified placement. Ambition is real, patient, and structural, and standing accrues over decades rather than seasons. Institutional work suits it. The cost is that identity can become wholly occupational, leaving little that is not measured by achievement."
+  },
+  "mc_aquarius": {
+    "title": "MC in Aquarius",
+    "summary": "A public identity built on originality, principle, and collective concern.",
+    "fullText": "Aquarius on the Midheaven marks the professional outsider — the one whose contribution is precisely that they do not think as the field thinks. Technology, reform, science, and group organisation suit it. Reputation is for independence, sometimes for difficulty. Conventional advancement matters less than being right."
+  },
+  "mc_pisces": {
+    "title": "MC in Pisces",
+    "summary": "A public identity built on imagination, compassion, and permeability.",
+    "fullText": "With Pisces on the Midheaven the professional face is soft-edged and hard to pin down, which can read as mystery or as vagueness depending on context. Art, healing, spiritual work, and service to the vulnerable all fit. The essential task is structure: this placement supplies vision abundantly and definition scarcely."
+  },
+  "sun_conjunct_mc": {
+    "title": "Sun Conjunct Midheaven (MC)",
+    "summary": "The core identity fused with public standing and vocation.",
+    "fullText": "Sun conjunct the Midheaven puts the essential self at the top of the chart, where it cannot be hidden. Career is not merely what this person does but a genuine expression of who they are, and recognition functions almost as a necessity rather than a vanity. Authority comes naturally. The difficulty is that self-worth becomes hard to separate from achievement."
+  },
+  "moon_conjunct_mc": {
+    "title": "Moon Conjunct Midheaven (MC)",
+    "summary": "Public life shaped by emotional need and an instinct for what people want.",
+    "fullText": "The Moon on the Midheaven produces an unusually responsive public presence and a real talent for sensing the mood of an audience or organisation. Career often involves the public directly, and frequently shifts as emotional needs change. Standing feels changeable, and the native may be perceived very differently by different people."
+  },
+  "mercury_conjunct_mc": {
+    "title": "Mercury Conjunct Midheaven (MC)",
+    "summary": "A vocation built on thinking, speaking, and moving information.",
+    "fullText": "Mercury conjunct the Midheaven marks the professional communicator — writer, teacher, analyst, negotiator, broker. Reputation is intellectual, and the mind is visibly the instrument of the career. There is often more than one occupation across a life, and restlessness is a genuine occupational hazard."
+  },
+  "venus_conjunct_mc": {
+    "title": "Venus Conjunct Midheaven (MC)",
+    "summary": "Charm, taste, and relational skill as the basis of public standing.",
+    "fullText": "Venus on the Midheaven makes the professional face attractive and diplomatically able; people want to work with this person. Careers in art, design, luxury, mediation, and beauty suit it. The risk is relying on being liked in place of being effective, and avoiding the confrontations a role sometimes requires."
+  },
+  "mars_conjunct_mc": {
+    "title": "Mars Conjunct Midheaven (MC)",
+    "summary": "Drive and assertion visible at the top of the chart.",
+    "fullText": "Mars conjunct the Midheaven produces a forceful professional presence — competitive, energetic, and unafraid of a fight. Careers requiring courage, physical capability, or willingness to lead from the front suit it. Reputation is for strength, sometimes for aggression, and conflict with authority is a recurring theme."
+  },
+  "jupiter_conjunct_mc": {
+    "title": "Jupiter Conjunct Midheaven (MC)",
+    "summary": "Expansion, optimism, and moral authority in public life.",
+    "fullText": "Jupiter on the Midheaven confers a large professional presence and genuine good fortune in career, often through mentors and opportunity arriving at the right moment. Teaching, law, publishing, and advocacy suit it. The characteristic excess is overcommitment — promising and taking on more than the schedule can hold."
+  },
+  "saturn_conjunct_mc": {
+    "title": "Saturn Conjunct Midheaven (MC)",
+    "summary": "Slow, structural, hard-earned authority.",
+    "fullText": "Saturn conjunct the Midheaven is the classic signature of the long professional climb: early obstruction, delayed recognition, and durable standing arrived at late. Responsibility is taken seriously and often assumed too young. What is built here lasts, but the price is a persistent sense of not yet having done enough."
+  },
+  "uranus_conjunct_mc": {
+    "title": "Uranus Conjunct Midheaven (MC)",
+    "summary": "An unconventional career and a reputation for independence.",
+    "fullText": "Uranus on the Midheaven refuses the standard path. Career proceeds in discontinuous jumps rather than steady progression, and the professional identity is bound up with being the exception. Technology, reform, and original work suit it. Instability is real and is usually the cost of genuine autonomy."
+  },
+  "neptune_conjunct_mc": {
+    "title": "Neptune Conjunct Midheaven (MC)",
+    "summary": "A public image that is diffuse, imaginative, and easily projected upon.",
+    "fullText": "Neptune conjunct the Midheaven makes the professional face a screen: others see what they need to see, which suits performance, art, and healing work and complicates everything requiring clear definition. Vocation often involves inspiration or service. The task is anchoring a career in something concrete enough to hold."
+  },
+  "pluto_conjunct_mc": {
+    "title": "Pluto Conjunct Midheaven (MC)",
+    "summary": "Power, intensity, and repeated reinvention of public identity.",
+    "fullText": "Pluto on the Midheaven marks a career that proceeds through cycles of destruction and rebuilding, each leaving the native more substantial. There is real capacity for influence and for work with what others avoid. Power is the explicit theme — how it is acquired, used, and surrendered — and cannot be sidestepped."
+  },
+  "chiron_conjunct_mc": {
+    "title": "Chiron Conjunct Midheaven (MC)",
+    "summary": "Public standing built on the very place you were wounded.",
+    "fullText": "Chiron conjunct the Midheaven makes the injury professionally visible, and often professionally useful: the vocation grows directly out of what hurt. There may be early shame about ambition or a sense of not belonging in the role. The mature expression is authority grounded in acknowledged experience rather than claimed invulnerability."
+  }
+}

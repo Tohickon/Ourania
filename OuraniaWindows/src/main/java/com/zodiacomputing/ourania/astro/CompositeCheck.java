@@ -1,0 +1,573 @@
+package com.zodiacomputing.ourania.astro;
+
+import com.zodiacomputing.ourania.gui.ChartMode;
+import com.zodiacomputing.ourania.gui.SkymapPanel;
+import de.thmac.swisseph.SweDate;
+import de.thmac.swisseph.SwissEph;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Verifies the composite chart features: Midpoint Composite and Davison Relationship Chart.
+ */
+public final class CompositeCheck {
+
+    private static final String EPHE_PATH = Ephemeris.PATH;
+
+    // Los Angeles. PDT in July is UTC-7.
+    private static final double LAT = 34.05;
+    private static final double LON = -118.24;
+
+    private static final List<String> failures = new ArrayList<>();
+    private static int checks = 0;
+
+    public static void main(String[] args) {
+        System.out.println("build: " + CompositeCheck.class.getProtectionDomain().getCodeSource().getLocation());
+        System.out.println("=== Part A: Composite Checks ===");
+        int before = failures.size();
+        liveCharts();
+        report("Part A", before);
+
+        System.out.println("=== Part B: A composite is a usable frame ===");
+        before = failures.size();
+        usableFrame();
+        report("Part B", before);
+
+        System.out.println("=== Part C: the panel keeps serving the composite ===");
+        before = failures.size();
+        panelKeepsComposite();
+        report("Part C", before);
+
+        System.out.println("=== Part D: transits are a choice, not a mode ===");
+        before = failures.size();
+        transitsAreAChoice();
+        report("Part D", before);
+
+        System.out.println("=== Part E: the reference pair, pinned ===");
+        before = failures.size();
+        referencePair();
+        report("Part E", before);
+
+        System.out.println("=== Part F: equal-house fallback in computeMidpointComposite ===");
+        before = failures.size();
+        equalHouseFallback();
+        report("Part F", before);
+
+        System.out.println();
+        if (failures.isEmpty()) {
+            System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
+        } else {
+            System.out.println("FAILURES (" + failures.size() + " of " + checks + " checks):");
+            for (String f : failures) {
+                System.out.println("  " + f);
+            }
+            System.exit(1);
+        }
+
+        // <b>Required, and only since Part C.</b> That part builds a SkymapPanel, which
+        // initialises AWT and starts a non-daemon event dispatch thread - so returning from
+        // main no longer ends the JVM. handover-stamp.sh captures each suite with $(...),
+        // which blocks until the process closes stdout, so without this the stamp reaches
+        // CompositeCheck at the end of batch one and hangs there forever.
+        //
+        // Found the hard way on 2026-08-25: a java process 67 minutes old holding 47 seconds
+        // of CPU, which is the signature of work finished and a thread still alive.
+        // AspectGridCheck has carried the same line since it began building a window; any
+        // suite that touches Swing needs it.
+        System.exit(0);
+    }
+
+    private static void liveCharts() {
+        SwissEph sw = new SwissEph(EPHE_PATH);
+
+        ChartFrame c1 = run(sw, 1980, 5, 15, 12.0, "Person 1");
+        ChartFrame c2 = run(sw, 1990, 8, 20, 8.0, "Person 2");
+
+        ChartFrame midpointComp = ChartFrame.computeMidpointComposite(sw, c1, c2);
+        ChartFrame davisonComp = ChartFrame.computeDavisonComposite(sw, c1, c2);
+
+        // 1. Spans sum to 360 (cusp intervals)
+        checkCusps(midpointComp, "Midpoint");
+        checkCusps(davisonComp, "Davison");
+
+        // 2. Cusp 1 and 7 are exactly 180 apart (to 1e-9)
+        near("Midpoint ASC/DSC opposed", 180.0, ChartFrame.separation(midpointComp.cusps[1], midpointComp.cusps[7]), 1e-9);
+        near("Davison ASC/DSC opposed", 180.0, ChartFrame.separation(davisonComp.cusps[1], davisonComp.cusps[7]), 1e-9);
+
+        // 3. Cusp 10 and 4 are exactly 180 apart (to 1e-9)
+        near("Midpoint MC/IC opposed", 180.0, ChartFrame.separation(midpointComp.cusps[10], midpointComp.cusps[4]), 1e-9);
+        near("Davison MC/IC opposed", 180.0, ChartFrame.separation(davisonComp.cusps[10], davisonComp.cusps[4]), 1e-9);
+
+        // 4. ASC derived rather than averaged (midpoint composite)
+        double avgAsc = ChartFrame.midpoint(c1.asc, c2.asc);
+        checks++;
+        if (Math.abs(ChartFrame.separation(midpointComp.asc, avgAsc)) < 1e-9) {
+            failures.add("Midpoint ASC is a simple average, not derived!");
+        }
+
+        // 5. Synthetic fields genuinely unset for Midpoint, but Davison unaffected
+        eq("Midpoint phase unset", null, midpointComp.phaseName);
+        eq("Midpoint phase index unset", -1, midpointComp.phaseIndex);
+        eq("Midpoint VOC unset", false, midpointComp.moonVoidOfCourse);
+        eq("Midpoint syzygy NaN", true, Double.isNaN(midpointComp.syzygyLon));
+
+        checks++;
+        if (davisonComp.phaseName == null) failures.add("Davison phase is unset!");
+        checks++;
+        if (davisonComp.phaseIndex == -1) failures.add("Davison phase index is unset!");
+        checks++;
+        if (Double.isNaN(davisonComp.syzygyLon)) failures.add("Davison syzygy is NaN!");
+
+        // 6. Retrograde forced false for midpoint composite bodies
+        for (ChartFrame.Body b : midpointComp.bodies) {
+            if (b.ok) {
+                eq("Midpoint body " + b.name + " retrograde false", false, b.retrograde);
+            }
+        }
+
+        // 7. The flag the UI keys off, and the sentence it shows. Added by Claude on top of
+        //    Antigravity's suite: every assertion above tests a suppressed VALUE, but nothing
+        //    tested the FLAG that tells the interface those values are absent on purpose. Flip
+        //    syntheticMoment and the chart would render a missing phase as though it were simply
+        //    unknown, with no caveat and no failing check.
+        eq("Midpoint is marked synthetic", true, midpointComp.syntheticMoment);
+        eq("Davison is NOT marked synthetic", false, davisonComp.syntheticMoment);
+        checks++;
+        if (midpointComp.syntheticNote == null || midpointComp.syntheticNote.isEmpty()) {
+            failures.add("Midpoint composite carries no explanation for its absent fields");
+        }
+        eq("Davison carries no synthetic note", null, davisonComp.syntheticNote);
+
+        // 8. Sect and the lots are COMPUTED for a midpoint composite, not suppressed with the
+        //    rest. They follow from the Ascendant, the Sun and the Moon, all of which the chart
+        //    genuinely has, and the convention says so explicitly - so a future tidy-up that
+        //    suppressed them along with the time-derived fields would be wrong, and until now
+        //    nothing would have caught it.
+        checks++;
+        if (midpointComp.lotOfFortune == 0.0 && midpointComp.lotOfSpirit == 0.0) {
+            failures.add("Midpoint composite lots were not computed");
+        }
+        near("Midpoint Spirit mirrors Fortune across the asc", 0.0,
+            ChartFrame.separation(Zodiac.normalise(2 * midpointComp.asc - midpointComp.lotOfFortune),
+                                  midpointComp.lotOfSpirit), 1e-9);
+        checks++;
+        if (midpointComp.elongation == 0.0) {
+            failures.add("Midpoint composite elongation was not computed");
+        }
+        // Sect must agree with the geometry it is derived from, synthetic ASC or not.
+        eq("Midpoint sect matches its own Sun and Ascendant",
+            Sect.isDiurnal(midpointComp.body("Sun").lon, midpointComp.asc),
+            midpointComp.diurnal);
+    }
+
+    /**
+     * A composite frame can be walked, ranked and interpreted like any other.
+     *
+     * <b>Written because it could not be, and the failure was total rather than partial.</b>
+     * {@code computeMidpointComposite} set ok=false and an error message for any body missing
+     * from either base chart but <b>never set that body&#39;s name</b>. {@code body(String)}
+     * calls name.equals(..) on every entry, so it threw a NullPointerException - and the Part
+     * of Spirit is not ok in an ordinary natal chart, so that branch fired on essentially
+     * every midpoint composite the app has ever built.
+     *
+     * The consequence was that BodyScore.rank -&gt; Gestalt.compute -&gt; TransferOfLight -&gt;
+     * body(String) crashed on any composite, which is the whole interpretation path. Nothing
+     * caught it because every existing check reads {@code bodies[i]} by index and never asks
+     * the frame for a body by name.
+     *
+     * <b>ok says whether to interpret a body, not whether it is there.</b> An entry that
+     * exists must be identifiable either way, and that is what these assert.
+     */
+    private static void usableFrame() {
+        SwissEph sw = new SwissEph(EPHE_PATH);
+        ChartFrame a = run(sw, 1980, 5, 15, 12.0, "Person 1");
+        ChartFrame b = run(sw, 1990, 8, 20, 8.0, "Person 2");
+
+        ChartFrame[] frames = {
+            ChartFrame.computeMidpointComposite(sw, a, b),
+            ChartFrame.computeDavisonComposite(sw, a, b),
+        };
+        String[] names = {"midpoint", "davison"};
+
+        for (int f = 0; f < frames.length; f++) {
+            ChartFrame comp = frames[f];
+            int nameless = 0;
+            for (int i = 0; i < comp.bodies.length; i++) {
+                ChartFrame.Body body = comp.bodies[i];
+                checks++;
+                if (body == null) {
+                    failures.add(names[f] + ": body slot " + Bodies.at(i).id + " is null");
+                    continue;
+                }
+                if (body.name == null) {
+                    failures.add(names[f] + ": " + Bodies.at(i).id
+                        + " has no name - body(String) will throw on this frame");
+                    nameless++;
+                    continue;
+                }
+                eq(names[f] + ": " + Bodies.at(i).id + " is named from the registry",
+                    Bodies.at(i).name, body.name);
+            }
+
+            // The call that actually threw. Every registry name, not a sample.
+            for (int i = 0; i < Bodies.count(); i++) {
+                checks++;
+                try {
+                    comp.body(Bodies.at(i).name);
+                } catch (IllegalArgumentException expected) {
+                    failures.add(names[f] + ": body(" + Bodies.at(i).name + ") not found");
+                } catch (RuntimeException e) {
+                    failures.add(names[f] + ": body(" + Bodies.at(i).name + ") threw " + e);
+                }
+            }
+
+            // And the whole path that crashed, end to end. A rank that completes is the
+            // evidence; the ranking itself is BodyScore&#39;s business, not this suite&#39;s.
+            checks++;
+            try {
+                int ranked = BodyScore.rank(comp).size();
+                if (ranked <= 0) {
+                    failures.add(names[f] + ": ranked no bodies at all");
+                }
+            } catch (RuntimeException e) {
+                failures.add(names[f] + ": BodyScore.rank threw " + e
+                    + " - the interpretation path is broken for this frame");
+            }
+
+            System.out.println("  " + names[f] + ": " + comp.bodies.length + " bodies, "
+                + nameless + " nameless");
+        }
+    }
+
+    private static void checkCusps(ChartFrame f, String label) {
+        double totalSpan = 0.0;
+        for (int i = 1; i <= 12; i++) {
+            int next = i == 12 ? 1 : i + 1;
+            double span = f.cusps[next] - f.cusps[i];
+            if (span < 0) span += 360.0;
+            totalSpan += span;
+        }
+        near(label + " cusps sum to 360", 360.0, totalSpan, 1e-9);
+    }
+
+    private static ChartFrame run(SwissEph sw, int y, int m, int d, double hourUt, String label) {
+        SweDate sd = new SweDate(y, m, d, hourUt);
+        return ChartFrame.compute(sw, sd.getJulDay(), LAT, LON, 'W', false, 0.0);
+    }
+
+    private static void eq(String label, Object expected, Object actual) {
+        checks++;
+        if (expected == null) {
+            if (actual != null) failures.add(label + ": got " + actual + ", expected null");
+        } else if (!expected.equals(actual)) {
+            failures.add(label + ": got " + actual + ", expected " + expected);
+        }
+    }
+
+    private static void near(String label, double expected, double actual, double tol) {
+        checks++;
+        if (Math.abs(expected - actual) > tol) {
+            failures.add(label + ": got " + actual + ", expected " + expected + " +/- " + tol);
+        }
+    }
+
+    /**
+     * The composite must survive anything else asking the panel for a frame.
+     *
+     * <b>This part exists because Parts A and B could not have caught the defect it guards.</b>
+     * They test {@link ChartFrame#computeMidpointComposite} in isolation, and that method was
+     * always correct. The bug was one field further out: {@code SkymapPanel.getCurrentChart}
+     * cached the composite in the same field {@code frameForCurrentChart} memoises natal charts
+     * in, so the first call to that method <b>replaced the composite with person A's natal
+     * chart</b>, and every later read - the wheel's included - got the natal chart back.
+     * Measured at the time: the Sun 66.9 degrees out, the Ascendant 237.
+     *
+     * So this reaches through to the panel deliberately, from an astro-package check, because
+     * the seam between the engine and the view is precisely where the defect lived and neither
+     * side's own tests could see it.
+     */
+    private static void panelKeepsComposite() {
+        try {
+            SwissEph sw = new SwissEph(EPHE_PATH);
+            SweDate a = new SweDate(1985, 3, 14, 9.5);
+            SweDate b = new SweDate(1991, 11, 2, 22.25);
+            double aLat = 34.05, aLon = -118.24, bLat = 51.51, bLon = -0.13;
+            char hsys = 'P';
+
+            ChartFrame fa = ChartFrame.compute(sw, a.getJulDay(), aLat, aLon, hsys, false, 0.0);
+            ChartFrame fb = ChartFrame.compute(sw, b.getJulDay(), bLat, bLon, hsys, false, 0.0);
+            ChartFrame truth = ChartFrame.computeMidpointComposite(sw, fa, fb);
+            double truthSun = truth.body("Sun").lon;
+            double natalSun = fa.body("Sun").lon;
+
+            // The two must be far apart or this check proves nothing.
+            near("Part C fixture: composite and natal Sun differ by more than 10 deg",
+                1.0, Math.abs(truthSun - natalSun) > 10.0 ? 1.0 : 0.0, 1e-9);
+
+            Class<?> panelCls = Class.forName("com.zodiacomputing.ourania.gui.SkymapPanel");
+            Class<?> modeCls = Class.forName("com.zodiacomputing.ourania.gui.ChartMode");
+            Object panel = panelCls.getConstructor(
+                Class.forName("com.zodiacomputing.ourania.gui.OuraniaWindow"))
+                .newInstance(new Object[] {null});
+
+            set(panelCls, panel, "sw", sw);
+            set(panelCls, panel, "baseSd", a);
+            set(panelCls, panel, "transitSd", b);
+            set(panelCls, panel, "baseLatitude", aLat);
+            set(panelCls, panel, "baseLongitude", aLon);
+            set(panelCls, panel, "transitLatitude", bLat);
+            set(panelCls, panel, "transitLongitude", bLon);
+            set(panelCls, panel, "houseSystem", hsys);
+            set(panelCls, panel, "chartMode",
+                Enum.valueOf((Class<Enum>) modeCls.asSubclass(Enum.class), "COMPOSITE_MIDPOINT"));
+
+            java.lang.reflect.Method get = panelCls.getMethod("getCurrentChart");
+            ChartFrame first = (ChartFrame) get.invoke(panel);
+            near("Part C: first getCurrentChart is the composite",
+                truthSun, first.body("Sun").lon, 1e-6);
+            eq("Part C: first frame is synthetic", Boolean.TRUE, first.syntheticMoment);
+
+            // What the reading panel does. This is the call that used to poison the cache.
+            java.lang.reflect.Method ffc = panelCls.getDeclaredMethod(
+                "frameForCurrentChart", double.class, double.class, double.class, int.class);
+            ffc.setAccessible(true);
+            ffc.invoke(panel, a.getJulDay(), aLat, aLon, (int) hsys);
+
+            ChartFrame second = (ChartFrame) get.invoke(panel);
+            near("Part C: composite survives frameForCurrentChart",
+                truthSun, second.body("Sun").lon, 1e-6);
+            eq("Part C: still synthetic afterwards", Boolean.TRUE, second.syntheticMoment);
+            near("Part C: Ascendant survives too", first.asc, second.asc, 1e-6);
+
+            // And it must not have quietly become the natal chart specifically.
+            checks++;
+            if (Math.abs(second.body("Sun").lon - natalSun) < 1e-6) {
+                failures.add("Part C: getCurrentChart returned person A's NATAL chart, not the "
+                    + "composite - the frame cache has been shared again");
+            }
+        } catch (Exception e) {
+            checks++;
+            failures.add("Part C: threw " + e.getClass().getSimpleName() + " - " + e.getMessage());
+        }
+    }
+
+    /**
+     * A composite stands on its own unless transits were asked for.
+     *
+     * <b>The expectations are a literal table, not the same boolean expression restated.</b>
+     * Re-deriving them here would assert only that a copy of the rule agrees with the rule.
+     * This is David's decision of 2026-08-25 written down as data: transits become an explicit
+     * choice, and the composite no longer forces an outer wheel on merely because it is a
+     * composite - which is what used to hand a composite reading the transit array.
+     *
+     * <b>Synastry's outer-wheel column is true in both rows and that is not a bug.</b> Its outer
+     * wheel is the second person, so one is always drawn whatever the checkbox says.
+     *
+     * <b>The checkbox drives TWO flags, so the table has two expectation columns.</b> It grew
+     * one on 2026-08-28, when the tri-wheel landed and this table did not notice. It asserted
+     * {@code outerWheelShown} only - which the tri-wheel did not change - so it stayed green
+     * while half of David's decision went uncovered, and its own prose still said synastry
+     * transits "would be a third wheel and this app does not draw one yet". It does now:
+     * SYNASTRY + transits is the tri-wheel, and that is the one true cell in the third column.
+     */
+    private static void transitsAreAChoice() {
+        //                                          transits  outer   tri
+        Object[][] spec = {
+            {ChartMode.SINGLE,             false, false, false},
+            {ChartMode.SINGLE,             true,  false, false},
+            {ChartMode.TRANSIT,            false, false, false},
+            {ChartMode.TRANSIT,            true,  true , false},
+            {ChartMode.SYNASTRY,           false, true , false},
+            {ChartMode.SYNASTRY,           true,  true , true },
+            {ChartMode.COMPOSITE_MIDPOINT, false, false, false},
+            {ChartMode.COMPOSITE_MIDPOINT, true,  true , false},
+            {ChartMode.COMPOSITE_DAVISON,  false, false, false},
+            {ChartMode.COMPOSITE_DAVISON,  true,  true , false},
+        };
+        for (Object[] row : spec) {
+            ChartMode mode = (ChartMode) row[0];
+            boolean transits = (Boolean) row[1];
+            boolean wantOuter = (Boolean) row[2];
+            boolean wantTri = (Boolean) row[3];
+            eq("Part D: " + mode + " with transits=" + transits + " draws an outer wheel",
+                Boolean.valueOf(wantOuter),
+                Boolean.valueOf(SkymapPanel.outerWheelShown(mode, transits)));
+            eq("Part D: " + mode + " with transits=" + transits + " draws a tri-wheel",
+                Boolean.valueOf(wantTri),
+                Boolean.valueOf(SkymapPanel.triWheelShown(mode, transits)));
+        }
+        // A tri-wheel is a third ring around an outer wheel, never a ring on its own. Stated
+        // as a relationship between the two flags rather than a third copy of the rule.
+        for (Object[] row : spec) {
+            ChartMode mode = (ChartMode) row[0];
+            boolean transits = (Boolean) row[1];
+            eq("Part D: " + mode + "/" + transits + " - a tri-wheel implies an outer wheel",
+                Boolean.TRUE,
+                Boolean.valueOf(!SkymapPanel.triWheelShown(mode, transits)
+                    || SkymapPanel.outerWheelShown(mode, transits)));
+        }
+    }
+
+    /**
+     * A pinned pair, chosen for its geometry: the defects it exposes and the figure it found.
+     *
+     * <b>Why a specific pair rather than swept inputs.</b> Both defects here were invisible to
+     * generated data. The two-Ascendants disagreement hides completely under whole-sign houses
+     * because both values fall in the same sign, and the near-opposition instability only shows
+     * when two charts happen to put a point ~178 degrees apart. A pair has to be selected for
+     * that; sweeping will not stumble into it.
+     *
+     * <b>Synthetic, and not anyone's birth data.</b> The original fixture was a real couple.
+     * It was replaced on 2026-08-28 because this repository is public and the charts were
+     * identifiable. A is the same synthetic reference chart the other suites share; B was
+     * found by scanning candidate dates for one that reproduces the required geometry.
+     *
+     * <b>If this pair ever needs replacing, it must be searched for, not guessed.</b> The
+     * condition is: {@code Part of Spirit} flagged {@code unstableMidpoint}, the Ascendant NOT
+     * flagged, and the derived angles equal to their registry bodies. B below puts Part of
+     * Spirit 178.45 degrees from A's - the original pair's figure was 178.4, so the assertions
+     * below are testing the same edge, not a weaker one.
+     *
+     * A 1984-09-08 07:33 UT, 41.88 N 87.63 W; B 1971-10-04 21:00 UT, 34.05 N 118.24 W.
+     */
+    private static void referencePair() {
+        SwissEph sw = new SwissEph(EPHE_PATH);
+        ChartFrame a = ChartFrame.compute(sw,
+            new SweDate(1984, 9, 8, 7 + 33.0 / 60.0).getJulDay(),
+            41.8781, -87.6298, 'W', false, 0.0);
+        ChartFrame b = ChartFrame.compute(sw,
+            new SweDate(1971, 10, 4, 21.0).getJulDay(),
+            34.05, -118.24, 'W', false, 0.0);
+        ChartFrame c = ChartFrame.computeMidpointComposite(sw, a, b);
+
+        // 1. The angles as registry bodies must BE the derived angles. Before 2026-08-25 the
+        //    Ascendant disagreed with itself by 12.93 degrees on the ORIGINAL fixture pair,
+        //    which this synthetic one replaced on 2026-08-28. The assertion is an invariant
+        //    and holds for any pair; the 12.93 figure is kept as the history of why it exists.
+        near("Part E: Ascendant body == derived asc", c.asc, c.body("Ascendant").lon, 1e-9);
+        near("Part E: Descendant body == derived dsc", c.dsc, c.body("Descendant").lon, 1e-9);
+        near("Part E: MC body == derived mc", c.mc, c.body("MC").lon, 1e-9);
+        near("Part E: IC body == derived ic", c.ic, c.body("IC").lon, 1e-9);
+        checks++;
+        if (c.body("Ascendant").unstableMidpoint) {
+            failures.add("Part E: a derived angle is flagged as an unstable midpoint");
+        }
+
+        // 2. Part of Spirit IS unstable for this pair - the two charts put it 178.45 apart,
+        //    and near an exact opposition a few minutes of birth time swings the composite
+        //    value by ~178 degrees. B was selected to reproduce this; see the javadoc.
+        ChartFrame.Body spirit = c.body("Part of Spirit");
+        checks++;
+        if (spirit == null || !spirit.ok || !spirit.unstableMidpoint) {
+            failures.add("Part E: Part of Spirit should be flagged unstable for this pair");
+        }
+        checks++;
+        if (c.warnings.isEmpty()) {
+            failures.add("Part E: an unstable midpoint should leave a warning on the frame");
+        }
+        // And the Sun, which the two charts put nowhere near opposite, must NOT be flagged -
+        // otherwise the test passes on a rule that flags everything.
+        checks++;
+        if (c.body("Sun").unstableMidpoint) {
+            failures.add("Part E: the Sun is not near-opposition and must not be flagged");
+        }
+
+        // 3. The figure this pair actually has, so a change to pattern detection or to the
+        //    empty leg shows up against known-good output rather than silently.
+        //
+        //    <b>Regenerated 2026-08-30 when the fixture pair was replaced.</b> These are
+        //    characterization values - what a verified-green build produces for THIS pair -
+        //    exactly as the previous set was for the previous pair. They catch a regression in
+        //    pattern detection; they are not an independent derivation, and re-pinning them is
+        //    only legitimate when the suite is otherwise green, as it was here.
+        //
+        //    The apex moved from Venus/fixed to Jupiter/mutable purely because the pair
+        //    changed. A search for a replacement that ALSO produced a Venus-apex fixed
+        //    T-square alongside the required near-opposition instability found none, so the
+        //    instability was kept - it is the property the pair exists to exercise - and the
+        //    T-square assertions were re-pinned around it.
+        Gestalt.Result g = Gestalt.compute(c);
+        AspectPatterns.Pattern t = null;
+        for (AspectPatterns.Pattern p : g.aspectPatterns) {
+            if (p.name.equals("T-square")) {
+                t = p;
+            }
+        }
+        checks++;
+        if (t == null) {
+            failures.add("Part E: the reference composite's T-square has gone");
+        } else {
+            eq("Part E: T-square apex", "Jupiter", t.apex);
+            eq("Part E: T-square modality", "mutable", t.modality);
+            near("Part E: composite Venus", 194.96, c.body("Venus").lon, 0.05);
+            near("Part E: composite Chiron", 40.07, c.body("Chiron").lon, 0.05);
+            near("Part E: composite Uranus", 221.74, c.body("Uranus").lon, 0.05);
+            for (TensionRelease.Release r : g.releases) {
+                if (r.source.equals("T-square") && r.hasEmptyLeg) {
+                    near("Part E: empty leg opposite the apex", 78.42, r.emptyLegLon, 0.05);
+                    eq("Part E: empty leg is vacant", null, r.emptyLegOccupant);
+                }
+            }
+        }
+    }
+
+    /**
+     * Verifies that computeMidpointComposite falls back gracefully to whole-sign-ish equal houses
+     * from the midpoint MC when the quadrant house system has no solution or when sw is null.
+     */
+    private static void equalHouseFallback() {
+        SwissEph sw = new SwissEph(EPHE_PATH);
+        ChartFrame a = ChartFrame.compute(sw, new SweDate(1980, 5, 15, 12.0).getJulDay(), LAT, LON, 'P', false, 0.0);
+        ChartFrame b = ChartFrame.compute(sw, new SweDate(1990, 8, 20, 8.0).getJulDay(), LAT, LON, 'P', false, 0.0);
+
+        // Force fallback by passing sw = null
+        ChartFrame fallbackChart = ChartFrame.computeMidpointComposite(null, a, b);
+
+        checks++;
+        if (fallbackChart == null) {
+            failures.add("Part F: computeMidpointComposite returned null on fallback");
+            return;
+        }
+
+        // Verify cusps array has 12 valid cusps
+        checks++;
+        boolean validCusps = fallbackChart.cusps != null && fallbackChart.cusps.length == 13;
+        if (!validCusps) {
+            failures.add("Part F: fallback chart cusps array is missing or invalid size");
+        } else {
+            // Verify equal-house spacing (30 degrees apart)
+            double firstCusp = fallbackChart.cusps[1];
+            boolean equalSpaced = true;
+            for (int i = 1; i <= 12; i++) {
+                double expectedCusp = Zodiac.normalise(firstCusp + (i - 1) * 30.0);
+                if (Math.abs(Aspects.separation(fallbackChart.cusps[i], expectedCusp)) > 0.001) {
+                    equalSpaced = false;
+                    break;
+                }
+            }
+            checks++;
+            if (!equalSpaced) {
+                failures.add("Part F: fallback chart cusps are not equal-house 30 degrees apart");
+            }
+        }
+
+        // Verify syntheticNote records the fallback explanation
+        checks++;
+        if (fallbackChart.syntheticNote == null || !fallbackChart.syntheticNote.contains("fell back to equal houses")) {
+            failures.add("Part F: syntheticNote does not document the equal-house fallback");
+        }
+    }
+
+    private static void set(Class<?> cls, Object target, String field, Object value)
+            throws Exception {
+        java.lang.reflect.Field f = cls.getDeclaredField(field);
+        f.setAccessible(true);
+        f.set(target, value);
+    }
+
+    private static void report(String part, int before) {
+        int added = failures.size() - before;
+        System.out.println(part + ": " + (added == 0 ? "PASS" : added + " FAILURE(S)"));
+    }
+}

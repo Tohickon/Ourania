@@ -1,0 +1,62 @@
+{
+  "1": {
+    "title": "First House",
+    "summary": "The First House, known as the Helm, governs physical appearance, personal identity, and the individual's outward persona.",
+    "fullText": "As an angular house marking the eastern horizon, the First House represents your physical emergence and vitality. Known traditionally as the Helm, it acts as the steering wheel of your life, indicating your core character and initial approach to the world. It is the most personal house, reflecting your physical body, mannerisms, and the immediate impression you make on others. It is also associated with the Joy of Mercury."
+  },
+  "2": {
+    "title": "Second House",
+    "summary": "The Second House rules personal resources, material wealth, financial security, and an individual's core values.",
+    "fullText": "This succedent house focuses on the tangible assets and movable possessions that sustain you in the physical world. It encompasses not only money and earning power, but also your innate skills, self-worth, and attitudes toward material security. Often referred to as the Gate of Hades in ancient traditions, this house grounds your identity in practical reality, demanding the steady cultivation of resources."
+  },
+  "3": {
+    "title": "Third House",
+    "summary": "The Third House represents the near environment, governing daily communication, siblings, short journeys, and the intellect.",
+    "fullText": "Traditionally known as the Place of the Goddess and the Joy of the Moon, this cadent house thrives on mental stimulation and local exchanges. It rules your communication style, early childhood education, and relationships with siblings or close neighbors. The Third House focuses on logic, reason, and the continuous assimilation of information from your immediate community and daily routines."
+  },
+  "4": {
+    "title": "Fourth House",
+    "summary": "The Fourth House, located at the midnight angle, symbolizes home, family, ancestry, and the deepest foundations of the psyche.",
+    "fullText": "Representing the roots of your existence, this angular house governs your domestic life, early upbringing, and physical real estate. It is the hidden sanctuary where you seek emotional security, intrinsically linked to parents, traditionally the father, and familial lineage. Acting as the base of operations for the personality, it reveals internal psychological patterns, cellular memory, and the conditions surrounding the end of life."
+  },
+  "5": {
+    "title": "Fifth House",
+    "summary": "The Fifth House is the realm of pleasure, creativity, romance, speculation, and children.",
+    "fullText": "Known traditionally as the Place of Good Fortune and the Joy of Venus, this succedent house demands an outlet for joyful self-expression and recreation. It rules the things you create, from art and hobbies to biological offspring. The Fifth House governs love affairs, sports, gambling, and all activities pursued purely for the sake of fun and personal fulfillment, highlighting where you feel most special and unique."
+  },
+  "6": {
+    "title": "Sixth House",
+    "summary": "The Sixth House governs daily routines, work, meticulous service, and matters of physical health and illness.",
+    "fullText": "This cadent house, historically termed the Place of Bad Fortune and the Joy of Mars, focuses on the practical mechanics of maintaining life. It rules your job, working environment, relationships with employees or subordinates, and your daily duties. Additionally, it highlights physical vulnerabilities, diseases, fitness regimens, and the care of small domestic pets."
+  },
+  "7": {
+    "title": "Seventh House",
+    "summary": "The Seventh House rules interpersonal relationships, committed partnerships, marriage, and open enemies.",
+    "fullText": "Positioned at the western horizon, this angular house represents the 'Other' and how you bridge personal boundaries to connect with people. It is the primary sector for marriage, business alliances, and official contracts, emphasizing diplomacy and social equilibrium. Conversely, it also governs known adversaries, lawsuits, and public conflicts, teaching the profound lessons of cooperation and balancing your needs with another's."
+  },
+  "8": {
+    "title": "Eighth House",
+    "summary": "The Eighth House is a transformative sector governing death, sex, the occult, and shared resources.",
+    "fullText": "This succedent house plunges into the profound mysteries of existence, dealing with irreversible changes, psychological crises, and deep intimacy. It oversees other people's money, including inheritances, taxes, debts, and partner finances. The Eighth House operates in extremes, functioning as an epicenter for intense emotional bonds, psychic connections, and ultimate spiritual or psychological regeneration."
+  },
+  "9": {
+    "title": "Ninth House",
+    "summary": "The Ninth House focuses on expansion through higher education, philosophy, religion, and long-distance travel.",
+    "fullText": "Known traditionally as the Place of God and the Joy of the Sun, this cadent house pushes past immediate boundaries to seek ultimate universal truths. It rules advanced academics, the law, spiritual pursuits, and encounters with foreign cultures. Through publishing, philosophical exploration, and grand voyages, the Ninth House represents the quest for profound meaning and the broadening of the higher mind."
+  },
+  "10": {
+    "title": "Tenth House",
+    "summary": "The Tenth House is the pinnacle of the chart, representing career, public reputation, status, and worldly ambition.",
+    "fullText": "Anchored by the Midheaven, this highly visible angular house defines your public standing and the legacy you build in society. It rules professional achievements, figures of authority, and traditionally, the mother or dominant parent. The Tenth House reflects the culmination of your efforts, highlighting honor, enterprise, and how you are perceived by the world at large."
+  },
+  "11": {
+    "title": "Eleventh House",
+    "summary": "The Eleventh House oversees friendships, social networks, group ideals, and your long-term hopes and wishes.",
+    "fullText": "Traditionally called the Place of Good Spirit and the Joy of Jupiter, this succedent house aligns personal ambition with collective progress. It rules your affiliations with clubs, humanitarian causes, and the supportive community that aids your goals. The Eleventh House is visionary, focusing on progressive ideals, beneficial alliances, and the harmonious integration of the individual into the broader society."
+  },
+  "12": {
+    "title": "Twelfth House",
+    "summary": "The Twelfth House represents the hidden realm, governing the subconscious, solitude, spiritual sacrifices, and self-undoing.",
+    "fullText": "Known historically as the Place of Bad Spirit and the Joy of Saturn, this cadent house dissolves physical boundaries, immersing you in the collective unconscious. It rules unseen forces, secret enemies, places of confinement like hospitals and prisons, and past karmic debts. Though often associated with suffering or isolation, it is also a profound space for psychic awakening, introspection, and deep, mystical compassion."
+  }
+}

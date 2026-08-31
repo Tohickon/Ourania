@@ -1,0 +1,16 @@
+{
+  "macro_dynamics": {
+    "Bundle": "The Bundle pattern indicates an intense, highly concentrated psychological focal point. You are a specialist, driven by a deep, singular motivation.",
+    "Bowl": "The Bowl pattern suggests a highly self-contained nature, often driven by a perceived inner void. You tend to focus your energy toward the empty hemisphere.",
+    "Bucket": "The Bucket pattern concentrates energy in one hemisphere, but channels it intensely through a single opposing planet (the 'handle').",
+    "Locomotive": "The Locomotive pattern reveals a driven, structured, relentless personality, led by a specific cutting planet (the 'engine').",
+    "Seesaw": "The Seesaw pattern indicates a polarized nature, constantly weighing alternatives and caught in dualities.",
+    "Splash": "The Splash pattern suggests a scattered, multi-talented, highly versatile individual, though sometimes lacking a singular focus.",
+    "Splay": "The Splay pattern indicates an individualistic and eccentric approach, operating in highly specialized but disconnected areas of life.",
+    
+    "Grand Trine": "A Grand Trine represents closed-circuit talent, self-containment, and spiritual ease, though it can sometimes lead to complacency.",
+    "T-Square": "A T-Square generates intense dynamic drive, pointing toward a primary area of stress and accomplishment.",
+    "Yod": "The Yod, or 'Finger of Fate', indicates a highly specialized, fated developmental path requiring significant shifts in perspective.",
+    "Stellium": "A Stellium indicates an intense, highly concentrated psychological focal point where multiple planetary energies fuse."
+  }
+}

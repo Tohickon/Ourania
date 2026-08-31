@@ -1,0 +1,392 @@
+{
+  "ic_aries": {
+    "title": "IC in Aries",
+    "summary": "The psychological foundation is active, fiercely independent, and potentially marked by early volatility or competition.",
+    "fullText": "Childhood may have required you to develop autonomy early on, leading to a deeply ingrained belief that you must fight for your own security. Inner peace is not found in stillness, but rather in self-reliance and having the freedom to take charge of your private sanctuary. You are intensely protective of your inner circle and derive emotional grounding from your own courage."
+  },
+  "ic_taurus": {
+    "title": "IC in Taurus",
+    "summary": "A profound need for stability, material comfort, and predictability forms the bedrock of your psyche.",
+    "fullText": "Your early environment likely emphasized traditional values, sensory comforts, or a strong connection to nature and the physical world. True inner security is achieved by building an unshakeable, peaceful domestic life filled with tangible abundance. You ground yourself through routine, loyalty, and cultivating a private space that feels profoundly safe and enduring."
+  },
+  "ic_gemini": {
+    "title": "IC in Gemini",
+    "summary": "Your psychological roots are deeply intertwined with communication, learning, and intellectual stimulation.",
+    "fullText": "The childhood home was likely bustling, restless, or characterized by a duality of experiences that taught you to be highly adaptable. Inner security is found not in a fixed location, but in a state of open dialogue and mental engagement with your family or chosen kin. You require a private life that offers variety, conversation, and the freedom to change your mind."
+  },
+  "ic_cancer": {
+    "title": "IC in Cancer",
+    "summary": "This is the natural home of the Imum Coeli, indicating a profound, highly sensitive connection to ancestry, maternal figures, and the concept of home.",
+    "fullText": "Your psychological foundation is built upon deep emotional bonds and generational memory, making you fiercely protective of your private world. True inner peace requires a domestic sanctuary where you can retreat, nurture, and be nurtured without the interference of the outside world. Your emotional baseline is deeply feeling, loyal, and heavily influenced by the past."
+  },
+  "ic_leo": {
+    "title": "IC in Leo",
+    "summary": "Your early life may have been a place of warmth, drama, or high expectations where you were encouraged to shine within the family unit.",
+    "fullText": "There is a deep, hidden pride in your ancestral lineage and a psychological need to be the sovereign of your own domestic sphere. Inner security is derived from creative expression, loyalty, and feeling recognized and appreciated by those closest to you. You build your foundational strength by making your home a place of generosity, playfulness, and heartfelt connection."
+  },
+  "ic_virgo": {
+    "title": "IC in Virgo",
+    "summary": "The roots of your psyche are structured around practicality, duty, and perhaps an early environment that emphasized health, routine, or perfectionism.",
+    "fullText": "You find emotional safety in order, feeling most grounded when your private life is meticulously organized and functioning efficiently. Your connection to your past is analytical, often leading you to serve your family or meticulously dissect your psychological conditioning. Inner peace is achieved through quiet competence, cleanliness, and a predictable domestic rhythm."
+  },
+  "ic_libra": {
+    "title": "IC in Libra",
+    "summary": "A deep psychological need for harmony, beauty, and equilibrium forms the base of your inner world.",
+    "fullText": "Your childhood home may have focused heavily on appearances, diplomacy, or the complex management of parental relationships. You seek to create a private sanctuary that is aesthetically pleasing and entirely devoid of conflict, as discord deeply unsettles your foundational security. Grounding is found through peaceful domestic partnerships and a carefully balanced home life."
+  },
+  "ic_scorpio": {
+    "title": "IC in Scorpio",
+    "summary": "Your ancestral background is marked by intense, secretive, or deeply transformative experiences that shaped your early psychology.",
+    "fullText": "There is a profound understanding of unspoken power dynamics, crisis, and emotional survival woven into the roots of your identity. True inner security is not found in superficial comforts, but in establishing unbreakable, fiercely loyal bonds built on absolute trust. You ground yourself by periodically purging your domestic life and facing your deepest psychological shadows."
+  },
+  "ic_sagittarius": {
+    "title": "IC in Sagittarius",
+    "summary": "The foundation of your psyche is expansive, restless, and likely influenced by diverse philosophies, travel, or a multicultural background.",
+    "fullText": "Your early life may have lacked traditional boundaries, instilling in you the belief that home is everywhere and nowhere all at once. Inner security is achieved by maintaining your personal freedom and continually exploring new horizons, even within your private life. You build your foundational strength on a bedrock of optimism, faith, and a relentless search for meaning."
+  },
+  "ic_capricorn": {
+    "title": "IC in Capricorn",
+    "summary": "Your early environment was likely structured, demanding, or burdened by early responsibilities that forced you to mature quickly.",
+    "fullText": "There is a deep, psychological respect for tradition, ancestral legacy, and the necessity of hard work to ensure survival. Emotional foundations are built on tangible achievements, discipline, and constructing a lasting, unshakeable structure for your family. Inner peace comes from fulfilling your duties and knowing your private world is fortified against external chaos."
+  },
+  "ic_aquarius": {
+    "title": "IC in Aquarius",
+    "summary": "The roots of your psyche are unconventional, erratic, or highly intellectual, often leaving you feeling like the alien within your own family.",
+    "fullText": "Your childhood may have involved sudden disruptions, a focus on collective ideals over emotional warmth, or a highly progressive atmosphere. True inner security is found by breaking free from ancestral conditioning and defining the concept of \"family\" on your own unique terms. You ground yourself by creating a domestic space that champions individuality, freedom, and radical authenticity."
+  },
+  "ic_pisces": {
+    "title": "IC in Pisces",
+    "summary": "Your psychological foundations are deeply empathic, spiritual, and perhaps marked by blurred boundaries or emotional chaos in the childhood home.",
+    "fullText": "You carry the unspoken dreams, traumas, and artistic sensitivities of your ancestry deep within your subconscious. Inner security requires a highly private, transcendent sanctuary where you can retreat from the harshness of the world and recharge your energetic field. You find your truest grounding through imagination, compassion, and a mystical connection to the divine."
+  },
+  "sun_conjunct_ic": {
+    "title": "IC Conjunction Sun",
+    "summary": "Your core identity and ego are deeply rooted in your family history, ancestry, and private life.",
+    "fullText": "You require a strong, secure domestic sanctuary to recharge your vitality and fully express who you are. Your primary life purpose is intimately tied to establishing a solid foundation or carrying on a significant family legacy."
+  },
+  "moon_conjunct_ic": {
+    "title": "IC Conjunction Moon",
+    "summary": "You possess extremely strong emotional ties to the past, your family, and maternal figures, making your home a deeply emotional sanctuary.",
+    "fullText": "Your psychological foundations are highly sensitive, and your emotional well-being dictates your entire sense of security in life. You have a profound, instinctual need to nurture and be nurtured within a protected private space."
+  },
+  "mercury_conjunct_ic": {
+    "title": "IC Conjunction Mercury",
+    "summary": "Your mind is heavily influenced by early childhood conditioning, making your home life bustling, communicative, and intellectually active.",
+    "fullText": "You process your psychological foundations through logic, writing, or constant dialogue with your family. Your private sanctuary doubles as a place of learning, reading, and mental exploration."
+  },
+  "venus_conjunct_ic": {
+    "title": "IC Conjunction Venus",
+    "summary": "You possess a deep love for your home, family, and the cultivation of beauty within your domestic sphere.",
+    "fullText": "Creating a peaceful, aesthetically pleasing, and harmonious private sanctuary is essential to your psychological security. Your roots are characterized by affection, and you draw immense comfort from domestic bliss and artistic surroundings."
+  },
+  "mars_conjunct_ic": {
+    "title": "IC Conjunction Mars",
+    "summary": "Your home environment is highly active, potentially turbulent, and fiercely protected from outside intrusion.",
+    "fullText": "You draw your physical vitality and courage directly from your psychological roots, making you a passionate defender of your family. Childhood may have been competitive or marked by conflict, teaching you to aggressively carve out your own private space."
+  },
+  "jupiter_conjunct_ic": {
+    "title": "IC Conjunction Jupiter",
+    "summary": "Your family background may be wealthy, expansive, highly philosophical, or deeply religious.",
+    "fullText": "The home is a place of major growth, optimism, and abundance, providing a profoundly secure and faithful psychological foundation. You believe deeply in the concept of family and likely desire a large, spacious, and welcoming domestic sanctuary."
+  },
+  "saturn_conjunct_ic": {
+    "title": "IC Conjunction Saturn",
+    "summary": "Your childhood was likely strict, traditional, or burdened by early responsibilities that forced you to grow up quickly.",
+    "fullText": "While your early life may have felt restrictive, it forged an immensely solid, disciplined, and resilient psychological foundation. You take the concept of home, family duty, and ancestral legacy with the utmost seriousness."
+  },
+  "uranus_conjunct_ic": {
+    "title": "IC Conjunction Uranus",
+    "summary": "Your early life was likely chaotic, unconventional, highly independent, or characterized by frequent sudden changes.",
+    "fullText": "You possess a deeply ingrained psychological need for absolute freedom within your domestic sphere. You find security not in tradition, but in disruption, innovation, and defining the concept of home entirely on your own terms."
+  },
+  "neptune_conjunct_ic": {
+    "title": "IC Conjunction Neptune",
+    "summary": "Your childhood was likely highly spiritual, artistic, chaotic, or lacking in clear emotional boundaries.",
+    "fullText": "The home serves as a transcendent place of retreat, imagination, and sometimes illusion or escapism. You possess a deeply empathic, almost psychic connection to your ancestry and the unspoken emotional undercurrents of your family."
+  },
+  "pluto_conjunct_ic": {
+    "title": "IC Conjunction Pluto",
+    "summary": "Your ancestral background is intense, highly secretive, or marked by profound trauma and total transformation.",
+    "fullText": "Your home was likely a place of hidden power dynamics, forging within you an unshakeable psychological resilience. You require absolute control over your private sanctuary, and your inner security depends on facing the deepest, darkest aspects of your psyche."
+  },
+  "chiron_conjunct_ic": {
+    "title": "IC Conjunction Chiron",
+    "summary": "You carry deep, foundational wounds related to your childhood, your family of origin, or your fundamental sense of belonging.",
+    "fullText": "The home was likely a place of pain, but it ultimately becomes the site of your most profound healing and teaching. By confronting your deepest psychological conditioning, you develop the ability to guide others through their own familial trauma."
+  },
+  "sun_sextile_ic": {
+    "title": "IC Sextile Sun",
+    "summary": "There is a harmonious, easy flow between your personal ambitions and your need for a secure home life.",
+    "fullText": "Your family naturally supports your self-expression, and your inner confidence helps you build a warm, stable private sanctuary. You effortlessly draw upon your roots to fuel your creative and worldly pursuits."
+  },
+  "sun_square_ic": {
+    "title": "IC Square Sun",
+    "summary": "You experience ongoing friction between who you inherently are and the expectations of your family or upbringing.",
+    "fullText": "There is a profound struggle to build an independent identity outside of your ancestral conditioning. Resolving this tension requires consciously separating your ego's needs from the demands of your domestic environment."
+  },
+  "sun_trine_ic": {
+    "title": "IC Trine Sun",
+    "summary": "A natural, deeply ingrained alignment exists between your core vitality and your domestic life.",
+    "fullText": "Your home provides an unshakeable, supportive foundation that effortlessly facilitates your personal growth and self-confidence. You possess a strong, positive connection to your past that illuminates your present path."
+  },
+  "sun_opposite_ic": {
+    "title": "IC Opposition Sun",
+    "summary": "You constantly feel the pull between your public career or worldly ambitions and your need for a quiet, private life.",
+    "fullText": "Finding a balance between external achievements and inner psychological peace is a major life theme. Your identity is often projected outward into the world, sometimes at the expense of your domestic security."
+  },
+  "sun_quincunx_ic": {
+    "title": "IC Quincunx Sun",
+    "summary": "Awkward, continuous adjustments are required between your ego-driven desires and your fundamental need for domestic security.",
+    "fullText": "You may often feel misunderstood at home or find that your true self does not quite fit into your family's dynamic. Integrating your public identity with your private roots requires delicate, ongoing compromise."
+  },
+  "moon_sextile_ic": {
+    "title": "IC Sextile Moon",
+    "summary": "You experience an easy, natural emotional grounding, and your family life generally flows smoothly to provide a comfortable base.",
+    "fullText": "You possess an innate ability to process the past and use those emotional lessons to secure your present. Nurturing yourself and others comes naturally, fostering a peaceful domestic atmosphere."
+  },
+  "moon_square_ic": {
+    "title": "IC Square Moon",
+    "summary": "Internal emotional conflicts regarding your past or childhood conditioning frequently clash with your current needs for security.",
+    "fullText": "You may struggle with ingrained familial habits that disrupt your emotional peace, requiring you to actively break generational patterns. Building a home that truly feels safe requires overcoming deep-seated emotional turbulence from your upbringing."
+  },
+  "moon_trine_ic": {
+    "title": "IC Trine Moon",
+    "summary": "You enjoy a seamless, deeply intuitive emotional connection to your roots and your family of origin.",
+    "fullText": "This aspect provides profound psychological stability and the ability to effortlessly create a nurturing, safe domestic environment. Your emotional baseline is secure, allowing you to trust your instincts when establishing your private life."
+  },
+  "moon_opposite_ic": {
+    "title": "IC Opposition Moon",
+    "summary": "Your emotional fulfillment may feel split between the need for public recognition and the desire for private comfort.",
+    "fullText": "You must consciously work to balance your vulnerable inner feelings with your professional responsibilities and outward authority. Emotions are often displayed publicly, which can sometimes leave your private sanctuary feeling depleted."
+  },
+  "moon_quincunx_ic": {
+    "title": "IC Quincunx Moon",
+    "summary": "There are irritating, persistent disconnects between your emotional habits and your true requirements for inner security.",
+    "fullText": "You may find yourself constantly having to adjust your home environment to achieve a fleeting sense of emotional comfort. A vague sense of not quite belonging emotionally to your ancestral roots requires conscious integration."
+  },
+  "mercury_sextile_ic": {
+    "title": "IC Sextile Mercury",
+    "summary": "You possess an easy, rational dialogue with family members and a logical approach to building emotional security.",
+    "fullText": "Understanding your past and communicating your psychological needs comes naturally to you. You are adept at organizing your domestic life through clear, effective communication."
+  },
+  "mercury_square_ic": {
+    "title": "IC Square Mercury",
+    "summary": "Mental restlessness frequently clashes with your fundamental need for domestic peace and grounding.",
+    "fullText": "Potential miscommunications or intellectual disagreements regarding family matters and ancestry can cause psychological tension. You must work to quiet your mind in order to truly connect with your deepest emotional roots."
+  },
+  "mercury_trine_ic": {
+    "title": "IC Trine Mercury",
+    "summary": "You have a natural ability to clearly articulate your feelings, explore your ancestry, and understand your psychological patterns.",
+    "fullText": "There is a harmonious, intellectually stimulating environment at home that supports your mental well-being. You easily translate your foundational emotions into constructive thoughts and ideas."
+  },
+  "mercury_opposite_ic": {
+    "title": "IC Opposition Mercury",
+    "summary": "A busy public or professional mind often distracts you from necessary private reflection and domestic rest.",
+    "fullText": "You may struggle to switch off your career planning or public communications when you enter your private sanctuary. Consciously separating your worldly thoughts from your psychological foundations is essential for inner peace."
+  },
+  "mercury_quincunx_ic": {
+    "title": "IC Quincunx Mercury",
+    "summary": "You experience a disconnect between your logical thoughts and your foundational, unspoken feelings.",
+    "fullText": "Struggling to accurately vocalize your deep psychological needs to your family can lead to minor, persistent misunderstandings. You must frequently adjust your communication style to align with the emotional reality of your home."
+  },
+  "venus_sextile_ic": {
+    "title": "IC Sextile Venus",
+    "summary": "You enjoy harmonious, loving relationships with your family and a natural ability to attract comfort to your home.",
+    "fullText": "Establishing financial stability and aesthetic warmth in your private life happens with relative ease. Your psychological foundation is supported by an innate appreciation for peace and diplomacy in the domestic realm."
+  },
+  "venus_square_ic": {
+    "title": "IC Square Venus",
+    "summary": "You may experience friction between your romantic or aesthetic desires and the traditional expectations of your family.",
+    "fullText": "There is a tendency to overindulge in sensory comforts as a way to self-soothe psychological insecurities rooted in the past. Finding a balance between what you value and what your foundational roots demand requires conscious effort."
+  },
+  "venus_trine_ic": {
+    "title": "IC Trine Venus",
+    "summary": "Effortless domestic bliss and a natural integration of art and love characterize your private life.",
+    "fullText": "You benefit from strong, loving ancestral roots that provide a deeply secure and beautiful psychological foundation. You effortlessly attract the resources needed to make your home a comfortable, luxurious sanctuary."
+  },
+  "venus_opposite_ic": {
+    "title": "IC Opposition Venus",
+    "summary": "You face a constant balancing act between maintaining public charm or professional partnerships and tending to your private intimacy.",
+    "fullText": "The demands of your social or relational life in the external world may threaten the peace of your domestic foundation. You must ensure that your pursuit of external harmony does not compromise your inner, foundational security."
+  },
+  "venus_quincunx_ic": {
+    "title": "IC Quincunx Venus",
+    "summary": "You face a constant need to adjust your values and relationship expectations to fit the reality of your psychological roots.",
+    "fullText": "What you find beautiful or desirable often feels slightly out of sync with your family background or domestic needs. Integrating your need for affection with your need for foundational security requires delicate, ongoing compromises."
+  },
+  "mars_sextile_ic": {
+    "title": "IC Sextile Mars",
+    "summary": "You are able to apply constructive, energetic action toward domestic projects and building inner security.",
+    "fullText": "You possess a healthy ability to assert your boundaries with family members without causing destructive conflict. Your psychological foundation provides a steady stream of motivation that supports your personal goals."
+  },
+  "mars_square_ic": {
+    "title": "IC Square Mars",
+    "summary": "Deep-seated familial conflicts or anger rooted in childhood conditioning may continually disrupt your inner peace.",
+    "fullText": "You experience a strong tension between your independent, aggressive drives and your need for a calm domestic sanctuary. Consciously managing domestic tension and healing early psychological anger is essential for your stability."
+  },
+  "mars_trine_ic": {
+    "title": "IC Trine Mars",
+    "summary": "You derive natural vitality, bravery, and resilience from a strong, highly supportive family base.",
+    "fullText": "You proactively build your emotional security, effortlessly taking charge of your private life and domestic duties. Your psychological roots fuel your ambitions, giving you the courage to assert yourself in the world."
+  },
+  "mars_opposite_ic": {
+    "title": "IC Opposition Mars",
+    "summary": "Your ambition and professional drive frequently pull your energy away from your home and family life.",
+    "fullText": "There is a high potential for public conflicts or career demands to aggressively disrupt your private peace. You must learn to channel your assertiveness professionally without bringing the battle back into your domestic sanctuary."
+  },
+  "mars_quincunx_ic": {
+    "title": "IC Quincunx Mars",
+    "summary": "You often experience a frustrating misdirection of energy regarding family matters and domestic responsibilities.",
+    "fullText": "Learning to assert your needs without unintentionally destabilizing your home life requires constant, careful adjustment. You may feel a persistent, irritating tension between your desire for action and your need for rest."
+  },
+  "jupiter_sextile_ic": {
+    "title": "IC Sextile Jupiter",
+    "summary": "Favorable opportunities naturally arise through your family connections or your connection to your ancestry.",
+    "fullText": "You possess a naturally optimistic psychological foundation that allows you to easily expand your sense of inner security. Cultivating abundance, joy, and philosophical meaning in your private life comes to you effortlessly."
+  },
+  "jupiter_square_ic": {
+    "title": "IC Square Jupiter",
+    "summary": "You have a tendency to overextend yourself domestically or inflate your expectations of family life.",
+    "fullText": "Grandiose visions of what a home should be can clash with the practical realities of your psychological roots. You must learn to ground your optimism and avoid excessive indulgence or over-promising within the private sphere."
+  },
+  "jupiter_trine_ic": {
+    "title": "IC Trine Jupiter",
+    "summary": "You experience an effortless expansion of your private world and benefit from a highly supportive, generous ancestral legacy.",
+    "fullText": "A deep psychological faith acts as your unshakeable foundation, protecting you during times of worldly stress. You naturally cultivate a home life that is prosperous, joyful, and rich in meaning."
+  },
+  "jupiter_opposite_ic": {
+    "title": "IC Opposition Jupiter",
+    "summary": "You are tasked with balancing grand professional aspirations and worldly success with the need for a quiet, secure base.",
+    "fullText": "There is a danger of becoming so focused on public expansion that you neglect your home and psychological roots. You must ensure your desire to conquer the world does not uproot the family foundation you rely upon."
+  },
+  "jupiter_quincunx_ic": {
+    "title": "IC Quincunx Jupiter",
+    "summary": "You face awkward adjustments between your profound desire for freedom and the expansive responsibilities of maintaining a home.",
+    "fullText": "Your philosophical beliefs may subtly conflict with the conditioning you received in childhood. Finding the right balance between exploring the world and enjoying domestic comfort requires ongoing tweaking."
+  },
+  "saturn_sextile_ic": {
+    "title": "IC Sextile Saturn",
+    "summary": "You utilize a steady, disciplined, and highly practical approach to building a secure home life.",
+    "fullText": "You can rely on consistent family support over time, and you honor your roots through steady, responsible actions. Your psychological foundation is built slowly but surely, resulting in unshakeable inner security."
+  },
+  "saturn_square_ic": {
+    "title": "IC Square Saturn",
+    "summary": "You may battle deep psychological blocks, fears, or feelings of inadequacy rooted firmly in your early life conditioning.",
+    "fullText": "There is an ongoing struggle against oppressive family structures or a feeling that your roots restrict your personal growth. Overcoming a sense of domestic burden and learning to nurture your inner child is a major life lesson."
+  },
+  "saturn_trine_ic": {
+    "title": "IC Trine Saturn",
+    "summary": "You benefit from excellent long-term stability in the domestic sphere and a profound respect for ancestral wisdom.",
+    "fullText": "Your psychological foundation is rock-solid, structured, and capable of weathering any external storm. You effortlessly integrate the rules and traditions of your past to build a secure future for your family."
+  },
+  "saturn_opposite_ic": {
+    "title": "IC Opposition Saturn",
+    "summary": "Heavy professional burdens, public responsibilities, or authority figures frequently restrict your private life and inner peace.",
+    "fullText": "You must work incredibly hard to build firm boundaries between your demanding career and your need for domestic rest. The weight of the world often feels at odds with your fundamental need for a protected psychological sanctuary."
+  },
+  "saturn_quincunx_ic": {
+    "title": "IC Quincunx Saturn",
+    "summary": "You experience persistent, low-level anxiety regarding your domestic responsibilities and familial obligations.",
+    "fullText": "You constantly feel the need to adjust your structural expectations at home to avoid feeling overwhelmed by duty. Integrating the strict rules of your upbringing with your current need for comfort requires delicate negotiation."
+  },
+  "uranus_sextile_ic": {
+    "title": "IC Sextile Uranus",
+    "summary": "You adapt easily to changes in the home and find psychological security through progressive or non-traditional family structures.",
+    "fullText": "You effortlessly integrate modern ideas, technology, or unique living arrangements into your private sanctuary. Your connection to your roots is intellectual, objective, and wonderfully liberating."
+  },
+  "uranus_square_ic": {
+    "title": "IC Square Uranus",
+    "summary": "Sudden, unexpected disruptions in your domestic life frequently clash with your need for foundational stability.",
+    "fullText": "You experience a deep psychological rebellion against your roots, ancestral conditioning, or family expectations. Finding peace requires you to accept that your inner world is meant to be dynamic and ever-changing, rather than fixed."
+  },
+  "uranus_trine_ic": {
+    "title": "IC Trine Uranus",
+    "summary": "You enjoy a liberating, exciting home environment that effortlessly supports your individuality and unique quirks.",
+    "fullText": "You have a natural ability to detach from toxic family patterns and radically reinvent your psychological foundations. Your private life is an effortless source of awakening, freedom, and intellectual stimulation."
+  },
+  "uranus_opposite_ic": {
+    "title": "IC Opposition Uranus",
+    "summary": "Unpredictable career changes, public controversies, or a desire to shock the world frequently destabilize your domestic foundation.",
+    "fullText": "You require a career that allows for immense personal freedom so that the tension does not destroy your private peace. Balancing your public rebellions with a need for a safe place to land is a lifelong theme."
+  },
+  "uranus_quincunx_ic": {
+    "title": "IC Quincunx Uranus",
+    "summary": "You experience irritating unpredictability in private matters and struggle to integrate your desire for rebellion with a need for roots.",
+    "fullText": "Your craving for absolute domestic freedom often feels slightly out of sync with your actual psychological vulnerabilities. You must continually adjust your living situation to satisfy both your restlessness and your need for a base."
+  },
+  "neptune_sextile_ic": {
+    "title": "IC Sextile Neptune",
+    "summary": "You have an intuitive, healing connection to your ancestry and approach family life with deep compassion.",
+    "fullText": "You effortlessly create a domestic environment that is peaceful, artistic, and spiritually uplifting. Your psychological foundations are softened by a natural acceptance and forgiveness of your past."
+  },
+  "neptune_square_ic": {
+    "title": "IC Square Neptune",
+    "summary": "You may suffer from confusion, idealization, or deception regarding your roots and early childhood conditioning.",
+    "fullText": "A struggle to find solid psychological grounding can lead to escapist tendencies within the private sphere. Establishing clear emotional boundaries with family members is essential to protect your fragile inner sanctuary."
+  },
+  "neptune_trine_ic": {
+    "title": "IC Trine Neptune",
+    "summary": "You experience an effortless spiritual anchoring, and your home serves as a truly transcendent, healing sanctuary.",
+    "fullText": "Your deep psychological foundations are infused with unconditional love, artistic inspiration, and divine connection. You naturally draw upon the mystical or creative strengths of your ancestral lineage."
+  },
+  "neptune_opposite_ic": {
+    "title": "IC Opposition Neptune",
+    "summary": "Your public life, career, or worldly reputation may be shrouded in glamour, confusion, or scandal, draining your private foundation.",
+    "fullText": "You may sacrifice your domestic peace for a public ideal, or struggle with a lack of direction in your professional life that bleeds into the home. Learning to set firm boundaries between the illusions of the world and the reality of your sanctuary is crucial."
+  },
+  "neptune_quincunx_ic": {
+    "title": "IC Quincunx Neptune",
+    "summary": "You carry a vague, persistent sense of not quite belonging at home or being fully understood by your family.",
+    "fullText": "You must constantly adjust your overly idealistic expectations of family life to avoid chronic disappointment. Bridging the gap between your spiritual longing and your actual psychological roots requires delicate inner work."
+  },
+  "pluto_sextile_ic": {
+    "title": "IC Sextile Pluto",
+    "summary": "You possess a natural ability to constructively regenerate your family patterns and heal generational wounds.",
+    "fullText": "You integrate depth, power, and emotional honesty into your private life with relative ease. Your psychological foundation is a source of immense empowerment, providing a steady base for personal transformation."
+  },
+  "pluto_square_ic": {
+    "title": "IC Square Pluto",
+    "summary": "You face intense power struggles, control issues, or deep psychological crises tied directly to your family of origin.",
+    "fullText": "The dismantling of toxic roots and the confronting of childhood conditioning are unavoidable and often painful themes in your life. You must consciously work to release the need for absolute control in your domestic sphere to find true inner peace."
+  },
+  "pluto_trine_ic": {
+    "title": "IC Trine Pluto",
+    "summary": "You experience effortless psychological empowerment through a profound, fearless connection to your ancestry.",
+    "fullText": "Your home environment is fiercely loyal, intensely protected, and naturally facilitates deep emotional regeneration. You draw immense, hidden strength from your roots, allowing you to weather any worldly crisis."
+  },
+  "pluto_opposite_ic": {
+    "title": "IC Opposition Pluto",
+    "summary": "Intense professional ambitions, public power dynamics, or authority struggles frequently threaten your domestic peace.",
+    "fullText": "You are tasked with balancing your desire for control and dominance in the public sphere with your need for a safe, vulnerable private life. The transformation of your career path will inevitably force a massive restructuring of your psychological foundations."
+  },
+  "pluto_quincunx_ic": {
+    "title": "IC Quincunx Pluto",
+    "summary": "You navigate simmering, unspoken tensions at home and a persistent feeling of psychological unease.",
+    "fullText": "There is a need to continually adjust to subtly shifting power dynamics within your family or your private life. Integrating your deepest survival instincts with your daily need for domestic comfort requires constant psychological calibration."
+  },
+  "chiron_sextile_ic": {
+    "title": "IC Sextile Chiron",
+    "summary": "You encounter easy opportunities to heal your psychological wounds through supportive domestic routines and a conscious connection to your ancestry.",
+    "fullText": "Family members may act as gentle guides in your healing process, or you may provide that healing for them. You effortlessly use your private sanctuary as a place of holistic recovery."
+  },
+  "chiron_square_ic": {
+    "title": "IC Square Chiron",
+    "summary": "You experience acute, recurring pain regarding your roots, your early conditioning, or a feeling of homelessness.",
+    "fullText": "There is a challenging but absolutely necessary confrontation with childhood trauma that continually disrupts your inner peace. True security can only be achieved by actively leaning into and unwinding the painful history of your family line."
+  },
+  "chiron_trine_ic": {
+    "title": "IC Trine Chiron",
+    "summary": "You experience a seamless integration of past pain into deep, empathetic emotional wisdom.",
+    "fullText": "Your home environment naturally facilitates healing, acting as a profound sanctuary for your bruised psyche. You have an effortless ability to understand the wounds of your ancestors and transform them into psychological strength."
+  },
+  "chiron_opposite_ic": {
+    "title": "IC Opposition Chiron",
+    "summary": "Wounds related to your public standing, career failures, or authority figures frequently disrupt your inner peace.",
+    "fullText": "You must find healing by learning to balance the painful demands of your worldly ambitions with the need for a safe private life. Your path to recovery involves protecting your psychological foundations from the harsh judgments of the public sphere."
+  },
+  "chiron_quincunx_ic": {
+    "title": "IC Quincunx Chiron",
+    "summary": "Nagging insecurities rooted in your childhood require ongoing, delicate emotional adjustments to heal.",
+    "fullText": "You may feel a persistent, low-level ache regarding your family dynamics that never quite seems to resolve. Finding inner security requires you to constantly tweak your domestic environment to soothe your psychological triggers."
+  }
+}

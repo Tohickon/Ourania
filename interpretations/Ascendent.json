@@ -1,0 +1,421 @@
+Planets on or near the Ascendant (typically within 10 degrees) act as a secondary "mask" and profoundly alter the expression of the rising sign
+. These planets possess "accidental dignity," meaning their power and visibility in the individual's life are greatly magnified
+.
+Because the Ascendant is a calculated mathematical point rather than a physical body, it only receives aspects
+. An aspect to the Ascendant colors the person's identity, physical appearance, and outward projection, but it does not alter the core expression of the aspecting planet itself
+.
+
+
+
+{
+  "ascendant_aries": {
+    "title": "Ascendant in Aries",
+    "summary": "An energetic, commanding persona that approaches the world with impulsiveness and courage [1].",
+    "fullText": "The Ascendant reflects the face you show the world and your outer demeanor [2]. With Aries rising, this persona is energetic, assertive, impulsive, and commanding [1]. Ruled by Mars, this placement projects an image of a pioneer or a warrior. Physically, this often manifests as a dry body of medium-tall height, strong bones and limbs, wide shoulders, a long face and neck, a dark complexion, and thick eyebrows [3]."
+  },
+  "ascendant_taurus": {
+    "title": "Ascendant in Taurus",
+    "summary": "A stable, methodical persona focused on maintaining security and practicality [4, 5].",
+    "fullText": "The Ascendant represents your outward approach to life and initial self-projection [6]. A Taurus Ascendant projects a loyal, methodical, and utilitarian personality that is highly goal-oriented and focused on security [4]. Ruled by Venus, this Ascendant acts as the 'maintainer' of the zodiac [5]. Physically, this placement traditionally indicates a short and full stature, large shoulders, a wide forehead, big eyes and mouth, dark hair, and large hands [3]."
+  },
+  "ascendant_gemini": {
+    "title": "Ascendant in Gemini",
+    "summary": "An inquisitive, communicative persona that navigates the world with intellect and curiosity [5].",
+    "fullText": "Because the Ascendant dictates how the outside world looks at you [2], Gemini rising projects the image of the 'questioner' [5]. Ruled by Mercury, the native appears highly communicative, adaptable, and intellectually restless. Physically, traditional astrology associates this Ascendant with a straight, tall body, long arms but short hands and feet, dark hair, and a sanguine (though sometimes darker) complexion [3]."
+  },
+  "ascendant_cancer": {
+    "title": "Ascendant in Cancer",
+    "summary": "A nurturing, sympathetic persona that acts as a protective force in its environment [5, 7].",
+    "fullText": "The Ascendant is the point of personal emergence and physical appearance [8]. Cancer rising presents a deeply sympathetic persona that is highly attuned to public feelings, though often driven by an instinct to nurture and protect [5, 7]. Because it is ruled by the Moon, the native's outer mask is sensitive and emotionally responsive. Physically, this Ascendant is associated with a short stature, a larger upper body, a pale complexion, dark hair, and small eyes [3]."
+  },
+  "ascendant_leo": {
+    "title": "Ascendant in Leo",
+    "summary": "A radiant, confident persona that seeks outward self-expression and personal glory [2, 9].",
+    "fullText": "The Ascendant colors your outward demeanor [2]. Leo rising projects a fun-loving, dramatic, and commanding image, constantly questing for personal glory [9]. Ruled by the Sun, this placement gives off an aura of natural authority and warmth. Traditional physical characteristics include an above-average stature, a full body with large shoulders but a narrow chest, a big round head, light curly hair, tanned skin, and prominent, large eyes [3]."
+  },
+  "ascendant_virgo": {
+    "title": "Ascendant in Virgo",
+    "summary": "A meticulous, practical persona that engages with the world through analysis and service [2, 4].",
+    "fullText": "Your Ascendant serves as the persona you easily and naturally show to others [10]. With Virgo rising, this mask is cautious, economical, and highly observant [4]. Ruled by Mercury, the individual approaches new situations with a practical, analytical, and problem-solving mindset. Physically, a Virgo Ascendant classically corresponds to a medium height, a thin and harmonious body with a tendency toward short limbs, and a dark complexion and hair [3]."
+  },
+  "ascendant_libra": {
+    "title": "Ascendant in Libra",
+    "summary": "A diplomatic, sociable persona focused on relationships, balance, and aesthetic harmony [2, 9].",
+    "fullText": "As the Ascendant describes the native's initial physical and psychological presentation [8, 11], Libra rising projects a deeply relational, curious, and mentalistic character [9]. Ruled by Venus, they strive to create a rich, harmonious atmosphere with others [12]. Physically, this placement is traditionally associated with a tall and thin body that is harmonious and straight, a round face, a fair complexion with pinkish skin, and soft, light hair [3]."
+  },
+  "ascendant_scorpio": {
+    "title": "Ascendant in Scorpio",
+    "summary": "An intense, guarded persona that projects profound emotional depth and magnetism [2, 9].",
+    "fullText": "The Ascendant signifies how you act initially in new environments [11]. Scorpio rising projects an intensely emotional, deeply feeling nature that prioritizes emotional authenticity above all else [9]. Ruled traditionally by Mars and modernly by Pluto, this persona can seem impenetrable, magnetic, and fiercely protective. Physically, this Ascendant is linked to a strong, robust, hairy, stocky, and compact body with slightly bowed legs, a dark complexion, coarse hair, a long face, and a short neck [3]."
+  },
+  "ascendant_sagittarius": {
+    "title": "Ascendant in Sagittarius",
+    "summary": "An adventurous, optimistic persona that approaches life as a philosophical quest [2, 9].",
+    "fullText": "Because the Ascendant represents the native's immediate engagement with the world [11], Sagittarius rising projects a fun-loving, independent, and enlightened seeker [9]. Ruled by Jupiter, the individual appears open, freedom-loving, and guided by a desire for absolute truth [13]. Physically, traditional texts describe this placement as having an above-average height, a robust body with harmonious limbs, a pleasant and full long face, a tanned complexion, and light hair [3]."
+  },
+  "ascendant_capricorn": {
+    "title": "Ascendant in Capricorn",
+    "summary": "A serious, goal-oriented persona that projects authority, structure, and pragmatic ambition [2, 4].",
+    "fullText": "The Ascendant reflects the face you show the world [2]. Capricorn rising projects a highly responsible, self-motivated, and pragmatic image [4, 9]. Ruled by Saturn, the native appears disciplined, cautious, and ready to navigate physical trials to build security. Physically, this Ascendant traditionally manifests as a dry body with a medium to short stature, a long neck, a narrow chest, dark hair, a long and lean face, and a narrow chin [3]."
+  },
+  "ascendant_aquarius": {
+    "title": "Ascendant in Aquarius",
+    "summary": "An eccentric, independent persona that interacts with the world through objective, collective ideals [2, 9].",
+    "fullText": "Your Rising sign determines your outward approach to life [6]. Aquarius rising presents a highly mental, curious, and socially conscious individual who values collective relationships over subjective emotional displays [9]. Ruled traditionally by Saturn and modernly by Uranus, this persona is often perceived as unique or unconventional. Physically, this placement indicates a stocky, large, fleshy or strong body that is well-proportioned, alongside a long face and a light sanguine complexion [3]."
+  },
+  "ascendant_pisces": {
+    "title": "Ascendant in Pisces",
+    "summary": "A compassionate, adaptable persona that acts as a sensitive chameleon in its environment [2, 14].",
+    "fullText": "The Ascendant characterizes the native's outward demeanor [2]. Pisces rising projects a benevolent, imaginative, and highly intuitive image [14]. Ruled traditionally by Jupiter and modernly by Neptune, the native is a chameleon, easily taking on the colors of their environment and showing deep empathy for others [14]. Physically, this Ascendant is classically described as having a short stature, a fleshy and slightly curved body that is not very harmonious, a pale complexion, and a large face [3]."
+  },
+  "sun_conjunct_ascendant": {
+    "title": "Sun Conjunct Ascendant",
+    "summary": "A self-motivated, highly visible persona with strong leadership potential.",
+    "fullText": "With the Sun on the Ascendant, the core identity is fused with the outward persona. This individual finds it nearly impossible to be inconspicuous and tends to be noticed wherever they go [4]. They are self-motivated, eager to take charge of their own destiny, and project a natural aura of authority and vitality [4]. There is no mask to hide behind; they authentically identify with the image they present to the world [5]."
+  },
+  "moon_conjunct_ascendant": {
+    "title": "Moon Conjunct Ascendant",
+    "summary": "A highly sensitive, emotionally expressive persona that openly projects its moods and needs.",
+    "fullText": "The Moon on the Ascendant makes the individual extremely lunar, openly projecting either a strong urge to nurture others or a deep need to be nurtured [6]. Their emotions and moods are highly visible to the public, and they process their immediate environment through feeling and intuition [6]. This placement is so powerful that emotional security needs can sometimes derail the conscious goals of the Sun [6]."
+  },
+  "mercury_conjunct_ascendant": {
+    "title": "Mercury Conjunct Ascendant",
+    "summary": "A bright, curious, and talkative persona driven by a need to communicate.",
+    "fullText": "Mercury on the Ascendant creates an immediate impression of someone who is youthful, inquisitive, and highly verbal [7]. These individuals have a pronounced need to talk, write, and share their personal experiences with their environment [7]. They are agile thinkers who constantly gather data from their surroundings, often resulting in a restless or highly mobile physical presentation [7]."
+  },
+  "venus_conjunct_ascendant": {
+    "title": "Venus Conjunct Ascendant",
+    "summary": "A charming, aesthetically pleasing persona focused on social harmony.",
+    "fullText": "With Venus rising, the individual projects an accommodating, diplomatic, and highly social image [1]. They are often very concerned with physical appearance, aesthetics, and keeping the peace in their immediate environment [8]. This placement grants a natural magnetism and attractiveness, making the person appear approachable and Venusian to a fault [1]."
+  },
+  "mars_conjunct_ascendant": {
+    "title": "Mars Conjunct Ascendant",
+    "summary": "A competitive, courageous, and action-oriented persona ready to take the initiative.",
+    "fullText": "Mars on the Ascendant views the world as a highly competitive place and approaches it with readiness for action [9]. The individual projects an image of strength, courage, and independence, sometimes appearing impatient or spoiling for a fight [9]. They are eager to get things started, highly self-reliant, and fiercely determined to assert their own will upon their environment [9]."
+  },
+  "jupiter_conjunct_ascendant": {
+    "title": "Jupiter Conjunct Ascendant",
+    "summary": "An expansive, optimistic, and philosophical persona that naturally attracts good fortune.",
+    "fullText": "With Jupiter on the Ascendant, the individual projects a larger-than-life, cheerful, and generous image. Jupiter brings expansion and good fortune to everything in its path [1]. The native often appears confident, highly philosophical, and eager to explore the world. This placement magnifies the qualities of the rising sign and can make the person seem naturally lucky or influential [2, 3]."
+  },
+  "saturn_conjunct_ascendant": {
+    "title": "Saturn Conjunct Ascendant",
+    "summary": "A serious, disciplined, and highly responsible persona.",
+    "fullText": "Saturn imposes orderly limitations, restrictions, structure, and discipline [2]. When conjunct the Ascendant, the individual projects an aura of maturity, caution, and authority, often appearing older or more serious than their years [4]. They approach new situations methodically and cautiously, focusing on practical realities rather than taking risks."
+  },
+  "uranus_conjunct_ascendant": {
+    "title": "Uranus Conjunct Ascendant",
+    "summary": "An eccentric, independent, and rebellious persona that breaks boundaries.",
+    "fullText": "Uranus invites innovation, revolution, and rebellion [2]. With Uranus rising, the native presents themselves as highly unconventional, unpredictable, and fiercely independent. They resist being boxed in by societal norms and project an electric, restless energy that can abruptly overturn established ways of operating."
+  },
+  "neptune_conjunct_ascendant": {
+    "title": "Neptune Conjunct Ascendant",
+    "summary": "A dreamy, sensitive, and highly intuitive persona that easily blends into its environment.",
+    "fullText": "Neptune combines a planet's usual energy with a hazy view of reality [2]. On the Ascendant, it creates a chameleon-like, mystical, and deeply compassionate outer mask. The individual is highly impressionable and emotionally attuned to their surroundings, often appearing elusive or possessing a glamorous, artistic, or otherworldly aura [2, 5]."
+  },
+  "pluto_conjunct_ascendant": {
+    "title": "Pluto Conjunct Ascendant",
+    "summary": "An intense, magnetic, and powerful persona that commands the environment.",
+    "fullText": "Pluto is the god of transformation, revealing the dark side of energy [2]. When on the Ascendant, the native projects formidable emotional depth, secrecy, and a penetrating intensity. They possess a powerful presence that easily impacts others, often undergoing profound physical or psychological regenerations throughout their lives [2, 5]."
+  },
+  "sun_square_ascendant": {
+    "title": "Sun Square Ascendant",
+    "summary": "A highly energetic period in relationships where you must guard against dominating others or encountering cross-purposes.",
+    "fullText": "During this transit, you will display a great deal of energy in your dealings with other people [1]. You might try to dominate others, or encounter people whose purposes are at cross-purposes with your own [1]. It is crucial to honestly evaluate your intentions and ensure your actions remain in harmony with those around you, rather than simply fighting for your own way [1]."
+  },
+  "moon_square_ascendant": {
+    "title": "Moon Square Ascendant",
+    "summary": "An emotionally tense period where fluctuating moods can create friction in your personal relationships and outward persona.",
+    "fullText": "The Moon governs your memories, comforts, and emotions [2]. When it forms a square aspect to your Ascendant, it brings dynamic tension and friction to the way you present yourself to the world [3, 4]. You may find that your internal emotional needs clash with your environment or your one-on-one relationships [5, 6]. It is an important time to be aware of emotional reactions and adjust how you relate to others [7]."
+  },
+  "mercury_square_ascendant": {
+    "title": "Mercury Square Ascendant",
+    "summary": "A mentally restless period favorable for communication, but prone to scattered energies and wasted time.",
+    "fullText": "Normally this transit is quite favorable for all forms of communication and getting in touch with people [8]. Your mind moves quickly and you will feel eager to exchange ideas, but the drive of this energy can cause you to waste time chattering without accomplishing much [8]. Be careful not to let this restless mental energy prevent you from being productive [8]."
+  },
+  "venus_square_ascendant": {
+    "title": "Venus Square Ascendant",
+    "summary": "A pleasant, sociable period focused on affection, though potentially lacking in self-discipline and honesty.",
+    "fullText": "This square is usually extremely pleasant, marking a time to reach out and give or receive affection [9]. You will enjoy being with people and socializing, but you might avoid necessary work or become self-indulgent [9]. There is also a distinct reluctance to voice your real complaints during this transit, as you will likely prefer to smooth over ruffled feelings [9]."
+  },
+  "mars_square_ascendant": {
+    "title": "Mars Square Ascendant",
+    "summary": "A stormy, highly competitive period requiring compromise to avoid severe relationship conflicts.",
+    "fullText": "This transit is likely to coincide with a stormy period in your personal relationships where you might differ on personal objectives [10]. You may identify so closely with your own point of view that you feel your honor depends on triumphing [10]. Try to work on independent projects if you cannot compromise with others, as team efforts are unlikely to work well right now [10]."
+  },
+  "jupiter_square_ascendant": {
+    "title": "Jupiter Square Ascendant",
+    "summary": "A period of relationship growth and expansion that carries the risk of arrogance or taking others for granted.",
+    "fullText": "This is usually an excellent transit for most relationships, signifying a strong desire to grow and advance through contacts with others [11]. While you are likely willing to give as much as you get, be careful not to act arrogantly or seek advantages without giving anything in return [11]. Acting selfishly now will cause others to reject you when you hit hard times [11]."
+  },
+  "saturn_square_ascendant": {
+    "title": "Saturn Square Ascendant",
+    "summary": "A time of severe relationship testing where you must reevaluate connections and avoid building walls.",
+    "fullText": "This transit signifies a time of severe testing in your relationships, forcing you to reevaluate which connections are worth keeping [12]. There is often a strong tendency to unknowingly build a wall between yourself and others, leading to feelings of loneliness or isolation [12]. You may feel that you lack support from loved ones you have counted on in the past [12]."
+  },
+  "uranus_square_ascendant": {
+    "title": "Uranus Square Ascendant",
+    "summary": "A disruptive period bringing sudden changes, challenges, and unpredictable encounters to your relationships.",
+    "fullText": "This transit will likely have a very disruptive effect on your relationships, challenging the foundations upon which your life is built [13]. It often brings surprising encounters that upset your way of living, or sudden separations from people you thought would remain in your life [13]. You yourself may act as the catalyst for these changes as you seek freedom from oppressive circumstances [13]."
+  },
+  "neptune_square_ascendant": {
+    "title": "Neptune Square Ascendant",
+    "summary": "A confusing period in relationships where clear goals and objective negotiations become difficult.",
+    "fullText": "Your relationships are likely to become confused and difficult at this time [14]. You may encounter people who try to dissuade you from your committed path, leaving you uncertain about your direction in life [14]. This is not a good time for business or contractual negotiations, as it will be exceedingly difficult to think clearly about your objectives [14]."
+  },
+  "pluto_square_ascendant": {
+    "title": "Pluto Square Ascendant",
+    "summary": "An intense period of relational upheaval that brings about profound transformation and new beginnings.",
+    "fullText": "This transit provides very intense encounters that may completely transform the important relationships in your life [15]. A relationship that has outlived its function or is in great difficulty may end altogether, making way for new connections that serve a more constructive purpose [15]. You are experiencing a profound period of death and resurrection through your relationships [15]."
+  },
+  "sun_trine_ascendant": {
+    "title": "Sun Trine Ascendant",
+    "summary": "A positive period of self-confidence, vitality, and harmonious interactions with others.",
+    "fullText": "Under this transit you are likely to feel quite good about yourself in a positive way [1, 2]. You will want to be with other people, making it an excellent time for socializing and having a good time [1, 2]. You seek to expand your daily routine and are eager to learn more about yourself and the world, making it a highly favorable time to relax, travel, and enjoy life [1, 2]."
+  },
+  "moon_trine_ascendant": {
+    "title": "Moon Trine Ascendant",
+    "summary": "A time of emotional equilibrium where your inner feelings flow smoothly into your outward persona.",
+    "fullText": "This transit brings a deep sense of inner peace and emotional balance [3, 4]. Your interactions with others are colored by heightened sensitivity and sympathy, allowing you to connect easily with your environment [3, 4]. Because your emotional needs are in harmony with the way you project yourself, you can build supportive, nurturing relationships and experience a natural flow of give-and-take [5, 6]."
+  },
+  "mercury_trine_ascendant": {
+    "title": "Mercury Trine Ascendant",
+    "summary": "A mentally stimulating period excellent for communication, learning, and sharing ideas.",
+    "fullText": "This transit is generally good for the flow of ideas and communication between you and others [7, 8]. You are intellectually alive, curious, and willing to learn [7, 8]. It is a highly favorable day to attend a lecture or class, as you are open to having your ideas challenged to broaden your thinking [7, 8]. All interchanges with others today should be fruitful and expansive [7, 8]."
+  },
+  "venus_trine_ascendant": {
+    "title": "Venus Trine Ascendant",
+    "summary": "A highly pleasant transit favoring affection, socializing, and the enjoyment of life's pleasures.",
+    "fullText": "This is an excellent transit for good times, entertaining, and just having fun [9, 10]. You are likely to put self-gratification and pleasure before work, but this is not out of selfishness; you are quite capable of being generous and giving to others [9, 10]. You are more openly affectionate than usual and feel real love for the people around you, making it an ideal time for social gatherings [9, 10]."
+  },
+  "mars_trine_ascendant": {
+    "title": "Mars Trine Ascendant",
+    "summary": "A period of high physical energy and confident self-assertion that earns the respect of others.",
+    "fullText": "This is a time of self-assurance and confidence in dealing with others [11, 12]. Without being overly aggressive or pugnacious, you get your point across in such a way that people respect you [11, 12]. You have a great deal of physical energy, making you want to take part in vigorous activity [11, 12]. You are able to act much more decisively than usual and can effectively balance group dynamics [11, 12]."
+  },
+  "jupiter_trine_ascendant": {
+    "title": "Jupiter Trine Ascendant",
+    "summary": "A period of natural optimism, growth, and beneficial connections with others.",
+    "fullText": "During this transit, you project a generous and expansive persona that effortlessly attracts good fortune and positive relationships [13]. This harmonious energy minimizes resistance from your environment, allowing you to grow in knowledge and experience without significant stress [13]. It is a highly favorable time to reach out to others, travel, or engage in educational pursuits [13]."
+  },
+  "saturn_trine_ascendant": {
+    "title": "Saturn Trine Ascendant",
+    "summary": "A stabilizing transit that favors disciplined work, organization, and earning respect for your practical efforts.",
+    "fullText": "This transit offers a period of stability where your disciplined approach to life easily meshes with your outward environment [13]. It is an excellent time to tackle hard work, establish long-term structures, and handle your responsibilities efficiently [13]. Others recognize your maturity and reliability, allowing you to quietly build security and lay the groundwork for future success [13]."
+  },
+  "uranus_trine_ascendant": {
+    "title": "Uranus Trine Ascendant",
+    "summary": "An exciting period where you can introduce creative changes and express your individuality harmoniously.",
+    "fullText": "Under this transit, you are offered an opportunity to break free from restrictive routines and express your uniqueness without causing disruptive chaos [13]. You feel more daring and willing to experiment with new ways of presenting yourself to the world [13]. It is a highly stimulating time that brings unexpected but pleasant encounters and a refreshing sense of personal freedom [13]."
+  },
+  "neptune_trine_ascendant": {
+    "title": "Neptune Trine Ascendant",
+    "summary": "A deeply compassionate and idealistic transit that enhances your spiritual and creative connections.",
+    "fullText": "This transit softens your outward persona, increasing your sensitivity, empathy, and appreciation for beauty [13]. Your interactions with others are guided by high ideals and a genuine desire to help or uplift them [13]. It is an excellent time for creative arts, spiritual studies, or simply enjoying a peaceful, harmonious flow with the people in your immediate environment [13]."
+  },
+  "pluto_trine_ascendant": {
+    "title": "Pluto Trine Ascendant",
+    "summary": "A transformative transit that allows for deep, empowering changes in your relationships and self-expression.",
+    "fullText": "This is a time of creative change in your relationships, where you have the opportunity to be either the agent of the changes or the object of them [14, 15]. You may experience an increase in personal power, allowing you to exert a meaningful influence on others [14, 15]. You will seek a higher quality and greater intensity in all your experiences, naturally drawing in constructive, profound encounters [16, 17]."
+  },
+  "sun_opposite_ascendant": {
+    "title": "Sun Opposite Ascendant",
+    "summary": "A time when your vital focus shifts to close partnerships, requiring balance between your ego and the needs of others.",
+    "fullText": "During this transit, your attention turns toward your one-on-one relationships and how you project yourself onto others [1, 2]. You may encounter people who oppose your goals, or you might find that you need another person to help you clearly see your own path [3]. It is a period that tests your ability to compromise and maintain your core identity while cooperating with a partner."
+  },
+  "moon_opposite_ascendant": {
+    "title": "Moon Opposite Ascendant",
+    "summary": "An emotionally charged period where your feelings are heavily influenced by your interactions and close relationships.",
+    "fullText": "This transit brings your emotional needs into the arena of partnerships. You are likely to seek comfort, security, and nurturing through close one-on-one encounters [3]. However, because the Moon rules fluctuating moods, you may also experience emotional ups and downs based entirely on how others are reacting to you. It is a time for sharing your feelings, provided you do not let irrational, subconscious drives dictate your actions [4]."
+  },
+  "mercury_opposite_ascendant": {
+    "title": "Mercury Opposite Ascendant",
+    "summary": "A highly stimulating mental period perfect for debates, conversations, and negotiating contracts with others.",
+    "fullText": "At this time, you will seek increased mental stimulation through contacts with others, whether through lively conversation or friendly debate [5]. It is an excellent transit for consulting experts, seeking advice, or negotiating business deals and contracts because your mind is clear and geared toward finding mutual understanding [5, 6]. Communication with a spouse or close partner is also highly favored, making it a great time to clear the air [6]."
+  },
+  "venus_opposite_ascendant": {
+    "title": "Venus Opposite Ascendant",
+    "summary": "A highly favorable and harmonious period for all close relationships, marriages, and one-on-one encounters.",
+    "fullText": "This is an extremely favorable transit for close relationships and one-on-one encounters of any sort [7]. Marriages and love relationships should go smoothly, with both partners showing a great deal of affection [7]. If there are any existing difficulties, this is the ideal time to smooth them out, as you will both be much more interested in making peace than in arguing a rigid position [7]."
+  },
+  "mars_opposite_ascendant": {
+    "title": "Mars Opposite Ascendant",
+    "summary": "A highly conflict-prone transit where you must navigate intense ego clashes, power struggles, and open opposition from others.",
+    "fullText": "This is one of the most conflict-prone of all transits, as the point opposite the Ascendant (the Descendant) signifies open enemies and conflicts [8]. Anything you try to do now is likely to encounter stiff opposition, and you will have to fight for what you want [8]. Ego energies run very high in direct confrontations, creating a serious conflict between your need to assert yourself and your need for harmonious relationships [8]."
+  },
+  "jupiter_opposite_ascendant": {
+    "title": "Jupiter Opposite Ascendant",
+    "summary": "A period of mutual growth, beneficial partnerships, and expanding your worldview through close contacts with others.",
+    "fullText": "During this period, you seek to grow in various ways through your closest contacts with other people [9]. You try to create relationships that will further your life in a spirit of mutual growth rather than selfishness [9]. Often, a person will come into your life who offers to help you out in some way, making this an extremely good time to enter into a business partnership, sign a contract, or deepen a personal bond [9]."
+  },
+  "saturn_opposite_ascendant": {
+    "title": "Saturn Opposite Ascendant",
+    "summary": "A time of severe testing and restructuring in your close relationships, demanding maturity and realistic boundaries.",
+    "fullText": "This transit forces you to evaluate the structures and commitments within your one-on-one relationships. You may feel that others are blocking your path or that a partner is being overly critical and restrictive [10]. Relationships that are weak or superficial may break under this pressure, while strong ones will be forced to mature and redefine their boundaries [11]. You must take responsibility for your commitments and face the reality of your partnerships."
+  },
+  "uranus_opposite_ascendant": {
+    "title": "Uranus Opposite Ascendant",
+    "summary": "A disruptive period that brings sudden changes, unexpected encounters, and a demand for freedom in your relationships.",
+    "fullText": "This transit brings about disturbing close encounters with others, making relationships in general a significant challenge [12]. Other people may seem to be trying to disrupt your life or make you uneasy, and you won't be able to take old, reliable relationships for granted [12]. There is a powerful urge to break free from restrictions, which can lead to sudden separations if a partnership has become oppressive [12, 13]."
+  },
+  "neptune_opposite_ascendant": {
+    "title": "Neptune Opposite Ascendant",
+    "summary": "A confusing time in partnerships where idealization, deception, or a desire to 'save' others can cloud your judgment.",
+    "fullText": "During this transit, the boundaries between you and others become highly permeable, making you deeply sensitive to your partner's needs. However, it also brings the danger of inflated expectations, illusions, and misunderstandings [14, 15]. You may attract people who seem to need rescuing, or you may project your own highest ideals onto someone who cannot live up to them [16]. Clarity and strict emotional boundaries are essential."
+  },
+  "pluto_opposite_ascendant": {
+    "title": "Pluto Opposite Ascendant",
+    "summary": "An intense period of power struggles and profound transformation brought about by your encounters with others.",
+    "fullText": "This transit indicates extremely intense encounters that can completely transform the important relationships in your life [17]. You are likely to get involved in severe power struggles, where you may try to force others to take a certain course of action, or they may attempt to coerce you [18]. It is crucial to avoid underhanded tactics or naked power plays, as these confrontations are meant to purge what is no longer working [18, 19]."
+  },
+{
+  "sun_sextile_ascendant": {
+    "title": "Sun Sextile Ascendant",
+    "summary": "A time to seek recognition and confidently integrate your individual goals with group efforts.",
+    "fullText": "During this aspect, you will seek recognition from your friends and the people you associate with every day [1]. You want to let your immediate world know that you are a person with individual needs and wants [1]. It is highly favorable for team efforts, as your own drives can be satisfied through working cooperatively rather than attempting to dominate others [1]."
+  },
+  "moon_sextile_ascendant": {
+    "title": "Moon Sextile Ascendant",
+    "summary": "A period of heightened emotional sensitivity and a strong desire to connect with close friends and relatives.",
+    "fullText": "This aspect increases your desire to be with people to whom you are emotionally close, especially female friends and relatives [2]. You may spend this time reminiscing or engaging in sentimental reverie [2]. Because you are highly sensitive to other people's moods and can judge them quickly, you naturally lend a sympathetic and friendly ear to their problems [2]."
+  },
+  "mercury_sextile_ascendant": {
+    "title": "Mercury Sextile Ascendant",
+    "summary": "A mentally alert period that favors quickened communication, commerce, and reaching agreements with others.",
+    "fullText": "This aspect quickens your mind and increases your mental, verbal, and commercial exchanges with other people [3]. You feel highly alert and eager to talk, but it is best used for more serious communication rather than just small talk [3]. It actively assists you and your associates in reaching agreements, even regarding matters that have previously been points of dispute [3]."
+  },
+  "venus_sextile_ascendant": {
+    "title": "Venus Sextile Ascendant",
+    "summary": "A harmonious aspect that brings opportunities for pleasant social interactions and cultivating diplomacy.",
+    "fullText": "This aspect represents an opportunity to smoothly integrate your desire for love, beauty, and harmony with your outward persona. Because the sextile requires a small amount of initiative to activate, reaching out to others will yield highly pleasant social exchanges and cooperative friendships [4, 5]. It is an excellent time to express affection and use your natural charm to foster peaceful connections in your immediate environment."
+  },
+  "mars_sextile_ascendant": {
+    "title": "Mars Sextile Ascendant",
+    "summary": "An energetic period excellent for team efforts, provided you have a degree of independent initiative.",
+    "fullText": "This is an excellent aspect for working with others in a team effort, as long as you are given a leadership role or plenty of independent initiative [6]. Your physical energy level is likely high, making you somewhat impulsive and eager to get things done quickly [6]. Fortunately, you are able to attract the energetic, capable people you need to accomplish your goals [6]."
+  },
+  "jupiter_sextile_ascendant": {
+    "title": "Jupiter Sextile Ascendant",
+    "summary": "An extremely fortunate aspect that brings opportunities for mutual benefit through social and group contacts.",
+    "fullText": "This is usually an extremely fortunate time for all kinds of social contacts, where you will benefit through others and they will benefit through you [7]. You will have opportunities to work on projects to your personal advantage, often arising from everyday encounters in your neighborhood or workplace [7]. Going it alone wastes this valuable opportunity; you will profit tremendously from team efforts [7]."
+  },
+  "saturn_sextile_ascendant": {
+    "title": "Saturn Sextile Ascendant",
+    "summary": "A productive time for successfully patterning your world and approaching your conscious goals with discipline.",
+    "fullText": "This aspect guarantees that you will be successful in patterning and structuring your world [8]. It is a highly productive time when you are successfully approaching your main conscious goals in life [8]. If everything has gone well previously, this is a period of equilibrium where you can make final preparations and fit yourself into the new order that is taking shape [9]."
+  },
+  "uranus_sextile_ascendant": {
+    "title": "Uranus Sextile Ascendant",
+    "summary": "An electric period bringing opportunities for favorable changes and greater freedom in your friendships.",
+    "fullText": "At this time you will seek greater flexibility and freedom in your friendships and daily associations [10]. This aspect often has an electric quality, bringing sudden opportunities for favorable change through the people you meet [10]. You are likely to attract individuals who are quite different from your usual circle, encouraging you to enlarge your perspective and break free from rigid attitudes [10]."
+  },
+  "neptune_sextile_ascendant": {
+    "title": "Neptune Sextile Ascendant",
+    "summary": "A spiritually and emotionally sensitive time that fosters deep compassion and selfless understanding for others.",
+    "fullText": "The principal effect of this aspect is to greatly heighten your sensitivity to the feelings of other people [11]. You become subliminally aware of the deeper attributes of your friends and neighbors, allowing you to act more selflessly and with greater understanding [11]. This heightened compassion may also lead you to become interested in charitable organizations or helping disadvantaged groups [11]."
+  },
+  "pluto_sextile_ascendant": {
+    "title": "Pluto Sextile Ascendant",
+    "summary": "A subtle but powerful aspect that offers opportunities to positively transform your environment and personal influence.",
+    "fullText": "The sextile to Pluto offers a doorway of opportunity to bring profound, transformative energy into your everyday interactions [12]. By taking a bit of initiative, you can use your psychological insight to gently but powerfully influence your surroundings. It is a favorable time to restructure your approach to the world, allowing deep-seated changes to manifest cooperatively rather than through intense power struggles."
+  },
+  "sun_quincunx_ascendant": {
+    "title": "Sun Quincunx Ascendant",
+    "summary": "An uncomfortable friction between your core identity and outward persona that requires continual adjustment.",
+    "fullText": "When the Sun is quincunx the Ascendant, your core sense of self often feels out of sync with the way you project yourself to the world. You may experience a niggling irritation, as if you have a stone in your shoe, constantly needing to adapt your ego drives to fit your environment [1, 2]. Because this aspect links signs with nothing in common by element, polarity, or modality, you are forced to make creative compromises between who you truly are and how others perceive you [3]. This underlying tension can sometimes manifest as health issues if ignored, as the sixth and eighth houses naturally quincunx the Ascendant, demanding that you consciously integrate these disparate energies [4]."
+  },
+  "moon_quincunx_ascendant": {
+    "title": "Moon Quincunx Ascendant",
+    "summary": "Emotional needs frequently clash with how you present yourself, demanding creative psychological adjustments.",
+    "fullText": "With the Moon quincunx the Ascendant, there is a persistent, underlying friction between your subconscious emotional needs and your outward demeanor [2]. You might find that your environment rarely provides the exact comfort you seek, demanding continual adjustments to your reactions [5]. This aspect links incompatible energies, meaning your feelings and your persona operate on entirely different wavelengths [3]. Navigating this requires significant psychological self-awareness to prevent emotional stress from affecting your physical health, a common risk associated with the quincunx aspect [4]."
+  },
+  "mercury_quincunx_ascendant": {
+    "title": "Mercury Quincunx Ascendant",
+    "summary": "A persistent disconnect between your internal thought processes and how you communicate them to your environment.",
+    "fullText": "Mercury quincunx the Ascendant indicates that the way you process information often feels at odds with your physical presentation. You may frequently feel misunderstood or find that your words don't quite match the first impression you make. This aspect acts as a minor but constant irritant, requiring you to carefully translate your thoughts so your environment can digest them [1, 2]. By recognizing this disconnect, you can develop a highly creative, unique style of communication that bridges these two completely unrelated facets of your life [3]."
+  },
+  "venus_quincunx_ascendant": {
+    "title": "Venus Quincunx Ascendant",
+    "summary": "A subtle but persistent tension between your relationship needs and the image you project to others.",
+    "fullText": "When Venus is quincunx the Ascendant, your desire for harmony, aesthetics, and affection often clashes awkwardly with your outward personality. You may attract partners who seem entirely incompatible with your lifestyle, or you might struggle to express your affections naturally. Because the energies involved share no common ground, you are continually forced to make uncomfortable compromises in relationships or social situations [3]. Finding a creative workaround to this social friction is essential to avoid feelings of dissatisfaction or feeling chronically out of sync with your social environment [1, 2]."
+  },
+  "mars_quincunx_ascendant": {
+    "title": "Mars Quincunx Ascendant",
+    "summary": "An irritating friction between your assertive drives and your physical environment, requiring careful energy management.",
+    "fullText": "Mars quincunx the Ascendant creates an underlying, restless tension where your desires for action and assertion do not easily align with how you engage the world. This aspect often manifests as a niggling irritant, causing you to act impulsively at the wrong times or suppress your anger until it affects your physical health [1, 5]. Since the signs involved have nothing in common, integrating your drive with your persona requires constant, conscious adjustment [3]. Learning to channel this awkward energy creatively is key to avoiding physical exhaustion and sudden, frustrating disputes [1, 2]."
+  },
+  "jupiter_quincunx_ascendant": {
+    "title": "Jupiter Quincunx Ascendant",
+    "summary": "A tendency to overextend yourself due to a mismatch between your grand visions and practical environment.",
+    "fullText": "With Jupiter quincunx the Ascendant, your philosophical beliefs and desire for expansion often feel incongruous with your daily, physical reality. You may struggle with taking on too much or promising more than your outward persona can comfortably deliver. This creates a persistent strain, requiring you to continually adjust your lofty goals to fit the practical limitations of your environment [2, 5]. If left unchecked, this imbalance can lead to stress or health issues, but when consciously managed, it forces you to find highly inventive ways to achieve growth [1, 4]."
+  },
+  "saturn_quincunx_ascendant": {
+    "title": "Saturn Quincunx Ascendant",
+    "summary": "A heavy, underlying sense of duty or restriction that constantly demands adjustment to your outward life.",
+    "fullText": "Saturn quincunx the Ascendant introduces a persistent friction between your need for structure and the way you naturally navigate the world. You may frequently feel burdened by obligations that seem completely unrelated to your personal goals, acting like a constant, low-level stressor [2]. This aspect forces you into situations where you must make uncomfortable compromises to fulfill your responsibilities [3]. Acknowledging and carefully managing these misaligned energies is crucial to prevent this chronic strain from manifesting as physical stiffness, fatigue, or health issues [4]."
+  },
+  "uranus_quincunx_ascendant": {
+    "title": "Uranus Quincunx Ascendant",
+    "summary": "A restless, unpredictable energy that causes frequent, awkward disruptions to your outward identity.",
+    "fullText": "When Uranus is quincunx the Ascendant, your drive for independence and rebellion operates on a completely different wavelength from your outward persona [3]. You may experience sudden, erratic impulses to drastically change your appearance or environment, leading to a feeling of being perpetually out of sync with those around you. This aspect requires constant psychological adjustment to integrate your eccentricity without completely destabilizing your life [5]. Finding a creative, albeit unconventional, outlet for this tense energy is necessary to prevent nervous exhaustion [1]."
+  },
+  "neptune_quincunx_ascendant": {
+    "title": "Neptune Quincunx Ascendant",
+    "summary": "A confusing, elusive tension between your spiritual or imaginative ideals and your physical reality.",
+    "fullText": "Neptune quincunx the Ascendant casts a hazy, subtle strain over how you present yourself to the world. Your deep sensitivities, dreams, and imaginative faculties often clash awkwardly with the demands of your immediate environment, making you feel misunderstood or vaguely out of place [2]. This aspect can lead to physical sensitivities or mysterious health issues if you absorb too much environmental stress [4]. You must consciously work to ground your mystical or creative urges into your daily persona through continuous, careful adjustment [5]."
+  },
+  "pluto_quincunx_ascendant": {
+    "title": "Pluto Quincunx Ascendant",
+    "summary": "A subtle but intense psychological friction that periodically forces you to undergo uncomfortable personal transformations.",
+    "fullText": "With Pluto quincunx the Ascendant, there is a deep, underlying tension between your need for control and transformation and your outward demeanor. You may experience power struggles or intense, obsessive drives that seem completely out of character with the persona you project. This stone in the shoe forces you to continually adjust and purge hidden psychological baggage [2]. Because it links incompatible signs, the required regeneration is often uncomfortable, yet it is essential for preventing this buried intensity from manifesting destructively in your physical life [3]."
+  },
+  "sun_septile_ascendant": {
+    "title": "Sun Septile Ascendant",
+    "summary": "A time when your core identity undergoes hidden inner changes that manifest as spiritual lessons on the physical plane.",
+    "fullText": "During this transit, your core vitality and outward persona are subjected to hidden inner changes that often affect your psychological state [1]. Because the septile has a \"hard\" testing quality, these spiritual lessons manifest on the physical plane in ways that are rarely pleasant but are highly necessary for growth [2]. You may experience sudden moments of discovery regarding your true self, though you must ensure your new inspirations remain grounded in reality [3]."
+  },
+  "moon_septile_ascendant": {
+    "title": "Moon Septile Ascendant",
+    "summary": "A highly sensitive period that profoundly impacts your fantasy life, emotions, and spiritual awareness.",
+    "fullText": "This transit brings a deeply romantic, emotional, and feeling quality to how you project yourself to the world [3]. Your moods are guided by a mystical, hidden flow of energy, increasing your spiritual and energetic sensitivity to your immediate environment [4]. While this is a powerful time for inspiration, you must guard against projecting fantasies onto others that have little basis in reality, as this aspect can have a dangerous, illusionary side [3]."
+  },
+  "mercury_septile_ascendant": {
+    "title": "Mercury Septile Ascendant",
+    "summary": "A mentally stimulating transit marked by radical changes in perception and moments of brilliant discovery.",
+    "fullText": "Your communication style and daily interactions are colored by radical changes in perception and consciousness during this transit [1]. The septile aspect abounds at moments of discovery, inspiring an inner awareness of a more subtle, hidden level of reality in your thoughts [3, 4]. You may find yourself expressing highly imaginative ideas, but you must ensure your mental inspirations do not completely lose touch with practical, physical facts [3]."
+  },
+  "venus_septile_ascendant": {
+    "title": "Venus Septile Ascendant",
+    "summary": "A mystical, romantic transit that heightens your relational fantasies and energetic sensitivity to others.",
+    "fullText": "With Venus forming a septile to your Ascendant, a romantic, emotional, and highly inspirational quality enters your social interactions and outward persona [3]. You may feel a mystical, hidden flow of energy connecting you to partners, giving you a deep inner awareness of subtle relationship dynamics [4]. However, you must be extremely careful, as the fantasies you build around your relationships right now may have little basis in reality and carry a dangerous side if left unchecked [3]."
+  },
+  "mars_septile_ascendant": {
+    "title": "Mars Septile Ascendant",
+    "summary": "A challenging period where your physical drive faces spiritual tests and hidden inner shifts.",
+    "fullText": "Your physical drive, assertiveness, and outward actions face a \"hard\" testing quality during this transit, as complex spiritual lessons are forced to manifest on the physical plane [2]. Your typical methods of taking action are disrupted by hidden inner changes that radically affect your psychological state [1]. Channeling this intense, subtle energy into creative discovery is crucial to avoid the more dangerous or ungrounded expressions of this aspect [3, 4]."
+  },
+  "jupiter_septile_ascendant": {
+    "title": "Jupiter Septile Ascendant",
+    "summary": "An expansive period of spiritual sensitivity where you are driven by high ideals and profound moments of discovery.",
+    "fullText": "Your desire for growth and expansion is channeled through a highly mystical lens, profoundly enhancing your spiritual and energetic sensitivity [4]. You possess a strong ability to provide inspiration to others and are likely to experience significant moments of philosophical or personal discovery [3]. Because this transit stimulates your fantasy life, you must remain cautious that your grand, expansive visions do not lose their basis in practical reality [3]."
+  },
+  "saturn_septile_ascendant": {
+    "title": "Saturn Septile Ascendant",
+    "summary": "A heavy period where strict spiritual lessons and hidden psychological changes test your outward structures.",
+    "fullText": "This is a period where strict spiritual lessons manifest on the physical plane, often in a manner that is severely testing and rarely pleasant [2]. The rigid structures of your outward persona undergo hidden inner changes, forcing a radical shift in your consciousness and psychological state [1]. You are forced to confront the subtle, hidden levels of reality underlying your responsibilities, stripping away any fantasies that lack a concrete basis [3, 4]."
+  },
+  "uranus_septile_ascendant": {
+    "title": "Uranus Septile Ascendant",
+    "summary": "An electrifying transit bringing radical shifts in consciousness, sudden inspirations, and mystical discoveries.",
+    "fullText": "This transit represents a time of intense, sudden moments of discovery that radically change your perception and consciousness [1, 3]. Your outward persona may unexpectedly reflect a hidden flow of energy, causing you to rebel against standard reality to embrace a more subtle, mystical awareness [4]. While your ability to inspire others is incredibly high, you must watch out for the dangerous side of pursuing eccentric fantasies that lack grounding [3]."
+  },
+  "neptune_septile_ascendant": {
+    "title": "Neptune Septile Ascendant",
+    "summary": "A deeply mystical transit that immerses your persona in fantasy, requiring strict boundaries to avoid dangerous illusions.",
+    "fullText": "Your outward mask becomes deeply immersed in your fantasy life, giving you a romantic, emotional, and highly inspirational quality [3]. Because both Neptune and the septile indicate a hidden flow of energy and a connection to subtle realities [4], you are highly spiritually sensitive right now. You must be extremely careful to stay grounded, as these powerful illusions and \"occult\" phenomena can have a dangerous side with very little basis in objective reality [1, 3]."
+  },
+  "pluto_septile_ascendant": {
+    "title": "Pluto Septile Ascendant",
+    "summary": "An intense transit where profound, hidden inner changes radically transform your psychological state and spiritual awareness.",
+    "fullText": "During this transit, profound, hidden inner changes radically affect your psychological state and how you project power to the world [1]. This aspect brings intense spiritual lessons to the physical plane, manifesting through \"hard,\" testing encounters that force personal evolution [2]. You are drawn toward exploring hidden levels of reality or \"occult\" phenomena, initiating a powerful period of discovery regarding your deepest, most buried psychological motivations [1, 3, 4]."
+  },
