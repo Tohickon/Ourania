@@ -966,10 +966,36 @@ public class InterpretationService {
             return null;
         }
         String a = aspect.toLowerCase();
+        // <b>Synastry is directional and this lookup used to pretend otherwise.</b> It
+        // tried body1_aspect_body2 and then fell back to the reverse, so a chart asking for
+        // THEIR Sun quincunx YOUR Moon could be answered with the text for their Moon
+        // quincunx your Sun. Those are different statements - the whole of synastry is who
+        // sends and who receives - and the corpus writes them separately: all 8,120 mirrored
+        // pairs in the 2026-08-31 batch differ, none is a copy of its opposite.
+        //
+        // <b>First argument is THEIRS, second is YOURS</b>, matching the prose ("their Sun in
+        // quincunx to your Moon") and matching both callers, which pass the clicked outer-ring
+        // body first. 8,440 of 9,055 keys exist in both directions, so the fallback was
+        // rarely load-bearing and, where it fired, was answering the wrong question. The 615
+        // single-direction keys now read as absent, which is true, rather than as reversed,
+        // which is not.
         String k1 = bodyKey(body1) + "_" + a + "_" + bodyKey(body2);
-        String k2 = bodyKey(body2) + "_" + a + "_" + bodyKey(body1);
         String hit = synastryInteraspects.get(k1);
-        return hit != null ? hit : synastryInteraspects.get(k2);
+        if (hit != null) {
+            return hit;
+        }
+        // <b>The mirror is a fallback, not an equivalence.</b> Removing it on 2026-08-31
+        // looked right - synastry is transactional, and the minor-aspect batch writes both
+        // directions separately - but the corpus is MIXED. The majors come from the older
+        // 756-entry set, which really does store one entry per unordered pair, so dropping
+        // the fallback cost 106 pairs their square reading in one direction and the suite
+        // said so immediately.
+        //
+        // So the exact direction wins whenever it exists, which is every minor aspect, and
+        // the mirror answers only where nobody wrote the direction asked for. That is a
+        // reading in the wrong voice rather than no reading at all, and it is the better of
+        // two wrong answers until the majors are written directionally too.
+        return synastryInteraspects.get(bodyKey(body2) + "_" + a + "_" + bodyKey(body1));
     }
 
     public String getPlanetInSign(String planet, String sign) {

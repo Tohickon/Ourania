@@ -819,8 +819,18 @@ public final class SynastryCheck {
         ok("the interaspect section is loaded",
             svc.getSynastryInteraspect("Sun", "Moon", "Conjunction") != null);
 
-        // Order must not decide whether a reading exists. The dataset stores one entry per
-        // unordered pair and the grid asks in whichever order the cell happens to run.
+        // <b>Order must not decide whether a reading EXISTS - but it must decide what the
+        // reading SAYS.</b> This used to require the two directions to be equal, on the note
+        // that "the dataset stores one entry per unordered pair". That was true of the 756
+        // entries it was written against and stopped being true on 2026-08-31, when a batch
+        // arrived carrying both directions written separately: all 8,120 mirrored pairs in it
+        // differ, none is a copy of its opposite.
+        //
+        // Synastry is transactional - their Sun quincunx your Moon is a different statement
+        // from their Moon quincunx your Sun, because one names the sender and the other names
+        // the receiver. Requiring the two to match asserted that synastry is a reworded
+        // composite. So coverage is still checked in both directions; equality is not, and the
+        // count of pairs that genuinely differ is printed rather than judged.
         int asymmetric = 0;
         int covered = 0;
         for (int i = 0; i < Bodies.count(); i++) {
@@ -828,9 +838,11 @@ public final class SynastryCheck {
                 String ab = svc.getSynastryInteraspect(Bodies.at(i).name, Bodies.at(j).name, "Square");
                 String ba = svc.getSynastryInteraspect(Bodies.at(j).name, Bodies.at(i).name, "Square");
                 checks++;
-                if (ab == null ? ba != null : !ab.equals(ba)) {
-                    failures.add("interaspect lookup is order-dependent for "
+                if (ab != null && ba == null) {
+                    failures.add("a reading exists one way round and not the other for "
                         + Bodies.at(i).name + "/" + Bodies.at(j).name);
+                }
+                if (ab != null && ba != null && !ab.equals(ba)) {
                     asymmetric++;
                 }
                 if (ab != null) covered++;
