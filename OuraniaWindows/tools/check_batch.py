@@ -157,7 +157,7 @@ def main():
             snake = {d.lower().replace(" ", "_"): r for r, d in ids.items()}
             snake["midheaven"] = "mc"
             snake["imum_coeli"] = "ic"
-            rid = snake.get(v.lower())
+            rid = snake.get(v.lower().replace(" ", "_"))
             guess = "  (the registry calls it '%s')" % rid if rid else "  (not a chart point at all?)"
             lines.append("      %-22s %4d entries%s" % (v, n, guess))
         problems.append("body names the app will never ask for, in %d entries:\n%s"
@@ -231,6 +231,62 @@ def main():
             else:
                 notes.append("symbols verified against the corpus: %d of %d name the right "
                              "degree" % (checked - invented, checked))
+
+    # ---- <b>coverage without discrimination.</b> Measured 2026-08-31: across two composite
+    # batches, a SQUARE and a TRINE of the same pair shared two thirds of their text, whole
+    # sentences appearing verbatim in both. Those aspects mean close to opposite things - a
+    # square is a fault line the couple works with, a trine is the comfort they hide behind -
+    # so wording that is 66% identical is not saying either. The natal corpus, as a control,
+    # shares 0% and 0 of 409 pairs exceed half, so this is a solvable problem and not the
+    # nature of the material.
+    pairs = collections.defaultdict(dict)
+    for r, t in zip(rows, texts):
+        b1, b2, asp = r.get("body_1"), r.get("body_2"), r.get("aspect")
+        if b1 and b2 and asp:
+            pairs[tuple(sorted((str(b1), str(b2))))][str(asp).lower()] = t
+
+    def sentences(t):
+        t = re.sub(r"<[^>]+>", " ", t or "").replace("! ", ". ").replace("? ", ". ")
+        return [x.strip() for x in t.split(". ") if len(x.strip()) > 25]
+
+    scores, worst = [], None
+    for pair, m in pairs.items():
+        asps = sorted(m)
+        for i in range(len(asps)):
+            for j in range(i + 1, len(asps)):
+                a, b = sentences(m[asps[i]]), sentences(m[asps[j]])
+                if not a or not b:
+                    continue
+                shared = sum(len(x) for x in a if x in b)
+                total = sum(len(x) for x in a)
+                if not total:
+                    continue
+                ratio = shared / float(total)
+                scores.append(ratio)
+                if worst is None or ratio > worst[0]:
+                    worst = (ratio, pair, asps[i], asps[j],
+                             next((x for x in a if x in b), ""))
+    if scores:
+        scores.sort()
+        med = scores[len(scores) // 2]
+        over = sum(1 for x in scores if x > 0.5)
+        print("overlap : %d same-pair aspect comparisons; median %.0f%% of one reading "
+              "appears verbatim in the other" % (len(scores), 100 * med))
+        if med > 0.5:
+            problems.append("different aspects of the SAME pair share %.0f%% of their text "
+                            "(median over %d comparisons, %d above half). A square and a "
+                            "trine of one pair should not read alike - they mean close to "
+                            "opposite things.%s"
+                            % (100 * med, len(scores), over,
+                               (chr(10) + "      shared verbatim by " + worst[2] + " and "
+                                + worst[3] + " of " + "/".join(worst[1]) + ":"
+                                + chr(10) + "      \"" + worst[4][:150] + "...\"")
+                               if worst else ""))
+        elif med > 0.25:
+            notes.append("%.0f%% median overlap between aspects of the same pair. This "
+                         "counts every aspect pairing, so neighbours like septile and novile "
+                         "drag it up honestly; the figure to worry about is square against "
+                         "trine, and above 50%% is where that goes wrong." % (100 * med))
 
     # ---- the quality measure this project actually uses ----
     openings = collections.Counter(" ".join(t.split()[:10]) for t in texts if t)
