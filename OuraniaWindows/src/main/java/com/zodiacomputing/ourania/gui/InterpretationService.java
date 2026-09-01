@@ -112,6 +112,23 @@ public class InterpretationService {
         "composite_transit_everything_else.json",
         "composite_transit_minor_aspects_asteroids_angles.json",
         "composite_transit_ptolemaic_asteroids_angles_classical.json",
+        // The five Ptolemaic aspects for every asteroid, lot and node in composite -
+        // 910 entries, David 2026-08-31. Registered LAST on purpose: putIfAbsent means
+        // the first file to claim a key wins, so this fills gaps and shadows nothing.
+        // <b>The supplied filename said "minor_aspects" and the contents are the five
+        // MAJORS</b> - conjunction, opposition, square, trine, sextile. Renamed here to
+        // match what is actually in it, because a file named for the wrong aspect set is
+        // how the next person writes a duplicate.
+        "composite_aspects_expanded.json",
+        // The 78 asteroid-to-asteroid composite pairs, five majors each - 390 entries,
+        // David 2026-08-31. The class the file above deliberately left empty.
+        // <b>Its supplied "key" field was wrong for this app in 165 of 390 rows</b> and was
+        // discarded: it spelled the registry ids naively - black_moon_lilith for lilith,
+        // part_of_fortune for fortune, part_of_spirit for spirit. Keys here are derived from
+        // the body NAMES through Bodies.byName, the same route bodyKey takes, so there is one
+        // normalisation rather than two. Trusting the supplied field would have loaded 42% of
+        // the file under keys nothing ever asks for - present, counted, and unreachable.
+        "composite_asteroid_pairs.json",
         "tarot_bodies.json"
     };
 

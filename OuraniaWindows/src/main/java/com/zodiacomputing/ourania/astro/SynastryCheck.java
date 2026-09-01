@@ -980,8 +980,20 @@ public final class SynastryCheck {
         // And the newly covered half, so the boundary is pinned from both sides.
         ok("a minor aspect between covered bodies now resolves",
             svc.getCompositeAspect("Sun", "Moon", "Quintile") != null);
-        ok("an asteroid is out of scope",
-            svc.getCompositeAspect("Vesta", "Sun", "Trine") == null);
+        // <b>This asserted a gap in the data as if it were a rule about scope.</b> It read
+        // getCompositeAspect("Vesta","Sun","Trine") == null and called that "an asteroid is
+        // out of scope" - but Vesta was never out of scope, it was merely unwritten. David
+        // supplied composite asteroid prose on 2026-08-31 and this went red, correctly
+        // describing new coverage as a failure. The same shape as the 2026-08-23 red run:
+        // the assertion was the thing that was wrong, not the engine.
+        //
+        // Now it tests the actual contract - <b>a body the registry does not know returns
+        // null</b> - which no amount of new prose can turn green, because the lookup can
+        // never resolve a name that is not a chart point.
+        ok("an unknown body gives no composite aspect",
+            svc.getCompositeAspect("Nibiru", "Sun", "Trine") == null);
+        ok("a known body with prose now answers",
+            svc.getCompositeAspect("Vesta", "Sun", "Trine") != null);
         ok("an unknown composite aspect gives null",
             svc.getCompositeAspectFrame("Novile") == null);
         // ---- the body click reads person B as a person (2026-08-31) ----
