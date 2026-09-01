@@ -247,7 +247,6 @@ public class InterpretationService {
     private static final String[][] LAZY_FILES = {
         {"body_decan",   "body_decans.json"},
         {"body_mansion", "body_mansions.json"},
-        {"body_sabian",   "body_sabian.json"},
         {"body_technical_degree", "body_technical_degrees.json"},
     };
 
@@ -424,8 +423,11 @@ public class InterpretationService {
      */
     private final Map<String, String> bodyDecans = new HashMap<>();
     private final Map<String, String> bodyMansions = new HashMap<>();
-    private final Map<String, String> bodySabian = new HashMap<>();
     private final Map<String, String> bodyTechnicalDegrees = new HashMap<>();
+    /** One paragraph per body: how THAT body meets a degree symbol. 29 entries, not 10,440. */
+    private final Map<String, String> bodyDegreeAngles = new HashMap<>();
+    /** How each body's degree reading transposes into a relationship. 29 entries, not 10,440. */
+    private final Map<String, String> bodyDegreeComposite = new HashMap<>();
     private final Map<String, String> compositeSabian = new HashMap<>();
     private final Map<String, String> compositeTransits = new HashMap<>();
     /** Their body in your house, and their body on your angle. Added 2026-08-31. */
@@ -501,8 +503,9 @@ public class InterpretationService {
         if (line.startsWith("\"composite_transit_aspect\"")) return compositeTransits;
         if (line.startsWith("\"body_decan\"")) return bodyDecans;
         if (line.startsWith("\"body_mansion\"")) return bodyMansions;
-        if (line.startsWith("\"body_sabian\"")) return bodySabian;
         if (line.startsWith("\"body_technical_degree\"")) return bodyTechnicalDegrees;
+        if (line.startsWith("\"body_degree_angle\"")) return bodyDegreeAngles;
+        if (line.startsWith("\"body_degree_composite\"")) return bodyDegreeComposite;
         if (line.startsWith("\"tarot_body\"")) return tarotBodies;
         if (line.startsWith("\"composite_aspect_frame\"")) return compositeAspectFrames;
         if (line.startsWith("\"composite_aspect\"")) return compositeAspects;
@@ -1052,9 +1055,89 @@ public class InterpretationService {
         if (bodyName == null || sign == null) {
             return null;
         }
-        ensureLazy("body_sabian");
-        return bodySabian.get((relationship ? "composite_" : "natal_") + bodyKey(bodyName)
-            + "_" + sign.toLowerCase() + "_" + degree);
+        // <b>Every cell is composed now.</b> body_sabian.json held 20,880 written
+        // readings and 353 of 360 named a symbol that is not the Sabian symbol for that
+        // degree - one set of thirty invented names pasted round all twelve signs, so
+        // natal_sun_taurus_1 interpreted "The First Spark of Manifestation" where the
+        // real image is "A clear mountain stream". Fluent, confident, and about the
+        // wrong degree; nothing in the prose gave it away. Deleted 2026-08-31.
+        //
+        // The 360 real degree texts have been on file since July and are better than
+        // what replaced them, so the composer serves all 10,440 cells from those.
+        return composeBodySabian(bodyName, sign, degree, relationship);
+    }
+
+    /**
+     * A degree reading assembled from parts, when nobody wrote one for this exact cell.
+     *
+     * <b>The grid is 29 bodies x 360 degrees and the information in it is not.</b> A Sabian
+     * degree means one thing - the app has held all 360 of those since July - and a body
+     * brings one angle to it, which is 29 paragraphs. Writing the product instead of the
+     * factors means 10,440 paragraphs, and asked for that many a generator writes a template
+     * and fills the slots: the batch rejected on 2026-08-31 opened with the same twelve words
+     * in all 10,440 entries, and the composite asteroid aspects shared 53% of their characters
+     * between a square and a trine of the same pair.
+     *
+     * So this composes. Two bodies on one degree share the symbol half; one body across two
+     * degrees shares the angle half. That repetition is real and visible, which is the point -
+     * it is the same repetition the generated text had, with the seam showing instead of
+     * disguised as specificity.
+     *
+     * <b>Written prose always wins.</b> The Sun, Moon, Ascendant and MC are where a degree
+     * earns its keep and are worth writing by hand; this catches everything else. Returns null
+     * rather than a stub when the symbol is missing, so a caller can still say nothing.
+     */
+    private String composeBodySabian(String bodyName, String sign, int degree,
+                                     boolean relationship) {
+        String symbol = getSabianSymbol(sign, degree);
+        if (symbol == null || symbol.isEmpty()) {
+            return null;
+        }
+        StringBuilder out = new StringBuilder();
+        out.append("<b>").append(bodyName).append(" on ").append(sign)
+            .append(" ").append(degree).append("&deg;: &quot;").append(symbol)
+            .append("&quot;</b><br><br>");
+
+        String full = getSabianFullText(sign, degree);
+        if (full != null && !full.isEmpty()) {
+            out.append(full).append("<br><br>");
+        }
+
+        // The body half. The 29-entry file is the good version; the body core is what this
+        // falls back to until it exists, and it is a true statement either way.
+        ensureLazy("body_degree_angle");
+        String angle = bodyDegreeAngles.get(bodyKey(bodyName));
+        if (angle == null || angle.isEmpty()) {
+            String core = getBodyCore(bodyName);
+            if (core != null && !core.isEmpty()) {
+                angle = "This degree colours what " + bodyName + " does in the chart. " + core;
+            }
+        }
+        if (angle != null && !angle.isEmpty()) {
+            out.append(angle);
+        }
+
+        // <b>A composite chart is not a person, and the same degree does not mean the same
+        // thing there.</b> Natally a symbol describes a psychological development; in a
+        // composite it describes what the relationship is built to DO - Mercury is how the
+        // pair thinks, Saturn is where it is tested, Chiron is the wound they share. That is
+        // one transposition per body, 29 of them, not a second set of 10,440 readings.
+        //
+        // Until those are written the frame below is the true general statement, and it is
+        // still the thing the natal text cannot say.
+        if (relationship) {
+            ensureLazy("body_degree_composite");
+            String trans = bodyDegreeComposite.get(bodyKey(bodyName));
+            out.append("<br><br>");
+            if (trans != null && !trans.isEmpty()) {
+                out.append(trans);
+            } else {
+                out.append("<i>In a composite chart this degree describes the relationship ")
+                   .append("rather than either person: what the pairing is built to do with ")
+                   .append(bodyName).append(", not what either partner does alone.</i>");
+            }
+        }
+        return out.toString();
     }
 
     /**
