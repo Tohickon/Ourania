@@ -143,11 +143,54 @@ public class NarrativeSynthesizer {
                     String other = v.body.equals(h.a) ? h.b : h.a;
                     String aspectText = relationship
                         ? svc.getCompositeAspect(v.body, other, h.type.label) : null;
+                    // <b>With no composite reading for the pair this borrows the NATAL one</b>
+                    // - and the natal corpus describes two drives inside one person. The
+                    // geometry is right and the voice is wrong: nothing in that sentence knows
+                    // both ends belong to a relationship. As of 2026-08-31 that is 1,404 of
+                    // 3,300 cells, every one of them a minor aspect.
+                    //
+                    // The frame is the one sentence the natal dataset cannot say, and it has
+                    // sat in composite_aspects.json since that file was written - eleven
+                    // entries, one per aspect type. <b>InterpretationPanel has shown it all
+                    // along; this surface never called it.</b> Same data, same getter, one
+                    // reader taught and its neighbour left behind.
+                    //
+                    // <b>Deliberately narrower here than on the panel</b>, which frames every
+                    // relationship aspect it renders. That page carries one aspect; this report
+                    // carries three per body across every body, so an unconditional frame would
+                    // repeat one of eleven sentences dozens of times. It appears only where it
+                    // does work - in front of borrowed natal wording. A difference driven by
+                    // the surface, not by drift.
+                    String frame = null;
                     if (aspectText == null) {
                         aspectText = svc.getAspect(v.body, other, h.type.label);
+                        if (relationship) {
+                            frame = svc.getCompositeAspectFrame(h.type.label);
+                            // <b>When the natal fallback is ITSELF only the aspect general</b>,
+                            // the frame already says that in the relationship's voice, so it
+                            // replaces the text rather than sitting on top of it. Printed as a
+                            // pair they said the same thing twice - "half a square and it
+                            // behaves like one" in both paragraphs - and the second one closed
+                            // by apologising for prose that is not written, which is a note to
+                            // the authors, not a reading for the couple.
+                            //
+                            // A natal reading written for the actual PAIR is different and is
+                            // kept: the geometry it describes is real, and the frame in front
+                            // of it supplies the one thing it cannot know.
+                            if (frame != null && aspectText != null
+                                    && aspectText.contains("is not written yet.")) {
+                                aspectText = frame;
+                                frame = null;
+                            }
+                        }
                     }
                     if (!aspectText.startsWith("Interpretation not found") && !aspectText.startsWith("General ")) {
-                        sb.append("<li><b>").append(h.type.label).append(" to ").append(other).append(":</b> ").append(aspectText).append("</li>");
+                        sb.append("<li><b>").append(h.type.label).append(" to ").append(other)
+                            .append(":</b> ");
+                        if (frame != null) {
+                            sb.append(frame).append("<br><br>");
+                        }
+                        sb.append(aspectText).append("</li>");
                     } else {
                         sb.append("<li><b>").append(h.type.label).append(" to ").append(other).append("</b> (").append(String.format("%.1f&deg;", h.offBy)).append(").</li>");
                     }
