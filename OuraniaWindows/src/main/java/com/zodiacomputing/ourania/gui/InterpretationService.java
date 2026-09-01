@@ -248,6 +248,7 @@ public class InterpretationService {
         {"body_decan",   "body_decans.json"},
         {"body_mansion", "body_mansions.json"},
         {"body_sabian",   "body_sabian.json"},
+        {"body_technical_degree", "body_technical_degrees.json"},
     };
 
     /** Lazy sections already pulled in. Guarded because the suites call off the EDT. */
@@ -424,6 +425,7 @@ public class InterpretationService {
     private final Map<String, String> bodyDecans = new HashMap<>();
     private final Map<String, String> bodyMansions = new HashMap<>();
     private final Map<String, String> bodySabian = new HashMap<>();
+    private final Map<String, String> bodyTechnicalDegrees = new HashMap<>();
     private final Map<String, String> compositeSabian = new HashMap<>();
     private final Map<String, String> compositeTransits = new HashMap<>();
     /** Their body in your house, and their body on your angle. Added 2026-08-31. */
@@ -500,6 +502,7 @@ public class InterpretationService {
         if (line.startsWith("\"body_decan\"")) return bodyDecans;
         if (line.startsWith("\"body_mansion\"")) return bodyMansions;
         if (line.startsWith("\"body_sabian\"")) return bodySabian;
+        if (line.startsWith("\"body_technical_degree\"")) return bodyTechnicalDegrees;
         if (line.startsWith("\"tarot_body\"")) return tarotBodies;
         if (line.startsWith("\"composite_aspect_frame\"")) return compositeAspectFrames;
         if (line.startsWith("\"composite_aspect\"")) return compositeAspects;
@@ -1052,6 +1055,22 @@ public class InterpretationService {
         ensureLazy("body_sabian");
         return bodySabian.get((relationship ? "composite_" : "natal_") + bodyKey(bodyName)
             + "_" + sign.toLowerCase() + "_" + degree);
+    }
+
+    /**
+     * The technical note on a body's exact degree - critical degrees and the like - or null.
+     *
+     * <b>No natal/composite split, unlike its neighbours.</b> The prose opens "in the natal
+     * or composite chart" and speaks to both, so there is one entry per body-sign-degree
+     * rather than two. Callers pass no relationship flag because there is nothing to choose.
+     */
+    public String getBodyTechnicalDegree(String bodyName, String sign, int degree) {
+        if (bodyName == null || sign == null) {
+            return null;
+        }
+        ensureLazy("body_technical_degree");
+        return bodyTechnicalDegrees.get(bodyKey(bodyName) + "_" + sign.toLowerCase()
+            + "_" + degree);
     }
 
     public String getSign(String signName) {

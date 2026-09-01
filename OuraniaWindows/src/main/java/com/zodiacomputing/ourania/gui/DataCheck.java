@@ -70,6 +70,8 @@ public final class DataCheck {
             lazy.getBodyMansion("Sun", 1, false) != null);
         ok("a sabian getter loads its own section on first use",
             lazy.getBodySabian("Sun", "aries", 1, false) != null);
+        ok("a technical-degree getter loads its own section on first use",
+            lazy.getBodyTechnicalDegree("Sun", "aries", 1) != null);
 
         // <b>Deferring only preserves meaning while a lazy section belongs to one file.</b>
         // The eager pass uses putIfAbsent, so the first file to claim a key wins; a lazy file

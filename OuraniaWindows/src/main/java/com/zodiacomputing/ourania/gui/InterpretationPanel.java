@@ -531,6 +531,14 @@ public class InterpretationPanel extends JPanel {
             // describe the Sabian symbol itself and have since July; this says what this
             // particular body does standing on it, and reads the composite entry in a
             // relationship chart.
+            // The technical note on the exact degree - critical degrees and their kin.
+            // One entry per body-sign-degree, natal and composite alike, so no flag.
+            String techDeg = InterpretationService.getInstance()
+                .getBodyTechnicalDegree(planetName, signName, degree);
+            if (techDeg != null) {
+                html.append("<p>").append(techDeg).append("</p>");
+            }
+
             String bodySabian = InterpretationService.getInstance()
                 .getBodySabian(planetName, signName, degree, relChart);
             if (bodySabian != null) {
