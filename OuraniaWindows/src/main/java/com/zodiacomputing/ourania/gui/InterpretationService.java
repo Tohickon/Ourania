@@ -97,6 +97,17 @@ public class InterpretationService {
         "relationship_prose.json",
         "synastry_interaspects.json",
         "composite_placements.json",
+        // Deeper framing for the five aspects the 2026-08-31 transposition document
+        // covers substantively. <b>Registered BEFORE composite_aspects.json so these win</b>
+        // under putIfAbsent - the six it does not cover stay as they were, because they were
+        // already right and rewriting them would be change for its own sake.
+        //
+        // Worth knowing what this does and does not fix. The frame is one sentence in front
+        // of every reading for that aspect, so it lifts all 3,300 cells at once. It does not
+        // touch the measured defect underneath: 260 pairs whose square and trine share 66% of
+        // their text. A good frame in front of undifferentiated prose is still a good frame
+        // in front of undifferentiated prose.
+        "composite_aspect_frames_v3.json",
         "composite_aspects.json",
         "composite_aspect_pairs.json",
         "composite_signs.json",
