@@ -129,6 +129,35 @@ public class InterpretationService {
         // normalisation rather than two. Trusting the supplied field would have loaded 42% of
         // the file under keys nothing ever asks for - present, counted, and unreachable.
         "composite_asteroid_pairs.json",
+        // The six minor aspects this engine computes, for every pair, in all four voices -
+        // natal, composite, synastry and transit. 14,964 entries, David 2026-08-31.
+        //
+        // <b>The supplied set carried ten aspects and four of them do not exist here</b>:
+        // septile, novile, biquintile and decile are not on Aspects.Type, so 9,976 entries
+        // were dropped rather than loaded. They would have parsed, counted and never been
+        // asked for. Whether to add those four to the engine is a judgement about what a
+        // reading should carry, and it is David's - the prose is waiting if he takes it.
+        //
+        // <b>Eager, unlike the decan and mansion sets.</b> Those own their sections outright
+        // and are read only when someone opens a body, so deferring them costs nothing. These
+        // four share sections with files already loaded and are consulted on every reading, so
+        // deferring would move the same cost from startup to the first click and add a way for
+        // load order to matter. Last in the list, so every earlier file still wins its keys.
+        "minor_aspects_natal.json",
+        "minor_aspects_composite.json",
+        "minor_aspects_synastry.json",
+        "minor_aspects_transit.json",
+        // Framing sentences for all fifteen aspect types, and the composite-transit readings
+        // for the four added the same day. David 2026-08-31.
+        //
+        // <b>Registered after the files that already hold eleven of those frames</b>, so
+        // putIfAbsent keeps the authored originals and only the four newcomers are taken from
+        // here. Adding an aspect to the enum is not finished when the pair prose exists: the
+        // frame is a separate entry per type, and SynastryCheck went red in eight places
+        // saying exactly that.
+        "aspect_frames_v2.json",
+        "composite_transits_new_aspects.json",
+        "composite_transits_new_aspects_b.json",
         "tarot_bodies.json"
     };
 
@@ -185,9 +214,10 @@ public class InterpretationService {
      * cannot reorder the real list, which is load-bearing: earlier files win under putIfAbsent.
      */
     public static String[] extraFilePaths() {
-        String[] out = new String[EXTRA_FILES.length];
-        for (int i = 0; i < EXTRA_FILES.length; i++) {
-            out[i] = DATA_DIR + EXTRA_FILES[i];
+        String[] names = allFileNames();
+        String[] out = new String[names.length];
+        for (int i = 0; i < names.length; i++) {
+            out[i] = DATA_DIR + names[i];
         }
         return out;
     }
@@ -197,6 +227,83 @@ public class InterpretationService {
             loadExtraFile(new File(DATA_DIR + name));
         }
     }
+
+    /**
+     * Files big enough that loading them at startup costs more than they are worth.
+     *
+     * <b>Measured, not assumed.</b> The corpus loaded in about 200 ms until 2026-08-31,
+     * when a body-in-decan and body-in-mansion set arrived - 3,712 entries - and took it to
+     * 475 ms. A Sabian set of 20,880 projected to roughly two seconds. A reader opens one
+     * body at a time and will see perhaps twenty-nine of those entries in a session, so the
+     * cost is paid entirely for prose nobody asks for.
+     *
+     * <b>One section per file, and the section belongs to that file alone.</b> The eager
+     * pass uses putIfAbsent, where the first file to claim a key wins, so load ORDER is
+     * load-bearing. A lazy file arrives whenever it is first asked for, which is always
+     * after every eager file - the same position it would have held at the end of
+     * EXTRA_FILES. That equivalence only holds while no eager file writes to a lazy
+     * section, and DataCheck asserts exactly that rather than trusting this comment.
+     */
+    private static final String[][] LAZY_FILES = {
+        {"body_decan",   "body_decans.json"},
+        {"body_mansion", "body_mansions.json"},
+    };
+
+    /** Lazy sections already pulled in. Guarded because the suites call off the EDT. */
+    private final java.util.Set<String> lazyLoaded = new java.util.HashSet<>();
+
+    /**
+     * Pull in the file that owns this section, once.
+     *
+     * Called by every getter that reads a lazy section. A getter that forgets returns null
+     * forever and looks exactly like missing data, so each one is asserted separately.
+     */
+    private synchronized void ensureLazy(String section) {
+        if (!lazyLoaded.add(section)) {
+            return;
+        }
+        for (String[] row : LAZY_FILES) {
+            if (row[0].equals(section)) {
+                loadExtraFile(new File(DATA_DIR + row[1]));
+                return;
+            }
+        }
+    }
+
+    /**
+     * Pull in every lazy section, for the checks.
+     *
+     * <b>DataCheck validates each key of each registered file against the map it landed
+     * in</b>, and a deferred file has landed nowhere until something asks for it - so
+     * without this the suite reports 3,712 keys missing and is right to. The app never
+     * calls this: deferring the load is the entire point, and a check that quietly made
+     * production eager would be testing an arrangement nobody ships.
+     */
+    public void loadEveryLazySection() {
+        for (String[] row : LAZY_FILES) {
+            ensureLazy(row[0]);
+        }
+    }
+
+    /** Every data file this build reads, eager first then lazy - the order keys resolve in. */
+    public static String[] allFileNames() {
+        String[] out = new String[EXTRA_FILES.length + LAZY_FILES.length];
+        System.arraycopy(EXTRA_FILES, 0, out, 0, EXTRA_FILES.length);
+        for (int i = 0; i < LAZY_FILES.length; i++) {
+            out[EXTRA_FILES.length + i] = LAZY_FILES[i][1];
+        }
+        return out;
+    }
+
+    /** The section each lazy file owns, for the checks that guard the arrangement. */
+    public static String[][] lazyFiles() {
+        String[][] out = new String[LAZY_FILES.length][];
+        for (int i = 0; i < LAZY_FILES.length; i++) {
+            out[i] = new String[] {LAZY_FILES[i][0], LAZY_FILES[i][1]};
+        }
+        return out;
+    }
+
 
     private void loadExtraFile(File file) {
         if (!file.exists()) {
@@ -305,6 +412,16 @@ public class InterpretationService {
     private final Map<String, String> compositePlanetSigns = new HashMap<>();
     /** Composite angle in sign, composite Sabian, composite transit. Added 2026-08-31. */
     private final Map<String, String> compositeAngles = new HashMap<>();
+    /**
+     * A body in a decan, and a body in a lunar mansion - natal and composite in one map
+     * each, distinguished by the key prefix. Added 2026-08-31.
+     *
+     * <b>Both were already computed and neither was ever read.</b> The wheel has drawn a
+     * decan ring since August and a mansion ring since 2026-08-23; clicking either told
+     * you which one a body stood in and nothing about what that meant for the body.
+     */
+    private final Map<String, String> bodyDecans = new HashMap<>();
+    private final Map<String, String> bodyMansions = new HashMap<>();
     private final Map<String, String> compositeSabian = new HashMap<>();
     private final Map<String, String> compositeTransits = new HashMap<>();
     /** Their body in your house, and their body on your angle. Added 2026-08-31. */
@@ -378,6 +495,8 @@ public class InterpretationService {
         if (line.startsWith("\"composite_angle\"")) return compositeAngles;
         if (line.startsWith("\"composite_sabian\"")) return compositeSabian;
         if (line.startsWith("\"composite_transit_aspect\"")) return compositeTransits;
+        if (line.startsWith("\"body_decan\"")) return bodyDecans;
+        if (line.startsWith("\"body_mansion\"")) return bodyMansions;
         if (line.startsWith("\"tarot_body\"")) return tarotBodies;
         if (line.startsWith("\"composite_aspect_frame\"")) return compositeAspectFrames;
         if (line.startsWith("\"composite_aspect\"")) return compositeAspects;
@@ -881,6 +1000,39 @@ public class InterpretationService {
         }
 
         return "Interpretation not found for " + aspect;
+    }
+
+    /**
+     * A body in its decan, or null. Natal and composite prose are different entries.
+     *
+     * The decan number is 1-3 and comes from the caller, which already computed it to draw
+     * the glyph - it is not re-derived here.
+     */
+    public String getBodyDecan(String bodyName, String sign, int decan, boolean relationship) {
+        if (bodyName == null || sign == null) {
+            return null;
+        }
+        ensureLazy("body_decan");
+        return bodyDecans.get((relationship ? "composite_" : "natal_") + bodyKey(bodyName)
+            + "_" + sign.toLowerCase() + "_decan_" + decan);
+    }
+
+    /**
+     * A body in its lunar mansion, or null. Natal and composite prose are different entries.
+     *
+     * <b>The mansion must be resolved from a longitude, not from a sign and a degree.</b>
+     * A mansion is 12.857 degrees wide and does not align to sign boundaries, so a whole
+     * degree rounded out of a sign position can fall in the neighbouring mansion - which is
+     * the boundary bug LunarMansionCheck caught on its first run. Callers pass the number
+     * they got from LunarMansions.at().
+     */
+    public String getBodyMansion(String bodyName, int mansion, boolean relationship) {
+        if (bodyName == null) {
+            return null;
+        }
+        ensureLazy("body_mansion");
+        return bodyMansions.get((relationship ? "composite_" : "natal_") + bodyKey(bodyName)
+            + "_mansion_" + mansion);
     }
 
     public String getSign(String signName) {

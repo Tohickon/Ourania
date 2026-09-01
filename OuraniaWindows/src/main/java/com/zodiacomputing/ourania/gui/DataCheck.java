@@ -60,6 +60,48 @@ public final class DataCheck {
     private DataCheck() { }
 
     public static void main(String[] args) {
+        // <b>A lazy getter that forgets to pull its section in returns null forever</b>, and
+        // null is indistinguishable from prose nobody wrote. So the deferred path is exercised
+        // FIRST, on a service that nothing has forced, before the load below makes it moot.
+        InterpretationService lazy = InterpretationService.getInstance();
+        ok("a decan getter loads its own section on first use",
+            lazy.getBodyDecan("Sun", "aries", 1, false) != null);
+        ok("a mansion getter loads its own section on first use",
+            lazy.getBodyMansion("Sun", 1, false) != null);
+
+        // <b>Deferring only preserves meaning while a lazy section belongs to one file.</b>
+        // The eager pass uses putIfAbsent, so the first file to claim a key wins; a lazy file
+        // arrives last, which is harmless only if no eager file writes to its section. Asserted
+        // by reading the files rather than trusting the comment that says so.
+        for (String[] row : InterpretationService.lazyFiles()) {
+            for (String path : InterpretationService.extraFilePaths()) {
+                if (path.endsWith(row[1])) {
+                    continue;
+                }
+                String head = "\"" + row[0] + "\"";
+                boolean claims = false;
+                try (java.io.BufferedReader r = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(new java.io.FileInputStream(path),
+                            java.nio.charset.StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = r.readLine()) != null) {
+                        if (line.trim().startsWith(head)) {
+                            claims = true;
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    // a missing file is Part A's business, not this check's
+                }
+                ok("no eager file claims the lazy section " + row[0] + " (" + path + ")",
+                    !claims);
+            }
+        }
+
+        // Now force them, because the assertions below read the map a key landed in and a
+        // deferred file has landed nowhere. The app never calls this - deferring is the point.
+        InterpretationService.getInstance().loadEveryLazySection();
+
         System.out.println("=== Part A: extra_bodies.json parses without losing entries ===");
         int before = failures.size();
         fileIntegrity();

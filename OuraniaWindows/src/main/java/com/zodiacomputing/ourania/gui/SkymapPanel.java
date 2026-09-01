@@ -2095,7 +2095,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     arrayList.add(new String[]{BODY_NAMES[n19], string, string3});
                 }
                 n19 = (int)(d2 % 30.0) + 1;
-                this.window.showInterpretationForPlanet(BODY_NAMES[n3], SIGN_NAMES[n20], n19, n21, n22, arrayList);
+                // d2 is this body's longitude, which the mansion lookup needs exactly.
+                this.window.showInterpretationForPlanet(BODY_NAMES[n3], SIGN_NAMES[n20], n19, n21, n22, arrayList, d2);
                 return;
             }
             n3 = this.aspectFilter.equals("Natal-Natal") || this.aspectFilter.equals("Both") ? 1 : 0;
@@ -3391,6 +3392,21 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             case "Sesquiquadrate": {
                 return "#CC7A5C";
             }
+            // The four added 2026-08-31. Muted for the same reason as the five above -
+            // these are 1-degree aspects - and each distinct, because falling through to
+            // the white default would make four different aspects look like one.
+            case "Septile": {
+                return "#8E7CC3";
+            }
+            case "Novile": {
+                return "#76A5AF";
+            }
+            case "Decile": {
+                return "#A2C4A9";
+            }
+            case "Biquintile": {
+                return "#B8860B";
+            }
             case "Opposition": {
                 return "#FF6400";
             }
@@ -3437,6 +3453,25 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
             case "Sesquiquadrate": {
                 return "\u221f";
+            }
+            // <b>Without these four the cells render blank</b>, not wrong - the same failure
+            // the quincunx had above, where a missing case fell through to the empty string
+            // and produced clickable links with no text in them.
+            case "Septile": {
+                return "S";
+            }
+            case "Novile": {
+                return "N";
+            }
+            case "Decile": {
+                return "D";
+            }
+            // <b>"bQ" is conventionally the biquintile mark and this codebase already spends
+            // it on the sesquiquintile</b> (108 degrees, the tredecile). Rather than silently
+            // reassign a symbol that has been on screen since 2026-08-23, the newcomer takes
+            // "2Q" and the collision is written down. Which should own "bQ" is David to settle.
+            case "Biquintile": {
+                return "2Q";
             }
             case "Opposition": {
                 return "\u260d";

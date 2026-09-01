@@ -796,7 +796,7 @@ public final class SynastryCheck {
         ok("house 13 gives null", svc.getCompositeHouse(13) == null);
         ok("overlay house 0 gives null", svc.getOverlayHouse(0) == null);
         ok("an unknown angle gives null", svc.getAngleContact("vertex") == null);
-        ok("an unknown aspect gives null", svc.getSynastryAspect("Novile") == null);
+        ok("an unknown aspect gives null", svc.getSynastryAspect("Quindecile") == null);
 
         // Case does not decide whether a reading appears. The panel hands these getters a
         // display name ("MC", "Square"), the file is keyed in lower case, and the two must
@@ -846,8 +846,13 @@ public final class SynastryCheck {
         // Null, so the caller can fall back. A not-found string would be printed as prose.
         ok("an uncovered pair gives null",
             svc.getSynastryInteraspect("Pholus", "Hygiea", "Trine") == null);
-        ok("an uncovered aspect gives null",
-            svc.getSynastryInteraspect("Sun", "Moon", "Quintile") == null);
+        // <b>This named a gap, not a rule.</b> Quintile prose was simply unwritten when
+        // this was added; it arrived 2026-08-31 and the check went red on new coverage.
+        // Quindecile is not on Aspects.Type at all, so no dataset can ever turn it green.
+        ok("an aspect the engine does not have gives null",
+            svc.getSynastryInteraspect("Sun", "Moon", "Quindecile") == null);
+        ok("a covered minor aspect now resolves",
+            svc.getSynastryInteraspect("Sun", "Moon", "Quintile") != null);
         ok("a null argument gives null", svc.getSynastryInteraspect(null, "Moon", "Square") == null);
 
         // ---- composite planet in composite house (2026-08-24) ----
@@ -975,8 +980,9 @@ public final class SynastryCheck {
         // prose until composite_minor_aspects.json added all six minors across the fourteen
         // covered bodies. An asteroid at a minor aspect is still absent on both axes, so it
         // tests the same fallback without asserting a gap that has been filled.
-        ok("a minor aspect is out of scope",
-            svc.getCompositeAspect("Vesta", "Sun", "Quintile") == null);
+        // Same correction as above: unwritten is not out of scope.
+        ok("an aspect the engine does not have gives no composite reading",
+            svc.getCompositeAspect("Vesta", "Sun", "Quindecile") == null);
         // And the newly covered half, so the boundary is pinned from both sides.
         ok("a minor aspect between covered bodies now resolves",
             svc.getCompositeAspect("Sun", "Moon", "Quintile") != null);
@@ -995,7 +1001,7 @@ public final class SynastryCheck {
         ok("a known body with prose now answers",
             svc.getCompositeAspect("Vesta", "Sun", "Trine") != null);
         ok("an unknown composite aspect gives null",
-            svc.getCompositeAspectFrame("Novile") == null);
+            svc.getCompositeAspectFrame("Quindecile") == null);
         // ---- the body click reads person B as a person (2026-08-31) ----
         //
         // <b>This suite ran 41,196 checks and none of them covered what a click produces.</b>

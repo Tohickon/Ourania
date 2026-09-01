@@ -39,6 +39,20 @@ public final class Aspects {
      * number and any value taken from it would be taste in the costume of measurement. 1.0 is
      * David's decision, inside conventional practice for minor aspects. See WORK-PLAN.
      *
+     * <b>Four more were added on 2026-08-31, also David's call.</b> Septile (360/7), novile
+     * (360/9), decile (360/10) and biquintile (2 x 72), all capped at the same 1.0 degrees.
+     * They arrived because the prose existed: a supplied minor-aspect set carried ten aspect
+     * types and four of them were not on this enum, so 9,976 readings had nowhere to go.
+     * <b>Prose is not a reason to add an aspect</b> - the reason is that he wanted them - but
+     * it is why the question came up, and it is recorded here so nobody later reads the enum
+     * and assumes the set was chosen on doctrine alone.
+     *
+     * They sit in angle order like the rest, and none of them collides: at 1.0 degrees the
+     * nearest neighbours are decile to semisextile (6 apart) and novile to semisquare (5),
+     * so typeOf cannot match two. Harmonics reuse existing families - decile joins
+     * sesquiquintile at 10, biquintile joins quintile at 5 - which is correct rather than
+     * convenient: they are the same division of the circle.
+     *
      * <b>The quincunx was capped at the same time, and that changed a shipped feature.</b> It
      * had been running uncapped at up to 10 degrees and firing 15.4 times per chart out of
      * 83.6; at 1.0 it fires 2.9. Charts lose quincunx readings they used to show. That is the
@@ -48,13 +62,17 @@ public final class Aspects {
     public enum Type {
         CONJUNCTION("Conjunction", 0.0, Double.MAX_VALUE, 1, "Mercury", 0),
         SEMISEXTILE("Semisextile", 30.0, 1.0, 12, null, 1),
+        DECILE("Decile", 36.0, 1.0, 10, null, -1),
+        NOVILE("Novile", 40.0, 1.0, 9, null, -1),
         SEMISQUARE("Semisquare", 45.0, 1.0, 8, null, -1),
+        SEPTILE("Septile", 360.0 / 7.0, 1.0, 7, null, -1),
         SEXTILE("Sextile", 60.0, Double.MAX_VALUE, 6, "Venus", 2),
         QUINTILE("Quintile", 72.0, 1.0, 5, null, -1),
         SQUARE("Square", 90.0, Double.MAX_VALUE, 4, "Mars", 3),
         SESQUIQUINTILE("Sesquiquintile", 108.0, 1.0, 10, null, -1),
         TRINE("Trine", 120.0, Double.MAX_VALUE, 3, "Jupiter", 4),
         SESQUIQUADRATE("Sesquiquadrate", 135.0, 1.0, 8, null, -1),
+        BIQUINTILE("Biquintile", 144.0, 1.0, 5, null, -1),
         QUINCUNX("Quincunx", 150.0, 1.0, 12, null, 5),
         OPPOSITION("Opposition", 180.0, Double.MAX_VALUE, 2, "Saturn", 6);
 

@@ -1,0 +1,36 @@
+{
+"composite_aspect_frame": {
+"conjunction": "<b>In a composite chart, a conjunction represents a fused, inseparable function where two planetary drives merge into a single focus of the relationship itself.</b>",
+"sextile": "<b>In a composite chart, a sextile establishes an open, cooperative flow of creative opportunity, allowing the relationship to easily integrate both drives when consciously activated.</b>",
+"square": "<b>In a composite chart, a square introduces a high-tension, catalytic challenge between two drives, forcing the relationship to grow through constructive crises.</b>",
+"trine": "<b>In a composite chart, a trine creates an automatic, highly harmonious circulation of supportive energy, giving the partnership an innate, flowing talent.</b>",
+"opposition": "<b>In a composite chart, an opposition constructs a polarized relational mirror, forcing the partnership to find balance and integration through dynamic compromise.</b>",
+"quincunx": "<b>In a composite chart, a quincunx creates a dynamic of friction and constant adjustments between two signs of completely different elements and modalities.</b>",
+"semisquare": "<b>In a composite chart, a semisquare creates a persistent undercurrent of low-grade friction and minor tension that quietly triggers action.</b>",
+"sesquiquadrate": "<b>In a composite chart, a sesquiquadrate represents stubborn obstacles requiring adjustment and structural tension that forces the partners to halt and rebuild.</b>",
+"semisextile": "<b>In a composite chart, a semisextile creates a dynamic of subtle, side-by-side growth and developmental bridges between adjacent signs.</b>",
+"quintile": "<b>In a composite chart, a quintile represents a unique, highly specialized channel of creative genius and mutual talent that can be harnessed through focus.</b>",
+"sesquiquintile": "<b>In a composite chart, a sesquiquintile represents an intuitive, specialized flow of talent and shared ancestral gifts that requires conscious action to integrate fully.</b>",
+"septile": "<b>In a composite chart, a septile introduces a fateful, deeply intuitive, and highly psychic coordinate of fated, spiritual adjustments within the union.</b>",
+"novile": "<b>In a composite chart, a novile represents the 9th-harmonic testing before the end of a cycle, pointing to a quiet spiritual transition and evolutionary homework.</b>",
+"biquintile": "<b>In a composite chart, a biquintile establishes a creative obsession and highly focused technical artistry, where the couple is driven to master shared talents.</b>",
+"decile": "<b>In a composite chart, a decile creates a subtle, preparatory mental spark of versatile alignment, allowing the couple to refine their collaborative skills.</b>"
+},
+"synastry_aspect": {
+"conjunction": "<b>In synastry, a conjunction represents a powerful, direct fusion of energy where one person's planetary drive directly activates and merges with the other person's psyche.</b>",
+"sextile": "<b>In synastry, a sextile represents a friendly, supportive bridge of communication and compatibility, offering a natural flow of interest and mutual understanding.</b>",
+"square": "<b>In synastry, a square generates intense friction, challenge, and dynamic chemistry, forcing both partners to adapt and grow by overcoming their behavioral differences.</b>",
+"trine": "<b>In synastry, a trine represents the absolute peak of emotional harmony, mutual comfort, and effortless compatibility, where energy circulates without friction.</b>",
+"opposition": "<b>In synastry, an opposition creates a highly magnetic polar attraction, acting as a direct mirror where each partner embodies what the other needs to balance.</b>",
+"quincunx": "<b>In synastry, a quincunx represents a tricky, semi-conscious irritation, forcing both partners to make continuous lifestyle adjustments to accommodate their differences.</b>",
+"semisquare": "<b>In synastry, a semisquare produces irritating, background speedbumps of tension that force the partners to refine their immediate reactions.</b>",
+"sesquiquadrate": "<b>In synastry, a sesquiquadrate acts like an ongoing minor square, bringing stubborn, repetitive blocks and external projections into the relationship.</b>",
+"semisextile": "<b>In synastry, a semisextile represents a subtle, supportive bridge that fosters tolerance and offers quiet opportunities for cooperative growth.</b>",
+"quintile": "<b>In synastry, a quintile reveals a specialized, intellectual, or artistic synergy that allows both partners to inspire unique creative talents in each other.</b>",
+"sesquiquintile": "<b>In synastry, a sesquiquintile represents a specialized creative link that allows the partners to unlock inherited talents and bring them into world achievement.</b>",
+"septile": "<b>In synastry, a septile creates a fateful, mysterious, and deeply intuitive bond that brings psychic-level adjustments and fated lessons into the connection.</b>",
+"novile": "<b>In synastry, a novile functions as a quiet spiritual connector, representing a period of inner gestation and preparation before emotional or karmic release.</b>",
+"biquintile": "<b>In synastry, a biquintile represents a double-quintile of creative obsession and technical artistry, sparking highly unique, collaborative inspirations.</b>",
+"decile": "<b>In synastry, a decile represents a quiet, preparatory mental spark of versatile alignment, offering a subtle bridge of cooperative intellectual development.</b>"
+}
+}

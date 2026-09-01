@@ -886,23 +886,12 @@ public final class AspectGridCheck {
                             html.contains("10. Current Transits"));
                     }
 
-                    // <b>Borrowed natal wording must arrive framed.</b> Where no composite
-                    // reading exists for a pair the report falls back to the natal corpus,
-                    // which describes two drives inside one person. composite_aspects.json
-                    // has carried the eleven framing sentences all along and this surface
-                    // never called them - InterpretationPanel did.
-                    //
-                    // <b>Counted, not hoped for.</b> The report lists three aspects per body,
-                    // so whether an unwritten pair appears at all depends on the chart. A
-                    // check that only fires when it happens to would pass vacuously on the
-                    // day the branch stopped working, so the opportunities are tallied and
-                    // asserted non-zero after the sweep.
                     // <b>The natal apology must never reach a couple.</b> Where no composite
-                    // reading exists the report used to print the natal aspect general, which
-                    // ends "a reading specific to X and Y is not written yet" - a note to the
-                    // authors, in a voice describing one person. The eleven framing sentences
-                    // in composite_aspects.json say the same thing about the relationship, so
-                    // they now stand in its place.
+                    // reading exists the report printed the natal aspect general, which ends
+                    // "a reading specific to X and Y is not written yet" - a note to the authors,
+                    // in a voice describing one person. The eleven framing sentences in
+                    // composite_aspects.json say the same thing about the relationship and now
+                    // stand in its place.
                     ok("Part Q: " + label + " never shows the natal not-written note",
                         !html.contains("is not written yet."));
                     if (html.contains("In a composite chart")) {
@@ -912,12 +901,19 @@ public final class AspectGridCheck {
             }
         }
 
-        // <b>Counted, not hoped for.</b> The report lists three aspects per body, so
-        // whether an unwritten pair appears at all depends on the chart. Without this the
-        // assertions above would pass on the day the frame stopped being emitted, by never
-        // having anything to judge.
-        ok("Part Q: a relationship report actually emitted a composite frame",
-            borrowed[0] > 0);
+        // <b>This was an assertion that a frame had been emitted, and it can no longer fire.</b>
+        // It existed because the report lists three aspects per body, so the borrowed-wording
+        // branch might never be reached and the check above would pass by having nothing to
+        // judge. On 2026-08-31 composite pair prose reached 3,300 of 3,300 - there is no
+        // borrowing left to frame, so the count is legitimately zero.
+        //
+        // <b>Kept as a measurement rather than deleted.</b> If composite coverage regresses,
+        // this goes positive and the framing assertion above starts doing work again; the number
+        // is what tells a reader which of those two worlds they are in. Asserting it is zero
+        // would freeze today's coverage into a rule, and asserting it is positive is what just
+        // went red on complete data.
+        System.out.println("  relationship reports that had to borrow natal wording: "
+            + borrowed[0] + " (0 means composite pair prose is complete)");
     }
 
     private static void triWheelSidePanel() throws Exception {

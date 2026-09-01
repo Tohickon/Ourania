@@ -299,15 +299,31 @@ public class InterpretationPanel extends JPanel {
         // Anything else is a no-op rather than a stack trace in the UI.
     }
 
+    /**
+     * <b>The longitude overload exists because a mansion cannot be recovered from a sign and
+     * a degree.</b> A mansion is 12.857 degrees wide and does not align to sign boundaries,
+     * and the degree these callers carry is already truncated to a whole number, so rebuilding
+     * a position from it can land in the neighbouring station - the boundary bug
+     * LunarMansionCheck caught on its first run. Callers that have the longitude pass it;
+     * the old signature passes NaN and simply gets no mansion section.
+     */
     public void showPlanetInterpretation(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects) {
+        showPlanetInterpretation(planetName, signName, degree, decanNum, houseNum, activeAspects, Double.NaN);
+    }
+
+    public void showPlanetInterpretation(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects, double lon) {
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
-        html.append(generatePlanetHtml(planetName, signName, degree, decanNum, houseNum, activeAspects));
+        html.append(generatePlanetHtml(planetName, signName, degree, decanNum, houseNum, activeAspects, lon));
         html.append("</body></html>");
         setHtml(html.toString(), false);
     }
 
     public String generatePlanetHtml(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects) {
+        return generatePlanetHtml(planetName, signName, degree, decanNum, houseNum, activeAspects, Double.NaN);
+    }
+
+    public String generatePlanetHtml(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects, double lon) {
         StringBuilder html = new StringBuilder();
         appendRelationshipFrame(html, planetName, signName, houseNum);
         
@@ -469,6 +485,19 @@ public class InterpretationPanel extends JPanel {
             // not, so the surface a reader actually meets kept the grey italic note and
             // never got the face ruler as a first-class part of the reading at all.
             appendDecanSection(html, signName, decanNum, "h3");
+
+            // <b>The decan ring has been drawn since August with nothing to say about the body</b>
+            // standing in it. appendDecanSection above describes the decan - its two rulers and
+            // what each does. This is the other half: what this particular body does from there.
+            // Composite charts get their own entry rather than the natal one, because a decan
+            // sub-rulership acting on a relationship is not the same statement as it acting on
+            // a person.
+            boolean relChart = skymapPanel != null && skymapPanel.isRelationshipChart();
+            String decanProse = InterpretationService.getInstance()
+                .getBodyDecan(planetName, signName, decanNum, relChart);
+            if (decanProse != null) {
+                html.append("<p>").append(decanProse).append("</p>");
+            }
             
             // Sabian Symbol
             html.append("<h3 style='color:#E0E0E0;'><b>Sabian Symbol (").append(signName).append(" ").append(degree).append("&deg;)</b></h3>");
@@ -478,6 +507,26 @@ public class InterpretationPanel extends JPanel {
             String sabianFullText = InterpretationService.getInstance().getSabianFullText(signName, degree);
             String sabianShadow = InterpretationService.getInstance().getSabianShadow(signName, degree);
             String sabianKeywords = InterpretationService.getInstance().getSabianKeywords(signName, degree);
+            // <b>The mansion is resolved from the longitude, never rebuilt from sign+degree.</b>
+            // 12.857 degrees wide and unaligned to the signs, so a truncated degree can name the
+            // wrong station. Callers without a longitude pass NaN and this section is absent -
+            // which is the honest outcome, rather than a confidently wrong mansion.
+            if (!Double.isNaN(lon)) {
+                com.zodiacomputing.ourania.astro.LunarMansions.Mansion man =
+                    com.zodiacomputing.ourania.astro.LunarMansions.at(lon);
+                if (man != null) {
+                    String manProse = InterpretationService.getInstance()
+                        .getBodyMansion(planetName, man.number, relChart);
+                    if (manProse != null) {
+                        html.append("<h3 style='color:#E0E0E0;'><b>Lunar Mansion ")
+                            .append(man.number).append(" - <a href='")
+                            .append(mansionHref(man.number)).append("'>").append(man.name)
+                            .append("</a></b></h3>");
+                        html.append("<p>").append(manProse).append("</p>");
+                    }
+                }
+            }
+
             if (!sabianFullText.isEmpty()) {
                 html.append("<p>").append(sabianFullText).append("</p>");
             }

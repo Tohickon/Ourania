@@ -133,8 +133,12 @@ public class OuraniaWindow extends JFrame {
     }
     
     public void showInterpretationForPlanet(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects) {
+        showInterpretationForPlanet(planetName, signName, degree, decanNum, houseNum, activeAspects, Double.NaN);
+    }
+
+    public void showInterpretationForPlanet(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects, double lon) {
         if (interpretationPanel != null) {
-            interpretationPanel.showPlanetInterpretation(planetName, signName, degree, decanNum, houseNum, activeAspects);
+            interpretationPanel.showPlanetInterpretation(planetName, signName, degree, decanNum, houseNum, activeAspects, lon);
             interpretationPanel.setVisible(true);
             revalidate();
             repaint();
