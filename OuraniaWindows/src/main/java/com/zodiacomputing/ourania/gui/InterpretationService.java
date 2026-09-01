@@ -1109,10 +1109,15 @@ public class InterpretationService {
             .append(" ").append(degree).append("&deg;: &quot;").append(symbol)
             .append("&quot;</b><br><br>");
 
-        String full = getSabianFullText(sign, degree);
-        if (full != null && !full.isEmpty()) {
-            out.append(full).append("<br><br>");
-        }
+        // <b>The degree text is NOT repeated here.</b> The body page already renders it in
+        // its own block, and the first version of this composer included it too - so a real
+        // page printed the whole of "A large well-kept public park is wild nature deliberately
+        // organised for shared use" twice, one paragraph apart. Caught by rendering a page and
+        // reading it, which no assertion in the suite would have done: both copies were
+        // correct, present and well-formed.
+        //
+        // So this contributes the two things the page does NOT already have - which body is
+        // standing on the degree, and what that means when the chart is a relationship.
 
         // The body half. The 29-entry file is the good version; the body core is what this
         // falls back to until it exists, and it is a true statement either way.
