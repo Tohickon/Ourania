@@ -527,6 +527,16 @@ public class InterpretationPanel extends JPanel {
                 }
             }
 
+            // <b>The body on the degree, not just the degree.</b> The three blocks below
+            // describe the Sabian symbol itself and have since July; this says what this
+            // particular body does standing on it, and reads the composite entry in a
+            // relationship chart.
+            String bodySabian = InterpretationService.getInstance()
+                .getBodySabian(planetName, signName, degree, relChart);
+            if (bodySabian != null) {
+                html.append("<p>").append(bodySabian).append("</p>");
+            }
+
             if (!sabianFullText.isEmpty()) {
                 html.append("<p>").append(sabianFullText).append("</p>");
             }

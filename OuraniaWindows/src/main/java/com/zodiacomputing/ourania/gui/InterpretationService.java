@@ -247,6 +247,7 @@ public class InterpretationService {
     private static final String[][] LAZY_FILES = {
         {"body_decan",   "body_decans.json"},
         {"body_mansion", "body_mansions.json"},
+        {"body_sabian",   "body_sabian.json"},
     };
 
     /** Lazy sections already pulled in. Guarded because the suites call off the EDT. */
@@ -422,6 +423,7 @@ public class InterpretationService {
      */
     private final Map<String, String> bodyDecans = new HashMap<>();
     private final Map<String, String> bodyMansions = new HashMap<>();
+    private final Map<String, String> bodySabian = new HashMap<>();
     private final Map<String, String> compositeSabian = new HashMap<>();
     private final Map<String, String> compositeTransits = new HashMap<>();
     /** Their body in your house, and their body on your angle. Added 2026-08-31. */
@@ -497,6 +499,7 @@ public class InterpretationService {
         if (line.startsWith("\"composite_transit_aspect\"")) return compositeTransits;
         if (line.startsWith("\"body_decan\"")) return bodyDecans;
         if (line.startsWith("\"body_mansion\"")) return bodyMansions;
+        if (line.startsWith("\"body_sabian\"")) return bodySabian;
         if (line.startsWith("\"tarot_body\"")) return tarotBodies;
         if (line.startsWith("\"composite_aspect_frame\"")) return compositeAspectFrames;
         if (line.startsWith("\"composite_aspect\"")) return compositeAspects;
@@ -1033,6 +1036,22 @@ public class InterpretationService {
         ensureLazy("body_mansion");
         return bodyMansions.get((relationship ? "composite_" : "natal_") + bodyKey(bodyName)
             + "_mansion_" + mansion);
+    }
+
+    /**
+     * A body on its Sabian degree, or null. Natal and composite are different entries.
+     *
+     * <b>20,880 entries and the largest file in the corpus</b>, which is why it is deferred:
+     * a reader meets one degree per body and will see perhaps twenty-nine of these in a
+     * session. The degree is 1-30 within the sign, matching what the panel already carries.
+     */
+    public String getBodySabian(String bodyName, String sign, int degree, boolean relationship) {
+        if (bodyName == null || sign == null) {
+            return null;
+        }
+        ensureLazy("body_sabian");
+        return bodySabian.get((relationship ? "composite_" : "natal_") + bodyKey(bodyName)
+            + "_" + sign.toLowerCase() + "_" + degree);
     }
 
     public String getSign(String signName) {
