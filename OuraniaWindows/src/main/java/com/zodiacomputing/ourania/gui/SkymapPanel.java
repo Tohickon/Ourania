@@ -1843,6 +1843,52 @@ extends JPanel {
         }
     }
 
+    /**
+     * Doors onto three engines that had none. See {@link ChartTables}.
+     *
+     * Midpoints, Rulership and HarmonicResonance were all implemented, all covered by suites,
+     * and all unreachable: zero references from this package on 2026-09-01. Casting the frame
+     * takes long enough to stutter the wheel, so it happens on a worker exactly as a reading
+     * does, and only the finished HTML crosses back to the event thread.
+     */
+    public void showTable(final String kind) {
+        if (this.sw == null || this.baseSd == null || this.window == null) {
+            return;
+        }
+        final double jd = this.baseSd.getJulDay();
+        final double lat = this.baseLatitude;
+        final double lon = this.baseLongitude;
+        final char hsys = this.houseSystem;
+        new javax.swing.SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() {
+                ChartFrame f = ChartFrame.compute(SkymapPanel.this.sw, jd, lat, lon, hsys, false, 0.0);
+                if ("MIDPOINTS".equals(kind)) {
+                    return ChartTables.midpoints(f);
+                }
+                if ("DISPOSITORS".equals(kind)) {
+                    return ChartTables.dispositors(f);
+                }
+                if ("RESONANCE".equals(kind)) {
+                    return ChartTables.resonance(f);
+                }
+                return "";
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    String html = get();
+                    if (html != null && !html.isEmpty()) {
+                        SkymapPanel.this.window.showInterpretationHtml(html);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.execute();
+    }
+
     private void showReading(final ReadingTier readingTier) {
         if (this.sw == null || this.baseSd == null || this.window == null || readingTier == ReadingTier.NONE) {
             return;

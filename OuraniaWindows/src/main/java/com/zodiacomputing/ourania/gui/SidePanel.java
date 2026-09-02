@@ -47,6 +47,7 @@ public final class SidePanel extends JPanel {
     static final String NATAL = "Natal Chart";
     static final String TRANSITS = "Transits";
     static final String GRIDS = "Aspect Grids";
+    static final String TABLES = "Tables";
     static final String READINGS = "Readings";
 
     /**
@@ -109,6 +110,18 @@ public final class SidePanel extends JPanel {
         // The grid is the tallest thing this drawer holds and the one a reader scans rather
         // than reads, so it gets more room before it starts scrolling.
         gridSection.setMaxOpenHeight(520);
+
+        // Three engines that were computed, checked and unreachable until 2026-09-02. A
+        // capability with no door is invisible in exactly the way a missing one is not: the
+        // suites stay green, so nothing reports it. See ChartTables.
+        JPanel tables = column();
+        tables.add(tableButton("Midpoints", "MIDPOINTS",
+            "Bodies sitting on the midpoints of the Sun, Moon, Ascendant and Midheaven"));
+        tables.add(tableButton("Dispositors", "DISPOSITORS",
+            "Which planet rules each house, where it sits, and any receptions between them"));
+        tables.add(tableButton("Resonance", "RESONANCE",
+            "The tightest harmonic contacts the classical aspects do not show"));
+        accordion.addSection(TABLES, tables);
 
         JPanel readings = column();
         readings.add(readingButton("Snapshot", "SNAPSHOT",
@@ -204,6 +217,16 @@ public final class SidePanel extends JPanel {
         p.setBackground(Theme.SURFACE);
         p.setBorder(Theme.pad(Theme.GAP_S, Theme.GAP_S, Theme.GAP_S, Theme.GAP_S));
         return p;
+    }
+
+    private JButton tableButton(String label, final String kind, String tip) {
+        JButton b = row(label, tip, Widgets.Role.READING);
+        b.addActionListener(e -> {
+            if (window != null) {
+                window.showTable(kind);
+            }
+        });
+        return b;
     }
 
     private JButton readingButton(String label, final String reading, String tip) {

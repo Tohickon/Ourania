@@ -72,6 +72,11 @@ public final class NavigationCheck {
         everyScreenReachable();
         report("Part C", before);
 
+        System.out.println("=== Part D: every engine has a door ===");
+        before = failures.size();
+        everyEngineHasADoor();
+        report("Part D", before);
+
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
@@ -267,6 +272,84 @@ public final class NavigationCheck {
      * scrolled section. Walking the tree naively counted four of them as menu rows: the Menu
      * came back with fourteen entries, four of them nameless and none of them clickable.
      */
+    /**
+     * No engine may be computed, checked, and unreachable.
+     *
+     * <b>This project's signature defect, caught four times before it was ever measured.</b>
+     * The browsable index whose only two entry points sat inside a panel that had to be open
+     * first. SavedCharts, a working profile store the name-list screen never read. The harmonic
+     * dial the work plan still listed as unimplemented. And on 2026-09-01, five astro classes
+     * with zero references from this package at once.
+     *
+     * Every one of those passed every suite. A capability with no door is invisible in exactly
+     * the way a missing one is not: nothing is broken, nothing is red, and no count moves. So
+     * the reference count itself has to be the assertion.
+     *
+     * Two exemptions, and the first is a rule rather than a list.
+     *
+     * A class declaring its own {@code main} is a command-line tool: it is invoked directly,
+     * so the interface is not the way in and its absence from this package means nothing.
+     * Calibration, FittingHarness and CorpusBuilder are all of that kind - weight diagnostics
+     * and fitting for a domain whose own header says it has no outcome variable. Writing the
+     * rule that way means a future harness exempts itself correctly instead of arriving as a
+     * failure someone silences by hand.
+     *
+     * DecanSystem is exempt by name, because that one is a judgement: four labels and a getter
+     * with no logic behind them and no reference anywhere in the tree. It wants implementing
+     * or deleting, not a button, and a door onto it would open onto nothing.
+     *
+     * The first version of this part named Calibration and DecanSystem and immediately found
+     * FittingHarness and CorpusBuilder, which the audit that prompted it had missed. Adding a
+     * name here is allowed. Adding one silently, to make this part go green, is the thing it
+     * exists to prevent.
+     */
+    private static void everyEngineHasADoor() {
+        java.util.Set<String> exempt = new java.util.HashSet<>(
+                java.util.Collections.singletonList("DecanSystem"));
+
+        java.io.File astro = new java.io.File("src/main/java/com/zodiacomputing/ourania/astro");
+        java.io.File guiDir = new java.io.File("src/main/java/com/zodiacomputing/ourania/gui");
+        java.io.File[] engines = astro.listFiles((d, n) -> n.endsWith(".java"));
+        java.io.File[] screens = guiDir.listFiles((d, n) -> n.endsWith(".java"));
+
+        ok("the astro package is readable from the working directory", engines != null);
+        ok("the gui package is readable from the working directory", screens != null);
+        if (engines == null || screens == null) {
+            return;
+        }
+
+        // One pass over the gui sources; grepping per engine would be 52 reads of every file.
+        StringBuilder all = new StringBuilder();
+        for (java.io.File f : screens) {
+            if (f.getName().endsWith("Check.java")) {
+                continue;   // a suite referencing an engine is not a door for a reader
+            }
+            try {
+                all.append(new String(java.nio.file.Files.readAllBytes(f.toPath()), "UTF-8"));
+            } catch (Exception e) {
+                failures.add("could not read " + f.getName() + ": " + e);
+            }
+        }
+        String gui = all.toString();
+
+        for (java.io.File f : engines) {
+            String name = f.getName().substring(0, f.getName().length() - ".java".length());
+            if (name.endsWith("Check") || exempt.contains(name)) {
+                continue;
+            }
+            try {
+                String src = new String(java.nio.file.Files.readAllBytes(f.toPath()), "UTF-8");
+                if (src.contains("public static void main")) {
+                    continue;   // a command-line tool; the interface is not its way in
+                }
+            } catch (Exception e) {
+                failures.add("could not read " + f.getName() + ": " + e);
+                continue;
+            }
+            ok(name + " is reachable from the interface", gui.contains(name));
+        }
+    }
+
     private static void collectButtons(Container c, List<JButton> out) {
         if (c instanceof javax.swing.JScrollBar) {
             return;

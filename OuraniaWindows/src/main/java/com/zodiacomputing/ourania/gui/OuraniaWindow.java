@@ -340,6 +340,19 @@ public class OuraniaWindow extends JFrame {
         showSynthesis(html);
     }
 
+    /**
+     * One chart table, from the sidebar's Tables section. See {@link ChartTables}.
+     *
+     * Delegates to the wheel for the same reason {@code runReading} does: SkymapPanel holds
+     * the ephemeris handle and the cast parameters, and a second copy of those here would be
+     * one rule with two implementations.
+     */
+    public void showTable(String kind) {
+        if (skymapPanel != null) {
+            skymapPanel.showTable(kind);
+        }
+    }
+
     /** The annual almanac, from SkymapPanel's Calendar button. */
     public void showCalendar(int year, String body) {
         if (interpretationPanel != null) {
