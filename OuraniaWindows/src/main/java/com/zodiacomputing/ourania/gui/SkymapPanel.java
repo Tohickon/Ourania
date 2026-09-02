@@ -574,6 +574,124 @@ extends JPanel {
     }
 
     /**
+     * The body under the cursor, packed as {@code index | (transit ? TRANSIT_BIT : 0)},
+     * or -1.
+     *
+     * <b>Deliberately the same three hit tests, in the same order, as {@code hoverTextAt}
+     * above.</b> The hover card and the focus highlight must agree about which body the cursor
+     * is on: a second, subtly different hit test would light one body while describing another,
+     * and the reader would have no way to tell which was lying. The wheel has already shipped
+     * one bug of that shape - the note above natalRadii records it.
+     */
+    private int bodyAt(int x, int y) {
+        if (this.sw == null || this.baseSd == null || this.chartPanel == null) {
+            return -1;
+        }
+        int w = this.chartPanel.getWidth();
+        int h = this.chartPanel.getHeight();
+        if (w <= 0 || h <= 0) {
+            return -1;
+        }
+        int cx = w / 2;
+        int cy = h / 2;
+        int[] rings = SkymapPanel.ringRadii(w, h, this.showTransitChart, this.showTriWheel);
+        double pin = this.getPinLongitude();
+
+        if (this.showTriWheel) {
+            int[] radii = this.triWheelRadii(rings[RING_TRI], rings[RING_TRANSIT]);
+            int i = this.nearestPoint(x, y, cx, cy, pin, this.cLon, this.cValid, radii, true);
+            if (i >= 0) {
+                return i | TRANSIT_BIT;
+            }
+        }
+        if (this.showTransitChart) {
+            int[] radii = this.transitRadii(rings[RING_TRANSIT], rings[RING_DECAN_OUTER]);
+            int i = this.nearestPoint(x, y, cx, cy, pin, this.tLon, this.tValid, radii, true);
+            if (i >= 0) {
+                return i | TRANSIT_BIT;
+            }
+        }
+        int[] radii = this.natalRadii(this.bodyBaseRadius(rings));
+        return this.nearestPoint(x, y, cx, cy, pin, this.bLon, this.bValid, radii, false);
+    }
+
+    /** Marks a packed hit as belonging to the outer wheel. Above any registry index. */
+    private static final int TRANSIT_BIT = 1 << 16;
+
+    /**
+     * The body the cursor is resting on, or -1.
+     *
+     * <b>Hover, not click.</b> Focus follows the cursor and lets go when it leaves, so a reader
+     * sweeping the wheel sees each body's own web in turn without having to select and
+     * deselect. Clicking still opens the reading - that is a separate, deliberate act.
+     */
+    private int focusBody = -1;
+    private boolean focusTransit;
+
+    /** True when nothing is focused, so every aspect draws at its ordinary strength. */
+    private boolean noFocus() {
+        return this.focusBody < 0;
+    }
+
+    /**
+     * How strongly to draw a line, given what is focused.
+     *
+     * 1.0 when nothing is focused or the line touches the focused body; otherwise
+     * {@link #FOCUS_DIM}. <b>Dimmed rather than hidden</b>: the rest of the chart is the
+     * context that makes one body's web mean anything, and removing it would leave a reader
+     * looking at five lines in an empty circle.
+     */
+    private double focusWeight(int a, int b, boolean transitPair) {
+        if (this.noFocus()) {
+            return 1.0;
+        }
+        boolean touches = transitPair == this.focusTransit
+            ? (a == this.focusBody || b == this.focusBody)
+            : (b == this.focusBody);
+        return touches ? 1.0 : FOCUS_DIM;
+    }
+
+    /**
+     * How strongly to draw body {@code i}'s glyph, given what is focused.
+     *
+     * Bright when it is the focused body itself, or when it makes a visible aspect to it -
+     * asked through {@code visibleAspect}, the same gate the lines use, so a glyph cannot stay
+     * lit for an aspect that was switched off in Settings.
+     */
+    private double glyphWeight(int i, boolean transit) {
+        if (this.noFocus()) {
+            return 1.0;
+        }
+        if (i == this.focusBody && transit == this.focusTransit) {
+            return 1.0;
+        }
+        double[] mine = transit ? this.tLon : this.bLon;
+        double[] theirs = this.focusTransit ? this.tLon : this.bLon;
+        if (this.focusBody >= mine.length || this.focusBody >= theirs.length
+                || i >= mine.length) {
+            return FOCUS_DIM;
+        }
+        boolean synastry = transit != this.focusTransit;
+        double sep = Aspects.separation(mine[i], theirs[this.focusBody]);
+        return this.visibleAspect(sep, i, this.focusBody, synastry) != null ? 1.0 : FOCUS_DIM;
+    }
+
+    /** What an unfocused line and glyph fade to. Enough to recede, not enough to vanish. */
+    private static final double FOCUS_DIM = 0.16;
+
+    /** Sets the focused body and reports whether anything changed, so hover repaints once. */
+    private boolean setFocus(int packed) {
+        int body = packed < 0 ? -1 : (packed & (TRANSIT_BIT - 1));
+        boolean transit = packed >= 0 && (packed & TRANSIT_BIT) != 0;
+        if (body == this.focusBody && transit == this.focusTransit) {
+            return false;
+        }
+        this.focusBody = body;
+        this.focusTransit = transit;
+        return true;
+    }
+
+    /**
      * The hover card: what it is, where it is, and the degree symbolism that goes with it.
      *
      * Swing tooltips take a subset of HTML, so this stays to a table-free stack of divs -
@@ -1066,6 +1184,15 @@ extends JPanel {
             public void mouseClicked(MouseEvent mouseEvent) {
                 SkymapPanel.this.handleChartClick(mouseEvent.getX(), mouseEvent.getY());
             }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                // Without this the chart stays dimmed around whatever the cursor left on,
+                // which reads as a rendering fault rather than as a selection.
+                if (SkymapPanel.this.setFocus(-1)) {
+                    SkymapPanel.this.chartPanel.repaint();
+                }
+            }
         });
         this.chartPanel.addMouseMotionListener(new java.awt.event.MouseMotionAdapter(){
 
@@ -1075,6 +1202,13 @@ extends JPanel {
                 // behaviour wanted over empty space: no card, and no stale one either.
                 SkymapPanel.this.chartPanel.setToolTipText(
                     SkymapPanel.this.hoverTextAt(mouseEvent.getX(), mouseEvent.getY()));
+                // Focus follows the cursor. setFocus reports whether anything actually
+                // changed, so sweeping across one glyph repaints once rather than on every
+                // pixel of travel - the same guard setHighlightedAspect already uses.
+                if (SkymapPanel.this.setFocus(
+                        SkymapPanel.this.bodyAt(mouseEvent.getX(), mouseEvent.getY()))) {
+                    SkymapPanel.this.chartPanel.repaint();
+                }
             }
         });
         // A chart is read by sweeping across it, so the default 750ms feels broken here.
@@ -4272,6 +4406,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n26 + 4);
                     continue;
                 }
+                // A body recedes with its lines unless it IS the focus or aspects it. Without
+                // this the web dims and the glyphs stay bright, which reads as the lines being
+                // broken rather than as one body being singled out.
+                java.awt.Composite priorComposite = graphics2D.getComposite();
+                if (!SkymapPanel.this.noFocus()) {
+                    graphics2D.setComposite(java.awt.AlphaComposite.getInstance(
+                        java.awt.AlphaComposite.SRC_OVER,
+                        (float) SkymapPanel.this.glyphWeight(n7, false)));
+                }
                 GlyphSize glyphSize = SkymapPanel.natalSize(n7);
                 graphics2D.setFont(glyphSize.font);
                 this.drawMetallicSphere(graphics2D, n4, n26, glyphSize.radius, new Color(192, 192, 192));
@@ -4290,6 +4433,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // spread outward when they crowd, so without this a reader cannot tell which
                 // degree a glyph belongs to. Colour and visibility are both settings; the
                 // alpha stays here because a solid leader would compete with the aspect lines.
+                graphics2D.setComposite(priorComposite);
                 if (Settings.showDegreeLines()) {
                     Color leader = ChartPalette.colorOr(ChartPalette.leaderHex(null),
                         Color.WHITE);
@@ -4462,6 +4606,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 float f = (float)Math.pow(1.0 - d7, 2.0);
                 int n7 = (int)(35.0f + 220.0f * f);
                 n7 = Math.max(20, Math.min(255, n7));
+                // Focus, applied on top of the orb fade rather than instead of it: a loose
+                // aspect to the focused body is still a loose aspect and should still look
+                // like one.
+                double focus = SkymapPanel.this.focusWeight(n5, n6, bl);
+                n7 = Math.max(6, (int)(n7 * focus));
                 // A hovered line is drawn at full strength regardless of how wide its orb is.
                 // The normal alpha ramp fades a loose aspect almost to nothing, which is right
                 // for the background weave and useless for "show me the one I am pointing at".
