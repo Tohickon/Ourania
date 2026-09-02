@@ -22,9 +22,24 @@ public class GenerateExtraBodies {
      *   - put() overwrote hand-written prose with template text. The Uranus, Neptune and
      *     Pluto splice of 2026-08-21 and all the asteroid prose would be lost on a re-run.
      *
-     * Both are now closed: the aspect loop uses putIfAbsent, and main() refuses to run
-     * without an explicit acknowledgement argument. The file is kept because it is the
-     * only record of where the boilerplate came from.
+     * Both are now closed, and closed structurally rather than by convention:
+     *   - Nothing overwrites. Every write into the loaded data is putIfAbsent, including the
+     *     body_core and transits blocks, which used plain put until 2026-09-02 and would have
+     *     reverted any hand-edit to those eight bodies and seven transits on a re-run.
+     *   - Nothing is dropped. A line the reader cannot classify aborts the run before any
+     *     write, instead of being parsed away and then written back out of existence. That
+     *     silent drop was the 2026-08-13 mechanism.
+     *   - The output is proved a superset of the input before it is allowed near the file.
+     *   - The previous file is copied to a timestamped sibling, and the new one is written to
+     *     a temp file and moved into place, so an interrupted run cannot truncate the corpus.
+     *
+     * One live defect was found by that work and is fixed here: "planet_sign" and
+     * "planet_house" are declared inline as empty objects, which matched neither the old
+     * section pattern nor the old key pattern, so both were dropped on every rewrite. They are
+     * live routing sections in InterpretationService.
+     *
+     * main() still refuses to run without an explicit acknowledgement argument. The file is
+     * kept because it is the only record of where the boilerplate came from.
      */
     public static final String ACK = "--yes-i-want-to-rewrite-extra-bodies-json";
 
@@ -88,47 +103,101 @@ public class GenerateExtraBodies {
             "<b>%s Quincunx %s:</b> Your %s is awkwardly misaligned with your %s. This creates a need for constant adjustment and compromise between these two areas of your life."
         };
 
-        // Load existing data
+        // Load existing data. Section order is taken from the file, not declared here, so a
+        // section this generator has never heard of survives the round trip in its own place.
         Map<String, Map<String, String>> data = new LinkedHashMap<>();
-        data.put("body_core", new LinkedHashMap<>());
-        data.put("aspects", new LinkedHashMap<>());
-        data.put("transits", new LinkedHashMap<>());
-        
-        try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/data/extra_bodies.json"))) {
-            Pattern sectionStart = Pattern.compile("^\\s*\"([a-z_0-9]+)\"\\s*:\\s*\\{\\s*$");
-            Pattern keyLine = Pattern.compile("^\\s*\"([a-z_0-9]+)\"\\s*:\\s*\"(.*)\"[,]?\\s*$");
-            
+
+        java.io.File target = new java.io.File("src/main/resources/data/extra_bodies.json");
+        if (!target.isFile()) {
+            System.err.println("ABORT: " + target.getPath() + " not found. Refusing to create it");
+            System.err.println("from templates - a blank starting point is how the 2026-08-13 loss began.");
+            return;
+        }
+
+        // Every line the reader cannot classify. The old reader dropped these silently and then
+        // rewrote the file without them, which is precisely the deletion mechanism. Now a single
+        // unclassified line aborts the run before anything is written.
+        java.util.List<String> unparsed = new java.util.ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(target))) {
+            // Keys widened to [A-Za-z_0-9]. The old [a-z_0-9] silently skipped any key carrying a
+            // capital, and a key this reader skips is a key the writer deletes.
+            Pattern sectionStart = Pattern.compile("^\\s*\"([A-Za-z_0-9]+)\"\\s*:\\s*\\{\\s*$");
+            Pattern sectionEmpty = Pattern.compile("^\\s*\"([A-Za-z_0-9]+)\"\\s*:\\s*\\{\\s*\\}\\s*,?\\s*$");
+            Pattern keyLine = Pattern.compile("^\\s*\"([A-Za-z_0-9]+)\"\\s*:\\s*\"(.*)\"\\s*,?\\s*$");
             String currentSection = null;
             String line;
+            int lineNo = 0;
             while ((line = br.readLine()) != null) {
-                Matcher sm = sectionStart.matcher(line);
-                if (sm.find()) {
-                    currentSection = sm.group(1);
-                    if (!data.containsKey(currentSection)) {
-                        data.put(currentSection, new LinkedHashMap<>());
-                    }
+                lineNo++;
+                String t = line.trim();
+
+                // An inline empty section - "planet_sign": {} - matched neither old pattern, so
+                // planet_sign and planet_house were dropped on every rewrite. Both are live
+                // routing sections in InterpretationService.
+                Matcher em = sectionEmpty.matcher(line);
+                if (em.matches()) {
+                    data.computeIfAbsent(em.group(1), k -> new LinkedHashMap<>());
+                    currentSection = null;
                     continue;
                 }
-                
-                Matcher km = keyLine.matcher(line);
-                if (km.find() && currentSection != null) {
-                    data.get(currentSection).put(km.group(1), km.group(2));
+
+                Matcher sm = sectionStart.matcher(line);
+                if (sm.matches()) {
+                    currentSection = sm.group(1);
+                    data.computeIfAbsent(currentSection, k -> new LinkedHashMap<>());
+                    continue;
                 }
+
+                Matcher km = keyLine.matcher(line);
+                if (km.matches() && currentSection != null) {
+                    data.get(currentSection).put(km.group(1), km.group(2));
+                    continue;
+                }
+
+                // Structural punctuation carries no data and needs no preserving.
+                if (t.isEmpty() || t.equals("{") || t.equals("}") || t.equals("},")
+                        || t.equals("]") || t.equals("],")) {
+                    continue;
+                }
+
+                unparsed.add("line " + lineNo + ": " + (t.length() > 90 ? t.substring(0, 90) + "..." : t));
             }
-        } catch (Exception e) {
-            System.out.println("Could not read existing file, generating from scratch.");
+        }
+
+        if (!unparsed.isEmpty()) {
+            System.err.println("ABORT: " + unparsed.size() + " line(s) of extra_bodies.json were not");
+            System.err.println("understood by this reader. Rewriting now would delete them. That is the");
+            System.err.println("2026-08-13 failure exactly: parse what you understand, write back only that.");
+            System.err.println("Nothing has been written. The offending lines:");
+            for (int i = 0; i < Math.min(unparsed.size(), 20); i++) {
+                System.err.println("  " + unparsed.get(i));
+            }
+            if (unparsed.size() > 20) System.err.println("  ... and " + (unparsed.size() - 20) + " more");
+            return;
+        }
+
+        // What the file held before this run touched anything - the yardstick the generated
+        // output is measured against before it is allowed to replace the file.
+        Map<String, java.util.Set<String>> beforeKeys = new LinkedHashMap<>();
+        for (Map.Entry<String, Map<String, String>> e : data.entrySet()) {
+            beforeKeys.put(e.getKey(), new java.util.LinkedHashSet<>(e.getValue().keySet()));
+        }
+
+        for (String required : new String[] { "body_core", "aspects", "transits" }) {
+            data.computeIfAbsent(required, k -> new LinkedHashMap<>());
         }
 
         // Generate and merge Body Cores
         Map<String, String> bodyCore = data.get("body_core");
-        bodyCore.put("ceres", "<b>Ceres — The Great Mother.</b><br><br>Ceres rules the harvest: unconditional love, sustenance, grief and loss, and the terms on which you were fed. She is the archetype of nurture, and she governs both how you care for others and what you require in order to feel cared for. Because her myth is a myth of abduction and return, she also rules the bargain struck around love — what is withheld, what is grieved, and what is grown back.");
-        bodyCore.put("pallas", "<b>Pallas Athena — The Warrior Queen.</b><br><br>Pallas is creative intelligence: pattern recognition, strategy, and the capacity to fight for a belief without brute force. Where Mars charges, Pallas out-thinks. She governs your problem-solving style, the shape of your craft, and the arena in which you see the whole board while others see only their own piece. Born fully armed from Jupiter's head, she is intellect that arrives ready for use.");
-        bodyCore.put("juno", "<b>Juno — The Divine Consort.</b><br><br>Venus is what attracts you; Juno is what you actually need in order to sustain a commitment. She governs marriage and long-term partnership of every kind, business included: the terms of the contract, the loyalty you expect, and the injustice you will not tolerate. Her myth is one of a binding vow repeatedly betrayed, so she also rules what you do when a promise is broken.");
-        bodyCore.put("vesta", "<b>Vesta — The Keeper of the Flame.</b><br><br>Vesta is what you are devoted to. She is the archetype of the priestess: focus, sacred purpose, and the willingness to sacrifice the merely pleasant for the genuinely central. She governs how you concentrate, what restores you, and where you tend a flame that must not go out. Because devotion narrows, she also rules what you have set aside in order to keep it burning.");
-        bodyCore.put("north_node", "<b>North Node — the karmic path forward.</b><br><br>The lunar nodes are not bodies but the two points where the Moon's orbit crosses the ecliptic, so they describe a direction rather than a drive. The North Node marks what your life is asking you to develop: the unfamiliar, initially uncomfortable capacity that growth runs through. Nothing here comes naturally, and that is the point — this is the work, not the talent. Read it always with the South Node opposite it.");
-        bodyCore.put("south_node", "<b>South Node — innate talent, and the comfort zone to evolve beyond.</b><br><br>Exactly opposite the North Node, the South Node marks what you already have: the skills that arrived without effort, the responses you reach for under stress, and the place you retreat to when the growth ahead feels like too much. It is not a fault to be corrected. It is the ground you stand on, and the trap is standing on it exclusively when the North Node is asking you to move.");
-        bodyCore.put("fortune", "<b>Part of Fortune — where success and joy land.</b><br><br>An Arabic lot rather than a body, calculated from the Sun, the Moon and the Ascendant, and reversed by sect — the formula runs one way for a day chart and the other for a night chart. It marks where the three most personal factors in the chart agree, and so where worldly success, ease and genuine enjoyment are most available to you. Not luck exactly: the place where effort meets the least resistance.");
-        bodyCore.put("lilith", "<b>Black Moon Lilith — the disowned and the uncompliant.</b><br><br>Not a body but the lunar apogee, the furthest point of the Moon's orbit from Earth, and a mathematical point rather than a rock. Lilith marks what you have exiled: the desire judged unacceptable, the rage with nowhere to go, the refusal to be made convenient. Where she falls, you were told to be smaller and something in you declined. Handled badly she is compulsion and sabotage; handled well she is the part of you that cannot be bought.");
+        bodyCore.putIfAbsent("ceres", "<b>Ceres — The Great Mother.</b><br><br>Ceres rules the harvest: unconditional love, sustenance, grief and loss, and the terms on which you were fed. She is the archetype of nurture, and she governs both how you care for others and what you require in order to feel cared for. Because her myth is a myth of abduction and return, she also rules the bargain struck around love — what is withheld, what is grieved, and what is grown back.");
+        bodyCore.putIfAbsent("pallas", "<b>Pallas Athena — The Warrior Queen.</b><br><br>Pallas is creative intelligence: pattern recognition, strategy, and the capacity to fight for a belief without brute force. Where Mars charges, Pallas out-thinks. She governs your problem-solving style, the shape of your craft, and the arena in which you see the whole board while others see only their own piece. Born fully armed from Jupiter's head, she is intellect that arrives ready for use.");
+        bodyCore.putIfAbsent("juno", "<b>Juno — The Divine Consort.</b><br><br>Venus is what attracts you; Juno is what you actually need in order to sustain a commitment. She governs marriage and long-term partnership of every kind, business included: the terms of the contract, the loyalty you expect, and the injustice you will not tolerate. Her myth is one of a binding vow repeatedly betrayed, so she also rules what you do when a promise is broken.");
+        bodyCore.putIfAbsent("vesta", "<b>Vesta — The Keeper of the Flame.</b><br><br>Vesta is what you are devoted to. She is the archetype of the priestess: focus, sacred purpose, and the willingness to sacrifice the merely pleasant for the genuinely central. She governs how you concentrate, what restores you, and where you tend a flame that must not go out. Because devotion narrows, she also rules what you have set aside in order to keep it burning.");
+        bodyCore.putIfAbsent("north_node", "<b>North Node — the karmic path forward.</b><br><br>The lunar nodes are not bodies but the two points where the Moon's orbit crosses the ecliptic, so they describe a direction rather than a drive. The North Node marks what your life is asking you to develop: the unfamiliar, initially uncomfortable capacity that growth runs through. Nothing here comes naturally, and that is the point — this is the work, not the talent. Read it always with the South Node opposite it.");
+        bodyCore.putIfAbsent("south_node", "<b>South Node — innate talent, and the comfort zone to evolve beyond.</b><br><br>Exactly opposite the North Node, the South Node marks what you already have: the skills that arrived without effort, the responses you reach for under stress, and the place you retreat to when the growth ahead feels like too much. It is not a fault to be corrected. It is the ground you stand on, and the trap is standing on it exclusively when the North Node is asking you to move.");
+        bodyCore.putIfAbsent("fortune", "<b>Part of Fortune — where success and joy land.</b><br><br>An Arabic lot rather than a body, calculated from the Sun, the Moon and the Ascendant, and reversed by sect — the formula runs one way for a day chart and the other for a night chart. It marks where the three most personal factors in the chart agree, and so where worldly success, ease and genuine enjoyment are most available to you. Not luck exactly: the place where effort meets the least resistance.");
+        bodyCore.putIfAbsent("lilith", "<b>Black Moon Lilith — the disowned and the uncompliant.</b><br><br>Not a body but the lunar apogee, the furthest point of the Moon's orbit from Earth, and a mathematical point rather than a rock. Lilith marks what you have exiled: the desire judged unacceptable, the rage with nowhere to go, the refusal to be made convenient. Where she falls, you were told to be smaller and something in you declined. Handled badly she is compulsion and sabotage; handled well she is the part of you that cannot be bought.");
         
         // Generate and merge Aspects
         Map<String, String> aspects = data.get("aspects");
@@ -148,13 +217,13 @@ public class GenerateExtraBodies {
 
         // Generate and merge Transits
         Map<String, String> transits = data.get("transits");
-        transits.put("transit_sun_quincunx_natal_south_node", "<b>Sun Quincunx South Node</b><br><i>Tension between current purpose and old defaults.</i><br><br>When the transiting Sun forms a quincunx to your natal South Node, there is a temporary but distinct tension between where you are being called to shine today, and the comfortable, habitual patterns of your past. You may feel an awkward adjustment is required to integrate your current sense of purpose with old karmic defaults.");
-        transits.put("transit_sun_square_natal_chiron", "<b>Sun Square Chiron</b><br><i>A brief illumination of an old wound.</i><br><br>A transit of the Sun squaring natal Chiron often brings a brief but sharp illumination to an old wound. For a day or two, circumstances or interactions might poke at a sensitive vulnerability or insecurity. The square demands action: you are challenged to consciously integrate this awareness rather than react from a place of hurt.");
-        transits.put("transit_sun_square_natal_ceres", "<b>Sun Square Ceres</b><br><i>Friction between ego and nurturing.</i><br><br>When the transiting Sun squares your natal Ceres, issues around nurturing, caretaking, and sustenance may temporarily clash with your ego needs or vitality. You might feel a friction between what you want to do for yourself and the responsibilities of caring for others (or your need to be cared for).");
-        transits.put("transit_sun_sextile_natal_pallas", "<b>Sun Sextile Pallas</b><br><i>A smooth flow of strategic thinking.</i><br><br>The transiting Sun sextiling natal Pallas offers a smooth, cooperative flow of creative intelligence and strategic thinking. This is an excellent couple of days for problem-solving, planning, and seeing the &quot;big picture&quot; patterns with clarity. Your vitality supports your wisdom.");
-        transits.put("transit_sun_trine_natal_juno", "<b>Sun Trine Juno</b><br><i>Harmonious energy in committed partnerships.</i><br><br>A trine from the transiting Sun to your natal Juno brings a harmonious, supportive energy to your committed relationships and partnerships. It's a favorable time for cooperation, mutual appreciation, and aligning your personal goals with the needs of a significant other.");
-        transits.put("transit_sun_opposition_natal_vesta", "<b>Sun Opposition Vesta</b><br><i>Tug-of-war between external drive and inner devotion.</i><br><br>As the transiting Sun opposes your natal Vesta, you may experience a tug-of-war between your external, ego-driven activities and your internal need for focus, devotion, and solitary dedication. Finding a balance between shining out in the world and tending your inner sacred flame is the task at hand.");
-        transits.put("transit_sun_conjunction_natal_part_of_fortune", "<b>Sun Conjunction Part of Fortune</b><br><i>Illumination of joy and prosperity.</i><br><br>When the transiting Sun conjuncts your natal Part of Fortune, it briefly illuminates your personal point of joy, prosperity, and natural alignment. You may feel a heightened sense of well-being, serendipity, or a clearer understanding of what truly brings you fulfillment.");
+        transits.putIfAbsent("transit_sun_quincunx_natal_south_node", "<b>Sun Quincunx South Node</b><br><i>Tension between current purpose and old defaults.</i><br><br>When the transiting Sun forms a quincunx to your natal South Node, there is a temporary but distinct tension between where you are being called to shine today, and the comfortable, habitual patterns of your past. You may feel an awkward adjustment is required to integrate your current sense of purpose with old karmic defaults.");
+        transits.putIfAbsent("transit_sun_square_natal_chiron", "<b>Sun Square Chiron</b><br><i>A brief illumination of an old wound.</i><br><br>A transit of the Sun squaring natal Chiron often brings a brief but sharp illumination to an old wound. For a day or two, circumstances or interactions might poke at a sensitive vulnerability or insecurity. The square demands action: you are challenged to consciously integrate this awareness rather than react from a place of hurt.");
+        transits.putIfAbsent("transit_sun_square_natal_ceres", "<b>Sun Square Ceres</b><br><i>Friction between ego and nurturing.</i><br><br>When the transiting Sun squares your natal Ceres, issues around nurturing, caretaking, and sustenance may temporarily clash with your ego needs or vitality. You might feel a friction between what you want to do for yourself and the responsibilities of caring for others (or your need to be cared for).");
+        transits.putIfAbsent("transit_sun_sextile_natal_pallas", "<b>Sun Sextile Pallas</b><br><i>A smooth flow of strategic thinking.</i><br><br>The transiting Sun sextiling natal Pallas offers a smooth, cooperative flow of creative intelligence and strategic thinking. This is an excellent couple of days for problem-solving, planning, and seeing the &quot;big picture&quot; patterns with clarity. Your vitality supports your wisdom.");
+        transits.putIfAbsent("transit_sun_trine_natal_juno", "<b>Sun Trine Juno</b><br><i>Harmonious energy in committed partnerships.</i><br><br>A trine from the transiting Sun to your natal Juno brings a harmonious, supportive energy to your committed relationships and partnerships. It's a favorable time for cooperation, mutual appreciation, and aligning your personal goals with the needs of a significant other.");
+        transits.putIfAbsent("transit_sun_opposition_natal_vesta", "<b>Sun Opposition Vesta</b><br><i>Tug-of-war between external drive and inner devotion.</i><br><br>As the transiting Sun opposes your natal Vesta, you may experience a tug-of-war between your external, ego-driven activities and your internal need for focus, devotion, and solitary dedication. Finding a balance between shining out in the world and tending your inner sacred flame is the task at hand.");
+        transits.putIfAbsent("transit_sun_conjunction_natal_part_of_fortune", "<b>Sun Conjunction Part of Fortune</b><br><i>Illumination of joy and prosperity.</i><br><br>When the transiting Sun conjuncts your natal Part of Fortune, it briefly illuminates your personal point of joy, prosperity, and natural alignment. You may feel a heightened sense of well-being, serendipity, or a clearer understanding of what truly brings you fulfillment.");
 
         // Write out merged JSON
         StringBuilder json = new StringBuilder();
@@ -162,8 +231,15 @@ public class GenerateExtraBodies {
         boolean firstSection = true;
         for (String section : data.keySet()) {
             if (!firstSection) json.append(",\n");
-            json.append("  \"").append(section).append("\": {\n");
             Map<String, String> sectionData = data.get(section);
+            // An empty section is emitted inline, the way the file already carries planet_sign
+            // and planet_house, so the round trip is byte-comparable rather than merely valid.
+            if (sectionData.isEmpty()) {
+                json.append("  \"").append(section).append("\": {}");
+                firstSection = false;
+                continue;
+            }
+            json.append("  \"").append(section).append("\": {\n");
             boolean firstKey = true;
             for (Map.Entry<String, String> entry : sectionData.entrySet()) {
                 if (!firstKey) json.append(",\n");
@@ -175,9 +251,49 @@ public class GenerateExtraBodies {
         }
         json.append("\n}\n");
 
-        FileWriter fw = new FileWriter("src/main/resources/data/extra_bodies.json");
-        fw.write(json.toString());
-        fw.close();
-        System.out.println("Successfully merged and generated data into extra_bodies.json");
+        // Prove the output is a superset of the input before letting it near the file. This
+        // generator has deleted 192 entries belonging to another agent once already; the rule
+        // it broke is that a script editing a shared file must not remove what it did not
+        // explicitly intend to remove. Verify, then write - never the other way round.
+        java.util.List<String> lost = new java.util.ArrayList<>();
+        for (Map.Entry<String, java.util.Set<String>> e : beforeKeys.entrySet()) {
+            Map<String, String> now = data.get(e.getKey());
+            if (now == null) {
+                lost.add("whole section \"" + e.getKey() + "\" (" + e.getValue().size() + " entries)");
+                continue;
+            }
+            for (String k : e.getValue()) {
+                if (!now.containsKey(k)) lost.add(e.getKey() + "." + k);
+            }
+        }
+        if (!lost.isEmpty()) {
+            System.err.println("ABORT: the generated file would drop " + lost.size() + " thing(s) that");
+            System.err.println("extra_bodies.json currently holds. Nothing has been written.");
+            for (int i = 0; i < Math.min(lost.size(), 20); i++) System.err.println("  " + lost.get(i));
+            if (lost.size() > 20) System.err.println("  ... and " + (lost.size() - 20) + " more");
+            return;
+        }
+
+        // Keep the previous file. Recovery from the 2026-08-13 loss was impossible because no
+        // copy existed anywhere; one timestamped sibling is the whole cost of never repeating it.
+        java.io.File backup = new java.io.File(target.getParentFile(),
+                "extra_bodies.json.bak-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
+                        .format(new java.util.Date()));
+        java.nio.file.Files.copy(target.toPath(), backup.toPath());
+
+        // Write to a sibling and move it into place, so an interrupted run cannot leave a
+        // half-written corpus behind.
+        java.io.File tmp = new java.io.File(target.getParentFile(), "extra_bodies.json.tmp");
+        try (FileWriter fw = new FileWriter(tmp)) {
+            fw.write(json.toString());
+        }
+        java.nio.file.Files.move(tmp.toPath(), target.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+        int total = 0;
+        for (Map<String, String> m : data.values()) total += m.size();
+        System.out.println("extra_bodies.json rewritten: " + data.size() + " sections, "
+                + total + " entries, 0 lost.");
+        System.out.println("Previous file kept at " + backup.getName());
     }
 }
