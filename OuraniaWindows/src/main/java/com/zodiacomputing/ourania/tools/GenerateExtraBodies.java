@@ -1,3 +1,5 @@
+package com.zodiacomputing.ourania.tools;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -41,9 +43,28 @@ public class GenerateExtraBodies {
      * main() still refuses to run without an explicit acknowledgement argument. The file is
      * kept because it is the only record of where the boilerplate came from.
      */
+    /**
+     * What a run did. Returned rather than printed so a check suite can assert on the
+     * outcome instead of scraping stdout, and so every abort path is distinguishable from
+     * every other. {@link #WROTE} is the only value that means the file changed.
+     */
+    public enum Result { REFUSED_NO_ACK, NO_FILE, ABORTED_UNPARSED, ABORTED_WOULD_LOSE, WROTE }
+
+    /** Overridable so a check can point a run at a scratch copy instead of the real corpus. */
+    public static final String PATH_PROPERTY = "ourania.extraBodies.path";
+
+    static java.io.File targetFile() {
+        return new java.io.File(System.getProperty(PATH_PROPERTY,
+                "src/main/resources/data/extra_bodies.json"));
+    }
+
     public static final String ACK = "--yes-i-want-to-rewrite-extra-bodies-json";
 
     public static void main(String[] args) throws Exception {
+        run(args);
+    }
+
+    public static Result run(String[] args) throws Exception {
         boolean acked = false;
         for (String a : args) {
             if (ACK.equals(a)) acked = true;
@@ -52,7 +73,7 @@ public class GenerateExtraBodies {
             System.err.println("GenerateExtraBodies is retired - it rewrites extra_bodies.json");
             System.err.println("wholesale from templates and has destroyed hand-written prose before.");
             System.err.println("Re-run with " + ACK + " only if that is genuinely what you want.");
-            return;
+            return Result.REFUSED_NO_ACK;
         }
         Map<String, String> themes = new LinkedHashMap<>();
         themes.put("sun", "core identity and vital energy");
@@ -107,11 +128,11 @@ public class GenerateExtraBodies {
         // section this generator has never heard of survives the round trip in its own place.
         Map<String, Map<String, String>> data = new LinkedHashMap<>();
 
-        java.io.File target = new java.io.File("src/main/resources/data/extra_bodies.json");
+        java.io.File target = targetFile();
         if (!target.isFile()) {
             System.err.println("ABORT: " + target.getPath() + " not found. Refusing to create it");
             System.err.println("from templates - a blank starting point is how the 2026-08-13 loss began.");
-            return;
+            return Result.NO_FILE;
         }
 
         // Every line the reader cannot classify. The old reader dropped these silently and then
@@ -174,7 +195,7 @@ public class GenerateExtraBodies {
                 System.err.println("  " + unparsed.get(i));
             }
             if (unparsed.size() > 20) System.err.println("  ... and " + (unparsed.size() - 20) + " more");
-            return;
+            return Result.ABORTED_UNPARSED;
         }
 
         // What the file held before this run touched anything - the yardstick the generated
@@ -271,7 +292,7 @@ public class GenerateExtraBodies {
             System.err.println("extra_bodies.json currently holds. Nothing has been written.");
             for (int i = 0; i < Math.min(lost.size(), 20); i++) System.err.println("  " + lost.get(i));
             if (lost.size() > 20) System.err.println("  ... and " + (lost.size() - 20) + " more");
-            return;
+            return Result.ABORTED_WOULD_LOSE;
         }
 
         // Keep the previous file. Recovery from the 2026-08-13 loss was impossible because no
@@ -295,5 +316,6 @@ public class GenerateExtraBodies {
         System.out.println("extra_bodies.json rewritten: " + data.size() + " sections, "
                 + total + " entries, 0 lost.");
         System.out.println("Previous file kept at " + backup.getName());
+        return Result.WROTE;
     }
 }

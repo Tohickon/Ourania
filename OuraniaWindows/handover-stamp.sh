@@ -15,7 +15,8 @@
 # A suite added here must also be added to the batch lists below, or it is invisible: the
 # script counts what it runs, not what exists. ReturnsCheck was added 2026-08-21,
 # AspectGridCheck 2026-08-22, TensionReleaseCheck, AspectPatternCheck, LunarMansionCheck and QuincunxCheck 2026-08-23,
-# HarmonicCheck 2026-08-25, HarmonicResonanceCheck, ChartSetupCheck and NavigationCheck 2026-09-01.
+# HarmonicCheck 2026-08-25, HarmonicResonanceCheck, ChartSetupCheck and NavigationCheck 2026-09-01,
+# GenerateExtraBodiesCheck 2026-09-02.
 #
 # A suite that builds Swing components must call System.exit(0) on success. The run() below
 # captures each one with $(...), which blocks until the process closes stdout - and an AWT
@@ -51,13 +52,15 @@ n=$(run "com.zodiacomputing.ourania.gui.ChartSetupCheck")
 [ "$n" = FAILED ] && failed+=(ChartSetupCheck) || t2=$((t2+n))
 n=$(run "com.zodiacomputing.ourania.gui.NavigationCheck")
 [ "$n" = FAILED ] && failed+=(NavigationCheck) || t2=$((t2+n))
+n=$(run "com.zodiacomputing.ourania.gui.GenerateExtraBodiesCheck")
+[ "$n" = FAILED ] && failed+=(GenerateExtraBodiesCheck) || t2=$((t2+n))
 for s in "${B2[@]}"; do
   n=$(run "com.zodiacomputing.ourania.astro.$s")
   [ "$n" = FAILED ] && failed+=("$s") || t2=$((t2+n))
 done
 
 total=$((t1+t2))
-suites=$(( ${#B1[@]} + ${#B2[@]} + 4 ))   # +4 for the four gui suites named in full above
+suites=$(( ${#B1[@]} + ${#B2[@]} + 5 ))   # +5 for the five gui suites named in full above
 fmt() { python3 -c "import sys;print(f'{int(sys.argv[1]):,}')" "$1"; }
 
 if [ ${#failed[@]} -gt 0 ]; then

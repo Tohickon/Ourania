@@ -21,19 +21,19 @@ state, an ownership table for the shared data files, and the genuinely open work
 
 ## 2. Do not regenerate shared data files
 
-**`GenerateExtraBodies.java` in this directory rewrites `src/main/resources/data/extra_bodies.json`
-from scratch** with a truncating `FileWriter`. It emits `body_core`, `aspects` and `transits` and
-nothing else. Running it has already destroyed data once: on 2026-08-13 it removed 192 sign and
-house entries that another agent had written into that file. Nothing looked broken afterward — the
-file parsed, the app ran, and the loss showed up only as "Interpretation not found".
+**`GenerateExtraBodies.java` moved on 2026-09-02** to `src/main/java/com/zodiacomputing/ourania/tools/`, so it compiles with everything else and `GenerateExtraBodiesCheck` can exercise the real class rather than a copy. It rewrites `src/main/resources/data/extra_bodies.json` whole, and running it destroyed data once: on 2026-08-13 it removed 192 sign and house entries another agent had written there. Nothing looked broken afterward - the file parsed, the app ran, and the loss surfaced only as "Interpretation not found".
 
-**It will do it again, and it will now also destroy work that this project's own JS generators
-added.** `add_missing_aspects.js`, `add_missing_ic_desc.js`, `add_missing_lilith_fortune.js` and
-`generate_cross.js` all read-modify-write, and together they contributed roughly 928 of the
-current 3,036 aspect entries. A re-run of the Java generator drops every one of them.
+**That specific failure is now closed by construction, and guarded.** A line the reader cannot classify aborts the run before any write; the output must be proved a superset of the input; every write is `putIfAbsent`; and the previous file is kept as a timestamped sibling. `GenerateExtraBodiesCheck` holds all four, and its Parts C and D were confirmed to fail when each protection is removed. **The warning below still stands for the JS generators, which have none of this.**
 
-**Before running it:** back the file up, or better, change it to merge rather than overwrite. The
-JS scripts are the pattern to copy — they load the existing JSON, add keys, and write it back.
+**The 928 entries the JS generators contributed are now safe from the Java one.**
+`add_missing_aspects.js`, `add_missing_ic_desc.js`, `add_missing_lilith_fortune.js` and
+`generate_cross.js` all read-modify-write, and together they wrote roughly 928 of the current
+3,036 aspect entries. A re-run of `GenerateExtraBodies` used to drop every one of them; it now
+preserves them, and aborts rather than writing if it cannot account for a line.
+
+**The JS generators themselves are still unguarded.** They have no superset check, no abort, no
+backup, and no suite. Treat them the way the Java generator had to be treated until today: back
+the file up before running one, and prefer merging to overwriting.
 
 ## 3. Where prose lives
 
