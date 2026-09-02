@@ -259,6 +259,17 @@ public class InterpretationService {
         {"body_decan",   "body_decans.json"},
         {"body_mansion", "body_mansions.json"},
         {"body_technical_degree", "body_technical_degrees.json"},
+        // The two factor sets the composer needs: 29 body angles and 29 relationship
+        // transpositions. <b>Fifty-eight paragraphs standing in for the 20,880 that were
+        // deleted</b> - a degree means one thing, a body brings one angle to it, and a
+        // composite reads the pair rather than the person. Written from David's two
+        // transposition documents of 2026-08-31; the fourteen bodies those did not cover
+        // (the nodes, the lots, the four angles, and the five outer asteroids) are standard
+        // meanings and are his to revise.
+        //
+        // Lazy, and owning both its sections outright.
+        {"body_degree_angle",     "body_degree_factors.json"},
+        {"body_degree_composite", "body_degree_factors.json"},
     };
 
     /** Lazy sections already pulled in. Guarded because the suites call off the EDT. */
@@ -299,12 +310,19 @@ public class InterpretationService {
 
     /** Every data file this build reads, eager first then lazy - the order keys resolve in. */
     public static String[] allFileNames() {
-        String[] out = new String[EXTRA_FILES.length + LAZY_FILES.length];
-        System.arraycopy(EXTRA_FILES, 0, out, 0, EXTRA_FILES.length);
-        for (int i = 0; i < LAZY_FILES.length; i++) {
-            out[EXTRA_FILES.length + i] = LAZY_FILES[i][1];
+        // <b>Two sections can live in one file</b> - body_degree_factors.json holds both
+        // factor sets - so the same name would appear twice here and DataCheck would
+        // validate it twice, reporting every failure double. De-duplicated, order kept.
+        java.util.List<String> names = new java.util.ArrayList<>();
+        for (String n : EXTRA_FILES) {
+            names.add(n);
         }
-        return out;
+        for (String[] row : LAZY_FILES) {
+            if (!names.contains(row[1])) {
+                names.add(row[1]);
+            }
+        }
+        return names.toArray(new String[0]);
     }
 
     /** The section each lazy file owns, for the checks that guard the arrangement. */
