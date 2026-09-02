@@ -48,7 +48,15 @@ public final class Widgets {
     /** Disabled accent - same hue, drained, so "off" still reads as the same control. */
     public static final Color ACCENT_OFF   = new Color(38, 52, 72);
 
-    public static final Color COMBO_BG = ACCENT;
+    /**
+     * Dropdown fill.
+     *
+     * <b>Was the accent itself</b>, which put seven solid blue blocks along the control strip
+     * and two more in the sidebar - on a dark ground they read as the most important things in
+     * the window, which they are not. A dropdown is a surface you read a value off; the accent
+     * belongs on the one control you are meant to press.
+     */
+    public static final Color COMBO_BG = Theme.SURFACE_3;
 
     private static final Font COMBO_FONT = new Font("Arial", Font.BOLD, 12);
 
@@ -92,36 +100,75 @@ public final class Widgets {
         READING
     }
 
-    /** Paints a button by role, with a hover state and no focus ring. */
+    /**
+     * Paints a button by role: rounded, themed, hover state, no focus ring.
+     *
+     * <b>Rounded and painted rather than filled.</b> A JButton with {@code setOpaque(true)} and
+     * a background colour is a square block, and square blocks in a dark panel are most of why
+     * this app read as a form rather than as a designed surface. The rounding costs one
+     * override and changes the whole window; see {@link Theme}.
+     */
     public static void styleButton(JButton b, Role role) {
         final Color base;
         final Color hover;
         final Color text;
         switch (role) {
             case PRIMARY:
-                base = ACCENT; hover = ACCENT_HOVER; text = Color.WHITE; break;
+                base = Theme.ACCENT; hover = Theme.ACCENT_HOVER;
+                text = Theme.TEXT_ON_ACCENT; break;
             case READING:
-                base = new Color(92, 74, 148); hover = new Color(112, 92, 174);
-                text = Color.WHITE; break;
+                base = Theme.VIOLET; hover = Theme.VIOLET_HOVER;
+                text = Theme.TEXT_ON_ACCENT; break;
             default:
-                base = new Color(34, 37, 46); hover = new Color(50, 55, 68);
-                text = new Color(206, 210, 220); break;
+                base = Theme.SURFACE_3; hover = new Color(44, 55, 80);
+                text = Theme.TEXT; break;
         }
-        b.setFont(new Font("Arial", Font.BOLD, 12));
+        b.setFont(Theme.HEADING);
         b.setForeground(text);
         b.setBackground(base);
         b.setFocusPainted(false);
         b.setBorderPainted(false);
         b.setContentAreaFilled(false);
-        b.setOpaque(true);
-        b.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        // <b>Not opaque.</b> An opaque button fills its own square before the rounded shape is
+        // painted, leaving hard corners behind the curve - the artefact that makes a rounded
+        // button look like a bug rather than a style.
+        b.setOpaque(false);
+        b.setBorder(Theme.pad(6, 12, 6, 12));
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        b.setUI(new RoundButtonUI());
         for (java.awt.event.MouseListener old : b.getMouseListeners()) {
             if (old instanceof Hover) {
                 b.removeMouseListener(old);
             }
         }
         b.addMouseListener(new Hover(b, base, hover));
+    }
+
+    /**
+     * Draws the button as a rounded surface and lets the label paint on top.
+     *
+     * Extends BasicButtonUI rather than replacing it, so focus traversal, mnemonics, the
+     * pressed state and the disabled colour all keep working - a fully hand-painted button
+     * loses those quietly, and the loss only shows up in keyboard use.
+     */
+    private static final class RoundButtonUI extends javax.swing.plaf.basic.BasicButtonUI {
+        @Override
+        public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
+            java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+            g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+            JButton b = (JButton) c;
+            Color fill = b.getBackground();
+            if (!b.isEnabled()) {
+                fill = Theme.SURFACE_2;
+            } else if (b.getModel().isPressed()) {
+                fill = fill.darker();
+            }
+            g2.setColor(fill);
+            g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), Theme.RADIUS, Theme.RADIUS);
+            g2.dispose();
+            super.paint(g, c);
+        }
     }
 
     /** Named rather than anonymous so styleButton can replace one it already installed. */
@@ -272,5 +319,143 @@ public final class Widgets {
     /** The wheel's control-strip dropdowns: bold 12, sized to their widest item. */
     public static void styleCombo(JComboBox<String> combo) {
         styleCombo(combo, COMBO_FONT, true);
+    }
+
+    /**
+     * A colour swatch: a small button that IS its colour.
+     *
+     * <b>Setting the background is not enough, and that is a look-and-feel trap.</b> The app
+     * installs the system look-and-feel, and the Windows ButtonUI paints its own gradient and
+     * ignores {@code setBackground} entirely - so every colour chip in Settings rendered as a
+     * blank white button on the machine that matters, while looking perfectly correct under
+     * Metal, which is what an offscreen test harness gets by default. The chip has to paint
+     * itself.
+     */
+    public static void styleSwatch(final JButton b, java.awt.Color colour) {
+        b.setBackground(colour);
+        b.setFocusPainted(false);
+        b.setBorderPainted(false);
+        b.setContentAreaFilled(false);
+        b.setOpaque(false);
+        b.setMargin(new Insets(0, 0, 0, 0));
+        b.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
+            @Override
+            public void paint(java.awt.Graphics g, JComponent c) {
+                java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(c.getBackground());
+                g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 4, 4);
+                // A hairline so a swatch the same colour as the panel behind it is still a
+                // control rather than a hole.
+                g2.setColor(Theme.EDGE);
+                g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 4, 4);
+                g2.dispose();
+            }
+        });
+    }
+
+    /** Plain 11 rather than bold 12 - see {@link #styleCompactCombo}. */
+    private static final Font COMPACT_COMBO_FONT = new Font("Arial", Font.PLAIN, 11);
+
+    /**
+     * A control-strip dropdown that has to share its row with six others.
+     *
+     * The wheel's strip carries Step, Harmonic, Animate, Filter, Align Houses, Pin and House
+     * System. At bold 12 with their labels they do not fit a 1024-wide window, and House
+     * System - the last one added - was the one off the end. Narrower type buys the room back;
+     * <b>{@link WrapLayout} is what makes the row safe at any width</b>, and the two are meant
+     * to be used together.
+     */
+    public static void styleCompactCombo(JComboBox<String> combo) {
+        styleCombo(combo, COMPACT_COMBO_FONT, true);
+    }
+
+    /**
+     * A {@link FlowLayout} that reports the height it will actually occupy.
+     *
+     * <p><b>This is the reason the House System dropdown was cut off, and nothing about it is
+     * visible in the code that placed the control.</b> FlowLayout wraps its children onto as
+     * many rows as it needs, but {@code preferredLayoutSize} always answers for a <i>single</i>
+     * row. Inside a BoxLayout - which is exactly how the wheel's control strip is built - the
+     * parent therefore reserves one row's height, the second row is laid out below the panel's
+     * own bounds, and the last controls are simply not drawn. Nothing throws, nothing logs, and
+     * widening the window makes it come back, which is what makes it read as a sizing quirk
+     * rather than a bug.
+     *
+     * <p>The fix is to measure the wrap: walk the children against the target's real width,
+     * break rows the way FlowLayout will, and sum the row heights. Laying out is left to
+     * FlowLayout - it already does that part correctly.
+     *
+     * <p><b>Use this anywhere a FlowLayout row can outgrow its container.</b> Setting a smaller
+     * font on the controls only postpones the clip to a narrower window; this removes it.
+     */
+    public static class WrapLayout extends FlowLayout {
+
+        public WrapLayout(int align, int hgap, int vgap) {
+            super(align, hgap, vgap);
+        }
+
+        @Override
+        public Dimension preferredLayoutSize(Container target) {
+            return layoutSize(target, true);
+        }
+
+        @Override
+        public Dimension minimumLayoutSize(Container target) {
+            Dimension d = layoutSize(target, false);
+            d.width -= getHgap() + 1;
+            return d;
+        }
+
+        private Dimension layoutSize(Container target, boolean preferred) {
+            synchronized (target.getTreeLock()) {
+                // Before the first layout the target has no width. Answering with one long
+                // row there is right: it becomes the preferred width, and the real wrap is
+                // measured on the next pass once a width exists.
+                int targetWidth = target.getSize().width;
+                if (targetWidth == 0) {
+                    targetWidth = Integer.MAX_VALUE;
+                }
+
+                Insets insets = target.getInsets();
+                int horizontal = insets.left + insets.right + getHgap() * 2;
+                int maxWidth = targetWidth - horizontal;
+
+                Dimension dim = new Dimension(0, 0);
+                int rowWidth = 0;
+                int rowHeight = 0;
+                for (int i = 0; i < target.getComponentCount(); i++) {
+                    Component m = target.getComponent(i);
+                    if (!m.isVisible()) {
+                        continue;
+                    }
+                    Dimension d = preferred ? m.getPreferredSize() : m.getMinimumSize();
+                    if (rowWidth + d.width > maxWidth && rowWidth > 0) {
+                        addRow(dim, rowWidth, rowHeight);
+                        rowWidth = 0;
+                        rowHeight = 0;
+                    }
+                    if (rowWidth != 0) {
+                        rowWidth += getHgap();
+                    }
+                    rowWidth += d.width;
+                    rowHeight = Math.max(rowHeight, d.height);
+                }
+                addRow(dim, rowWidth, rowHeight);
+
+                dim.width += horizontal;
+                dim.height += insets.top + insets.bottom + getVgap() * 2;
+                return dim;
+            }
+        }
+
+        private void addRow(Dimension dim, int rowWidth, int rowHeight) {
+            dim.width = Math.max(dim.width, rowWidth);
+            if (dim.height > 0) {
+                dim.height += getVgap();
+            }
+            dim.height += rowHeight;
+        }
     }
 }
