@@ -205,6 +205,13 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /** One body's detail, from a click on the wheel, into the drawer's Selection section. */
+    public void showSelection(String html) {
+        if (sidePanel != null) {
+            sidePanel.showSelection(html);
+        }
+    }
+
     /** One reading, from the sidebar's Readings section. See {@code SkymapPanel.runReading}. */
     public void runReading(String name) {
         if (skymapPanel != null) {

@@ -628,6 +628,16 @@ extends JPanel {
     private int focusBody = -1;
     private boolean focusTransit;
 
+    /**
+     * True when the focus was set by a click rather than by the cursor resting on a body.
+     *
+     * <b>Without this the highlight dies on the way to reading it.</b> Focus follows the
+     * cursor, so clicking a body and then moving toward the drawer to read its detail cleared
+     * the very highlight the detail is about. A click means "keep this"; hover no longer
+     * overrides it, and leaving the wheel no longer clears it. Clicking empty space lets go.
+     */
+    private boolean focusPinned;
+
     /** True when nothing is focused, so every aspect draws at its ordinary strength. */
     private boolean noFocus() {
         return this.focusBody < 0;
@@ -679,8 +689,23 @@ extends JPanel {
     /** What an unfocused line and glyph fade to. Enough to recede, not enough to vanish. */
     private static final double FOCUS_DIM = 0.16;
 
+    /**
+     * Pins the focus to a clicked body, or lets go when the click missed everything.
+     *
+     * Returns true when the wheel needs repainting.
+     */
+    private boolean pinFocus(int packed) {
+        this.focusPinned = false;
+        boolean changed = this.setFocus(packed);
+        this.focusPinned = packed >= 0;
+        return changed || !this.focusPinned;
+    }
+
     /** Sets the focused body and reports whether anything changed, so hover repaints once. */
     private boolean setFocus(int packed) {
+        if (this.focusPinned) {
+            return false;
+        }
         int body = packed < 0 ? -1 : (packed & (TRANSIT_BIT - 1));
         boolean transit = packed >= 0 && (packed & TRANSIT_BIT) != 0;
         if (body == this.focusBody && transit == this.focusTransit) {
@@ -2222,6 +2247,24 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     private void handleChartClick(int n, int n2) {
+        // <b>Pin first, before the branches below decide what was clicked.</b> This method has
+        // several exits - angle, transit body, natal body, aspect line, empty space - and
+        // pinning inside one of them would leave the others silently unpinned. Asked through
+        // bodyAt, which is the same hit test the hover card and the highlight use.
+        if (this.chartPanel != null && this.pinFocus(this.bodyAt(n, n2))) {
+            this.chartPanel.repaint();
+        }
+        if (this.window != null && this.focusBody >= 0) {
+            double[] lon = this.focusTransit ? this.tLon : this.bLon;
+            double[] spd = this.focusTransit ? this.tSpeed : this.bSpeed;
+            if (this.focusBody < lon.length) {
+                // The same card the tooltip builds - one description of a body, shown in two
+                // places rather than written twice.
+                this.window.showSelection(
+                    this.hoverHtml(this.focusBody, lon[this.focusBody], spd[this.focusBody],
+                        this.focusTransit));
+            }
+        }
         double d;
         double d2;
         double d3;

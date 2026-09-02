@@ -41,6 +41,7 @@ import java.awt.Dimension;
  */
 public final class SidePanel extends JPanel {
 
+    static final String SELECTION = "Selection";
     static final String MENU = "Menu";
     static final String PROFILES = "Saved Charts";
     static final String NATAL = "Natal Chart";
@@ -70,6 +71,7 @@ public final class SidePanel extends JPanel {
     private final Accordion accordion;
     private final Drawer drawer;
     private final ProfileListPanel profiles;
+    private final JEditorPane selectionPane;
     private final JEditorPane natalPane;
     private final JEditorPane transitPane;
     private final JEditorPane gridPane;
@@ -81,6 +83,13 @@ public final class SidePanel extends JPanel {
 
         accordion = new Accordion();
         accordion.setBorder(Theme.pad(Theme.GAP, Theme.GAP, Theme.GAP, Theme.GAP));
+
+        // <b>First in the list, because it is the only section about what you just did.</b>
+        // Everything below it describes the whole chart; this describes the one body under the
+        // cursor when you clicked, and it is filled on demand rather than on every chart update.
+        selectionPane = HtmlPanes.chartPane(window);
+        Accordion.Section selectionSection = accordion.addSection(SELECTION, selectionPane);
+        selectionSection.setMaxOpenHeight(360);
 
         JPanel screens = column();
         for (String[] screen : SCREENS) {
@@ -145,6 +154,24 @@ public final class SidePanel extends JPanel {
             natalSection.setOpen(true);
         }
         add(drawer, BorderLayout.CENTER);
+    }
+
+    /**
+     * Shows one body's detail, opening the drawer and the section to do it.
+     *
+     * <b>Opens what it needs rather than assuming.</b> A click that filled a section inside a
+     * shut drawer would do nothing visible at all, and the reader would conclude clicking
+     * bodies is not a thing this app does.
+     */
+    public void showSelection(String html) {
+        HtmlPanes.setHtml(selectionPane, html);
+        Accordion.Section section = accordion.section(SELECTION);
+        if (section != null) {
+            section.setOpen(true);
+        }
+        if (!drawer.isOpen()) {
+            drawer.setOpen(true);
+        }
     }
 
     /** Fills the three chart sections, each from its own part of the wheel's HTML. */
