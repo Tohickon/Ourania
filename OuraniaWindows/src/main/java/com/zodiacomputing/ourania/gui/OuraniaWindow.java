@@ -12,7 +12,8 @@ public class OuraniaWindow extends JFrame {
     private NameListPanel nameListPanel;
     private ReleasingPanel releasingPanel;
 
-    private MainMenuPanel mainMenu;
+    private ChartSetupPanel chartSetupPanel;
+    private SidePanel sidePanel;
 
     public OuraniaWindow() {
         setTitle("Ourania+ (Windows Edition)");
@@ -21,14 +22,14 @@ public class OuraniaWindow extends JFrame {
         setLocationRelativeTo(null); // Center the window
         setLayout(new BorderLayout());
 
-        // 1. Add the Sidebar Menu (West)
-        mainMenu = new MainMenuPanel(this);
-        add(mainMenu, BorderLayout.WEST);
+        // <b>Nothing on the west edge any more.</b> Navigation was on the left and the
+        // chart's data on the right, so the wheel sat between two panels with a handle down
+        // each side - two places to look for one idea. Everything is in SidePanel now.
 
         // 2. Set up the Content Area (Center) with a CardLayout to swap screens
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
-        contentPanel.setBackground(Color.BLACK);
+        contentPanel.setBackground(Theme.BG);
         add(contentPanel, BorderLayout.CENTER);
 
         // 3. Initialize Placeholder Screens
@@ -41,8 +42,16 @@ public class OuraniaWindow extends JFrame {
     private void initScreens() {
         // Create simple placeholder panels for now
         
-        ChartSetupPanel chartSetupPanel = new ChartSetupPanel(this);
+        chartSetupPanel = new ChartSetupPanel(this);
         contentPanel.add(chartSetupPanel, "SEARCH");
+
+        // <b>Before SkymapPanel, and that is load-bearing.</b> The wheel's constructor runs a
+        // chart update, which calls straight back into updateChartSections - so a right-hand
+        // drawer built after the wheel is null for the first update and opens on an empty
+        // Natal section. Nothing throws; the panel is simply blank until something moves the
+        // chart, which reads as a chart with nothing to report. mainMenu has always been
+        // built before the wheel for the same reason.
+        sidePanel = new SidePanel(this);
         
         // Add our newly ported Skymap Rendering Panel!
         skymapPanel = new SkymapPanel(this);
@@ -54,18 +63,41 @@ public class OuraniaWindow extends JFrame {
         interpretationPanel = new InterpretationPanel(skymapPanel, this);
         interpretationPanel.setPreferredSize(new Dimension(350, 0));
         interpretationPanel.setVisible(false);
-        add(interpretationPanel, BorderLayout.EAST);
+
+        // <b>Two things share the east edge, so they get a container of their own.</b>
+        // BorderLayout gives one component per region; adding the drawer straight to EAST
+        // would have silently replaced the reading panel - no error, it simply would not be
+        // there any more. The drawer sits outermost so its handle stays on the window's edge
+        // where a handle belongs, with the reading panel opening inside it.
+        JPanel eastStack = new JPanel(new BorderLayout());
+        eastStack.setBackground(Theme.BG);
+        eastStack.add(interpretationPanel, BorderLayout.CENTER);
+        eastStack.add(sidePanel, BorderLayout.EAST);
+        add(eastStack, BorderLayout.EAST);
         
         releasingPanel = new ReleasingPanel(this);
         contentPanel.add(releasingPanel, "RELEASING");
         
-        contentPanel.add(createPlaceholder("Share..."), "SHARE");
-        contentPanel.add(createPlaceholder("Syncing Data..."), "SYNC");
-        contentPanel.add(createPlaceholder("Connect / Store..."), "CONNECT");
-        contentPanel.add(createPlaceholder("Help Documentation..."), "HELP");
+        // <b>Share, Sync, Connect and Help are gone.</b> All four were placeholder cards
+        // reading "(Under Construction)" behind live menu entries. A menu that offers ten
+        // destinations and delivers six teaches a reader that the menu cannot be trusted,
+        // which costs more than the missing features do. They come back with something behind
+        // them; SidePanel.SCREENS is the list, and NavigationCheck asserts the two agree.
 
         // After skymapPanel, because applying a selection calls straight into it.
         contentPanel.add(new SettingsPanel(this), "SETTINGS");
+    }
+
+    /** The wheel's chart-setting dropdowns, for the Settings screen to host. */
+    public javax.swing.JPanel chartControlsPanel() {
+        return skymapPanel == null ? null : skymapPanel.chartControlsPanel();
+    }
+
+    /** The settings screen changed which aspects are drawn. */
+    public void applyAspectSelection() {
+        if (skymapPanel != null) {
+            skymapPanel.reloadAspectSelection();
+        }
     }
 
     /** The settings screen changed which points the chart shows. */
@@ -154,9 +186,29 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
-    public void updatePlanetPlacements(String html) {
-        if (mainMenu != null) {
-            mainMenu.updatePlanetPlacements(html);
+    /** The wheel's three chart sections, into the right-hand drawer's accordion. */
+    public void updateChartSections(String natalHtml, String transitHtml, String gridHtml) {
+        if (sidePanel != null) {
+            sidePanel.updateChartSections(natalHtml, transitHtml, gridHtml);
+        }
+    }
+
+    /**
+     * Loads a saved chart from the profile directory into Chart A or Chart B.
+     *
+     * The store behind it - {@link SavedCharts} - has backed Chart Setup's Save and Load
+     * buttons all along; until now nothing else could reach it.
+     */
+    public void loadSavedProfile(String name, boolean asPartner) {
+        if (chartSetupPanel != null) {
+            chartSetupPanel.applySavedProfile(name, asPartner);
+        }
+    }
+
+    /** One reading, from the sidebar's Readings section. See {@code SkymapPanel.runReading}. */
+    public void runReading(String name) {
+        if (skymapPanel != null) {
+            skymapPanel.runReading(name);
         }
     }
 
@@ -267,6 +319,18 @@ public class OuraniaWindow extends JFrame {
             revalidate();
             repaint();
         }
+    }
+
+    /**
+     * Prepared HTML into the reading panel, for a caller that is not a synthesis.
+     *
+     * <b>Delegates rather than duplicating.</b> {@code showSynthesis} is the same door under an
+     * older name - it does nothing synthesis-specific, it sets the panel's HTML and reveals it -
+     * and a second copy of those four lines is exactly the one-rule-two-implementations defect
+     * this project logs more than any other. Used by the wheel's Aspect Table drawer.
+     */
+    public void showInterpretationHtml(String html) {
+        showSynthesis(html);
     }
 
     /** The annual almanac, from SkymapPanel's Calendar button. */

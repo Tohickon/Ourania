@@ -58,12 +58,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
@@ -228,6 +231,9 @@ extends JPanel {
     private String transitTimeZoneId = ZoneId.systemDefault().getId();
     private String animateTarget = "Transit";
     private String aspectFilter = "Natal-Natal";
+    /** The chart's own settings, shown on the Settings screen rather than under the wheel. */
+    private JPanel chartControls;
+
     private JComboBox<String> animateCombo;
     private JComboBox<String> filterCombo;
     private JComboBox<String> alignCombo;
@@ -274,6 +280,9 @@ extends JPanel {
      */
     private String stepAmount = "1 Hour";
     private ChartPanel chartPanel;
+    /** Which aspects are drawn, by {@code Aspects.Type} ordinal. Absent setting means all. */
+    private boolean[] aspectShown = Settings.loadAspectSelection();
+
     private char houseSystem = (char)80;
     private String currentHouseSystemName = "Placidus";
     public static final int BODY_COUNT = Bodies.count();
@@ -542,7 +551,7 @@ extends JPanel {
         int triOuter   = rings[RING_TRI];
         int transitRing = rings[RING_TRANSIT];
         int decanOuter  = rings[RING_DECAN_OUTER];
-        int bodyBase    = rings[RING_SIGN_INNER];
+        int bodyBase    = this.bodyBaseRadius(rings);
         double pin = this.getPinLongitude();
 
         if (this.showTriWheel) {
@@ -562,6 +571,124 @@ extends JPanel {
         int[] radii = this.natalRadii(bodyBase);
         int i = this.nearestPoint(x, y, cx, cy, pin, this.bLon, this.bValid, radii, false);
         return i >= 0 ? this.hoverHtml(i, this.bLon[i], this.bSpeed[i], false) : null;
+    }
+
+    /**
+     * The body under the cursor, packed as {@code index | (transit ? TRANSIT_BIT : 0)},
+     * or -1.
+     *
+     * <b>Deliberately the same three hit tests, in the same order, as {@code hoverTextAt}
+     * above.</b> The hover card and the focus highlight must agree about which body the cursor
+     * is on: a second, subtly different hit test would light one body while describing another,
+     * and the reader would have no way to tell which was lying. The wheel has already shipped
+     * one bug of that shape - the note above natalRadii records it.
+     */
+    private int bodyAt(int x, int y) {
+        if (this.sw == null || this.baseSd == null || this.chartPanel == null) {
+            return -1;
+        }
+        int w = this.chartPanel.getWidth();
+        int h = this.chartPanel.getHeight();
+        if (w <= 0 || h <= 0) {
+            return -1;
+        }
+        int cx = w / 2;
+        int cy = h / 2;
+        int[] rings = SkymapPanel.ringRadii(w, h, this.showTransitChart, this.showTriWheel);
+        double pin = this.getPinLongitude();
+
+        if (this.showTriWheel) {
+            int[] radii = this.triWheelRadii(rings[RING_TRI], rings[RING_TRANSIT]);
+            int i = this.nearestPoint(x, y, cx, cy, pin, this.cLon, this.cValid, radii, true);
+            if (i >= 0) {
+                return i | TRANSIT_BIT;
+            }
+        }
+        if (this.showTransitChart) {
+            int[] radii = this.transitRadii(rings[RING_TRANSIT], rings[RING_DECAN_OUTER]);
+            int i = this.nearestPoint(x, y, cx, cy, pin, this.tLon, this.tValid, radii, true);
+            if (i >= 0) {
+                return i | TRANSIT_BIT;
+            }
+        }
+        int[] radii = this.natalRadii(this.bodyBaseRadius(rings));
+        return this.nearestPoint(x, y, cx, cy, pin, this.bLon, this.bValid, radii, false);
+    }
+
+    /** Marks a packed hit as belonging to the outer wheel. Above any registry index. */
+    private static final int TRANSIT_BIT = 1 << 16;
+
+    /**
+     * The body the cursor is resting on, or -1.
+     *
+     * <b>Hover, not click.</b> Focus follows the cursor and lets go when it leaves, so a reader
+     * sweeping the wheel sees each body's own web in turn without having to select and
+     * deselect. Clicking still opens the reading - that is a separate, deliberate act.
+     */
+    private int focusBody = -1;
+    private boolean focusTransit;
+
+    /** True when nothing is focused, so every aspect draws at its ordinary strength. */
+    private boolean noFocus() {
+        return this.focusBody < 0;
+    }
+
+    /**
+     * How strongly to draw a line, given what is focused.
+     *
+     * 1.0 when nothing is focused or the line touches the focused body; otherwise
+     * {@link #FOCUS_DIM}. <b>Dimmed rather than hidden</b>: the rest of the chart is the
+     * context that makes one body's web mean anything, and removing it would leave a reader
+     * looking at five lines in an empty circle.
+     */
+    private double focusWeight(int a, int b, boolean transitPair) {
+        if (this.noFocus()) {
+            return 1.0;
+        }
+        boolean touches = transitPair == this.focusTransit
+            ? (a == this.focusBody || b == this.focusBody)
+            : (b == this.focusBody);
+        return touches ? 1.0 : FOCUS_DIM;
+    }
+
+    /**
+     * How strongly to draw body {@code i}'s glyph, given what is focused.
+     *
+     * Bright when it is the focused body itself, or when it makes a visible aspect to it -
+     * asked through {@code visibleAspect}, the same gate the lines use, so a glyph cannot stay
+     * lit for an aspect that was switched off in Settings.
+     */
+    private double glyphWeight(int i, boolean transit) {
+        if (this.noFocus()) {
+            return 1.0;
+        }
+        if (i == this.focusBody && transit == this.focusTransit) {
+            return 1.0;
+        }
+        double[] mine = transit ? this.tLon : this.bLon;
+        double[] theirs = this.focusTransit ? this.tLon : this.bLon;
+        if (this.focusBody >= mine.length || this.focusBody >= theirs.length
+                || i >= mine.length) {
+            return FOCUS_DIM;
+        }
+        boolean synastry = transit != this.focusTransit;
+        double sep = Aspects.separation(mine[i], theirs[this.focusBody]);
+        return this.visibleAspect(sep, i, this.focusBody, synastry) != null ? 1.0 : FOCUS_DIM;
+    }
+
+    /** What an unfocused line and glyph fade to. Enough to recede, not enough to vanish. */
+    private static final double FOCUS_DIM = 0.16;
+
+    /** Sets the focused body and reports whether anything changed, so hover repaints once. */
+    private boolean setFocus(int packed) {
+        int body = packed < 0 ? -1 : (packed & (TRANSIT_BIT - 1));
+        boolean transit = packed >= 0 && (packed & TRANSIT_BIT) != 0;
+        if (body == this.focusBody && transit == this.focusTransit) {
+            return false;
+        }
+        this.focusBody = body;
+        this.focusTransit = transit;
+        return true;
     }
 
     /**
@@ -785,6 +912,28 @@ extends JPanel {
         return nArray2;
     }
 
+    /**
+     * Where the bodies sit, from the ring table and the reader's choice.
+     *
+     * <b>Both the painter and the hit test must ask this.</b> They already both call
+     * natalRadii - the note above that method says so - and a placement offset applied to only
+     * one of them would put the glyphs somewhere the clicks are not. That is invisible until
+     * someone tries to click a planet and nothing happens.
+     */
+    int bodyBaseRadius(int[] rings) {
+        int base = rings[RING_SIGN_INNER];
+        String ring = Settings.bodyRing();
+        if (Settings.RING_CENTRE.equals(ring)) {
+            // Well inside the rings, leaving the sign band and the ticks clear.
+            return (int) (base * 0.62);
+        }
+        if (Settings.RING_OUTSIDE.equals(ring)) {
+            // Just beyond the sign band, the way many traditional charts print them.
+            return rings[RING_SIGN_OUTER] + 14;
+        }
+        return base;
+    }
+
     private int[] natalRadii(int n) {
         double d = (double)n - 30.0;
         double d2 = (double)n - 14.0;
@@ -863,11 +1012,57 @@ extends JPanel {
      * @param lightBacking true when the glyph sits on the pale natal sphere, false when it
      *                     sits on one of the dark transit or sky cubes
      */
+    /**
+     * The colour body {@code i} is drawn in: its own override, else its element's.
+     *
+     * <b>Introduced so there is exactly one answer.</b> Five call sites asked
+     * {@code getElementColor(BODY_ELEMENTS[i])} directly - three on the wheel, two in the grid -
+     * and a per-body override added to some of them would have produced a chart where a body
+     * was one colour on the wheel and another in the table.
+     */
+    Color bodyColor(int bodyIndex) {
+        return ChartPalette.colorOr(
+            ChartPalette.bodyHex(Bodies.at(bodyIndex).id),
+            this.getElementColor(BODY_ELEMENTS[bodyIndex]));
+    }
+
+    String bodyColorHex(int bodyIndex) {
+        String own = ChartPalette.bodyHex(Bodies.at(bodyIndex).id);
+        return own != null ? own : this.getElementColorHex(BODY_ELEMENTS[bodyIndex]);
+    }
+
     private Color getElementColor(int n, boolean lightBacking) {
         if (n < 0 || n >= ELEMENT_COLORS.length) {
             return lightBacking ? Color.BLACK : new Color(226, 228, 234);
         }
-        return ELEMENT_COLORS[n];
+        // <b>Through the palette, with this panel's own constant as the fallback.</b> The
+        // constants stay as the last word on what Classic means; what changed is that they are
+        // no longer the ONLY word - Settings now shows the same four colours the wheel paints,
+        // which it did not before.
+        return ChartPalette.colorOr(
+            ChartPalette.elementHex(n, hex(ELEMENT_COLORS[n])), ELEMENT_COLORS[n]);
+    }
+
+    /**
+     * The chart's structural lines: rings, spokes, the centre crosshair.
+     *
+     * <b>Was a hardcoded light grey at four call sites.</b> That is why a white-ground template
+     * drew an invisible wheel - near-white rings on white - with the glyphs apparently floating
+     * unattached. A template that moves the background has to move this with it.
+     */
+    /** Black or white, whichever is legible on the given fill. */
+    static Color readableOn(Color fill) {
+        double luma = (0.299 * fill.getRed() + 0.587 * fill.getGreen() + 0.114 * fill.getBlue());
+        return luma > 140 ? new Color(24, 20, 6) : new Color(240, 240, 240);
+    }
+
+    static Color inkColor() {
+        return ChartPalette.colorOr(ChartPalette.inkHex("#DCDCDC"), new Color(220, 220, 220));
+    }
+
+    /** A Color as #RRGGBB, for handing this panel's constants to the palette as fallbacks. */
+    private static String hex(Color c) {
+        return String.format("#%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
     }
 
     private void drawMoonPhase(Graphics2D graphics2D, int n, int n2, int n3, double d) {
@@ -989,6 +1184,15 @@ extends JPanel {
             public void mouseClicked(MouseEvent mouseEvent) {
                 SkymapPanel.this.handleChartClick(mouseEvent.getX(), mouseEvent.getY());
             }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                // Without this the chart stays dimmed around whatever the cursor left on,
+                // which reads as a rendering fault rather than as a selection.
+                if (SkymapPanel.this.setFocus(-1)) {
+                    SkymapPanel.this.chartPanel.repaint();
+                }
+            }
         });
         this.chartPanel.addMouseMotionListener(new java.awt.event.MouseMotionAdapter(){
 
@@ -998,6 +1202,13 @@ extends JPanel {
                 // behaviour wanted over empty space: no card, and no stale one either.
                 SkymapPanel.this.chartPanel.setToolTipText(
                     SkymapPanel.this.hoverTextAt(mouseEvent.getX(), mouseEvent.getY()));
+                // Focus follows the cursor. setFocus reports whether anything actually
+                // changed, so sweeping across one glyph repaints once rather than on every
+                // pixel of travel - the same guard setHighlightedAspect already uses.
+                if (SkymapPanel.this.setFocus(
+                        SkymapPanel.this.bodyAt(mouseEvent.getX(), mouseEvent.getY()))) {
+                    SkymapPanel.this.chartPanel.repaint();
+                }
             }
         });
         // A chart is read by sweeping across it, so the default 750ms feels broken here.
@@ -1112,6 +1323,54 @@ extends JPanel {
 
     private static void styleCombo(JComboBox<String> jComboBox) {
         Widgets.styleCombo(jComboBox);
+    }
+
+    /**
+     * The aspect grid on its own, rather than at the bottom of a reading.
+     *
+     * The grid has always been generated as the tail of
+     * {@code generatePlanetPlacementsHtml}, so the only way to see it was to open a reading
+     * and scroll past the placements. It is a table, it is clickable, and people go to it
+     * directly - so it gets a way in of its own.
+     */
+    private void showAspectTable() {
+        if (this.window == null) {
+            return;
+        }
+        this.window.showInterpretationHtml(this.generatePlanetPlacementsHtml());
+    }
+
+    /** The chart-setting dropdowns, for the Settings screen to display. */
+    public JPanel chartControlsPanel() {
+        return this.chartControls;
+    }
+
+    /**
+     * The control strip's dropdowns, narrower than the app's default.
+     *
+     * Seven labelled dropdowns do not fit one 1024-wide row at bold 12, and House System was
+     * the one that fell off the end. This buys the room back; {@link Widgets.WrapLayout} on
+     * the row is what makes it safe at any width rather than at one width.
+     */
+    private static void styleCompactCombo(JComboBox<String> jComboBox) {
+        Widgets.styleCompactCombo(jComboBox);
+    }
+
+    /**
+     * A control-strip label short enough to leave room for its dropdown.
+     *
+     * <b>The label text was the actual overflow.</b> "Harmonic:", "Animate:", "Align Houses:"
+     * and "House System:" cost more of the row than several of the dropdowns they name, and
+     * House System - last in the row - was the one pushed off the end of a 1024-wide window.
+     * <b>The full name is not lost, it moves to the tooltip</b>, so an abbreviation nobody
+     * recognises is one hover from being spelled out.
+     */
+    private static JLabel compactLabel(String shortText, String fullName) {
+        JLabel label = new JLabel(shortText);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Arial", Font.PLAIN, 11));
+        label.setToolTipText(fullName);
+        return label;
     }
 
     private void showAnnualCalendar() {
@@ -1534,6 +1793,31 @@ extends JPanel {
         return this.cachedFrame;
     }
 
+    /**
+     * The readings, addressable by name from the sidebar's Readings section.
+     *
+     * <b>By name rather than by exposing {@link ReadingTier}</b>, which is private and stays
+     * that way: the sidebar has no business knowing the wheel's internal tiers, and an enum
+     * widened to public for one caller is how a private detail becomes an API nobody meant to
+     * publish. Calendar is not a tier at all - it has its own path - which is precisely the
+     * sort of thing a shared enum would have hidden.
+     */
+    public void runReading(String name) {
+        if ("CALENDAR".equals(name)) {
+            this.showAnnualCalendar();
+            return;
+        }
+        if ("SNAPSHOT".equals(name)) {
+            this.showReading(ReadingTier.PARAGRAPH);
+        } else if ("REPORT".equals(name)) {
+            this.showReading(ReadingTier.REPORT);
+        } else if ("SYNTHESIZE".equals(name)) {
+            this.showReading(ReadingTier.SYNTHESIZE);
+        } else if ("TIMELINE".equals(name)) {
+            this.showReading(ReadingTier.TIMELINE);
+        }
+    }
+
     private void showReading(final ReadingTier readingTier) {
         if (this.sw == null || this.baseSd == null || this.window == null || readingTier == ReadingTier.NONE) {
             return;
@@ -1642,10 +1926,35 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         JPanel jPanel = new JPanel();
         jPanel.setLayout(new BoxLayout(jPanel, 1));
         jPanel.setBackground(Color.BLACK);
-        JPanel jPanel2 = new JPanel(new FlowLayout(1, 5, 5));
+        // <b>WrapLayout, not FlowLayout.</b> Both rows outgrow a 1024-wide window - eleven
+        // buttons on one, seven labelled dropdowns on the other - and a plain FlowLayout wraps
+        // them while still reporting one row's height to the BoxLayout above. The parent then
+        // reserves that one row and the second is drawn outside the panel's bounds, which is
+        // how House System, the last control added, came to be cut off the bottom with nothing
+        // logged. See Widgets.WrapLayout.
+        JPanel jPanel2 = new JPanel(new Widgets.WrapLayout(1, 5, 5));
         jPanel2.setBackground(Color.BLACK);
-        JPanel jPanel3 = new JPanel(new FlowLayout(1, 10, 5));
+        JPanel jPanel3 = new JPanel(new Widgets.WrapLayout(1, 8, 4));
         jPanel3.setBackground(Color.BLACK);
+        // <b>The strip keeps time, and nothing else.</b> It carried seven labelled dropdowns -
+        // harmonic, animate target, aspect filter, house alignment, pin and house system -
+        // beside the transport buttons, which is a settings panel laid across the bottom of
+        // the chart. They are chart settings, so they live on the Settings screen now and the
+        // strip is left with the one control that belongs beside a play button: the step.
+        this.chartControls = new JPanel(new Widgets.WrapLayout(0, 10, 6));
+        this.chartControls.setBackground(Theme.BG);
+        this.chartControls.setMaximumSize(
+            new java.awt.Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        // <b>Without this the WrapLayout above can never wrap, and that is not obvious.</b>
+        // BoxLayout sizes a child along the axis it does not manage using the child's MAXIMUM
+        // size, which for a JPanel defaults to its preferred size - so each row was made as
+        // wide as one unwrapped line needed, overflowed the window, and was clipped at the
+        // edge. The layout was never given a width narrow enough to wrap against. Releasing
+        // the maximum width lets the row be sized to the window, which is the input WrapLayout
+        // measures. Measured at 900px wide: without it the strip stays 60px and House System
+        // is off the edge; with it the strip grows a row and every control is on screen.
+        jPanel2.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        jPanel3.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         JButton jButton = new JButton("Fast <<");
         JButton jButton2 = new JButton("< Slow");
         JButton jButton3 = new JButton("Play / Pause");
@@ -1713,7 +2022,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // constantly and says little; Play/Pause is the control the row is built around; the
         // five readings are peers and now look like peers. "Now" left red for months, which
         // reads as destructive when jumping to the present is the safest thing here.
-        JButton[] jButtonArray = new JButton[]{jButton, jButton2, jButton3, jButton4, jButton5, jButton6, jButton7, jButton8, jButton9, jButton9_2, jButton10};
+        // <b>Transport stays on the strip; the readings move into a drawer.</b> Eleven buttons
+        // beside seven dropdowns is what put the control area over a 1024-wide window in the
+        // first place, and the five readings are the ones a reader presses occasionally rather
+        // than constantly. Transport is the row's working set and stays one press away.
+        JButton[] jButtonArray = new JButton[]{jButton, jButton2, jButton3, jButton4, jButton5, jButton6};
         Widgets.Role[] buttonRoles = {
             Widgets.Role.TRANSPORT,  // Fast <<
             Widgets.Role.TRANSPORT,  // < Slow
@@ -1721,16 +2034,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             Widgets.Role.TRANSPORT,  // Slow >
             Widgets.Role.TRANSPORT,  // Fast >>
             Widgets.Role.TRANSPORT,  // Now
-            Widgets.Role.READING,    // Snapshot
-            Widgets.Role.READING,    // Report
-            Widgets.Role.READING,    // Synthesize
-            Widgets.Role.READING,    // Predict
-            Widgets.Role.READING,    // Calendar
         };
         for (int bi = 0; bi < jButtonArray.length; bi++) {
             Widgets.styleButton(jButtonArray[bi], buttonRoles[bi]);
             jPanel2.add(jButtonArray[bi]);
         }
+
+        // <b>Readings, Tables and Tools have moved to the sidebar.</b> They were popup
+        // menus here, which grouped the controls but stayed menus: they floated over the
+        // chart, shut on the next click, and could only hold rows of buttons. They are now
+        // accordion sections inside the sidebar's drawer, which is where the placements and
+        // the aspect grid live too - see MainMenuPanel. The strip keeps transport only, which
+        // is the working set: the controls pressed constantly rather than occasionally.
         Object[] objectArray = new String[]{"Real Time", "1 Minute", "1 Hour", "1 Day", "1 Week", "1 Month", "1 Year"};
         JComboBox<Object> jComboBox = new JComboBox<Object>(objectArray);
         // Seeded FROM the field, not from a literal. A literal here is a second statement of
@@ -1739,7 +2054,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         jComboBox.addActionListener(actionEvent -> {
             this.stepAmount = (String)jComboBox.getSelectedItem();
         });
-        SkymapPanel.styleCombo((JComboBox<String>)(Object)jComboBox);
+        SkymapPanel.styleCompactCombo((JComboBox<String>)(Object)jComboBox);
         JLabel jLabel = new JLabel("Step:");
         jLabel.setForeground(Color.WHITE);
         jPanel3.add(jLabel);
@@ -1780,11 +2095,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.updateChartData();
             this.repaint();
         });
-        SkymapPanel.styleCombo(harmonicCombo);
-        JLabel harmonicLabel = new JLabel("Harmonic:");
+        SkymapPanel.styleCompactCombo(harmonicCombo);
+        JLabel harmonicLabel = compactLabel("H:", "Harmonic");
         harmonicLabel.setForeground(Color.WHITE);
-        jPanel3.add(harmonicLabel);
-        jPanel3.add(harmonicCombo);
+        this.chartControls.add(harmonicLabel);
+        this.chartControls.add(harmonicCombo);
         String[] stringArray = new String[]{"Natal", "Transit", "Both"};
         this.animateCombo = new JComboBox<String>(stringArray);
         this.animateCombo.setSelectedItem(this.animateTarget);
@@ -1792,11 +2107,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.animateTarget = (String)this.animateCombo.getSelectedItem();
         });
         this.animateCombo.setToolTipText("Which chart advances when the animation runs");
-        SkymapPanel.styleCombo(this.animateCombo);
-        JLabel jLabel2 = new JLabel("Animate:");
+        SkymapPanel.styleCompactCombo(this.animateCombo);
+        JLabel jLabel2 = compactLabel("Anim:", "Animate");
         jLabel2.setForeground(Color.WHITE);
-        jPanel3.add(jLabel2);
-        jPanel3.add(this.animateCombo);
+        this.chartControls.add(jLabel2);
+        this.chartControls.add(this.animateCombo);
         String[] stringArray2 = new String[]{"Natal-Natal", "Transit-Natal", "Both"};
         this.filterCombo = new JComboBox<String>(stringArray2);
         this.filterCombo.setSelectedItem(this.aspectFilter);
@@ -1805,11 +2120,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.chartPanel.repaint();
         });
         this.filterCombo.setToolTipText("Which aspect lines are drawn: natal-to-natal, transit-to-natal, or both");
-        SkymapPanel.styleCombo(this.filterCombo);
+        SkymapPanel.styleCompactCombo(this.filterCombo);
         JLabel jLabel3 = new JLabel("Aspects:");
         jLabel3.setForeground(Color.WHITE);
-        jPanel3.add(jLabel3);
-        jPanel3.add(this.filterCombo);
+        this.chartControls.add(jLabel3);
+        this.chartControls.add(this.filterCombo);
         String[] stringArray3 = new String[]{"Natal", "Transit", "Both"};
         this.alignCombo = new JComboBox<String>(stringArray3);
         this.alignCombo.setSelectedItem(this.houseAlignment);
@@ -1819,12 +2134,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.chartPanel.repaint();
         });
         this.alignCombo.setToolTipText("Which house ring is drawn - natal (inner wheel) or transit (outer wheel)");
-        SkymapPanel.styleCombo(this.alignCombo);
+        SkymapPanel.styleCompactCombo(this.alignCombo);
         this.alignCombo.setEnabled(this.showTransitChart);
-        JLabel jLabel4 = new JLabel("Align Houses:");
+        JLabel jLabel4 = compactLabel("Align:", "Align Houses");
         jLabel4.setForeground(Color.WHITE);
-        jPanel3.add(jLabel4);
-        jPanel3.add(this.alignCombo);
+        this.chartControls.add(jLabel4);
+        this.chartControls.add(this.alignCombo);
         String[] stringArray4 = new String[]{"Aries", "Natal Asc", "Transit Asc"};
         this.pinCombo = new JComboBox<String>(stringArray4);
         this.pinCombo.setSelectedItem(this.wheelPin);
@@ -1840,11 +2155,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.chartPanel.repaint();
         });
         this.pinCombo.setToolTipText("What stays still on screen. Natal Asc = inner wheel Ascendant, Transit Asc = outer wheel Ascendant");
-        SkymapPanel.styleCombo(this.pinCombo);
+        SkymapPanel.styleCompactCombo(this.pinCombo);
         JLabel jLabel5 = new JLabel("Pin:");
         jLabel5.setForeground(Color.WHITE);
-        jPanel3.add(jLabel5);
-        jPanel3.add(this.pinCombo);
+        this.chartControls.add(jLabel5);
+        this.chartControls.add(this.pinCombo);
         String[] stringArray5 = new String[]{"Placidus", "Koch", "Equal", "Whole Sign", "Campanus", "Regiomontanus"};
         JComboBox<String> jComboBox2 = new JComboBox<String>(stringArray5);
         jComboBox2.setSelectedItem(this.currentHouseSystemName);
@@ -1880,13 +2195,29 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.updateChartData();
             this.chartPanel.repaint();
         });
-        SkymapPanel.styleCombo(jComboBox2);
-        JLabel jLabel6 = new JLabel("House System:");
+        SkymapPanel.styleCompactCombo(jComboBox2);
+        JLabel jLabel6 = compactLabel("Houses:", "House System");
         jLabel6.setForeground(Color.WHITE);
-        jPanel3.add(jLabel6);
-        jPanel3.add(jComboBox2);
+        this.chartControls.add(jLabel6);
+        this.chartControls.add(jComboBox2);
         jPanel.add(jPanel2);
         jPanel.add(jPanel3);
+
+        // <b>The rows have to be re-measured when the width changes, and nothing does that on
+        // its own.</b> A WrapLayout reports how tall it will be for the width it currently
+        // has; the enclosing BoxLayout asks once, caches, and does not ask again when the
+        // window is resized - so widening never reclaims the second row and narrowing clips
+        // the last control. invalidate() discards the cached answer; revalidate() schedules
+        // the pass that asks again. Measured at 760px: without this the strip stays 60px with
+        // House System off the edge, with it the strip becomes 79px and wraps.
+        jPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                jPanel2.invalidate();
+                jPanel3.invalidate();
+                jPanel.revalidate();
+            }
+        });
         return jPanel;
     }
 
@@ -1919,7 +2250,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int n10 = rings[RING_TRANSIT];
         int n11 = rings[RING_DECAN_OUTER];
         int n12 = rings[RING_SIGN_OUTER];
-        int n13 = rings[RING_SIGN_INNER];
+        int n13 = this.bodyBaseRadius(rings);
         double[] dArray = this.activeCusps;
         double d8 = this.getPinLongitude();
         double d9 = (180.0 + d8 - d7) % 360.0;
@@ -2310,9 +2641,36 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * Ask {@link #isSynastryPair} rather than passing a literal.
      */
     private String getAspectType(double d, int n, int n2, boolean synastry) {
-        Aspects.Type type = Aspects.typeOf(d, SkymapPanel.planetName(n),
-            SkymapPanel.planetName(n2), synastry);
+        Aspects.Type type = this.visibleAspect(d, n, n2, synastry);
         return type == null ? null : type.label;
+    }
+
+    /**
+     * <b>The one gate: which aspect a separation makes, and whether it is switched on.</b>
+     *
+     * There are two draw paths - the grid asks through {@code getAspectType}, the wheel's
+     * {@code drawAspectLine} used to call {@code Aspects.typeOf} directly - and a visibility
+     * filter added to only one of them would have produced a chart whose grid and whose lines
+     * disagreed about which aspects exist. That is this project's most-logged defect and it
+     * would have been invisible: both surfaces look entirely plausible on their own.
+     */
+    private Aspects.Type visibleAspect(double sep, int a, int b, boolean synastry) {
+        Aspects.Type type = Aspects.typeOf(sep, SkymapPanel.planetName(a),
+            SkymapPanel.planetName(b), synastry);
+        if (type == null) {
+            return null;
+        }
+        return this.aspectShown == null || type.ordinal() >= this.aspectShown.length
+            || this.aspectShown[type.ordinal()] ? type : null;
+    }
+
+    /** The Settings screen changed which aspects are drawn. */
+    public void reloadAspectSelection() {
+        this.aspectShown = Settings.loadAspectSelection();
+        this.updateChartData();
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
     }
 
     private String getSolarCondition(int n, double d, double d2) {
@@ -2780,7 +3138,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (moonMansion != null) {
                 double startTheta = 180.0 + pin - moonMansion.start;
                 int r = (bandOuter + bandInner) / 2;
-                g.setColor(new Color(181, 160, 227, 110));
+                // The mansion ring's colour, overridable in Settings. Alpha kept here: the
+                // ring sits under the glyphs and a solid band would bury them.
+                Color mansion = ChartPalette.colorOr(ChartPalette.mansionHex(null),
+                    new Color(181, 160, 227));
+                g.setColor(new Color(mansion.getRed(), mansion.getGreen(), mansion.getBlue(), 110));
                 g.setStroke(new BasicStroke(bandOuter - bandInner));
                 g.drawArc(cx - r, cy - r, r * 2, r * 2,
                     (int) Math.round(-startTheta),
@@ -3258,7 +3620,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.activeAscendant = this.baseAscendant;
         }
         if (this.window != null) {
-            this.window.updatePlanetPlacements(this.generatePlanetPlacementsHtml());
+            // Three parts, three accordion sections. One document would mean the
+            // sidebar could only show or hide all of it at once, which is what it did before.
+            this.window.updateChartSections(
+                this.generatePlanetPlacementsHtml(PlacementPart.NATAL),
+                this.generatePlanetPlacementsHtml(PlacementPart.TRANSITS),
+                this.generatePlanetPlacementsHtml(PlacementPart.GRID));
         }
         this.refreshReadingIfShown();
     }
@@ -3358,60 +3725,20 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** Pure lookup, static so a check can call it without standing up a whole window. */
+    /**
+     * The colour an aspect is drawn in.
+     *
+     * <b>Was a fifteen-case switch; now asks {@link ChartPalette}.</b> The switch was already
+     * the single source six callers read - wheel, grid, legend, interpretation panel, hover
+     * card and Prose - which is why moving it was a one-line change rather than a hunt. What it
+     * could not do was vary: there was no template to choose, and a reader who cannot separate
+     * the red square from the green trine had no recourse at all.
+     *
+     * Kept static and kept at this name so those six callers, and AspectGridCheck's reflection
+     * into it, all still resolve.
+     */
     static String getAspectColorHex(String string) {
-        switch (string) {
-            case "Conjunction": {
-                return "#FFD700";
-            }
-            case "Sextile": {
-                return "#00C8FF";
-            }
-            case "Square": {
-                return "#FF3232";
-            }
-            case "Trine": {
-                return "#32FF32";
-            }
-            case "Quincunx": {
-                return "#B36AE2";
-            }
-            // The five added 2026-08-23. Deliberately muted next to the Ptolemaic five: these
-            // are 1-degree aspects and should not shout as loudly as a partile square.
-            case "Semisextile": {
-                return "#6FA8DC";
-            }
-            case "Semisquare": {
-                return "#E06666";
-            }
-            case "Quintile": {
-                return "#F6C453";
-            }
-            case "Sesquiquintile": {
-                return "#C9A227";
-            }
-            case "Sesquiquadrate": {
-                return "#CC7A5C";
-            }
-            // The four added 2026-08-31. Muted for the same reason as the five above -
-            // these are 1-degree aspects - and each distinct, because falling through to
-            // the white default would make four different aspects look like one.
-            case "Septile": {
-                return "#8E7CC3";
-            }
-            case "Novile": {
-                return "#76A5AF";
-            }
-            case "Decile": {
-                return "#A2C4A9";
-            }
-            case "Biquintile": {
-                return "#B8860B";
-            }
-            case "Opposition": {
-                return "#FF6400";
-            }
-        }
-        return "#FFFFFF";
+        return ChartPalette.aspectHex(string);
     }
 
     /** Pure lookup, static so a check can call it without standing up a whole window. */
@@ -3480,15 +3807,52 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return "";
     }
 
+    /**
+     * Which part of the sidebar's HTML to build.
+     *
+     * <b>A parameter rather than three methods carved out of this one.</b> This builder is
+     * decompiler output: 130 lines of interleaved StringBuilder calls whose loop counters
+     * (n, n2, n3, n4) are shared across its three sections - n3 in particular is the base
+     * placements' loop variable and is then reused as the transit-grid flag. Cutting it apart
+     * would mean untangling that by hand for no gain; gating the blocks it already has is a
+     * change a reader can check line by line against the original.
+     */
+    enum PlacementPart {
+        /** Everything, one document - what the reading panel takes. */
+        ALL,
+        /** Chart header, aspect patterns, and the base chart's placements. */
+        NATAL,
+        /** Transit or Chart B placements, the sky ring, and synastry cross-contacts. */
+        TRANSITS,
+        /** The aspect grid and its legend. */
+        GRID
+    }
+
     private String generatePlanetPlacementsHtml() {
+        return this.generatePlanetPlacementsHtml(PlacementPart.ALL);
+    }
+
+    /** The width the aspect grid has to fit into: the drawer, less padding and scrollbar. */
+    private static final int GRID_FIT_WIDTH = 276;
+
+    /** Below this the glyphs stop being distinguishable, so the grid scrolls rather than lies. */
+    private static final int GRID_MIN_CELL = 11;
+
+    private String generatePlanetPlacementsHtml(PlacementPart part) {
+        final boolean wantNatal = part == PlacementPart.ALL || part == PlacementPart.NATAL;
+        final boolean wantTransits = part == PlacementPart.ALL || part == PlacementPart.TRANSITS;
+        final boolean wantGrid = part == PlacementPart.ALL || part == PlacementPart.GRID;
         int n;
         int n2;
         String stringArray;
         int n3;
         StringBuilder stringBuilder = new StringBuilder("<html><body style='font-family:Arial; font-size:12px; color:white;'>");
         String string = this.chartMode == ChartMode.SYNASTRY ? "Chart A (Inner)" : (this.chartMode == ChartMode.COMPOSITE_MIDPOINT || this.chartMode == ChartMode.COMPOSITE_DAVISON ? "Composite Chart" : "Natal Chart");
-        stringBuilder.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(string).append("</h2>");
+        // Hoisted above the gate: the transit block below formats its own timestamps with
+        // this same formatter, so leaving it inside the natal section made it invisible there.
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy HH:mm z");
+        if (wantNatal) {
+        stringBuilder.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(string).append("</h2>");
         String string2 = this.baseChartTime != null ? this.baseChartTime.format(dateTimeFormatter) : "";
         String string3 = String.format("%.2f, %.2f", this.baseLatitude, this.baseLongitude);
         stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(string2).append("<br>").append(string3).append("</div>");
@@ -3555,7 +3919,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (!this.bValid[n3]) continue;
             stringBuilder.append(this.formatPlanetPlacement(n3, this.bLon[n3], this.bSpeed[n3], "base_"));
         }
-        if (this.showTransitChart) {
+        }
+        if (wantTransits && this.showTransitChart) {
             String string4 = this.chartMode == ChartMode.SYNASTRY ? "Chart B (Outer)" : "Transit Chart";
             stringBuilder.append("<br><h2 style='color:#ffa500; margin-bottom: 2px;'>").append(string4).append("</h2>");
             stringArray = this.transitChartTime != null ? this.transitChartTime.format(dateTimeFormatter) : "";
@@ -3567,7 +3932,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 stringBuilder.append(this.formatPlanetPlacement(n2, this.tLon[n2], this.tSpeed[n2], "transit_"));
             }
         }
-        if (this.showTriWheel) {
+        if (wantTransits && this.showTriWheel) {
             stringBuilder.append("<br><h2 style='color:#a0d2ff; margin-bottom: 2px;'>Sky (Transiting)</h2>");
             String stringSkyTime = this.compositeTransitTime != null ? this.compositeTransitTime.format(dateTimeFormatter) : "";
             String stringSkyLoc = String.format("%.2f, %.2f", this.transitLatitude, this.transitLongitude);
@@ -3581,10 +3946,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // Cross-chart placement, above the grid because it outranks it: a body on the
         // other person's Ascendant is a larger fact than any single cell of the
         // matrix, and house overlays are invisible to that matrix altogether.
-        if (this.chartMode == ChartMode.SYNASTRY) {
+        if (wantTransits && this.chartMode == ChartMode.SYNASTRY) {
             stringBuilder.append(this.generateSynastryCrossHtml());
         }
-        stringBuilder.append("<br><hr style='border-color:#444;'><br>");
+        // A drawer that asked only for placements stops here; the grid part, or the whole
+        // document, goes on to build the table.
+        if (!wantGrid) {
+            stringBuilder.append("</body></html>");
+            return stringBuilder.toString();
+        }
+        if (part == PlacementPart.ALL) {
+            stringBuilder.append("<br><hr style='border-color:#444;'><br>");
+        }
         int n4 = n3 = this.showTransitChart && (this.aspectFilter.equals("Transit-Natal") || this.aspectFilter.equals("Both")) ? 1 : 0;
         if (n3 != 0) {
             if (this.chartMode == ChartMode.SYNASTRY) {
@@ -3606,18 +3979,34 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             stringBuilder.append("<span style='color:").append(this.getAspectColorHex(string5)).append("; font-size:14px;'>").append(this.getAspectSymbol(string5)).append("</span> <span style='color:#ccc;'>").append(string5).append("</span> &nbsp; ");
         }
         stringBuilder.append("</div>");
-        stringBuilder.append("<table border='1' cellspacing='0' cellpadding='2' style='border-collapse: collapse; border-color: #555; text-align:center;'>");
-        stringBuilder.append("<tr><td></td>");
+        // <b>The grid sizes itself to the points that are switched on.</b> It was a fixed
+        // 22px cell at 14px type, which is a table as wide as the number of bodies enabled -
+        // with the asteroids and angles on that is far wider than any drawer, and the columns
+        // ran off the edge where they could not be read at all. Scaled to fit instead of
+        // scrolled: a triangular grid is read by scanning across a row, and a table you have
+        // to drag sideways to finish one row is worse than a small one you can take in whole.
+        int gridCols = 0;
+        for (n = 0; n < BODY_COUNT; ++n) {
+            if (SkymapPanel.aspecting(n, this.bValid)) {
+                gridCols++;
+            }
+        }
+        // The drawer's content width, less its padding and the vertical scrollbar.
+        int cell = gridCols > 0 ? (GRID_FIT_WIDTH / (gridCols + 1)) : 22;
+        cell = Math.max(GRID_MIN_CELL, Math.min(22, cell));
+        int glyph = Math.max(8, cell - 3);
+        stringBuilder.append("<table border='1' cellspacing='0' cellpadding='0' style='border-collapse: collapse; border-color: #555; text-align:center;'>");
+        stringBuilder.append("<tr><td style='width:").append(cell).append("px;'></td>");
         for (n = 0; n < BODY_COUNT; ++n) {
             if (!SkymapPanel.aspecting(n, this.bValid)) continue;
-            stringBuilder.append("<td style='color:").append(this.getElementColorHex(BODY_ELEMENTS[n])).append("; font-size:14px; width:22px;'>").append(BODY_GLYPHS[n]).append("</td>");
+            stringBuilder.append("<td style='color:").append(this.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
         }
         stringBuilder.append("</tr>");
         for (n = 0; n < BODY_COUNT; ++n) {
             n2 = (n3 != 0 ? SkymapPanel.aspecting(n, this.tValid) : SkymapPanel.aspecting(n, this.bValid)) ? 1 : 0;
             if (n2 == 0) continue;
             stringBuilder.append("<tr>");
-            stringBuilder.append("<td style='color:").append(this.getElementColorHex(BODY_ELEMENTS[n])).append("; font-size:14px;'>").append(BODY_GLYPHS[n]).append("</td>");
+            stringBuilder.append("<td style='color:").append(this.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
             for (int i = 0; i < BODY_COUNT; ++i) {
                 String string6;
                 double d;
@@ -3641,7 +4030,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // Through aspectHref, never formatted inline: the parser is the only other
                     // place that knows this format and the two must not be able to drift.
                     String string9 = SkymapPanel.aspectHref(string7, string8, string6);
-                    stringBuilder.append("<td style='background-color:#222;'><a href='").append(string9).append("' style='text-decoration:none;'>").append("<span style='color:").append(this.getAspectColorHex(string6)).append("; font-size:14px;'>").append(this.getAspectSymbol(string6)).append("</span></a></td>");
+                    stringBuilder.append("<td style='background-color:#222;'><a href='").append(string9).append("' style='text-decoration:none;'>").append("<span style='color:").append(this.getAspectColorHex(string6)).append("; font-size:").append(glyph).append("px;'>").append(this.getAspectSymbol(string6)).append("</span></a></td>");
                     continue;
                 }
                 stringBuilder.append("<td style='background-color:#222;'></td>");
@@ -3775,7 +4164,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // 2026-08-31 to suggest depth and removed the same day: against the muted
             // element palette the lifted centre greyed the ground and the copper and sage
             // glyphs lost contrast. Pure black is the strongest backing those colours have.
-            graphics.setColor(Color.BLACK);
+            // <b>The wheel's ground, and the last surface that was not on the theme.</b>
+            // Black since the app existed - which left the chart reading as a hole cut in the
+            // window once everything around it moved to a navy ground. Overridable in
+            // Settings; black is still what it falls back to, so a reader who never opens
+            // Settings sees the chart they had yesterday.
+            graphics.setColor(ChartPalette.colorOr(ChartPalette.backgroundHex(null),
+                Color.BLACK));
             graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
             if (SkymapPanel.this.sw == null || SkymapPanel.this.baseSd == null) {
                 return;
@@ -3794,13 +4189,21 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int n16 = rings[RING_DECAN_OUTER];
             int n17 = rings[RING_SIGN_OUTER];
             int n18 = rings[RING_SIGN_INNER];
+            // <b>The disc, filled separately from the page.</b> One colour used to do both -
+            // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
+            // Filled before any ring is drawn, so every stroke below lands on top of it.
+            Color disc = ChartPalette.colorOr(ChartPalette.wheelHex(null), null);
+            if (disc != null) {
+                graphics2D.setColor(disc);
+                graphics2D.fillOval(n12 - n14, n13 - n14, n14 * 2, n14 * 2);
+            }
             double[] dArray = SkymapPanel.this.activeCusps;
             double d4 = SkymapPanel.this.getPinLongitude();
-            graphics2D.setColor(new Color(220, 220, 220));
+            graphics2D.setColor(SkymapPanel.inkColor());
             graphics2D.setStroke(new BasicStroke(1.0f));
             graphics2D.drawLine(n12 - 10, n13, n12 + 10, n13);
             graphics2D.drawLine(n12, n13 - 10, n12, n13 + 10);
-            graphics2D.setColor(new Color(220, 220, 220));
+            graphics2D.setColor(SkymapPanel.inkColor());
             graphics2D.setStroke(new BasicStroke(2.0f));
             graphics2D.drawOval(n12 - n18, n13 - n18, n18 * 2, n18 * 2);
             graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
@@ -3849,7 +4252,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 n6 = n13 + (int)((double)n18 * Math.sin(d2));
                 n5 = n12 + (int)((double)n17 * Math.cos(d2));
                 n4 = n13 + (int)((double)n17 * Math.sin(d2));
-                graphics2D.setColor(new Color(220, 220, 220));
+                graphics2D.setColor(SkymapPanel.inkColor());
                 graphics2D.setStroke(new BasicStroke(2.0f));
                 graphics2D.drawLine(n7, n6, n5, n4);
                 d = Math.toRadians(180.0 + d4 - (d3 + 15.0));
@@ -3878,7 +4281,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 n5 = n12 + (int)((double)n18 * Math.cos(d5));
                 n4 = n13 + (int)((double)n18 * Math.sin(d5));
                 if (n8 == 1 || n8 == 4 || n8 == 7 || n8 == 10) {
-                    graphics2D.setColor(new Color(220, 220, 220));
+                    graphics2D.setColor(SkymapPanel.inkColor());
                     graphics2D.setStroke(new BasicStroke(3.0f));
                 } else {
                     graphics2D.setColor(Color.DARK_GRAY);
@@ -3991,11 +4394,26 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
                 if (Bodies.at(n7).isAngle()) {
                     graphics2D.setFont(ANGLE_FONT);
-                    this.drawMetallicSphere(graphics2D, n4, n26, 13, new Color(212, 175, 55));
-                    graphics2D.setColor(new Color(35, 28, 5));
+                    // The angle marker follows the template: gold is invisible on a white
+                    // ground and is the only warm thing in a cool palette.
+                    Color angle = ChartPalette.colorOr(ChartPalette.angleHex("#D4AF37"),
+                        new Color(212, 175, 55));
+                    this.drawMetallicSphere(graphics2D, n4, n26, 13, angle);
+                    // The glyph reads against its own bead rather than against a fixed dark
+                    // brown, which disappears on a pale marker.
+                    graphics2D.setColor(SkymapPanel.readableOn(angle));
                     object = Bodies.at((int)n7).glyph;
                     graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n26 + 4);
                     continue;
+                }
+                // A body recedes with its lines unless it IS the focus or aspects it. Without
+                // this the web dims and the glyphs stay bright, which reads as the lines being
+                // broken rather than as one body being singled out.
+                java.awt.Composite priorComposite = graphics2D.getComposite();
+                if (!SkymapPanel.this.noFocus()) {
+                    graphics2D.setComposite(java.awt.AlphaComposite.getInstance(
+                        java.awt.AlphaComposite.SRC_OVER,
+                        (float) SkymapPanel.this.glyphWeight(n7, false)));
                 }
                 GlyphSize glyphSize = SkymapPanel.natalSize(n7);
                 graphics2D.setFont(glyphSize.font);
@@ -4007,12 +4425,22 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                     SkymapPanel.this.drawMoonPhase(graphics2D, n4, n26, Math.round((float)glyphSize.radius * 0.47f), d11 / 360.0);
                 } else {
-                    graphics2D.setColor(SkymapPanel.this.getElementColor(BODY_ELEMENTS[n7]));
+                    graphics2D.setColor(SkymapPanel.this.bodyColor(n7));
                     object = SkymapPanel.glyphFor(n7, glyphSize.font);
                     graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n26 + glyphSize.baseline);
                 }
-                graphics2D.setColor(new Color(255, 255, 255, 30));
-                graphics2D.drawLine(n4, n26, n12 + (int)((double)n18 * Math.cos(d10)), n13 + (int)((double)n18 * Math.sin(d10)));
+                // The leader from the glyph to the degree it actually occupies. Bodies are
+                // spread outward when they crowd, so without this a reader cannot tell which
+                // degree a glyph belongs to. Colour and visibility are both settings; the
+                // alpha stays here because a solid leader would compete with the aspect lines.
+                graphics2D.setComposite(priorComposite);
+                if (Settings.showDegreeLines()) {
+                    Color leader = ChartPalette.colorOr(ChartPalette.leaderHex(null),
+                        Color.WHITE);
+                    graphics2D.setColor(new Color(leader.getRed(), leader.getGreen(),
+                        leader.getBlue(), 60));
+                    graphics2D.drawLine(n4, n26, n12 + (int)((double)n18 * Math.cos(d10)), n13 + (int)((double)n18 * Math.sin(d10)));
+                }
             }
             if (SkymapPanel.this.showTransitChart) {
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
@@ -4030,7 +4458,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                     GlyphSize glyphSize2 = SkymapPanel.transitSize(n7);
                     graphics2D.setFont(glyphSize2.font);
-                    object = SkymapPanel.lighten(SkymapPanel.this.getElementColor(BODY_ELEMENTS[n7], false), 0.45);
+                    object = SkymapPanel.lighten(SkymapPanel.this.bodyColor(n7), 0.45);
                     this.drawMetallicCube(graphics2D, n4, n27, glyphSize2.radius, new Color(62, 66, 76));
                     if (n7 == MOON && SkymapPanel.this.tValid[SUN]) {
                         double d13 = (SkymapPanel.this.tLon[MOON] - SkymapPanel.this.tLon[SUN]) % 360.0;
@@ -4063,7 +4491,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                     GlyphSize glyphSize3 = SkymapPanel.transitSize(n7);
                     graphics2D.setFont(glyphSize3.font);
-                    Color cColor = SkymapPanel.lighten(SkymapPanel.this.getElementColor(BODY_ELEMENTS[n7], false), 0.6);
+                    Color cColor = SkymapPanel.lighten(SkymapPanel.this.bodyColor(n7), 0.6);
                     this.drawMetallicCube(graphics2D, n4, n28, glyphSize3.radius, new Color(20, 50, 80));
                     if (n7 == MOON && SkymapPanel.this.cValid[SUN]) {
                         double d15 = (SkymapPanel.this.cLon[MOON] - SkymapPanel.this.cLon[SUN]) % 360.0;
@@ -4107,7 +4535,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.setStroke(stroke);
         }
 
+        /**
+         * The bead a glyph sits on.
+         *
+         * <b>Optional, for a traditional chart.</b> The metallic sphere is a modern rendering
+         * convention; a classical wheel puts the bare glyph on the ring and nothing behind it.
+         * Switched off, this draws nothing at all rather than a flat disc - a disc would still
+         * cover the ring lines and degree ticks the traditional look is meant to show.
+         */
         private void drawMetallicSphere(Graphics2D graphics2D, int n, int n2, int n3, Color color) {
+            if (!Settings.showPlanetSpheres()) {
+                return;
+            }
             float[] fArray = new float[]{0.0f, 0.4f, 1.0f};
             Color color2 = new Color(255, 255, 255, 200);
             Color color3 = color.darker().darker();
@@ -4119,6 +4558,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.setColor(color3);
             graphics2D.drawOval(n - n3, n2 - n3, n3 * 2, n3 * 2);
         }
+
+        /**
+         * How many widening passes make the glow.
+         *
+         * Three is where it stops being worth it: a fourth pass is wide enough to overlap its
+         * neighbours and turns a chart with forty aspects into a haze. Measured by eye on a
+         * chart with every point switched on, which is the case that breaks first.
+         */
+        private static final int GLOW_PASSES = 3;
 
         private void drawAspectLine(Graphics2D graphics2D, double d, double d2, double d3, int n, int n2, int n3, int n4, boolean bl, int n5, int n6) {
             double d4 = Math.abs(d - d2);
@@ -4141,8 +4589,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // grid listed quincunxes the wheel could not draw, and adding five more aspects to
             // a hand-written ladder would have been five more chances at the same silence.
             // Now a new constant on Aspects.Type appears here automatically.
-            Aspects.Type drawn = Aspects.typeOf(d4, SkymapPanel.planetName(n5),
-                                                SkymapPanel.planetName(n6), syn);
+            // Through the same gate the grid uses, so a switched-off aspect disappears from
+            // both or from neither.
+            Aspects.Type drawn = SkymapPanel.this.visibleAspect(d4, n5, n6, syn);
             if (drawn != null) {
                 color = Color.decode(SkymapPanel.getAspectColorHex(drawn.label));
                 d6 = drawn.exactAngle;
@@ -4157,6 +4606,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 float f = (float)Math.pow(1.0 - d7, 2.0);
                 int n7 = (int)(35.0f + 220.0f * f);
                 n7 = Math.max(20, Math.min(255, n7));
+                // Focus, applied on top of the orb fade rather than instead of it: a loose
+                // aspect to the focused body is still a loose aspect and should still look
+                // like one.
+                double focus = SkymapPanel.this.focusWeight(n5, n6, bl);
+                n7 = Math.max(6, (int)(n7 * focus));
                 // A hovered line is drawn at full strength regardless of how wide its orb is.
                 // The normal alpha ramp fades a loose aspect almost to nothing, which is right
                 // for the background weave and useless for "show me the one I am pointing at".
@@ -4179,11 +4633,36 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         BasicStroke.JOIN_ROUND));
                     graphics2D.drawLine(n8, n9, n10, n11);
                 }
+                // <b>The glow: a wide, faint pass of the same colour under the crisp line.</b>
+                // Real bloom needs a blur, which Java2D will not do cheaply on every frame -
+                // but two or three widening strokes at low alpha read as light spilling off a
+                // strand, which is the whole effect. The passes are driven by the SAME f as the
+                // line, so a tight aspect glows and a loose one barely does: the fade already
+                // in this method is what makes the weave legible, and the glow must not undo it
+                // by lighting up the aspects the ramp is busy hiding.
+                if (!bl) {
+                    for (int pass = GLOW_PASSES; pass >= 1; pass--) {
+                        int glowAlpha = (int) (n7 * 0.10f * f / pass);
+                        if (glowAlpha < 3) {
+                            continue;
+                        }
+                        graphics2D.setColor(new Color(color.getRed(), color.getGreen(),
+                            color.getBlue(), Math.min(60, glowAlpha * 3)));
+                        graphics2D.setStroke(new BasicStroke(f2 + pass * 2.4f,
+                            BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                        graphics2D.drawLine(n8, n9, n10, n11);
+                    }
+                }
+
                 graphics2D.setColor(color);
                 if (bl) {
                     graphics2D.setStroke(new BasicStroke(f2, 0, 0, 10.0f, new float[]{5.0f, 5.0f}, 0.0f));
                 } else {
-                    graphics2D.setStroke(new BasicStroke(f2));
+                    // Thinner core than before (was f2 alone at up to 1.0). A strand reads as
+                    // light when the bright part is narrow and the spill is wide; a thick core
+                    // with a glow around it just looks like a thick line.
+                    graphics2D.setStroke(new BasicStroke(Math.max(0.6f, f2 * 0.8f),
+                        BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 }
                 graphics2D.drawLine(n8, n9, n10, n11);
                 graphics2D.setStroke(stroke);

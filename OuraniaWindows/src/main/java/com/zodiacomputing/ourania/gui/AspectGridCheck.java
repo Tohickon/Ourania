@@ -188,7 +188,10 @@ public final class AspectGridCheck {
 
     /** The tooltip lookup must find a link under the link and nothing anywhere else. */
     private static void hitTest() throws Exception {
-        Method hrefAt = MainMenuPanel.class.getDeclaredMethod("hrefAt", JEditorPane.class, Point.class);
+        // HtmlPanes, not MainMenuPanel: the hit test moved there on 2026-09-02, when the
+        // sidebar became two sidebars and both needed the same pane.
+        Method hrefAt = HtmlPanes.class.getDeclaredMethod("hrefAt", JEditorPane.class,
+            Point.class);
         hrefAt.setAccessible(true);
 
         JEditorPane pane = new JEditorPane();
@@ -257,7 +260,10 @@ public final class AspectGridCheck {
      * of each glyph, passed with the fix reverted, and therefore guarded nothing.
      */
     private static void everyCellHoverableAcrossItsWholeGlyph() throws Exception {
-        Method hrefAt = MainMenuPanel.class.getDeclaredMethod("hrefAt", JEditorPane.class, Point.class);
+        // HtmlPanes, not MainMenuPanel: the hit test moved there on 2026-09-02, when the
+        // sidebar became two sidebars and both needed the same pane.
+        Method hrefAt = HtmlPanes.class.getDeclaredMethod("hrefAt", JEditorPane.class,
+            Point.class);
         hrefAt.setAccessible(true);
 
         // Built from the REAL grid, not a hand-written imitation of it.

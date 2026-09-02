@@ -84,6 +84,119 @@ public final class Settings {
         return Bodies.parse(load().getProperty(BODIES_KEY));
     }
 
+    // ------------------------------------------------------------------ chart rendering
+
+    /** Settings key for the bead behind each glyph. */
+    public static final String SPHERES_KEY = "chart.spheres";
+
+    /**
+     * Whether each body is drawn on a metallic bead.
+     *
+     * <b>On by default</b>, because that is what the app has always drawn and a rendering
+     * change should not arrive unasked. Off gives the classical look: a bare glyph on the ring
+     * with the degree ticks and house lines visible behind it.
+     */
+    public static boolean showPlanetSpheres() {
+        return !"false".equals(get(SPHERES_KEY, "true"));
+    }
+
+    public static void setShowPlanetSpheres(boolean on) {
+        set(SPHERES_KEY, on ? "true" : "false");
+    }
+
+    /** Settings key for the line from a body to its exact degree. */
+    public static final String DEGREE_LINE_KEY = "chart.degreeLines";
+
+    /**
+     * Whether a body is joined to its exact degree on the ring by a leader line.
+     *
+     * <b>On by default - it has always been drawn</b>, faintly, at alpha 30. Bodies are spread
+     * outward when they crowd, so the glyph is often not at the degree it names; the leader is
+     * what says where it actually is. Worth being able to turn off all the same: on a busy
+     * chart it is twenty more lines.
+     */
+    public static boolean showDegreeLines() {
+        return !"false".equals(get(DEGREE_LINE_KEY, "true"));
+    }
+
+    public static void setShowDegreeLines(boolean on) {
+        set(DEGREE_LINE_KEY, on ? "true" : "false");
+    }
+
+    /** Settings key for where the bodies sit. */
+    public static final String BODY_RING_KEY = "chart.bodyRing";
+
+    /** Bodies just inside the sign ring - where this app has always drawn them. */
+    public static final String RING_DEFAULT = "Inside the sign ring";
+    /** Bodies pulled into the middle, leaving the rings clear. */
+    public static final String RING_CENTRE = "In the centre";
+    /** Bodies pushed outside the sign ring, the way many traditional charts print them. */
+    public static final String RING_OUTSIDE = "Outside the sign ring";
+
+    public static final String[] BODY_RINGS = {RING_DEFAULT, RING_CENTRE, RING_OUTSIDE};
+
+    public static String bodyRing() {
+        String v = get(BODY_RING_KEY, RING_DEFAULT);
+        for (String r : BODY_RINGS) {
+            if (r.equals(v)) {
+                return r;
+            }
+        }
+        return RING_DEFAULT;
+    }
+
+    public static void setBodyRing(String ring) {
+        set(BODY_RING_KEY, ring);
+    }
+
+    // ------------------------------------------------------------------ aspect selection
+
+    /** Settings key for which aspects are drawn. */
+    public static final String ASPECTS_KEY = "aspects.enabled";
+
+    /**
+     * Which aspects the wheel and the grid show.
+     *
+     * <b>Absent means all of them</b>, the same distinction {@link #loadBodySelection} draws:
+     * getProperty returns null for a key never written and "" for one written empty, and those
+     * are two different answers - a fresh install shows every aspect, while a user who
+     * unticked every box gets what they asked for. Defaulting the string would make "show
+     * none" silently revert on the next launch, which is the defect the body selection
+     * already shipped once.
+     */
+    public static boolean[] loadAspectSelection() {
+        String csv = load().getProperty(ASPECTS_KEY);
+        boolean[] on = new boolean[com.zodiacomputing.ourania.astro.Aspects.Type.values().length];
+        if (csv == null) {
+            java.util.Arrays.fill(on, true);
+            return on;
+        }
+        for (String part : csv.split(",")) {
+            String want = part.trim();
+            for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                    : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+                if (t.label.equalsIgnoreCase(want)) {
+                    on[t.ordinal()] = true;
+                }
+            }
+        }
+        return on;
+    }
+
+    public static void saveAspectSelection(boolean[] enabled) {
+        StringBuilder sb = new StringBuilder();
+        for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+            if (t.ordinal() < enabled.length && enabled[t.ordinal()]) {
+                if (sb.length() > 0) {
+                    sb.append(',');
+                }
+                sb.append(t.label);
+            }
+        }
+        set(ASPECTS_KEY, sb.toString());
+    }
+
     public static void saveBodySelection(boolean[] enabled) {
         set(BODIES_KEY, Bodies.format(enabled));
     }
