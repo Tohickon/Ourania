@@ -118,6 +118,10 @@ public final class AspectGridCheck {
         readingsGenerate();
         report("Part Q - every reading generates, for every mode, with and without time", before);
 
+        before = failures.size();
+        aspectSelectionIsPinned();
+        report("Part R - this suite reads the code, not the user's settings", before);
+
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
@@ -349,9 +353,7 @@ public final class AspectGridCheck {
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             try {
                 OuraniaWindow w = new OuraniaWindow();          // built, never shown
-                java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
-                fs.setAccessible(true);
-                SkymapPanel sky = (SkymapPanel) fs.get(w);
+                SkymapPanel sky = skyOf(w);
                 setField(sky, "showTransitChart", true);
                 setField(sky, "aspectFilter", "Transit-Natal");
                 java.util.Arrays.fill((boolean[]) getField(sky, "tValid"), true);
@@ -579,10 +581,7 @@ public final class AspectGridCheck {
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 try {
                     OuraniaWindow w = new OuraniaWindow();
-                    java.lang.reflect.Field fs =
-                        OuraniaWindow.class.getDeclaredField("skymapPanel");
-                    fs.setAccessible(true);
-                    panel = (SkymapPanel) fs.get(w);
+                    panel = skyOf(w);
                     setField(panel, "chartMode", mode);
                     setField(panel, "showTransitChart", true);
                     setField(panel, "aspectFilter", "Both");
@@ -632,9 +631,7 @@ public final class AspectGridCheck {
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             try {
                 OuraniaWindow w = new OuraniaWindow();
-                java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
-                fs.setAccessible(true);
-                out[0] = fs.get(w);
+                out[0] = skyOf(w);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -719,9 +716,7 @@ public final class AspectGridCheck {
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             try {
                 OuraniaWindow w = new OuraniaWindow();
-                java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
-                fs.setAccessible(true);
-                out[0] = fs.get(w);
+                out[0] = skyOf(w);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -927,9 +922,7 @@ public final class AspectGridCheck {
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             try {
                 OuraniaWindow w = new OuraniaWindow();
-                java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
-                fs.setAccessible(true);
-                out[0] = fs.get(w);
+                out[0] = skyOf(w);
                 java.lang.reflect.Field fi =
                     OuraniaWindow.class.getDeclaredField("interpretationPanel");
                 fi.setAccessible(true);
@@ -1261,9 +1254,7 @@ public final class AspectGridCheck {
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             try {
                 OuraniaWindow w = new OuraniaWindow();
-                java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
-                fs.setAccessible(true);
-                SkymapPanel sky = (SkymapPanel) fs.get(w);
+                SkymapPanel sky = skyOf(w);
                 Method gen = SkymapPanel.class.getDeclaredMethod("generatePlanetPlacementsHtml");
                 gen.setAccessible(true);
                 out[0] = (String) gen.invoke(sky);
@@ -1367,9 +1358,7 @@ public final class AspectGridCheck {
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             try {
                 OuraniaWindow w = new OuraniaWindow();          // built, never shown
-                java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
-                fs.setAccessible(true);
-                SkymapPanel sky = (SkymapPanel) fs.get(w);
+                SkymapPanel sky = skyOf(w);
 
                 setField(sky, "chartMode", mode);
                 setField(sky, "showTransitChart", true);
@@ -1400,6 +1389,63 @@ public final class AspectGridCheck {
         int minute = (int) Math.round((at[3] - hour) * 60.0);
         return java.time.ZonedDateTime.of((int) at[0], (int) at[1], (int) at[2], hour, minute, 0, 0,
             java.time.ZoneOffset.UTC);
+    }
+
+    /**
+     * The window's wheel, with the aspect selection pinned on.
+     *
+     * <b>This suite was reading the user's preferences and calling it a result.</b>
+     * SkymapPanel seeds {@code aspectShown} from settings.properties at construction, and
+     * Settings treats a missing key as all-on but an empty one as all-off. On 2026-09-02 that
+     * key was empty, so every aspect was off, the grid drew nothing, and 374 of 6154 checks
+     * failed against code that was correct. Removing the key turned the same run green at 6519
+     * checks - so the totals moved with a preference too, not only the verdict.
+     *
+     * Pinning here rather than at the seven call sites is deliberate: all seven were the same
+     * three lines of reflection, and a helper that has to be remembered at an eighth is the
+     * one-rule-two-implementations defect this project logs more than any other. There is now
+     * one way to get a panel, and it pins.
+     */
+    /**
+     * The pin itself, asserted rather than assumed.
+     *
+     * Without this, removing the pin in {@link #skyOf} only shows up when someone happens to
+     * be running with an aspect selection that hides things - which is exactly how this went
+     * unnoticed until a stamp run went red on 2026-09-02 against correct code. Reading the
+     * field back fails the moment the pin goes, whatever settings.properties happens to say.
+     */
+    private static void aspectSelectionIsPinned() throws Exception {
+        final Object[] seen = new Object[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            try {
+                seen[0] = getField(skyOf(new OuraniaWindow()), "aspectShown");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        boolean[] on = (boolean[]) seen[0];
+        ok("the panel exposes an aspect selection", on != null);
+        if (on == null) {
+            return;
+        }
+        eq("one flag per aspect type", Aspects.Type.values().length, on.length);
+        int off = 0;
+        for (boolean b : on) {
+            if (!b) {
+                off++;
+            }
+        }
+        eq("no aspect is hidden from this suite by a saved preference", 0, off);
+    }
+
+    private static SkymapPanel skyOf(OuraniaWindow w) throws Exception {
+        java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+        fs.setAccessible(true);
+        SkymapPanel sky = (SkymapPanel) fs.get(w);
+        boolean[] all = new boolean[Aspects.Type.values().length];
+        java.util.Arrays.fill(all, true);
+        setField(sky, "aspectShown", all);
+        return sky;
     }
 
     private static void setField(Object target, String name, Object value) throws Exception {
