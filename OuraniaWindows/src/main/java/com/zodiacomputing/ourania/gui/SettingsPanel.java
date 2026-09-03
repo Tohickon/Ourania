@@ -261,6 +261,36 @@ public class SettingsPanel extends JPanel {
         decanRow.add(decanLabel);
         decanRow.add(decanCombo);
         body.add(decanRow);
+        body.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // What the outer wheel carries when a chart has one.
+        JPanel outerRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        outerRow.setBackground(Color.BLACK);
+        outerRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel outerLabel = new JLabel("Outer wheel shows:");
+        outerLabel.setForeground(TEXT);
+        outerLabel.setFont(Theme.BODY);
+        final JComboBox<String> outerCombo = new JComboBox<>(Settings.OUTER_WHEELS);
+        seeding = true;
+        outerCombo.setSelectedItem(Settings.outerWheel());
+        seeding = false;
+        Widgets.styleCombo(outerCombo);
+        outerCombo.setToolTipText("<html>What the outer ring carries when a chart has one. "
+            + "<b>Transits</b> is the sky at the transit moment. <b>Progressions</b> advances "
+            + "the chart one day for each year of life and draws it round the natal frame - "
+            + "the houses stay natal, because a progressed bi-wheel is progressed bodies in "
+            + "the birth frame. Progressed bodies are labelled and read as placements, never "
+            + "as transits.</html>");
+        outerCombo.addActionListener(e -> {
+            Object picked = outerCombo.getSelectedItem();
+            if (!constructing && !seeding && picked != null) {
+                Settings.setOuterWheel(String.valueOf(picked));
+                applyPalette();
+            }
+        });
+        outerRow.add(outerLabel);
+        outerRow.add(outerCombo);
+        body.add(outerRow);
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
         body.add(heading("Chart Points"));

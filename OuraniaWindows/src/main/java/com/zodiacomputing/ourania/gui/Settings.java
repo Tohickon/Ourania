@@ -185,6 +185,36 @@ public final class Settings {
         set(DECAN_RING_KEY, ring);
     }
 
+    /**
+     * What the outer wheel carries when there is one: the sky, or the progressed chart.
+     *
+     * Read here rather than threaded through applyChartSettings because it behaves like the
+     * house system and the node variant - it changes what the wheel means, the panel asks for
+     * it when it computes, and nothing between the two needs to carry it.
+     */
+    public static final String OUTER_WHEEL_KEY = "chart.outerWheel";
+
+    /** The sky at the transit moment - what the outer wheel has always shown. */
+    public static final String OUTER_TRANSITS = "Transits";
+    /** The chart advanced a day per year of life, drawn round the natal frame. */
+    public static final String OUTER_PROGRESSED = "Progressions";
+
+    public static final String[] OUTER_WHEELS = {OUTER_TRANSITS, OUTER_PROGRESSED};
+
+    public static String outerWheel() {
+        String v = get(OUTER_WHEEL_KEY, OUTER_TRANSITS);
+        for (String o : OUTER_WHEELS) {
+            if (o.equals(v)) {
+                return o;
+            }
+        }
+        return OUTER_TRANSITS;
+    }
+
+    public static void setOuterWheel(String which) {
+        set(OUTER_WHEEL_KEY, which);
+    }
+
     // ------------------------------------------------------------------ aspect selection
 
     /** Settings key for which aspects are drawn. */

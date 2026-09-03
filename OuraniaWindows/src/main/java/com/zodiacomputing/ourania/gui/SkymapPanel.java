@@ -80,6 +80,33 @@ extends JPanel {
     private String baseLocationName = "Los Angeles, CA";
     private String baseTimeZoneId = ZoneId.systemDefault().getId();
     public boolean showTransitChart = false;
+
+    /**
+     * Whether the outer wheel carries the progressed chart instead of the sky.
+     *
+     * <b>It is the same ring, moved to a different moment.</b> Secondary progression advances
+     * the chart a day per year of life, so the outer bodies are computed at
+     * {@code Progressions.progressedJd} rather than at the transit date - the ring, its hit
+     * tests, its aspect lines and its glyph spreading all work unchanged.
+     *
+     * <b>What does NOT come free is the vocabulary.</b> Every label on that ring says
+     * "transiting", and progressed contacts shown as transits would be the defect this file
+     * already carries a comment about, where synastry rows read as transit rows for months.
+     * So the label is asked for through {@link #outerRingWord}, and a progressed body is read
+     * as a placement - Venus in Scorpio, in a house - rather than through the transit prose,
+     * which is what a progressed chart actually is.
+     *
+     * Houses stay natal. A progressed bi-wheel is progressed bodies around the natal frame;
+     * recomputing cusps at the progressed moment would be a different technique.
+     */
+    private boolean showProgressed() {
+        return Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+    }
+
+    /** What the outer ring's bodies are, for any label that has to name them. */
+    private String outerRingWord() {
+        return this.showProgressed() ? "progressed" : "transiting";
+    }
     public ChartMode chartMode = ChartMode.SINGLE;
 
     /**
@@ -1077,7 +1104,8 @@ extends JPanel {
         sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;'>");
         sb.append("<div style='font-size:13px;'><b>").append(def.name).append("</b>");
         if (transit) {
-            sb.append(" <span style='color:#5A7FBF;'>(transiting)</span>");
+            sb.append(" <span style='color:#5A7FBF;'>(")
+                  .append(this.outerRingWord()).append(")</span>");
         }
         if (!def.isAngle() && speed < 0.0) {
             sb.append(" <span style='color:#B03030;'><b>R</b></span>");
@@ -2844,7 +2872,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     arrayListC.add(new String[]{BODY_NAMES[n14c], string, string2, "Chart B"});
                 }
                 n14c = (int)(this.cLon[n3] % 30.0) + 1;
-                this.window.showInterpretationForPlanet("transit_" + BODY_NAMES[n3].toLowerCase(), SIGN_NAMES[n15c], n14c, n16c, n17c, arrayListC);
+                // A progressed body is a placement, not a transit. The transit route would head
+                // the page "Transiting Venus" and describe a passing event; what a progressed
+                // chart says is where the body has moved to. Same defect shape as the synastry
+                // rows that read as transit rows, guarded before it could happen rather than
+                // after.
+                this.window.showInterpretationForPlanet(
+                    this.showProgressed() ? BODY_NAMES[n3]
+                        : "transit_" + BODY_NAMES[n3].toLowerCase(),
+                    SIGN_NAMES[n15c], n14c, n16c, n17c, arrayListC);
                 return;
             }
         }
@@ -2884,7 +2920,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     arrayList.add(new String[]{BODY_NAMES[n14], string, string2});
                 }
                 n14 = (int)(this.tLon[n3] % 30.0) + 1;
-                this.window.showInterpretationForPlanet("transit_" + BODY_NAMES[n3].toLowerCase(), SIGN_NAMES[n15], n14, n16, n17, arrayList);
+                this.window.showInterpretationForPlanet(
+                    this.showProgressed() ? BODY_NAMES[n3]
+                        : "transit_" + BODY_NAMES[n3].toLowerCase(),
+                    SIGN_NAMES[n15], n14, n16, n17, arrayList);
                 return;
             }
         }
@@ -3423,7 +3462,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;'>");
         sb.append("<div style='font-size:13px;'><b>").append(BODY_NAMES[a]);
         if (transit) {
-            sb.append(" <span style='color:#5A7FBF;'>(transiting)</span>");
+            sb.append(" <span style='color:#5A7FBF;'>(")
+                  .append(this.outerRingWord()).append(")</span>");
         }
         sb.append("</b> <span style='color:").append(this.getAspectColorHex(type.label))
           .append("; font-size:15px;'>").append(this.getAspectSymbol(type.label))
@@ -4055,7 +4095,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.baseAscendant = dArray[0];
         }
         SweDate outerSd = relationship ? this.compositeTransitSd : this.transitSd;
-        if (this.showTransitChart && outerSd != null) {
+        // A day of ephemeris for a year of life. Everything downstream - houses, bodies, the
+        // ring, the aspect lines - is unchanged; only the moment it is asked about moves.
+        boolean progressedRing = this.showProgressed() && !relationship
+            && this.baseSd != null && outerSd != null;
+        if (progressedRing) {
+            outerSd = new SweDate(com.zodiacomputing.ourania.astro.Progressions.progressedJd(
+                this.baseSd.getJulDay(), outerSd.getJulDay()));
+        }
+        if (this.showTransitChart && outerSd != null && !progressedRing) {
             double[] dArray2 = new double[10];
             this.sw.swe_houses(outerSd.getJulDay(), 2, this.transitLatitude, this.transitLongitude, this.houseSystem, this.transitCusps, dArray2);
             this.transitAscendant = dArray2[0];
