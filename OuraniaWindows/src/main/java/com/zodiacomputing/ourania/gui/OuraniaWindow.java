@@ -255,6 +255,106 @@ public class OuraniaWindow extends JFrame {
             decanNum, houseNum, activeAspects, lon);
     }
 
+    // ============================================================ export (Section B)
+    //
+    // Nothing left this application before 3 Sep 2026. Each of these is a door onto
+    // ChartExporter, which does the work; the window's job is only to know which component
+    // holds the thing being exported.
+
+    /** B1. The wheel as a PNG, at a chosen resolution. */
+    public void exportChartImage() {
+        if (skymapPanel != null) {
+            ChartExporter.saveChartImage(this, skymapPanel.chartComponent());
+        }
+    }
+
+    /** B2. The wheel to a printer. */
+    public void printChart() {
+        if (skymapPanel != null) {
+            ChartExporter.printChart(this, skymapPanel.chartComponent());
+        }
+    }
+
+    /** B4. The wheel to the clipboard as an image. */
+    public void copyChartImage() {
+        if (skymapPanel != null) {
+            ChartExporter.copyChartImage(this, skymapPanel.chartComponent());
+        }
+    }
+
+    /** B4. Positions to the clipboard, tab separated for a spreadsheet. */
+    public void copyPositions() {
+        if (skymapPanel != null) {
+            ChartExporter.copyText(skymapPanel.positionsText());
+        }
+    }
+
+    /** B4. Positions to a file, same data as the clipboard copy. */
+    public void savePositions() {
+        if (skymapPanel != null) {
+            ChartExporter.saveText(this, skymapPanel.positionsText(),
+                "ourania-positions.tsv", "Tab-separated values", "tsv");
+        }
+    }
+
+    /** B5. The aspect grid as its own HTML - it is already a table. */
+    public void exportAspectGrid() {
+        if (sidePanel != null) {
+            ChartExporter.saveText(this, sidePanel.gridHtml(),
+                "ourania-aspect-grid.html", "HTML document", "html");
+        }
+    }
+
+    /** B6. The reading on screen, as markup. */
+    public void exportReadingHtml() {
+        if (interpretationPanel != null) {
+            ChartExporter.saveText(this, interpretationPanel.currentHtml(),
+                "ourania-reading.html", "HTML document", "html");
+        }
+    }
+
+    /** B6. The reading on screen, as plain text. */
+    public void exportReadingText() {
+        if (interpretationPanel != null) {
+            ChartExporter.saveText(this,
+                ChartExporter.toPlainText(interpretationPanel.currentHtml()),
+                "ourania-reading.txt", "Text file", "txt");
+        }
+    }
+
+    /** B4. The reading on screen, to the clipboard as plain text. */
+    public void copyReading() {
+        if (interpretationPanel != null) {
+            ChartExporter.copyText(
+                ChartExporter.toPlainText(interpretationPanel.currentHtml()));
+        }
+    }
+
+    /**
+     * One export, from the drawer's Export section.
+     *
+     * A string switch rather than nine listeners wired individually, for the same reason the
+     * readings use one: the sidebar names what it wants and this decides where it comes from,
+     * so a button cannot end up pointing at nothing without the name being wrong here too.
+     */
+    public void runExport(String what) {
+        if (what == null) {
+            return;
+        }
+        switch (what) {
+            case "SAVE_IMAGE":         exportChartImage(); break;
+            case "PRINT":              printChart(); break;
+            case "COPY_IMAGE":         copyChartImage(); break;
+            case "COPY_POSITIONS":     copyPositions(); break;
+            case "SAVE_POSITIONS":     savePositions(); break;
+            case "SAVE_GRID":          exportAspectGrid(); break;
+            case "SAVE_READING":       exportReadingHtml(); break;
+            case "SAVE_READING_TEXT":  exportReadingText(); break;
+            case "COPY_READING":       copyReading(); break;
+            default: break;
+        }
+    }
+
     public void handlePlacementClick(String command) {
         // The index, before anything tries to read it as a body label.
         if (command != null && (command.equals("index") || command.startsWith("index|"))) {

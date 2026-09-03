@@ -1446,6 +1446,23 @@ public final class AspectGridCheck {
             }
         });
         ok("the outer ring is pinned to transits", Boolean.FALSE.equals(outer[0]));
+
+        final Object[] points = new Object[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            try {
+                points[0] = getField(skyOf(new OuraniaWindow()), "shown");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        boolean[] shown = (boolean[]) points[0];
+        int hidden = 0;
+        for (boolean b : shown) {
+            if (!b) {
+                hidden++;
+            }
+        }
+        eq("every chart point is visible to this suite", 0, hidden);
     }
 
     private static SkymapPanel skyOf(OuraniaWindow w) throws Exception {
@@ -1459,6 +1476,17 @@ public final class AspectGridCheck {
         // chosen. Added 2026-09-03 with the progressed wheel, which moved this suite's total
         // to 6509 the day it shipped - the same drift the aspect pin above exists to stop.
         setField(sky, "showProgressed", Boolean.FALSE);
+        // And the body selection. This suite counts grid cells, so the reader's chosen points
+        // set its total directly: 6523 checks at 29 bodies against 5215 at 15, green both
+        // times. Third pin on this method and the third time the same lesson - a suite that
+        // reads a preference is measuring the machine it runs on.
+        boolean[] every = new boolean[Bodies.ALL.length];
+        java.util.Arrays.fill(every, true);
+        setField(sky, "shown", every);
+        java.lang.reflect.Method reload =
+            SkymapPanel.class.getDeclaredMethod("updateChartData");
+        reload.setAccessible(true);
+        reload.invoke(sky);
         return sky;
     }
 

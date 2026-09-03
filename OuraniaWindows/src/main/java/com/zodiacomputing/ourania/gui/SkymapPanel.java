@@ -2161,6 +2161,44 @@ extends JPanel {
         return com.zodiacomputing.ourania.astro.Harmonics.of(radixChart(), this.harmonic);
     }
     /**
+     * The inner panel that paints the wheel, for the exporter to paint into an image.
+     *
+     * <b>Read-only.</b> The caller paints it into a BufferedImage or onto a printer graphics;
+     * nothing here is changed by either. Exposed as a Component rather than the panel type so
+     * a caller cannot reach into the wheel's state through it.
+     */
+    public java.awt.Component chartComponent() {
+        return this.chartPanel;
+    }
+
+    /**
+     * Every drawn position as tab-separated text, for a spreadsheet or a note.
+     *
+     * Built from the same arrays the wheel draws from, so what is copied is what is on screen
+     * - including the reader's body selection. A copy that quietly held more than the chart
+     * showed would be the same defect as a reading that describes a chart the wheel is not
+     * drawing.
+     */
+    public String positionsText() {
+        StringBuilder sb = new StringBuilder("Body\tLongitude\tSign\tDegree\tHouse\tRetrograde\n");
+        for (int i = 0; i < BODY_COUNT; i++) {
+            if (!this.bValid[i]) {
+                continue;
+            }
+            double lon = this.bLon[i];
+            int house = Zodiac.houseOf(lon, this.activeCusps);
+            sb.append(BODY_NAMES[i]).append('\t')
+              .append(String.format("%.4f", lon)).append('\t')
+              .append(SkymapPanel.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)])).append('\t')
+              .append(String.format("%.2f", Zodiac.degreeInSign(lon))).append('\t')
+              .append(house > 0 ? String.valueOf(house) : "").append('\t')
+              .append(SkymapPanel.showsDirection(i) && this.bSpeed[i] < 0.0 ? "R" : "")
+              .append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
      * The chart a reading describes.
      *
      * <b>Named, so a check can assert it rather than a copy of it</b> - the same reason

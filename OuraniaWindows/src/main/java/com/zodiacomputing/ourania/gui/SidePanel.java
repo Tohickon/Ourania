@@ -47,6 +47,7 @@ public final class SidePanel extends JPanel {
     static final String NATAL = "Natal Chart";
     static final String TRANSITS = "Transits";
     static final String GRIDS = "Aspect Grids";
+    static final String EXPORT = "Export";
     static final String TABLES = "Tables";
     static final String READINGS = "Readings";
 
@@ -126,6 +127,30 @@ public final class SidePanel extends JPanel {
         tables.add(tableButton("Solar Arc", "SOLARARC",
             "Every point moved forward by the arc the progressed Sun has travelled"));
         accordion.addSection(TABLES, tables);
+
+        // Section B. Until 3 Sep 2026 nothing could leave this application at all - no image,
+        // no print, no clipboard, no file - which caps what it is for however good the engine
+        // behind it is.
+        JPanel export = column();
+        export.add(exportButton("Save Chart Image", "SAVE_IMAGE",
+            "The wheel as a PNG, at screen, 2x or 4x resolution"));
+        export.add(exportButton("Print Chart", "PRINT",
+            "Print the wheel, fitted to the page"));
+        export.add(exportButton("Copy Chart", "COPY_IMAGE",
+            "The wheel to the clipboard as an image"));
+        export.add(exportButton("Copy Positions", "COPY_POSITIONS",
+            "Every drawn position to the clipboard, tab separated for a spreadsheet"));
+        export.add(exportButton("Save Positions", "SAVE_POSITIONS",
+            "The same positions as a .tsv file"));
+        export.add(exportButton("Save Aspect Grid", "SAVE_GRID",
+            "The aspect grid as an HTML table"));
+        export.add(exportButton("Save Reading", "SAVE_READING",
+            "The reading on screen, as an HTML document"));
+        export.add(exportButton("Save Reading as Text", "SAVE_READING_TEXT",
+            "The reading on screen, as plain text"));
+        export.add(exportButton("Copy Reading", "COPY_READING",
+            "The reading on screen to the clipboard, as plain text"));
+        accordion.addSection(EXPORT, export);
 
         JPanel readings = column();
         readings.add(readingButton("Snapshot", "SNAPSHOT",
@@ -210,6 +235,11 @@ public final class SidePanel extends JPanel {
         }
     }
 
+    /** The aspect grid exactly as this drawer is showing it, for export. */
+    String gridHtml() {
+        return gridPane == null ? "" : gridPane.getText();
+    }
+
     /** The accordion, for a check that needs to walk the sections. */
     Accordion accordion() {
         return accordion;
@@ -221,6 +251,16 @@ public final class SidePanel extends JPanel {
         p.setBackground(Theme.SURFACE);
         p.setBorder(Theme.pad(Theme.GAP_S, Theme.GAP_S, Theme.GAP_S, Theme.GAP_S));
         return p;
+    }
+
+    private JButton exportButton(String label, final String what, String tip) {
+        JButton b = row(label, tip, Widgets.Role.TRANSPORT);
+        b.addActionListener(e -> {
+            if (window != null) {
+                window.runExport(what);
+            }
+        });
+        return b;
     }
 
     private JButton tableButton(String label, final String kind, String tip) {

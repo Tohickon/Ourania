@@ -38,6 +38,11 @@ public class InterpretationPanel extends JPanel {
      * <b>Preformatted output is left alone.</b> The report pane is monospaced, column-aligned
      * text; injecting a stylesheet or anchors into it would break the alignment it depends on.
      */
+    /** Whatever reading is on screen, as its own markup, for export. */
+    public String currentHtml() {
+        return editorPane == null ? "" : editorPane.getText();
+    }
+
     private void setHtml(String html, boolean pre) {
         preformatted = pre;
         setPreferredSize(new Dimension(pre ? REPORT_WIDTH : FLOW_WIDTH, 0));
