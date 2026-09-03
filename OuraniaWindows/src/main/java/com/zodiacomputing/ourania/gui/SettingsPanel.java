@@ -230,6 +230,37 @@ public class SettingsPanel extends JPanel {
         ringRow.add(ringLabel);
         ringRow.add(ringCombo);
         body.add(ringRow);
+        body.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // The decan band. Visual only - see Settings.decanRing for why this is not, and
+        // cannot be, a global choice of decan system.
+        JPanel decanRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        decanRow.setBackground(Color.BLACK);
+        decanRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel decanLabel = new JLabel("Decan ring shows:");
+        decanLabel.setForeground(TEXT);
+        decanLabel.setFont(Theme.BODY);
+        final JComboBox<String> decanCombo = new JComboBox<>(Settings.DECAN_RINGS);
+        seeding = true;
+        decanCombo.setSelectedItem(Settings.decanRing());
+        seeding = false;
+        Widgets.styleCombo(decanCombo);
+        decanCombo.setToolTipText("<html>Which scheme the decan band draws, and <b>only</b> "
+            + "that band. This app carries two decan rulerships that disagree for 30 of the "
+            + "36 decans, each tied to different data: <b>triplicity</b> rules the decan "
+            + "prose, the <b>Chaldean face</b> rules the Golden Dawn tarot cards and the "
+            + "Sabian decan ruler. Changing this moves glyphs on the wheel; it never remaps "
+            + "a reading, and both rulers stay named wherever one is reported.</html>");
+        decanCombo.addActionListener(e -> {
+            Object picked = decanCombo.getSelectedItem();
+            if (!constructing && !seeding && picked != null) {
+                Settings.setDecanRing(String.valueOf(picked));
+                applyPalette();
+            }
+        });
+        decanRow.add(decanLabel);
+        decanRow.add(decanCombo);
+        body.add(decanRow);
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
         body.add(heading("Chart Points"));

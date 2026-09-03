@@ -4190,7 +4190,42 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         String string2 = SkymapPanel.showsDirection(n) ? (d2 < 0.0 ? " R" : " D") : "";
         String string3 = this.getElementColorHex(Zodiac.elementIndex(n2));
-        return String.format("<div style='margin-bottom:4px;'><a href='%s%d' style='color:#cccccc; text-decoration:none; font-family:SansSerif; font-size:14px;'><span style='font-size:16px;'>%s</span> %d&deg; %02d'%s <span style='color:%s; font-size:16px;'>%s</span> House %s</a></div>", string, n, BODY_GLYPHS[n], n3, n4, string2, string3, ZODIAC_SYMBOLS[n2], this.romanNumeral(n5));
+        // <b>Both decan rulers, each named, under the placement.</b> The app runs two schemes
+        // at once and they disagree for 30 of the 36 decans, so an unlabelled "sub-ruler" here
+        // would be worse than none: the reader cannot tell whether it governs the prose or the
+        // tarot. Triplicity rules the decan prose; the Chaldean face rules the Golden Dawn
+        // cards and the Sabian decan_ruler field. Zodiac's header carries the full note.
+        String decanLine = SkymapPanel.decanRulers(d);
+        return String.format("<div style='margin-bottom:4px;'><a href='%s%d' style='color:#cccccc; text-decoration:none; font-family:SansSerif; font-size:14px;'><span style='font-size:16px;'>%s</span> %d&deg; %02d'%s <span style='color:%s; font-size:16px;'>%s</span> House %s</a>%s</div>", string, n, BODY_GLYPHS[n], n3, n4, string2, string3, ZODIAC_SYMBOLS[n2], this.romanNumeral(n5), decanLine);
+    }
+
+    /**
+     * The decan and its two rulers, as one small line for a placement row.
+     *
+     * Static and shared so the placements list and the hover card cannot drift apart - they
+     * are the two surfaces a reader compares, and a decan named differently on each would be
+     * read as a bug in the chart rather than a difference between two traditions.
+     */
+    static String decanRulers(double lon) {
+        int decan = Zodiac.decan(lon);
+        String triplicity = Zodiac.triplicityDecanRuler(lon);
+        String face = Zodiac.chaldeanDecanRuler(lon);
+        if ((triplicity == null || triplicity.isEmpty()) && (face == null || face.isEmpty())) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(
+            "<div style='color:#9FB4C7; font-size:10px; margin-left:20px;'>Decan ");
+        sb.append(decan).append(" &middot; ");
+        if (triplicity != null && !triplicity.isEmpty()) {
+            sb.append("triplicity <b>").append(triplicity).append("</b>");
+        }
+        if (face != null && !face.isEmpty()) {
+            if (triplicity != null && !triplicity.isEmpty()) {
+                sb.append(" &middot; ");
+            }
+            sb.append("Chaldean <b>").append(face).append("</b>");
+        }
+        return sb.append("</div>").toString();
     }
 
     private static boolean showsDirection(int n) {
@@ -4357,7 +4392,22 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 d = Math.toRadians(180.0 + d4 - (d3 + 5.0));
                 n3 = n12 + (int)((double)(n16 - 10) * Math.cos(d));
                 n2 = n13 + (int)((double)(n16 - 10) * Math.sin(d));
+                // <b>One band, two traditions, and the reader picks which one it draws.</b>
+                // Visual only: the prose and the tarot keep their own schemes whatever this
+                // says, because they are bound to datasets that cannot be remapped. See
+                // Settings.decanRing for why a global decan-system toggle is not on offer.
                 int n19 = n8 / 3;
+                if (Settings.DECAN_RING_CHALDEAN.equals(Settings.decanRing())) {
+                    String faceRuler = Zodiac.chaldeanDecanRuler(Zodiac.SIGNS[n19], n8 % 3 + 1);
+                    int fi = Bodies.indexOfName(faceRuler);
+                    if (fi >= 0 && fi < BODY_GLYPHS.length) {
+                        graphics2D.setColor(SkymapPanel.this.bodyColor(fi));
+                        graphics2D.drawString(BODY_GLYPHS[fi], n3 - 4, n2 + 4);
+                        continue;
+                    }
+                    // An unresolvable ruler falls through to the sign glyph rather than
+                    // leaving a gap in the band, which would read as a rendering fault.
+                }
                 int n20 = Zodiac.triplicityDecanSignIndex(n19, n8 % 3 + 1);
                 graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n20)));
                 graphics2D.drawString(ZODIAC_SYMBOLS[n20], n3 - 4, n2 + 4);

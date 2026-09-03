@@ -149,6 +149,42 @@ public final class Settings {
         set(BODY_RING_KEY, ring);
     }
 
+    /**
+     * Which decan scheme the wheel's decan band draws. Visual only, and deliberately so.
+     *
+     * <b>This is not a choice of decan system, because that choice cannot be offered.</b> The
+     * app carries two schemes bound to different datasets - Chaldean to the Sabian
+     * decan_ruler field and the Golden Dawn tarot cards, triplicity to the decan prose - and
+     * they disagree for 30 of the 36. A global toggle would leave the ruler on screen
+     * contradicting the prose beside it, which is why the DecanSystem enum was deleted on
+     * 2026-09-02 rather than wired up.
+     *
+     * This setting moves one band of glyphs and nothing else. Both schemes stay named on
+     * every surface that reports a ruler, so a reader can always see which is which.
+     */
+    public static final String DECAN_RING_KEY = "chart.decanRing";
+
+    /** The triplicity decan sign, which is what this band has always drawn. */
+    public static final String DECAN_RING_TRIPLICITY = "Triplicity signs";
+    /** The Chaldean face ruler, as a planet glyph. */
+    public static final String DECAN_RING_CHALDEAN = "Chaldean faces";
+
+    public static final String[] DECAN_RINGS = {DECAN_RING_TRIPLICITY, DECAN_RING_CHALDEAN};
+
+    public static String decanRing() {
+        String v = get(DECAN_RING_KEY, DECAN_RING_TRIPLICITY);
+        for (String r : DECAN_RINGS) {
+            if (r.equals(v)) {
+                return r;
+            }
+        }
+        return DECAN_RING_TRIPLICITY;
+    }
+
+    public static void setDecanRing(String ring) {
+        set(DECAN_RING_KEY, ring);
+    }
+
     // ------------------------------------------------------------------ aspect selection
 
     /** Settings key for which aspects are drawn. */
