@@ -85,11 +85,39 @@ public final class Topics {
      *   0.20       2224      7189     715   1722   (44.3%)
      * </pre>
      *
-     * So <b>0.06 is a choice, not a derivation.</b> It is kept because it sits far from the
-     * failure mode that prompted the sweep - at 0.10 nine of twelve topics on the test chart
-     * read "unremarkable" - and because the parameter trades smoothly, so no value is
-     * defensible on the data alone. What fraction of topics <i>should</i> read as unremarkable
-     * is a product judgement nobody has made yet.
+     * <h3>The judgement was made on 2026-09-03 (DECISIONS.md, K6)</h3>
+     *
+     * The old note ended by saying that what fraction of topics <i>should</i> read as
+     * unremarkable was a product judgement nobody had made. It has been made: <b>30 to 35
+     * per cent</b>, and the margin follows from it rather than the other way round.
+     *
+     * The reasoning is about alarm fatigue. At 4.5% almost every area of a life is flagged as
+     * a crisis or a threshold, and when everything is a red light none of them reads as one.
+     * At the other end, 44.3% leaves so much of the chart quiet that the reading feels
+     * unfinished. A third of topics resting is what lets the other two thirds be heard.
+     *
+     * Re-swept over the same 324-chart corpus to place the value:
+     *
+     * <pre>
+     *   margin   ALL_MIDDLING topics (of 3888)   share
+     *   0.06        128                           3.3%
+     *   0.10        363                           9.3%
+     *   0.15        916                          23.6%
+     *   0.17       1212                          31.2%   &lt;- chosen
+     *   0.18       1287                          33.1%
+     *   0.20       1629                          41.9%
+     * </pre>
+     *
+     * 0.17 is taken rather than 0.18 because it sits mid-band rather than near the top of it,
+     * and the run above reads about a point low against the 2026-08-10 sweep in this same
+     * comment - 3.3% where that recorded 4.5% at the same margin - so the true figure is
+     * nearer 32%. Either reading is inside the target; 0.18 would not be under both.
+     *
+     * <b>The state is still a finding, and now says so.</b> It used to render as "X is
+     * unremarkable", which reads as the app having nothing to say. Integrated ground is a
+     * condition: three witnesses that neither push nor drag, an area asking to be neither
+     * defended nor repaired. That is worth a sentence, and at a third of topics it is worth
+     * writing properly.
      *
      * <h3>The finding that matters more: the asymmetry is structural</h3>
      *
@@ -111,7 +139,7 @@ public final class Topics {
      * Deliberately not done here: it changes what every standing means and is a design
      * decision, not a tuning.
      */
-    public static double strongMargin = 0.06;
+    public static double strongMargin = 0.17;
 
     /** How many of the prominence ranking count as "a body that matters" for reporting. */
     public static int defaultTopN = 5;
@@ -530,7 +558,8 @@ public final class Topics {
                 return h + " is genuinely difficult: its occupants, its ruler "
                     + t.rulerName + " and its natural significator are all poorly placed.";
             case ALL_MIDDLING:
-                return h + " is unremarkable.";
+                return h + " is integrated ground: none of its three witnesses is notably "
+                    + "strong or weak, so nothing here is asking to be defended or repaired.";
             case ACTIVITY_WITHOUT_FOLLOW_THROUGH:
                 return h + " is busy but its ruler " + t.rulerName
                     + " is weak - much happens here and little of it consolidates.";

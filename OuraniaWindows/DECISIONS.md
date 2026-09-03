@@ -96,7 +96,7 @@ Tompkins on the back-row violinist turning a page.
 3. A Visual Aspect Mode with three settings: Essential (ten planets only, default),
    Manifestation (adds the four angles), Esoteric (everything, minors at low opacity).
 
-## K6 — How much of a chart should read as unremarkable · **TO BUILD**
+## K6 — How much of a chart should read as unremarkable · **BUILT 2026-09-03**
 
 **Decision.** Target 30-35%, against 4.5% today. Rename the state from "unremarkable" to
 **Integrated Ground** and write it as a real finding - a place that needs no defending - rather
