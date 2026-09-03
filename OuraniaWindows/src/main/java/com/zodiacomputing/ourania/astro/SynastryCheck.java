@@ -133,7 +133,8 @@ public final class SynastryCheck {
                 if (t != null && Math.abs(sepAB - t.exactAngle) > effOrb) {
                     failures.add(ba.name + "/" + bb.name + " typed " + t.label
                         + " at " + sepAB + " outside its orb of " + effOrb);
-                } else if (t == null && anyTypeWithin(sepAB, orb)) {
+                } else if (t == null && anyTypeWithin(sepAB, orb)
+                        && !Aspects.bothCalculated(ba.name, bb.name)) {
                     failures.add(ba.name + "/" + bb.name + " typed null at " + sepAB
                         + " while inside an orb of " + orb);
                 }
@@ -674,7 +675,13 @@ public final class SynastryCheck {
                 if (Bodies.oppositeOf(i) >= 0) continue;
                 for (String angle : Synastry.ANGLES) {
                     double sep = Aspects.separation(body.lon, Synastry.angleLon(b, angle));
-                    boolean inside = sep <= Aspects.orbFor(body.name, angle, true);
+                    // <b>An angle is a calculated point, so a calculated body cannot reach
+                    // it.</b> Burk: these points have no moieties of their own and so receive
+                    // aspects without casting them. Being inside the orb is therefore not
+                    // enough on its own to expect a contact - K5 made that the engine's rule
+                    // and this is the suite catching up to it, one commit late.
+                    boolean inside = sep <= Aspects.orbFor(body.name, angle, true)
+                        && !Aspects.bothCalculated(body.name, angle);
                     boolean reported = false;
                     for (Synastry.AngleContact h : hits) {
                         if (h.body.equals(body.name) && h.angle.equals(angle)) {

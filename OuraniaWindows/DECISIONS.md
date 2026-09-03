@@ -78,7 +78,7 @@ is not anaretic. 0° is a **separate** condition, not the same one: 0° is a pha
 
 **Note.** The corpus already stores these under `_30` keys, since the 30th degree is 29°.
 
-## K4 — Asteroid-to-asteroid prose · **TO BUILD (suppression, not prose)**
+## K4 — Asteroid-to-asteroid prose · **BUILT, PREMISE CORRECTED**
 
 **Decision.** Leave the 60 cells empty. Keep the geometry in the aspect grid; suppress the
 narrative. Clicking one shows a data badge naming the orb and saying plainly that the contact
@@ -86,6 +86,27 @@ sits below the threshold of character analysis.
 
 **Sources.** Burk on the ten planets as the only primary actors; Cunningham on brain clutter;
 Tompkins on the back-row violinist turning a page.
+
+**The premise was out of date.** The decision rests on those 60 cells being empty. Measured
+2026-09-03: all 60 are written. Following the letter would have meant deleting 60 entries
+somebody composed, and the project's rule is never to rewrite a shared data file.
+
+**Built instead — the reasoning, which is about weight rather than existence.** Burk's claim is
+that a contact between two minor bodies has no primary actor to express it, not that no text
+should exist for it. So the prose stays and the claims made *above* it change:
+
+- `Bodies.isMinor(String)` — one definition of the class (asteroid, node, Arabic lot, Lilith).
+  Angles are `Kind.ANGLE` and correctly excluded; verified against all 10 planets and 4 angles.
+- `InterpretationPanel` — a minor-to-minor aspect card carries a "Subtle esoteric resonance"
+  note saying the contact has no primary actor and works as background. Verified: fires for
+  Vesta/Ceres and Juno/Pallas, silent for Sun/Ceres and Sun/Saturn, prose kept in all four.
+- `NarrativeSynthesizer` — these contacts no longer print under a heading reading "Major
+  Contacts", which was the app asserting something false about its own weight. They move to
+  "Background Resonance". The geometry stays in the aspect grid throughout, as decided.
+
+**Found while verifying.** SynastryCheck was still asserting the pre-Burk contract and failed
+42 of 65,554 — K5 shipped without re-running it. The suite now knows a calculated point cannot
+reach an angle. All 25 suites clear.
 
 ## K5 — What the wheel draws · **BUILT 2026-09-03**
 

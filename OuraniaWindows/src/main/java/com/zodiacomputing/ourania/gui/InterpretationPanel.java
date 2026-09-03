@@ -2182,6 +2182,35 @@ public class InterpretationPanel extends JPanel {
         html.append("</div>");
     }
 
+    /**
+     * Marks a contact between two minor bodies as the background alignment it is.
+     *
+     * <b>The decision this implements assumed these cells were empty, and they are not.</b>
+     * K4 says to leave the sixty asteroid-to-asteroid cells unwritten and show a data badge in
+     * their place. Measured 2026-09-03: all sixty are written, so the letter of that decision
+     * would now mean deleting sixty entries somebody composed. Its reasoning is about weight
+     * rather than existence - Burk's point is that the ten planets are the psychic actors and
+     * a contact between two asteroids has no actor to express it, not that no text should
+     * exist - so the prose stays and the weight is stated.
+     *
+     * Without this a Pallas square Juno arrives looking exactly like a Sun square Saturn:
+     * same heading, same weight of paragraph, same place on the page. Cunningham's brain
+     * clutter and Tompkins' violinist turning a page in the back row are both about a reader
+     * being unable to tell which is which.
+     */
+    private void appendTertiaryNote(StringBuilder html, String planet1, String planet2) {
+        if (!com.zodiacomputing.ourania.astro.Bodies.isMinor(planet1)
+                || !com.zodiacomputing.ourania.astro.Bodies.isMinor(planet2)) {
+            return;
+        }
+        html.append("<div style='margin-top:16px; border-left:3px solid #6B5FA8; ")
+            .append("padding-left:10px; color:#B9B2D6; font-size:11px;'>")
+            .append("<b>Subtle esoteric resonance.</b> Both ends of this contact are minor ")
+            .append("bodies, so it has no primary actor to express it and works in the ")
+            .append("background rather than as a feature of character. Read it as texture ")
+            .append("beneath the planetary signatures, not beside them.</div>");
+    }
+
     public void showAspectInterpretation(String planet1, String planet2, String aspectType) {
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
@@ -2203,6 +2232,7 @@ public class InterpretationPanel extends JPanel {
         html.append("<p>").append(pair != null ? pair
             : svc.getAspect(planet1, planet2, aspectType)).append("</p>");
         appendQuincunxKind(html, planet1, planet2, aspectType);
+        appendTertiaryNote(html, planet1, planet2);
         html.append("</body></html>");
         setHtml(html.toString(), false);
     }

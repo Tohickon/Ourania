@@ -375,6 +375,21 @@ public final class Bodies {
     }
 
     /** The one-line meaning for a display name, or "" if the name is unknown. */
+    /**
+     * True for a body that is neither a light, a planet, nor an angle.
+     *
+     * The ten classical planets are the psychic actors; an asteroid, a node or an Arabic lot
+     * has no actor of its own to express a contact. Callers use this to state a contact's
+     * weight, not to hide it - the prose for these pairs is written and stays written.
+     */
+    public static boolean isMinor(String name) {
+        Def d = byName(name);
+        if (d == null) {
+            return false;
+        }
+        return d.kind == Kind.ASTEROID || d.kind == Kind.POINT || d.kind == Kind.NODE;
+    }
+
     public static String meaningOf(String name) {
         Def d = byName(name);
         return d == null ? "" : d.meaning;

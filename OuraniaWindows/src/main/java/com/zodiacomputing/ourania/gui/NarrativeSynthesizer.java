@@ -2,6 +2,7 @@ package com.zodiacomputing.ourania.gui;
 
 import com.zodiacomputing.ourania.astro.AspectPatterns;
 import com.zodiacomputing.ourania.astro.Aspects;
+import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.BodyScore;
 import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.Convergence;
@@ -137,7 +138,16 @@ public class NarrativeSynthesizer {
             
             // Major Aspects
             if (v.aspects != null && !v.aspects.isEmpty()) {
-                sb.append("<p><b>Major Contacts:</b></p><ul>");
+                // <b>Both ends minor means there is no actor to express the contact</b>, so it
+                // is listed as background rather than under a heading that calls it major. The
+                // K4 decision asked for these sixty asteroid-to-asteroid cells to be left
+                // unwritten; measured 2026-09-03 all sixty are written, so the prose stays and
+                // the claim above it is the thing that changes. A Pallas square Juno that
+                // arrives titled "Major Contacts" is the app asserting something false about
+                // its own weight - which is precisely Tompkins' clutter and Cunningham's
+                // alarm fatigue, reached through wording rather than through line-drawing.
+                StringBuilder major = new StringBuilder();
+                StringBuilder background = new StringBuilder();
                 for (int i = 0; i < Math.min(3, v.aspects.size()); i++) {
                     Aspects.Hit h = v.aspects.get(i);
                     String other = v.body.equals(h.a) ? h.b : h.a;
@@ -184,18 +194,28 @@ public class NarrativeSynthesizer {
                             }
                         }
                     }
+                    StringBuilder into = Bodies.isMinor(v.body) && Bodies.isMinor(other)
+                        ? background : major;
                     if (!aspectText.startsWith("Interpretation not found") && !aspectText.startsWith("General ")) {
-                        sb.append("<li><b>").append(h.type.label).append(" to ").append(other)
+                        into.append("<li><b>").append(h.type.label).append(" to ").append(other)
                             .append(":</b> ");
                         if (frame != null) {
-                            sb.append(frame).append("<br><br>");
+                            into.append(frame).append("<br><br>");
                         }
-                        sb.append(aspectText).append("</li>");
+                        into.append(aspectText).append("</li>");
                     } else {
-                        sb.append("<li><b>").append(h.type.label).append(" to ").append(other).append("</b> (").append(String.format("%.1f&deg;", h.offBy)).append(").</li>");
+                        into.append("<li><b>").append(h.type.label).append(" to ").append(other).append("</b> (").append(String.format("%.1f&deg;", h.offBy)).append(").</li>");
                     }
                 }
-                sb.append("</ul>");
+                if (major.length() > 0) {
+                    sb.append("<p><b>Major Contacts:</b></p><ul>").append(major).append("</ul>");
+                }
+                if (background.length() > 0) {
+                    sb.append("<p><b>Background Resonance:</b> <span style='font-size:11px;")
+                      .append(" color:#B9B2D6;'>minor bodies at both ends - texture beneath the")
+                      .append(" planetary signatures, not beside them.</span></p><ul>")
+                      .append(background).append("</ul>");
+                }
             }
             sb.append("</div>");
         }
