@@ -749,32 +749,114 @@ extends JPanel {
         if (close < 0) {
             close = sb.length();
         }
-        StringBuilder extra = new StringBuilder();
 
         int signIdx = Zodiac.signIndex(lon);
-        String sign = SkymapPanel.capitalise(Zodiac.SIGNS[signIdx]);
+        int degree = (int) (lon % 30.0) + 1;
+        int decan = Zodiac.decan(lon);
         int house = Zodiac.houseOf(lon, transit ? this.transitCusps : this.activeCusps);
-        InterpretationService svc = InterpretationService.getInstance();
+        String reading = this.window == null ? "" : this.window.planetReadingHtml(
+            BODY_NAMES[n], SIGN_NAMES[signIdx], degree, decan, house,
+            this.getActiveAspectsFor(n, transit), lon);
 
-        extra.append(section("sign", "In " + sign, svc.getSign(Zodiac.SIGNS[signIdx])));
-        if (house > 0) {
-            extra.append(section("house", "In house " + house, svc.getHouse(house)));
+        StringBuilder extra = new StringBuilder();
+        String lead = leadParagraph(reading);
+        if (!lead.isEmpty()) {
+            extra.append(section("core", "What it is", lead));
         }
+        int i = 0;
+        for (String[] part : readingSections(reading)) {
+            extra.append(section("s" + i++, part[0], part[1]));
+        }
+        if (i == 0 && lead.isEmpty()) {
+            extra.append("<div style='margin-top:6px; color:#9FB4C7;'><i>No reading recorded "
+                + "for this point.</i></div>");
+        }
+        sb.insert(close, extra.toString());
+        return sb.toString();
+    }
 
-        java.util.List<String[]> aspects = this.getActiveAspectsFor(n, transit);
-        StringBuilder aspectBody = new StringBuilder();
-        if (aspects.isEmpty()) {
-            aspectBody.append("<i>No aspects within orb.</i>");
-        } else {
-            for (String[] row : aspects) {
-                aspectBody.append("<div style='margin-bottom:3px;'><b>")
-                          .append(row[1]).append(' ').append(row[0]).append("</b><br>")
-                          .append(row[2] == null ? "" : row[2]).append("</div>");
+    /**
+     * The reading's sections, in the order it wrote them.
+     *
+     * Cut on the h2 and h3 headings the reading emits rather than rebuilt from the service,
+     * so the card carries whatever the reading carries - if a section is added there it
+     * appears here, and neither can quietly fall behind the other. Index-keyed, so the open
+     * set survives moving between bodies with the same shape of reading.
+     */
+    private static java.util.List<String[]> readingSections(String html) {
+        java.util.List<String[]> out = new java.util.ArrayList<String[]>();
+        if (html == null || html.isEmpty()) {
+            return out;
+        }
+        int i = 0;
+        while (i < html.length()) {
+            int h = nextHeading(html, i);
+            if (h < 0) {
+                break;
+            }
+            String tag = html.startsWith("<h2", h) ? "h2" : "h3";
+            int open = html.indexOf('>', h);
+            int shut = open < 0 ? -1 : html.indexOf("</" + tag + ">", open);
+            if (open < 0 || shut < 0) {
+                break;
+            }
+            String title = stripTags(html.substring(open + 1, shut)).trim();
+            int from = shut + tag.length() + 3;
+            int next = nextHeading(html, from);
+            int to = next < 0 ? html.length() : next;
+            String body = html.substring(from, Math.max(from, to));
+            int tail = body.indexOf("</body>");
+            if (tail >= 0) {
+                body = body.substring(0, tail);
+            }
+            if (!title.isEmpty()) {
+                out.add(new String[] {title, body});
+            }
+            i = to;
+        }
+        return out;
+    }
+
+    /** Whatever the reading says before its first heading - the body's core paragraph. */
+    private static String leadParagraph(String html) {
+        if (html == null || html.isEmpty()) {
+            return "";
+        }
+        int h = nextHeading(html, 0);
+        String lead = h < 0 ? html : html.substring(0, h);
+        int b = lead.indexOf("<body");
+        if (b >= 0) {
+            int gt = lead.indexOf('>', b);
+            if (gt >= 0) {
+                lead = lead.substring(gt + 1);
             }
         }
-        extra.append(section("aspects", "Aspects (" + aspects.size() + ")", aspectBody.toString()));
+        return stripTags(lead).trim().isEmpty() ? "" : lead;
+    }
 
-        sb.insert(close, extra.toString());
+    private static int nextHeading(String html, int from) {
+        int a = html.indexOf("<h2", from);
+        int b = html.indexOf("<h3", from);
+        if (a < 0) {
+            return b;
+        }
+        return b < 0 ? a : Math.min(a, b);
+    }
+
+    /** Tags out, text kept - used only to decide whether a fragment says anything. */
+    private static String stripTags(String html) {
+        StringBuilder sb = new StringBuilder();
+        boolean in = false;
+        for (int i = 0; i < html.length(); i++) {
+            char c = html.charAt(i);
+            if (c == '<') {
+                in = true;
+            } else if (c == '>') {
+                in = false;
+            } else if (!in) {
+                sb.append(c);
+            }
+        }
         return sb.toString();
     }
 
@@ -1874,33 +1956,6 @@ extends JPanel {
     public ChartFrame getCurrentChart() {
         return com.zodiacomputing.ourania.astro.Harmonics.of(radixChart(), this.harmonic);
     }
-
-    /**
-     * The inner panel that paints the wheel, for off-screen rendering.
-     *
-     * <b>Read-only.</b> The caller paints it into a BufferedImage via component.paint(g);
-     * nothing here is changed. Exposed for {@link ChartExporter} rather than giving it
-     * access to anything wider.
-     */
-    public Component getChartPanel() {
-        return this.chartPanel;
-    }
-
-    /** Which aspects are currently shown, by Type ordinal. */
-    public boolean[] getAspectSelection() {
-        return this.aspectShown;
-    }
-
-    /** The active house system character. */
-    public char getHouseSystem() {
-        return this.houseSystem;
-    }
-
-    /** The ephemeris handle, for batch operations that need to compute headlessly. */
-    public de.thmac.swisseph.SwissEph getSwissEph() {
-        return this.sw;
-    }
-
     /**
      * The chart a reading describes.
      *
@@ -2491,7 +2546,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // has had a one-click path to this reading all along, through a "base_N"
                     // href; the wheel simply never used it. Same call, same href format, so
                     // the two doors cannot drift apart.
-                    this.triggerPlanetInterpretation(BASE_PREFIX + this.focusBody);
+                    // The reading is in the card now, so the panel is not opened as well.
+                    // It was one click producing two answers in two places, which is the
+                    // redundancy this replaced.
                     return;
                 }
             }
