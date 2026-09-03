@@ -206,7 +206,20 @@ public class NarrativeSynthesizer {
         for (Themes.Contradiction contradiction : t.contradictions) {
             sb.append("<li><b>Clash:</b> ").append(contradiction.themeA).append(" vs ").append(contradiction.themeB).append("</li>");
         }
-        sb.append("<li>Elemental Distribution: Fire ").append(String.format("%.1f", g.elements.getOrDefault("Fire", 0.0))).append(", Water ").append(String.format("%.1f", g.elements.getOrDefault("Water", 0.0))).append(", Air ").append(String.format("%.1f", g.elements.getOrDefault("Air", 0.0))).append(", Earth ").append(String.format("%.1f", g.elements.getOrDefault("Earth", 0.0))).append(".</li>");
+        // <b>Read the keys the engine writes, not the ones that read well.</b> Zodiac.ELEMENTS
+        // is lowercase - fire, earth, air, water - and this asked for "Fire", "Water", "Air",
+        // "Earth". Four lookups, four misses, and getOrDefault turned every one into 0.0, so
+        // the section reported a chart with no elements at all while the paragraph above it
+        // correctly named air as dominant. A get() would have shown null and been noticed the
+        // first time anyone read the page; the default is what made it survive.
+        sb.append("<li>Elemental Distribution:");
+        for (int i = 0; i < Gestalt.ELEMENTS.length; i++) {
+            String key = Gestalt.ELEMENTS[i];
+            sb.append(i == 0 ? " " : ", ")
+              .append(Character.toUpperCase(key.charAt(0))).append(key.substring(1))
+              .append(' ').append(String.format("%.1f", g.elements.getOrDefault(key, 0.0)));
+        }
+        sb.append(".</li>");
         sb.append("</ul>");
 
         // 4. Current Chronometry
@@ -263,7 +276,12 @@ public class NarrativeSynthesizer {
         }
 
         // 6. The Lunar Engine
-        sb.append("<h2 style='color: #FFD700;'>6. The Lunar Engine: Translation of Light</h2>");
+        // Named for what it lists. Translation and collection of light are classical
+        // techniques about any two planets and a third that carries between them - the Moon
+        // has no special part in either, and the heading "The Lunar Engine" promised one that
+        // never appeared: on a real chart this section listed the Sun, Venus, Mars, Jupiter,
+        // Uranus, Neptune, Pluto and Saturn, and not the Moon once.
+        sb.append("<h2 style='color: #FFD700;'>6. Translation and Collection of Light</h2>");
         List<String> transfers = TransferOfLight.findTransfers(f, Aspects.betweenBodies(f));
         if (transfers.isEmpty()) {
             sb.append("<p>No active classical translations of light detected.</p>");
@@ -289,6 +307,23 @@ public class NarrativeSynthesizer {
         }
         sb.append("<p><b>The Zones of Quiet Competence:</b> Houses ").append(strongHouses.isEmpty() ? "None" : strongHouses.stream().map(String::valueOf).collect(Collectors.joining(", "))).append(". These areas operate with strategic stability.</p>");
         sb.append("<p><b>The Zones of Friction:</b> Houses ").append(weakHouses.isEmpty() ? "None" : weakHouses.stream().map(String::valueOf).collect(Collectors.joining(", "))).append(". You may expend massive energy here, but results require significant effort to consolidate.</p>");
+        // <b>Say what happened to the rest.</b> A house whose witnesses neither agree nor
+        // disagree lands in neither list above, so a reader saw nine houses named under a
+        // heading promising a partition of twelve and could not tell an unremarkable house
+        // from a house the code had lost.
+        List<Integer> middling = new ArrayList<>();
+        for (int h = 1; h <= 12; h++) {
+            if (!strongHouses.contains(h) && !weakHouses.contains(h)) {
+                middling.add(h);
+            }
+        }
+        if (!middling.isEmpty()) {
+            sb.append("<p><b>Unremarkable:</b> Houses ")
+              .append(middling.stream().map(String::valueOf)
+                  .collect(Collectors.joining(", ")))
+              .append(". The witnesses here neither agree nor contradict, which is a finding "
+                  + "rather than a gap - most charts have several.</p>");
+        }
 
         // 8. Angles and Sabian Archetypes
         sb.append("<h2 style='color: #FFD700;'>8. The Angles and their Sabian Archetypes</h2>");
