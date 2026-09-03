@@ -1300,14 +1300,37 @@ public class InterpretationService {
             return transits.get(key);
         }
         
-        // Try the general natal aspect interpretation as fallback
+        // <b>The fallback says what it is now, because it was being read as what it is not.</b>
+        //
+        // The transit corpus is uneven: measured 2026-09-03, each of the ten minor aspects
+        // carries around 841 transit entries while the five Ptolemaic aspects carry about 110
+        // apiece - roughly an eighth of the coverage. So a quintile to an angle gets a written
+        // transit reading and an opposition to the same angle falls through to here.
+        //
+        // What came back was natal prose under the label "(Transit triggering natal aspect
+        // meaning)", and natal prose is written in the permanent tense. A synthesis showed
+        // "Jupiter Opposition Natal Descendant" followed by "You generate your own
+        // opportunities rather than receiving them through others" - a standing fact about a
+        // birth chart, printed under a heading about this fortnight, where a reader takes it
+        // for a description of now.
+        //
+        // The text is not wrong and is not discarded: the natal meaning of a pair is the thing
+        // a transit activates, and it is the best material the corpus has for this pair. It is
+        // framed so the reader knows which of the two they are holding.
         String natalKey1 = bodyKey(planet1) + "_" + aspect.toLowerCase() + "_" + bodyKey(planet2);
         String natalKey2 = bodyKey(planet2) + "_" + aspect.toLowerCase() + "_" + bodyKey(planet1);
-        if (aspects.containsKey(natalKey1)) {
-            return "<i>(Transit triggering natal aspect meaning)</i><br>" + aspects.get(natalKey1);
-        }
-        if (aspects.containsKey(natalKey2)) {
-            return "<i>(Transit triggering natal aspect meaning)</i><br>" + aspects.get(natalKey2);
+        String natalText = aspects.containsKey(natalKey1) ? aspects.get(natalKey1)
+                         : aspects.containsKey(natalKey2) ? aspects.get(natalKey2) : null;
+        if (natalText != null) {
+            // <b>Parenthetical on purpose.</b> InterpretationPanel identifies this fallback by
+            // the leading bracket - a parenthetical italic is a label, not a finding - and it
+            // records having measured that none of the 677 real italic summaries in the
+            // transits section start with one. Dropping the bracket would have made this
+            // sentence itself get shown as the reading.
+            return "<i>(No transit reading is recorded for " + planet1 + " "
+                 + aspect.toLowerCase() + " natal " + planet2 + ". What follows is the NATAL "
+                 + "meaning of that pairing - the standing condition this transit stirs, not a "
+                 + "description of the transit.)</i><br>" + natalText;
         }
         
         // Final fallback to general aspect
