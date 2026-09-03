@@ -767,6 +767,7 @@ extends JPanel {
         java.util.List<String[]> parts = readingSections(reading);
         parts = fold(parts, "This degree", true, "sabian", "degree interpretation");
         parts = fold(parts, "Correspondences", false, "tarot", "lunar mansion");
+        parts = moveAfterFirst(parts, "in house");
         for (String[] part : parts) {
             extra.append(section("s" + i++, part[0], part[1]));
         }
@@ -776,6 +777,38 @@ extends JPanel {
         }
         sb.insert(close, extra.toString());
         return sb.toString();
+    }
+
+    /**
+     * Lifts a section to sit immediately after the first one.
+     *
+     * The reading writes the house well down the page, after the degree and the tarot, which
+     * suits a page read top to bottom. In a column of collapsed headings the sign and the
+     * house are the two facts a reader checks together - where the body is, twice - and
+     * putting the symbolic material between them made the card read as if the house were an
+     * afterthought.
+     *
+     * Applied after the folds, so it moves a finished section rather than one that a later
+     * merge would move again. A no-op when nothing matches, which is what angles do.
+     */
+    private static java.util.List<String[]> moveAfterFirst(java.util.List<String[]> in,
+                                                           String keyword) {
+        if (in.size() < 3) {
+            return in;
+        }
+        int found = -1;
+        for (int i = 1; i < in.size(); i++) {
+            if (in.get(i)[0].toLowerCase().contains(keyword)) {
+                found = i;
+                break;
+            }
+        }
+        if (found <= 1) {
+            return in;          // absent, or already where it belongs
+        }
+        java.util.List<String[]> out = new java.util.ArrayList<String[]>(in);
+        out.add(1, out.remove(found));
+        return out;
     }
 
     /**
