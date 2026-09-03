@@ -1243,10 +1243,9 @@ extends JPanel {
 
             @Override
             public void mouseMoved(MouseEvent mouseEvent) {
-                // setToolTipText(null) unregisters the component, which is exactly the
-                // behaviour wanted over empty space: no card, and no stale one either.
-                SkymapPanel.this.chartPanel.setToolTipText(
-                    SkymapPanel.this.hoverTextAt(mouseEvent.getX(), mouseEvent.getY()));
+                // The tooltip is no longer pushed from here. ChartPanel overrides
+                // getToolTipText(MouseEvent) and ToolTipManager asks it, which is the whole
+                // fix: see the note on that override.
                 // Focus follows the cursor. setFocus reports whether anything actually
                 // changed, so sweeping across one glyph repaints once rather than on every
                 // pixel of travel - the same guard setHighlightedAspect already uses.
@@ -1257,6 +1256,9 @@ extends JPanel {
             }
         });
         // A chart is read by sweeping across it, so the default 750ms feels broken here.
+        // <b>Registered once, with a non-null placeholder, and never unregistered.</b>
+        // The text itself comes from getToolTipText(MouseEvent) below.
+        this.chartPanel.setToolTipText("");
         javax.swing.ToolTipManager.sharedInstance().setInitialDelay(220);
         javax.swing.ToolTipManager.sharedInstance().setDismissDelay(20000);
         this.add((Component)this.chartPanel, "Center");
@@ -4320,6 +4322,27 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     private class ChartPanel
     extends JPanel {
         private ChartPanel() {
+        }
+
+        /**
+         * The hover card, asked for rather than pushed.
+         *
+         * <b>This is why hovering a body showed nothing.</b> mouseMoved used to call
+         * setToolTipText with whatever hoverTextAt returned, and a comment here said that
+         * passing null over empty space "unregisters the component, which is exactly the
+         * behaviour wanted". It is not: ToolTipManager.unregisterComponent removes the
+         * listeners it uses to track the pointer. The wheel is mostly empty space, so the
+         * first move over blank chart unregistered the panel; moving on to a glyph set the
+         * text again, but no mouseEntered can fire while the cursor is already inside the
+         * component, so the manager never woke up and no card was ever shown.
+         *
+         * Overriding this instead keeps the panel registered for the life of the window and
+         * lets the answer be per position. Returning null here suppresses the card without
+         * touching registration, which is the behaviour that comment actually wanted.
+         */
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            return SkymapPanel.this.hoverTextAt(event.getX(), event.getY());
         }
 
         @Override
