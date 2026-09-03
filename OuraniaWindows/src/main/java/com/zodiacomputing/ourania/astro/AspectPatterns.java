@@ -176,6 +176,19 @@ public final class AspectPatterns {
                 }
             }
         }
+        // found is a HashSet and merging needs stable positions, so this works on a list and
+        // writes the result back.
+        List<Pattern> tsquares = new ArrayList<>();
+        for (Pattern p : found) {
+            if ("T-square".equals(p.name)) {
+                tsquares.add(p);
+            }
+        }
+        if (tsquares.size() > 1) {
+            mergeTSquares(tsquares);
+            found.removeIf(p -> "T-square".equals(p.name));
+            found.addAll(tsquares);
+        }
 
         // Grand Cross: two oppositions that square each other
         for (int i = 0; i < oppositions.size(); i++) {
@@ -419,6 +432,68 @@ public final class AspectPatterns {
 
     private static String other(Aspects.Hit h, String one) {
         return h.a.equals(one) ? h.b : h.a;
+    }
+
+    /**
+     * Collapses T-squares that are one figure reported several times.
+     *
+     * <b>A stellium at a corner multiplies the figure.</b> When the Sun, Mercury and Pluto sit
+     * together, each of them opposes the Moon and each of those oppositions squares Jupiter,
+     * so the loop above emits a T-square per member: four figures, one apex, byte-identical
+     * prose printed four times. On the chart that prompted this the report carried
+     * Jupiter/Mars/Moon, Jupiter/Mercury/Moon, Jupiter/Moon/Pluto and Jupiter/Moon/Sun as
+     * though they were four separate configurations to work with.
+     *
+     * They are one. Two T-squares merge when they share an apex and share a corner: the shared
+     * corner is one end of the opposition and the differing bodies are conjunct each other at
+     * the other end. Merging is transitive, so three bodies at a corner collapse to a single
+     * figure listing all of them rather than to two overlapping pairs.
+     *
+     * Deliberately narrow. Same apex alone is not enough - a planet can be the apex of two
+     * genuinely separate T-squares, and those stay separate because they share no corner.
+     */
+    private static void mergeTSquares(List<Pattern> found) {
+        boolean merged = true;
+        while (merged) {
+            merged = false;
+            outer:
+            for (int i = 0; i < found.size(); i++) {
+                Pattern a = found.get(i);
+                if (!"T-square".equals(a.name)) {
+                    continue;
+                }
+                for (int j = i + 1; j < found.size(); j++) {
+                    Pattern b = found.get(j);
+                    if (!"T-square".equals(b.name)
+                            || a.apex == null || !a.apex.equals(b.apex)) {
+                        continue;
+                    }
+                    if (!sharesCorner(a, b)) {
+                        continue;
+                    }
+                    List<String> union = new ArrayList<>(a.bodies);
+                    for (String body : b.bodies) {
+                        if (!union.contains(body)) {
+                            union.add(body);
+                        }
+                    }
+                    found.set(i, new Pattern(a.name, union, a.apex));
+                    found.remove(j);
+                    merged = true;
+                    break outer;
+                }
+            }
+        }
+    }
+
+    /** True when two same-apex T-squares share a body that is not the apex. */
+    private static boolean sharesCorner(Pattern a, Pattern b) {
+        for (String body : a.bodies) {
+            if (!body.equals(a.apex) && b.bodies.contains(body)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean distinct(String... bodies) {

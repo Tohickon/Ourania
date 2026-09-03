@@ -304,18 +304,30 @@ public final class Convergence {
             score(t, lordOfTheYear);
         }
         
-        // Apply Softmax normalization
+        // <b>Share of the loudest, not share of the total.</b>
+        //
+        // This was a softmax, and a softmax answers a different question than the one the
+        // report asks. It distributes one unit across the targets, so a target's number moves
+        // when OTHER targets change: adding a twelfth target lowers everything else's
+        // "intensity" although nothing about them got weaker. And because the exponent is of
+        // an unbounded sum - rawScore adds a term per witness, with the lord of the year
+        // multiplied - the spread scales with how many witnesses a chart happens to have.
+        // Measured: on one chart the loudest read 50.5% and the quietest 0.6%; on another,
+        // with more witnesses and a wider spread, the loudest read 100.0% and every one of
+        // the other ten read 0.0% while listing twenty triggers each. exp(-10) is 4.5e-5, so
+        // the display rounded a real, well-witnessed target to nothing.
+        //
+        // Dividing by the loudest says what a reader takes "intensity" to mean: how loud this
+        // is against the loudest thing in the year. It is stable when the field changes, it
+        // cannot round to zero unless the raw score is zero, and being a monotone transform of
+        // rawScore it leaves the sort below and loudest() behaving exactly as before.
         if (!out.isEmpty()) {
             double maxRaw = 0.0;
             for (Target t : out) {
                 maxRaw = Math.max(maxRaw, t.rawScore);
             }
-            double sumExp = 0.0;
             for (Target t : out) {
-                sumExp += Math.exp(t.rawScore - maxRaw);
-            }
-            for (Target t : out) {
-                t.score = Math.exp(t.rawScore - maxRaw) / sumExp;
+                t.score = maxRaw > 0.0 ? t.rawScore / maxRaw : 0.0;
             }
         }
         
