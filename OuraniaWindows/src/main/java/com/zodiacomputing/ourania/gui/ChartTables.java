@@ -72,6 +72,77 @@ public final class ChartTables {
         h.append("</table>");
         h.append("<p><i>An opposition to a midpoint activates the same axis, which is why ")
          .append("both are listed.</i></p>");
+        h.append(treeSection(f));
+        return h.toString();
+    }
+
+    /**
+     * The midpoint tree: every pair a body sits on, grouped under that body.
+     *
+     * <b>This is the reading the technique is named for, and it is a different question from
+     * the table above.</b> That one asks which bodies occupy the axes of the lights and the
+     * angles - six axes. This asks it of every pair in the chart: 29 points make 406 axes, and
+     * a body can be found on a dozen of them. Written under the body that occupies them, it
+     * reads the way Ebertin wrote it - Venus = Sun/Moon, = Mars/Saturn - which is why the
+     * grouping is by the occupying body rather than by the pair.
+     *
+     * One degree, the same orb the table above uses. Measured on a real chart the tree holds
+     * 69 contacts at half a degree, 131 at one, and 250 at two - so a loose orb here does not
+     * find more, it finds nearly everything, which tells a reader nothing.
+     */
+    private static String treeSection(ChartFrame f) {
+        List<Midpoints.Hit> hits = Midpoints.tree(f, MIDPOINT_ORB);
+        StringBuilder h = new StringBuilder();
+        h.append("<h2>Midpoint tree</h2>");
+        if (hits.isEmpty()) {
+            h.append("<p><i>No body sits on any pair's midpoint within ")
+             .append(trim(MIDPOINT_ORB)).append("&deg;.</i></p>");
+            return h.toString();
+        }
+
+        // Grouped by the occupying body, tightest axis first under each.
+        java.util.Map<String, java.util.List<Midpoints.Hit>> byBody =
+            new java.util.LinkedHashMap<String, java.util.List<Midpoints.Hit>>();
+        for (Midpoints.Hit hit : hits) {
+            java.util.List<Midpoints.Hit> row = byBody.get(hit.activatingBody);
+            if (row == null) {
+                row = new java.util.ArrayList<Midpoints.Hit>();
+                byBody.put(hit.activatingBody, row);
+            }
+            row.add(hit);
+        }
+        for (java.util.List<Midpoints.Hit> row : byBody.values()) {
+            java.util.Collections.sort(row, new java.util.Comparator<Midpoints.Hit>() {
+                @Override
+                public int compare(Midpoints.Hit x, Midpoints.Hit y) {
+                    return Double.compare(x.separation, y.separation);
+                }
+            });
+        }
+
+        h.append("<p>Every pair whose midpoint a body occupies, within ")
+         .append(trim(MIDPOINT_ORB)).append("&deg;. ").append(hits.size())
+         .append(" in this chart.</p>");
+        h.append("<table cellpadding=\"4\">");
+        h.append(row2("th", "Body", "Sits on the midpoint of"));
+        for (java.util.Map.Entry<String, java.util.List<Midpoints.Hit>> e : byBody.entrySet()) {
+            StringBuilder axes = new StringBuilder();
+            for (Midpoints.Hit hit : e.getValue()) {
+                if (axes.length() > 0) {
+                    axes.append("<br>");
+                }
+                axes.append(hit.p1).append('/').append(hit.p2)
+                    .append(" <span style='color:#9FB4C7;'>")
+                    .append(trim(hit.separation)).append("&deg;")
+                    .append(hit.isOpposition ? ", opposite" : "")
+                    .append("</span>");
+            }
+            h.append(row2("td", e.getKey(), axes.toString()));
+        }
+        h.append("</table>");
+        h.append("<p><i>An axis is read as one statement: the body takes its meaning from ")
+         .append("both ends at once. A body on many axes is doing a great deal of work in ")
+         .append("the chart, which is the tree's whole point.</i></p>");
         return h.toString();
     }
 
@@ -369,6 +440,11 @@ public final class ChartTables {
 
     private static String trim(double d) {
         return String.format("%.2f", d);
+    }
+
+    private static String row2(String cell, String a, String b) {
+        return "<tr><" + cell + " valign=\"top\">" + a + "</" + cell + "><" + cell + ">"
+             + b + "</" + cell + "></tr>";
     }
 
     private static String row3(String cell, String a, String b, String c) {

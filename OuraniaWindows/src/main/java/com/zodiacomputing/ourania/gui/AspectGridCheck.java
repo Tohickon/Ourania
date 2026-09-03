@@ -1436,6 +1436,16 @@ public final class AspectGridCheck {
             }
         }
         eq("no aspect is hidden from this suite by a saved preference", 0, off);
+
+        final Object[] outer = new Object[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            try {
+                outer[0] = getField(skyOf(new OuraniaWindow()), "showProgressed");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        ok("the outer ring is pinned to transits", Boolean.FALSE.equals(outer[0]));
     }
 
     private static SkymapPanel skyOf(OuraniaWindow w) throws Exception {
@@ -1445,6 +1455,10 @@ public final class AspectGridCheck {
         boolean[] all = new boolean[Aspects.Type.values().length];
         java.util.Arrays.fill(all, true);
         setField(sky, "aspectShown", all);
+        // The outer ring is this suite's subject as transits, not as whatever the reader has
+        // chosen. Added 2026-09-03 with the progressed wheel, which moved this suite's total
+        // to 6509 the day it shipped - the same drift the aspect pin above exists to stop.
+        setField(sky, "showProgressed", Boolean.FALSE);
         return sky;
     }
 

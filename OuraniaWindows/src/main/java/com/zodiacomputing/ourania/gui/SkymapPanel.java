@@ -99,8 +99,19 @@ extends JPanel {
      * Houses stay natal. A progressed bi-wheel is progressed bodies around the natal frame;
      * recomputing cusps at the progressed moment would be a different technique.
      */
+    /**
+     * Whether the outer ring carries progressions, refreshed from Settings on every compute.
+     *
+     * <b>A field rather than a question asked of Settings, so a suite can pin it.</b> Asking
+     * Settings directly made AspectGridCheck settings-dependent the moment this setting
+     * existed - 6509 checks under Progressions against 6522 under Transits, green both times,
+     * which is the drift that hid the empty aspect selection for a whole morning. aspectShown
+     * is seeded the same way and pinned in the same place for the same reason.
+     */
+    private boolean showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+
     private boolean showProgressed() {
-        return Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+        return this.showProgressed;
     }
 
     /** What the outer ring's bodies are, for any label that has to name them. */
@@ -3207,6 +3218,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     /** The Settings screen changed which aspects are drawn. */
     public void reloadAspectSelection() {
         this.aspectShown = Settings.loadAspectSelection();
+        // Read here and not in updateChartData. Refreshing on every compute overwrote the pin
+        // a suite had just set, so AspectGridCheck still drifted 6509 against 6522 with the
+        // pin apparently in place - a guard that a later line quietly undoes is worse than
+        // none, because the suite goes green either way. This is the hook SettingsPanel calls
+        // when anything it owns changes, which is exactly when this needs re-reading.
+        this.showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
         this.updateChartData();
         if (this.chartPanel != null) {
             this.chartPanel.repaint();
