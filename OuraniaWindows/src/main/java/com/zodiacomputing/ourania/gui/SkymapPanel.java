@@ -723,6 +723,101 @@ extends JPanel {
      * anything cleverer renders as literal markup, which is the same defect the Snapshot
      * panel was carrying until it was fixed.
      */
+    /** Which sections of the selection card the reader has opened. Survives re-selection. */
+    private final java.util.Set<String> selectionOpen = new java.util.LinkedHashSet<>();
+
+    /** The href prefix a selection card's expander links carry. */
+    static final String SELECT_EXPAND = "selexp|";
+
+    /**
+     * The selection card: the hover summary, plus sections that open in place.
+     *
+     * <b>The card told you where a body is and stopped.</b> Reading what the placement meant
+     * took four more steps - Interpretations, the index, Planets, the body you had already
+     * clicked - which is a long way to travel for text the app already has in hand.
+     *
+     * Swing's HTML renderer has no scripting and no details element, so the sections toggle
+     * by round trip: each heading is a link, the click records the section and rebuilds this
+     * card. That is why the open set lives on the panel rather than in the markup.
+     *
+     * The tooltip deliberately does not use this. A card that cannot be clicked has no use
+     * for expanders, and hoverHtml stays the one description of a body that both share.
+     */
+    String selectionHtml(int n, double lon, double speed, boolean transit) {
+        StringBuilder sb = new StringBuilder(this.hoverHtml(n, lon, speed, transit));
+        int close = sb.lastIndexOf("</body>");
+        if (close < 0) {
+            close = sb.length();
+        }
+        StringBuilder extra = new StringBuilder();
+
+        int signIdx = Zodiac.signIndex(lon);
+        String sign = SkymapPanel.capitalise(Zodiac.SIGNS[signIdx]);
+        int house = Zodiac.houseOf(lon, transit ? this.transitCusps : this.activeCusps);
+        InterpretationService svc = InterpretationService.getInstance();
+
+        extra.append(section("sign", "In " + sign, svc.getSign(Zodiac.SIGNS[signIdx])));
+        if (house > 0) {
+            extra.append(section("house", "In house " + house, svc.getHouse(house)));
+        }
+
+        java.util.List<String[]> aspects = this.getActiveAspectsFor(n, transit);
+        StringBuilder aspectBody = new StringBuilder();
+        if (aspects.isEmpty()) {
+            aspectBody.append("<i>No aspects within orb.</i>");
+        } else {
+            for (String[] row : aspects) {
+                aspectBody.append("<div style='margin-bottom:3px;'><b>")
+                          .append(row[1]).append(' ').append(row[0]).append("</b><br>")
+                          .append(row[2] == null ? "" : row[2]).append("</div>");
+            }
+        }
+        extra.append(section("aspects", "Aspects (" + aspects.size() + ")", aspectBody.toString()));
+
+        sb.insert(close, extra.toString());
+        return sb.toString();
+    }
+
+    /** One expander: a heading that is always a link, and a body only when it is open. */
+    private String section(String key, String title, String body) {
+        boolean open = this.selectionOpen.contains(key);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<div style='margin-top:6px; border-top:1px solid #2A3244; padding-top:4px;'>")
+          .append("<a href='").append(SELECT_EXPAND).append(key)
+          .append("' style='color:#7FB3FF; text-decoration:none; font-size:11px;'>")
+          .append(open ? "&#9662; " : "&#9656; ").append(title).append("</a>");
+        if (open) {
+            sb.append("<div style='margin-top:3px; color:#cfd6e4;'>")
+              .append(body == null || body.isEmpty() ? "<i>Nothing recorded.</i>" : body)
+              .append("</div>");
+        }
+        return sb.append("</div>").toString();
+    }
+
+    /**
+     * Opens or closes one section of the card and redraws it in place.
+     *
+     * Redrawn from the focused body rather than from anything the link carries, so the card
+     * cannot end up describing one body with another's sections open.
+     */
+    public void toggleSelectionSection(String key) {
+        if (key == null || this.window == null) {
+            return;
+        }
+        if (!this.selectionOpen.remove(key)) {
+            this.selectionOpen.add(key);
+        }
+        if (this.focusBody < 0) {
+            return;
+        }
+        double[] lon = this.focusTransit ? this.tLon : this.bLon;
+        double[] spd = this.focusTransit ? this.tSpeed : this.bSpeed;
+        if (this.focusBody < lon.length) {
+            this.window.showSelection(this.selectionHtml(
+                this.focusBody, lon[this.focusBody], spd[this.focusBody], this.focusTransit));
+        }
+    }
+
     private String hoverHtml(int n, double lon, double speed, boolean transit) {
         Bodies.Def def = Bodies.at(n);
         int signIdx = Zodiac.signIndex(lon);
@@ -1781,6 +1876,32 @@ extends JPanel {
     }
 
     /**
+     * The inner panel that paints the wheel, for off-screen rendering.
+     *
+     * <b>Read-only.</b> The caller paints it into a BufferedImage via component.paint(g);
+     * nothing here is changed. Exposed for {@link ChartExporter} rather than giving it
+     * access to anything wider.
+     */
+    public Component getChartPanel() {
+        return this.chartPanel;
+    }
+
+    /** Which aspects are currently shown, by Type ordinal. */
+    public boolean[] getAspectSelection() {
+        return this.aspectShown;
+    }
+
+    /** The active house system character. */
+    public char getHouseSystem() {
+        return this.houseSystem;
+    }
+
+    /** The ephemeris handle, for batch operations that need to compute headlessly. */
+    public de.thmac.swisseph.SwissEph getSwissEph() {
+        return this.sw;
+    }
+
+    /**
      * The chart a reading describes.
      *
      * <b>Named, so a check can assert it rather than a copy of it</b> - the same reason
@@ -2346,7 +2467,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // The same card the tooltip builds - one description of a body, shown in two
                 // places rather than written twice.
                 this.window.showSelection(
-                    this.hoverHtml(this.focusBody, lon[this.focusBody], spd[this.focusBody],
+                    this.selectionHtml(this.focusBody, lon[this.focusBody], spd[this.focusBody],
                         this.focusTransit));
                 // <b>The natal-body exit, which this method's own list of exits promised and
                 // did not have.</b> Everything below resolves by radius, and the last two

@@ -257,6 +257,16 @@ public class OuraniaWindow extends JFrame {
             }
             return;
         }
+        // A selection-card expander, before the body path: "selexp|house" is not a body
+        // label and triggerPlanetInterpretation would silently do nothing with it, which is
+        // how the transit grid cells were dead for months.
+        if (command != null && command.startsWith(SkymapPanel.SELECT_EXPAND)) {
+            if (skymapPanel != null) {
+                skymapPanel.toggleSelectionSection(
+                    command.substring(SkymapPanel.SELECT_EXPAND.length()));
+            }
+            return;
+        }
         if (skymapPanel != null) {
             skymapPanel.triggerPlanetInterpretation(command);
         }
@@ -444,6 +454,93 @@ public class OuraniaWindow extends JFrame {
     public void highlightPattern(java.util.List<String> bodyNames) {
         if (skymapPanel != null) {
             skymapPanel.setHighlightedPattern(bodyNames);
+        }
+    }
+
+    // ================================================================== export (Section B)
+
+    /** B1: Save the chart wheel as a PNG image. */
+    public void exportChartImage() {
+        if (skymapPanel != null) {
+            ChartExporter.saveChartAsImage(this, skymapPanel.getChartPanel());
+        }
+    }
+
+    /** B2: Print the chart wheel. */
+    public void printChart() {
+        if (skymapPanel != null) {
+            ChartExporter.printChart(this, skymapPanel.getChartPanel());
+        }
+    }
+
+    /** B3: Save a PDF with the wheel and the current reading. */
+    public void exportPdfReport() {
+        if (skymapPanel == null) return;
+        String html = interpretationPanel != null ? interpretationPanel.getCurrentHtml() : "";
+        String title = getTitle();
+        String practName = Settings.get("practitioner.name", "");
+        String practContact = Settings.get("practitioner.contact", "");
+        String logoPath = Settings.get("practitioner.logo", "");
+        java.io.File logo = logoPath.isEmpty() ? null : new java.io.File(logoPath);
+        ChartExporter.saveReportAsPdf(this, skymapPanel.getChartPanel(),
+                html, title, practName, practContact, logo);
+    }
+
+    /** B4: Copy positions as tab-separated text. */
+    public void copyPositions() {
+        if (skymapPanel != null) {
+            ChartExporter.copyPositionsToClipboard(
+                    skymapPanel.getCurrentChart(),
+                    Settings.loadBodySelection());
+        }
+    }
+
+    /** B4: Copy the wheel as a clipboard image. */
+    public void copyChartImage() {
+        if (skymapPanel != null) {
+            ChartExporter.copyImageToClipboard(skymapPanel.getChartPanel());
+        }
+    }
+
+    /** B5: Export the aspect grid as a standalone HTML file. */
+    public void exportAspectGridHtml() {
+        if (sidePanel != null) {
+            ChartExporter.saveAspectGridAsHtml(this, sidePanel.getGridHtml());
+        }
+    }
+
+    /** B5: Export the aspect grid as CSV data. */
+    public void exportAspectGridCsv() {
+        if (skymapPanel != null) {
+            ChartExporter.saveAspectGridAsCsv(this,
+                    skymapPanel.getCurrentChart(),
+                    Settings.loadBodySelection(),
+                    skymapPanel.getAspectSelection());
+        }
+    }
+
+    /** B6: Save the current reading as HTML or text. */
+    public void saveCurrentReading() {
+        if (interpretationPanel != null) {
+            ChartExporter.saveReadingAsHtml(this,
+                    interpretationPanel.getCurrentHtml(),
+                    "reading.html");
+        }
+    }
+
+    /** B6: Copy the current reading text to the clipboard. */
+    public void copyCurrentReading() {
+        if (interpretationPanel != null) {
+            ChartExporter.copyReadingToClipboard(interpretationPanel.getCurrentHtml());
+        }
+    }
+
+    /** B8: Batch export all saved charts. */
+    public void batchExport() {
+        if (skymapPanel != null) {
+            ChartExporter.batchExport(this,
+                    skymapPanel.getSwissEph(),
+                    skymapPanel.getHouseSystem());
         }
     }
 
