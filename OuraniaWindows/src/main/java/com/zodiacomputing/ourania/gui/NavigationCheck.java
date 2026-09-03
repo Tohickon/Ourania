@@ -294,9 +294,13 @@ public final class NavigationCheck {
      * rule that way means a future harness exempts itself correctly instead of arriving as a
      * failure someone silences by hand.
      *
-     * DecanSystem is exempt by name, because that one is a judgement: four labels and a getter
-     * with no logic behind them and no reference anywhere in the tree. It wants implementing
-     * or deleting, not a button, and a door onto it would open onto nothing.
+     * The exempt-by-name list is empty, and that is the point of keeping it. DecanSystem was
+     * its only entry on 2026-09-02 and was deleted the same day rather than exempted: Zodiac's
+     * own header records that the app runs two decan schemes deliberately, Chaldean bound to
+     * the Sabian decan_ruler field and the Golden Dawn cards, triplicity bound to the decan
+     * prose and the wheel's ring, agreeing on 6 of 36 and each surface saying which it shows.
+     * An enum offering a choice between them was not an unfinished feature; acting on it would
+     * have printed a ruler that contradicted the prose beside it.
      *
      * The first version of this part named Calibration and DecanSystem and immediately found
      * FittingHarness and CorpusBuilder, which the audit that prompted it had missed. Adding a
@@ -304,8 +308,7 @@ public final class NavigationCheck {
      * exists to prevent.
      */
     private static void everyEngineHasADoor() {
-        java.util.Set<String> exempt = new java.util.HashSet<>(
-                java.util.Collections.singletonList("DecanSystem"));
+        java.util.Set<String> exempt = new java.util.HashSet<>();
 
         java.io.File astro = new java.io.File("src/main/java/com/zodiacomputing/ourania/astro");
         java.io.File guiDir = new java.io.File("src/main/java/com/zodiacomputing/ourania/gui");

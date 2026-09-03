@@ -3,6 +3,9 @@ package com.zodiacomputing.ourania.gui;
 import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.HarmonicResonance;
 import com.zodiacomputing.ourania.astro.Midpoints;
+import com.zodiacomputing.ourania.astro.Aspects;
+import com.zodiacomputing.ourania.astro.BodyScore;
+import com.zodiacomputing.ourania.astro.Profection;
 import com.zodiacomputing.ourania.astro.Progressions;
 import com.zodiacomputing.ourania.astro.Rulership;
 import com.zodiacomputing.ourania.astro.SolarArc;
@@ -219,6 +222,7 @@ public final class ChartTables {
         h.append("<p><i>Houses are not shown: progressed angles need the birth time to be a ")
          .append("real time rather than a placeholder, which the chart record does not yet ")
          .append("distinguish. The bodies are unaffected by that.</i></p>");
+        h.append(contactSection(natal, sw, natalJd, nowJd, false));
         return h.toString();
     }
 
@@ -261,6 +265,7 @@ public final class ChartTables {
         h.append("<p><i>A directed point is read where it lands, against the natal chart. ")
          .append("The arc is the same for every point, so what varies is what each one ")
          .append("arrives at.</i></p>");
+        h.append(contactSection(natal, sw, natalJd, nowJd, true));
         return h.toString();
     }
 
@@ -275,6 +280,76 @@ public final class ChartTables {
         }
         return String.format("%d&deg;%02d' %s", deg, min,
                 com.zodiacomputing.ourania.astro.Zodiac.signName(lon));
+    }
+
+    /**
+     * The window both contact tables scan: six months either side of the moment.
+     *
+     * The year scan uses the solar return year, which is right for a profection reading
+     * because that is the unit profection counts in. These tables are not a profection
+     * reading - they answer "what is my progressed chart doing", and a symmetric window
+     * around now is the honest answer to that. Named rather than inlined so the two tables
+     * cannot drift apart.
+     */
+    private static final double CONTACT_HALF_WINDOW = 182.6;
+
+    /** Ranked bodies and the year's lord, which both contact scans need to filter targets. */
+    private static String contactSection(ChartFrame natal, SwissEph sw, double natalJd,
+                                         double nowJd, boolean arc) {
+        StringBuilder h = new StringBuilder();
+        List<BodyScore.Vector> ranked;
+        String lord;
+        try {
+            ranked = BodyScore.rank(natal);
+            lord = Profection.at(natalJd, nowJd, natal.asc).lord;
+        } catch (RuntimeException e) {
+            return "";
+        }
+        double from = nowJd - CONTACT_HALF_WINDOW;
+        double to = nowJd + CONTACT_HALF_WINDOW;
+
+        h.append("<h2>Perfecting within the year</h2>");
+        h.append("<p>Contacts to natal points that reach exactness between ")
+         .append(dateOf(from)).append(" and ").append(dateOf(to))
+         .append(". Filtered to points that carry weight in the chart, with the lord of the ")
+         .append("year (").append(lord == null ? "none" : lord).append(") given priority - ")
+         .append("the same filter the Predict reading uses, so the two agree.</p>");
+
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Date", arc ? "Directed" : "Progressed", "Aspect", "Natal"));
+        int rows = 0;
+        if (arc) {
+            for (SolarArc.Contact c : SolarArc.contacts(sw, natal, natalJd, ranked, lord, from, to)) {
+                h.append(row4("td", dateOf(c.jd), c.directed, label(c.type), c.natal));
+                rows++;
+            }
+        } else {
+            for (Progressions.Contact c
+                    : Progressions.contacts(sw, natal, natalJd, ranked, lord, from, to)) {
+                h.append(row4("td", dateOf(c.jd), c.progressed + (c.retrograde ? " R" : ""),
+                        label(c.type), c.natal));
+                rows++;
+            }
+        }
+        h.append("</table>");
+        if (rows == 0) {
+            return "<h2>Perfecting within the year</h2><p><i>Nothing perfects on a "
+                 + "significant natal point inside this window. For solar arc that is common - "
+                 + "the arc moves about a degree a year, so a point either arrives or it does "
+                 + "not.</i></p>";
+        }
+        return h.toString();
+    }
+
+    private static String label(Aspects.Type t) {
+        return t == null ? "&mdash;" : t.label;
+    }
+
+    /** Calendar date of a Julian day, in UT - the same form the report prints. */
+    private static String dateOf(double jd) {
+        de.thmac.swisseph.SweDate sd = new de.thmac.swisseph.SweDate();
+        sd.setJulDay(jd);
+        return String.format("%04d-%02d-%02d", sd.getYear(), sd.getMonth(), sd.getDay());
     }
 
     // -------------------------------------------------------------------- shared
