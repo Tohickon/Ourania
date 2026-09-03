@@ -751,12 +751,32 @@ extends JPanel {
         }
         sb.append("</div>");
 
-        String ruler = Zodiac.triplicityDecanRuler(lon);
-        sb.append("<div style='color:#9FB4C7;'>Decan ").append(decan);
-        if (ruler != null && !ruler.isEmpty()) {
-            sb.append(" &mdash; sub-ruler ").append(ruler);
+        // <b>Both decan schemes, each named.</b> This line used to read "sub-ruler Mercury"
+        // without saying which of the two systems that was, which is the one thing a reader
+        // cannot afford not to know here: they disagree for 30 of the 36 decans, and the app
+        // uses both at once. The triplicity ruler is the one the decan prose is written to;
+        // the Chaldean face is the one the Golden Dawn tarot cards and the Sabian decan_ruler
+        // field encode. Naming them is what lets a practitioner reconcile the two surfaces
+        // instead of reading the difference as a fault. Zodiac's header carries the full note.
+        String triplicity = Zodiac.triplicityDecanRuler(lon);
+        String face = Zodiac.chaldeanDecanRuler(lon);
+        int decanFrom = (decan - 1) * 10;
+        sb.append("<div style='color:#9FB4C7;'>Decan ").append(decan)
+          .append(" &middot; ").append(decanFrom).append("&deg;&ndash;").append(decanFrom + 10)
+          .append("&deg;</div>");
+        if ((triplicity != null && !triplicity.isEmpty()) || (face != null && !face.isEmpty())) {
+            sb.append("<div style='color:#9FB4C7; font-size:10px;'>");
+            if (triplicity != null && !triplicity.isEmpty()) {
+                sb.append("Triplicity <b>").append(triplicity).append("</b>");
+            }
+            if (face != null && !face.isEmpty()) {
+                if (triplicity != null && !triplicity.isEmpty()) {
+                    sb.append(" &nbsp;&middot;&nbsp; ");
+                }
+                sb.append("Chaldean face <b>").append(face).append("</b>");
+            }
+            sb.append("</div>");
         }
-        sb.append("</div>");
 
         try {
             String sabian = InterpretationService.getInstance()
