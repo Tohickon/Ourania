@@ -764,7 +764,7 @@ extends JPanel {
             extra.append(section("core", "What it is", lead));
         }
         int i = 0;
-        for (String[] part : readingSections(reading)) {
+        for (String[] part : foldDegree(readingSections(reading))) {
             extra.append(section("s" + i++, part[0], part[1]));
         }
         if (i == 0 && lead.isEmpty()) {
@@ -773,6 +773,51 @@ extends JPanel {
         }
         sb.insert(close, extra.toString());
         return sb.toString();
+    }
+
+    /**
+     * Folds the Sabian symbol and the degree interpretation into one heading.
+     *
+     * They are two readings of the same degree, and in a narrow column two headings for one
+     * fact is one too many. The reading puts the lunar mansion between them, so this merges
+     * across a gap rather than swallowing a range - the mansion is a different division of
+     * the zodiac and keeps its own heading. Each half keeps a bold label inside, so folding
+     * loses the door and not the distinction.
+     *
+     * Matched on heading text, so the fold survives the degree label changing and does not
+     * depend on the order the reading emits them in.
+     */
+    private static java.util.List<String[]> foldDegree(java.util.List<String[]> in) {
+        java.util.List<String[]> out = new java.util.ArrayList<String[]>();
+        StringBuilder merged = new StringBuilder();
+        String label = "";
+        int at = -1;
+        for (String[] part : in) {
+            String lower = part[0].toLowerCase();
+            boolean sabian = lower.contains("sabian");
+            boolean degree = lower.contains("degree interpretation");
+            if (!sabian && !degree) {
+                out.add(part);
+                continue;
+            }
+            if (at < 0) {
+                at = out.size();
+                out.add(null);          // held, and filled once both halves are in
+                int open = part[0].indexOf('(');
+                int shut = open < 0 ? -1 : part[0].indexOf(')', open + 1);
+                if (shut > open) {
+                    label = " " + part[0].substring(open, shut + 1);
+                }
+            }
+            merged.append("<div style='margin-top:4px; color:#9FB4C7;'><b>")
+                  .append(sabian ? "Sabian symbol" : "Degree")
+                  .append("</b></div>")
+                  .append(part[1]);
+        }
+        if (at >= 0) {
+            out.set(at, new String[] {"This degree" + label, merged.toString()});
+        }
+        return out;
     }
 
     /**
