@@ -2346,6 +2346,23 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.window.showSelection(
                     this.hoverHtml(this.focusBody, lon[this.focusBody], spd[this.focusBody],
                         this.focusTransit));
+                // <b>The natal-body exit, which this method's own list of exits promised and
+                // did not have.</b> Everything below resolves by radius, and the last two
+                // branches are "inside the body ring is a house, outside it is a sign" - so a
+                // body click fell through, showed its card, and had it overwritten by the
+                // house underneath the glyph. Invisible at the default ring, where the glyphs
+                // sit near the sign band; total with bodies set to the centre, which puts
+                // every glyph inside the house branch. Reported as "I select a body and all I
+                // get is a sign or a house".
+                //
+                // Two kinds of hit are deliberately NOT returned here, because the branches
+                // below give them more than the card does and are reached by the same test:
+                // angles, which showAngleAt reads in full, and anything on the transit or sky
+                // ring, whose branches list its contacts back to Chart A and Chart B. Guarding
+                // only on isAngle cost exactly those two sky assertions in AspectGridCheck.
+                if (!this.focusTransit && !Bodies.at(this.focusBody).isAngle()) {
+                    return;
+                }
             }
         }
         double d;
