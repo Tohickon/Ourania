@@ -2363,6 +2363,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // ring, whose branches list its contacts back to Chart A and Chart B. Guarding
                 // only on isAngle cost exactly those two sky assertions in AspectGridCheck.
                 if (!this.focusTransit && !Bodies.at(this.focusBody).isAngle()) {
+                    // <b>And the full reading, not just the card.</b> The card is a summary -
+                    // degree, house, decan, one line of Sabian - and reaching the placement's
+                    // actual meaning took four more steps: Interpretations, then the index,
+                    // then Planets, then the body you had already clicked. The placements list
+                    // has had a one-click path to this reading all along, through a "base_N"
+                    // href; the wheel simply never used it. Same call, same href format, so
+                    // the two doors cannot drift apart.
+                    this.triggerPlanetInterpretation(BASE_PREFIX + this.focusBody);
                     return;
                 }
             }
@@ -2875,6 +2883,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
 
     /** Prefix the aspect grid puts on the row body when the row is a transiting point. */
     private static final String TRANSIT_PREFIX = "transit_";
+
+    /**
+     * The natal half of the placement href, which was a bare literal in one place and is now
+     * read by two: the placements list that writes it and the wheel click that sends it.
+     */
+    private static final String BASE_PREFIX = "base_";
 
     /** The aspect the grid is currently hovering, as body indices. -1 when nothing is hovered. */
     private int highlightA = -1;
@@ -4062,7 +4076,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         stringBuilder.append("<h3 style='color:#add8e6;'>Placements</h3>");
         for (n3 = 0; n3 < BODY_COUNT; ++n3) {
             if (!this.bValid[n3]) continue;
-            stringBuilder.append(this.formatPlanetPlacement(n3, this.bLon[n3], this.bSpeed[n3], "base_"));
+            stringBuilder.append(this.formatPlanetPlacement(n3, this.bLon[n3], this.bSpeed[n3], BASE_PREFIX));
         }
         }
         if (wantTransits && this.showTransitChart) {
