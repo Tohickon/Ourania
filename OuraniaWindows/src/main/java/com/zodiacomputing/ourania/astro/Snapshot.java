@@ -598,6 +598,21 @@ public final class Snapshot {
                                    List<Transits.Hit> hits,
                                    List<Transits.EventHit> events,
                                    List<Convergence.Target> targets) {
+        return timeLayer(prof, ranked, hits, events, targets, null, Double.NaN);
+    }
+
+    /**
+     * As above, plus the releasing periods running at a given moment.
+     *
+     * The frame and the moment arrive rather than being derived, for the same reason the
+     * convergence ranking does: this is an L9 renderer, and a renderer that opens an
+     * ephemeris to lay out a page is the wrong shape.
+     */
+    public static String timeLayer(Profection prof, List<BodyScore.Vector> ranked,
+                                   List<Transits.Hit> hits,
+                                   List<Transits.EventHit> events,
+                                   List<Convergence.Target> targets,
+                                   ChartFrame frame, double nowJd) {
         StringBuilder sb = new StringBuilder();
         sb.append("\nTHE YEAR\n");
         sb.append(String.format("  %s%n", prof));
@@ -617,6 +632,9 @@ public final class Snapshot {
         }
         sb.append(eventSection(events));
         sb.append(convergenceSection(targets));
+        if (frame != null && !Double.isNaN(nowJd)) {
+            sb.append(releasingSection(frame, nowJd));
+        }
         return sb.toString();
     }
 
@@ -1131,6 +1149,76 @@ public final class Snapshot {
             line += word.length() + 1;
         }
         return sb.toString().trim();
+    }
+
+    /**
+     * The releasing periods running right now, for the report's time section.
+     *
+     * <b>Zodiacal releasing was computed to four levels and appeared in no reading.</b> The
+     * releasing panel could show the whole 100-year tree, and clicking a period gave a full
+     * page on it, but a reader who opened the Report - the reading that is supposed to say
+     * what time it is - saw nothing of it at all. The technique's whole claim is that it says
+     * which chapter you are in, so its absence from the one section headed THE YEAR was the
+     * gap worth closing.
+     *
+     * Prints the active chain from the general period down, because the levels only mean
+     * anything against each other: an L1 that has run twenty years and an L4 that turns over
+     * in a fortnight are different kinds of statement.
+     */
+    public static String releasingSection(ChartFrame f, double nowJd) {
+        if (f == null || Double.isNaN(f.lotOfFortune) || Double.isNaN(f.lotOfSpirit)) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int pass = 0; pass < 2; pass++) {
+            boolean spirit = pass == 1;
+            double lot = spirit ? f.lotOfSpirit : f.lotOfFortune;
+            List<ZodiacalReleasing.Period> top;
+            try {
+                top = ZodiacalReleasing.release(f.julianDayUt, lot, f.lotOfSpirit,
+                        f.julianDayUt + 100 * ZodiacalReleasing.DAYS_PER_YEAR, 4);
+            } catch (RuntimeException e) {
+                continue;
+            }
+            List<ZodiacalReleasing.Period> chain = new ArrayList<>();
+            active(top, nowJd, chain);
+            if (chain.isEmpty()) {
+                continue;
+            }
+            if (sb.length() == 0) {
+                sb.append("\nZODIACAL RELEASING\n");
+            }
+            sb.append(String.format("  from the Lot of %s%n", spirit ? "Spirit" : "Fortune"));
+            for (ZodiacalReleasing.Period p : chain) {
+                double yearsIn = (nowJd - p.startJd) / ZodiacalReleasing.DAYS_PER_YEAR;
+                double yearsLeft = (p.endJd - nowJd) / ZodiacalReleasing.DAYS_PER_YEAR;
+                StringBuilder flags = new StringBuilder();
+                if (p.peak) {
+                    flags.append(" PEAK");
+                }
+                if (p.afterBond) {
+                    flags.append(" loosing of the bond");
+                }
+                if (p.truncated) {
+                    flags.append(" (cut short by its parent)");
+                }
+                sb.append(String.format("    L%d %-12s %5.1f years in, %5.1f to run%s%n",
+                        p.level, Zodiac.SIGNS[p.sign], yearsIn, yearsLeft, flags));
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Walks the nested periods, collecting the one containing the moment at each level. */
+    private static void active(List<ZodiacalReleasing.Period> periods, double jd,
+                               List<ZodiacalReleasing.Period> out) {
+        for (ZodiacalReleasing.Period p : periods) {
+            if (jd >= p.startJd && jd < p.endJd) {
+                out.add(p);
+                active(p.children, jd, out);
+                return;
+            }
+        }
     }
 
     /**

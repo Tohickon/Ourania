@@ -3,7 +3,11 @@ package com.zodiacomputing.ourania.gui;
 import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.HarmonicResonance;
 import com.zodiacomputing.ourania.astro.Midpoints;
+import com.zodiacomputing.ourania.astro.Progressions;
 import com.zodiacomputing.ourania.astro.Rulership;
+import com.zodiacomputing.ourania.astro.SolarArc;
+
+import de.thmac.swisseph.SwissEph;
 
 import java.util.List;
 
@@ -166,6 +170,111 @@ public final class ChartTables {
         return "<p><b>The Moon is void of course.</b> It completes no further Ptolemaic aspect "
              + "before leaving the sign it is in. Traditionally that is read as a period in "
              + "which matters do not come to the conclusion they are aimed at.</p>";
+    }
+
+    /**
+     * The secondary progressed chart, as positions rather than as a list of hits.
+     *
+     * Progressions was referenced once in this package, inside the year scan that feeds
+     * Predict, so its output reached a reader only after being folded into a convergence
+     * count. Nothing could show where the progressed bodies actually are - which is what a
+     * progressed chart is. Cast at the progressed moment: a day of ephemeris time for a year
+     * of life.
+     */
+    public static String progressed(ChartFrame natal, SwissEph sw, double natalJd, double nowJd) {
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Progressed chart</h1>");
+
+        double pjd = Progressions.progressedJd(natalJd, nowJd);
+        double years = (nowJd - natalJd) / 365.2422;
+        h.append("<p>Secondary progressions advance the chart one day for each year of life. ")
+         .append("At ").append(String.format("%.1f", years)).append(" years, the progressed ")
+         .append("moment is ").append(String.format("%.1f", pjd - natalJd))
+         .append(" days after birth.</p>");
+
+        String phase = Progressions.lunationPhase(sw, natalJd, nowJd);
+        if (phase != null && !phase.isEmpty()) {
+            h.append("<p><b>Progressed lunation phase:</b> ").append(phase).append("</p>");
+        }
+
+        ChartFrame p = ChartFrame.compute(sw, pjd, 0.0, 0.0, (char) 80, false, 0.0);
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Body", "Progressed", "Natal", "Moved"));
+        for (ChartFrame.Body pb : p.bodies) {
+            if (pb == null || !pb.ok) {
+                continue;
+            }
+            ChartFrame.Body nb = natal.body(pb.name);
+            if (nb == null || !nb.ok) {
+                continue;
+            }
+            double moved = com.zodiacomputing.ourania.astro.Zodiac.normalise(pb.lon - nb.lon);
+            h.append(row4("td",
+                    pb.name + (pb.retrograde ? " R" : ""),
+                    position(pb.lon),
+                    position(nb.lon),
+                    trim(moved > 180.0 ? moved - 360.0 : moved) + "&deg;"));
+        }
+        h.append("</table>");
+        h.append("<p><i>Houses are not shown: progressed angles need the birth time to be a ")
+         .append("real time rather than a placeholder, which the chart record does not yet ")
+         .append("distinguish. The bodies are unaffected by that.</i></p>");
+        return h.toString();
+    }
+
+    /**
+     * Solar arc directions: the whole chart moved forward by the Sun's own progressed travel.
+     *
+     * Like Progressions, SolarArc had exactly one reference in this package and it was inside
+     * the year scan. The arc itself - one number that moves every point in the chart - was
+     * never shown anywhere.
+     */
+    public static String solarArc(ChartFrame natal, SwissEph sw, double natalJd, double nowJd) {
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Solar arc directions</h1>");
+
+        ChartFrame.Body sun = natal.body("Sun");
+        if (sun == null || !sun.ok) {
+            h.append("<p><i>The natal Sun did not compute, so there is no arc.</i></p>");
+            return h.toString();
+        }
+        double arc = SolarArc.arcAt(sw, natalJd, sun.lon, nowJd);
+        if (Double.isNaN(arc)) {
+            h.append("<p><i>The ephemeris would not answer for the progressed Sun.</i></p>");
+            return h.toString();
+        }
+
+        h.append("<p>Every point in the chart is moved forward by the same arc - the distance ")
+         .append("the progressed Sun has travelled. The arc today is <b>")
+         .append(trim(arc)).append("&deg;</b>.</p>");
+
+        h.append("<table cellpadding=\"4\">");
+        h.append(row3("th", "Point", "Natal", "Directed"));
+        for (ChartFrame.Body b : natal.bodies) {
+            if (b == null || !b.ok) {
+                continue;
+            }
+            h.append(row3("td", b.name, position(b.lon),
+                    position(com.zodiacomputing.ourania.astro.Zodiac.normalise(b.lon + arc))));
+        }
+        h.append("</table>");
+        h.append("<p><i>A directed point is read where it lands, against the natal chart. ")
+         .append("The arc is the same for every point, so what varies is what each one ")
+         .append("arrives at.</i></p>");
+        return h.toString();
+    }
+
+    /** Sign and degree, the way the rest of the app writes a position. */
+    private static String position(double lon) {
+        double d = com.zodiacomputing.ourania.astro.Zodiac.degreeInSign(lon);
+        int deg = (int) d;
+        int min = (int) Math.round((d - deg) * 60.0);
+        if (min == 60) {
+            deg++;
+            min = 0;
+        }
+        return String.format("%d&deg;%02d' %s", deg, min,
+                com.zodiacomputing.ourania.astro.Zodiac.signName(lon));
     }
 
     // -------------------------------------------------------------------- shared

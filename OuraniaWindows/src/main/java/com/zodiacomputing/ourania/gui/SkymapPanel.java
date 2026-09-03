@@ -1872,6 +1872,18 @@ extends JPanel {
                 if ("RESONANCE".equals(kind)) {
                     return ChartTables.resonance(f);
                 }
+                // These two are read against a moment, not just a chart, so they take the
+                // birth instant and today. The transit clock drives them when it is set, so
+                // stepping time moves the progressed chart with it.
+                double now = SkymapPanel.this.showTransitChart && SkymapPanel.this.transitSd != null
+                        ? SkymapPanel.this.transitSd.getJulDay()
+                        : new SweDate().getJulDay();
+                if ("PROGRESSED".equals(kind)) {
+                    return ChartTables.progressed(f, SkymapPanel.this.sw, jd, now);
+                }
+                if ("SOLARARC".equals(kind)) {
+                    return ChartTables.solarArc(f, SkymapPanel.this.sw, jd, now);
+                }
                 return "";
             }
 
@@ -1935,7 +1947,12 @@ extends JPanel {
                 if (readingTier == ReadingTier.REPORT) {
                     object = Snapshot.report(chartFrame, result, list, result2) + Snapshot.topicLayer(Topics.analyse(chartFrame, list));
                     if (bl) {
-                        object = (String)object + Snapshot.timeLayer(profection, list, list2, yearScan.events, list3);
+                        // The frame and the moment carry the releasing section, which was
+                        // computed to four levels and appeared in no reading until 2026-09-02.
+                        object = (String)object + Snapshot.timeLayer(profection, list, list2,
+                            yearScan.events, list3, chartFrame, d4);   // d4 is the moment;
+                        // d2 is baseLatitude in this decompiled scope, and passing it here
+                        // would have produced an empty section rather than an error.
                     }
                     return (String)object;
                 }

@@ -121,6 +121,10 @@ public final class SidePanel extends JPanel {
             "Which planet rules each house, where it sits, and any receptions between them"));
         tables.add(tableButton("Resonance", "RESONANCE",
             "The tightest harmonic contacts the classical aspects do not show"));
+        tables.add(tableButton("Progressed", "PROGRESSED",
+            "The secondary progressed chart: a day of ephemeris for a year of life"));
+        tables.add(tableButton("Solar Arc", "SOLARARC",
+            "Every point moved forward by the arc the progressed Sun has travelled"));
         accordion.addSection(TABLES, tables);
 
         JPanel readings = column();
