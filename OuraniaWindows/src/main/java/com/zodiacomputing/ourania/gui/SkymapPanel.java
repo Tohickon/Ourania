@@ -2393,7 +2393,14 @@ extends JPanel {
                     list2 = Transits.toNatal(chartFrame, chartFrame2, list, profection.lord);
                     if (readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
                         yearScan = SkymapPanel.scanProfectionYear(chartFrame, d, d4, profection, list, d2, d3, c);
-                        list3 = Convergence.collect(profection, yearScan.perfections, yearScan.events, yearScan.arcs, yearScan.progressions, yearScan.returns);
+                        // Releasing gates the ranking rather than voting in it, which is what
+                        // finally puts it inside a reading. The chart carries the lots already,
+                        // so the gate costs one release walk and no ephemeris. d4 is the moment.
+                        Convergence.Gate gate = Convergence.Gate.at(
+                            d, chartFrame.lotOfFortune, chartFrame.lotOfSpirit, d4);
+                        list3 = Convergence.collect(profection, yearScan.perfections,
+                            yearScan.events, yearScan.arcs, yearScan.progressions,
+                            yearScan.returns, gate);
                     }
                 }
                 if (readingTier == ReadingTier.REPORT) {

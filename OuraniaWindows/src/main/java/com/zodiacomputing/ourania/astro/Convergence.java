@@ -206,6 +206,27 @@ public final class Convergence {
                                        List<SolarArc.Contact> arcs,
                                        List<Progressions.Contact> progressions,
                                        List<Returns.Contact> returns) {
+        return collect(prof, perfections, events, arcs, progressions, returns, null);
+    }
+
+    /**
+     * As above, gated by zodiacal releasing.
+     *
+     * The gate arrives already read rather than being computed here, for the reason the
+     * convergence ranking itself arrives already computed at the L9 renderer: this class has
+     * no ephemeris and no business opening one, and a caller that already knows the chart's
+     * lots can answer the question far more cheaply than a rebuild from scratch.
+     *
+     * A null gate means ungated, not dormant. Callers that have no lots - a composite, a chart
+     * whose Sun failed to compute - get exactly the ranking they got before releasing existed
+     * rather than a uniformly suppressed one.
+     */
+    public static List<Target> collect(Profection prof, List<Transits.Perfection> perfections,
+                                       List<Transits.EventHit> events,
+                                       List<SolarArc.Contact> arcs,
+                                       List<Progressions.Contact> progressions,
+                                       List<Returns.Contact> returns,
+                                       Gate releasingGate) {
         Map<String, Target> byPoint = new LinkedHashMap<>();
 
         // Profection. The only family that is not a body arriving somewhere - it is
@@ -300,8 +321,9 @@ public final class Convergence {
 
         List<Target> out = new ArrayList<>(byPoint.values());
         String lordOfTheYear = prof != null ? prof.lord : null;
+        Gate gate = releasingGate == null ? Gate.open() : releasingGate;
         for (Target t : out) {
-            score(t, lordOfTheYear);
+            score(t, lordOfTheYear, gate);
         }
         
         // <b>Share of the loudest, not share of the total.</b>
@@ -346,7 +368,7 @@ public final class Convergence {
      * the baseline the others are compared against, and discounting both halves of a pair
      * would remove the fact entirely.
      */
-    private static void score(Target t, String lordOfTheYear) {
+    private static void score(Target t, String lordOfTheYear, Gate gate) {
         if (discountSharedBodies) {
             for (Witness w : t.witnesses) {
                 // Only a real sky position can echo a transit, and the transit family is
@@ -384,7 +406,107 @@ public final class Convergence {
                 * bodyWeight(t.natal)
                 * aspectWeight(w.aspect)
                 * precision(w)
-                * lordFactor;
+                * lordFactor
+                * gate.multiplierFor(w.movingBody);
+        }
+    }
+
+    /**
+     * Zodiacal releasing as a gate on the whole score, rather than one more voter.
+     *
+     * <b>This is the half of K8 that unblocks releasing itself.</b> Releasing was deliberately
+     * kept out of the convergence ranking because adding it as another family made
+     * discrimination worse - which is the same complaint that produced the weighting above.
+     * As a multiplier it does not compete with the other families, it conditions them.
+     *
+     * The Hellenistic claim it encodes: a transit is dormant until its time-lord is awake. A
+     * hard Saturn transit during a period Saturn does not rule passes with far less to show
+     * for itself than the same transit while Saturn holds the year.
+     *
+     * <b>Peak and bond scale everything at that moment equally, and that is deliberate.</b>
+     * Within one instant a uniform factor cannot change an ordering - it is there for
+     * comparing one date against another along a timeline, which is what the calendar and the
+     * predictor do. The part that discriminates inside a single reading is the lord test.
+     */
+    public static final class Gate {
+        /** Domicile ruler of the active general period, or null when nothing is released. */
+        public final String l1Lord;
+        /** Domicile ruler of the active sub-period. */
+        public final String l2Lord;
+        /** The active chain reaches a peak period - angular to the Lot of Spirit. */
+        public final boolean peak;
+        /** The active chain includes a period that follows a loosing of the bond. */
+        public final boolean afterBond;
+
+        public Gate(String l1Lord, String l2Lord, boolean peak, boolean afterBond) {
+            this.l1Lord = l1Lord;
+            this.l2Lord = l2Lord;
+            this.peak = peak;
+            this.afterBond = afterBond;
+        }
+
+        /** Nothing released, so nothing is gated: every witness keeps its own weight. */
+        public static Gate open() {
+            return new Gate(null, null, false, false);
+        }
+
+        /**
+         * Reads the gate off a chart at a moment.
+         *
+         * Fortune is the lot released from, because Fortune is the chain about circumstance
+         * and body, which is what a transit lands on. Spirit supplies the angle the peak test
+         * is measured against, which is why both longitudes go in.
+         */
+        public static Gate at(double natalJd, double lotLon, double spiritLon, double jd) {
+            if (Double.isNaN(lotLon) || Double.isNaN(spiritLon) || Double.isNaN(jd)) {
+                return open();
+            }
+            List<ZodiacalReleasing.Period> top;
+            try {
+                top = ZodiacalReleasing.release(natalJd, lotLon, spiritLon,
+                    jd + ZodiacalReleasing.DAYS_PER_YEAR, 4);
+            } catch (RuntimeException e) {
+                return open();
+            }
+            List<ZodiacalReleasing.Period> chain = ZodiacalReleasing.activeChain(top, jd);
+            if (chain.isEmpty()) {
+                return open();
+            }
+            String l1 = Dignity.domicileRulerOf(chain.get(0).sign);
+            String l2 = chain.size() > 1 ? Dignity.domicileRulerOf(chain.get(1).sign) : null;
+            boolean peak = false;
+            boolean bond = false;
+            for (ZodiacalReleasing.Period p : chain) {
+                peak |= p.peak;
+                bond |= p.afterBond;
+            }
+            return new Gate(l1, l2, peak, bond);
+        }
+
+        /**
+         * What this moment does to a witness moved by {@code body}.
+         *
+         * The lord tests are taken at their strongest rather than multiplied together: a
+         * planet ruling both the general period and the sub-period is emphatically awake, not
+         * six times awake, and stacking them would let one body swamp a whole reading.
+         */
+        public double multiplierFor(String body) {
+            double m;
+            if (body != null && body.equalsIgnoreCase(this.l1Lord)) {
+                m = 3.0;
+            } else if (body != null && body.equalsIgnoreCase(this.l2Lord)) {
+                m = 2.0;
+            } else if (this.l1Lord == null) {
+                m = 1.0;        // nothing released: do not punish what was never gated
+            } else {
+                m = 0.3;        // dormant
+            }
+            if (this.afterBond) {
+                m *= 4.0;
+            } else if (this.peak) {
+                m *= 2.5;
+            }
+            return m;
         }
     }
 

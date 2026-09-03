@@ -153,6 +153,36 @@ public final class ZodiacalReleasing {
     }
 
     /**
+     * The periods running at one moment, outermost first.
+     *
+     * Walks the nesting and takes the period containing the instant at each level, so the
+     * result reads L1 down to however deep the chain was released. Empty when the moment lies
+     * outside the released span.
+     *
+     * <b>Lived in Snapshot as a private helper until 2026-09-03.</b> Convergence needs the
+     * same walk to know which planet is the active time-lord, and two copies of a traversal
+     * is how the two surfaces end up disagreeing about what period a chart is in.
+     */
+    public static List<Period> activeChain(List<Period> periods, double jd) {
+        List<Period> out = new ArrayList<>();
+        collectActive(periods, jd, out);
+        return out;
+    }
+
+    private static void collectActive(List<Period> periods, double jd, List<Period> out) {
+        if (periods == null) {
+            return;
+        }
+        for (Period p : periods) {
+            if (jd >= p.startJd && jd < p.endJd) {
+                out.add(p);
+                collectActive(p.children, jd, out);
+                return;
+            }
+        }
+    }
+
+    /**
      * Releasing from a Lot, from birth until a date, to the requested depth.
      *
      * @param lotLon    the releasing Lot - Spirit for career and action, Fortune for body and

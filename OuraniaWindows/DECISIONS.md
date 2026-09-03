@@ -67,7 +67,7 @@ Closed as intended behaviour.
 The audit flagged Mercury's presence beside the slow bodies as a contradiction; it is now a
 declared exception instead.
 
-## K3 — Anaretic degree · **TO BUILD (F11)**
+## K3 — Anaretic degree · **BUILT 2026-09-03 (closes F11)**
 
 **Decision.** Anaretic is exactly 29°00'00" to 29°59'59", zero tolerance either side. 28°59'59"
 is not anaretic. 0° is a **separate** condition, not the same one: 0° is a phase beginning,
@@ -104,7 +104,7 @@ than an absence.
 
 **Why not 44.3%.** The measured upper end reads as an unfinished product to a lay reader.
 
-## K8 — Convergence weighting · **TO BUILD**
+## K8 — Convergence weighting · **BUILT 2026-09-03**
 
 **Decision.** Replace flat `atLeast(n)` counting with a hierarchical weighted model.
 - Base weight = body weight x aspect weight x precision, where precision falls off across the
