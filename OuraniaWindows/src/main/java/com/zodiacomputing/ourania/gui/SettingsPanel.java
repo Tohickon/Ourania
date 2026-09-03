@@ -291,6 +291,36 @@ public class SettingsPanel extends JPanel {
         outerRow.add(outerLabel);
         outerRow.add(outerCombo);
         body.add(outerRow);
+        body.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // How much of the geometry becomes a line. Drawing only; nothing is dropped.
+        JPanel modeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        modeRow.setBackground(Color.BLACK);
+        modeRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel modeLabel = new JLabel("Aspect lines:");
+        modeLabel.setForeground(TEXT);
+        modeLabel.setFont(Theme.BODY);
+        final JComboBox<String> modeCombo = new JComboBox<>(Settings.ASPECT_MODES);
+        seeding = true;
+        modeCombo.setSelectedItem(Settings.aspectMode());
+        seeding = false;
+        Widgets.styleCombo(modeCombo);
+        modeCombo.setToolTipText("<html>Which pairs get a line drawn across the wheel. "
+            + "<b>Essential</b> draws the ten classical planets only. <b>Manifestation</b> adds "
+            + "the four angles, where inner pressure becomes an outward event. <b>Esoteric</b> "
+            + "draws everything. This is about legibility, not significance: every mode "
+            + "computes the same aspects, and the ones not drawn are still in the aspect grid, "
+            + "the placements and the reading.</html>");
+        modeCombo.addActionListener(e -> {
+            Object picked = modeCombo.getSelectedItem();
+            if (!constructing && !seeding && picked != null) {
+                Settings.setAspectMode(String.valueOf(picked));
+                applyPalette();
+            }
+        });
+        modeRow.add(modeLabel);
+        modeRow.add(modeCombo);
+        body.add(modeRow);
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
         body.add(heading("Chart Points"));

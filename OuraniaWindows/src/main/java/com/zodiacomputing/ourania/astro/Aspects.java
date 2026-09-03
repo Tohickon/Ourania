@@ -325,6 +325,20 @@ public final class Aspects {
      * first, exactly as the wheel has always tested it.
      */
     public static Type typeOf(double separation, String nameA, String nameB, boolean isSynastry) {
+        // <b>A calculated point can receive an aspect and cannot cast one.</b> Burk: the
+        // angles, the nodes and the Arabic lots are not bodies, emit and reflect no light, and
+        // so carry no moiety of their own - "these points... do not make aspects, they can
+        // only receive aspects". Two of them together therefore have nothing between them to
+        // measure, and the North Node square the Ascendant, the Part of Fortune square the
+        // Part of Spirit and the South Node conjunct a lot were all being drawn and counted as
+        // though they did. Settled 2026-09-03; see DECISIONS.md, K5.
+        //
+        // Placed here rather than at the call sites because this is the one decision the wheel,
+        // the grid and every reading already share - a filter in the painter alone would leave
+        // the grid still listing what the wheel had stopped drawing.
+        if (bothCalculated(nameA, nameB)) {
+            return null;
+        }
         if (separation <= effectiveOrb(nameA, nameB, Type.CONJUNCTION, isSynastry)) {
             return Type.CONJUNCTION;
         }
@@ -341,6 +355,22 @@ public final class Aspects {
             }
         }
         return null;
+    }
+
+    /** True when neither point is a physical body, so neither can cast an aspect. */
+    public static boolean bothCalculated(String nameA, String nameB) {
+        return isCalculatedPoint(nameA) && isCalculatedPoint(nameB);
+    }
+
+    /** Nodes, angles and lots: real positions, no light of their own. */
+    public static boolean isCalculatedPoint(String name) {
+        Bodies.Def d = Bodies.byName(name);
+        if (d == null) {
+            return false;
+        }
+        return d.kind == Bodies.Kind.NODE
+            || d.kind == Bodies.Kind.ANGLE
+            || d.kind == Bodies.Kind.POINT;
     }
 
     public static Type typeOf(double separation, String nameA, String nameB) {

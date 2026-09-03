@@ -215,6 +215,41 @@ public final class Settings {
         set(OUTER_WHEEL_KEY, which);
     }
 
+    /**
+     * How much of the aspect geometry the wheel draws. Settled 2026-09-03; DECISIONS.md, K5.
+     *
+     * <b>Drawing is not the same question as computing.</b> Every mode here computes the same
+     * aspects and lists them in the grid and the placements; what changes is how many become
+     * lines across the middle of the wheel. Tompkins puts it directly - note the aspects to
+     * the minor bodies, do not draw them in, "so that the essentials can be more quickly
+     * located". Nothing is lost by any of these settings, only relocated.
+     */
+    public static final String ASPECT_MODE_KEY = "chart.aspectMode";
+
+    /** Lines between the ten classical planets only. The default. */
+    public static final String ASPECTS_ESSENTIAL = "Essential (planets)";
+    /** Adds the four angles, which is where internal pressure becomes an outward event. */
+    public static final String ASPECTS_MANIFESTATION = "Manifestation (planets and angles)";
+    /** Everything the engine finds, with the minor bodies drawn faintly. */
+    public static final String ASPECTS_ESOTERIC = "Esoteric (all bodies)";
+
+    public static final String[] ASPECT_MODES =
+        {ASPECTS_ESSENTIAL, ASPECTS_MANIFESTATION, ASPECTS_ESOTERIC};
+
+    public static String aspectMode() {
+        String v = get(ASPECT_MODE_KEY, ASPECTS_ESSENTIAL);
+        for (String m : ASPECT_MODES) {
+            if (m.equals(v)) {
+                return m;
+            }
+        }
+        return ASPECTS_ESSENTIAL;
+    }
+
+    public static void setAspectMode(String mode) {
+        set(ASPECT_MODE_KEY, mode);
+    }
+
     // ------------------------------------------------------------------ aspect selection
 
     /** Settings key for which aspects are drawn. */

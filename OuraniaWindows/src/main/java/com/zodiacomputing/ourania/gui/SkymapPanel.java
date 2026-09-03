@@ -321,6 +321,9 @@ extends JPanel {
     /** Which aspects are drawn, by {@code Aspects.Type} ordinal. Absent setting means all. */
     private boolean[] aspectShown = Settings.loadAspectSelection();
 
+    /** Which pairs get a line. See {@link #drawsPair}. */
+    private String aspectMode = Settings.aspectMode();
+
     private char houseSystem = (char)80;
     private String currentHouseSystemName = "Placidus";
     public static final int BODY_COUNT = Bodies.count();
@@ -3272,6 +3275,43 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             || this.aspectShown[type.ordinal()] ? type : null;
     }
 
+    /**
+     * Whether this pair earns a line across the wheel, under the reader's chosen mode.
+     *
+     * <b>The aspect still exists either way.</b> It is computed, it is in the grid, it is in
+     * the placements and the reading; the mode decides only what becomes a line through the
+     * middle. Tompkins' rule, which is about legibility rather than significance: note the
+     * aspects to the minor bodies, do not draw them, so the essentials can be found quickly.
+     *
+     * <b>Asked here and not inside visibleAspect, which was the first attempt.</b> That method
+     * is the one gate the wheel and the grid share, so putting the mode in it emptied the grid
+     * of every asteroid and point as well - 286 failures in AspectGridCheck, all of the form
+     * "Sun/North Node is blank and really has no aspect at that orb", because the cell was
+     * blank for a reason the check could not see. Listed and drawn are different questions.
+     *
+     * Seeded at declaration and refreshed on the settings hook, not per call: this runs once
+     * per body pair per repaint, and reading a properties file inside that loop would be felt.
+     */
+    private boolean drawsPair(int a, int b) {
+        if (Settings.ASPECTS_ESOTERIC.equals(this.aspectMode)) {
+            return true;
+        }
+        boolean angles = Settings.ASPECTS_MANIFESTATION.equals(this.aspectMode);
+        return SkymapPanel.drawable(a, angles) && SkymapPanel.drawable(b, angles);
+    }
+
+    /** A classical planet always; an angle too once Manifestation is chosen. */
+    private static boolean drawable(int index, boolean anglesCount) {
+        Bodies.Def d = Bodies.at(index);
+        if (d == null) {
+            return false;
+        }
+        if (d.kind == Bodies.Kind.LUMINARY || d.kind == Bodies.Kind.PLANET) {
+            return true;
+        }
+        return anglesCount && d.kind == Bodies.Kind.ANGLE;
+    }
+
     /** The Settings screen changed which aspects are drawn. */
     public void reloadAspectSelection() {
         this.aspectShown = Settings.loadAspectSelection();
@@ -3281,6 +3321,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // none, because the suite goes green either way. This is the hook SettingsPanel calls
         // when anything it owns changes, which is exactly when this needs re-reading.
         this.showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+        this.aspectMode = Settings.aspectMode();
         this.updateChartData();
         if (this.chartPanel != null) {
             this.chartPanel.repaint();
@@ -5304,6 +5345,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // Through the same gate the grid uses, so a switched-off aspect disappears from
             // both or from neither.
             Aspects.Type drawn = SkymapPanel.this.visibleAspect(d4, n5, n6, syn);
+            // The reader's aspect mode applies to the line and not to the aspect. A pair the
+            // mode excludes is still computed, still in the grid, still in the reading - it
+            // simply does not cross the middle of the wheel. See drawsPair.
+            if (drawn != null && !SkymapPanel.this.drawsPair(n5, n6)) {
+                drawn = null;
+            }
             if (drawn != null) {
                 color = Color.decode(SkymapPanel.getAspectColorHex(drawn.label));
                 d6 = drawn.exactAngle;

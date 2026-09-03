@@ -87,7 +87,7 @@ sits below the threshold of character analysis.
 **Sources.** Burk on the ten planets as the only primary actors; Cunningham on brain clutter;
 Tompkins on the back-row violinist turning a page.
 
-## K5 — What the wheel draws · **TO BUILD**
+## K5 — What the wheel draws · **BUILT 2026-09-03**
 
 **Decision.** Three rules.
 1. No aspects between two calculated points. Burk: such points "do not make aspects, they can
