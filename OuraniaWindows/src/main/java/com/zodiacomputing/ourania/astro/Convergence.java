@@ -375,9 +375,102 @@ public final class Convergence {
             t.families.add(w.family);
             t.independentWitnesses++;
             
-            double multiplier = (lordOfTheYear != null && lordOfTheYear.equals(w.movingBody)) ? 3.5 : 0.1;
-            t.rawScore += w.intensity * multiplier;
+            // Weighted by what the witness actually is, not counted flat. See the helpers
+            // below and DECISIONS.md, K8.
+            double lordFactor = (lordOfTheYear != null && lordOfTheYear.equals(w.movingBody))
+                ? 3.5 : 1.0;
+            t.rawScore += w.intensity
+                * bodyWeight(w.movingBody)
+                * bodyWeight(t.natal)
+                * aspectWeight(w.aspect)
+                * precision(w)
+                * lordFactor;
         }
+    }
+
+    // ------------------------------------------------- the hierarchy (DECISIONS.md, K8)
+
+    /**
+     * What a witness is worth before the year's lord and the orb are taken into account.
+     *
+     * <b>Flat counting was the defect.</b> Every witness used to contribute the same
+     * {@code intensity x 3.5-or-0.1}, so transiting Ceres semisquare the South Node scored
+     * exactly what transiting Saturn conjunct the Sun scored. With 29 bodies and fifteen
+     * aspect types every point in the chart collects several such witnesses on any given day,
+     * which is why adding voters made the ranking worse instead of better: the noise floor
+     * rose faster than the signal.
+     *
+     * Weighting by body and by aspect fixes that arithmetically rather than by taste. A minor
+     * aspect between two asteroids is worth 0.5 x 0.3 = 0.15 against a conjunction of a light
+     * to an angle at 5.0 x 3.0 = 15.0, a hundredfold gap, so background contacts can pile up
+     * indefinitely without ever summing to one real alignment.
+     *
+     * <b>Both ends are weighted, and the first attempt weighted only one.</b> Scoring the
+     * moving body alone left the natal target unranked, and since rawScore sums over witnesses
+     * a minor point simply aspected by many things climbed: on a test chart that put Chiron
+     * second and Eris fourth, above the Ascendant. The decision's own worked example
+     * multiplies both ends - transiting Mars at 3.0 onto a natal Ascendant at 5.0 - which is
+     * what makes a busy asteroid stay quiet.
+     */
+    private static double bodyWeight(String body) {
+        if (body == null) {
+            return 1.0;
+        }
+        String b = body.toLowerCase();
+        switch (b) {
+            case "sun": case "moon":
+            case "ascendant": case "descendant": case "mc": case "ic":
+                return 5.0;
+            case "mercury": case "venus": case "mars":
+                return 3.0;
+            case "jupiter": case "saturn":
+                return 2.0;
+            case "uranus": case "neptune": case "pluto":
+                return 1.5;
+            case "chiron": case "ceres": case "juno": case "pallas": case "vesta":
+                return 0.5;
+            default:
+                // Lilith, the nodes, the lots, and the outer asteroids. Kept above zero so a
+                // genuine pile-up still registers, low enough that it cannot lead.
+                return 0.2;
+        }
+    }
+
+    /** What the geometry is worth. Conjunction and opposition lead; the minors barely count. */
+    private static double aspectWeight(Aspects.Type type) {
+        if (type == null) {
+            return 1.0;     // profection is a condition, not an aspect
+        }
+        switch (type) {
+            case CONJUNCTION: case OPPOSITION:
+                return 3.0;
+            case SQUARE: case TRINE:
+                return 2.0;
+            case SEXTILE:
+                return 1.0;
+            default:
+                return 0.3;
+        }
+    }
+
+    /**
+     * How much of the aspect's allowance is left, from 1.0 at exact to 0.0 at the edge.
+     *
+     * This is what stops a minor aspect sitting at the very edge of its 1.0 degree cap from
+     * counting as much as one that is exact. A witness with no recorded orb - profection has
+     * none - keeps its full value rather than being punished for a measurement that does not
+     * apply to it.
+     */
+    private static double precision(Witness w) {
+        if (w.aspect == null || Double.isNaN(w.offBy)) {
+            return 1.0;
+        }
+        double max = w.aspect.maxOrb;
+        if (max <= 0.0) {
+            return 1.0;
+        }
+        double p = 1.0 - (Math.abs(w.offBy) / max);
+        return p < 0.0 ? 0.0 : p > 1.0 ? 1.0 : p;
     }
 
     private static Target target(Map<String, Target> byPoint, String natal, String why) {
