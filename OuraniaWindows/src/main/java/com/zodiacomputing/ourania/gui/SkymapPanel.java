@@ -1139,6 +1139,18 @@ extends JPanel {
         // the Chaldean face is the one the Golden Dawn tarot cards and the Sabian decan_ruler
         // field encode. Naming them is what lets a practitioner reconcile the two surfaces
         // instead of reading the difference as a fault. Zodiac's header carries the full note.
+        // <b>The degree's own condition, when it has one.</b> Open in the work plan since
+        // 21 Aug and settled 2026-09-03: anaretic is exactly 29d00'00" to 29d59'59" with no
+        // tolerance either side, and 0d is the opposite condition rather than the same one.
+        // See DECISIONS.md, K3.
+        Zodiac.DegreeStatus status = Zodiac.degreeStatus(lon);
+        if (status == Zodiac.DegreeStatus.ANARETIC) {
+            sb.append("<div style='color:#E8B24A;'><b>Anaretic</b> &middot; the 30th degree, ")
+              .append("completing this sign</div>");
+        } else if (status == Zodiac.DegreeStatus.INITIATION) {
+            sb.append("<div style='color:#7FB3FF;'><b>First degree</b> &middot; the sign just ")
+              .append("begun</div>");
+        }
         String triplicity = Zodiac.triplicityDecanRuler(lon);
         String face = Zodiac.chaldeanDecanRuler(lon);
         int decanFrom = (decan - 1) * 10;

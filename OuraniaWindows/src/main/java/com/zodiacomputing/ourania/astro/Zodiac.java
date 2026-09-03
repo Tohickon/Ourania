@@ -123,6 +123,63 @@ public final class Zodiac {
     }
 
     /**
+     * Where a degree sits in its sign's arc of development.
+     *
+     * Two conditions, and they are opposite ones rather than two names for a boundary. Settled
+     * 2026-09-03; see DECISIONS.md, K3.
+     */
+    public enum DegreeStatus {
+        /** 0°00'00" to 0°59'59". A phase beginning: raw, undifferentiated, impressionable. */
+        INITIATION,
+        /** 29°00'00" to 29°59'59". A phase ending, under pressure to complete. */
+        ANARETIC,
+        /** Everything between. */
+        STANDARD
+    }
+
+    /**
+     * The developmental status of a longitude's degree within its sign.
+     *
+     * <b>Zero tolerance on either side, deliberately.</b> 28°59'59" is not anaretic - it is
+     * still the 29th degree, and the 30th is what the condition is about. 0°00'00" of the next
+     * sign is not anaretic either; it is the opposite condition. March and McEvers put both
+     * under "critical degrees" while naming them as opposite directions - "just beginning" or
+     * "nearly ending some phase" - so they get separate values here rather than one flag with
+     * two meanings, which is how they would end up merged by whoever reads this next.
+     *
+     * The 0-to-29 convention is why the last degree is written 29 and keyed 30: a sign holds
+     * 30 degrees numbered from zero, so the 30th degree is 29°. The corpus already stores
+     * these under the _30 keys, which is why nothing about the data needs to move.
+     */
+    public static DegreeStatus degreeStatus(double longitude) {
+        double d = degreeInSign(longitude);
+        if (d >= 29.0 && d < 30.0) {
+            return DegreeStatus.ANARETIC;
+        }
+        if (d >= 0.0 && d < 1.0) {
+            return DegreeStatus.INITIATION;
+        }
+        return DegreeStatus.STANDARD;
+    }
+
+    /** True only inside 29°00'00" to 29°59'59". See {@link #degreeStatus}. */
+    public static boolean isAnaretic(double longitude) {
+        return degreeStatus(longitude) == DegreeStatus.ANARETIC;
+    }
+
+    /**
+     * The display degree, 1 to 30, which is what the technical-degree corpus is keyed on.
+     *
+     * A body at 29°30' is in the 30th degree. Callers that pass {@code (int) degreeInSign}
+     * are one short of the key they want, which is the arithmetic this exists to stop being
+     * rewritten at each call site.
+     */
+    public static int ordinalDegree(double longitude) {
+        int n = (int) Math.floor(degreeInSign(longitude)) + 1;
+        return n < 1 ? 1 : n > 30 ? 30 : n;
+    }
+
+    /**
      * Sabian degree ordinal within the sign, 1 to 30.
      *
      * The nth Sabian degree covers longitudes (n-1) up to but not including n, which
