@@ -4531,7 +4531,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 }
                 graphics2D.setStroke(stroke);
             }
-            int[] nArray = SkymapPanel.this.natalRadii(n18);
+            // <b>The painter must ask bodyBaseRadius too, and it never did.</b> n18 is
+            // RING_SIGN_INNER, the default placement, so the glyphs were drawn there whatever
+            // the reader chose while bodyAt tested natalRadii(bodyBaseRadius(rings)) - the
+            // setting moved the clicks and not the glyphs. At 820px: painter 325 for all three
+            // settings, hit test 325 inside the sign ring, 201 in the centre, 374 outside. So
+            // bodies were selectable on the default alone, which is exactly how it was
+            // reported. bodyBaseRadius's own header names this failure and says both sides
+            // must call it; only one did.
+            //
+            // n18 keeps RING_SIGN_INNER for everything else here - the sign circle it strokes
+            // and the spoke endpoints - because those genuinely are the sign ring.
+            int[] nArray = SkymapPanel.this.natalRadii(
+                SkymapPanel.this.bodyBaseRadius(rings));
             int[] nArray2 = SkymapPanel.this.transitRadii(n15, n16);
             int[] nArrayC = SkymapPanel.this.triWheelRadii(nTriOuter, n15);
             int n24 = n18 - 60;
