@@ -802,7 +802,13 @@ extends JPanel {
             }
             String title = stripTags(html.substring(open + 1, shut)).trim();
             int from = shut + tag.length() + 3;
-            int next = nextHeading(html, from);
+            // <b>Aspects group under their own heading.</b> The reading gives each contact an
+            // h3 of its own, which is right on a full page and twenty collapsed headings in a
+            // 250px column. Everything from the Active Aspects banner to the next h2 - which
+            // is the end of the reading - becomes one section, and the per-aspect headings
+            // stay inside it as the sub-headings they already are.
+            boolean groups = title.toLowerCase().contains("aspect");
+            int next = groups ? nextH2(html, from) : nextHeading(html, from);
             int to = next < 0 ? html.length() : next;
             String body = html.substring(from, Math.max(from, to));
             int tail = body.indexOf("</body>");
@@ -832,6 +838,11 @@ extends JPanel {
             }
         }
         return stripTags(lead).trim().isEmpty() ? "" : lead;
+    }
+
+    /** The next h2 only, so a grouped section can swallow the h3s underneath it. */
+    private static int nextH2(String html, int from) {
+        return html.indexOf("<h2", from);
     }
 
     private static int nextHeading(String html, int from) {
