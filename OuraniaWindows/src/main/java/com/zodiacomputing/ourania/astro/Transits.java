@@ -242,6 +242,82 @@ public final class Transits {
         return out;
     }
 
+    /**
+     * The two ends of an angular axis, keyed each way.
+     *
+     * The Ascendant and Descendant are one axis and so are the MC and IC: a body 180 degrees
+     * from one is on the other, by construction and always.
+     */
+    private static String axisPartner(String angle) {
+        if ("Ascendant".equals(angle)) {
+            return "Descendant";
+        }
+        if ("Descendant".equals(angle)) {
+            return "Ascendant";
+        }
+        if ("MC".equals(angle)) {
+            return "IC";
+        }
+        if ("IC".equals(angle)) {
+            return "MC";
+        }
+        return null;
+    }
+
+    /**
+     * Drops the half of an axis contact that restates the other half.
+     *
+     * <b>Every transit to an angle was reported twice.</b> A body conjunct the MC is opposite
+     * the IC at the same orb in the same instant, so significantTargets - which carries all
+     * four angles, correctly, because they are four distinct points - produced two hits for
+     * one event. A synthesis showed "Chiron Conjunction Natal MC" and "Chiron Opposition Natal
+     * IC" a few lines apart, both true, both the same fact in different words, and the same
+     * for Vesta, Pluto, Jupiter and Saturn down the page.
+     *
+     * The one kept is the one that names where the body actually is. A conjunction wins,
+     * because "Chiron on your MC" says more than "Chiron opposite your IC" about the same
+     * degree. When neither is a conjunction - a square hits both ends alike - the primary is
+     * kept, which is arbitrary but has to be decided somewhere and is at least consistent.
+     *
+     * Only pairs at the same orb from the same body collapse. Two genuinely different
+     * contacts to the two ends, at different orbs, are two events and both survive.
+     */
+    public static List<Hit> collapseAxisMirrors(List<Hit> hits) {
+        if (hits == null || hits.isEmpty()) {
+            return hits;
+        }
+        List<Hit> out = new ArrayList<>();
+        for (Hit h : hits) {
+            String partner = axisPartner(h.natal);
+            boolean mirrored = false;
+            if (partner != null) {
+                for (Hit other : hits) {
+                    if (other == h
+                            || !partner.equals(other.natal)
+                            || !other.transiting.equals(h.transiting)
+                            || Math.abs(other.offBy - h.offBy) > 1.0e-6) {
+                        continue;
+                    }
+                    boolean mineIsConjunction = h.type == Aspects.Type.CONJUNCTION;
+                    boolean theirsIsConjunction = other.type == Aspects.Type.CONJUNCTION;
+                    if (theirsIsConjunction && !mineIsConjunction) {
+                        mirrored = true;
+                    } else if (mineIsConjunction == theirsIsConjunction
+                            && ("Descendant".equals(h.natal) || "IC".equals(h.natal))) {
+                        mirrored = true;
+                    }
+                    if (mirrored) {
+                        break;
+                    }
+                }
+            }
+            if (!mirrored) {
+                out.add(h);
+            }
+        }
+        return out;
+    }
+
     /** The top-N prominence set, built once so both techniques select the same targets. */
     private static Set<String> prominentSet(List<BodyScore.Vector> ranked, int topN) {
         Set<String> prominent = new LinkedHashSet<>();

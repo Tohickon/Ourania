@@ -383,8 +383,11 @@ public class NarrativeSynthesizer {
         // 10. Current Transits
         sb.append("<h2 style='color: #FFD700;'>10. Current Transits</h2>");
         if (withTime && hits != null && !hits.isEmpty()) {
+            // One contact per axis. A body conjunct the MC is opposite the IC at the same orb
+            // in the same instant, and the page was reporting both as though they were two
+            // things to think about.
             java.util.Map<String, List<Transits.Hit>> byTarget = new java.util.LinkedHashMap<>();
-            for (Transits.Hit h : hits) {
+            for (Transits.Hit h : Transits.collapseAxisMirrors(hits)) {
                 byTarget.computeIfAbsent(h.natal, k -> new java.util.ArrayList<>()).add(h);
             }
             for (java.util.Map.Entry<String, List<Transits.Hit>> e : byTarget.entrySet()) {
