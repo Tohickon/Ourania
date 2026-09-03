@@ -540,36 +540,26 @@ extends JPanel {
         if (this.sw == null || this.baseSd == null || this.chartPanel == null) {
             return null;
         }
-        int w = this.chartPanel.getWidth();
-        int h = this.chartPanel.getHeight();
-        if (w <= 0 || h <= 0) {
+        Geometry g = this.geometry();
+        if (g == null) {
             return null;
         }
-        int cx = w / 2;
-        int cy = h / 2;
-        int[] rings = SkymapPanel.ringRadii(w, h, this.showTransitChart, this.showTriWheel);
-        int triOuter   = rings[RING_TRI];
-        int transitRing = rings[RING_TRANSIT];
-        int decanOuter  = rings[RING_DECAN_OUTER];
-        int bodyBase    = this.bodyBaseRadius(rings);
-        double pin = this.getPinLongitude();
-
         if (this.showTriWheel) {
-            int[] radii = this.triWheelRadii(triOuter, transitRing);
-            int i = this.nearestPoint(x, y, cx, cy, pin, this.cLon, this.cValid, radii, true);
+            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.cLon, this.cValid,
+                g.triRadii(), true);
             if (i >= 0) {
                 return this.hoverHtml(i, this.cLon[i], this.cSpeed[i], true);
             }
         }
         if (this.showTransitChart) {
-            int[] radii = this.transitRadii(transitRing, decanOuter);
-            int i = this.nearestPoint(x, y, cx, cy, pin, this.tLon, this.tValid, radii, true);
+            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.tLon, this.tValid,
+                g.transitRadii(), true);
             if (i >= 0) {
                 return this.hoverHtml(i, this.tLon[i], this.tSpeed[i], true);
             }
         }
-        int[] radii = this.natalRadii(bodyBase);
-        int i = this.nearestPoint(x, y, cx, cy, pin, this.bLon, this.bValid, radii, false);
+        int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.bLon, this.bValid,
+            g.natalRadii(), false);
         return i >= 0 ? this.hoverHtml(i, this.bLon[i], this.bSpeed[i], false) : null;
     }
 
@@ -583,36 +573,107 @@ extends JPanel {
      * and the reader would have no way to tell which was lying. The wheel has already shipped
      * one bug of that shape - the note above natalRadii records it.
      */
+    /**
+     * Every radius and angle one paint or one hit test works from.
+     *
+     * <b>Four places derived this chain independently, and that is how a glyph you can see
+     * becomes a glyph you cannot click.</b> On 2026-09-03 the painter drew bodies at
+     * RING_SIGN_INNER while bodyAt tested natalRadii(bodyBaseRadius(rings)); with the reader's
+     * placement set to the centre the two were 124 pixels apart and nothing on the wheel could
+     * be selected. bodyBaseRadius's own header had warned of exactly that and asked both sides
+     * to call it - a comment cannot enforce anything, so this does.
+     *
+     * The three body-radius arrays are built on demand. hoverTextAt runs on every mouse move
+     * and wants one of them; computing all three there to look tidy would be a real cost for
+     * no gain.
+     */
+    final class Geometry {
+        final int cx;
+        final int cy;
+        final int[] rings;
+        /** Where the bodies sit, after the reader's ring choice. */
+        final int bodyBase;
+        /** The rotation, so a hit test and the painter agree on where zero is. */
+        final double pin;
+
+        private int[] natal;
+        private int[] transit;
+        private int[] tri;
+
+        private Geometry(int w, int h) {
+            this.cx = w / 2;
+            this.cy = h / 2;
+            this.rings = SkymapPanel.ringRadii(w, h,
+                SkymapPanel.this.showTransitChart, SkymapPanel.this.showTriWheel);
+            this.bodyBase = SkymapPanel.this.bodyBaseRadius(this.rings);
+            this.pin = SkymapPanel.this.getPinLongitude();
+        }
+
+        int ring(int which) {
+            return this.rings[which];
+        }
+
+        int[] natalRadii() {
+            if (this.natal == null) {
+                this.natal = SkymapPanel.this.natalRadii(this.bodyBase);
+            }
+            return this.natal;
+        }
+
+        int[] transitRadii() {
+            if (this.transit == null) {
+                this.transit = SkymapPanel.this.transitRadii(
+                    this.rings[RING_TRANSIT], this.rings[RING_DECAN_OUTER]);
+            }
+            return this.transit;
+        }
+
+        int[] triRadii() {
+            if (this.tri == null) {
+                this.tri = SkymapPanel.this.triWheelRadii(
+                    this.rings[RING_TRI], this.rings[RING_TRANSIT]);
+            }
+            return this.tri;
+        }
+    }
+
+    /** The wheel's geometry at its current size, or null when it has none to speak of. */
+    private Geometry geometry() {
+        if (this.chartPanel == null) {
+            return null;
+        }
+        return this.geometry(this.chartPanel.getWidth(), this.chartPanel.getHeight());
+    }
+
+    /** As above, for the painter, which is handed the size it is painting into. */
+    private Geometry geometry(int w, int h) {
+        return w <= 0 || h <= 0 ? null : new Geometry(w, h);
+    }
+
     private int bodyAt(int x, int y) {
         if (this.sw == null || this.baseSd == null || this.chartPanel == null) {
             return -1;
         }
-        int w = this.chartPanel.getWidth();
-        int h = this.chartPanel.getHeight();
-        if (w <= 0 || h <= 0) {
+        Geometry g = this.geometry();
+        if (g == null) {
             return -1;
         }
-        int cx = w / 2;
-        int cy = h / 2;
-        int[] rings = SkymapPanel.ringRadii(w, h, this.showTransitChart, this.showTriWheel);
-        double pin = this.getPinLongitude();
-
         if (this.showTriWheel) {
-            int[] radii = this.triWheelRadii(rings[RING_TRI], rings[RING_TRANSIT]);
-            int i = this.nearestPoint(x, y, cx, cy, pin, this.cLon, this.cValid, radii, true);
+            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.cLon, this.cValid,
+                g.triRadii(), true);
             if (i >= 0) {
                 return i | TRANSIT_BIT;
             }
         }
         if (this.showTransitChart) {
-            int[] radii = this.transitRadii(rings[RING_TRANSIT], rings[RING_DECAN_OUTER]);
-            int i = this.nearestPoint(x, y, cx, cy, pin, this.tLon, this.tValid, radii, true);
+            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.tLon, this.tValid,
+                g.transitRadii(), true);
             if (i >= 0) {
                 return i | TRANSIT_BIT;
             }
         }
-        int[] radii = this.natalRadii(this.bodyBaseRadius(rings));
-        return this.nearestPoint(x, y, cx, cy, pin, this.bLon, this.bValid, radii, false);
+        return this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.bLon, this.bValid,
+            g.natalRadii(), false);
     }
 
     /** Marks a packed hit as belonging to the outer wheel. Above any registry index. */
@@ -2665,10 +2726,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.sw == null || this.baseSd == null || this.window == null) {
             return;
         }
-        int n5 = this.chartPanel.getWidth();
-        int n6 = this.chartPanel.getHeight();
-        int n7 = n5 / 2;
-        int n8 = n6 / 2;
+        // One geometry, shared with the painter and both hit tests. The machine-named locals
+        // are kept and bound to it rather than renamed: this is decompiler output and each is
+        // read a dozen times below, so rebinding is the change that cannot go wrong.
+        Geometry g = this.geometry();
+        if (g == null) {
+            return;
+        }
+        int n7 = g.cx;
+        int n8 = g.cy;
         double d4 = n - n7;
         double d5 = n2 - n8;
         double d6 = Math.sqrt(d4 * d4 + d5 * d5);
@@ -2679,22 +2745,22 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // The same chain the painter uses, from the same method. This was a second inline copy
         // until 2026-08-23 - the hit test computing the rings independently of the code that
         // draws them, which is how a glyph you can see becomes a glyph you cannot click.
-        int[] rings = SkymapPanel.ringRadii(n5, n6, this.showTransitChart, this.showTriWheel);
+        int[] rings = g.rings;
         int n9 = n4 = rings[RING_OUTER];
         int nTri = rings[RING_TRI];
         int n10 = rings[RING_TRANSIT];
         int n11 = rings[RING_DECAN_OUTER];
         int n12 = rings[RING_SIGN_OUTER];
-        int n13 = this.bodyBaseRadius(rings);
+        int n13 = g.bodyBase;
         double[] dArray = this.activeCusps;
-        double d8 = this.getPinLongitude();
+        double d8 = g.pin;
         double d9 = (180.0 + d8 - d7) % 360.0;
         if (d9 < 0.0) {
             d9 += 360.0;
         }
-        int[] nArray = this.natalRadii(n13);
-        int[] nArray2 = this.transitRadii(n10, n11);
-        int[] nArrayC = this.triWheelRadii(nTri, n10);
+        int[] nArray = g.natalRadii();
+        int[] nArray2 = g.transitRadii();
+        int[] nArrayC = g.triRadii();
         for (n3 = 0; n3 < BODY_COUNT; ++n3) {
             if (!this.bValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.bLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, false))) continue;
             this.showAngleAt(n3, this.bLon[n3]);
@@ -4676,10 +4742,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             int n10 = this.getWidth();
             int n11 = this.getHeight();
-            int n12 = n10 / 2;
-            int n13 = n11 / 2;
-            int[] rings = SkymapPanel.ringRadii(n10, n11, SkymapPanel.this.showTransitChart,
-                SkymapPanel.this.showTriWheel);
+            // The same geometry both hit tests and the click dispatcher use. This painter is
+            // the site that diverged: it drew bodies at RING_SIGN_INNER while bodyAt tested
+            // bodyBaseRadius, so with the reader's placement anywhere but the default the
+            // glyphs and the clicks were tens of pixels apart.
+            Geometry g = SkymapPanel.this.geometry(n10, n11);
+            if (g == null) {
+                return;
+            }
+            int n12 = g.cx;
+            int n13 = g.cy;
+            int[] rings = g.rings;
             int n14 = n9 = rings[RING_OUTER];
             int nTriOuter = rings[RING_TRI];
             int n15 = rings[RING_TRANSIT];
@@ -4827,21 +4900,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 }
                 graphics2D.setStroke(stroke);
             }
-            // <b>The painter must ask bodyBaseRadius too, and it never did.</b> n18 is
-            // RING_SIGN_INNER, the default placement, so the glyphs were drawn there whatever
-            // the reader chose while bodyAt tested natalRadii(bodyBaseRadius(rings)) - the
-            // setting moved the clicks and not the glyphs. At 820px: painter 325 for all three
-            // settings, hit test 325 inside the sign ring, 201 in the centre, 374 outside. So
-            // bodies were selectable on the default alone, which is exactly how it was
-            // reported. bodyBaseRadius's own header names this failure and says both sides
-            // must call it; only one did.
-            //
-            // n18 keeps RING_SIGN_INNER for everything else here - the sign circle it strokes
-            // and the spoke endpoints - because those genuinely are the sign ring.
-            int[] nArray = SkymapPanel.this.natalRadii(
-                SkymapPanel.this.bodyBaseRadius(rings));
-            int[] nArray2 = SkymapPanel.this.transitRadii(n15, n16);
-            int[] nArrayC = SkymapPanel.this.triWheelRadii(nTriOuter, n15);
+            // Body radii come from the shared geometry, not from n18. n18 is RING_SIGN_INNER
+            // and this painter used to draw bodies there whatever placement the reader chose,
+            // while bodyAt tested bodyBaseRadius - 325 against 201 in the centre at 820px, so
+            // nothing on the wheel could be clicked. n18 keeps RING_SIGN_INNER for the sign
+            // circle it strokes and the spokes it ends, because those are the sign ring.
+            int[] nArray = g.natalRadii();
+            int[] nArray2 = g.transitRadii();
+            int[] nArrayC = g.triRadii();
             int n24 = n18 - 60;
             graphics2D.setStroke(new BasicStroke(0.5f));
             boolean bl = SkymapPanel.this.aspectFilter.equals("Natal-Natal") || SkymapPanel.this.aspectFilter.equals("Both");
