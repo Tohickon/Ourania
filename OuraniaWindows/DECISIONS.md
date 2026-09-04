@@ -100,6 +100,25 @@ passing and simply verified less, and reverting `scopeOf` would have restored th
 stayed green. Part F now asserts the rule directly (1,069 checks). TransitCheck gained 8
 checks pinning the station split.
 
+**Follow-on: the return contacts were ordered by tightness, which read as importance.** The
+first render of the table opened with Pholus exactly on the Sun, Chiron on the Ascendant and
+Eris on the Moon — all a tenth of a degree, all above Mars conjunct the Sun two degrees off.
+`Contact.weight` now carries K8's hierarchy (body × body × aspect × orb slack) and the sort
+reads it. `Convergence.bodyWeight` and `aspectWeight` were made public rather than copied, so
+the return surface and the convergence engine cannot be tuned apart.
+
+**Precision comes off `orbUsed`, never `type.maxOrb`.** A conjunction's `maxOrb` is
+effectively unbounded; dividing by it scores every conjunction as exact and restores the
+defect. This is the same trap K5's measurement fell into once already.
+
+**The table splits on the return end alone**, not on both ends as the reading's aspect lists
+do. A return is directional: the return chart is what arrives, the natal point is what it
+arrives at, so a return Pholus on the natal Sun is background however important the Sun is.
+Keyed on both ends the split never fired once on the default chart.
+
+**Part G pins it, mutation-tested.** Reverting the sort to orb-only fails 31 of 1,233 checks,
+including "no return is led by a minor body while a planetary contact sits below it".
+
 ## K3 — Anaretic degree · **BUILT 2026-09-03 (closes F11)**
 
 **Decision.** Anaretic is exactly 29°00'00" to 29°59'59", zero tolerance either side. 28°59'59"

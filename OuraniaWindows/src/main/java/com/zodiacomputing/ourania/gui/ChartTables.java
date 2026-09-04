@@ -4,6 +4,7 @@ import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.HarmonicResonance;
 import com.zodiacomputing.ourania.astro.Midpoints;
 import com.zodiacomputing.ourania.astro.Aspects;
+import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.BodyScore;
 import com.zodiacomputing.ourania.astro.Profection;
 import com.zodiacomputing.ourania.astro.Progressions;
@@ -402,17 +403,46 @@ public final class ChartTables {
         h.append(row2("td", "MC", Zodiac.format(r.chart.mc)));
         h.append("</table>");
 
+        // <b>Principal and background, not one undifferentiated list.</b> The contacts arrive
+        // ordered by weight now, but a reader scanning sixteen rows of identical typography
+        // still has to work out which ones have a planet behind them. Splitting them says it
+        // once.
+        //
+        // <b>The rule keys on the return end, not on both ends.</b> The reading's aspect lists
+        // ask whether either side has a primary actor, because there both bodies belong to the
+        // same person. A return is directional: the return chart is what is arriving, and the
+        // natal point is what it arrives at. So a return Pholus exactly on the natal Sun is
+        // background however important the Sun is - the Sun is not the thing making the
+        // statement here. Same distinction Burk draws about which end casts and which
+        // receives, applied to a chart pair rather than to one wheel.
         List<Returns.Contact> cs = Returns.contacts(r, natal, ranked, null);
+        StringBuilder principal = new StringBuilder();
+        StringBuilder background = new StringBuilder();
+        for (Returns.Contact c : cs) {
+            String cell = row3("td", c.returnPoint, c.type.label,
+                c.natal + String.format(" (%.1f&deg;)", c.offBy));
+            if (Bodies.isMinor(c.returnPoint)) {
+                background.append(cell);
+            } else {
+                principal.append(cell);
+            }
+        }
         h.append("<table cellpadding=\"4\">");
         h.append(row3("th", "Return point", "Aspect", "Natal point"));
-        if (cs.isEmpty()) {
+        if (principal.length() == 0) {
             h.append(row3("td", "&mdash;", "", "nothing inside orb"));
         }
-        for (Returns.Contact c : cs) {
-            h.append(row3("td", c.returnPoint, c.type.label,
-                c.natal + String.format(" (%.1f&deg;)", c.offBy)));
-        }
+        h.append(principal);
         h.append("</table>");
+        if (background.length() > 0) {
+            h.append("<p><b>Background resonance:</b> <span style='font-size:11px;")
+             .append(" color:#B9B2D6;'>a minor body is the one arriving, whatever it lands")
+             .append(" on.</span></p>");
+            h.append("<table cellpadding=\"4\">");
+            h.append(row3("th", "Return point", "Aspect", "Natal point"));
+            h.append(background);
+            h.append("</table>");
+        }
     }
 
     public static String solarArc(ChartFrame natal, SwissEph sw, double natalJd, double nowJd) {

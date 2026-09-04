@@ -91,6 +91,12 @@ public final class ReturnsCheck {
         report("Part E", before);
 
         System.out.println();
+        System.out.println("=== Part G: weight decides the order, not tightness ===");
+        before = failures.size();
+        ordering(sw, natal);
+        report("Part G", before);
+
+        System.out.println();
         System.out.println("=== Part F: each return is read to the depth its period earns ===");
         before = failures.size();
         scope(sw, natal);
@@ -272,6 +278,98 @@ public final class ReturnsCheck {
                                                String body, int years) {
         return Returns.planetary(sw, body, natal.body(body).lon,
             NATAL_JD, NATAL_JD + DAYS_PER_YEAR * years, LAT, LON, 'P');
+    }
+
+    // ---------------------------------------------------------------- part G
+
+    /**
+     * Contacts come back ordered by what they are worth, not by how tight they are.
+     *
+     * <b>Sorting on orb alone let the minor bodies lead a return.</b> On the app's default
+     * chart the solar return opened with Pholus exactly on the Sun, Chiron on the Ascendant
+     * and Eris on the Moon - all at a tenth of a degree, all above Mars conjunct the Sun two
+     * degrees off. Tightness is a measurement and the sort was reading it as importance.
+     * These assertions hold the K8 hierarchy in place on this surface too, so the two cannot
+     * be tuned apart.
+     */
+    private static void ordering(SwissEph sw, ChartFrame natal) {
+        Gestalt.Result g = Gestalt.compute(natal);
+        List<BodyScore.Vector> ranked = BodyScore.rank(natal, g);
+        int compared = 0;
+        int minorFirst = 0;
+        int lists = 0;
+        for (String body : Returns.returnableBodies()) {
+            for (Returns.Return r : window(sw, natal, body, 3)) {
+                List<Returns.Contact> cs = Returns.contacts(r, natal, ranked, null);
+                if (cs.isEmpty()) {
+                    continue;
+                }
+                lists++;
+                for (Returns.Contact c : cs) {
+                    yes("every contact carries a weight (" + body + ")",
+                        c.weight > 0.0 && !Double.isNaN(c.weight));
+                }
+                for (int i = 1; i < cs.size(); i++) {
+                    compared++;
+                    yes("the list is ordered by weight (" + body + ")",
+                        cs.get(i - 1).weight >= cs.get(i).weight - 1e-9);
+                }
+                // The leading contact must not be a minor body arriving while a planetary
+                // one waits below it. This is the defect stated as an assertion.
+                Returns.Contact top = cs.get(0);
+                if (Bodies.isMinor(top.returnPoint)) {
+                    boolean planetaryBelow = false;
+                    for (Returns.Contact c : cs) {
+                        if (!Bodies.isMinor(c.returnPoint)) {
+                            planetaryBelow = true;
+                            break;
+                        }
+                    }
+                    if (planetaryBelow) {
+                        minorFirst++;
+                    }
+                }
+            }
+        }
+        eq("no return is led by a minor body while a planetary contact sits below it",
+            0, minorFirst);
+        yes("the ordering was actually exercised", compared > 0 && lists > 0);
+
+        // <b>A conjunction's maxOrb is effectively unbounded</b>, so precision has to come
+        // off the orb actually allowed. Dividing by maxOrb would make every conjunction score
+        // as though it were exact and put this whole ordering back where it started. Asserted
+        // by finding two conjunctions of the same pairing at different orbs and requiring the
+        // tighter one to weigh more - a tautological check here would hide the exact bug the
+        // rest of this part exists to catch.
+        Returns.Contact loose = null;
+        Returns.Contact tight = null;
+        for (String body : Returns.returnableBodies()) {
+            for (Returns.Return r : window(sw, natal, body, 3)) {
+                for (Returns.Contact c : Returns.contacts(r, natal, ranked, null)) {
+                    if (c.type != Aspects.Type.CONJUNCTION) {
+                        continue;
+                    }
+                    if (tight == null || c.offBy < tight.offBy) {
+                        tight = c;
+                    }
+                    if (loose == null || c.offBy > loose.offBy) {
+                        loose = c;
+                    }
+                }
+            }
+        }
+        if (tight != null && loose != null && loose.offBy - tight.offBy > 0.5
+                && Convergence.bodyWeight(tight.returnPoint) == Convergence.bodyWeight(loose.returnPoint)
+                && Convergence.bodyWeight(tight.natal) == Convergence.bodyWeight(loose.natal)) {
+            yes("a tighter conjunction outweighs a looser one of equal standing",
+                tight.weight > loose.weight);
+        } else {
+            yes("the orb term is live rather than constant across conjunctions",
+                tight != null && loose != null && (loose.offBy - tight.offBy < 1e-9
+                    || Math.abs(tight.weight - loose.weight) > 1e-9));
+        }
+        System.out.printf("  %d lists, %d adjacent pairs compared, %d led by a minor body%n",
+            lists, compared, minorFirst);
     }
 
     // ---------------------------------------------------------------- part F

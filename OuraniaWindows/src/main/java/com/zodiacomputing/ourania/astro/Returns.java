@@ -122,6 +122,16 @@ public final class Returns {
         public double jd;
         public double offBy;
         public double orbUsed;
+        /**
+         * What this contact is worth, on K8's hierarchy.
+         *
+         * <b>Sorting by orb alone made a return read as though its minor bodies ran it.</b>
+         * Tightness is a measurement, not an importance: Pholus exactly on the Sun printed
+         * above Mars conjunct the Sun two degrees off, and a return whose first five lines
+         * were Pholus, Chiron, Eris and Nessus said, by placement, that those were the year.
+         * Same weighting the convergence engine uses, so the two surfaces rank alike.
+         */
+        public double weight;
         public String kind;
         public String why;
         public int natalRank = -1;
@@ -442,10 +452,20 @@ public final class Returns {
                 c.kind = ret.kind;
                 c.why = target.why;
                 c.natalRank = target.rank;
+                // Precision off orbUsed, not type.maxOrb: CONJUNCTION.maxOrb is
+                // Double.MAX_VALUE, and dividing by it makes every conjunction look exact.
+                double slack = orb > 0.0 ? 1.0 - (off / orb) : 1.0;
+                slack = slack < 0.0 ? 0.0 : slack > 1.0 ? 1.0 : slack;
+                c.weight = Convergence.bodyWeight(c.returnPoint)
+                    * Convergence.bodyWeight(c.natal)
+                    * Convergence.aspectWeight(type)
+                    * (0.25 + 0.75 * slack);
                 out.add(c);
             }
         }
-        out.sort(Comparator.comparingDouble((Contact c) -> c.offBy).thenComparing(c -> c.natal));
+        out.sort(Comparator.comparingDouble((Contact c) -> -c.weight)
+            .thenComparingDouble(c -> c.offBy)
+            .thenComparing(c -> c.natal));
         return out;
     }
 

@@ -534,7 +534,7 @@ public final class Convergence {
      * multiplies both ends - transiting Mars at 3.0 onto a natal Ascendant at 5.0 - which is
      * what makes a busy asteroid stay quiet.
      */
-    private static double bodyWeight(String body) {
+    public static double bodyWeight(String body) {
         if (body == null) {
             return 1.0;
         }
@@ -559,7 +559,7 @@ public final class Convergence {
     }
 
     /** What the geometry is worth. Conjunction and opposition lead; the minors barely count. */
-    private static double aspectWeight(Aspects.Type type) {
+    public static double aspectWeight(Aspects.Type type) {
         if (type == null) {
             return 1.0;     // profection is a condition, not an aspect
         }
