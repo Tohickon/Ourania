@@ -138,11 +138,67 @@ public final class NavigationCheck {
                 + "navigation combo was replaced by a drawer");
         }
 
-        // Everything is in one drawer now, so every section must be in this one.
-        for (String s : new String[] {SidePanel.MENU, SidePanel.PROFILES, SidePanel.NATAL,
-                                      SidePanel.TRANSITS, SidePanel.GRIDS,
-                                      SidePanel.READINGS}) {
+        // <b>The right drawer holds what the app can DO; the chart's own data moved left.</b>
+        // Natal and Transits are pages on the left rail and the grid is the other tab of the
+        // rail this panel sits in, so asserting they are still here would pin the layout that
+        // was replaced.
+        for (String s : new String[] {SidePanel.TABLES, SidePanel.EXPORT}) {
             ok("the drawer holds " + s, sectionTitles(side).contains(s));
+        }
+        // <b>Everything about the chart itself moved to the left rail.</b> The right drawer
+        // is now what the app can do; the left is what you are looking at. Asserting these
+        // are absent is what stops one drifting back into the other.
+        for (String s : new String[] {"Natal Chart", "Transits", "Aspect Grids", "Selection",
+                                      "Interpretation", "Readings", "Saved Charts"}) {
+            ok("the drawer no longer holds " + s, !sectionTitles(side).contains(s));
+        }
+        // <b>Every reading kept a door when its section was dissolved.</b> Deleting a wrapper
+        // is only safe if what it held survives, and five readings that became five tabs are
+        // exactly the kind of thing that goes missing in a move with nothing noticing. Asked
+        // of a real window, because the rail is the thing that would be wrong - checking the
+        // READINGS array against itself would pass however few pages were actually built.
+        WindowFacts facts = windowFacts();
+        java.util.List<String> pages = facts.railPages;
+        for (String[] r : OuraniaWindow.READINGS) {
+            ok("the rail has a page for the reading " + r[0], pages.contains(r[0]));
+        }
+        for (String p : new String[] {OuraniaWindow.CHART_PAGE, OuraniaWindow.TRANSITS_PAGE,
+                                      OuraniaWindow.SELECTION_PAGE,
+                                      OuraniaWindow.READING_PAGE}) {
+            ok("the rail has a page for " + p, pages.contains(p));
+        }
+
+        // <b>The menu and the grid are two tabs on one strip.</b> The grid spent a version
+        // across the top, where its handle was a horizontal bar between two vertical strips
+        // and read as a title rather than as a drawer, and a version as a second drawer on
+        // this edge, which put one strip in front of the other instead of beside it.
+        //
+        // All three halves are pinned, because each was a different way of getting it wrong:
+        // both tabs exist, the east edge is ONE component rather than a container holding two
+        // drawers, and nothing is on the top edge. The middle one is the load-bearing check -
+        // BorderLayout replaces the occupant of a region in silence, so a grid added straight
+        // to EAST would take the menu off the screen with nothing failing.
+        ok("the right rail has a " + OuraniaWindow.MENU_PAGE + " tab",
+            facts.menuRailPages.contains(OuraniaWindow.MENU_PAGE));
+        ok("the right rail has an " + OuraniaWindow.GRID_PAGE + " tab",
+            facts.menuRailPages.contains(OuraniaWindow.GRID_PAGE));
+        ok("the east edge is one rail, not two strips stacked",
+            facts.eastIsOneRail);
+        ok("nothing is left on the top edge for a handle to lie across",
+            facts.nothingOnTop);
+
+        // <b>The Menu wrapper is gone and its six destinations sit at the drawer's level.</b>
+        // A section whose entire content was a list of links cost a click on the way to every
+        // screen behind it. This pins both halves: the wrapper is absent, and nothing it held
+        // was lost with it.
+        ok("there is no Menu section left to nest the screens in",
+            !sectionTitles(side).contains("Menu"));
+        List<String> labels = new ArrayList<>();
+        for (JButton row : rows(side)) {
+            labels.add(row.getText());
+        }
+        for (String[] screen : SidePanel.SCREENS) {
+            ok("the drawer offers " + screen[0] + " directly", labels.contains(screen[0]));
         }
         // Tools duplicated three rows that Menu already carried; with one drawer there is
         // nowhere for that duplication to hide, so it was removed rather than moved.
@@ -220,15 +276,67 @@ public final class NavigationCheck {
         }
     }
 
-    /** The Menu section's rows - the ten screens, without the directory's Chart A/B buttons. */
+    /**
+     * The screen destinations, without the directory's Chart A/B buttons.
+     *
+     * These used to live inside a Menu section; they now sit at the drawer's own level, so
+     * this reads the screens column directly rather than looking for a wrapper that no
+     * longer exists.
+     */
     private static List<JButton> menuRows() {
         List<JButton> out = new ArrayList<>();
-        Accordion acc = side.accordion();
-        Accordion.Section menu = acc == null ? null : acc.section(SidePanel.MENU);
-        if (menu != null) {
-            collectButtons(menu, out);
+        java.awt.Container screens = side.screensColumn();
+        if (screens != null) {
+            collectButtons(screens, out);
         }
         return out;
+    }
+
+    /** What only a whole window can answer, gathered in one construction. */
+    private static final class WindowFacts {
+        final List<String> railPages = new ArrayList<>();
+        final List<String> menuRailPages = new ArrayList<>();
+        boolean eastIsOneRail;
+        boolean nothingOnTop;
+    }
+
+    /**
+     * The arrangement, read off a real window.
+     *
+     * Building a whole OuraniaWindow is heavier than the rest of this suite needs, so it is
+     * done once and only for the questions that cannot be answered without it - which is why
+     * everything one window can settle is collected here rather than asked for separately.
+     */
+    private static WindowFacts windowFacts() {
+        final WindowFacts f = new WindowFacts();
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                OuraniaWindow w = new OuraniaWindow();
+                DrawerRail rail = w.chartRail();
+                if (rail != null) {
+                    f.railPages.addAll(rail.pageNames());
+                }
+                DrawerRail menu = w.menuRail();
+                if (menu != null) {
+                    f.menuRailPages.addAll(menu.pageNames());
+                }
+                java.awt.LayoutManager lm = w.getContentPane().getLayout();
+                if (lm instanceof java.awt.BorderLayout) {
+                    java.awt.BorderLayout bl = (java.awt.BorderLayout) lm;
+                    f.nothingOnTop =
+                        bl.getLayoutComponent(java.awt.BorderLayout.NORTH) == null;
+                    // One rail, not a container holding a menu drawer and a grid drawer. Asked
+                    // of the region rather than of the rail, because the rail could be correct
+                    // and still be sharing the edge with something else.
+                    f.eastIsOneRail =
+                        bl.getLayoutComponent(java.awt.BorderLayout.EAST) instanceof DrawerRail;
+                }
+                w.dispose();
+            });
+        } catch (Exception e) {
+            failures.add("a window would not construct for the layout check: " + e);
+        }
+        return f;
     }
 
     private static List<String> sectionTitles(Container panel) {

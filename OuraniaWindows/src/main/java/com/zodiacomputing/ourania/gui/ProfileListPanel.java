@@ -179,7 +179,12 @@ public final class ProfileListPanel extends JPanel {
         b.setFont(new Font("Arial", Font.BOLD, 11));
         b.setHorizontalAlignment(SwingConstants.CENTER);
         b.setMargin(new java.awt.Insets(2, 8, 2, 8));
-        Widgets.styleButton(b, asPartner ? Widgets.Role.TRANSPORT : Widgets.Role.PRIMARY);
+        // <b>Both slots look the same, because neither is selected.</b> Chart A was PRIMARY
+        // and Chart B TRANSPORT, which is a permanent difference in styling and not a state -
+        // so A read as "currently chosen" always, including right after loading someone into
+        // B. Two slots offered side by side are peers, and a highlight that never moves is
+        // worse than no highlight at all: it reports a selection that was never made.
+        Widgets.styleButton(b, Widgets.Role.TRANSPORT);
         b.addActionListener(e -> {
             if (window != null) {
                 window.loadSavedProfile(name, asPartner);

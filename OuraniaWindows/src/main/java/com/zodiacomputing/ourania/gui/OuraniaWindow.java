@@ -14,6 +14,90 @@ public class OuraniaWindow extends JFrame {
 
     private ChartSetupPanel chartSetupPanel;
     private SidePanel sidePanel;
+    /** The left rail: what this chart is, opposite the menu that says what the app does. */
+    private DrawerRail chartRail;
+    private javax.swing.JEditorPane natalPane;
+    private javax.swing.JEditorPane transitPane;
+    private javax.swing.JEditorPane selectionPane;
+    /** The right rail: what the app can do, and the grid that is read against the wheel. */
+    private DrawerRail menuRail;
+    private javax.swing.JEditorPane gridPane;
+
+    /** Right-rail page names. Two tabs on one strip, not two strips. */
+    public static final String MENU_PAGE = "Menu";
+    public static final String GRID_PAGE = "Aspect Grids";
+
+    /** Left-rail page names, shared with the wheel and with NavigationCheck. */
+    public static final String CHART_PAGE = "Chart";
+    public static final String TRANSITS_PAGE = "Transits";
+    public static final String SELECTION_PAGE = "Selection";
+    public static final String READING_PAGE = "Interpretation";
+
+    /**
+     * The five readings, each its own tab rather than rows inside a Readings section.
+     *
+     * <b>The wrapper is gone for the same reason the Menu section went.</b> A section whose
+     * whole content is five buttons costs a click on the way to each of them. And once every
+     * reading has a page of its own they can be flipped between without regenerating, which a
+     * shared panel could never do - the last reading overwrote the one before it.
+     *
+     * Label first, then the kind {@code SkymapPanel.runReading} answers to.
+     */
+    public static final String[][] READINGS = {
+        {"Snapshot", "SNAPSHOT"},
+        {"Report", "REPORT"},
+        {"Synthesize", "SYNTHESIZE"},
+        {"Predict", "TIMELINE"},
+        {"Calendar", "CALENDAR"},
+    };
+
+    private final java.util.Map<String, javax.swing.JEditorPane> readingPanes =
+        new java.util.LinkedHashMap<>();
+
+    /**
+     * Which reading page the answer belongs on.
+     *
+     * The reading runs on a worker and comes back through the same door every reading uses,
+     * carrying no clue as to which one asked. Set when the request goes out, read when it
+     * returns. Two readings started at once would both land on the second one's page - a
+     * worse outcome than a wrong tab only if readings were cheap, and they are not: each
+     * takes long enough that starting a second before the first lands is a deliberate act.
+     */
+    private String pendingReadingPage;
+
+    /**
+     * Whose chart is on the wheel, when it came from the saved directory.
+     *
+     * <b>A loaded chart stops being "a natal chart" and becomes a person's.</b> The heading
+     * said "Natal Chart" whichever profile was open, so the one fact a reader most needs when
+     * several charts are saved - which one am I looking at - was the fact the panel would not
+     * state. Empty when the wheel is showing hand-entered data, which genuinely has no name.
+     */
+    private String chartName = "";
+
+    /** The name of the loaded chart, or "" when the data was typed rather than loaded. */
+    public String chartName() {
+        return chartName;
+    }
+
+    /** Records whose chart is on the wheel. Cleared by passing null or blank. */
+    public void setChartName(String name) {
+        this.chartName = name == null ? "" : name.trim();
+    }
+
+    /**
+     * "David" becomes "David's"; a name already ending in s takes the bare apostrophe.
+     *
+     * Returns "" for no name, so a caller can prepend it unconditionally.
+     */
+    public static String possessive(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return "";
+        }
+        String n = name.trim();
+        char last = n.charAt(n.length() - 1);
+        return last == 's' || last == 'S' ? n + "' " : n + "'s ";
+    }
 
     public OuraniaWindow() {
         setTitle("Ourania+ (Windows Edition)");
@@ -52,6 +136,30 @@ public class OuraniaWindow extends JFrame {
         // chart, which reads as a chart with nothing to report. mainMenu has always been
         // built before the wheel for the same reason.
         sidePanel = new SidePanel(this);
+
+        // <b>The chart's own data moved to the left, opposite the menu.</b> What a chart IS -
+        // its name, its moment, its placements - is a different question from what you can do
+        // with the app, and the two were sharing one drawer. The rail is a sibling of the
+        // content area, so opening it takes width from the wheel and closing gives it back,
+        // exactly as the right-hand drawer behaves.
+        natalPane = HtmlPanes.chartPane(this);
+        transitPane = HtmlPanes.chartPane(this);
+        selectionPane = HtmlPanes.chartPane(this);
+        chartRail = new DrawerRail(Drawer.Side.LEFT, 340);
+        chartRail.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
+        chartRail.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
+        // <b>Selection and the reading join the chart's own side.</b> All four answer "what
+        // am I looking at" - the chart, the sky over it, the body just clicked, and what that
+        // means - so they belong on one edge, leaving the right for what the app can do.
+        chartRail.addPage(SELECTION_PAGE, HtmlPanes.scroller(selectionPane));
+        // Open on Chart at launch, without animating - the Natal section used to be the one
+        // section open when the app started, and this is where that content went.
+        chartRail.revealImmediately(CHART_PAGE);
+        add(chartRail, BorderLayout.WEST);
+
+        // Built here rather than beside the rail below, because SkymapPanel's constructor
+        // calls straight back into updateChartSections and this pane has to exist by then.
+        gridPane = HtmlPanes.wideChartPane(this);
         
         // Add our newly ported Skymap Rendering Panel!
         skymapPanel = new SkymapPanel(this);
@@ -61,19 +169,58 @@ public class OuraniaWindow extends JFrame {
         contentPanel.add(nameListPanel, "NAME_LIST");
         
         interpretationPanel = new InterpretationPanel(skymapPanel, this);
-        interpretationPanel.setPreferredSize(new Dimension(350, 0));
-        interpretationPanel.setVisible(false);
+        // Sized by the rail now, and always visible within it - the rail's own tab is what
+        // shows and hides it, so a second visibility flag would fight the tab for control.
+        interpretationPanel.setVisible(true);
+        chartRail.addPage(READING_PAGE, interpretationPanel);
+        for (String[] r : READINGS) {
+            javax.swing.JEditorPane pane = HtmlPanes.chartPane(this);
+            readingPanes.put(r[0], pane);
+            chartRail.addPage(r[0], HtmlPanes.scroller(pane));
+        }
 
-        // <b>Two things share the east edge, so they get a container of their own.</b>
-        // BorderLayout gives one component per region; adding the drawer straight to EAST
-        // would have silently replaced the reading panel - no error, it simply would not be
-        // there any more. The drawer sits outermost so its handle stays on the window's edge
-        // where a handle belongs, with the reading panel opening inside it.
-        JPanel eastStack = new JPanel(new BorderLayout());
-        eastStack.setBackground(Theme.BG);
-        eastStack.add(interpretationPanel, BorderLayout.CENTER);
-        eastStack.add(sidePanel, BorderLayout.EAST);
-        add(eastStack, BorderLayout.EAST);
+        // <b>Opening a tab has to produce the page, not just reveal it.</b> The readings were
+        // buttons that ran something; turned into tabs they revealed panes nothing had ever
+        // written to, so five of them opened onto blank panels and Interpretation opened onto
+        // an empty one. A card swap is not a door - the thing behind the door has to be made.
+        chartRail.setOnSelect(page -> {
+            if (READING_PAGE.equals(page)) {
+                if (interpretationPanel != null) {
+                    interpretationPanel.updateInterpretations();
+                }
+                return;
+            }
+            for (String[] r : READINGS) {
+                if (r[0].equals(page)) {
+                    // Regenerated on each open. A reading is a snapshot of a moment, and the
+                    // moment moves whenever the transport buttons do, so a cached page would
+                    // quietly describe a chart that is no longer on screen.
+                    runReading(r[1]);
+                    return;
+                }
+            }
+        });
+
+        // Nothing has been clicked yet, so Selection has nothing to show.
+        chartRail.setPageEnabled(SELECTION_PAGE, false);
+
+        // <b>One strip on the east edge, with a tab each.</b> The grid was tried across the
+        // top, where its handle was a bar lying between two vertical strips and read as a
+        // title rather than as a drawer; then as a second drawer on this edge, which put one
+        // handle in front of the other instead of beside it. A rail is the shape both attempts
+        // were reaching for - the tabs sit next to each other in one column, and one body
+        // opens behind whichever is chosen - and it is what the left edge already does, so the
+        // window now has one idea on both sides rather than two.
+        //
+        // Each page opens to its own width; see DrawerRail.addPage for why that is per-page.
+        menuRail = new DrawerRail(Drawer.Side.RIGHT, SidePanel.MENU_WIDTH);
+        menuRail.addPage(MENU_PAGE, sidePanel, SidePanel.MENU_WIDTH);
+        menuRail.addPage(GRID_PAGE, HtmlPanes.scroller(gridPane), 430);
+        // Open on Menu at launch and without animating, which is what the drawer it replaced
+        // did: an app that slides its own panel out on every start is animating at the one
+        // moment nobody asked it to.
+        menuRail.revealImmediately(MENU_PAGE);
+        add(menuRail, BorderLayout.EAST);
         
         releasingPanel = new ReleasingPanel(this);
         contentPanel.add(releasingPanel, "RELEASING");
@@ -125,10 +272,15 @@ public class OuraniaWindow extends JFrame {
             nameListPanel.updateData();
         }
         if ("INTERPRETATION".equals(screenName) && interpretationPanel != null) {
-            interpretationPanel.updateInterpretations(); // The default fallback if clicked from menu
-            interpretationPanel.setVisible(!interpretationPanel.isVisible());
-            revalidate();
-            repaint();
+            // <b>The rail's tab owns showing and hiding this now.</b> The panel used to sit on
+            // the east edge with its own visibility flag, and this row flipped it; as a rail
+            // page, flipping that flag would empty the tab while leaving the rail open. So the
+            // menu row asks the rail for the page, and select() gives the same toggle the tab
+            // does - press it again and the rail closes.
+            interpretationPanel.updateInterpretations();
+            if (chartRail != null) {
+                chartRail.select(READING_PAGE);
+            }
             return;
         }
         
@@ -186,10 +338,76 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
-    /** The wheel's three chart sections, into the right-hand drawer's accordion. */
+    /**
+     * The wheel's three chart sections, each to the edge that now owns it.
+     *
+     * Natal and transits to the left rail, the grid to the top drawer, and the right-hand
+     * drawer told only that the chart changed so it can refresh its saved-chart list.
+     */
     public void updateChartSections(String natalHtml, String transitHtml, String gridHtml) {
+        if (natalPane != null) {
+            HtmlPanes.setHtml(natalPane, natalHtml);
+        }
+        if (transitPane != null) {
+            HtmlPanes.setHtml(transitPane, transitHtml);
+        }
+        // <b>Greyed out on a chart drawn without transits.</b> The wheel still emits a transit
+        // section for a single chart - the document wrapper with nothing in it - so the tab
+        // opened onto a blank panel, which reads as broken rather than as empty. Measured on
+        // the markup rather than asked of the wheel, because this method is the only thing
+        // that sees the section and it already has it in hand.
+        if (chartRail != null) {
+            chartRail.setPageEnabled(TRANSITS_PAGE, hasContent(transitHtml));
+        }
+        if (gridPane != null) {
+            HtmlPanes.setHtml(gridPane, gridHtml);
+        }
         if (sidePanel != null) {
-            sidePanel.updateChartSections(natalHtml, transitHtml, gridHtml);
+            sidePanel.updateChartSections();
+        }
+        // The saved-chart list moved to Chart Setup, so the rebuild follows it there.
+        if (chartSetupPanel != null) {
+            chartSetupPanel.refreshProfiles();
+        }
+    }
+
+    /**
+     * Whether a section of chart markup actually says anything.
+     *
+     * Strips the tags and asks whether words are left. An empty section is not an empty
+     * string - it is a full html/body wrapper with nothing between the tags - so a length
+     * test on the markup would call every section populated.
+     */
+    static boolean hasContent(String html) {
+        if (html == null) {
+            return false;
+        }
+        String text = html.replaceAll("(?s)<[^>]*>", " ")
+            .replace("&nbsp;", " ")
+            .replaceAll("\\s+", " ")
+            .trim();
+        return !text.isEmpty();
+    }
+
+    /** The aspect grid exactly as the top drawer is showing it, for export. */
+    String gridHtml() {
+        return gridPane == null ? "" : gridPane.getText();
+    }
+
+    /** The right rail, for a check that needs to walk its tabs. */
+    DrawerRail menuRail() {
+        return menuRail;
+    }
+
+    /** The left rail, for a check that needs to walk its pages. */
+    DrawerRail chartRail() {
+        return chartRail;
+    }
+
+    /** Opens the left rail on a page, for a caller that needs it visible. */
+    public void showChartPage(String page) {
+        if (chartRail != null) {
+            chartRail.reveal(page);
         }
     }
 
@@ -205,15 +423,35 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
-    /** One body's detail, from a click on the wheel, into the drawer's Selection section. */
+    /**
+     * One body's detail, from a click on the wheel, onto the left rail's Selection page.
+     *
+     * <b>Reveals rather than toggles.</b> A click on a body is a request to see that body, so
+     * this uses reveal and not select - select would close the rail when the page it wants is
+     * already the one showing, and clicking a second planet would put the panel away.
+     */
     public void showSelection(String html) {
-        if (sidePanel != null) {
-            sidePanel.showSelection(html);
+        if (selectionPane != null) {
+            HtmlPanes.setHtml(selectionPane, html);
+        }
+        if (chartRail != null) {
+            // There is something selected now, so the tab stops being greyed out.
+            chartRail.setPageEnabled(SELECTION_PAGE, true);
+            chartRail.reveal(SELECTION_PAGE);
         }
     }
 
     /** One reading, from the sidebar's Readings section. See {@code SkymapPanel.runReading}. */
     public void runReading(String name) {
+        // Remember which tab asked, so the answer lands there rather than on whichever page
+        // the reading panel happens to be showing.
+        pendingReadingPage = null;
+        for (String[] r : READINGS) {
+            if (r[1].equals(name)) {
+                pendingReadingPage = r[0];
+                break;
+            }
+        }
         if (skymapPanel != null) {
             skymapPanel.runReading(name);
         }
@@ -300,7 +538,7 @@ public class OuraniaWindow extends JFrame {
     /** B5. The aspect grid as its own HTML - it is already a table. */
     public void exportAspectGrid() {
         if (sidePanel != null) {
-            ChartExporter.saveText(this, sidePanel.gridHtml(),
+            ChartExporter.saveText(this, gridHtml(),
                 "ourania-aspect-grid.html", "HTML document", "html");
         }
     }
@@ -448,9 +686,20 @@ public class OuraniaWindow extends JFrame {
     }
 
     public void showSynthesis(String html) {
+        // A reading asked for by tab goes back to that tab. Anything else - a body clicked on
+        // the wheel, a chart table - goes to the general Interpretation page.
+        if (routeToReadingPage(html)) {
+            return;
+        }
         if (interpretationPanel != null) {
             interpretationPanel.showSynthesis(html);
-            interpretationPanel.setVisible(true);
+            // <b>Open the rail on the reading, not just fill it.</b> Setting the panel
+            // visible was enough when it had the east edge to itself; as a rail page, a
+            // reading generated into a shut rail is written and never shown, which reads as
+            // a Readings button that does nothing.
+            if (chartRail != null) {
+                chartRail.reveal(READING_PAGE);
+            }
             revalidate();
             repaint();
         }
@@ -483,12 +732,52 @@ public class OuraniaWindow extends JFrame {
 
     /** The annual almanac, from SkymapPanel's Calendar button. */
     public void showCalendar(int year, String body) {
+        // The calendar is one of the five and has a tab of its own, so it is routed like the
+        // rest rather than borrowing the reading panel. It arrives as plain text, so it is
+        // escaped and wrapped rather than treated as markup.
+        if (pendingReadingPage != null) {
+            StringBuilder h = new StringBuilder();
+            h.append("<html><body style=\"font-family:Arial; color:#E0E0E0;\">");
+            h.append("<h2 style=\"color:#00BFFF;\">").append(year).append("</h2>");
+            h.append("<pre style=\"font-family:Consolas,monospace; font-size:11px;\">");
+            h.append(escape(body)).append("</pre></body></html>");
+            if (routeToReadingPage(h.toString())) {
+                return;
+            }
+        }
         if (interpretationPanel != null) {
             interpretationPanel.showCalendar(year, body);
-            interpretationPanel.setVisible(true);
             revalidate();
             repaint();
         }
+    }
+
+    /** Minimal escaping: the calendar is plain text going into a pre block. */
+    private static String escape(String text) {
+        return text == null ? "" : text.replace("&", "&amp;")
+            .replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    /**
+     * Puts a finished reading on the tab that asked for it.
+     *
+     * @return true when it was handled here, so the caller does not also write it elsewhere
+     */
+    private boolean routeToReadingPage(String html) {
+        if (pendingReadingPage == null) {
+            return false;
+        }
+        javax.swing.JEditorPane pane = readingPanes.get(pendingReadingPage);
+        String page = pendingReadingPage;
+        pendingReadingPage = null;
+        if (pane == null) {
+            return false;
+        }
+        HtmlPanes.setHtml(pane, html);
+        if (chartRail != null) {
+            chartRail.reveal(page);
+        }
+        return true;
     }
 
     public void closeInterpretationPanel() {

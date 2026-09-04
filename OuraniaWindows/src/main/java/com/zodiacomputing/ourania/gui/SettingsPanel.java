@@ -179,6 +179,25 @@ public class SettingsPanel extends JPanel {
         });
         body.add(spheres);
 
+        // <b>A shape per chart, because a tri-wheel draws three at once.</b> These say which
+        // chart a body belongs to without the reader counting rings outward from the centre.
+        // The checkbox above is the master switch: off, none of these are drawn.
+        body.add(Box.createRigidArea(new Dimension(0, 6)));
+        body.add(note("A synastry with transits puts three sets of bodies on one wheel. Give "
+            + "each a different shape and whose Mars you are looking at stops being a "
+            + "question about which shade of grey the bead is."));
+        body.add(markerRow("This chart:", Settings.natalMarker(), Settings::setNatalMarker,
+            "<html>The bodies of the chart at the centre of the wheel - yours.</html>"));
+        body.add(markerRow("The other chart:", Settings.synastryMarker(),
+            Settings::setSynastryMarker,
+            "<html>Chart B of a synastry: the second person, on the outer wheel."
+            + "<br>No other kind of chart has a second person, so no other kind uses "
+            + "this.</html>"));
+        body.add(markerRow("Transits:", Settings.transitMarker(), Settings::setTransitMarker,
+            "<html>The sky at the transit moment - the outer wheel of a natal-and-transit "
+            + "chart, and the outermost ring of a synastry tri-wheel.</html>"));
+        body.add(Box.createRigidArea(new Dimension(0, 10)));
+
         JCheckBox degreeLines = new JCheckBox("Draw a line from each body to its exact degree",
             Settings.showDegreeLines());
         degreeLines.setForeground(TEXT);
@@ -668,6 +687,39 @@ public class SettingsPanel extends JPanel {
      * That stays the default and the chip shows it; picking here adds an override that wins
      * over the element, and right-click gives the element back.
      */
+    /**
+     * One "what shape does this chart's bodies wear" row.
+     *
+     * <b>Built rather than written out three times.</b> The three differ only in their label,
+     * their current value and where the choice is stored; three hand-written copies is where
+     * the third one keeps a tooltip that describes the second one's combo.
+     */
+    private JPanel markerRow(String label, String current,
+                             java.util.function.Consumer<String> save, String tip) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        row.setBackground(Color.BLACK);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel text = new JLabel(label);
+        text.setForeground(TEXT);
+        text.setFont(Theme.BODY);
+        final JComboBox<String> combo = new JComboBox<>(Settings.MARKER_SHAPES);
+        seeding = true;
+        combo.setSelectedItem(current);
+        seeding = false;
+        Widgets.styleCombo(combo);
+        combo.setToolTipText(tip);
+        combo.addActionListener(e -> {
+            Object picked = combo.getSelectedItem();
+            if (!constructing && !seeding && picked != null) {
+                save.accept(String.valueOf(picked));
+                applyPalette();
+            }
+        });
+        row.add(text);
+        row.add(combo);
+        return row;
+    }
+
     private JButton bodySwatch(final int bodyIndex, final JCheckBox box) {
         final String id = Bodies.at(bodyIndex).id;
         return chip(() -> bodyDisplayColor(bodyIndex),

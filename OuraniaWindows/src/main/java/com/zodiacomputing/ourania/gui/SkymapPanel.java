@@ -244,8 +244,25 @@ extends JPanel {
     public static boolean triWheelShown(ChartMode mode, boolean transits) {
         return mode == ChartMode.SYNASTRY && transits;
     }
+
+    /**
+     * Which bead shape the outer wheel wears, which depends on what it is carrying.
+     *
+     * <b>Asked of the mode, not of the ring number</b>, for the same reason
+     * {@link #outerWheelShown} is: in synastry the outer wheel is the second person and the
+     * sky goes to the tri-wheel ring outside it, while in every other mode the outer wheel IS
+     * the sky. A rule written per-ring would give chart B the transit shape in exactly the
+     * chart - two people plus transits - that this shape exists to disentangle.
+     */
+    public static String outerRingMarker(ChartMode mode) {
+        return mode == ChartMode.SYNASTRY
+            ? Settings.synastryMarker()
+            : Settings.transitMarker();
+    }
     private SweDate transitSd;
     private ZonedDateTime transitChartTime;
+    /** The bottom drawer: transport controls, with the live moment on its handle. */
+    private Drawer timeDrawer;
     private double transitLatitude = 51.4779;
     private double transitLongitude = 0.0;
 
@@ -1657,9 +1674,23 @@ extends JPanel {
         this.chartPanel.setToolTipText("");
         javax.swing.ToolTipManager.sharedInstance().setInitialDelay(220);
         javax.swing.ToolTipManager.sharedInstance().setDismissDelay(20000);
-        this.add((Component)this.chartPanel, "Center");
+        // chartPanel goes in via the OverlayDock below, so the transport drawer can lie
+        // over the bottom of the wheel's area rather than taking height from it.
         controlPanel = this.createControlPanel();
-        this.add((Component)controlPanel, "South");
+        // <b>The transport row goes in a drawer, and its handle is the clock.</b> The strip
+        // was two wrapped rows of controls permanently across the bottom of the window, most
+        // of them set once and left alone. Put away, the one thing that must stay readable is
+        // the moment being drawn - which is exactly what a handle spanning the window has
+        // room for, so the handle carries it rather than a separate always-on label competing
+        // for the same space.
+        this.timeDrawer = new Drawer(Drawer.Side.BOTTOM, "", controlPanel, 120);
+        // <b>Over the wheel's area, not under it.</b> Pushing moved the wheel up and rescaled
+        // it every time the row was opened, so glancing at the transport buttons redrew the
+        // whole chart. Overlaid, the wheel does not move at all - the row covers the empty
+        // band below a circle inscribed in a rectangle, which is space the chart was not
+        // using.
+        this.add(new OverlayDock(this.chartPanel, null, this.timeDrawer), "Center");
+        this.refreshTimeReadout();
         this.animationTimer = new Timer(50, actionEvent -> {
             if (this.isPlaying) {
                 this.stepTime();
@@ -2478,6 +2509,32 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         });
         this.refreshDebounce.setRepeats(false);
         this.refreshDebounce.start();
+    }
+
+    /**
+     * Puts the moment being drawn onto the bottom drawer's handle.
+     *
+     * Called on every chart update, so stepping time with the transport buttons moves the
+     * readout whether the drawer is open or shut - which is the point of putting it there.
+     */
+    private void refreshTimeReadout() {
+        if (this.timeDrawer == null) {
+            return;
+        }
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("d MMM yyyy  HH:mm");
+        StringBuilder out = new StringBuilder();
+        if (this.baseChartTime != null) {
+            out.append(this.baseChartTime.format(fmt));
+        }
+        out.append(String.format("   %.2f, %.2f", this.baseLatitude, this.baseLongitude));
+        // The outer wheel is a second moment, and it is the one the transport usually moves,
+        // so it is named rather than left for the reader to infer from a changing number.
+        ZonedDateTime outer = this.isRelationshipChart()
+            ? this.compositeTransitTime : this.transitChartTime;
+        if (this.showTransitChart && outer != null) {
+            out.append("      sky: ").append(outer.format(fmt));
+        }
+        this.timeDrawer.setLabel(out.toString());
     }
 
     private JPanel createControlPanel() {
@@ -4305,6 +4362,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.generatePlanetPlacementsHtml(PlacementPart.TRANSITS),
                 this.generatePlanetPlacementsHtml(PlacementPart.GRID));
         }
+        this.refreshTimeReadout();
         this.refreshReadingIfShown();
     }
 
@@ -4525,7 +4583,21 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         String stringArray;
         int n3;
         StringBuilder stringBuilder = new StringBuilder("<html><body style='font-family:Arial; font-size:12px; color:white;'>");
-        String string = this.chartMode == ChartMode.SYNASTRY ? "Chart A (Inner)" : (this.chartMode == ChartMode.COMPOSITE_MIDPOINT || this.chartMode == ChartMode.COMPOSITE_DAVISON ? "Composite Chart" : "Natal Chart");
+        // <b>A loaded chart is somebody's, and says so.</b> The heading read "Natal Chart"
+        // whichever profile was open, so with several charts saved the one fact a reader most
+        // needs - which of them am I looking at - was the one the panel would not state. The
+        // possessive is dropped for a composite, which belongs to two people rather than one,
+        // and for hand-entered data, which genuinely has no name.
+        String who = this.window == null ? "" : OuraniaWindow.possessive(this.window.chartName());
+        String string;
+        if (this.chartMode == ChartMode.SYNASTRY) {
+            string = who.isEmpty() ? "Chart A (Inner)" : who + "Chart (Inner)";
+        } else if (this.chartMode == ChartMode.COMPOSITE_MIDPOINT
+                || this.chartMode == ChartMode.COMPOSITE_DAVISON) {
+            string = "Composite Chart";
+        } else {
+            string = who + "Natal Chart";
+        }
         // Hoisted above the gate: the transit block below formats its own timestamps with
         // this same formatter, so leaving it inside the natal section made it invisible there.
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy HH:mm z");
@@ -5159,7 +5231,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // ground and is the only warm thing in a cool palette.
                     Color angle = ChartPalette.colorOr(ChartPalette.angleHex("#D4AF37"),
                         new Color(212, 175, 55));
-                    this.drawMetallicSphere(graphics2D, n4, n26, 13, angle);
+                    this.drawBodyMarker(graphics2D, n4, n26, 13, angle,
+                        Settings.natalMarker());
                     // The glyph reads against its own bead rather than against a fixed dark
                     // brown, which disappears on a pale marker.
                     graphics2D.setColor(SkymapPanel.readableOn(angle));
@@ -5178,7 +5251,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 }
                 GlyphSize glyphSize = SkymapPanel.natalSize(n7);
                 graphics2D.setFont(glyphSize.font);
-                this.drawMetallicSphere(graphics2D, n4, n26, glyphSize.radius, new Color(192, 192, 192));
+                this.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
+                    new Color(192, 192, 192), Settings.natalMarker());
                 if (n7 == MOON && SkymapPanel.this.bValid[SUN]) {
                     double d11 = (SkymapPanel.this.bLon[MOON] - SkymapPanel.this.bLon[SUN]) % 360.0;
                     if (d11 < 0.0) {
@@ -5211,7 +5285,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     int n27 = n13 + (int)((double)nArray2[n7] * Math.sin(d12));
                     if (Bodies.at(n7).isAngle()) {
                         graphics2D.setFont(ANGLE_FONT);
-                        this.drawMetallicCube(graphics2D, n4, n27, 13, new Color(94, 82, 46));
+                        this.drawBodyMarker(graphics2D, n4, n27, 13, new Color(94, 82, 46),
+                            SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
                         graphics2D.setColor(new Color(255, 228, 160));
                         object = Bodies.at((int)n7).glyph;
                         graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n27 + 4);
@@ -5220,7 +5295,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     GlyphSize glyphSize2 = SkymapPanel.transitSize(n7);
                     graphics2D.setFont(glyphSize2.font);
                     object = SkymapPanel.lighten(SkymapPanel.this.bodyColor(n7), 0.45);
-                    this.drawMetallicCube(graphics2D, n4, n27, glyphSize2.radius, new Color(62, 66, 76));
+                    this.drawBodyMarker(graphics2D, n4, n27, glyphSize2.radius,
+                        new Color(62, 66, 76),
+                        SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
                     if (n7 == MOON && SkymapPanel.this.tValid[SUN]) {
                         double d13 = (SkymapPanel.this.tLon[MOON] - SkymapPanel.this.tLon[SUN]) % 360.0;
                         if (d13 < 0.0) {
@@ -5234,8 +5311,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     graphics2D.drawString(string, n4 - graphics2D.getFontMetrics().stringWidth(string) / 2, n27 + glyphSize2.baseline);
                 }
             }
-            // Tri-wheel: sky positions in the outermost ring, distinguished by a blue-tinted
-            // cube to tell them apart from the synastry ring's golden cubes.
+            // Tri-wheel: sky positions in the outermost ring. Blue-tinted, and by default a
+            // different shape from the synastry ring inside it - see Settings.MARKER_SHAPES
+            // for why the tint alone was not enough.
             if (SkymapPanel.this.showTriWheel) {
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
                     if (!SkymapPanel.this.cValid[n7]) continue;
@@ -5244,7 +5322,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     int n28 = n13 + (int)((double)nArrayC[n7] * Math.sin(d14));
                     if (Bodies.at(n7).isAngle()) {
                         graphics2D.setFont(ANGLE_FONT);
-                        this.drawMetallicCube(graphics2D, n4, n28, 13, new Color(20, 60, 90));
+                        this.drawBodyMarker(graphics2D, n4, n28, 13, new Color(20, 60, 90),
+                            Settings.transitMarker());
                         graphics2D.setColor(new Color(160, 210, 255));
                         object = Bodies.at((int)n7).glyph;
                         graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n28 + 4);
@@ -5253,7 +5332,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     GlyphSize glyphSize3 = SkymapPanel.transitSize(n7);
                     graphics2D.setFont(glyphSize3.font);
                     Color cColor = SkymapPanel.lighten(SkymapPanel.this.bodyColor(n7), 0.6);
-                    this.drawMetallicCube(graphics2D, n4, n28, glyphSize3.radius, new Color(20, 50, 80));
+                    this.drawBodyMarker(graphics2D, n4, n28, glyphSize3.radius,
+                        new Color(20, 50, 80), Settings.transitMarker());
                     if (n7 == MOON && SkymapPanel.this.cValid[SUN]) {
                         double d15 = (SkymapPanel.this.cLon[MOON] - SkymapPanel.this.cLon[SUN]) % 360.0;
                         if (d15 < 0.0) d15 += 360.0;
@@ -5265,6 +5345,73 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     graphics2D.drawString(stringC, n4 - graphics2D.getFontMetrics().stringWidth(stringC) / 2, n28 + glyphSize3.baseline);
                 }
             }
+        }
+
+        /**
+         * The bead a glyph sits on, in whatever shape its ring's role asks for.
+         *
+         * <b>One gate for the classical look.</b> {@code showPlanetSpheres} used to be checked
+         * inside drawMetallicSphere alone, so switching it off cleared the natal ring and left
+         * the outer wheels drawing cubes - a chart that had asked for bare glyphs and got them
+         * on one ring out of three. Every marker now comes through here, so the switch means
+         * what it says.
+         */
+        private void drawBodyMarker(Graphics2D graphics2D, int n, int n2, int n3, Color color,
+                                    String shape) {
+            if (!Settings.showPlanetSpheres()) {
+                return;
+            }
+            if (Settings.MARKER_CUBE.equals(shape)) {
+                this.drawMetallicCube(graphics2D, n, n2, n3, color);
+            } else if (Settings.MARKER_PYRAMID.equals(shape)) {
+                this.drawMetallicPyramid(graphics2D, n, n2, n3, color);
+            } else if (Settings.MARKER_SPHERE.equals(shape)) {
+                this.drawMetallicSphere(graphics2D, n, n2, n3, color);
+            }
+            // MARKER_NONE draws nothing, which is the whole of what it is for.
+        }
+
+        /**
+         * A four-sided pyramid seen from the same angle as the cube.
+         *
+         * <b>Two faces, because only two are ever visible.</b> Drawing the back pair as well
+         * would put seams across a bead thirteen pixels wide. The lit face is on the left and
+         * the shaded one on the right, which is the cube's convention - the two have to read
+         * as the same chart lit by the same lamp, or the wheel looks like two drawings.
+         */
+        private void drawMetallicPyramid(Graphics2D graphics2D, int n, int n2, int n3,
+                                         Color color) {
+            // <b>Wider at the base than the cube is.</b> A pyramid's mass is at the bottom, so
+            // at the height the glyph is drawn it is only about two thirds as wide as a cube of
+            // the same radius - and the glyph overhung the sides. Widening the base restores
+            // the width where the glyph actually sits, and keeps the three shapes reading as
+            // one weight on the ring.
+            int n4 = (int)((double)n3 * 1.18);
+            int n5 = (int)((double)n3 * 0.52);
+            int n6 = (int)((double)n3 * 0.95);
+            int apexY = n2 - n6 / 2 - n5;
+            int baseY = n2 + n6 / 2;
+            int footY = baseY + n5;
+            Polygon left = new Polygon(new int[]{n, n - n4, n},
+                new int[]{apexY, baseY, footY}, 3);
+            Polygon right = new Polygon(new int[]{n, n + n4, n},
+                new int[]{apexY, baseY, footY}, 3);
+            Paint paint = graphics2D.getPaint();
+            Stroke stroke = graphics2D.getStroke();
+            Color color2 = color.brighter();
+            Color color3 = color.darker();
+            graphics2D.setPaint(new GradientPaint(n - n4, apexY, color2, n, footY,
+                color2.darker()));
+            graphics2D.fill(left);
+            graphics2D.setPaint(new GradientPaint(n, apexY, color3.brighter(), n + n4, footY,
+                color3.darker().darker()));
+            graphics2D.fill(right);
+            graphics2D.setPaint(paint);
+            graphics2D.setColor(color.darker().darker());
+            graphics2D.setStroke(new BasicStroke(1.0f));
+            graphics2D.draw(left);
+            graphics2D.draw(right);
+            graphics2D.setStroke(stroke);
         }
 
         private void drawMetallicCube(Graphics2D graphics2D, int n, int n2, int n3, Color color) {
@@ -5297,17 +5444,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
 
         /**
-         * The bead a glyph sits on.
+         * The bead a glyph sits on: the metallic sphere, and the default for a natal ring.
          *
-         * <b>Optional, for a traditional chart.</b> The metallic sphere is a modern rendering
-         * convention; a classical wheel puts the bare glyph on the ring and nothing behind it.
-         * Switched off, this draws nothing at all rather than a flat disc - a disc would still
-         * cover the ring lines and degree ticks the traditional look is meant to show.
+         * <b>Whether any bead is drawn is decided by drawBodyMarker, not here.</b> This method
+         * used to test showPlanetSpheres itself, which read as the switch belonging to the
+         * sphere rather than to the beads - and it did, which is exactly how the cubes went on
+         * being drawn on a chart that had asked for bare glyphs.
          */
         private void drawMetallicSphere(Graphics2D graphics2D, int n, int n2, int n3, Color color) {
-            if (!Settings.showPlanetSpheres()) {
-                return;
-            }
             float[] fArray = new float[]{0.0f, 0.4f, 1.0f};
             Color color2 = new Color(255, 255, 255, 200);
             Color color3 = color.darker().darker();

@@ -21,6 +21,8 @@ public class ChartSetupPanel extends JPanel {
     private String homeLocation = "Los Angeles, CA";
 
     private OuraniaWindow parentWindow;
+    /** The saved-chart directory, living beside the forms it fills. */
+    private ProfileListPanel profiles;
 
     // Natal Chart Fields
     private JTextField baseDateField;
@@ -352,7 +354,24 @@ public class ChartSetupPanel extends JPanel {
         formPanel.add(basePanel);
         formPanel.add(transitPanel);
         
-        add(formPanel, BorderLayout.CENTER);
+        // <b>The saved charts belong beside the fields they fill.</b> They were a section in
+        // the menu drawer, which meant choosing whose chart to draw happened in one place and
+        // entering a chart happened in another - and the drawer had to be wide enough to hold
+        // a name plus two slot buttons on every row. Here, Chart A and Chart B sit next to the
+        // Chart A and Chart B forms they load into, which is what those buttons mean.
+        JPanel setupWithProfiles = new JPanel(new BorderLayout());
+        setupWithProfiles.setBackground(Theme.BG);
+        setupWithProfiles.add(formPanel, BorderLayout.CENTER);
+        profiles = new ProfileListPanel(parentWindow);
+        JScrollPane profileScroll = new JScrollPane(profiles);
+        profileScroll.setBorder(BorderFactory.createEmptyBorder());
+        profileScroll.getViewport().setBackground(Theme.BG);
+        profileScroll.setPreferredSize(new Dimension(250, 0));
+        profileScroll.setHorizontalScrollBarPolicy(
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        Widgets.styleScrollPane(profileScroll);
+        setupWithProfiles.add(profileScroll, BorderLayout.EAST);
+        add(setupWithProfiles, BorderLayout.CENTER);
         
         // --- BUTTONS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -548,6 +567,26 @@ public class ChartSetupPanel extends JPanel {
     }
 
     /** Which engines a subject's step 2 offers. The memory is only written through this. */
+    /**
+     * Re-reads the saved-chart directory.
+     *
+     * A chart saved here lands in the store this list reads, and generating is what follows a
+     * save - so a new name should appear then. The call used to live in the sidebar, which is
+     * where the list used to live.
+     */
+    public void refreshProfiles() {
+        if (profiles != null) {
+            profiles.rebuild();
+        }
+    }
+
+    /** True for the modes in which the second chart is a person rather than a moment. */
+    static boolean isRelationship(ChartMode m) {
+        return m == ChartMode.SYNASTRY
+            || m == ChartMode.COMPOSITE_MIDPOINT
+            || m == ChartMode.COMPOSITE_DAVISON;
+    }
+
     private static boolean allows(Subject s, ChartMode m) {
         switch (s) {
             case MYSELF:      return m == ChartMode.SINGLE || m == ChartMode.TRANSIT;
@@ -1095,16 +1134,26 @@ public class ChartSetupPanel extends JPanel {
             transitDateField.setText(e.date);
             transitTimeField.setText(e.time);
             transitLocationField.setText(e.location);
-            if (!allows(subject, selectedMode)  || selectedMode == ChartMode.SINGLE) {
+            // <b>A saved profile is a person, so Chart B is a second chart and never a
+            // transit moment.</b> This used to switch to synastry only from SINGLE, so
+            // loading someone into Chart B while the mode was Natal & Transit left the mode
+            // alone and their birth data went into the transit fields - the app then drew
+            // their nativity as the sky over Chart A, which is a different claim entirely and
+            // looked like a working chart. Any non-relationship mode now becomes synastry;
+            // a composite is left as it is, being already a relationship reading.
+            if (!isRelationship(selectedMode)) {
                 setSubject(Subject.PARTNERSHIP);
-            }
-            if (selectedMode == ChartMode.SINGLE) {
                 setMode(ChartMode.SYNASTRY);
             }
         } else {
             baseDateField.setText(e.date);
             baseTimeField.setText(e.time);
             baseLocationField.setText(e.location);
+            // The wheel's heading takes the name from here; without this a loaded chart is
+            // titled the same as a typed one.
+            if (parentWindow != null) {
+                parentWindow.setChartName(name);
+            }
         }
         generateChart();
     }
@@ -1117,7 +1166,19 @@ public class ChartSetupPanel extends JPanel {
         baseDateField.setText(e.date);
         baseTimeField.setText(e.time);
         baseLocationField.setText(e.location);
+        if (parentWindow != null) {
+            parentWindow.setChartName(lastPicked);
+        }
     }
+
+    /**
+     * The name chosen in the last {@link #pickChart} dialog.
+     *
+     * The dialog picks by name and then throws the name away, returning only the dates. The
+     * wheel's heading needs the name, so it is kept here rather than by asking the user to
+     * choose twice.
+     */
+    private String lastPicked = "";
 
     private SavedCharts.Entry pickChart(String title) {
         java.util.List<String> names = SavedCharts.names();
@@ -1129,6 +1190,9 @@ public class ChartSetupPanel extends JPanel {
         String[] options = names.toArray(new String[0]);
         String selected = (String) JOptionPane.showInputDialog(this, "Select a chart:",
             title, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+        if (selected != null) {
+            lastPicked = selected;
+        }
         return selected == null ? null : SavedCharts.get(selected);
     }
 }

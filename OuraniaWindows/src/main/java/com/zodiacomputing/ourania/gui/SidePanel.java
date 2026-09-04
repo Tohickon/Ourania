@@ -15,16 +15,18 @@ import java.awt.Component;
 import java.awt.Dimension;
 
 /**
- * The side panel: one drawer, on the right, holding everything.
+ * The menu: what the app can DO, behind the Menu tab of the right-hand rail.
  *
  * <p><b>Two sidebars became one.</b> Navigation and the saved-chart directory were on the left,
  * the chart's own data on the right, and the chart sat between them with a handle down each
  * edge. That is two things to learn where nothing needed to be in two places: the wheel is the
  * page, and everything else is a panel you pull out beside it.
  *
- * <p>Sections, top to bottom: <b>Menu, Saved Charts, Natal Chart, Transits, Aspect Grids,
- * Readings</b>. They expand and retract independently - see {@link Accordion} for why not
- * one-at-a-time.
+ * <p>What is left here is the six screens as a plain column, then <b>Tables</b> and
+ * <b>Export</b> as accordion sections. Everything about the chart itself - its placements,
+ * the transits, the selection, the readings - went to the left rail, and the aspect grid is
+ * the other tab of the rail this sits in. Sections expand and retract independently; see
+ * {@link Accordion} for why not one-at-a-time.
  *
  * <h2>What was removed on the way, and why</h2>
  *
@@ -41,15 +43,8 @@ import java.awt.Dimension;
  */
 public final class SidePanel extends JPanel {
 
-    static final String SELECTION = "Selection";
-    static final String MENU = "Menu";
-    static final String PROFILES = "Saved Charts";
-    static final String NATAL = "Natal Chart";
-    static final String TRANSITS = "Transits";
-    static final String GRIDS = "Aspect Grids";
     static final String EXPORT = "Export";
     static final String TABLES = "Tables";
-    static final String READINGS = "Readings";
 
     /**
      * The screens the menu offers, and every one of them is real.
@@ -69,14 +64,19 @@ public final class SidePanel extends JPanel {
             "Which points the chart shows, house system defaults and the rest"},
     };
 
+    /**
+     * How wide the rail opens this panel.
+     *
+     * <b>Narrower than it was.</b> 310px was sized for the placements and the aspect grid,
+     * which have both moved off this panel; what is left is a column of short rows, and the
+     * panel was carrying half a panel of empty space at the chart's expense every time it
+     * opened.
+     */
+    static final int MENU_WIDTH = 196;
+
     private final OuraniaWindow window;
     private final Accordion accordion;
-    private final Drawer drawer;
-    private final ProfileListPanel profiles;
-    private final JEditorPane selectionPane;
-    private final JEditorPane natalPane;
-    private final JEditorPane transitPane;
-    private final JEditorPane gridPane;
+    private JPanel screens;
 
     public SidePanel(OuraniaWindow window) {
         this.window = window;
@@ -86,31 +86,16 @@ public final class SidePanel extends JPanel {
         accordion = new Accordion();
         accordion.setBorder(Theme.pad(Theme.GAP, Theme.GAP, Theme.GAP, Theme.GAP));
 
-        // <b>First in the list, because it is the only section about what you just did.</b>
-        // Everything below it describes the whole chart; this describes the one body under the
-        // cursor when you clicked, and it is filled on demand rather than on every chart update.
-        selectionPane = HtmlPanes.chartPane(window);
-        Accordion.Section selectionSection = accordion.addSection(SELECTION, selectionPane);
-        selectionSection.setMaxOpenHeight(360);
-
-        JPanel screens = column();
+        // <b>The Menu section is gone and its six screens sit at the drawer's own level.</b>
+        // Reaching Settings used to be: open the drawer, open Menu, click Settings - three
+        // acts for one destination, with the middle one existing only to hold the other two.
+        // A wrapper whose whole content is a list of links is a level of nesting that earns
+        // nothing, and this app has removed several of those already.
+        screens = column();
         for (String[] screen : SCREENS) {
             screens.add(screenButton(screen[0], screen[1], screen[2]));
         }
-        accordion.addSection(MENU, screens);
 
-        profiles = new ProfileListPanel(window);
-        accordion.addSection(PROFILES, profiles);
-
-        natalPane = HtmlPanes.chartPane(window);
-        accordion.addSection(NATAL, natalPane);
-        transitPane = HtmlPanes.chartPane(window);
-        accordion.addSection(TRANSITS, transitPane);
-        gridPane = HtmlPanes.chartPane(window);
-        Accordion.Section gridSection = accordion.addSection(GRIDS, gridPane);
-        // The grid is the tallest thing this drawer holds and the one a reader scans rather
-        // than reads, so it gets more room before it starts scrolling.
-        gridSection.setMaxOpenHeight(520);
 
         // Three engines that were computed, checked and unreachable until 2026-09-02. A
         // capability with no door is invisible in exactly the way a missing one is not: the
@@ -154,19 +139,6 @@ public final class SidePanel extends JPanel {
             "The reading on screen to the clipboard, as plain text"));
         accordion.addSection(EXPORT, export);
 
-        JPanel readings = column();
-        readings.add(readingButton("Snapshot", "SNAPSHOT",
-            "Read the natal chart as it currently stands"));
-        readings.add(readingButton("Report", "REPORT",
-            "The full reading: shape, weights, repeated themes, tensions"));
-        readings.add(readingButton("Synthesize", "SYNTHESIZE",
-            "Generate a narrative reading based on the chart"));
-        readings.add(readingButton("Predict", "TIMELINE",
-            "Generate a timeline prediction based on the chart"));
-        readings.add(readingButton("Calendar", "CALENDAR",
-            "Ingresses, stations, lunations and mundane aspects for the year"));
-        accordion.addSection(READINGS, readings);
-
         JLabel heading = new JLabel("Ourania+", SwingConstants.CENTER);
         heading.setForeground(Theme.TEXT);
         heading.setFont(Theme.TITLE);
@@ -174,10 +146,16 @@ public final class SidePanel extends JPanel {
 
         JPanel top = new JPanel(new BorderLayout());
         top.setBackground(Theme.BG);
+        // The six destinations first, then the sections that hold content. Where you can go
+        // is a shorter list than what you can read, and it does not change with the chart.
+        JPanel stack = new JPanel(new BorderLayout());
+        stack.setBackground(Theme.BG);
+        stack.add(screens, BorderLayout.NORTH);
+        stack.add(accordion, BorderLayout.CENTER);
         // NORTH, not CENTER: the accordion's height is the sum of whatever is open, and given
         // CENTER it would be stretched to the drawer's full height with the closed sections
         // drifting apart down the column.
-        top.add(accordion, BorderLayout.NORTH);
+        top.add(stack, BorderLayout.NORTH);
         JScrollPane scroll = new JScrollPane(top);
         scroll.setBorder(BorderFactory.createEmptyBorder());
         scroll.getViewport().setBackground(Theme.BG);
@@ -189,45 +167,22 @@ public final class SidePanel extends JPanel {
         inner.add(heading, BorderLayout.NORTH);
         inner.add(scroll, BorderLayout.CENTER);
 
-        drawer = new Drawer(Drawer.Side.RIGHT, "Menu", inner, 310);
-        // Open on launch, and without animating: an app that slides its own panel out on every
-        // start is animating at the one moment nobody asked it to.
-        drawer.openImmediately();
-        Accordion.Section natalSection = accordion.section(NATAL);
-        if (natalSection != null) {
-            natalSection.setOpen(true);
-        }
-        add(drawer, BorderLayout.CENTER);
+        // <b>This is a page in the right-hand rail, not a drawer of its own.</b> Wrapping
+        // itself in one was right while it was the only thing on this edge. The aspect grid
+        // is on that edge now, and two drawers side by side put one strip in front of the
+        // other rather than beside it - so the rail owns the sliding, the handle and the
+        // opening-on-launch, and this class is only what sits behind the Menu tab.
+        add(inner, BorderLayout.CENTER);
     }
 
     /**
-     * Shows one body's detail, opening the drawer and the section to do it.
+     * Refreshes what this panel still owns when the chart changes.
      *
-     * <b>Opens what it needs rather than assuming.</b> A click that filled a section inside a
-     * shut drawer would do nothing visible at all, and the reader would conclude clicking
-     * bodies is not a thing this app does.
+     * The natal, transit and grid panes moved to the left rail and the grid tab, so this no
+     * longer fills them - it keeps the saved-chart list current and re-measures the open
+     * sections.
      */
-    public void showSelection(String html) {
-        HtmlPanes.setHtml(selectionPane, html);
-        Accordion.Section section = accordion.section(SELECTION);
-        if (section != null) {
-            section.setOpen(true);
-        }
-        if (!drawer.isOpen()) {
-            drawer.setOpen(true);
-        }
-    }
-
-    /** Fills the three chart sections, each from its own part of the wheel's HTML. */
-    public void updateChartSections(String natalHtml, String transitHtml, String gridHtml) {
-        HtmlPanes.setHtml(natalPane, natalHtml);
-        HtmlPanes.setHtml(transitPane, transitHtml);
-        HtmlPanes.setHtml(gridPane, gridHtml);
-        // A chart saved from Chart Setup lands in the store the directory reads, and
-        // generating is what follows a save - so this is when a new name should appear.
-        if (profiles != null) {
-            profiles.rebuild();
-        }
+    public void updateChartSections() {
         // Re-measures whatever is open, so new content is not clipped at the old height: a
         // chart change can turn three placements into thirty.
         for (Accordion.Section section : accordion.sections()) {
@@ -237,9 +192,9 @@ public final class SidePanel extends JPanel {
         }
     }
 
-    /** The aspect grid exactly as this drawer is showing it, for export. */
-    String gridHtml() {
-        return gridPane == null ? "" : gridPane.getText();
+    /** The screens column, for a check that needs to walk the destinations. */
+    JPanel screensColumn() {
+        return screens;
     }
 
     /** The accordion, for a check that needs to walk the sections. */

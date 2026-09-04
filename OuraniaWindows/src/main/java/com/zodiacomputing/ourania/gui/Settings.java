@@ -104,6 +104,75 @@ public final class Settings {
         set(SPHERES_KEY, on ? "true" : "false");
     }
 
+    // ------------------------------------------------------------------- marker shapes
+
+    /**
+     * The bead shapes a body can be drawn on.
+     *
+     * <b>Shape is what tells the rings apart; colour could not do it alone.</b> A synastry
+     * tri-wheel draws three sets of bodies at once - this chart, the other person's, and the
+     * sky - and two of the three were cubes separated only by a tint. That distinction is the
+     * first thing lost to a small window, a projector or a printout, and it asks the reader to
+     * compare two shades on opposite sides of the wheel to decide whose Mars they are looking
+     * at. A sphere, a pyramid and a cube are told apart at a glance and survive all three.
+     */
+    public static final String MARKER_SPHERE = "Sphere";
+    public static final String MARKER_CUBE = "Cube";
+    public static final String MARKER_PYRAMID = "Pyramid";
+    /** No bead: the bare glyph, with the ring lines and ticks visible behind it. */
+    public static final String MARKER_NONE = "Bare glyph";
+
+    public static final String[] MARKER_SHAPES =
+        {MARKER_SPHERE, MARKER_CUBE, MARKER_PYRAMID, MARKER_NONE};
+
+    public static final String MARKER_NATAL_KEY = "chart.marker.natal";
+    public static final String MARKER_SYNASTRY_KEY = "chart.marker.synastry";
+    public static final String MARKER_TRANSIT_KEY = "chart.marker.transit";
+
+    /**
+     * A stored shape name, or the fallback when it is not one this app draws.
+     *
+     * <b>Split from the getters so it can be checked without touching the file.</b> The
+     * settings file is edited by hand often enough that a typo reaching the wheel as "draw
+     * nothing" is a real outcome, and a fallback that is only exercised through disk I/O is a
+     * fallback nobody tests.
+     */
+    static String markerOr(String value, String fallback) {
+        for (String s : MARKER_SHAPES) {
+            if (s.equals(value)) {
+                return s;
+            }
+        }
+        return fallback;
+    }
+
+    /** The chart at the centre of the wheel - yours. Spheres, as this app has always drawn. */
+    public static String natalMarker() {
+        return markerOr(get(MARKER_NATAL_KEY, MARKER_SPHERE), MARKER_SPHERE);
+    }
+
+    /** Chart B of a synastry: the second person, never the sky. */
+    public static String synastryMarker() {
+        return markerOr(get(MARKER_SYNASTRY_KEY, MARKER_PYRAMID), MARKER_PYRAMID);
+    }
+
+    /** The sky at the transit moment, wherever it is drawn. */
+    public static String transitMarker() {
+        return markerOr(get(MARKER_TRANSIT_KEY, MARKER_CUBE), MARKER_CUBE);
+    }
+
+    public static void setNatalMarker(String shape) {
+        set(MARKER_NATAL_KEY, markerOr(shape, MARKER_SPHERE));
+    }
+
+    public static void setSynastryMarker(String shape) {
+        set(MARKER_SYNASTRY_KEY, markerOr(shape, MARKER_PYRAMID));
+    }
+
+    public static void setTransitMarker(String shape) {
+        set(MARKER_TRANSIT_KEY, markerOr(shape, MARKER_CUBE));
+    }
+
     /** Settings key for the line from a body to its exact degree. */
     public static final String DEGREE_LINE_KEY = "chart.degreeLines";
 

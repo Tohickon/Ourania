@@ -48,8 +48,15 @@ import java.awt.event.MouseEvent;
  */
 public final class Drawer extends JPanel {
 
-    /** Which edge the drawer lives on. */
-    public enum Side { LEFT, RIGHT }
+    /**
+     * Which edge the drawer lives on.
+     *
+     * <b>LEFT and RIGHT open along the width; TOP and BOTTOM along the height.</b> Everything
+     * below that reads "width" predates the vertical pair and now means "extent along this
+     * drawer's own axis" - renaming it throughout would have touched every line in the class
+     * for no behavioural gain, so the axis is asked for explicitly where it matters instead.
+     */
+    public enum Side { LEFT, RIGHT, TOP, BOTTOM }
 
     /** Handle thickness: enough for a rotated label and a comfortable click target. */
     public static final int HANDLE_WIDTH = 26;
@@ -79,26 +86,67 @@ public final class Drawer extends JPanel {
     private boolean open;
     private int currentWidth;
     private int targetWidth;
+    /** Handle text, which the bottom drawer replaces as the clock moves. */
+    private String label;
 
     public Drawer(Side side, String handleLabel, JComponent content, int openWidth) {
         this.side = side;
         this.openWidth = openWidth;
+        this.label = handleLabel;
         setLayout(new BorderLayout());
         setBackground(HANDLE_BG);
         setOpaque(true);
 
-        handle = new Handle(handleLabel);
+        handle = new Handle();
         body = new JPanel(new BorderLayout());
         body.setBackground(Theme.BG);
+        // A hairline on the side the content faces, so an open drawer reads as a panel
+        // against the chart rather than as the chart having changed colour.
         body.setBorder(BorderFactory.createMatteBorder(
-            0, side == Side.LEFT ? 0 : 1, 0, side == Side.LEFT ? 1 : 0, EDGE));
+            side == Side.BOTTOM ? 1 : 0,
+            side == Side.RIGHT ? 1 : 0,
+            side == Side.TOP ? 1 : 0,
+            side == Side.LEFT ? 1 : 0, EDGE));
         body.add(content, BorderLayout.CENTER);
 
-        add(handle, side == Side.LEFT ? BorderLayout.WEST : BorderLayout.EAST);
+        add(handle, handlePosition());
         add(body, BorderLayout.CENTER);
 
         animator = new Timer(FRAME_MS, e -> step());
         applyWidth(0);
+    }
+
+    /** Which edge this drawer lives on, for a check that needs to pin the arrangement. */
+    Side side() {
+        return side;
+    }
+
+    /** Where this drawer's handle sits: always on the edge the drawer opens away from. */
+    private String handlePosition() {
+        switch (side) {
+            case LEFT:   return BorderLayout.WEST;
+            case RIGHT:  return BorderLayout.EAST;
+            case TOP:    return BorderLayout.NORTH;
+            default:     return BorderLayout.SOUTH;
+        }
+    }
+
+    /** True for a drawer that opens along the window's height rather than its width. */
+    private boolean vertical() {
+        return side == Side.TOP || side == Side.BOTTOM;
+    }
+
+    /**
+     * Replaces the handle's text.
+     *
+     * <b>For the bottom drawer, whose handle IS the clock.</b> The date, time and place have
+     * to stay readable while the transport controls are put away, and a handle that is
+     * already spanning the window is the one piece of chrome with room for them.
+     */
+    public void setLabel(String text) {
+        this.label = text == null ? "" : text;
+        handle.setToolTipText(this.label + " - click to open or close this panel");
+        handle.repaint();
     }
 
     public boolean isOpen() {
@@ -139,10 +187,15 @@ public final class Drawer extends JPanel {
     private void applyWidth(int width) {
         currentWidth = width;
         body.setVisible(width > 0);
-        Dimension d = new Dimension(HANDLE_WIDTH + width, 0);
-        setPreferredSize(d);
-        setMinimumSize(new Dimension(HANDLE_WIDTH, 0));
-        setMaximumSize(new Dimension(HANDLE_WIDTH + width, Integer.MAX_VALUE));
+        if (vertical()) {
+            setPreferredSize(new Dimension(0, HANDLE_WIDTH + width));
+            setMinimumSize(new Dimension(0, HANDLE_WIDTH));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, HANDLE_WIDTH + width));
+        } else {
+            setPreferredSize(new Dimension(HANDLE_WIDTH + width, 0));
+            setMinimumSize(new Dimension(HANDLE_WIDTH, 0));
+            setMaximumSize(new Dimension(HANDLE_WIDTH + width, Integer.MAX_VALUE));
+        }
         revalidate();
         Component parent = getParent();
         if (parent != null) {
@@ -160,11 +213,9 @@ public final class Drawer extends JPanel {
      */
     private final class Handle extends JComponent {
 
-        private final String label;
         private boolean hover;
 
-        Handle(String label) {
-            this.label = label;
+        Handle() {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
             setToolTipText(label + " - click to open or close this panel");
             addMouseListener(new MouseAdapter() {
@@ -189,7 +240,9 @@ public final class Drawer extends JPanel {
 
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(HANDLE_WIDTH, 0);
+            return vertical()
+                ? new Dimension(0, HANDLE_WIDTH)
+                : new Dimension(HANDLE_WIDTH, 0);
         }
 
         @Override
@@ -200,24 +253,42 @@ public final class Drawer extends JPanel {
             g2.setColor(open ? HANDLE_ON : (hover ? HANDLE_HOVER : HANDLE_BG));
             g2.fillRect(0, 0, getWidth(), getHeight());
             g2.setColor(open ? Theme.ACCENT : EDGE);
-            int edgeX = side == Side.LEFT ? getWidth() - 2 : 0;
-            g2.fillRect(edgeX, 0, open ? 2 : 1, getHeight());
+            int thick = open ? 2 : 1;
+            switch (side) {
+                case LEFT:   g2.fillRect(getWidth() - thick, 0, thick, getHeight()); break;
+                case RIGHT:  g2.fillRect(0, 0, thick, getHeight()); break;
+                case TOP:    g2.fillRect(0, getHeight() - thick, getWidth(), thick); break;
+                default:     g2.fillRect(0, 0, getWidth(), thick); break;
+            }
 
-            Font f = Theme.HEADING;
-            g2.setFont(f);
+            g2.setFont(Theme.HEADING);
             g2.setColor(open ? Color.WHITE : TEXT);
             FontMetrics fm = g2.getFontMetrics();
             // ASCII arrows: this font renders the triangle glyphs as empty boxes, which is
             // why the wheel's drawer labels use "..." and why "Swap Natal / Transit" still
             // shows a box where its arrow should be.
-            String openArrow = side == Side.LEFT ? "<" : ">";
-            String shutArrow = side == Side.LEFT ? ">" : "<";
-            String text = (open ? openArrow : shutArrow) + "  " + label;
-            // Bottom-to-top, the convention for a vertical tab on either edge.
-            g2.rotate(-Math.PI / 2.0);
-            int textX = -(getHeight() + fm.stringWidth(text)) / 2;
-            int textY = (getWidth() + fm.getAscent()) / 2 - 2;
-            g2.drawString(text, textX, textY);
+            String arrow;
+            switch (side) {
+                case LEFT:   arrow = open ? "<" : ">"; break;
+                case RIGHT:  arrow = open ? ">" : "<"; break;
+                case TOP:    arrow = open ? "^" : "v"; break;
+                default:     arrow = open ? "v" : "^"; break;
+            }
+            String text = arrow + "  " + label;
+            if (vertical()) {
+                // <b>Horizontal, not rotated.</b> A top or bottom handle is as wide as the
+                // window and as thin as the text is tall, so the rotation that makes a side
+                // tab readable would stand the label on its end in a 26px-high strip.
+                int textX = (getWidth() - fm.stringWidth(text)) / 2;
+                int textY = (getHeight() + fm.getAscent()) / 2 - 2;
+                g2.drawString(text, Math.max(8, textX), textY);
+            } else {
+                // Bottom-to-top, the convention for a vertical tab on either edge.
+                g2.rotate(-Math.PI / 2.0);
+                int textX = -(getHeight() + fm.stringWidth(text)) / 2;
+                int textY = (getWidth() + fm.getAscent()) / 2 - 2;
+                g2.drawString(text, textX, textY);
+            }
             g2.dispose();
         }
     }

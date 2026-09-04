@@ -124,6 +124,22 @@ final class HtmlPanes {
      * animation frame while the wheel is playing, and a pane that jumped back to the top on
      * each frame could not be read at all.
      */
+    /**
+     * Wraps a pane so it can scroll inside a drawer.
+     *
+     * A drawer gives its content a fixed slice of the window, and a chart with thirty
+     * placements does not fit it. Without this the content is simply clipped, which looks
+     * like a chart that stops halfway rather than like a panel that needs scrolling.
+     */
+    static javax.swing.JScrollPane scroller(JEditorPane pane) {
+        javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(pane);
+        scroll.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        scroll.getViewport().setBackground(Theme.BG);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        Widgets.styleScrollPane(scroll);
+        return scroll;
+    }
+
     static void setHtml(JEditorPane pane, String html) {
         if (pane == null) {
             return;

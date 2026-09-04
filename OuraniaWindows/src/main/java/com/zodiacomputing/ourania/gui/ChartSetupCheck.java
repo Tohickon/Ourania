@@ -78,6 +78,12 @@ public final class ChartSetupCheck {
         report("Part E", before);
 
         System.out.println();
+        System.out.println("=== Part F: a saved person in Chart B is never a transit ===");
+        before = failures.size();
+        theSecondSlot();
+        report("Part F", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -337,6 +343,37 @@ public final class ChartSetupCheck {
         Method m = ChartSetupPanel.class.getDeclaredMethod("savesNatalData");
         m.setAccessible(true);
         return ((Boolean) m.invoke(panel)).booleanValue();
+    }
+
+    /**
+     * Loading a saved profile into Chart B means a relationship, from any starting mode.
+     *
+     * <b>It only switched from SINGLE.</b> Starting in Natal &amp; Transit and loading someone
+     * into Chart B left the mode alone, so their birth data went into the transit fields and
+     * the app drew their nativity as the sky over Chart A. That is a different claim from
+     * synastry and it looked like a working chart, which is what made it worth pinning: the
+     * failure had no symptom except being wrong.
+     *
+     * A composite is left alone - it is already a reading of two people.
+     */
+    private static void theSecondSlot() {
+        for (ChartMode from : ChartMode.values()) {
+            boolean relationship = ChartSetupPanel.isRelationship(from);
+            ok("isRelationship agrees with the mode " + from,
+                relationship == (from == ChartMode.SYNASTRY
+                    || from == ChartMode.COMPOSITE_MIDPOINT
+                    || from == ChartMode.COMPOSITE_DAVISON));
+        }
+        // The two that used to be handled differently from each other, and the reason why.
+        ok("a single chart is not a relationship",
+            !ChartSetupPanel.isRelationship(ChartMode.SINGLE));
+        ok("natal-and-transit is not a relationship - this is the one that leaked",
+            !ChartSetupPanel.isRelationship(ChartMode.TRANSIT));
+        ok("synastry is a relationship",
+            ChartSetupPanel.isRelationship(ChartMode.SYNASTRY));
+        ok("both composites are relationships",
+            ChartSetupPanel.isRelationship(ChartMode.COMPOSITE_MIDPOINT)
+                && ChartSetupPanel.isRelationship(ChartMode.COMPOSITE_DAVISON));
     }
 
     private static void ok(String label, boolean condition) {
