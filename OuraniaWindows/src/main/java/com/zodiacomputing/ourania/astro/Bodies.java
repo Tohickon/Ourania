@@ -390,6 +390,40 @@ public final class Bodies {
         return d.kind == Kind.ASTEROID || d.kind == Kind.POINT || d.kind == Kind.NODE;
     }
 
+    /**
+     * Whether a contact has a body behind it that can actually express it.
+     *
+     * <b>One rule, asked once, for every surface that ranks a contact.</b> The reading's
+     * aspect lists, the aspect card and the returns table were each deciding separately what
+     * counted as background, and two of them had drifted to different answers - the reading
+     * asking whether both ends were minor, the returns table whether the arriving end was.
+     * They are not two policies. They are one question, and the thing that differs is the
+     * contact, not the opinion.
+     *
+     * <b>What differs is whether the contact has a direction.</b> Two natal bodies belong to
+     * the same person and aspect each other mutually, so either end can carry it and the
+     * contact is background only when neither can. A return, a transit or a progression
+     * arrives at a natal chart from outside: the arriving end is the one making the
+     * statement, and the natal point is what it lands on. So a return Pholus exactly on the
+     * natal Sun is background however important the Sun is - the Sun is not what is
+     * happening, it is what is being happened to.
+     *
+     * Burk supplies the reasoning on both branches: the ten planets are the primary actors,
+     * and which end of a pair is doing the acting is already a distinction this engine draws
+     * when it refuses to let a calculated point cast an aspect.
+     *
+     * @param acting     the end making the statement - the arriving body in a directional
+     *                   contact, or either end of a mutual one
+     * @param receiving  the other end
+     * @param directional true when the contact arrives from outside the chart it lands on
+     */
+    public static boolean hasPrimaryActor(String acting, String receiving, boolean directional) {
+        if (directional) {
+            return !isMinor(acting);
+        }
+        return !isMinor(acting) || !isMinor(receiving);
+    }
+
     public static String meaningOf(String name) {
         Def d = byName(name);
         return d == null ? "" : d.meaning;

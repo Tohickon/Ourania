@@ -77,6 +77,12 @@ public final class BodyCheck {
         report("Part D", before);
 
         System.out.println();
+        System.out.println("=== Part E: one rule decides what counts as background ===");
+        before = failures.size();
+        primaryActor();
+        report("Part E", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -478,6 +484,63 @@ public final class BodyCheck {
                 return;
             }
         }
+    }
+
+    /**
+     * {@link Bodies#hasPrimaryActor} - the one rule the reading, the aspect card and the
+     * returns table all ask.
+     *
+     * <b>They used to decide separately and had already drifted apart</b>: the reading asked
+     * whether both ends were minor, the returns table whether the arriving end was. Both
+     * answers were defensible and the pair of them was not, because nothing said which
+     * question the app was asking. These assertions hold the two branches and, more
+     * importantly, the reason they differ - direction is a property of the contact, not a
+     * per-surface preference.
+     */
+    private static void primaryActor() {
+        // Mutual: either end can carry it, so background needs both ends minor.
+        ok("two minor bodies have no actor between them",
+            !Bodies.hasPrimaryActor("Vesta", "Ceres", false));
+        ok("a lot and a node have no actor between them",
+            !Bodies.hasPrimaryActor("North Node", "Part of Fortune", false));
+        ok("a planet at either end supplies one",
+            Bodies.hasPrimaryActor("Sun", "Ceres", false)
+                && Bodies.hasPrimaryActor("Ceres", "Sun", false));
+        ok("an angle supplies one", Bodies.hasPrimaryActor("Ascendant", "Vesta", false));
+        ok("two planets plainly supply one",
+            Bodies.hasPrimaryActor("Sun", "Saturn", false));
+
+        // Directional: only the arriving end is making the statement.
+        ok("an arriving minor body has no actor however big the target",
+            !Bodies.hasPrimaryActor("Pholus", "Sun", true));
+        ok("an arriving planet has one however small the target",
+            Bodies.hasPrimaryActor("Mars", "Vesta", true));
+        ok("an arriving angle has one", Bodies.hasPrimaryActor("Ascendant", "Moon", true));
+
+        // The shape of each branch, which is what stops them being quietly swapped.
+        ok("the mutual branch is symmetric",
+            Bodies.hasPrimaryActor("Sun", "Vesta", false)
+                == Bodies.hasPrimaryActor("Vesta", "Sun", false));
+        ok("the directional branch is not symmetric",
+            Bodies.hasPrimaryActor("Sun", "Vesta", true)
+                != Bodies.hasPrimaryActor("Vesta", "Sun", true));
+        ok("directional is never more permissive than mutual",
+            !Bodies.hasPrimaryActor("Pholus", "Sun", true)
+                && Bodies.hasPrimaryActor("Pholus", "Sun", false));
+
+        // Every registered body agrees with isMinor on both branches, so the two cannot be
+        // tuned apart for some bodies and not others.
+        int disagreed = 0;
+        for (int i = 0; i < Bodies.count(); i++) {
+            String a = Bodies.at(i).name;
+            if (Bodies.hasPrimaryActor(a, "Sun", true) != !Bodies.isMinor(a)) {
+                disagreed++;
+            }
+            if (Bodies.hasPrimaryActor(a, "Vesta", false) != !Bodies.isMinor(a)) {
+                disagreed++;
+            }
+        }
+        eq("both branches agree with isMinor across the whole registry", 0, disagreed);
     }
 
     private static void ok(String label, boolean condition) {

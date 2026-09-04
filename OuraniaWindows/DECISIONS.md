@@ -119,6 +119,22 @@ Keyed on both ends the split never fired once on the default chart.
 **Part G pins it, mutation-tested.** Reverting the sort to orb-only fails 31 of 1,233 checks,
 including "no return is led by a minor body while a planetary contact sits below it".
 
+**One rule for every surface.** The reading's aspect lists, the aspect card and the returns
+table were each deciding what counted as background on their own, and two had already drifted:
+the reading asked whether *both* ends were minor, the returns table whether the *arriving* end
+was. Both answers were defensible; the pair of them was not, because nothing said which
+question the app was asking.
+
+`Bodies.hasPrimaryActor(acting, receiving, directional)` is now that question, asked once. What
+differs between the surfaces is not policy but the contact: two natal bodies belong to one
+person and aspect each other mutually, so either end can carry it; a return arrives from
+outside the chart it lands on, so the arriving end is what is making the statement. A return
+Pholus on the natal Sun is background however important the Sun is — the Sun is not what is
+happening, it is what is being happened to.
+
+Pure refactor: all three surfaces render exactly as before. BodyCheck Part E pins both
+branches and the reason they differ; collapsing them to one fails 4 of 1,140 checks.
+
 ## K3 — Anaretic degree · **BUILT 2026-09-03 (closes F11)**
 
 **Decision.** Anaretic is exactly 29°00'00" to 29°59'59", zero tolerance either side. 28°59'59"

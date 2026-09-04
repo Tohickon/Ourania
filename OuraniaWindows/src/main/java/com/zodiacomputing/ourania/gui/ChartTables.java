@@ -408,20 +408,16 @@ public final class ChartTables {
         // still has to work out which ones have a planet behind them. Splitting them says it
         // once.
         //
-        // <b>The rule keys on the return end, not on both ends.</b> The reading's aspect lists
-        // ask whether either side has a primary actor, because there both bodies belong to the
-        // same person. A return is directional: the return chart is what is arriving, and the
-        // natal point is what it arrives at. So a return Pholus exactly on the natal Sun is
-        // background however important the Sun is - the Sun is not the thing making the
-        // statement here. Same distinction Burk draws about which end casts and which
-        // receives, applied to a chart pair rather than to one wheel.
+        // The shared rule, asked with this surface's direction: a return arrives from outside
+        // the chart it lands on, so the return end is the one making the statement. See
+        // Bodies.hasPrimaryActor - the reading's lists ask the same question mutually.
         List<Returns.Contact> cs = Returns.contacts(r, natal, ranked, null);
         StringBuilder principal = new StringBuilder();
         StringBuilder background = new StringBuilder();
         for (Returns.Contact c : cs) {
             String cell = row3("td", c.returnPoint, c.type.label,
                 c.natal + String.format(" (%.1f&deg;)", c.offBy));
-            if (Bodies.isMinor(c.returnPoint)) {
+            if (!Bodies.hasPrimaryActor(c.returnPoint, c.natal, true)) {
                 background.append(cell);
             } else {
                 principal.append(cell);

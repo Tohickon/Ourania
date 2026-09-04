@@ -2199,8 +2199,8 @@ public class InterpretationPanel extends JPanel {
      * being unable to tell which is which.
      */
     private void appendTertiaryNote(StringBuilder html, String planet1, String planet2) {
-        if (!com.zodiacomputing.ourania.astro.Bodies.isMinor(planet1)
-                || !com.zodiacomputing.ourania.astro.Bodies.isMinor(planet2)) {
+        // Mutual contact between two bodies of one chart; the shared rule decides.
+        if (com.zodiacomputing.ourania.astro.Bodies.hasPrimaryActor(planet1, planet2, false)) {
             return;
         }
         html.append("<div style='margin-top:16px; border-left:3px solid #6B5FA8; ")

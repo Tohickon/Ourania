@@ -194,8 +194,10 @@ public class NarrativeSynthesizer {
                             }
                         }
                     }
-                    StringBuilder into = Bodies.isMinor(v.body) && Bodies.isMinor(other)
-                        ? background : major;
+                    // Mutual: both bodies belong to the same person, so either end can
+                    // carry the contact. Same rule the returns table asks directionally.
+                    StringBuilder into = Bodies.hasPrimaryActor(v.body, other, false)
+                        ? major : background;
                     if (!aspectText.startsWith("Interpretation not found") && !aspectText.startsWith("General ")) {
                         into.append("<li><b>").append(h.type.label).append(" to ").append(other)
                             .append(":</b> ");
