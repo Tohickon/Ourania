@@ -91,6 +91,12 @@ public final class ReturnsCheck {
         report("Part E", before);
 
         System.out.println();
+        System.out.println("=== Part F: each return is read to the depth its period earns ===");
+        before = failures.size();
+        scope(sw, natal);
+        report("Part F", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -266,6 +272,64 @@ public final class ReturnsCheck {
                                                String body, int years) {
         return Returns.planetary(sw, body, natal.body(body).lon,
             NATAL_JD, NATAL_JD + DAYS_PER_YEAR * years, LAT, LON, 'P');
+    }
+
+    // ---------------------------------------------------------------- part F
+
+    /**
+     * The K1 scope rule, pinned so it cannot be undone silently.
+     *
+     * <b>Without this the rule is invisible to the suite.</b> Narrowing Mercury, Venus and
+     * Mars to their angles took Part D from 1,431 checks to 1,033 - the suite kept passing
+     * and simply verified less, which is the shape of defect this project keeps finding:
+     * a total that drifts with a decision rather than with the code's correctness. Reverting
+     * scopeOf would restore the 398 checks and still be green. So the rule is asserted
+     * directly: an angles-only return contributes angles and nothing else, and a full-wheel
+     * return is not quietly reduced to the same thing.
+     */
+    private static void scope(SwissEph sw, ChartFrame natal) {
+        Gestalt.Result g = Gestalt.compute(natal);
+        List<BodyScore.Vector> ranked = BodyScore.rank(natal, g);
+
+        eq("the Sun's return is a whole chart", Returns.Scope.FULL_WHEEL,
+            Returns.scopeOf("Sun"));
+        eq("the Moon's return is a whole chart", Returns.Scope.FULL_WHEEL,
+            Returns.scopeOf("Moon"));
+        for (String body : new String[]{"Mercury", "Venus", "Mars"}) {
+            eq("the annual three are angles only (" + body + ")", Returns.Scope.ANGLES_ONLY,
+                Returns.scopeOf(body));
+        }
+        for (String body : new String[]{"Jupiter", "Saturn"}) {
+            eq("the slow returns keep their wheel (" + body + ")", Returns.Scope.FULL_WHEEL,
+                Returns.scopeOf(body));
+        }
+        yes("an unknown body defaults to a whole chart rather than to silence",
+            Returns.scopeOf("Nessus") == Returns.Scope.FULL_WHEEL);
+        yes("a null body does not throw", Returns.scopeOf(null) != null);
+
+        // The rule as the reader meets it, not just as the enum reports it.
+        int anglesOnlyContacts = 0;
+        int fullWheelNonAngle = 0;
+        for (String body : Returns.returnableBodies()) {
+            boolean anglesOnly = Returns.scopeOf(body) == Returns.Scope.ANGLES_ONLY;
+            for (Returns.Return r : window(sw, natal, body, 3)) {
+                for (Returns.Contact c : Returns.contacts(r, natal, ranked, null)) {
+                    boolean isAngle = "Ascendant".equals(c.returnPoint)
+                        || "MC".equals(c.returnPoint);
+                    if (anglesOnly) {
+                        anglesOnlyContacts++;
+                        yes("an angles-only return reports only angles (" + body + " gave "
+                            + c.returnPoint + ")", isAngle);
+                    } else if (!isAngle) {
+                        fullWheelNonAngle++;
+                    }
+                }
+            }
+        }
+        yes("the angles-only rule was actually exercised", anglesOnlyContacts > 0);
+        yes("a full-wheel return still reports its bodies", fullWheelNonAngle > 0);
+        System.out.printf("  angles-only contacts %d, full-wheel non-angle contacts %d%n",
+            anglesOnlyContacts, fullWheelNonAngle);
     }
 
     private static void yes(String label, boolean condition) {

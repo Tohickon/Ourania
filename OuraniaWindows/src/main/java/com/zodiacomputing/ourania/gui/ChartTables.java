@@ -7,9 +7,13 @@ import com.zodiacomputing.ourania.astro.Aspects;
 import com.zodiacomputing.ourania.astro.BodyScore;
 import com.zodiacomputing.ourania.astro.Profection;
 import com.zodiacomputing.ourania.astro.Progressions;
+import com.zodiacomputing.ourania.astro.Returns;
+import com.zodiacomputing.ourania.astro.Zodiac;
+import com.zodiacomputing.ourania.astro.Transits;
 import com.zodiacomputing.ourania.astro.Rulership;
 import com.zodiacomputing.ourania.astro.SolarArc;
 
+import de.thmac.swisseph.SweDate;
 import de.thmac.swisseph.SwissEph;
 
 import java.util.List;
@@ -304,6 +308,113 @@ public final class ChartTables {
      * the year scan. The arc itself - one number that moves every point in the chart - was
      * never shown anywhere.
      */
+    /**
+     * The year's returns, each shown to the depth its period earns.
+     *
+     * Solar and lunar returns are charts in their own right and print their angles and cusps;
+     * Mercury, Venus and Mars print two angles and stop. That split is {@link Returns#scopeOf}
+     * and the reasoning lives there - this method only renders what the policy decides, so
+     * the two cannot drift apart.
+     */
+    public static String returns(ChartFrame natal, SwissEph sw, double natalJd,
+                                 double fromJd, double toJd, double lat, double lon, int hsys) {
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Returns</h1>");
+
+        List<BodyScore.Vector> ranked = BodyScore.rank(natal);
+
+        // --- Solar: the year's chart.
+        ChartFrame.Body sun = natal.body("Sun");
+        if (sun != null && sun.ok) {
+            int age = (int) Math.floor((fromJd - natalJd) / 365.2422);
+            Returns.Return sr = Returns.solar(sw, natalJd, sun.lon, age, lat, lon, hsys);
+            appendReturn(h, "Solar return", sr, natal, ranked);
+        }
+
+        // --- Lunar: this month's chart. One is a reading; thirteen is a list, so the window
+        // is the caller's and only the first is shown in full.
+        ChartFrame.Body moon = natal.body("Moon");
+        if (moon != null && moon.ok) {
+            List<Returns.Return> lrs =
+                Returns.lunar(sw, natalJd, moon.lon, fromJd, toJd, lat, lon, hsys);
+            h.append("<p><b>Lunar returns in this window:</b> ").append(lrs.size()).append("</p>");
+            if (!lrs.isEmpty()) {
+                appendReturn(h, "Lunar return", lrs.get(0), natal, ranked);
+            }
+        }
+
+        // --- The angles-only three.
+        h.append("<h2>Trigger nodes</h2>");
+        h.append("<p>Mercury, Venus and Mars return roughly once a year, and their returns are ")
+         .append("moments rather than chapters. No house structure is cast for them; their ")
+         .append("angles are laid over the natal wheel as triggers.</p>");
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Return", "Date", "Return angle", "On natal"));
+        boolean any = false;
+        for (String body : new String[]{"Mercury", "Venus", "Mars"}) {
+            ChartFrame.Body nb = natal.body(body);
+            if (nb == null || !nb.ok) {
+                continue;
+            }
+            for (Returns.Return r : Returns.planetary(sw, body, nb.lon,
+                                                      fromJd, toJd, lat, lon, hsys)) {
+                List<Returns.Contact> cs = Returns.contacts(r, natal, ranked, null);
+                if (cs.isEmpty()) {
+                    h.append(row4("td", body, dateOf(r.jd), "&mdash;", "no contact"));
+                    any = true;
+                    continue;
+                }
+                for (Returns.Contact c : cs) {
+                    h.append(row4("td", body, dateOf(r.jd), c.returnPoint,
+                        c.type.label + " " + c.natal
+                            + String.format(" (%.1f&deg;)", c.offBy)));
+                    any = true;
+                }
+            }
+        }
+        if (!any) {
+            h.append(row4("td", "&mdash;", "", "", "none in this window"));
+        }
+        h.append("</table>");
+        return h.toString();
+    }
+
+    /** One full-wheel return: when it falls, where it was cast, and what it lands on. */
+    private static void appendReturn(StringBuilder h, String title, Returns.Return r,
+                                     ChartFrame natal, List<BodyScore.Vector> ranked) {
+        h.append("<h2>").append(title).append("</h2>");
+        if (r == null || r.chart == null) {
+            h.append("<p>Not available for this window.</p>");
+            return;
+        }
+        // <b>The place is printed rather than judged.</b> A return's angles are its new
+        // information and they move with the native, so whether this is a relocated return
+        // is the reader's first question - but ChartFrame does not record a chart's
+        // geographic place, and there is no relocation field in the UI yet, so nothing here
+        // can honestly label it. Returns.Return now carries the coordinates it was cast for;
+        // stating them says exactly as much as is known.
+        h.append("<p><b>Exact:</b> ").append(dateOf(r.jd))
+         .append(String.format(" &middot; cast for %.2f, %.2f", r.lat, r.lon)).append("</p>");
+
+        h.append("<table cellpadding=\"4\">");
+        h.append(row2("th", "Return angle", "Position"));
+        h.append(row2("td", "Ascendant", Zodiac.format(r.chart.asc)));
+        h.append(row2("td", "MC", Zodiac.format(r.chart.mc)));
+        h.append("</table>");
+
+        List<Returns.Contact> cs = Returns.contacts(r, natal, ranked, null);
+        h.append("<table cellpadding=\"4\">");
+        h.append(row3("th", "Return point", "Aspect", "Natal point"));
+        if (cs.isEmpty()) {
+            h.append(row3("td", "&mdash;", "", "nothing inside orb"));
+        }
+        for (Returns.Contact c : cs) {
+            h.append(row3("td", c.returnPoint, c.type.label,
+                c.natal + String.format(" (%.1f&deg;)", c.offBy)));
+        }
+        h.append("</table>");
+    }
+
     public static String solarArc(ChartFrame natal, SwissEph sw, double natalJd, double nowJd) {
         StringBuilder h = new StringBuilder();
         h.append("<h1>Solar arc directions</h1>");

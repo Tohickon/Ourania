@@ -98,6 +98,11 @@ public final class Almanac {
         public boolean retrograde;
         /** Eclipse magnitude class: "total", "annular", "hybrid", "partial", "penumbral". */
         public String detail = "";
+        /**
+         * A short badge naming why an entry is here when the rule alone would not put it here.
+         * Empty for the great majority of events, which need no defence.
+         */
+        public String note = "";
 
         @Override
         public int compareTo(Event o) {
@@ -521,6 +526,34 @@ public final class Almanac {
         "Uranus", "Neptune", "Pluto", "Chiron"
     };
 
+    /**
+     * The stations a year's calendar shows unasked.
+     *
+     * <b>A station earns its line by being rare enough to date a year by.</b> Jupiter through
+     * Pluto and Chiron station once a year each and the retrograde runs for months, so the
+     * date names a season. Venus and Mars station rarely too but their loops are read as
+     * personal weather rather than as landmarks, and they are off by default; ask for them
+     * with the flag on {@link #annualCalendar}.
+     *
+     * <b>Mercury is the declared exception, and is badged as one.</b> By the rule it belongs
+     * with Venus and Mars: it stations three times a year, which is the opposite of rare, and
+     * an earlier audit flagged its presence beside the slow bodies as a contradiction. It is
+     * here because a reader who opens a calendar and cannot find Mercury retrograde concludes
+     * the calendar is broken. That is a cultural fact about the audience rather than an
+     * astrological one about the body, so the entry carries a note saying so instead of
+     * sitting silently among the landmarks pretending to be one.
+     */
+    private static final String[] STATION_DEFAULT = {
+        "Mercury", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Chiron"
+    };
+
+    /** Stations shown only when asked for: read as personal weather, not as landmarks. */
+    private static final String[] STATION_ON_REQUEST = { "Venus", "Mars" };
+
+    /** The badge {@link #STATION_DEFAULT} hangs on Mercury, and on nothing else. */
+    public static final String MERCURY_STATION_NOTE =
+        "shown by convention, not by the rule that admits the slow stations";
+
     /** The slow pairs whose exact aspects are the mundane events worth listing. */
     private static final String[] MUNDANE = {
         "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"
@@ -547,6 +580,16 @@ public final class Almanac {
      */
     public static List<Event> annualCalendar(SwissEph sw, double jd0, double jd1,
                                              boolean includeMoonIngresses) {
+        return annualCalendar(sw, jd0, jd1, includeMoonIngresses, false);
+    }
+
+    /**
+     * @param includeFastStations adds the Venus and Mars stations, which are off by default.
+     *     See {@link #STATION_DEFAULT} for what the default admits and why Mercury is in it.
+     */
+    public static List<Event> annualCalendar(SwissEph sw, double jd0, double jd1,
+                                             boolean includeMoonIngresses,
+                                             boolean includeFastStations) {
         List<Event> out = new ArrayList<>();
         double saved = scanStep;
         try {
@@ -557,9 +600,20 @@ public final class Almanac {
                 scanStep = stepFor(body);
                 out.addAll(ingresses(sw, jd0, jd1, body));
             }
-            for (String body : RETROGRADERS) {
+            for (String body : STATION_DEFAULT) {
                 scanStep = stepFor(body);
-                out.addAll(stations(sw, jd0, jd1, body));
+                for (Event e : stations(sw, jd0, jd1, body)) {
+                    if ("Mercury".equals(body)) {
+                        e.note = MERCURY_STATION_NOTE;
+                    }
+                    out.add(e);
+                }
+            }
+            if (includeFastStations) {
+                for (String body : STATION_ON_REQUEST) {
+                    scanStep = stepFor(body);
+                    out.addAll(stations(sw, jd0, jd1, body));
+                }
             }
             scanStep = 0.5;
             // An eclipse IS a new or full Moon. Emitting both would print one moment twice

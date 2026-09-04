@@ -55,7 +55,7 @@ Closed as intended behaviour.
 
 ---
 
-## K1 — Return charts, and the calendar's stations · **TO BUILD**
+## K1 — Return charts, and the calendar's stations · **BUILT 2026-09-03**
 
 **Decision.** One principle answers both: selective hierarchy.
 - Solar and Lunar returns: full standalone wheel, own house cusps, relocatable.
@@ -66,6 +66,39 @@ Closed as intended behaviour.
 **Why the Mercury exception is not an inconsistency.** It is a cultural one, badged as such.
 The audit flagged Mercury's presence beside the slow bodies as a contradiction; it is now a
 declared exception instead.
+
+**Built — returns.** `Returns.Scope` and `Returns.scopeOf(body)` are the one place the rule
+lives, and `contacts()` reads it, so policy and rendering cannot drift apart. An angles-only
+return contributes its Ascendant and MC and nothing else: measured on a 1990 chart, Mercury,
+Venus and Mars gave 25 contacts across three returns each, every one an angle, while the solar
+return kept 23 contacts over 8 distinct points. `Return` now records the `lat`/`lon` it was
+cast for, so a relocated return can say so — the engine always accepted a place, but the
+result did not carry it, which made a relocated return and a natal-place one the same object
+with different numbers inside.
+
+**Jupiter and Saturn the decision does not name.** They read as full wheels: a Saturn return
+is the canonical return-as-chapter, and at one every 12 and 29 years there is no crowding
+argument. Flagged rather than assumed — it is a one-line change in `scopeOf` if that is wrong.
+
+**Built — stations.** `Almanac.STATION_DEFAULT` admits Mercury, Jupiter, Saturn, Uranus,
+Neptune, Pluto and Chiron; Venus and Mars need `annualCalendar(..., includeFastStations)`.
+Measured for 2026: default gives Chiron 2, Jupiter 2, Mercury 6, Neptune 2, Pluto 2, Saturn 2,
+Uranus 2 — 119 calendar entries, rising to 121 with the fast stations. All six Mercury entries
+carry `MERCURY_STATION_NOTE`; nothing else is badged.
+
+**The calendar and the degree-contact feed deliberately disagree.** `datedMoments` still keeps
+all nine retrograders, because a Venus station landing on a natal degree is a real contact and
+K8's weighting already decides how loudly it speaks. The calendar is a list a human reads top
+to bottom, so it admits only what is rare enough to date a year by. Making the two agree would
+be the easy mistake.
+
+**Door.** Side panel → Tables → **Returns**, rendering through `ChartTables.returns`.
+NavigationCheck picked it up unprompted, 93 → 94.
+
+**Suites.** Narrowing the annual three took ReturnsCheck from 1,431 checks to 1,033 — it kept
+passing and simply verified less, and reverting `scopeOf` would have restored the count and
+stayed green. Part F now asserts the rule directly (1,069 checks). TransitCheck gained 8
+checks pinning the station split.
 
 ## K3 — Anaretic degree · **BUILT 2026-09-03 (closes F11)**
 

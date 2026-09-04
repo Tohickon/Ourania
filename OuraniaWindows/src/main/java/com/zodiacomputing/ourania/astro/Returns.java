@@ -91,6 +91,17 @@ public final class Returns {
         public String body;
         public double jd;
         public ChartFrame chart;
+        /**
+         * Where the return was cast, so a relocated one can say so.
+         *
+         * A return chart's angles are the whole of its new information, and the angles are
+         * the part that moves when the native does. Without this a return cast for the
+         * natal place and one cast for wherever the native actually was are the same object
+         * with different numbers in it, and nothing downstream can tell the reader which
+         * claim is on the screen.
+         */
+        public double lat = Double.NaN;
+        public double lon = Double.NaN;
         /** Age in completed years for a solar return; the index within the window for lunar. */
         public int ordinal;
 
@@ -141,6 +152,8 @@ public final class Returns {
         }
         Return r = new Return();
         r.kind = "solar";
+        r.lat = lat;
+        r.lon = lon;
         r.body = "Sun";
         r.jd = jd;
         r.ordinal = forAge;
@@ -166,6 +179,8 @@ public final class Returns {
         for (double jd : Almanac.roots(f, jdFrom, jdTo, 1.0)) {
             Return r = new Return();
             r.kind = "lunar";
+            r.lat = lat;
+            r.lon = lon;
             r.body = "Moon";
             r.jd = jd;
             r.ordinal = i++;
@@ -196,6 +211,52 @@ public final class Returns {
         RETURN_SCAN_STEP.put("Mars", 2.0);
         RETURN_SCAN_STEP.put("Jupiter", 4.0);
         RETURN_SCAN_STEP.put("Saturn", 4.0);
+    }
+
+    /** How much of a return chart is worth reading. */
+    public enum Scope {
+        /**
+         * A chart in its own right: own house cusps, its own angles, relocatable to wherever
+         * the native actually is when the return falls.
+         */
+        FULL_WHEEL,
+        /**
+         * The return's angles only, laid over the natal wheel as trigger nodes.
+         *
+         * The wheel is still computed - the angles have to come from somewhere - but nothing
+         * asks the reader to treat it as a standalone chart.
+         */
+        ANGLES_ONLY
+    }
+
+    /**
+     * How much of this body's return to read.
+     *
+     * <b>Selective hierarchy: a return is worth a whole chart when its period is long enough
+     * for that chart to describe.</b> A solar return governs a year and a lunar return a
+     * month, so each has room for twelve houses of its own. Mercury, Venus and Mars return
+     * roughly annually but their returns are moments rather than chapters; casting twelve
+     * houses over one gives it a structure it does not have, and three extra full wheels a
+     * year is the crowding this app keeps deciding against. Their angles still matter, so
+     * they arrive as trigger nodes on the natal wheel.
+     *
+     * <b>Jupiter and Saturn the decision does not name</b>, and they are returnable here.
+     * They read as full wheels: a Saturn return is the canonical example of a return that IS
+     * a chapter, and at one every twelve and twenty-nine years there is no crowding argument
+     * against them. Flagged rather than assumed - if that is wrong it is a one-line change.
+     */
+    public static Scope scopeOf(String body) {
+        if (body == null) {
+            return Scope.FULL_WHEEL;
+        }
+        switch (body) {
+            case "Mercury":
+            case "Venus":
+            case "Mars":
+                return Scope.ANGLES_ONLY;
+            default:
+                return Scope.FULL_WHEEL;
+        }
     }
 
     /** Whether a planetary return can be computed for this body. */
@@ -249,6 +310,8 @@ public final class Returns {
         for (double jd : Almanac.roots(f, jdFrom, jdTo, step)) {
             Return r = new Return();
             r.kind = body.toLowerCase();
+            r.lat = lat;
+            r.lon = lon;
             r.body = body;
             r.jd = jd;
             r.ordinal = i++;
@@ -277,7 +340,11 @@ public final class Returns {
 
         List<String> names = new ArrayList<>();
         List<Double> lons = new ArrayList<>();
-        for (int bi = 0; bi < ret.chart.bodies.length && bi < Bodies.count(); bi++) {
+        // An angles-only return contributes its two angles and nothing else - see scopeOf.
+        // The bodies of a Venus return are just the sky on that day, which the transit engine
+        // already reports; what the return adds that transits cannot is where its angles fall.
+        boolean anglesOnly = scopeOf(ret.body) == Scope.ANGLES_ONLY;
+        for (int bi = 0; !anglesOnly && bi < ret.chart.bodies.length && bi < Bodies.count(); bi++) {
             ChartFrame.Body b = ret.chart.bodies[bi];
             // Angles are skipped here and added explicitly below. Before the Bodies
             // registry, `bodies` held twelve planets and the angles lived in their own

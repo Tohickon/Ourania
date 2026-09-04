@@ -467,6 +467,63 @@ public final class TransitCheck {
         yes("datedMoments carries no ingresses",
             moments.stream().noneMatch(e -> e.kind == Almanac.Kind.INGRESS));
 
+        // ---- K1: which stations a calendar shows unasked.
+        //
+        // <b>The calendar and the degree-contact feed answer to different rules</b>, and the
+        // easy mistake is to make them agree. datedMoments keeps all nine retrograders
+        // because a Venus station on a natal degree is a real contact and the convergence
+        // weighting already decides how loudly it speaks. The calendar is a list a human
+        // reads top to bottom, so it admits only the stations rare enough to date a year by
+        // - plus Mercury, which is there by convention and says so.
+        List<Almanac.Event> defaultCal = Almanac.annualCalendar(sw, jd0, jd1, false, false);
+        List<Almanac.Event> fastCal = Almanac.annualCalendar(sw, jd0, jd1, false, true);
+        java.util.Set<String> defaultStations = new java.util.TreeSet<>();
+        java.util.Set<String> fastStations = new java.util.TreeSet<>();
+        int badged = 0;
+        int badgedNotMercury = 0;
+        for (Almanac.Event e : defaultCal) {
+            if (e.kind == Almanac.Kind.STATION_RETROGRADE
+                    || e.kind == Almanac.Kind.STATION_DIRECT) {
+                defaultStations.add(e.body);
+                if (e.note != null && !e.note.isEmpty()) {
+                    badged++;
+                    if (!"Mercury".equals(e.body)) {
+                        badgedNotMercury++;
+                    }
+                }
+            }
+        }
+        for (Almanac.Event e : fastCal) {
+            if (e.kind == Almanac.Kind.STATION_RETROGRADE
+                    || e.kind == Almanac.Kind.STATION_DIRECT) {
+                fastStations.add(e.body);
+            }
+        }
+        java.util.Set<String> momentStations = new java.util.TreeSet<>();
+        for (Almanac.Event e : moments) {
+            if (e.kind == Almanac.Kind.STATION_RETROGRADE
+                    || e.kind == Almanac.Kind.STATION_DIRECT) {
+                momentStations.add(e.body);
+            }
+        }
+        yes("the calendar hides the Venus stations by default",
+            !defaultStations.contains("Venus"));
+        yes("the calendar hides the Mars stations by default",
+            !defaultStations.contains("Mars"));
+        yes("asking for the fast stations brings Venus or Mars back",
+            fastStations.contains("Venus") || fastStations.contains("Mars"));
+        yes("the slow stations are shown unasked",
+            defaultStations.contains("Jupiter") && defaultStations.contains("Saturn")
+                && defaultStations.contains("Uranus") && defaultStations.contains("Neptune")
+                && defaultStations.contains("Pluto"));
+        yes("Mercury is kept as the declared exception", defaultStations.contains("Mercury"));
+        yes("every Mercury station carries its badge", badged > 0);
+        eq("nothing but Mercury is badged", 0, badgedNotMercury);
+        yes("the degree-contact feed still keeps every retrograder",
+            momentStations.contains("Venus") || momentStations.contains("Mars"));
+        System.out.printf("calendar stations %s; datedMoments stations %s%n",
+            defaultStations, momentStations);
+
         // The calendar must not print one moment twice under two names.
         List<Almanac.Event> cal = Almanac.annualCalendar(sw, jd0, jd1);
         for (Almanac.Event ecl : cal) {

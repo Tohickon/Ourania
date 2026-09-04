@@ -126,6 +126,8 @@ public final class SidePanel extends JPanel {
             "The secondary progressed chart: a day of ephemeris for a year of life"));
         tables.add(tableButton("Solar Arc", "SOLARARC",
             "Every point moved forward by the arc the progressed Sun has travelled"));
+        tables.add(tableButton("Returns", "RETURNS",
+            "The year's returns: solar and lunar as charts, the annual three as triggers"));
         accordion.addSection(TABLES, tables);
 
         // Section B. Until 3 Sep 2026 nothing could leave this application at all - no image,

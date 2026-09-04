@@ -2339,6 +2339,14 @@ extends JPanel {
                 if ("SOLARARC".equals(kind)) {
                     return ChartTables.solarArc(f, SkymapPanel.this.sw, jd, now);
                 }
+                // A year either side of the clock: enough for one solar return, the lunar
+                // returns inside it, and the annual three. Cast for the chart's own place -
+                // relocation is a claim the user has to make, and there is no field for it
+                // yet, so the table says which place it used rather than assuming.
+                if ("RETURNS".equals(kind)) {
+                    return ChartTables.returns(f, SkymapPanel.this.sw, jd,
+                        now, now + 365.2422, lat, lon, hsys);
+                }
                 return "";
             }
 
