@@ -729,14 +729,40 @@ public final class Snapshot {
         }
         for (java.util.Map.Entry<String, List<Transits.Hit>> e : byTarget.entrySet()) {
             sb.append(String.format("  natal %s (%s)%n", e.getKey(), e.getValue().get(0).why));
+            // <b>The same rule the reading's aspect lists and the returns table ask</b>, with
+            // this surface's direction: a transit arrives from outside, so the transiting
+            // body is the one making the statement. Over half the contacts to a natal point
+            // are typically minor bodies arriving, and printed in one run they bury the two
+            // or three that a person would act on. Nothing is dropped - the block is divided,
+            // and the division is stated rather than left for the reader to work out.
+            List<Transits.Hit> principal = new java.util.ArrayList<>();
+            List<Transits.Hit> background = new java.util.ArrayList<>();
             for (Transits.Hit h : e.getValue()) {
-                sb.append(String.format("      %-11s %-12s %5.2f° %s%n",
-                    h.transiting + (h.transitRetrograde ? " Rx" : ""),
-                    h.type.label.toLowerCase(), h.offBy,
-                    h.applying ? "applying" : "separating"));
+                if (Bodies.hasPrimaryActor(h.transiting, h.natal, true)) {
+                    principal.add(h);
+                } else {
+                    background.add(h);
+                }
+            }
+            for (Transits.Hit h : principal) {
+                sb.append(transitLine(h));
+            }
+            if (!background.isEmpty()) {
+                sb.append(String.format("      -- background (minor bodies arriving) --%n"));
+                for (Transits.Hit h : background) {
+                    sb.append(transitLine(h));
+                }
             }
         }
         return sb.toString();
+    }
+
+    /** One transit contact, formatted the one way. */
+    private static String transitLine(Transits.Hit h) {
+        return String.format("      %-11s %-12s %5.2f° %s%n",
+            h.transiting + (h.transitRetrograde ? " Rx" : ""),
+            h.type.label.toLowerCase(), h.offBy,
+            h.applying ? "applying" : "separating");
     }
 
     /** Delegates: one spelling of this, in Zodiac. */

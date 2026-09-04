@@ -86,6 +86,10 @@ public final class TransitCheck {
         partK(sw, natal, natalJd);
 
         System.out.println();
+        System.out.println("=== Part L: what arrives decides the order, not how close it is ===");
+        partL(sw, natal, natalJd);
+
+        System.out.println();
         if (failures == 0) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -1530,6 +1534,122 @@ public final class TransitCheck {
             case "IC":         return f.ic;
             default:           return lonOf(f, name);
         }
+    }
+
+    /**
+     * The transit list is ordered by what is arriving, not by how tight it happens to be.
+     *
+     * <b>The sort ranked natal targets and then fell straight through to orb</b>, so the
+     * transiting body never entered it. On the app's default chart that put Eros septile the
+     * Ascendant at position one and filled the whole angular block - the most prominent group
+     * in the reading - with Eros, Pholus, Vesta, Chiron, Juno, Eris, Ceres and Pallas before
+     * any transiting planet appeared. 53 of 102 contacts had a minor body as the arriving end.
+     *
+     * <b>Nothing in this suite noticed.</b> Adding the weight term changed the order of every
+     * list here and the count did not move by one, because no assertion had ever looked at
+     * what came first. That is the same gap Part G of ReturnsCheck was written to close, in
+     * the surface that feeds the reading rather than a side table.
+     */
+    private static void partL(SwissEph sw, ChartFrame natal, double natalJd) {
+        double when = new SweDate(2026, 9, 4, 12.0).getJulDay();
+        ChartFrame tf = ChartFrame.compute(sw, when, NATAL_LAT, NATAL_LON, 'P', false, 0.0);
+        Gestalt.Result g = Gestalt.compute(natal);
+        List<BodyScore.Vector> ranked = BodyScore.rank(natal, g);
+        Profection prof = Profection.at(natalJd, when, natal.asc);
+        List<Transits.Hit> hits = Transits.toNatal(natal, tf, ranked, prof.lord);
+
+        yes("there are transits to rank", hits.size() > 10);
+        for (Transits.Hit h : hits) {
+            yes("every hit carries a weight",
+                h.weight > 0.0 && !Double.isNaN(h.weight));
+        }
+
+        // Within one natal target, a planet arriving outranks a minor body arriving.
+        java.util.Map<String, List<Transits.Hit>> byTarget =
+            new java.util.LinkedHashMap<>();
+        for (Transits.Hit h : hits) {
+            byTarget.computeIfAbsent(h.natal, k -> new java.util.ArrayList<>()).add(h);
+        }
+        int groups = 0;
+        int inverted = 0;
+        for (java.util.Map.Entry<String, List<Transits.Hit>> e : byTarget.entrySet()) {
+            List<Transits.Hit> g2 = e.getValue();
+            groups++;
+            for (int i = 1; i < g2.size(); i++) {
+                yes("a target's contacts run in weight order (" + e.getKey() + ")",
+                    g2.get(i - 1).weight >= g2.get(i).weight - 1e-9);
+            }
+            // The defect stated directly: a minor body leading a group that also holds a
+            // planetary contact.
+            boolean leadIsMinor = !Bodies.hasPrimaryActor(
+                g2.get(0).transiting, g2.get(0).natal, true);
+            boolean planetPresent = false;
+            for (Transits.Hit h : g2) {
+                if (Bodies.hasPrimaryActor(h.transiting, h.natal, true)) {
+                    planetPresent = true;
+                    break;
+                }
+            }
+            if (leadIsMinor && planetPresent) {
+                inverted++;
+            }
+        }
+        eq("no natal target is led by a minor body while a planet is arriving too",
+            0, inverted);
+
+        // The whole list, not just a group: the first contact must be a real arrival.
+        yes("the list does not open with a minor body arriving",
+            Bodies.hasPrimaryActor(hits.get(0).transiting, hits.get(0).natal, true));
+
+        // Orb alone must not be able to reorder the list. A tight minor aspect from a minor
+        // body has to stay below a wide major one from a planet on the same target.
+        Transits.Hit tightMinor = null;
+        Transits.Hit wideMajor = null;
+        for (Transits.Hit h : hits) {
+            boolean actor = Bodies.hasPrimaryActor(h.transiting, h.natal, true);
+            if (!actor && (tightMinor == null || h.offBy < tightMinor.offBy)) {
+                tightMinor = h;
+            }
+            if (actor && h.type != null && !h.type.isMinor()
+                    && (wideMajor == null || h.offBy > wideMajor.offBy)) {
+                wideMajor = h;
+            }
+        }
+        if (tightMinor != null && wideMajor != null && tightMinor.offBy < wideMajor.offBy) {
+            yes("a tight minor arrival still weighs less than a wide planetary one",
+                tightMinor.weight < wideMajor.weight);
+        }
+
+        // <b>intensity must stay clean.</b> Convergence multiplies its own body and aspect
+        // weights over intensity, so folding the hierarchy into it would count the hierarchy
+        // twice and re-tune the predictive engine as a side effect of a display change.
+        // Asserted structurally: intensity is tightness x phase x an optional station boost
+        // and nothing else, so it cannot vary between two bodies of different standing that
+        // share those three facts.
+        int impure = 0;
+        for (Transits.Hit h : hits) {
+            double base = h.tightness * (h.applying ? 1.3 : 0.7);
+            boolean stationary = Math.abs(h.transitSpeed) <= 0.05;
+            double expected = stationary ? base * 5.0 : base;
+            if (Math.abs(h.intensity - expected) > 1e-9) {
+                impure++;
+            }
+        }
+        eq("intensity is tightness, phase and station only", 0, impure);
+
+        // And the station boost must reach the ranking weight, which it did not when the
+        // weight was computed one line too early.
+        for (Transits.Hit h : hits) {
+            if (Math.abs(h.transitSpeed) <= 0.05) {
+                yes("a stationing transit's weight carries its station boost",
+                    h.weight >= h.intensity * 0.99
+                        * Convergence.bodyWeight(h.transiting)
+                        * Convergence.bodyWeight(h.natal)
+                        * Convergence.aspectWeight(h.type));
+            }
+        }
+        System.out.printf("  %d hits over %d targets, %d led by a minor arrival%n",
+            hits.size(), groups, inverted);
     }
 
     private static void eq(String what, Object expect, Object got) {

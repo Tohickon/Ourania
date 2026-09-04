@@ -135,6 +135,32 @@ happening, it is what is being happened to.
 Pure refactor: all three surfaces render exactly as before. BodyCheck Part E pins both
 branches and the reason they differ; collapsing them to one fails 4 of 1,140 checks.
 
+**The same defect was in the transit list, and worse.** I judged it milder by reading the
+comparator instead of rendering the output — the same mistake as measuring a function rather
+than the mechanism. The sort ranked natal targets and then fell straight through to orb, so
+the arriving body never entered it: on the default chart, position one was Eros septile the
+Ascendant at 0.2°, and the whole angular block — the most prominent group in the reading — ran
+Eros, Pholus, Vesta, Chiron, Juno, Eris, Ceres, Pallas before a single transiting planet.
+53 of 102 contacts had a minor body as the arriving end.
+
+`Transits.Hit.weight` now carries the hierarchy and sits between the target ranking and the
+orb tie-break. The grouping is deliberately kept — angular first, then targets by prominence —
+because a reading that gathers every contact to one natal point together is easier to read
+than a flat score. Only the tie-break inside each group changed. Eros moved from #1 to #28.
+`Snapshot.timeLayer` splits each target's block on the shared rule.
+
+**`intensity` had to stay untouched.** Convergence multiplies its own body and aspect weights
+over it, so folding the hierarchy in would count it twice and re-tune the predictive engine as
+a side effect of a display fix. Part L guards this structurally.
+
+**Two mistakes of mine caught by writing the assertion rather than by reasoning.** The weight
+was computed one line above the ×5 station boost, so a stationing transit — a body that has
+stopped and sits on a degree for weeks — lost that from its ranking. And my first purity check
+used 1.3 as intensity's ceiling, which the station boost takes to 6.5. Both fixed.
+
+Mutation-tested: removing the weight from the sort fails 48 checks, folding the hierarchy into
+intensity fails 1. TransitCheck 3,968 → 4,256; twelve suites clear.
+
 ## K3 — Anaretic degree · **BUILT 2026-09-03 (closes F11)**
 
 **Decision.** Anaretic is exactly 29°00'00" to 29°59'59", zero tolerance either side. 28°59'59"

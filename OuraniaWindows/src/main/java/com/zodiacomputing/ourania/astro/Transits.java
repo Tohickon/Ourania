@@ -103,6 +103,23 @@ public final class Transits {
         public int natalRank = -1;
         /** Weighted score based on orb tightness, phase (applying/separating), and station status. */
         public double intensity = 1.0;
+        /**
+         * What this contact is worth for ranking, on K8's hierarchy.
+         *
+         * <b>Deliberately separate from {@link #intensity}.</b> Convergence multiplies
+         * intensity by its own body and aspect weights, so folding the hierarchy into
+         * intensity would count it twice and quietly re-tune the whole predictive engine.
+         * This field exists for ordering a list a person reads; intensity remains what it
+         * always was.
+         *
+         * <b>What it fixes.</b> The sort ranked natal targets and then fell back to orb, so
+         * the arriving body never entered it at all. On the default chart that put Eros
+         * septile the Ascendant at position one and filled the entire angular block - the
+         * most prominent group in the reading - with Eros, Pholus, Vesta, Chiron, Juno,
+         * Eris, Ceres and Pallas before a single transiting planet appeared. Tightness was
+         * standing in for importance, the same defect the return contacts had.
+         */
+        public double weight = 1.0;
 
         @Override
         public String toString() {
@@ -171,10 +188,19 @@ public final class Transits {
             }
         }
 
-        // Tightest first within a target, most significant target first.
+        // Most significant target first, then what is actually arriving at it, then orb.
+        //
+        // <b>The weight term is the fix; the grouping above it is deliberately kept.</b>
+        // Angular contacts still lead and the natal targets still come in prominence order,
+        // because a reading that groups every contact to one natal point together is easier
+        // to read than one sorted purely by score. What changed is the tie-break inside each
+        // group: it was orb, which let a septile from Eros outrank a square from Saturn
+        // merely by being tighter. Ordering by weight first and orb second says that a
+        // planet arriving matters more than a minor body arriving closer.
         out.sort(Comparator
             .comparingInt((Hit h) -> "angle".equals(h.why) ? 0 : 1)
             .thenComparingInt(h -> h.natalRank < 0 ? Integer.MAX_VALUE : h.natalRank)
+            .thenComparingDouble(h -> -h.weight)
             .thenComparingDouble(h -> h.offBy));
         return out;
     }
@@ -419,6 +445,13 @@ public final class Transits {
         if (Math.abs(h.transitSpeed) <= 0.05) {
             h.intensity *= 5.0;
         }
+        // <b>After the station boost, not before it.</b> A body that has stopped is the
+        // strongest transit there is - it sits on the degree for weeks instead of crossing
+        // it - and computing the ranking weight above this line silently threw that away.
+        h.weight = h.intensity
+            * Convergence.bodyWeight(h.transiting)
+            * Convergence.bodyWeight(h.natal)
+            * Convergence.aspectWeight(h.type);
         
         return h;
     }
