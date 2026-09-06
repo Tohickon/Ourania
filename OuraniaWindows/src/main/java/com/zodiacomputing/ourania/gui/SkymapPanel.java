@@ -560,7 +560,7 @@ extends JPanel {
         return d3 > 180.0 ? 360.0 - d3 : d3;
     }
 
-    private int[] radialLevels(double[] dArray, boolean[] blArray, double d, double d2, double d3) {
+    private static int[] radialLevels(double[] dArray, boolean[] blArray, double d, double d2, double d3) {
         int n3 = dArray.length;
         int[] nArray = new int[n3];
         Integer[] integerArray = new Integer[n3];
@@ -768,6 +768,7 @@ extends JPanel {
         private int[] natal;
         private int[] transit;
         private int[] tri;
+        private int[] discs;
 
         private Geometry(int w, int h) {
             this.cx = w / 2;
@@ -795,17 +796,57 @@ extends JPanel {
         int[] transitRadii() {
             if (this.transit == null) {
                 this.transit = SkymapPanel.bloomed(
-                    SkymapPanel.this.transitRadii(
-                        this.rings[RING_TRANSIT], this.rings[RING_DECAN_OUTER]),
-                    this.rings[RING_DECAN_OUTER], SkymapPanel.this.outerOpenFraction());
+                    SkymapPanel.bandRadii(SkymapPanel.this.tLon, SkymapPanel.this.tValid,
+                        this.rings[RING_TRANSIT], this.rings[RING_BODY_TOP]),
+                    this.rings[RING_BODY_TOP], SkymapPanel.this.outerOpenFraction());
             }
             return this.transit;
+        }
+
+        /**
+         * The circle an aspect line between two rings is drawn on.
+         *
+         * <b>One field per ring, nested at the depth its ring sits at.</b> Natal-to-natal
+         * lines in the innermost circle, the first outer ring's in the next, the sky's in the
+         * widest - so three sets of lines that used to cross each other across the whole wheel
+         * now occupy three separate bands, and a reader can follow one without the other two
+         * running through it.
+         *
+         * <b>The endpoints stay at each body's own longitude</b>, so a line still points at
+         * the bodies it joins even though it no longer touches them: an opposition is still a
+         * diameter and a sextile is still a sixth of the way round. What it loses is the leg
+         * out to the glyph, which is the part that was doing the tangling.
+         *
+         * Sized from where the innermost natal body actually is rather than from the ring
+         * chain, because the reader can move the bodies inward with the placement setting and
+         * a field drawn over the glyphs would be worse than the tangle it replaced.
+         *
+         * @param level 0 for the natal wheel, 1 for the ring outside it, 2 for the sky
+         */
+        int aspectDisc(int level) {
+            if (this.discs == null) {
+                int ceiling = this.bodyBase;
+                int[] natal = this.natalRadii();
+                for (int i = 0; i < natal.length; i++) {
+                    if (SkymapPanel.this.bValid[i] && natal[i] < ceiling) {
+                        ceiling = natal[i];
+                    }
+                }
+                // Clear of the innermost glyph, and never so small there is nothing to draw.
+                int top = Math.max(30, ceiling - 18);
+                this.discs = new int[] {
+                    (int) Math.round(top * 0.52),
+                    (int) Math.round(top * 0.76),
+                    top,
+                };
+            }
+            return this.discs[Math.max(0, Math.min(this.discs.length - 1, level))];
         }
 
         int[] triRadii() {
             if (this.tri == null) {
                 this.tri = SkymapPanel.bloomed(
-                    SkymapPanel.this.triWheelRadii(
+                    SkymapPanel.bandRadii(SkymapPanel.this.cLon, SkymapPanel.this.cValid,
                         this.rings[RING_TRI], this.rings[RING_TRANSIT]),
                     this.rings[RING_TRANSIT], SkymapPanel.this.triOpenFraction());
             }
@@ -1402,17 +1443,27 @@ extends JPanel {
         }
     }
 
+    /**
+     * <b>Four tiers, close together on purpose.</b> The lights used to be drawn at nearly
+     * twice an asteroid's radius, which read as a hierarchy of importance the chart does not
+     * actually claim - and, more practically, made a Sun and a Moon next to each other wide
+     * enough to push their neighbours out of the band they belong to. They are still the
+     * largest, by enough to find at a glance and no more.
+     *
+     * The largest transit radius here is what BAND_EDGE is set from; raising one without the
+     * other is what lets a glyph overhang the ring it is drawn on.
+     */
     private static final GlyphSize[] NATAL_SIZES = {
-        new GlyphSize(19, 32),      // lights
-        new GlyphSize(16, 28),      // inner planets
-        new GlyphSize(14, 25),      // outer planets
+        new GlyphSize(14, 24),      // lights
+        new GlyphSize(13, 22),      // inner planets
+        new GlyphSize(12, 21),      // outer planets
         new GlyphSize(11, 20)       // asteroids and points
     };
 
     private static final GlyphSize[] TRANSIT_SIZES = {
-        new GlyphSize(17, 28),
-        new GlyphSize(14, 24),
-        new GlyphSize(12, 21),
+        new GlyphSize(12, 20),
+        new GlyphSize(11, 19),
+        new GlyphSize(11, 18),
         new GlyphSize(10, 17)
     };
 
@@ -1455,6 +1506,35 @@ extends JPanel {
     /** Innermost ring: asteroids, centaurs, nodes and the calculated points. */
     private static final int RING_ASTEROIDS = 2;
     private static final int RING_COUNT = 3;
+
+    /**
+     * Clearance kept at each edge of an outer band, so a glyph on the outermost sub-ring
+     * does not overhang the boundary it is drawn against. One more than the largest radius
+     * in TRANSIT_SIZES.
+     */
+    static final int BAND_EDGE = 13;
+
+    /** Shallowest an outer band is allowed to get before the wheel is simply too small. */
+    static final int MIN_BAND_DEPTH = 22;
+
+    /**
+     * How deep a band the partner ring and the sky ring each get.
+     *
+     * <b>Derived from what the band has to hold, not chosen.</b> The two bands used to be 22
+     * and 25 pixels, while the layout inside them ran RING_COUNT sub-rings apart - three rings
+     * twenty pixels apart is sixty pixels of content in a twenty-five pixel band, so the
+     * asteroid sub-ring landed in the decans and the signs. Reading it as "a ring" was
+     * accurate: it was a line with things scattered on both sides of it. A band is an area,
+     * and its depth is the space its own sub-rings need.
+     *
+     * Capped at a sixth of the wheel, because on a small window a band that insists on its
+     * ideal depth eats the chart it is wrapped around; there it compresses, and bandRadii
+     * closes the sub-rings up to match.
+     */
+    static int outerBandDepth(int outer) {
+        int ideal = (RING_COUNT - 1) * (int) TRANSIT_RING_GAP + 2 * BAND_EDGE;
+        return Math.max(MIN_BAND_DEPTH, Math.min(ideal, outer / 6));
+    }
 
     /** Radial distance between one ring and the next, natal wheel. */
     private static final double NATAL_RING_GAP = 40.0;
@@ -1507,11 +1587,11 @@ extends JPanel {
      * @param spacing  minimum glyph separation in pixels, passed through to radialLevels
      * @param floorPx  never draw closer to the centre than this
      */
-    private int[] ringedRadii(double[] dArray, boolean[] blArray, double base, double gap,
+    private static int[] ringedRadii(double[] dArray, boolean[] blArray, double base, double gap,
                               double step, double spacing, double floorPx) {
         int[][] nArray = new int[RING_COUNT][];
         for (int i = 0; i < RING_COUNT; ++i) {
-            nArray[i] = this.radialLevels(dArray, SkymapPanel.restrictToRing(blArray, i),
+            nArray[i] = SkymapPanel.radialLevels(dArray, SkymapPanel.restrictToRing(blArray, i),
                 base - (double)i * gap, step, spacing);
         }
         int[] nArray2 = new int[BODY_COUNT];
@@ -1535,17 +1615,21 @@ extends JPanel {
      * someone tries to click a planet and nothing happens.
      */
     int bodyBaseRadius(int[] rings) {
-        int base = rings[RING_SIGN_INNER];
+        int base = rings[RING_BODY_TOP];
         String ring = Settings.bodyRing();
         if (Settings.RING_CENTRE.equals(ring)) {
-            // Well inside the rings, leaving the sign band and the ticks clear.
+            // Well inside the rings, leaving the body bands and the zodiac clear.
             return (int) (base * 0.62);
         }
         if (Settings.RING_OUTSIDE.equals(ring)) {
-            // Just beyond the sign band, the way many traditional charts print them.
-            return rings[RING_SIGN_OUTER] + 14;
+            // <b>This option lost its old destination in the reorder.</b> "Outside the sign
+            // ring" used to mean between the signs and the transit wheel; with the zodiac now
+            // outermost there is nothing out there but the degree ticks, and putting bodies
+            // there would place them beyond the frame that measures them. It now means as far
+            // out as the natal wheel goes - hard against whatever ring is above it.
+            return base;
         }
-        return base;
+        return base - 14;
     }
 
     private int[] natalRadii(int n) {
@@ -1561,39 +1645,54 @@ extends JPanel {
         return nArray3;
     }
 
-    private int[] transitRadii(int n, int n2) {
-        double d = (double)(n2 + n) / 2.0;
-        int[] nArray = this.ringedRadii(this.tLon, SkymapPanel.restrict(this.tValid, false),
-            (double)n, TRANSIT_RING_GAP, TRANSIT_RING_STEP, 28.0, 40.0);
-        int[] nArray2 = this.radialLevels(this.tLon, SkymapPanel.restrict(this.tValid, true), d, 18.0, 28.0);
-        int[] nArray3 = new int[BODY_COUNT];
-        for (int i = 0; i < BODY_COUNT; ++i) {
-            nArray3[i] = Bodies.at(i).isAngle() ? (int)Math.max(d - (double)nArray2[i] * 18.0, 40.0) : nArray[i];
-        }
-        return nArray3;
-    }
-
     /**
-     * Per-body radii for the tri-wheel (outermost sky ring).
+     * Where one outer band's bodies sit, contained inside the band by construction.
      *
-     * Mirrors {@link #transitRadii} but reads {@link #cLon}/{@link #cValid} and sits in
-     * the band between {@code RING_OUTER} and {@code RING_TRI}. The ring gap is the same
-     * 20-pixel transit gap — the band is the same width.
+     * <b>This was two methods, and the second one's own header said it "mirrors" the first.</b>
+     * That is the project's most expensive defect written down as a comment: one rule, two
+     * implementations, drifting. The partner ring and the sky ring differ only in which
+     * longitude array they read and which two radii bound them, so they are one method taking
+     * those as arguments.
      *
-     * @param triOuter  outer edge of the tri-wheel band   (rings[RING_TRI])
-     * @param triInner  inner edge of the tri-wheel band   (rings[RING_TRANSIT])
+     * <b>The sub-rings are derived from the band, not fixed.</b> The old pair asked for three
+     * sub-rings twenty pixels apart regardless of how deep the band actually was, which is how
+     * bodies ended up in the decans. Here the gap is whatever divides the usable depth, so the
+     * innermost sub-ring lands exactly on the floor and nothing can be laid outside
+     * {@code [bandInner + edge, bandOuter - edge]} - not by a wide glyph, not by a crowded
+     * collision level, and not on a window too small to give the band its ideal depth.
+     * AspectGridCheck asserts that containment across sizes rather than trusting it.
+     *
+     * @param bandOuter the band's outer boundary
+     * @param bandInner the band's inner boundary
      */
-    private int[] triWheelRadii(int triOuter, int triInner) {
-        double mid = (double)(triInner + triOuter) / 2.0;
-        int[] nArray = this.ringedRadii(this.cLon, SkymapPanel.restrict(this.cValid, false),
-            (double)triOuter, TRANSIT_RING_GAP, TRANSIT_RING_STEP, 28.0, 40.0);
-        int[] nArray2 = this.radialLevels(this.cLon, SkymapPanel.restrict(this.cValid, true), mid, 18.0, 28.0);
-        int[] nArray3 = new int[BODY_COUNT];
-        for (int i = 0; i < BODY_COUNT; ++i) {
-            nArray3[i] = Bodies.at(i).isAngle()
-                ? (int)Math.max(mid - (double)nArray2[i] * 18.0, 40.0) : nArray[i];
+    static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner) {
+        // On a band too shallow for full clearance, give up half of what there is at each
+        // edge rather than letting top and floor cross - crossed bounds put every body on the
+        // wrong side of the boundary, which is worse than a tight fit.
+        int edge = Math.min(BAND_EDGE, Math.max(0, (bandOuter - bandInner) / 2));
+        int top = bandOuter - edge;
+        int floor = bandInner + edge;
+        double usable = Math.max(0.0, top - floor);
+        double gap = usable / (double) (RING_COUNT - 1);
+        double step = Math.min(gap * 0.35, TRANSIT_RING_STEP);
+
+        int[] bodies = SkymapPanel.ringedRadii(lon, SkymapPanel.restrict(valid, false),
+            top, gap, step, 28.0, floor);
+
+        // Angles ride the middle of the band, where they read as belonging to it rather than
+        // to either neighbour.
+        double mid = (top + floor) / 2.0;
+        double angleStep = Math.min(gap * 0.5, 18.0);
+        int[] levels = SkymapPanel.radialLevels(lon, SkymapPanel.restrict(valid, true),
+            mid, angleStep, 28.0);
+
+        int[] out = new int[BODY_COUNT];
+        for (int i = 0; i < BODY_COUNT; i++) {
+            out[i] = Bodies.at(i).isAngle()
+                ? (int) Math.max(mid - (double) levels[i] * angleStep, floor)
+                : bodies[i];
         }
-        return nArray3;
+        return out;
     }
 
     /**
@@ -3139,7 +3238,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int n9 = n4 = rings[RING_OUTER];
         int nTri = rings[RING_TRI];
         int n10 = rings[RING_TRANSIT];
-        int n11 = rings[RING_DECAN_OUTER];
+        int n11 = rings[RING_BODY_TOP];      // floor of the partner band, since the reorder
         int n12 = rings[RING_SIGN_OUTER];
         int n13 = g.bodyBase;
         double[] dArray = this.activeCusps;
@@ -3338,7 +3437,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
                     if (!SkymapPanel.aspecting(n18, this.bValid)) continue;
                     for (int i = n18 + 1; i < BODY_COUNT; ++i) {
-                        if (!SkymapPanel.aspecting(i, this.bValid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, nArray[n18], nArray[i], this.bLon[n18], this.bLon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
+                        if (!SkymapPanel.aspecting(i, this.bValid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(0), g.aspectDisc(0), this.bLon[n18], this.bLon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
                         return;
                     }
                 }
@@ -3347,7 +3446,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
                     if (!SkymapPanel.aspecting(n18, this.tValid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
-                        if (!SkymapPanel.aspecting(i, this.bValid) || !this.checkAspectHit(n, n2, n7, n8, d8, nArray2[n18], nArray[i], this.tLon[n18], this.bLon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
+                        if (!SkymapPanel.aspecting(i, this.bValid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(1), g.aspectDisc(1), this.tLon[n18], this.bLon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
                         return;
                     }
                 }
@@ -3739,7 +3838,40 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     /** The aspect the grid is currently hovering, as body indices. -1 when nothing is hovered. */
     private int highlightA = -1;
     private int highlightB = -1;
+
+    /**
+     * Whether this body is one end of the aspect line the cursor is resting on.
+     *
+     * <b>Since the lines moved onto the discs they no longer touch their bodies</b>, so
+     * hovering one had nothing to say about which two points it joined - the reader could see
+     * a chord light up and still have to work out its ends from the angle. Lighting the two
+     * glyphs is what puts that back, and it has to be one predicate rather than a test written
+     * into each of the glyph loops, because the natal loop and the outer loop read the
+     * highlight from opposite ends of the pair.
+     */
+    private boolean onHighlightedLine(int body, boolean outerRing) {
+        if (this.highlightA < 0 || this.highlightB < 0) {
+            return false;
+        }
+        if (this.highlightTransit) {
+            // A cross-chart line: A is the outer body, B the natal one.
+            return outerRing ? body == this.highlightA : body == this.highlightB;
+        }
+        return !outerRing && (body == this.highlightA || body == this.highlightB);
+    }
     private boolean highlightTransit;
+
+    /** A ring of light around a glyph at the end of the hovered aspect line. */
+    private static void drawHighlightHalo(Graphics2D g, int x, int y, int r) {
+        Stroke was = g.getStroke();
+        g.setStroke(new BasicStroke(2.0f));
+        g.setColor(new Color(255, 238, 170, 225));
+        g.drawOval(x - r - 4, y - r - 4, (r + 4) * 2, (r + 4) * 2);
+        g.setColor(new Color(255, 238, 170, 80));
+        g.setStroke(new BasicStroke(1.0f));
+        g.drawOval(x - r - 8, y - r - 8, (r + 8) * 2, (r + 8) * 2);
+        g.setStroke(was);
+    }
 
     /**
      * Registry indices of an aspect pattern's members, lit as a group. Empty when none.
@@ -3798,6 +3930,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     static final int RING_DECAN_OUTER = 3;
     static final int RING_SIGN_OUTER = 4;
     static final int RING_SIGN_INNER = 5;
+    /**
+     * Inner edge of the partner band, and so the ceiling of the natal wheel.
+     *
+     * Added when the zodiac moved outward: with the body bands nested underneath the signs
+     * there has to be a name for where the innermost of them stops, because that is where the
+     * natal wheel is now allowed to start. Before the reorder this was RING_SIGN_INNER, and
+     * with no outer ring open it still equals it exactly.
+     */
+    static final int RING_BODY_TOP = 6;
 
     /**
      * The wheel's ring radii, outermost first, derived in one place.
@@ -3809,15 +3950,22 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * after. The historical formula is asserted against this method in AspectGridCheck, so the
      * extraction cannot have silently moved the wheel.
      *
-     * Reading outward: the sign band runs from {@code RING_SIGN_INNER} to
-     * {@code RING_SIGN_OUTER}, the decan band from there to {@code RING_DECAN_OUTER}, and the
-     * degree ticks hang inside {@code RING_OUTER}. {@code RING_TRANSIT} is only meaningful
-     * when the transit wheel is shown. {@code RING_TRI} is the outermost band and only
-     * meaningful when the tri-wheel is shown; it sits between RING_OUTER and RING_TRANSIT.
+     * <b>The zodiac is the outermost thing, and the bodies nest underneath it.</b> Reading
+     * inward from the rim: degree ticks inside {@code RING_OUTER}, then the decan band from
+     * {@code RING_DECAN_OUTER} to {@code RING_SIGN_OUTER}, then the sign band down to
+     * {@code RING_SIGN_INNER}. The body bands hang below that - the sky from
+     * {@code RING_SIGN_INNER} (== {@code RING_TRI}) to {@code RING_TRANSIT}, the partner from
+     * there to {@code RING_BODY_TOP}, and the natal wheel inside all of it.
      *
-     * When neither tri-wheel nor transit is shown, RING_TRI == RING_TRANSIT == RING_OUTER-20
-     * so existing callers that read only RING_TRANSIT, RING_DECAN_OUTER, RING_SIGN_OUTER and
-     * RING_SIGN_INNER are unaffected.
+     * <b>It used to be the other way up</b>, with the two body bands wrapped around the
+     * outside of the zodiac. Two things were wrong with that. The signs are the frame every
+     * position is read against, and a frame drawn inside the things it measures reads as one
+     * more ring rather than as the scale; and the outer bands, being widest, gave the most
+     * room to the wheels with the fewest reasons to need it. Turning it over puts the zodiac
+     * where it is read and the bodies where they are compared.
+     *
+     * With nothing open, RING_TRI == RING_TRANSIT == RING_BODY_TOP == RING_SIGN_INNER, so a
+     * single wheel lays out exactly as it always has - which is asserted rather than assumed.
      */
     static int[] ringRadii(int width, int height, boolean showTransit, boolean showTri) {
         return ringRadii(width, height, showTransit ? 1.0 : 0.0, showTri ? 1.0 : 0.0);
@@ -3845,15 +3993,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         double o = Math.max(0.0, Math.min(1.0, outerOpen));
         double t = Math.max(0.0, Math.min(1.0, triOpen));
         int outer = Math.min(width, height) / 2 - 10;
-        // When the tri-wheel is on, carve out a 22-pixel band for it outside the synastry ring.
-        int tri     = outer - 20;  // always outer-20; transit steps 22 px inward when tri-wheel is on
-        int transit = (int) Math.round((double) tri - 22.0 * t);
-        int closed = outer - 20;
-        int decanOuter = (int) Math.round((double) closed
-            + ((double) (transit - 25) - (double) closed) * o);
+        // Both body bands get the same depth, deep enough to hold their own sub-rings.
+        int depth = SkymapPanel.outerBandDepth(outer);
+        // The zodiac sits at fixed radii just inside the rim; it no longer moves when a body
+        // ring opens, which is the point of putting it outside them.
+        int decanOuter = outer - 20;
         int signOuter = decanOuter - 20;
         int signInner = signOuter - 35;
-        return new int[] { outer, tri, transit, decanOuter, signOuter, signInner };
+        // The body bands hang below the zodiac, each opening downward into the wheel.
+        int tri     = signInner;
+        int transit = (int) Math.round((double) tri - (double) depth * t);
+        int bodyTop = (int) Math.round((double) transit - (double) depth * o);
+        return new int[] { outer, tri, transit, decanOuter, signOuter, signInner, bodyTop };
     }
 
     /** Overload for callers that pre-date the tri-wheel; preserves the old contract. */
@@ -5308,6 +5459,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int n16 = rings[RING_DECAN_OUTER];
             int n17 = rings[RING_SIGN_OUTER];
             int n18 = rings[RING_SIGN_INNER];
+            int nBodyTop = rings[RING_BODY_TOP];
             // <b>The disc, filled separately from the page.</b> One colour used to do both -
             // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
             // Filled before any ring is drawn, so every stroke below lands on top of it.
@@ -5328,8 +5480,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
             graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
             if (SkymapPanel.this.outerRingDrawn()) {
+                // Both boundaries of the partner band. Since the reorder it hangs below the
+                // zodiac rather than outside it, so its floor is a line of its own - without
+                // it the band bleeds into the natal wheel and stops reading as a field.
                 graphics2D.setColor(new Color(80, 40, 80));
                 graphics2D.drawOval(n12 - n15, n13 - n15, n15 * 2, n15 * 2);
+                graphics2D.drawOval(n12 - nBodyTop, n13 - nBodyTop,
+                    nBodyTop * 2, nBodyTop * 2);
             }
             // Tri-wheel: an additional ring outside the synastry ring.
             if (SkymapPanel.this.triRingDrawn()) {
@@ -5438,9 +5595,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 Stroke stroke = graphics2D.getStroke();
                 graphics2D.setStroke(new BasicStroke(2.0f, 0, 0, 10.0f, new float[]{4.0f, 4.0f}, 0.0f));
                 for (int i = 1; i <= 12; ++i) {
+                    // Across the partner band, which is where those cusps belong - not from
+                    // the decan ring, which the reorder moved to the other side of the wheel.
                     double d9 = Math.toRadians(180.0 + d4 - SkymapPanel.this.transitCusps[i]);
-                    n = n12 + (int)((double)n16 * Math.cos(d9));
-                    n7 = n13 + (int)((double)n16 * Math.sin(d9));
+                    n = n12 + (int)((double)nBodyTop * Math.cos(d9));
+                    n7 = n13 + (int)((double)nBodyTop * Math.sin(d9));
                     n6 = n12 + (int)((double)n15 * Math.cos(d9));
                     n5 = n13 + (int)((double)n15 * Math.sin(d9));
                     n4 = i == 1 || i == 4 || i == 7 || i == 10 ? 1 : 0;
@@ -5457,6 +5616,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int[] nArray = g.natalRadii();
             int[] nArray2 = g.transitRadii();
             int[] nArrayC = g.triRadii();
+            // The three aspect fields. Lines are drawn on these, not between the glyphs -
+            // see Geometry.aspectDisc for why, and note that the hit test reads the same
+            // three numbers, because a line you can see has to be a line you can hover.
+            int discNatal = g.aspectDisc(0);
+            int discOuter = g.aspectDisc(1);
+            int discSky = g.aspectDisc(2);
             int n24 = n18 - 60;
             graphics2D.setStroke(new BasicStroke(0.5f));
             boolean bl = SkymapPanel.this.aspectFilter.equals("Natal-Natal") || SkymapPanel.this.aspectFilter.equals("Both");
@@ -5466,7 +5631,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!SkymapPanel.aspecting(n7, SkymapPanel.this.bValid)) continue;
                     for (n6 = n7 + 1; n6 < BODY_COUNT; ++n6) {
                         if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid) || Bodies.isOppositePair(n7, n6)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, nArray[n7], nArray[n6], false, n7, n6);
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, discNatal, discNatal, false, n7, n6);
                     }
                 }
             }
@@ -5475,7 +5640,22 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!SkymapPanel.aspecting(n7, SkymapPanel.this.tValid)) continue;
                     for (n6 = 0; n6 < BODY_COUNT; ++n6) {
                         if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.tLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, nArray2[n7], nArray[n6], true, n7, n6);
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.tLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, discOuter, discOuter, true, n7, n6);
+                    }
+                }
+            }
+            // <b>The sky ring had no aspect lines at all.</b> It could be drawn, hovered and
+            // read, and the one thing the wheel is for - showing what is in aspect to what -
+            // stopped at the ring below it. With a field of its own there is now somewhere to
+            // put them where they do not cross the other two.
+            if (n != 0 && SkymapPanel.this.triRingDrawn()) {
+                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
+                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.cValid)) continue;
+                    for (n6 = 0; n6 < BODY_COUNT; ++n6) {
+                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid)) continue;
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.cLon[n7],
+                            SkymapPanel.this.bLon[n6], d4, n12, n13, discSky, discSky,
+                            true, n7, n6);
                     }
                 }
             }
@@ -5505,7 +5685,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                             continue;
                         }
                         this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[pa],
-                            SkymapPanel.this.bLon[pb], d4, n12, n13, nArray[pa], nArray[pb],
+                            SkymapPanel.this.bLon[pb], d4, n12, n13, discNatal, discNatal,
                             false, pa, pb);
                     }
                 }
@@ -5518,12 +5698,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (SkymapPanel.aspecting(hlA, SkymapPanel.this.tValid)
                         && SkymapPanel.aspecting(hlB, SkymapPanel.this.bValid)) {
                         this.drawAspectLine(graphics2D, SkymapPanel.this.tLon[hlA], SkymapPanel.this.bLon[hlB],
-                            d4, n12, n13, nArray2[hlA], nArray[hlB], true, hlA, hlB);
+                            d4, n12, n13, discOuter, discOuter, true, hlA, hlB);
                     }
                 } else if (SkymapPanel.aspecting(hlA, SkymapPanel.this.bValid)
                     && SkymapPanel.aspecting(hlB, SkymapPanel.this.bValid)) {
                     this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[hlA], SkymapPanel.this.bLon[hlB],
-                        d4, n12, n13, nArray[hlA], nArray[hlB], false, hlA, hlB);
+                        d4, n12, n13, discNatal, discNatal, false, hlA, hlB);
                 }
             }
             for (n7 = 0; n7 < BODY_COUNT; ++n7) {
@@ -5531,6 +5711,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 double d10 = Math.toRadians(180.0 + d4 - SkymapPanel.this.bLon[n7]);
                 n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));
                 int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
+                if (SkymapPanel.this.onHighlightedLine(n7, false)) {
+                    SkymapPanel.drawHighlightHalo(graphics2D, n4, n26,
+                        Bodies.at(n7).isAngle() ? 13 : SkymapPanel.natalSize(n7).radius);
+                }
                 if (Bodies.at(n7).isAngle()) {
                     graphics2D.setFont(ANGLE_FONT);
                     // The angle marker follows the template: gold is invisible on a white
@@ -5595,6 +5779,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.tLon[n7]);
                     n4 = n12 + (int)((double)nArray2[n7] * Math.cos(d12));
                     int n27 = n13 + (int)((double)nArray2[n7] * Math.sin(d12));
+                    if (SkymapPanel.this.onHighlightedLine(n7, true)) {
+                        SkymapPanel.drawHighlightHalo(graphics2D, n4, n27,
+                            Bodies.at(n7).isAngle() ? 13
+                                : SkymapPanel.transitSize(n7).radius);
+                    }
                     if (Bodies.at(n7).isAngle()) {
                         graphics2D.setFont(ANGLE_FONT);
                         this.drawBodyMarker(graphics2D, n4, n27, 13, new Color(94, 82, 46),

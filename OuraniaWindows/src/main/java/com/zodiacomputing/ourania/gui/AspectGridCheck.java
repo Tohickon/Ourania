@@ -710,6 +710,69 @@ public final class AspectGridCheck {
      * failure said nothing about composites. A check whose result depends on a preference is
      * not a check; it is a reason to stop trusting the suite.
      */
+    /**
+     * Nothing a band lays out may be drawn outside the band.
+     *
+     * <b>The defect this exists for was visible and unasserted for weeks.</b> The wheel drew
+     * an outer "ring" that was really a line, with the asteroid sub-ring scattered across the
+     * decan and sign bands below it. Every existing geometry check passed throughout, because
+     * they all asked where the boundaries were and none asked where the bodies went.
+     *
+     * Crowded longitudes on purpose: a collision level pushes a body inward past its
+     * sub-ring, and that is the case a band computed from fixed gaps gets wrong first.
+     *
+     * <b>Containment on its own would not have caught this.</b> Handed the old 22-pixel band,
+     * bandRadii keeps every body inside it - by putting all twenty-nine on the same circle,
+     * because the usable depth after clearance came out negative. That passes a containment
+     * assertion and is exactly the thin line David reported. So the spread is asserted too:
+     * the sub-rings have to be genuinely apart, which is what makes the band an area.
+     */
+    private static void bandsContainTheirBodies() {
+        double[] lon = new double[Bodies.count()];
+        boolean[] valid = new boolean[Bodies.count()];
+        for (int i = 0; i < lon.length; i++) {
+            // All within four degrees, so every body collides with every other one.
+            lon[i] = 100.0 + (i * 4.0) / lon.length;
+            valid[i] = true;
+        }
+        for (int w = 200; w <= 2200; w += 173) {
+            for (int h = 200; h <= 2200; h += 197) {
+                int[] r = SkymapPanel.ringRadii(w, h, true, true);
+                int[][] bands = {
+                    {r[SkymapPanel.RING_TRI], r[SkymapPanel.RING_TRANSIT]},
+                    {r[SkymapPanel.RING_TRANSIT], r[SkymapPanel.RING_BODY_TOP]},
+                };
+                String[] names = {"the sky band", "the partner band"};
+                for (int b = 0; b < bands.length; b++) {
+                    int hi = bands[b][0];
+                    int lo = bands[b][1];
+                    ok(names[b] + " is not inside out (" + w + "x" + h + ")", hi >= lo);
+                    int[] radii = SkymapPanel.bandRadii(lon, valid, hi, lo);
+                    int lowest = Integer.MAX_VALUE;
+                    int highest = Integer.MIN_VALUE;
+                    for (int i = 0; i < radii.length; i++) {
+                        ok(names[b] + " keeps " + Bodies.at(i).name + " inside it ("
+                            + w + "x" + h + "): " + radii[i] + " not in [" + lo + "," + hi + "]",
+                            radii[i] >= lo && radii[i] <= hi);
+                        lowest = Math.min(lowest, radii[i]);
+                        highest = Math.max(highest, radii[i]);
+                    }
+                    // Two sub-ring gaps' worth of depth, at any wheel big enough to have it.
+                    if (outerOf(w, h) > 200) {
+                        ok(names[b] + " is an area, not a line (" + w + "x" + h
+                            + "): bodies span " + (highest - lowest) + "px",
+                            highest - lowest >= 2 * 12);
+                    }
+                }
+            }
+        }
+    }
+
+    /** The wheel's outer radius at a window size - the one figure the sweep above needs. */
+    private static int outerOf(int w, int h) {
+        return Math.min(w, h) / 2 - 10;
+    }
+
     private static void compositeCarriesTransits() throws Exception {
         String savedBodies = Settings.get(Settings.BODIES_KEY, null);
         try {
@@ -1101,9 +1164,8 @@ public final class AspectGridCheck {
         final java.awt.Component chart = (java.awt.Component) getField(sky, "chartPanel");
         javax.swing.SwingUtilities.invokeAndWait(() -> chart.setSize(800, 800));
 
-        Method triRadii =
-            SkymapPanel.class.getDeclaredMethod("triWheelRadii", int.class, int.class);
-        triRadii.setAccessible(true);
+        // triWheelRadii and transitRadii were merged into one bandRadii on 2026-09-06 - the
+        // second had said it "mirrors" the first since it was written. This is the same call.
         Method pinLon = SkymapPanel.class.getDeclaredMethod("getPinLongitude");
         pinLon.setAccessible(true);
         final Method click =
@@ -1113,11 +1175,11 @@ public final class AspectGridCheck {
         int w = chart.getWidth();
         int h = chart.getHeight();
         int[] rings = SkymapPanel.ringRadii(w, h, true, true);
-        int[] radii = (int[]) triRadii.invoke(sky,
-            rings[SkymapPanel.RING_TRI], rings[SkymapPanel.RING_TRANSIT]);
         double pin = (Double) pinLon.invoke(sky);
         double[] cLon = (double[]) getField(sky, "cLon");
         boolean[] cValid = (boolean[]) getField(sky, "cValid");
+        int[] radii = SkymapPanel.bandRadii(cLon, cValid,
+            rings[SkymapPanel.RING_TRI], rings[SkymapPanel.RING_TRANSIT]);
         int cx = w / 2;
         int cy = h / 2;
 
@@ -1711,52 +1773,107 @@ public final class AspectGridCheck {
     private static void ringGeometry() {
         for (int w = 200; w <= 2000; w += 137) {
             for (int h = 200; h <= 2000; h += 211) {
-                for (boolean transit : new boolean[] {false, true}) {
-                    int outer = Math.min(w, h) / 2 - 10;
-                    int transitRing = outer - 20;
-                    int decanOuter = transit ? transitRing - 25 : outer - 20;
-                    int signOuter = decanOuter - 20;
-                    int signInner = signOuter - 35;
+                int outer = Math.min(w, h) / 2 - 10;
+                // Typed out rather than asked for - the whole point of this part is that the
+                // chain is stated twice and the copies agree. (RING_COUNT - 1) sub-ring gaps
+                // plus clearance at both edges, capped at a sixth of the wheel, floored so a
+                // tiny window still gets a band.
+                int depth = Math.max(22, Math.min(2 * 20 + 2 * 13, outer / 6));
+                // The zodiac is fixed just inside the rim and no longer moves when a body
+                // ring opens - that is what the 2026-09-06 reorder was for.
+                int decanOuter = outer - 20;
+                int signOuter = decanOuter - 20;
+                int signInner = signOuter - 35;
+                String at = " (" + w + "x" + h + ")";
 
-                    // No tri-wheel: the 3-arg overload passes showTri=false, so the RING_TRI
-                    // and RING_TRANSIT slots collapse to the same value (outer - 20) and the
-                    // array is six elements wide. The historical five-element contract is kept
-                    // by using the named constants, whose values shifted when RING_TRI was
-                    // inserted, so all five legacy values are still present and correct.
-                    int[] got = SkymapPanel.ringRadii(w, h, transit);
-                    ok("ring chain returns six radii", got.length == 6);
-                    ok("outer matches (" + w + "x" + h + ")",
-                        got[SkymapPanel.RING_OUTER] == outer);
-                    ok("transit ring matches (" + w + "x" + h + ")",
-                        got[SkymapPanel.RING_TRANSIT] == transitRing);
-                    ok("decan outer matches (" + w + "x" + h + ", transit=" + transit + ")",
-                        got[SkymapPanel.RING_DECAN_OUTER] == decanOuter);
-                    ok("sign outer matches (" + w + "x" + h + ")",
-                        got[SkymapPanel.RING_SIGN_OUTER] == signOuter);
-                    ok("sign inner matches (" + w + "x" + h + ")",
-                        got[SkymapPanel.RING_SIGN_INNER] == signInner);
+                for (boolean partner : new boolean[] {false, true}) {
+                    for (boolean sky : new boolean[] {false, true}) {
+                        int tri = signInner;
+                        int transit = tri - (sky ? depth : 0);
+                        int bodyTop = transit - (partner ? depth : 0);
+                        String tag = at + " partner=" + partner + " sky=" + sky;
 
-                    // The rings must nest, outermost first, at any size the window can be.
-                    if (outer > 120) {
-                        ok("rings nest outward-in (" + w + "x" + h + ")",
-                            got[SkymapPanel.RING_OUTER] > got[SkymapPanel.RING_DECAN_OUTER]
-                                && got[SkymapPanel.RING_DECAN_OUTER]
-                                    > got[SkymapPanel.RING_SIGN_OUTER]
+                        int[] got = SkymapPanel.ringRadii(w, h, partner, sky);
+                        ok("ring chain returns seven radii" + tag, got.length == 7);
+                        ok("outer matches" + tag, got[SkymapPanel.RING_OUTER] == outer);
+                        ok("decan outer matches" + tag,
+                            got[SkymapPanel.RING_DECAN_OUTER] == decanOuter);
+                        ok("sign outer matches" + tag,
+                            got[SkymapPanel.RING_SIGN_OUTER] == signOuter);
+                        ok("sign inner matches" + tag,
+                            got[SkymapPanel.RING_SIGN_INNER] == signInner);
+                        ok("the sky band hangs from the sign ring" + tag,
+                            got[SkymapPanel.RING_TRI] == tri);
+                        ok("the sky|partner boundary matches" + tag,
+                            got[SkymapPanel.RING_TRANSIT] == transit);
+                        ok("the natal ceiling matches" + tag,
+                            got[SkymapPanel.RING_BODY_TOP] == bodyTop);
+
+                        // <b>The zodiac must not move when a body ring opens.</b> That it did
+                        // is exactly what this reorder was for; asserting the radii above
+                        // would still pass if decanOuter were made to depend on the flags,
+                        // so the independence is stated on its own.
+                        int[] shut = SkymapPanel.ringRadii(w, h, false, false);
+                        ok("the zodiac does not move when a ring opens" + tag,
+                            got[SkymapPanel.RING_DECAN_OUTER]
+                                    == shut[SkymapPanel.RING_DECAN_OUTER]
                                 && got[SkymapPanel.RING_SIGN_OUTER]
-                                    > got[SkymapPanel.RING_SIGN_INNER]);
-                    }
+                                    == shut[SkymapPanel.RING_SIGN_OUTER]
+                                && got[SkymapPanel.RING_SIGN_INNER]
+                                    == shut[SkymapPanel.RING_SIGN_INNER]);
 
-                    // Tri-wheel: the 4-arg overload, tri=true. RING_TRI must be between OUTER
-                    // and RING_TRANSIT, and RING_TRANSIT must be 22px inside RING_TRI.
-                    int[] gotTri = SkymapPanel.ringRadii(w, h, transit, true);
-                    ok("tri-wheel ring chain returns six radii", gotTri.length == 6);
-                    ok("tri outer matches outer-20 (" + w + "x" + h + ")",
-                        gotTri[SkymapPanel.RING_TRI] == outer - 20);
-                    ok("tri transit = tri outer - 22 (" + w + "x" + h + ")",
-                        gotTri[SkymapPanel.RING_TRANSIT] == gotTri[SkymapPanel.RING_TRI] - 22);
+                        // Everything nests, outermost first, at any size the window can be.
+                        if (outer > 120) {
+                            ok("rings nest outward-in" + tag,
+                                got[SkymapPanel.RING_OUTER] > got[SkymapPanel.RING_DECAN_OUTER]
+                                    && got[SkymapPanel.RING_DECAN_OUTER]
+                                        > got[SkymapPanel.RING_SIGN_OUTER]
+                                    && got[SkymapPanel.RING_SIGN_OUTER]
+                                        > got[SkymapPanel.RING_SIGN_INNER]
+                                    && got[SkymapPanel.RING_SIGN_INNER]
+                                        >= got[SkymapPanel.RING_TRI]
+                                    && got[SkymapPanel.RING_TRI]
+                                        >= got[SkymapPanel.RING_TRANSIT]
+                                    && got[SkymapPanel.RING_TRANSIT]
+                                        >= got[SkymapPanel.RING_BODY_TOP]);
+                        }
+
+                        // A band that is open takes exactly one band depth; a band that is
+                        // shut takes none.
+                        //
+                        // <b>Against the depth itself, not a threshold.</b> This first
+                        // asserted every open band was at least 2*BAND_EDGE deep, which is
+                        // false by design below about 780 pixels of window - outerBandDepth
+                        // floors at MIN_BAND_DEPTH and lets the sub-rings close up rather
+                        // than let the band eat the chart. 88 failures that said nothing
+                        // about the geometry and everything about the assertion.
+                        ok("an open sky band is one band deep" + tag,
+                            got[SkymapPanel.RING_TRI] - got[SkymapPanel.RING_TRANSIT]
+                                == (sky ? depth : 0));
+                        ok("an open partner band is one band deep" + tag,
+                            got[SkymapPanel.RING_TRANSIT] - got[SkymapPanel.RING_BODY_TOP]
+                                == (partner ? depth : 0));
+                        // And on a wheel that can afford it, a band is deeper than the
+                        // clearance its own glyphs need - which is the property that stops
+                        // points landing in the ring next door.
+                        if (outer / 6 >= 2 * 13) {
+                            ok("a band the wheel can afford clears its own glyphs" + tag,
+                                depth >= 2 * 13);
+                        }
+                    }
                 }
+
+                // <b>A single wheel must lay out exactly as it always has.</b> With nothing
+                // open the three body boundaries collapse onto the sign ring, so the natal
+                // wheel starts where it started before any of this existed.
+                int[] single = SkymapPanel.ringRadii(w, h, false, false);
+                ok("a single wheel puts the natal ceiling on the sign ring" + at,
+                    single[SkymapPanel.RING_BODY_TOP] == signInner
+                        && single[SkymapPanel.RING_TRI] == signInner
+                        && single[SkymapPanel.RING_TRANSIT] == signInner);
             }
         }
+
         ok("28 mansions tile the circle exactly",
             Math.abs(com.zodiacomputing.ourania.astro.LunarMansions.WIDTH * 28 - 360.0) < 1e-9);
 

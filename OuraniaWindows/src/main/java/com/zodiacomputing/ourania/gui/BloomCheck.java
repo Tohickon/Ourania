@@ -199,23 +199,38 @@ public final class BloomCheck {
                 }
             }
 
-            // Opening the outer ring costs the wheel inside it room, and must do so gradually.
-            int shut = SkymapPanel.ringRadii(w, h, 0.0, 0.0)[SkymapPanel.RING_DECAN_OUTER];
-            int open = SkymapPanel.ringRadii(w, h, 1.0, 0.0)[SkymapPanel.RING_DECAN_OUTER];
-            yes("an outer ring costs the wheel inside it room" + at, open < shut);
+            // Opening a ring costs the wheel inside it room, and must do so gradually.
+            //
+            // <b>Watched at the natal ceiling, not at the decan ring.</b> Until the zodiac
+            // moved outward on 2026-09-06 the decan ring was what a ring pushed inward; now
+            // the zodiac is fixed and RING_BODY_TOP is what gives way. This part failed on
+            // the reorder, which is the right way round - the assertion was pinned to a
+            // radius and the radius stopped being the one that moves.
+            int shut = SkymapPanel.ringRadii(w, h, 0.0, 0.0)[SkymapPanel.RING_BODY_TOP];
+            int open = SkymapPanel.ringRadii(w, h, 1.0, 0.0)[SkymapPanel.RING_BODY_TOP];
+            yes("an open ring costs the wheel inside it room" + at, open < shut);
             int last = shut + 1;
             for (int step = 0; step <= 20; step++) {
                 double v = step / 20.0;
-                int d = SkymapPanel.ringRadii(w, h, v, 0.0)[SkymapPanel.RING_DECAN_OUTER];
+                int d = SkymapPanel.ringRadii(w, h, v, 0.0)[SkymapPanel.RING_BODY_TOP];
                 yes("the band never widens backwards" + at, d <= last);
                 yes("and never overshoots either end" + at, d <= shut && d >= open);
                 last = d;
             }
             // <b>The point of the whole exercise.</b> If half-open equalled either end, the
             // wheel would jump on one frame and the bloom would be decoration.
-            int half = SkymapPanel.ringRadii(w, h, 0.5, 0.0)[SkymapPanel.RING_DECAN_OUTER];
+            int half = SkymapPanel.ringRadii(w, h, 0.5, 0.0)[SkymapPanel.RING_BODY_TOP];
             yes("half-open is genuinely between the two layouts" + at,
                 half < shut && half > open);
+            // And the zodiac must sit still throughout, which is what the reorder was for.
+            for (int step = 0; step <= 20; step++) {
+                int[] mid = SkymapPanel.ringRadii(w, h, step / 20.0, 0.0);
+                int[] rest = SkymapPanel.ringRadii(w, h, 0.0, 0.0);
+                yes("the zodiac does not move while a ring blooms" + at,
+                    mid[SkymapPanel.RING_DECAN_OUTER] == rest[SkymapPanel.RING_DECAN_OUTER]
+                        && mid[SkymapPanel.RING_SIGN_INNER]
+                            == rest[SkymapPanel.RING_SIGN_INNER]);
+            }
         }
     }
 

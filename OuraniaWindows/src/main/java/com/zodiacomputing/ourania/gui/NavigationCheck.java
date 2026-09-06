@@ -83,6 +83,12 @@ public final class NavigationCheck {
         report("Part E", before);
 
         System.out.println();
+        System.out.println("=== Part F: a hovered aspect line lights both its ends ===");
+        before = failures.size();
+        hoveredLineEnds();
+        report("Part F", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -563,6 +569,76 @@ public final class NavigationCheck {
         } finally {
             SwingUtilities.invokeAndWait(w[0]::dispose);
         }
+    }
+
+    /**
+     * Hovering an aspect line has to say which two bodies it joins.
+     *
+     * <b>The lines stopped touching their bodies on 2026-09-06.</b> Moving them onto three
+     * nested discs is what stopped the wheel reading as a tangle, but it also cut the visible
+     * link between a line and its ends - a reader could light a chord and still have to work
+     * out from its angle which two points it belonged to. The halo puts that back, and this is
+     * the rule it draws from.
+     *
+     * <b>The two ends are read from opposite ends of the pair</b>, which is the part worth
+     * asserting: for a cross-chart line A is the outer body and B the natal one, so the natal
+     * loop must not light A and the outer loop must not light B. Get that backwards and the
+     * halo appears on two bodies that are not in aspect at all - which looks exactly like a
+     * working feature.
+     */
+    private static void hoveredLineEnds() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+            java.lang.reflect.Method lit = SkymapPanel.class.getDeclaredMethod(
+                "onHighlightedLine", int.class, boolean.class);
+            lit.setAccessible(true);
+
+            // Nothing hovered: nothing lights, on either ring.
+            set(sky, "highlightA", -1);
+            set(sky, "highlightB", -1);
+            set(sky, "highlightTransit", Boolean.FALSE);
+            for (int i = 0; i < 6; i++) {
+                ok("with no line hovered, body " + i + " stays dark",
+                    !(Boolean) lit.invoke(sky, i, false)
+                        && !(Boolean) lit.invoke(sky, i, true));
+            }
+
+            // A natal-to-natal line: both ends are on the natal wheel, neither on the outer.
+            set(sky, "highlightA", 2);
+            set(sky, "highlightB", 5);
+            set(sky, "highlightTransit", Boolean.FALSE);
+            ok("a natal line lights its first end", (Boolean) lit.invoke(sky, 2, false));
+            ok("a natal line lights its second end", (Boolean) lit.invoke(sky, 5, false));
+            ok("and lights nothing on the outer ring",
+                !(Boolean) lit.invoke(sky, 2, true) && !(Boolean) lit.invoke(sky, 5, true));
+            ok("and nothing that is not an end", !(Boolean) lit.invoke(sky, 3, false));
+
+            // A cross-chart line: A is the outer body, B the natal one, and not the reverse.
+            set(sky, "highlightA", 2);
+            set(sky, "highlightB", 5);
+            set(sky, "highlightTransit", Boolean.TRUE);
+            ok("a cross-chart line lights its outer end on the outer ring",
+                (Boolean) lit.invoke(sky, 2, true));
+            ok("and its natal end on the natal wheel",
+                (Boolean) lit.invoke(sky, 5, false));
+            ok("the outer end does not also light on the natal wheel",
+                !(Boolean) lit.invoke(sky, 2, false));
+            ok("the natal end does not also light on the outer ring",
+                !(Boolean) lit.invoke(sky, 5, true));
+            ok("and nothing that is not an end", !(Boolean) lit.invoke(sky, 3, true));
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    private static void set(Object target, String name, Object value) throws Exception {
+        java.lang.reflect.Field f = target.getClass().getDeclaredField(name);
+        f.setAccessible(true);
+        f.set(target, value);
     }
 
     private static void ok(String label, boolean condition) {
