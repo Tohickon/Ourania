@@ -41,6 +41,18 @@ public final class BloomCheck {
         report("Part C", before);
 
         System.out.println();
+        System.out.println("=== Part D: the wheel opens a band for the ring filling it ===");
+        before = failures.size();
+        theBand();
+        report("Part D", before);
+
+        System.out.println();
+        System.out.println("=== Part E: a ring unfurls, and can be clicked where it is ===");
+        before = failures.size();
+        theUnfurl();
+        report("Part E", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -159,6 +171,113 @@ public final class BloomCheck {
         yes("toggling a folded ring opens it", t.opening());
         t.toggle();
         yes("toggling it again folds it", !t.opening());
+    }
+
+    /**
+     * The band a ring occupies has to widen at the ring's own pace.
+     *
+     * <b>The corners are the contract.</b> ringRadii's boolean form is asserted against the
+     * wheel's historical formula in AspectGridCheck Part J, and the fractional form now has to
+     * reproduce it exactly at 0 and 1 or that formula has quietly moved. Part J caught the
+     * first attempt at this doing precisely that, so the identity is asserted here too, at the
+     * point where it is easy to read.
+     */
+    private static void theBand() {
+        int[][] sizes = { {900, 900}, {1400, 900}, {600, 1200}, {240, 240} };
+        for (int[] wh : sizes) {
+            int w = wh[0];
+            int h = wh[1];
+            String at = " (" + w + "x" + h + ")";
+            for (int oi = 0; oi <= 1; oi++) {
+                for (int ti = 0; ti <= 1; ti++) {
+                    int[] byFlag = SkymapPanel.ringRadii(w, h, oi == 1, ti == 1);
+                    int[] byFraction = SkymapPanel.ringRadii(w, h, (double) oi, (double) ti);
+                    for (int r = 0; r < byFlag.length; r++) {
+                        eq("fully open matches the boolean layout, ring " + r
+                            + " o=" + oi + " t=" + ti + at, byFlag[r], byFraction[r]);
+                    }
+                }
+            }
+
+            // Opening the outer ring costs the wheel inside it room, and must do so gradually.
+            int shut = SkymapPanel.ringRadii(w, h, 0.0, 0.0)[SkymapPanel.RING_DECAN_OUTER];
+            int open = SkymapPanel.ringRadii(w, h, 1.0, 0.0)[SkymapPanel.RING_DECAN_OUTER];
+            yes("an outer ring costs the wheel inside it room" + at, open < shut);
+            int last = shut + 1;
+            for (int step = 0; step <= 20; step++) {
+                double v = step / 20.0;
+                int d = SkymapPanel.ringRadii(w, h, v, 0.0)[SkymapPanel.RING_DECAN_OUTER];
+                yes("the band never widens backwards" + at, d <= last);
+                yes("and never overshoots either end" + at, d <= shut && d >= open);
+                last = d;
+            }
+            // <b>The point of the whole exercise.</b> If half-open equalled either end, the
+            // wheel would jump on one frame and the bloom would be decoration.
+            int half = SkymapPanel.ringRadii(w, h, 0.5, 0.0)[SkymapPanel.RING_DECAN_OUTER];
+            yes("half-open is genuinely between the two layouts" + at,
+                half < shut && half > open);
+        }
+    }
+
+    /**
+     * A blooming ring's radii: gathered at the band's inner edge, arriving in order.
+     *
+     * <b>Asserted on the array both the painter and the hit test read.</b> Blooming the glyphs
+     * in the painter alone would have drawn a ring you could see travelling and could only
+     * click at its destination - the defect SkymapPanel.Geometry exists to prevent. That the
+     * radii themselves move is what makes a half-open ring clickable half-open.
+     */
+    private static void theUnfurl() {
+        int inner = 300;
+        int[] settled = new int[12];
+        for (int i = 0; i < settled.length; i++) {
+            settled[i] = 360 + i;               // distinct, so a mix-up would show
+        }
+
+        int[] open = SkymapPanel.bloomed(settled, inner, 1.0);
+        for (int i = 0; i < settled.length; i++) {
+            eq("an open ring is the settled radius, body " + i, settled[i], open[i]);
+        }
+
+        int[] shut = SkymapPanel.bloomed(settled, inner, 0.0);
+        for (int i = 0; i < settled.length; i++) {
+            eq("a folded ring is gathered at the band's inner edge, body " + i,
+                inner, shut[i]);
+        }
+
+        // Every body travels outward and none of them overshoots.
+        int[] prev = shut;
+        for (int step = 1; step <= 20; step++) {
+            int[] now = SkymapPanel.bloomed(settled, inner, step / 20.0);
+            for (int i = 0; i < settled.length; i++) {
+                yes("body " + i + " never travels backwards mid-bloom", now[i] >= prev[i]);
+                yes("body " + i + " stays inside its band",
+                    now[i] >= inner && now[i] <= settled[i]);
+            }
+            prev = now;
+        }
+
+        // <b>Earlier bodies lead.</b> Without this the ring expands as a disc, which reads as
+        // the wheel being resized rather than as a ring opening.
+        int[] mid = SkymapPanel.bloomed(settled, inner, 0.35);
+        double firstOut = mid[0] - inner;
+        double lastOut = mid[settled.length - 1] - inner;
+        yes("the first body is further out than the last, mid-bloom", firstOut > lastOut);
+        yes("and the ring is genuinely part-way, not at either end",
+            firstOut > 0 && mid[0] < settled[0]);
+
+        // Opacity leads the travel, so the reader watches glyphs arrive rather than fade in.
+        yes("a folded ring is fully transparent",
+            Bloom.smoothstep(0.0, 0.45, 0.0) == 0.0);
+        yes("a ring is fully opaque before it has finished travelling",
+            Bloom.smoothstep(0.0, 0.45, 0.5) >= 0.999);
+    }
+
+    private static void eq(String label, int expected, int actual) {
+        checks++;
+        if (expected != actual) {
+            failures.add(label + ": got " + actual + ", expected " + expected);
+        }
     }
 
     private static boolean inRange(double v) {

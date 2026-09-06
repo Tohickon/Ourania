@@ -30,6 +30,7 @@ import de.thmac.swisseph.SweDate;
 import de.thmac.swisseph.SwissEph;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -37,6 +38,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Polygon;
@@ -269,6 +271,82 @@ extends JPanel {
 
     /** The ring chips above the transport row - see RingBar. */
     private RingBar ringBar;
+
+    /**
+     * How far the outer ring is open, and the sky ring beyond it.
+     *
+     * <b>One bloom per ring that is DRAWN, not per idea it carries.</b> The outer ring holds a
+     * partner in a synastry and the sky in a transit chart, and the painter does not care
+     * which - it draws a ring of glyphs from tLon either way. Keying the blooms to the arrays
+     * rather than to the meaning is what stops this needing a branch per mode.
+     *
+     * The ring keeps drawing while a bloom is folding even though the flag that gated it has
+     * already gone false, which is the whole point: the ring leaves rather than vanishing.
+     */
+    private final Bloom outerBloom = new Bloom(false, this::repaintWheel);
+    private final Bloom triBloom = new Bloom(false, this::repaintWheel);
+
+    /**
+     * How much of the bloom is spent letting earlier bodies lead. See Bloom.stagger.
+     *
+     * At 0.45 the last body starts a little under halfway through, so the ring reads as
+     * unfurling rather than as one object sliding outward.
+     */
+    private static final double RING_SPREAD = 0.45;
+
+    /**
+     * Whether the outer ring is <b>on screen</b>, as opposed to whether it exists.
+     *
+     * <b>This is a different question from {@link #showTransitChart}, not a second answer to
+     * the same one.</b> That flag is intent - the reader asked for an outer wheel, so compute
+     * its data, set the aspect filter, enable the alignment control. This predicate is about
+     * pixels: a ring the reader has just folded away is still being drawn for the length of
+     * the fold, and a ring being drawn must be laid out, painted and clicked on.
+     *
+     * Everything that answers "where is it" - the ring layout, the painter, the hit test -
+     * asks this. Everything that answers "should it exist" asks the flag. Merging them is how
+     * a fold turns into a disappearance, and splitting the wrong way is how a glyph you can
+     * see becomes a glyph you cannot click.
+     */
+    boolean outerRingDrawn() {
+        return this.outerOpenFraction() > 0.001;
+    }
+
+    /** As above, for the outermost sky ring. */
+    boolean triRingDrawn() {
+        return this.triOpenFraction() > 0.001;
+    }
+
+    /**
+     * How far the outer ring is open, 0 to 1 - the one number every ring question resolves to.
+     *
+     * <b>The flag wins when the two disagree.</b> showTransitChart is a public field and code
+     * outside this class writes it, so a bloom that was never told about a change must not be
+     * able to hide a ring the flag says is there: an un-animated ring is a cosmetic loss, a
+     * missing one is a broken chart. The one case where the bloom knows better is a fold, and
+     * there the flag has already gone false, so the two cannot fight.
+     */
+    double outerOpenFraction() {
+        if (this.showTransitChart && !this.outerBloom.opening()) {
+            return 1.0;
+        }
+        return this.outerBloom.value();
+    }
+
+    /** As above, for the outermost sky ring. */
+    double triOpenFraction() {
+        if (this.showTriWheel && !this.triBloom.opening()) {
+            return 1.0;
+        }
+        return this.triBloom.value();
+    }
+
+    /** Repaints just the wheel, for a bloom frame. */
+    private void repaintWheel() {
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+    }
 
     /**
      * A time zone the reader chose, overriding the one the geocoder inferred.
@@ -635,14 +713,14 @@ extends JPanel {
         if (g == null) {
             return null;
         }
-        if (this.showTriWheel) {
+        if (this.triRingDrawn()) {
             int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.cLon, this.cValid,
                 g.triRadii(), true);
             if (i >= 0) {
                 return this.hoverHtml(i, this.cLon[i], this.cSpeed[i], true);
             }
         }
-        if (this.showTransitChart) {
+        if (this.outerRingDrawn()) {
             int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.tLon, this.tValid,
                 g.transitRadii(), true);
             if (i >= 0) {
@@ -694,8 +772,11 @@ extends JPanel {
         private Geometry(int w, int h) {
             this.cx = w / 2;
             this.cy = h / 2;
+            // Laid out from what is on screen, not from what was asked for. A ring folding
+            // away still occupies its band until the fold ends - otherwise the whole wheel
+            // resizes on the first frame of the fold and there is nothing left to animate.
             this.rings = SkymapPanel.ringRadii(w, h,
-                SkymapPanel.this.showTransitChart, SkymapPanel.this.showTriWheel);
+                SkymapPanel.this.outerOpenFraction(), SkymapPanel.this.triOpenFraction());
             this.bodyBase = SkymapPanel.this.bodyBaseRadius(this.rings);
             this.pin = SkymapPanel.this.getPinLongitude();
         }
@@ -713,19 +794,61 @@ extends JPanel {
 
         int[] transitRadii() {
             if (this.transit == null) {
-                this.transit = SkymapPanel.this.transitRadii(
-                    this.rings[RING_TRANSIT], this.rings[RING_DECAN_OUTER]);
+                this.transit = SkymapPanel.bloomed(
+                    SkymapPanel.this.transitRadii(
+                        this.rings[RING_TRANSIT], this.rings[RING_DECAN_OUTER]),
+                    this.rings[RING_DECAN_OUTER], SkymapPanel.this.outerOpenFraction());
             }
             return this.transit;
         }
 
         int[] triRadii() {
             if (this.tri == null) {
-                this.tri = SkymapPanel.this.triWheelRadii(
-                    this.rings[RING_TRI], this.rings[RING_TRANSIT]);
+                this.tri = SkymapPanel.bloomed(
+                    SkymapPanel.this.triWheelRadii(
+                        this.rings[RING_TRI], this.rings[RING_TRANSIT]),
+                    this.rings[RING_TRANSIT], SkymapPanel.this.triOpenFraction());
             }
             return this.tri;
         }
+    }
+
+    /**
+     * A ring's radii, part-way out of the band they unfurl from.
+     *
+     * <b>Applied here rather than in the painter, so the hit test moves with the glyphs.</b>
+     * Both sides read these arrays through Geometry - the note on that class records the day
+     * they did not - so blooming the array is the only way to bloom the ring without
+     * reintroducing exactly the defect Geometry exists to prevent. A glyph half-way out is
+     * clickable half-way out.
+     *
+     * Bodies are staggered so the ring opens around the wheel instead of expanding as a disc.
+     * Angles ride the same bloom as everything else: they are drawn on the ring, so they
+     * arrive with it.
+     *
+     * @param settled where each body sits once the ring is fully open
+     * @param inner   the band's inner edge - where a folded ring is gathered
+     */
+    static int[] bloomed(int[] settled, int inner, double v) {
+        if (v >= 0.999) {
+            return settled;                     // open: the array as computed, untouched
+        }
+        int[] out = new int[settled.length];
+        for (int i = 0; i < settled.length; i++) {
+            double p = Bloom.stagger(v, i, settled.length, RING_SPREAD);
+            out[i] = (int) Math.round(inner + (settled[i] - inner) * p);
+        }
+        return out;
+    }
+
+    /**
+     * How opaque a blooming ring is drawn, 0 to 1.
+     *
+     * Reaches full well before the bloom does, so the reader watches the glyphs travel rather
+     * than watching them fade in once they have already arrived.
+     */
+    private static float ringAlpha(double open) {
+        return (float) Bloom.smoothstep(0.0, 0.45, open);
     }
 
     /** The wheel's geometry at its current size, or null when it has none to speak of. */
@@ -749,14 +872,14 @@ extends JPanel {
         if (g == null) {
             return -1;
         }
-        if (this.showTriWheel) {
+        if (this.triRingDrawn()) {
             int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.cLon, this.cValid,
                 g.triRadii(), true);
             if (i >= 0) {
                 return i | TRANSIT_BIT;
             }
         }
-        if (this.showTransitChart) {
+        if (this.outerRingDrawn()) {
             int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.tLon, this.tValid,
                 g.transitRadii(), true);
             if (i >= 0) {
@@ -1760,6 +1883,10 @@ extends JPanel {
         this.transitsEnabled = transits;
         this.showTransitChart = SkymapPanel.outerWheelShown(chartMode, transits);
         this.showTriWheel    = SkymapPanel.triWheelShown(chartMode, transits);
+        // The rings open or fold to match. Set after the flags, so a bloom never disagrees
+        // with the thing it is animating.
+        this.outerBloom.set(this.showTransitChart);
+        this.triBloom.set(this.showTriWheel);
         this.cachedFrame = null;
         this.relationshipFrame = null;
         this.relationshipCacheKey = null;
@@ -3030,14 +3157,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             return;
         }
         // Tri-wheel angle hit test before the synastry ring, because the tri ring is outermost.
-        if (this.showTriWheel) {
+        if (this.triRingDrawn()) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 if (!this.cValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArrayC[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.cLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArrayC[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
                 this.showAngleAt(n3, this.cLon[n3], true, AngleRole.SKY);
                 return;
             }
         }
-        if (this.showTransitChart) {
+        if (this.outerRingDrawn()) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 if (!this.tValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray2[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.tLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray2[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
                 this.showAngleAt(n3, this.tLon[n3], this.angleRoleFor(false, true));
@@ -3059,7 +3186,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
         }
         // Tri-wheel body hit test — outermost ring, so test it before the transit ring.
-        if (this.showTriWheel && d6 >= (double)n10 && d6 <= (double)(nTri + 10)) {
+        if (this.triRingDrawn() && d6 >= (double)n10 && d6 <= (double)(nTri + 10)) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 int n14c;
                 if (!this.cValid[n3] || Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArrayC[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.cLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArrayC[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
@@ -3119,7 +3246,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 return;
             }
         }
-        if (this.showTransitChart && d6 >= (double)n11 && d6 <= (double)(n10 + 10)) {
+        if (this.outerRingDrawn() && d6 >= (double)n11 && d6 <= (double)(n10 + 10)) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 int n14;
                 if (!this.tValid[n3] || Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray2[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.tLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray2[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
@@ -3693,11 +3820,37 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * RING_SIGN_INNER are unaffected.
      */
     static int[] ringRadii(int width, int height, boolean showTransit, boolean showTri) {
+        return ringRadii(width, height, showTransit ? 1.0 : 0.0, showTri ? 1.0 : 0.0);
+    }
+
+    /**
+     * The same rings, with each outer band part-way open.
+     *
+     * <b>The bands have to widen with the bloom, or the wheel jumps.</b> A ring being switched
+     * on costs the wheel inside it 25 pixels; done as a boolean that happens on the first
+     * frame, so the reader sees the natal wheel snap smaller and only then watches the new
+     * ring unfurl into the gap. Carving the band open at the same rate as the ring that fills
+     * it is what makes the whole thing one movement.
+     *
+     * The two booleans were only ever switching a fixed inset on and off - 22 pixels for the
+     * sky band, 25 for the band inside it - so the fractional form is the same arithmetic with
+     * the insets scaled, and at every one of the four corners it is the historical formula to
+     * the pixel. That is what lets AspectGridCheck keep asserting the formula it has always
+     * asserted, and Part J of that suite is what caught the first attempt at this: scaling
+     * decanOuter's inset off the already-scaled transit radius looked equivalent and was not,
+     * because the boolean form ignores transit entirely when there is no outer wheel. The
+     * band is therefore interpolated between the two layouts it actually has, not derived.
+     */
+    static int[] ringRadii(int width, int height, double outerOpen, double triOpen) {
+        double o = Math.max(0.0, Math.min(1.0, outerOpen));
+        double t = Math.max(0.0, Math.min(1.0, triOpen));
         int outer = Math.min(width, height) / 2 - 10;
         // When the tri-wheel is on, carve out a 22-pixel band for it outside the synastry ring.
         int tri     = outer - 20;  // always outer-20; transit steps 22 px inward when tri-wheel is on
-        int transit = showTri    ? tri - 22           : outer - 20;
-        int decanOuter = showTransit ? transit - 25 : outer - 20;
+        int transit = (int) Math.round((double) tri - 22.0 * t);
+        int closed = outer - 20;
+        int decanOuter = (int) Math.round((double) closed
+            + ((double) (transit - 25) - (double) closed) * o);
         int signOuter = decanOuter - 20;
         int signInner = signOuter - 35;
         return new int[] { outer, tri, transit, decanOuter, signOuter, signInner };
@@ -5174,12 +5327,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.drawOval(n12 - n18, n13 - n18, n18 * 2, n18 * 2);
             graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
             graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
-            if (SkymapPanel.this.showTransitChart) {
+            if (SkymapPanel.this.outerRingDrawn()) {
                 graphics2D.setColor(new Color(80, 40, 80));
                 graphics2D.drawOval(n12 - n15, n13 - n15, n15 * 2, n15 * 2);
             }
             // Tri-wheel: an additional ring outside the synastry ring.
-            if (SkymapPanel.this.showTriWheel) {
+            if (SkymapPanel.this.triRingDrawn()) {
                 graphics2D.setColor(new Color(30, 60, 80));
                 graphics2D.drawOval(n12 - nTriOuter, n13 - nTriOuter, nTriOuter * 2, nTriOuter * 2);
             }
@@ -5430,7 +5583,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     graphics2D.drawLine(n4, n26, n12 + (int)((double)n18 * Math.cos(d10)), n13 + (int)((double)n18 * Math.sin(d10)));
                 }
             }
-            if (SkymapPanel.this.showTransitChart) {
+            if (SkymapPanel.this.outerRingDrawn()) {
+                Composite outerWas = graphics2D.getComposite();
+                float outerA = SkymapPanel.ringAlpha(SkymapPanel.this.outerOpenFraction());
+                if (outerA < 0.999f) {
+                    graphics2D.setComposite(
+                        AlphaComposite.getInstance(AlphaComposite.SRC_OVER, outerA));
+                }
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
                     if (!SkymapPanel.this.tValid[n7]) continue;
                     double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.tLon[n7]);
@@ -5463,11 +5622,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     String string = SkymapPanel.glyphFor(n7, glyphSize2.font);
                     graphics2D.drawString(string, n4 - graphics2D.getFontMetrics().stringWidth(string) / 2, n27 + glyphSize2.baseline);
                 }
+                graphics2D.setComposite(outerWas);
             }
             // Tri-wheel: sky positions in the outermost ring. Blue-tinted, and by default a
             // different shape from the synastry ring inside it - see Settings.MARKER_SHAPES
             // for why the tint alone was not enough.
-            if (SkymapPanel.this.showTriWheel) {
+            if (SkymapPanel.this.triRingDrawn()) {
+                Composite triWas = graphics2D.getComposite();
+                float triA = SkymapPanel.ringAlpha(SkymapPanel.this.triOpenFraction());
+                if (triA < 0.999f) {
+                    graphics2D.setComposite(
+                        AlphaComposite.getInstance(AlphaComposite.SRC_OVER, triA));
+                }
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
                     if (!SkymapPanel.this.cValid[n7]) continue;
                     double d14 = Math.toRadians(180.0 + d4 - SkymapPanel.this.cLon[n7]);
@@ -5497,6 +5663,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     String stringC = SkymapPanel.glyphFor(n7, glyphSize3.font);
                     graphics2D.drawString(stringC, n4 - graphics2D.getFontMetrics().stringWidth(stringC) / 2, n28 + glyphSize3.baseline);
                 }
+                graphics2D.setComposite(triWas);
             }
         }
 

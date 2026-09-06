@@ -702,7 +702,33 @@ public final class AspectGridCheck {
      * holds the composite rather than one of the partners, that the outer wheel is live, and
      * that a single chart is untouched by any of it.
      */
+    /**
+     * <b>Pins the body selection it depends on, and puts it back.</b> This part counted the
+     * bodies a composite hands over and asserted there were more than ten - but ChartFrame
+     * masks every body by Settings.loadBodySelection before returning, so the count was really
+     * "how many bodies has the reader ticked". With four ticked the part failed, and the
+     * failure said nothing about composites. A check whose result depends on a preference is
+     * not a check; it is a reason to stop trusting the suite.
+     */
     private static void compositeCarriesTransits() throws Exception {
+        String savedBodies = Settings.get(Settings.BODIES_KEY, null);
+        try {
+            compositeWithEveryBodyOn();
+        } finally {
+            if (savedBodies == null) {
+                Settings.set(Settings.BODIES_KEY, "");
+            } else {
+                Settings.set(Settings.BODIES_KEY, savedBodies);
+            }
+        }
+    }
+
+    private static void compositeWithEveryBodyOn() throws Exception {
+        // Every body on, so the count below measures the composite and not a preference.
+        boolean[] all = new boolean[Bodies.count()];
+        java.util.Arrays.fill(all, true);
+        Settings.set(Settings.BODIES_KEY, Bodies.format(all));
+
         SwissEph sw = new SwissEph(EPHE_PATH);
         double[] base = PANEL_CHARTS.get("base");
         double[] tr = PANEL_CHARTS.get("transit");
