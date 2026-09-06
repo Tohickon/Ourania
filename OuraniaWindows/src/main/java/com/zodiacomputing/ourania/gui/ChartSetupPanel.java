@@ -1277,16 +1277,15 @@ public class ChartSetupPanel extends JPanel {
                 setMode(ChartMode.SYNASTRY);
             }
         } else {
-            baseDateField.setText(e.date);
-            baseTimeField.setText(e.time);
-            baseLocationField.setText(e.location);
-            // The wheel's heading takes the name from here; without this a loaded chart is
-            // titled the same as a typed one.
-            if (parentWindow != null) {
-                parentWindow.setChartName(name);
-            }
+            // Through the one filler, so this route and the Load button cannot disagree.
+            fillChartA(e, name);
         }
-        generateChart();
+        // <b>Loading fills the form; Generate draws the chart.</b> This used to generate
+        // immediately, which threw the reader straight out of Chart Setup and onto the wheel
+        // the instant they picked a chart - so loading Chart A and then Chart B was
+        // impossible without navigating back in between, and there was no moment in which to
+        // correct a birth time, set a relocation, or tick the time as unknown. The two acts
+        // are separate: choosing whose chart this is, and asking for it to be drawn.
     }
 
     private void loadNatal() {
@@ -1294,11 +1293,31 @@ public class ChartSetupPanel extends JPanel {
         if (e == null) {
             return;
         }
+        fillChartA(e, lastPicked);
+    }
+
+    /**
+     * Puts a saved chart into Chart A's fields, rating included.
+     *
+     * <b>One method because there are two doors.</b> The Load button and the saved-chart
+     * directory both fill this form, and they were filling it differently - the directory
+     * restored the rating and Load did not, so the same chart opened as "no time" from one
+     * route and as an ordinary A-rated chart from the other, casting angles it never had.
+     * That is the two-surfaces defect this project keeps finding, in the one place where the
+     * two answers are a different chart rather than a different label.
+     */
+    private void fillChartA(SavedCharts.Entry e, String name) {
         baseDateField.setText(e.date);
         baseTimeField.setText(e.time);
         baseLocationField.setText(e.location);
+        if (baseRodden != null) {
+            baseRodden.setSelectedItem(e.rodden);
+            for (java.awt.event.ActionListener l : baseRodden.getActionListeners()) {
+                l.actionPerformed(new java.awt.event.ActionEvent(baseRodden, 0, ""));
+            }
+        }
         if (parentWindow != null) {
-            parentWindow.setChartName(lastPicked);
+            parentWindow.setChartName(name);
         }
     }
 

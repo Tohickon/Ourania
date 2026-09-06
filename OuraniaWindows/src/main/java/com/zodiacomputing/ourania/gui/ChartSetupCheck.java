@@ -2,6 +2,7 @@ package com.zodiacomputing.ourania.gui;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -82,6 +83,12 @@ public final class ChartSetupCheck {
         before = failures.size();
         theSecondSlot();
         report("Part F", before);
+
+        System.out.println();
+        System.out.println("=== Part G: loading a chart fills the form, nothing more ===");
+        before = failures.size();
+        loadingFillsOnly();
+        report("Part G", before);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -356,6 +363,109 @@ public final class ChartSetupCheck {
      *
      * A composite is left alone - it is already a reading of two people.
      */
+    /**
+     * Choosing a saved chart fills the form. Drawing it is a separate act.
+     *
+     * <b>It used to generate immediately.</b> Picking a chart from the directory threw the
+     * reader straight out of Chart Setup and onto the wheel, so loading Chart A and then
+     * Chart B meant navigating back in between - and there was no moment in which to correct
+     * a birth time, set a relocation, or mark the time unknown before the chart was drawn.
+     *
+     * Also pins that both doors into this form agree. The Load button restored the date, time
+     * and place but not the rating, so the same chart opened as "no time" from the directory
+     * and as an ordinary A-rated chart from Load, casting angles it never had. Two surfaces,
+     * two answers, and here the answers are different charts rather than different labels.
+     */
+    private static void loadingFillsOnly() throws Exception {
+        final boolean[] drew = {false};
+        final String[] went = {null};
+        class Recorder extends OuraniaWindow {
+            @Override
+            public void switchScreen(String screen) {
+                went[0] = screen;
+            }
+
+            @Override
+            public void applyChartSettings(String bDate, String bTime, String bLoc,
+                                           ChartMode mode, String tDate, String tTime,
+                                           String tLoc, boolean transits, boolean baseUnknown,
+                                           String zoneOverride, String relocate) {
+                drew[0] = true;
+            }
+        }
+        final Recorder rec = new Recorder();
+        final ChartSetupPanel[] cp = new ChartSetupPanel[1];
+        SwingUtilities.invokeAndWait(() -> cp[0] = new ChartSetupPanel(rec));
+
+        java.io.File live = new java.io.File("saved_charts.properties");
+        java.io.File kept = null;
+        if (live.exists()) {
+            kept = java.io.File.createTempFile("book", ".bak");
+            java.nio.file.Files.copy(live.toPath(), kept.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
+        try {
+            SavedCharts.put("SuiteA", "1955-04-18", "09:30", "Bern, CH",
+                com.zodiacomputing.ourania.astro.Rodden.X, "", "");
+            SavedCharts.put("SuiteB", "1960-11-02", "14:15", "Rome, IT",
+                com.zodiacomputing.ourania.astro.Rodden.AA, "", "");
+
+            // <b>Cleared first.</b> Building the recorder runs OuraniaWindow's constructor,
+            // which switches to the wheel - so the recorder has already seen a navigation
+            // before any chart is loaded, and asserting on it without this reads the app's
+            // own startup as the bug under test.
+            went[0] = null;
+            drew[0] = false;
+            SwingUtilities.invokeAndWait(() -> cp[0].applySavedProfile("SuiteA", false));
+            ok("loading Chart A does not draw the chart", !drew[0]);
+            ok("loading Chart A does not navigate away", went[0] == null);
+            eq("Chart A's date is filled", "1955-04-18",
+                ((JTextField) fieldOf(cp[0], "baseDateField")).getText());
+            eq("Chart A's rating came back", com.zodiacomputing.ourania.astro.Rodden.X,
+                roddenOf(cp[0]));
+            ok("a timeless chart disables its time field",
+                !((JTextField) fieldOf(cp[0], "baseTimeField")).isEnabled());
+
+            went[0] = null;
+            drew[0] = false;
+            SwingUtilities.invokeAndWait(() -> cp[0].applySavedProfile("SuiteB", true));
+            ok("loading Chart B does not draw the chart", !drew[0]);
+            ok("loading Chart B does not navigate away", went[0] == null);
+            eq("Chart B's date is filled", "1960-11-02",
+                ((JTextField) fieldOf(cp[0], "transitDateField")).getText());
+            eq("Chart A survived loading Chart B", "1955-04-18",
+                ((JTextField) fieldOf(cp[0], "baseDateField")).getText());
+
+            SwingUtilities.invokeAndWait(() -> cp[0].applySavedProfile("SuiteB", false));
+            eq("a rated chart restores its rating",
+                com.zodiacomputing.ourania.astro.Rodden.AA, roddenOf(cp[0]));
+            ok("and its time field is live again",
+                ((JTextField) fieldOf(cp[0], "baseTimeField")).isEnabled());
+
+            SavedCharts.remove("SuiteA");
+            SavedCharts.remove("SuiteB");
+        } finally {
+            if (kept != null) {
+                java.nio.file.Files.copy(kept.toPath(), live.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                kept.delete();
+            }
+            SwingUtilities.invokeAndWait(rec::dispose);
+        }
+    }
+
+    private static Object fieldOf(ChartSetupPanel p, String name) throws Exception {
+        Field f = ChartSetupPanel.class.getDeclaredField(name);
+        f.setAccessible(true);
+        return f.get(p);
+    }
+
+    private static Object roddenOf(ChartSetupPanel p) throws Exception {
+        Field f = ChartSetupPanel.class.getDeclaredField("baseRodden");
+        f.setAccessible(true);
+        return ((JComboBox<?>) f.get(p)).getSelectedItem();
+    }
+
     private static void theSecondSlot() {
         for (ChartMode from : ChartMode.values()) {
             boolean relationship = ChartSetupPanel.isRelationship(from);
