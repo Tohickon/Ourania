@@ -639,11 +639,84 @@ public class InterpretationPanel extends JPanel {
     }
 
     public void showAngleInterpretation(String angleName, String signName, int degree, java.util.List<String[]> activeAspects) {
+        showAngleInterpretation(angleName, signName, degree, activeAspects, "ANCHOR", -1);
+    }
+
+    /**
+     * An angle's reading, headed by whose angle it is and what that makes the card.
+     *
+     * <b>K7's missing half.</b> The decision settled that clicking Chart A's angle reads
+     * natally while Chart B's reads cross-chart, and closed the behaviour as correct - but
+     * left the labelling unbuilt, so the two cards looked identical while making different
+     * claims. A deliberate asymmetry that the reader cannot see is indistinguishable from an
+     * inconsistency, which is the one way this design could fail.
+     *
+     * @param role       ANCHOR, BRIDGE or SKY - see {@code SkymapPanel.AngleRole}
+     * @param hostHouse  for a BRIDGE, which of Chart A's houses the visiting angle falls in
+     */
+    public void showAngleInterpretation(String angleName, String signName, int degree,
+                                        java.util.List<String[]> activeAspects,
+                                        String role, int hostHouse) {
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
+        html.append(angleRoleBanner(angleName, role, hostHouse));
         html.append(generateAngleHtml(angleName, signName, degree, activeAspects));
         html.append("</body></html>");
         setHtml(html.toString(), false);
+    }
+
+    /**
+     * The banner that says which chart this angle belongs to and which way the reading runs.
+     *
+     * Silent for a single chart: with one chart on screen every angle is the anchor, and a
+     * badge saying so on every card would be noise that teaches the reader to stop reading
+     * badges - which would cost exactly the case it exists for.
+     */
+    private String angleRoleBanner(String angleName, String role, int hostHouse) {
+        // <b>Whenever more than one chart's angles are on the wheel.</b> Guarded first on
+        // isRelationshipChart, which was wrong: in this class that name means a COMPOSITE
+        // specifically - synastry has its own predicate - so the banner was silent in exactly
+        // the case K7 was written about. Caught by the probe rather than by reading, because
+        // the method reads as though it means "a chart about a relationship".
+        if (skymapPanel == null
+                || !(skymapPanel.showTransitChart || skymapPanel.isSynastryChart())) {
+            return "";
+        }
+        StringBuilder h = new StringBuilder();
+        if ("BRIDGE".equals(role)) {
+            h.append("<div style='border-left:3px solid #7FB3FF; padding-left:10px; ")
+             .append("margin-bottom:14px;'>")
+             .append("<div style='color:#7FB3FF; font-size:12px; font-weight:bold;'>")
+             .append("Chart B &rarr; Chart A &middot; ").append(angleName.toUpperCase())
+             .append(" OVERLAY</div>")
+             .append("<div style='color:#9AA5B1; font-size:11px;'>")
+             .append("Interpersonal bridge - the visitor's impact. Chart B has no houses of ")
+             .append("its own here, so this angle is read by where it falls in Chart A");
+            if (hostHouse >= 1 && hostHouse <= 12) {
+                h.append(": <b>Chart A's ").append(Zodiac.ordinal(hostHouse))
+                 .append(" house</b>");
+            }
+            h.append(".</div></div>");
+            return h.toString();
+        }
+        if ("SKY".equals(role)) {
+            h.append("<div style='border-left:3px solid #B9B2D6; padding-left:10px; ")
+             .append("margin-bottom:14px;'>")
+             .append("<div style='color:#B9B2D6; font-size:12px; font-weight:bold;'>")
+             .append("SKY &middot; ").append(angleName.toUpperCase()).append("</div>")
+             .append("<div style='color:#9AA5B1; font-size:11px;'>")
+             .append("A moment passing over the chart, not a person's angle.</div></div>");
+            return h.toString();
+        }
+        h.append("<div style='border-left:3px solid #FFD166; padding-left:10px; ")
+         .append("margin-bottom:14px;'>")
+         .append("<div style='color:#FFD166; font-size:12px; font-weight:bold;'>")
+         .append("Chart A &middot; ").append(angleName.toUpperCase()).append("</div>")
+         .append("<div style='color:#9AA5B1; font-size:11px;'>")
+         .append("Natal anchor - the sovereign host. The twelve houses on screen are Chart ")
+         .append("A's, so this angle is read as their own and frames everything else.")
+         .append("</div></div>");
+        return h.toString();
     }
 
     public String generateAngleHtml(String angleName, String signName, int degree, java.util.List<String[]> activeAspects) {

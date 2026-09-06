@@ -330,8 +330,16 @@ public class OuraniaWindow extends JFrame {
     }
 
     public void showInterpretationForAngle(String angleName, String signName, int degree, java.util.List<String[]> activeAspects) {
+        showInterpretationForAngle(angleName, signName, degree, activeAspects, "ANCHOR", -1);
+    }
+
+    /** With the K7 role, so the card can say whose angle this is and which way it reads. */
+    public void showInterpretationForAngle(String angleName, String signName, int degree,
+                                           java.util.List<String[]> activeAspects,
+                                           String role, int hostHouse) {
         if (interpretationPanel != null) {
-            interpretationPanel.showAngleInterpretation(angleName, signName, degree, activeAspects);
+            interpretationPanel.showAngleInterpretation(angleName, signName, degree,
+                activeAspects, role, hostHouse);
             interpretationPanel.setVisible(true);
             revalidate();
             repaint();

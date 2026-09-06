@@ -2927,21 +2927,21 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int[] nArrayC = g.triRadii();
         for (n3 = 0; n3 < BODY_COUNT; ++n3) {
             if (!this.bValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.bLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, false))) continue;
-            this.showAngleAt(n3, this.bLon[n3]);
+            this.showAngleAt(n3, this.bLon[n3], AngleRole.ANCHOR);
             return;
         }
         // Tri-wheel angle hit test before the synastry ring, because the tri ring is outermost.
         if (this.showTriWheel) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 if (!this.cValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArrayC[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.cLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArrayC[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
-                this.showAngleAt(n3, this.cLon[n3], true);
+                this.showAngleAt(n3, this.cLon[n3], true, AngleRole.SKY);
                 return;
             }
         }
         if (this.showTransitChart) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 if (!this.tValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray2[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.tLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray2[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
-                this.showAngleAt(n3, this.tLon[n3]);
+                this.showAngleAt(n3, this.tLon[n3], this.angleRoleFor(false, true));
                 return;
             }
         }
@@ -3235,8 +3235,55 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** An angle click from any wheel except the tri-wheel's sky ring. */
+    /**
+     * Which chart a clicked angle belongs to, and therefore what the card is claiming.
+     *
+     * <b>The K7 decision: the asymmetry is a relational law, not a bug.</b> Chart A owns the
+     * twelve houses on screen, so clicking Chart A's angle reads natally - it is the baseline
+     * the whole session is framed by. Chart B has no house boundaries here; its angles are
+     * visiting, falling into Chart A's houses, so clicking one is inherently a cross-chart
+     * event. Forcing symmetry breaks it either way: "both natal" makes the reader work out by
+     * hand where B's Ascendant lands, and "both cross-chart" denies A their own baseline.
+     *
+     * <b>The behaviour was already right; what was missing was saying so.</b> The two cards
+     * were identical in appearance while making different claims, which is the one thing a
+     * deliberate asymmetry cannot afford - indistinguishable, it reads as inconsistency.
+     */
+    enum AngleRole {
+        /** Chart A's own angle: the frame everything else is measured against. */
+        ANCHOR,
+        /** Chart B's angle, projected into Chart A's houses. */
+        BRIDGE,
+        /** A transit or sky angle - a moment passing over the chart, not a person. */
+        SKY
+    }
+
+    /**
+     * Which chart an angle belongs to, asked once for both surfaces that can open one.
+     *
+     * <b>The wheel and the placements list are two doors onto the same card.</b> Clicking a
+     * glyph and following a {@code transit_} link have to answer this identically, and a
+     * ternary written out at each site is the one-rule-two-implementations defect this
+     * project has shipped several times - the copies do not diverge on the day they are
+     * written, they diverge the day one of them is edited.
+     */
+    AngleRole angleRoleFor(boolean isSky, boolean isTransit) {
+        if (isSky) {
+            return AngleRole.SKY;
+        }
+        if (isTransit) {
+            // The outer wheel is a second person in a synastry and a moment otherwise.
+            return this.chartMode == ChartMode.SYNASTRY ? AngleRole.BRIDGE : AngleRole.SKY;
+        }
+        return AngleRole.ANCHOR;
+    }
+
     private void showAngleAt(int n, double d) {
-        this.showAngleAt(n, d, false);
+        this.showAngleAt(n, d, false, AngleRole.ANCHOR);
+    }
+
+    private void showAngleAt(int n, double d, AngleRole role) {
+        this.showAngleAt(n, d, false, role);
     }
 
     /**
@@ -3257,7 +3304,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * <b>Rows are tagged only in that case.</b> Every other caller still emits three-element
      * rows and renders exactly as it did, so no existing reading changes wording.
      */
-    private void showAngleAt(int n, double d, boolean fromSky) {
+    private void showAngleAt(int n, double d, boolean fromSky, AngleRole role) {
         int n2 = (int)(d / 30.0) % 12;
         int n3 = (int)(d % 30.0) + 1;
         boolean bothCharts = fromSky && this.showTriWheel;
@@ -3293,7 +3340,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 arrayList.add(new String[]{BODY_NAMES[i], string, string2, "Chart B"});
             }
         }
-        this.window.showInterpretationForAngle(BODY_NAMES[n], SIGN_NAMES[n2], n3, arrayList);
+        // <b>Where a visiting angle lands is the whole content of a bridge card.</b> "Your
+        // Ascendant falls in my 7th" is the reading; without it the card states a sign and a
+        // degree belonging to someone whose houses are not on the screen.
+        int hostHouse = role == AngleRole.BRIDGE
+            ? Zodiac.houseOf(d, this.activeCusps) : -1;
+        this.window.showInterpretationForAngle(BODY_NAMES[n], SIGN_NAMES[n2], n3, arrayList,
+            role.name(), hostHouse);
     }
 
     private double getOrbFor(int n, int n2, boolean synastry) {
@@ -3994,7 +4047,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (Bodies.at(n).isAngle()) {
                 // isSky carries the prefix through, so a sky_ / tri_ link from the placements
                 // panel reads both charts exactly as clicking the glyph on the wheel does.
-                this.showAngleAt(n, dArray[n], isSky);
+                this.showAngleAt(n, dArray[n], isSky,
+                    this.angleRoleFor(isSky, isTransit));
                 return;
             }
             double d2 = dArray[n];

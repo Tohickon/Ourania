@@ -77,6 +77,11 @@ public final class NavigationCheck {
         everyEngineHasADoor();
         report("Part D", before);
 
+        System.out.println("=== Part E: an angle card says whose angle it is ===");
+        before = failures.size();
+        angleRoles();
+        report("Part E", before);
+
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
@@ -484,6 +489,79 @@ public final class NavigationCheck {
             } else if (k instanceof Container) {
                 findCombos((Container) k, out);
             }
+        }
+    }
+
+    /**
+     * K7's labelling: the same click means different things and the card has to say which.
+     *
+     * <b>The decision closed the behaviour as correct and left this unbuilt.</b> Chart A's
+     * angle reads natally because Chart A owns the houses on screen; Chart B's is visiting
+     * and reads cross-chart. That asymmetry is the design - but the two cards were
+     * identical in appearance, and an asymmetry a reader cannot see is indistinguishable
+     * from an inconsistency, which is the one way it could fail.
+     *
+     * <b>Also guards the silence.</b> A single chart has only one set of angles, so there is
+     * no question to answer and no badge; a badge on every card would train the reader to
+     * ignore badges, which costs exactly the case this exists for.
+     */
+    private static void angleRoles() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fp =
+                OuraniaWindow.class.getDeclaredField("interpretationPanel");
+            fp.setAccessible(true);
+            Object ip = fp.get(w[0]);
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+            java.lang.reflect.Method banner = ip.getClass().getDeclaredMethod(
+                "angleRoleBanner", String.class, String.class, int.class);
+            banner.setAccessible(true);
+            java.lang.reflect.Field mode = SkymapPanel.class.getDeclaredField("chartMode");
+            mode.setAccessible(true);
+            java.lang.reflect.Method roleFor = SkymapPanel.class.getDeclaredMethod(
+                "angleRoleFor", boolean.class, boolean.class);
+            roleFor.setAccessible(true);
+
+            mode.set(sky, ChartMode.SINGLE);
+            sky.showTransitChart = false;
+            ok("a single chart shows no role banner",
+                ((String) banner.invoke(ip, "Ascendant", "ANCHOR", -1)).isEmpty());
+
+            mode.set(sky, ChartMode.SYNASTRY);
+            String anchor = (String) banner.invoke(ip, "Ascendant", "ANCHOR", -1);
+            String bridge = (String) banner.invoke(ip, "Ascendant", "BRIDGE", 7);
+            String skyCard = (String) banner.invoke(ip, "Ascendant", "SKY", -1);
+
+            ok("the anchor card names Chart A", anchor.contains("Chart A"));
+            ok("the anchor card calls it the sovereign host",
+                anchor.toLowerCase().contains("sovereign host"));
+            ok("the bridge card shows the B-to-A direction", bridge.contains("&rarr;"));
+            ok("the bridge card calls it the interpersonal bridge",
+                bridge.toLowerCase().contains("interpersonal bridge"));
+            ok("the bridge card names which of A's houses it lands in",
+                bridge.contains("7th"));
+            ok("the sky card claims neither role",
+                skyCard.contains("SKY") && !skyCard.toLowerCase().contains("sovereign"));
+            ok("the three cards are distinguishable",
+                !anchor.equals(bridge) && !bridge.equals(skyCard)
+                    && !anchor.equals(skyCard));
+
+            // One rule, asked by the wheel and by the placements list alike.
+            mode.set(sky, ChartMode.SYNASTRY);
+            ok("a synastry outer angle is a bridge",
+                "BRIDGE".equals(roleFor.invoke(sky, false, true).toString()));
+            ok("a synastry inner angle is the anchor",
+                "ANCHOR".equals(roleFor.invoke(sky, false, false).toString()));
+            ok("the sky ring is always the sky",
+                "SKY".equals(roleFor.invoke(sky, true, false).toString()));
+            mode.set(sky, ChartMode.TRANSIT);
+            ok("a transit outer angle is a moment, not a person",
+                "SKY".equals(roleFor.invoke(sky, false, true).toString()));
+        } finally {
+            SwingUtilities.invokeAndWait(w[0]::dispose);
         }
     }
 

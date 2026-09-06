@@ -36,7 +36,7 @@ Transit contacts are shown on hover, not statically.
 body's web while dimming the rest. The decision confirms the existing behaviour rather than
 asking for new work.
 
-## K7 — Synastry angle clicks · **ALREADY CORRECT (needs labelling)**
+## K7 — Synastry angle clicks · **CLOSED 2026-09-06 (labelling built)**
 
 **Decision.** Keep the asymmetry. It is a relational law, not an inconsistency: **the Law of
 the Sovereign Host.** Chart A owns the house frame on screen, so clicking Chart A's angle reads
@@ -44,9 +44,27 @@ natal; Chart B is visiting Chart A's houses, so clicking Chart B's angle reads c
 Forcing symmetry would break it in either direction - "both natal" makes the reader work out
 by hand where B's Ascendant lands, and "both cross-chart" denies A their own baseline.
 
-**Status.** The behaviour is correct and stays. What is missing is the labelling that makes the
-direction visible: a natal card should say it is the anchor, a cross-chart card should show the
-B to A direction.
+**Status.** The behaviour was correct and stays. The labelling that makes the direction visible
+was built on 2026-09-06 and this decision is now closed.
+
+**Built.** `SkymapPanel.AngleRole` names the three cases - ANCHOR, BRIDGE, SKY - and the angle
+card is headed accordingly: Chart A's angle reads *"Chart A · natal anchor, the sovereign
+host"*, Chart B's reads *"Chart B → Chart A · ASCENDANT OVERLAY — interpersonal bridge"* and
+names which of Chart A's houses the visiting angle lands in, and a sky angle says it is a
+moment rather than a person.
+
+**Silent on a single chart.** One set of angles raises no question of whose they are, and a
+badge on every card would teach the reader to ignore badges - which would cost exactly the
+case this exists for.
+
+**One rule, two doors.** The wheel click and the placements-panel link both ask
+`angleRoleFor`, rather than each carrying its own ternary. Two copies do not diverge the day
+they are written; they diverge the day one is edited.
+
+**Found while building it.** The first guard used `isRelationshipChart()`, which in
+`SkymapPanel` means a *composite* specifically - synastry has its own predicate - so the
+banner was silent in precisely the case K7 is about. The method reads as though it means "a
+chart about a relationship"; a probe caught it, reading would not have.
 
 **This also settles the `showAngleAt` question.** The audit flagged the Chart A pass handing a
 literal `false` to `getAspectType` as a suspected bug. Under this decision it is right: Chart
