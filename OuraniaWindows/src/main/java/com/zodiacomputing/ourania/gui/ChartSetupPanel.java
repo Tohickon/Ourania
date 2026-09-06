@@ -711,6 +711,56 @@ public class ChartSetupPanel extends JPanel {
         return v == null || ZONE_FROM_PLACE.equals(v) ? "" : String.valueOf(v);
     }
 
+    /**
+     * Applies a ring composition chosen on the wheel, and redraws.
+     *
+     * <b>The ring bar asks; this decides.</b> Keeping {@link #setMode} the only writer of the
+     * mode is what stops the wheel's chips and this panel's chooser drifting apart - the
+     * defect this panel has shipped twice, where a control said one thing and
+     * {@code applyChartSettings} sent another.
+     *
+     * A composite is left alone. It is one derived wheel rather than two people side by side,
+     * so "fold the partner away" has no meaning there; the sky ring still applies and is the
+     * only half of this that acts.
+     */
+    void applyRings(boolean partnerRing, boolean skyRing) {
+        boolean composite = selectedMode == ChartMode.COMPOSITE_MIDPOINT
+            || selectedMode == ChartMode.COMPOSITE_DAVISON;
+        if (!composite) {
+            if (partnerRing) {
+                setSubject(Subject.PARTNERSHIP);
+                setMode(ChartMode.SYNASTRY);
+            } else {
+                setSubject(Subject.MYSELF);
+                // <b>Natal plus sky is TRANSIT, not SINGLE with a tick.</b> outerWheelShown
+                // returns false for SINGLE whatever the transits flag says, so mapping this
+                // to SINGLE would have drawn no sky ring at all - the chip would light up and
+                // the wheel would not change. Caught by the probe; reading the mapping alone
+                // it looks obviously right.
+                setMode(skyRing ? ChartMode.TRANSIT : ChartMode.SINGLE);
+            }
+        }
+        transitsCheck.setSelected(skyRing);
+        syncTransitsCheck();
+        generateChart();
+    }
+
+    /** True when Chart B has enough entered to draw a ring from. */
+    boolean hasPartnerData() {
+        return transitDateField != null
+            && !transitDateField.getText().trim().isEmpty();
+    }
+
+    /** The mode currently chosen, for the wheel's ring chips to reflect. */
+    ChartMode currentMode() {
+        return selectedMode;
+    }
+
+    /** Whether the sky ring is currently asked for. */
+    boolean skyWanted() {
+        return transitsCheck != null && transitsCheck.isSelected();
+    }
+
     /** Chart A's time rating, for the engine and the chart book. */
     Rodden baseRodden() {
         Rodden r = baseRodden == null ? null : (Rodden) baseRodden.getSelectedItem();
@@ -1178,6 +1228,11 @@ public class ChartSetupPanel extends JPanel {
             }
         });
         
+        // Guarded: this panel is constructed without a window in the check suites, and a
+        // generate from there should be a no-op rather than a stack trace.
+        if (parentWindow == null) {
+            return;
+        }
         // The rating is not decoration: X casts for noon and withholds the angles.
         parentWindow.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc,
             transitsCheck.isSelected(), baseRodden().timeUnknown(), baseZoneOverride(),

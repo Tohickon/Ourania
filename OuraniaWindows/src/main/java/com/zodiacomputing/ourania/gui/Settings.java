@@ -152,6 +152,25 @@ public final class Settings {
 
     // ------------------------------------------------------------------ chart rendering
 
+    /** Settings key for whether rings animate when they open and fold. */
+    public static final String ANIMATE_RINGS_KEY = "chart.animateRings";
+
+    /**
+     * Whether a ring unfurls when it opens, or simply appears.
+     *
+     * <b>On by default, and genuinely optional.</b> Swing exposes no equivalent of the web's
+     * {@code prefers-reduced-motion}, so the only honest way to respect a reader who does not
+     * want motion is to ask. Off makes every bloom instantaneous - the rings still open and
+     * fold, they just do it in one frame.
+     */
+    public static boolean animateRings() {
+        return !"false".equals(get(ANIMATE_RINGS_KEY, "true"));
+    }
+
+    public static void setAnimateRings(boolean on) {
+        set(ANIMATE_RINGS_KEY, on ? "true" : "false");
+    }
+
     /** Settings key for the bead behind each glyph. */
     public static final String SPHERES_KEY = "chart.spheres";
 

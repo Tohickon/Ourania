@@ -267,6 +267,9 @@ extends JPanel {
      */
     private boolean baseTimeUnknown;
 
+    /** The ring chips above the transport row - see RingBar. */
+    private RingBar ringBar;
+
     /**
      * A time zone the reader chose, overriding the one the geocoder inferred.
      *
@@ -1721,6 +1724,10 @@ extends JPanel {
         // using.
         this.add(new OverlayDock(this.chartPanel, null, this.timeDrawer), "Center");
         this.refreshTimeReadout();
+        // The chips reflect the chart that was actually built, not the last thing clicked.
+        if (this.window != null && this.ringBar != null) {
+            this.window.syncRingBar(this.ringBar);
+        }
         this.animationTimer = new Timer(50, actionEvent -> {
             if (this.isPlaying) {
                 this.stepTime();
@@ -2898,6 +2905,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         jLabel6.setForeground(Color.WHITE);
         this.chartControls.add(jLabel6);
         this.chartControls.add(jComboBox2);
+        // <b>The rings, above the controls that move time.</b> Which rings are open is a
+        // question about what the chart IS; the row below is about when it is. Putting them
+        // together in one strip was what made the mode chooser feel like a settings screen.
+        this.ringBar = new RingBar(this.window);
+        JPanel ringRow = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        ringRow.setBackground(Color.BLACK);
+        ringRow.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 30));
+        ringRow.add(this.ringBar);
+        jPanel.add(ringRow);
         jPanel.add(jPanel2);
         jPanel.add(jPanel3);
 

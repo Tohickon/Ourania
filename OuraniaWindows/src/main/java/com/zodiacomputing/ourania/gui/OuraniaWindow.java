@@ -235,6 +235,26 @@ public class OuraniaWindow extends JFrame {
         contentPanel.add(new SettingsPanel(this), "SETTINGS");
     }
 
+    /**
+     * Opens or folds a ring, from the wheel.
+     *
+     * Delegates to Chart Setup rather than touching the mode, so there is still exactly one
+     * writer - see {@code ChartSetupPanel.applyRings}.
+     */
+    public void setRings(boolean partnerRing, boolean skyRing) {
+        if (chartSetupPanel != null) {
+            chartSetupPanel.applyRings(partnerRing, skyRing);
+        }
+    }
+
+    /** Lets the wheel's chips show what is actually drawn rather than what was last clicked. */
+    public void syncRingBar(RingBar bar) {
+        if (bar != null && chartSetupPanel != null) {
+            bar.syncFrom(chartSetupPanel.currentMode(), chartSetupPanel.skyWanted(),
+                chartSetupPanel.hasPartnerData());
+        }
+    }
+
     /** The wheel's chart-setting dropdowns, for the Settings screen to host. */
     public javax.swing.JPanel chartControlsPanel() {
         return skymapPanel == null ? null : skymapPanel.chartControlsPanel();
