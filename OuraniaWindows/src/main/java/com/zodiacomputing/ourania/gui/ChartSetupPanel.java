@@ -133,6 +133,12 @@ public class ChartSetupPanel extends JPanel {
     /** Names the right-hand column for what it currently holds - a partner, or the sky. */
     private JLabel transitTitle;
 
+    /** True once a saved person has been loaded into Chart B this session. */
+    private boolean partnerLoaded;
+
+    /** The line that says Chart B holds a person the current mode will read as a moment. */
+    private JLabel partnerHint;
+
     /** Chart A's contents while The Sky Now is borrowing those fields. Null otherwise. */
     private String[] stashedBase;
 
@@ -326,6 +332,13 @@ public class ChartSetupPanel extends JPanel {
         transitPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         
         transitDateField = createField(transitPanel, "Date (YYYY-MM-DD):", "");
+        partnerHint = new JLabel(" ");
+        partnerHint.setFont(Theme.SMALL);
+        partnerHint.setAlignmentX(0.0f);
+        partnerHint.setVisible(false);
+        partnerHint.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
+        transitPanel.add(partnerHint);
+
         transitTimeField = createField(transitPanel, "Time (HH:MM):", "");
         transitLocationField = createField(transitPanel, "Location:", "");
 
@@ -764,13 +777,39 @@ public class ChartSetupPanel extends JPanel {
      * something other than what the engine reads.
      */
     private void updateColumnTitles() {
-        boolean partner = selectedMode == ChartMode.SYNASTRY
-            || selectedMode == ChartMode.COMPOSITE_MIDPOINT
-            || selectedMode == ChartMode.COMPOSITE_DAVISON;
+        boolean partner = isRelationship(selectedMode);
         transitTitle.setText(partner ? "Chart B (Partner)" : "Chart B (Transit)");
         transitTitle.setToolTipText(partner
             ? "The second person's birth date, time and place."
             : "The moment and place the outer wheel is drawn for.");
+        partnerNotice();
+    }
+
+    /**
+     * Says so when Chart B holds a person and the mode will read it as a moment.
+     *
+     * <b>The mode is the reader's to choose, so this warns rather than corrects.</b> Loading a
+     * saved profile into Chart B used to force synastry - right about the astrology, wrong
+     * about whose decision it was. But the mismatch it prevented is real and silent: in a
+     * transit mode the second column is the sky, so a person's birth data there is drawn as
+     * the weather over Chart A. That is a different claim and it renders as an entirely
+     * ordinary chart, which is what makes it worth a line on screen.
+     *
+     * Clears itself the moment the mode agrees again, so it reports a state rather than
+     * lingering as a scold.
+     */
+    private void partnerNotice() {
+        if (partnerHint == null) {
+            return;
+        }
+        boolean mismatched = partnerLoaded && !isRelationship(selectedMode);
+        partnerHint.setText(mismatched
+            ? "<html><span style='color:#E8A33D;'>A saved person is in Chart B, but this "
+                + "mode reads that column as a moment - their chart will be drawn as the sky "
+                + "over Chart A. Choose Synastry or a Composite to read them as a person."
+                + "</span></html>"
+            : " ");
+        partnerHint.setVisible(mismatched);
     }
 
     private static String subjectHelp(Subject s) {
@@ -1232,6 +1271,12 @@ public class ChartSetupPanel extends JPanel {
     
 
 
+    /** Chart B is a moment again once its fields are no longer a loaded person's. */
+    void clearPartnerLoaded() {
+        partnerLoaded = false;
+        updateColumnTitles();
+    }
+
     private void loadTransit() {
         SavedCharts.Entry e = pickChart("Load into the transit wheel");
         if (e == null) {
@@ -1265,17 +1310,18 @@ public class ChartSetupPanel extends JPanel {
             transitDateField.setText(e.date);
             transitTimeField.setText(e.time);
             transitLocationField.setText(e.location);
-            // <b>A saved profile is a person, so Chart B is a second chart and never a
-            // transit moment.</b> This used to switch to synastry only from SINGLE, so
-            // loading someone into Chart B while the mode was Natal & Transit left the mode
-            // alone and their birth data went into the transit fields - the app then drew
-            // their nativity as the sky over Chart A, which is a different claim entirely and
-            // looked like a working chart. Any non-relationship mode now becomes synastry;
-            // a composite is left as it is, being already a relationship reading.
-            if (!isRelationship(selectedMode)) {
-                setSubject(Subject.PARTNERSHIP);
-                setMode(ChartMode.SYNASTRY);
-            }
+            // <b>The mode is the reader's, not this method's.</b> Loading a person into
+            // Chart B used to force synastry, which was right about the astrology and wrong
+            // about whose decision it is - the mode changed under you every time you picked a
+            // chart.
+            //
+            // The hazard that forcing guarded is real and has not gone away: a saved profile
+            // is a person, and in a transit mode their birth data is read as the sky, so the
+            // app draws their nativity as the weather over Chart A. That is a different claim
+            // entirely and it renders as a perfectly ordinary chart. So the mode is left
+            // alone and the mismatch is said out loud instead - see partnerNotice.
+            partnerLoaded = true;
+            updateColumnTitles();
         } else {
             // Through the one filler, so this route and the Load button cannot disagree.
             fillChartA(e, name);

@@ -436,6 +436,34 @@ public final class ChartSetupCheck {
             eq("Chart A survived loading Chart B", "1955-04-18",
                 ((JTextField) fieldOf(cp[0], "baseDateField")).getText());
 
+            // <b>The mode is the reader's.</b> Loading a person into Chart B used to force
+            // synastry - right about the astrology, wrong about whose decision it is, and the
+            // mode changed under you every time you picked a chart. It is left alone now and
+            // the mismatch is said on screen instead; see partnerNotice.
+            java.lang.reflect.Field fm =
+                ChartSetupPanel.class.getDeclaredField("selectedMode");
+            fm.setAccessible(true);
+            java.lang.reflect.Field fh =
+                ChartSetupPanel.class.getDeclaredField("partnerHint");
+            fh.setAccessible(true);
+            JLabel hint = (JLabel) fh.get(cp[0]);
+            for (final ChartMode m : ChartMode.values()) {
+                SwingUtilities.invokeAndWait(() -> {
+                    try {
+                        java.lang.reflect.Method sm = ChartSetupPanel.class
+                            .getDeclaredMethod("setMode", ChartMode.class);
+                        sm.setAccessible(true);
+                        sm.invoke(cp[0], m);
+                        cp[0].applySavedProfile("SuiteB", true);
+                    } catch (Exception e) {
+                        failures.add("loading Chart B threw in " + m + ": " + e);
+                    }
+                });
+                eq("loading Chart B leaves the mode at " + m, m, fm.get(cp[0]));
+                ok(m + ": the mismatch line shows exactly when there is one",
+                    hint.isVisible() == !ChartSetupPanel.isRelationship(m));
+            }
+
             SwingUtilities.invokeAndWait(() -> cp[0].applySavedProfile("SuiteB", false));
             eq("a rated chart restores its rating",
                 com.zodiacomputing.ourania.astro.Rodden.AA, roddenOf(cp[0]));
