@@ -254,7 +254,11 @@ public final class Widgets {
      *                      for a combo that its layout stretches anyway; a fixed preferred
      *                      size on one of those fights the layout instead of helping it.
      */
-    public static void styleCombo(JComboBox<String> combo, Font font, boolean sizeToContent) {
+    // Wildcard rather than String: the styling is paint and metrics, and cares nothing for
+    // what the model holds. Typed to String it turned away the one combo in the app whose
+    // items are an enum, which would have meant either a second copy of this or one
+    // control styled differently from its neighbours.
+    public static void styleCombo(JComboBox<?> combo, Font font, boolean sizeToContent) {
         combo.setOpaque(true);
         combo.setBackground(COMBO_BG);
         combo.setForeground(Color.WHITE);
@@ -305,9 +309,11 @@ public final class Widgets {
             FontMetrics fm = combo.getFontMetrics(combo.getFont());
             int widest = 0;
             for (int i = 0; i < combo.getItemCount(); i++) {
-                String item = combo.getItemAt(i);
+                // Measured through toString, which is what the renderer draws - so a combo of
+                // enums is sized by the text the reader actually sees rather than skipped.
+                Object item = combo.getItemAt(i);
                 if (item != null) {
-                    widest = Math.max(widest, fm.stringWidth(item));
+                    widest = Math.max(widest, fm.stringWidth(String.valueOf(item)));
                 }
             }
             int arrowAndPadding = 40;
@@ -317,7 +323,7 @@ public final class Widgets {
     }
 
     /** The wheel's control-strip dropdowns: bold 12, sized to their widest item. */
-    public static void styleCombo(JComboBox<String> combo) {
+    public static void styleCombo(JComboBox<?> combo) {
         styleCombo(combo, COMBO_FONT, true);
     }
 

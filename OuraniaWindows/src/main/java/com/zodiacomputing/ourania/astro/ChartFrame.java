@@ -90,6 +90,28 @@ public final class ChartFrame {
 
     /** Why the time-derived fields are absent, for the UI to show. Null unless synthetic. */
     public String syntheticNote;
+
+    /**
+     * True when the birth time was not known and the chart was cast for noon.
+     *
+     * <b>Different from {@link #syntheticMoment}, and the difference is which half is real.</b>
+     * A midpoint composite has real angles and an unreal Moon: it is an average of two charts,
+     * so nothing about it happened at an instant. A timeless chart is the opposite - the sky is
+     * genuine to within a few degrees, because the planets barely move in a day, while the
+     * angles and houses are pure artefacts of the noon guess. The Ascendant crosses all twelve
+     * signs in twenty-four hours, so a chart with an unknown time has no Ascendant at all;
+     * printing the noon one would be inventing the single most specific-looking fact on the
+     * page.
+     *
+     * <b>Suppressed through {@code ok}, not through special cases.</b> The angles and the two
+     * Lots are marked not-ok, which every reader in the app already honours - the same
+     * mechanism that hides an unselected body. Adding a "if timeUnknown" branch to the wheel,
+     * the grid, the hit test and the readings in turn is how one rule becomes five copies.
+     */
+    public boolean timeUnknown;
+
+    /** What is missing and why, for the UI to show. Null unless the time is unknown. */
+    public String timeUnknownNote;
     public double julianDayUt;
     public double geoLat;
     public double geoLon;
@@ -115,6 +137,38 @@ public final class ChartFrame {
      *
      * @param hsys house system as a character code, e.g. 'W' whole sign, 'P' Placidus
      */
+    /**
+     * A chart whose birth time is not known: cast for noon, with the angles withheld.
+     *
+     * See {@link #timeUnknown} for why the angles go and the planets stay. The caller supplies
+     * the noon Julian day - this class does not know the zone the noon belongs to.
+     */
+    public static ChartFrame computeTimeUnknown(SwissEph sw, double tjdUtNoon, double geoLat,
+                                                double geoLon, int hsys, boolean topocentric,
+                                                double geoAltM) {
+        ChartFrame f = compute(sw, tjdUtNoon, geoLat, geoLon, hsys, topocentric, geoAltM);
+        f.timeUnknown = true;
+        f.timeUnknownNote = "The birth time is not known, so this chart is cast for noon. "
+            + "The planets are within about half a degree of where they were - they barely "
+            + "move in a day - but the Ascendant crosses the whole zodiac in twenty-four "
+            + "hours, so the angles, the houses and the Lots are withheld rather than guessed.";
+        for (int i = 0; i < Bodies.count() && i < f.bodies.length; i++) {
+            Body b = f.bodies[i];
+            if (b == null) {
+                continue;
+            }
+            // The angles themselves, and the two Lots, which are measured from the Ascendant
+            // and so inherit its whole error.
+            if (Bodies.at(i).isAngle()
+                    || "Part of Fortune".equals(b.name) || "Part of Spirit".equals(b.name)) {
+                b.ok = false;
+            }
+        }
+        f.lotOfFortune = Double.NaN;
+        f.lotOfSpirit = Double.NaN;
+        return f;
+    }
+
     public static ChartFrame compute(SwissEph sw, double tjdUt, double geoLat, double geoLon,
                                      int hsys, boolean topocentric, double geoAltM) {
         ChartFrame f = new ChartFrame();

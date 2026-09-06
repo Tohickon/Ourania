@@ -139,17 +139,32 @@ public final class ProfileListPanel extends JPanel {
         card.setBackground(CARD_BG);
         card.setBorder(Theme.card(CARD_EDGE, Theme.GAP));
         card.setAlignmentX(Component.LEFT_ALIGNMENT);
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 82));
+        // Raised from 82: the row gained a rating line and two more buttons, and a maximum
+        // set for the old contents clips the new ones rather than growing.
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 112));
 
         JLabel title = new JLabel(name);
         title.setForeground(TEXT);
         title.setFont(Theme.HEADING);
 
-        JLabel detail = new JLabel(entry.date + "  " + entry.time
+        // <b>How well the time is known, on the row.</b> A rectified guess and a birth
+        // certificate produce charts that look identical - same Ascendant to the arcminute -
+        // and the difference is entirely in what the reader may conclude. Shown here because
+        // this list is where one chart is chosen over another.
+        String rating = entry.rodden.code;
+        String tagLine = entry.tags == null || entry.tags.trim().isEmpty()
+            ? "" : "  ·  " + entry.tags.trim();
+        JLabel detail = new JLabel("<html>" + entry.date + "  " + entry.time
             + (entry.location == null || entry.location.trim().isEmpty()
-                ? "" : "  -  " + entry.location));
+                ? "" : "  -  " + entry.location)
+            + "<br><span style='color:#7f8ca3;'>" + rating + " " + entry.rodden.label
+            + tagLine + "</span></html>");
         detail.setForeground(DIM);
         detail.setFont(Theme.SMALL);
+        detail.setToolTipText("<html><b>" + rating + " &middot; " + entry.rodden.label
+            + "</b><br>" + entry.rodden.meaning
+            + (entry.notes == null || entry.notes.trim().isEmpty()
+                ? "" : "<br><br><i>" + entry.notes.trim() + "</i>") + "</html>");
 
         JPanel actions = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 4, 0));
         actions.setBackground(CARD_BG);
@@ -158,6 +173,9 @@ public final class ProfileListPanel extends JPanel {
         actions.add(loadButton("Chart B", name, true,
             "Load " + name + " as the second chart - the partner in a synastry or composite, "
                 + "or the moment a transit wheel is drawn for"));
+        actions.add(manageButton("Rename", name,
+            "Give " + name + " a different name, keeping its data"));
+        actions.add(manageButton("Delete", name, "Remove " + name + " from the chart book"));
 
         JPanel text = new JPanel();
         text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
@@ -170,6 +188,58 @@ public final class ProfileListPanel extends JPanel {
         card.add(text, BorderLayout.CENTER);
         card.add(actions, BorderLayout.SOUTH);
         return card;
+    }
+
+    /**
+     * Rename and Delete, the two things this book could never do.
+     *
+     * <b>Delete confirms, and says what is about to be lost.</b> Birth data is the one thing
+     * in this app nobody can reconstruct - a reading regenerates, a layout redraws, but the
+     * document a birth time came from may not exist any more. A one-click delete on a row
+     * beside two load buttons is a mis-click away from that.
+     */
+    private JButton manageButton(final String label, final String name, String tip) {
+        JButton b = new JButton(label);
+        Widgets.styleButton(b, Widgets.Role.TRANSPORT);
+        b.setFont(Theme.SMALL);
+        b.setBorder(Theme.pad(3, 8, 3, 8));
+        b.setToolTipText(tip);
+        b.addActionListener(e -> {
+            if ("Delete".equals(label)) {
+                SavedCharts.Entry entry = SavedCharts.get(name);
+                String what = entry == null ? name
+                    : name + " - " + entry.date + " " + entry.time
+                        + (entry.location.isEmpty() ? "" : ", " + entry.location);
+                int answer = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "<html>Delete <b>" + name + "</b> from the chart book?<br><br>"
+                        + "<span style='color:#888;'>" + what + "</span><br><br>"
+                        + "Birth data cannot be recovered once it is gone.</html>",
+                    "Delete saved chart",
+                    javax.swing.JOptionPane.YES_NO_OPTION,
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+                if (answer == javax.swing.JOptionPane.YES_OPTION
+                        && SavedCharts.remove(name)) {
+                    rebuild();
+                }
+                return;
+            }
+            String next = javax.swing.JOptionPane.showInputDialog(this,
+                "New name for " + name + ":", name);
+            if (next == null || next.trim().isEmpty() || next.trim().equals(name)) {
+                return;
+            }
+            if (SavedCharts.rename(name, next.trim())) {
+                rebuild();
+            } else {
+                // The rename refuses rather than overwrites; say which of the two it was.
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "There is already a chart called \"" + next.trim()
+                        + "\". Renaming onto it would replace its birth data, so nothing "
+                        + "was changed.",
+                    "Name already used", javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
+        });
+        return b;
     }
 
     private JButton loadButton(String label, final String name, final boolean asPartner,

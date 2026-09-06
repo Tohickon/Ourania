@@ -310,8 +310,18 @@ public class OuraniaWindow extends JFrame {
     }
 
     public void applyChartSettings(String bDate, String bTime, String bLoc, ChartMode mode, String tDate, String tTime, String tLoc, boolean transits) {
+        applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc, transits, false);
+    }
+
+    /** With Chart A's time-unknown flag; see {@code ChartFrame.computeTimeUnknown}. */
+    public void applyChartSettings(String bDate, String bTime, String bLoc, ChartMode mode,
+                                   String tDate, String tTime, String tLoc, boolean transits,
+                                   boolean baseUnknown) {
         if (skymapPanel != null) {
-            skymapPanel.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc, transits);
+            skymapPanel.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc,
+                transits, baseUnknown);
+            // Generating a chart shows the chart. Dropped for a moment when this method was
+            // split in two, which would have left Generate looking like it did nothing.
             switchScreen("SKYMAP");
         }
     }

@@ -259,6 +259,13 @@ extends JPanel {
             ? Settings.synastryMarker()
             : Settings.transitMarker();
     }
+    /**
+     * True when Chart A's birth time is not known, so the chart is cast for noon.
+     *
+     * Set from the Rodden rating in Chart Setup - X, and only X, changes the calculation.
+     * See {@code ChartFrame.computeTimeUnknown} for what is withheld and why.
+     */
+    private boolean baseTimeUnknown;
     private SweDate transitSd;
     private ZonedDateTime transitChartTime;
     /** The bottom drawer: transport controls, with the live moment on its handle. */
@@ -1701,7 +1708,19 @@ extends JPanel {
         this.animationTimer.start();
     }
 
-    public void applyChartSettings(final String string, final String string2, final String string3, ChartMode chartMode, final String string4, final String string5, final String string6, final boolean transits) {
+    /** The eight-argument form: Chart A's time is known. */
+    public void applyChartSettings(String string, String string2, String string3,
+                                   ChartMode chartMode, String string4, String string5,
+                                   String string6, boolean transits) {
+        applyChartSettings(string, string2, string3, chartMode, string4, string5, string6,
+            transits, false);
+    }
+
+    /**
+     * @param baseUnknown Chart A's birth time is not known: cast for noon, angles withheld.
+     */
+    public void applyChartSettings(final String string, final String string2, final String string3, ChartMode chartMode, final String string4, final String string5, final String string6, final boolean transits, final boolean baseUnknown) {
+        this.baseTimeUnknown = baseUnknown;
         this.chartMode = chartMode;
         final boolean bl = chartMode != ChartMode.SINGLE;
         this.transitsEnabled = transits;
@@ -2170,12 +2189,19 @@ extends JPanel {
 
     private ChartFrame frameForCurrentChart(double d, double d2, double d3, int n) {
         ChartFrame chartFrame;
-        String string = SkymapPanel.frameKey(d, d2, d3, n);
+        // <b>The flag belongs in the key.</b> Without it, choosing "no time" hands back the
+        // cached chart that still has its angles, and the rating appears to do nothing until
+        // something else happens to invalidate the cache.
+        String string = SkymapPanel.frameKey(d, d2, d3, n)
+            + (this.baseTimeUnknown ? "|noon" : "");
         ChartFrame chartFrame2 = this.cachedFrame;
         if (chartFrame2 != null && string.equals(this.frameCacheKey)) {
             return chartFrame2;
         }
-        this.cachedFrame = chartFrame = ChartFrame.compute(this.sw, d, d2, d3, n, false, 0.0);
+        // Chart A withholds its angles when its birth time was never known.
+        this.cachedFrame = chartFrame = this.baseTimeUnknown
+            ? ChartFrame.computeTimeUnknown(this.sw, d, d2, d3, n, false, 0.0)
+            : ChartFrame.compute(this.sw, d, d2, d3, n, false, 0.0);
         this.frameCacheKey = string;
         return chartFrame;
     }

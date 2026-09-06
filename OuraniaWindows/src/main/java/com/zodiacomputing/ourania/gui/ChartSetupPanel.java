@@ -1,5 +1,7 @@
 package com.zodiacomputing.ourania.gui;
 
+import com.zodiacomputing.ourania.astro.Rodden;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -39,6 +41,17 @@ public class ChartSetupPanel extends JPanel {
      * geographic midpoint, which is the default and what the app did before this existed.
      */
     private JTextField compositeRefField;
+
+    /**
+     * How well Chart A's birth time is known, on Lois Rodden's scale.
+     *
+     * <b>Most charts people actually have are not AA.</b> Nothing in this app recorded the
+     * difference, so a time from a birth certificate and a time somebody half-remembers
+     * produced charts that looked identical and invited the same confidence. Choosing X casts
+     * the chart for noon and withholds the angles, which is the only entry on the scale that
+     * changes the calculation rather than the reading.
+     */
+    private JComboBox<Rodden> baseRodden;
 
     /**
      * Step 1 of the setup drawer: who the session is about.
@@ -190,6 +203,7 @@ public class ChartSetupPanel extends JPanel {
         
         baseDateField = createField(basePanel, "Date (YYYY-MM-DD):", "1990-01-01");
         baseTimeField = createField(basePanel, "Time (HH:MM):", "12:00");
+        baseRodden = roddenBox(basePanel, baseTimeField);
         // Location field is initialized later to load defaults
         
         // --- TRANSIT CHART FORM ---
@@ -578,6 +592,47 @@ public class ChartSetupPanel extends JPanel {
         if (profiles != null) {
             profiles.rebuild();
         }
+    }
+
+    /**
+     * The time-accuracy control, and the time field it governs.
+     *
+     * Choosing "no time" disables the time box rather than clearing it: a half-remembered
+     * time is worth keeping on screen while the reader decides, and clearing it would punish
+     * an honest answer.
+     */
+    private JComboBox<Rodden> roddenBox(JPanel column, final JTextField timeField) {
+        final JComboBox<Rodden> box = new JComboBox<>(Rodden.values());
+        box.setSelectedItem(Rodden.A);
+        box.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+            box.getPreferredSize().height));
+        box.setAlignmentX(0.0f);
+        Widgets.styleCombo(box);
+        Runnable sync = () -> {
+            Rodden r = (Rodden) box.getSelectedItem();
+            if (r == null) {
+                return;
+            }
+            timeField.setEnabled(!r.timeUnknown());
+            box.setToolTipText("<html><b>" + r.code + " &middot; " + r.label + "</b><br>"
+                + r.meaning + "</html>");
+        };
+        box.addActionListener(e -> sync.run());
+        sync.run();
+
+        JLabel label = new JLabel("Time accuracy:");
+        label.setForeground(Theme.TEXT_DIM);
+        label.setFont(Theme.SMALL);
+        label.setAlignmentX(0.0f);
+        column.add(label);
+        column.add(box);
+        return box;
+    }
+
+    /** Chart A's time rating, for the engine and the chart book. */
+    Rodden baseRodden() {
+        Rodden r = baseRodden == null ? null : (Rodden) baseRodden.getSelectedItem();
+        return r == null ? Rodden.A : r;
     }
 
     /** True for the modes in which the second chart is a person rather than a moment. */
@@ -1015,8 +1070,9 @@ public class ChartSetupPanel extends JPanel {
             }
         });
         
+        // The rating is not decoration: X casts for noon and withholds the angles.
         parentWindow.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc,
-            transitsCheck.isSelected());
+            transitsCheck.isSelected(), baseRodden().timeUnknown());
     }
 
     /** Base-side "Set to Now", corrected to the base location's zone the same way. */
@@ -1090,8 +1146,13 @@ public class ChartSetupPanel extends JPanel {
                 return;
             }
         }
+        // The rating is part of the chart, so it is saved with it - see SavedCharts.Entry.
+        SavedCharts.Entry prior = SavedCharts.get(name);
         boolean ok = SavedCharts.put(name, dateF.getText().trim(), timeF.getText().trim(),
-            locF.getText().trim());
+            locF.getText().trim(),
+            "natal".equals(which) ? baseRodden() : (prior == null ? Rodden.A : prior.rodden),
+            prior == null ? "" : prior.notes,
+            prior == null ? "" : prior.tags);
         JOptionPane.showMessageDialog(this,
             ok ? "Saved \"" + name + "\"." : "Could not write the chart book.",
             ok ? "Saved" : "Error",
