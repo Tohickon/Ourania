@@ -317,9 +317,25 @@ public class OuraniaWindow extends JFrame {
     public void applyChartSettings(String bDate, String bTime, String bLoc, ChartMode mode,
                                    String tDate, String tTime, String tLoc, boolean transits,
                                    boolean baseUnknown) {
+        applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc, transits,
+            baseUnknown, "");
+    }
+
+    /** @param zoneOverride an IANA zone id chosen by hand, or "" to trust the location. */
+    public void applyChartSettings(String bDate, String bTime, String bLoc, ChartMode mode,
+                                   String tDate, String tTime, String tLoc, boolean transits,
+                                   boolean baseUnknown, String zoneOverride) {
+        applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc, transits,
+            baseUnknown, zoneOverride, "");
+    }
+
+    /** @param relocate a place to recast the houses for, or "" for the birthplace. */
+    public void applyChartSettings(String bDate, String bTime, String bLoc, ChartMode mode,
+                                   String tDate, String tTime, String tLoc, boolean transits,
+                                   boolean baseUnknown, String zoneOverride, String relocate) {
         if (skymapPanel != null) {
             skymapPanel.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc,
-                transits, baseUnknown);
+                transits, baseUnknown, zoneOverride, relocate);
             // Generating a chart shows the chart. Dropped for a moment when this method was
             // split in two, which would have left Generate looking like it did nothing.
             switchScreen("SKYMAP");

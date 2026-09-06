@@ -54,6 +54,24 @@ public class ChartSetupPanel extends JPanel {
     private JComboBox<Rodden> baseRodden;
 
     /**
+     * A time zone chosen by hand, overriding the one inferred from the place.
+     *
+     * <b>Because the geocoder is a guess.</b> Ambiguous place names - a dozen Springfields,
+     * Boston in two countries - resolve to the wrong zone often enough to matter, and an hour
+     * of error is about fifteen degrees of Ascendant. The first entry keeps the inferred zone,
+     * which is right nearly always and stays the default.
+     */
+    private JComboBox<String> baseZone;
+
+    /**
+     * Where to recast the houses, leaving the moment alone. Blank means the birthplace.
+     *
+     * A relocated chart is the standard technique for "what does this place do to me" - the
+     * planets are untouched and the angles move, which is the whole content of the reading.
+     */
+    private JTextField relocateField;
+
+    /**
      * Step 1 of the setup drawer: who the session is about.
      *
      * <b>A separate field from the mode rather than derived from it</b>, because two subjects
@@ -204,6 +222,13 @@ public class ChartSetupPanel extends JPanel {
         baseDateField = createField(basePanel, "Date (YYYY-MM-DD):", "1990-01-01");
         baseTimeField = createField(basePanel, "Time (HH:MM):", "12:00");
         baseRodden = roddenBox(basePanel, baseTimeField);
+        baseZone = zoneBox(basePanel);
+        relocateField = createField(basePanel, "Relocate to (blank = birthplace):", "");
+        relocateField.setToolTipText("<html><b>The same birth moment, seen from somewhere "
+            + "else.</b><br>Every planet stays in the degree it was in - they depend on time "
+            + "alone.<br>The Ascendant, Midheaven and all twelve houses are recast for the new "
+            + "place.<br><i>The birth time is not re-read in the new zone: relocating moves "
+            + "where you were, not when.</i></html>");
         // Location field is initialized later to load defaults
         
         // --- TRANSIT CHART FORM ---
@@ -627,6 +652,50 @@ public class ChartSetupPanel extends JPanel {
         column.add(label);
         column.add(box);
         return box;
+    }
+
+    /** The first entry: keep whatever the place resolved to. */
+    static final String ZONE_FROM_PLACE = "From the location";
+
+    /**
+     * The time-zone control.
+     *
+     * <b>Every zone Java knows, with the sensible answer first.</b> A list of six hundred
+     * identifiers is not a control a person uses, so the default sits at the top and is what
+     * the reader keeps unless they have a reason not to. Sorted, because "Africa/Abidjan"
+     * first and "America/New_York" somewhere in the middle is the same list either way - but
+     * only one of them can be scanned.
+     */
+    private JComboBox<String> zoneBox(JPanel column) {
+        java.util.List<String> ids = new java.util.ArrayList<>(ZoneId.getAvailableZoneIds());
+        java.util.Collections.sort(ids);
+        JComboBox<String> box = new JComboBox<>();
+        box.addItem(ZONE_FROM_PLACE);
+        for (String id : ids) {
+            box.addItem(id);
+        }
+        box.setSelectedItem(ZONE_FROM_PLACE);
+        box.setMaximumSize(new Dimension(Integer.MAX_VALUE, box.getPreferredSize().height));
+        box.setAlignmentX(0.0f);
+        box.setToolTipText("<html>The zone the birth time is read in.<br>"
+            + "<b>" + ZONE_FROM_PLACE + "</b> uses whatever the place resolves to, which is "
+            + "right nearly always.<br>Override it when the place name is ambiguous - an hour "
+            + "of error moves the Ascendant about fifteen degrees.</html>");
+        Widgets.styleCombo(box);
+
+        JLabel label = new JLabel("Time zone:");
+        label.setForeground(Theme.TEXT_DIM);
+        label.setFont(Theme.SMALL);
+        label.setAlignmentX(0.0f);
+        column.add(label);
+        column.add(box);
+        return box;
+    }
+
+    /** The chosen zone id, or "" to keep the one the location gave. */
+    String baseZoneOverride() {
+        Object v = baseZone == null ? null : baseZone.getSelectedItem();
+        return v == null || ZONE_FROM_PLACE.equals(v) ? "" : String.valueOf(v);
     }
 
     /** Chart A's time rating, for the engine and the chart book. */
@@ -1072,7 +1141,8 @@ public class ChartSetupPanel extends JPanel {
         
         // The rating is not decoration: X casts for noon and withholds the angles.
         parentWindow.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc,
-            transitsCheck.isSelected(), baseRodden().timeUnknown());
+            transitsCheck.isSelected(), baseRodden().timeUnknown(), baseZoneOverride(),
+            relocateField == null ? "" : relocateField.getText().trim());
     }
 
     /** Base-side "Set to Now", corrected to the base location's zone the same way. */

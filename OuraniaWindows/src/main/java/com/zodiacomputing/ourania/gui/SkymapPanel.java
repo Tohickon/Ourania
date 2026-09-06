@@ -266,6 +266,29 @@ extends JPanel {
      * See {@code ChartFrame.computeTimeUnknown} for what is withheld and why.
      */
     private boolean baseTimeUnknown;
+
+    /**
+     * A time zone the reader chose, overriding the one the geocoder inferred.
+     *
+     * <b>The geocoder guesses, and for an ambiguous place name it guesses wrong.</b> There are
+     * a dozen Springfields and two Bostons; picking the wrong one moves the chart by hours,
+     * and until now there was no way to say so - the zone was whatever the lookup returned and
+     * the reader had no vote. Empty means "trust the location", which is still the default.
+     */
+    private String baseZoneOverride = "";
+
+    /**
+     * Where the chart is relocated to, or empty for the birthplace.
+     *
+     * <b>Relocation moves the houses, not the moment.</b> A relocated chart asks what the same
+     * instant looks like from somewhere else: every planet is in the degree it was in - they
+     * depend on time alone - while the Ascendant, the Midheaven and all twelve cusps are recast
+     * for the new latitude and longitude. So this replaces the coordinates and deliberately
+     * does <b>not</b> touch the time zone: the birth instant is fixed, and reading the birth
+     * time in the new place's zone would move the chart in time as well, which is a different
+     * chart of a different moment.
+     */
+    private String relocateTo = "";
     private SweDate transitSd;
     private ZonedDateTime transitChartTime;
     /** The bottom drawer: transport controls, with the live moment on its handle. */
@@ -1713,14 +1736,18 @@ extends JPanel {
                                    ChartMode chartMode, String string4, String string5,
                                    String string6, boolean transits) {
         applyChartSettings(string, string2, string3, chartMode, string4, string5, string6,
-            transits, false);
+            transits, false, "", "");
     }
 
     /**
      * @param baseUnknown Chart A's birth time is not known: cast for noon, angles withheld.
+     * @param zoneOverride an IANA zone id the reader chose, or empty to trust the location.
+     * @param relocate a place to recast the houses for, or empty for the birthplace.
      */
-    public void applyChartSettings(final String string, final String string2, final String string3, ChartMode chartMode, final String string4, final String string5, final String string6, final boolean transits, final boolean baseUnknown) {
+    public void applyChartSettings(final String string, final String string2, final String string3, ChartMode chartMode, final String string4, final String string5, final String string6, final boolean transits, final boolean baseUnknown, final String zoneOverride, final String relocate) {
         this.baseTimeUnknown = baseUnknown;
+        this.baseZoneOverride = zoneOverride == null ? "" : zoneOverride.trim();
+        this.relocateTo = relocate == null ? "" : relocate.trim();
         this.chartMode = chartMode;
         final boolean bl = chartMode != ChartMode.SINGLE;
         this.transitsEnabled = transits;
@@ -1771,6 +1798,33 @@ extends JPanel {
                     SkymapPanel.this.baseLongitude = result.lon;
                     SkymapPanel.this.baseLocationName = result.name;
                     SkymapPanel.this.baseTimeZoneId = result.tzId;
+                }
+                // <b>The reader's zone wins over the geocoder's.</b> Applied after the lookup
+                // rather than instead of it, because the place still supplies the latitude and
+                // longitude the houses are cast from - it is only the zone that was in doubt.
+                // Validated here: an id Java does not know would throw inside ZonedDateTime.of
+                // below, on a worker, and lose the whole chart to a stack trace.
+                String chosen = SkymapPanel.this.baseZoneOverride;
+                if (chosen != null && !chosen.isEmpty()) {
+                    try {
+                        SkymapPanel.this.baseTimeZoneId = ZoneId.of(chosen).getId();
+                    } catch (Exception bad) {
+                        System.out.println("Ignoring unknown time zone \"" + chosen + "\"");
+                    }
+                }
+                // <b>Relocation, applied after the birthplace and before the time is read.</b>
+                // The coordinates move and the zone does not - see relocateTo. Ordering
+                // matters: the zone above was resolved from the BIRTHPLACE, which is what the
+                // birth time was written in, and taking the new place's zone here would shift
+                // the instant as well as the houses.
+                String moveTo = SkymapPanel.this.relocateTo;
+                if (moveTo != null && !moveTo.isEmpty()) {
+                    Geocoder.Result there = SkymapPanel.this.syncGeocode(moveTo);
+                    if (there != null) {
+                        SkymapPanel.this.baseLatitude = there.lat;
+                        SkymapPanel.this.baseLongitude = there.lon;
+                        SkymapPanel.this.baseLocationName = there.name + " (relocated)";
+                    }
                 }
                 try {
                     object = LocalDate.parse(string, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -2383,6 +2437,9 @@ extends JPanel {
                 }
                 if ("RESONANCE".equals(kind)) {
                     return ChartTables.resonance(f);
+                }
+                if ("DRACONIC".equals(kind)) {
+                    return ChartTables.draconic(f);
                 }
                 // These two are read against a moment, not just a chart, so they take the
                 // birth instant and today. The transit clock drives them when it is set, so

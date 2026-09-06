@@ -34,34 +34,100 @@ public final class Settings {
 
     private Settings() { }
 
+    /** The schema this build writes. Bump it when a key changes meaning, not when one is added. */
+    public static final int SCHEMA = 1;
+
+    /** Key holding the schema a file was written by. Absent means "before this existed". */
+    public static final String SCHEMA_KEY = "settings.version";
+
+    /**
+     * True when the last {@link #load} could not read the file that was there.
+     *
+     * <b>An unreadable settings file used to be indistinguishable from a fresh install.</b>
+     * The read threw, the exception went to the console, an empty Properties came back, and
+     * every preference silently reverted to its default - then the next save wrote that empty
+     * set over the damaged file, so whatever was recoverable went with it. This is what lets
+     * the write path tell the two apart.
+     */
+    private static volatile boolean lastLoadFailed;
+
     /** Everything currently on disk, or an empty set if there is no file yet. */
     public static Properties load() {
         Properties p = new Properties();
         File f = new File(FILE);
+        lastLoadFailed = false;
         if (f.exists()) {
             try (FileInputStream fis = new FileInputStream(f)) {
                 p.load(fis);
             } catch (Exception ex) {
+                lastLoadFailed = true;
                 ex.printStackTrace();
             }
         }
         return p;
     }
 
+    /** True when the file on disk exists but could not be read. */
+    public static boolean loadFailed() {
+        return lastLoadFailed;
+    }
+
+    /**
+     * The schema a stored file claims, or 0 for one written before versioning existed.
+     *
+     * Nothing migrates on 0 today - every key this build reads has the same meaning it always
+     * had - but a file can now say which build wrote it, which is the thing a migration will
+     * need and cannot be added retroactively.
+     */
+    public static int storedSchema() {
+        try {
+            return Integer.parseInt(load().getProperty(SCHEMA_KEY, "0").trim());
+        } catch (NumberFormatException bad) {
+            return 0;
+        }
+    }
+
     public static String get(String key, String fallback) {
         return load().getProperty(key, fallback);
     }
 
-    /** Read, apply the mutation, write back. Other keys are preserved. */
+    /**
+     * Read, apply the mutation, write back. Other keys are preserved.
+     *
+     * <b>A file that would not parse is set aside, never overwritten.</b> Before this, a
+     * corrupt settings file was read as empty and then replaced by the next save - so the one
+     * artefact that could have said what went wrong was destroyed by the act of carrying on.
+     * It is renamed with a {@code .corrupt} suffix instead, which costs nothing and leaves
+     * something to look at.
+     */
     public static void update(Consumer<Properties> mutation) {
         try {
             Properties p = load();
+            if (lastLoadFailed) {
+                preserveCorrupt();
+            }
             mutation.accept(p);
+            p.setProperty(SCHEMA_KEY, String.valueOf(SCHEMA));
             try (FileOutputStream fos = new FileOutputStream(FILE)) {
                 p.store(fos, "Ourania Settings");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    /** Moves an unreadable settings file aside so the next write does not destroy it. */
+    private static void preserveCorrupt() {
+        File f = new File(FILE);
+        if (!f.exists()) {
+            return;
+        }
+        File aside = new File(FILE + ".corrupt");
+        for (int i = 2; aside.exists() && i < 100; i++) {
+            aside = new File(FILE + ".corrupt." + i);
+        }
+        if (f.renameTo(aside)) {
+            System.out.println("Settings file could not be read; kept as " + aside.getName());
         }
     }
 

@@ -11,6 +11,7 @@ import com.zodiacomputing.ourania.astro.Progressions;
 import com.zodiacomputing.ourania.astro.Returns;
 import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.astro.Transits;
+import com.zodiacomputing.ourania.astro.Draconic;
 import com.zodiacomputing.ourania.astro.Rulership;
 import com.zodiacomputing.ourania.astro.SolarArc;
 
@@ -439,6 +440,78 @@ public final class ChartTables {
             h.append(background);
             h.append("</table>");
         }
+    }
+
+    /**
+     * The draconic chart beside the tropical one, which is how it is read.
+     *
+     * <b>Never alone.</b> A draconic chart on its own is the radix with every longitude
+     * shifted by one constant - the same picture, relabelled - so a page of draconic degrees
+     * says nothing a tropical chart did not already say. What the technique is for is the
+     * comparison: a draconic Sun sitting on a tropical Ascendant is a contact between the two
+     * frames, and the pair of columns is the only way to see one.
+     */
+    public static String draconic(ChartFrame natal) {
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Draconic chart</h1>");
+
+        double origin = Draconic.origin(natal);
+        if (Double.isNaN(origin)) {
+            h.append("<p>This chart has no north node, so there is no draconic origin to ")
+             .append("measure from.</p>");
+            return h.toString();
+        }
+        ChartFrame drac = Draconic.of(natal);
+        h.append("<p>Measured from the Moon's north node at <b>").append(Zodiac.format(origin))
+         .append("</b> rather than from the equinox. Every aspect is identical to the radix - ")
+         .append("only the zero has moved - so the node itself sits on 0&deg; Aries.</p>");
+        h.append("<p style='color:#9AA5B1; font-size:11px;'>The angles and houses are the ")
+         .append("tropical ones. A draconic longitude restates a relationship; it does not ")
+         .append("name a place in the sky, and the horizon is a place.</p>");
+
+        h.append("<table cellpadding=\"4\">");
+        h.append(row3("th", "Body", "Draconic", "Tropical"));
+        for (int i = 0; i < natal.bodies.length; i++) {
+            ChartFrame.Body t = natal.bodies[i];
+            ChartFrame.Body d = drac.bodies[i];
+            if (t == null || d == null || !t.ok || Bodies.at(i).isAngle()) {
+                continue;
+            }
+            h.append(row3("td", t.name, Zodiac.format(d.lon), Zodiac.format(t.lon)));
+        }
+        h.append("</table>");
+
+        // <b>The contacts are the reading.</b> A draconic body conjunct a tropical one is the
+        // technique's whole claim, so they are found here rather than left to the reader to
+        // spot by comparing two columns of degrees.
+        h.append("<h2>Draconic on tropical</h2>");
+        h.append("<p>Draconic placements sitting on the tropical chart, within 2&deg;.</p>");
+        h.append("<table cellpadding=\"4\">");
+        h.append(row3("th", "Draconic", "On tropical", "Orb"));
+        int hits = 0;
+        for (int i = 0; i < drac.bodies.length; i++) {
+            ChartFrame.Body d = drac.bodies[i];
+            if (d == null || !d.ok || Bodies.at(i).isAngle()) {
+                continue;
+            }
+            for (int j = 0; j < natal.bodies.length; j++) {
+                ChartFrame.Body t = natal.bodies[j];
+                if (t == null || !t.ok) {
+                    continue;
+                }
+                double sep = Aspects.separation(d.lon, t.lon);
+                if (sep <= 2.0) {
+                    h.append(row3("td", d.name, t.name,
+                        String.format("%.2f&deg;", sep)));
+                    hits++;
+                }
+            }
+        }
+        if (hits == 0) {
+            h.append(row3("td", "&mdash;", "nothing within 2&deg;", ""));
+        }
+        h.append("</table>");
+        return h.toString();
     }
 
     public static String solarArc(ChartFrame natal, SwissEph sw, double natalJd, double nowJd) {
