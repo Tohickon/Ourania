@@ -760,8 +760,10 @@ extends JPanel {
         final int cx;
         final int cy;
         final int[] rings;
-        /** Where the bodies sit, after the reader's ring choice. */
+        /** Where the bodies sit, after the reader's ring choice - the natal band's ceiling. */
         final int bodyBase;
+        /** The natal band's floor, and so the ceiling of the aspect fields. */
+        final int natalFloor;
         /** The rotation, so a hit test and the painter agree on where zero is. */
         final double pin;
 
@@ -779,6 +781,8 @@ extends JPanel {
             this.rings = SkymapPanel.ringRadii(w, h,
                 SkymapPanel.this.outerOpenFraction(), SkymapPanel.this.triOpenFraction());
             this.bodyBase = SkymapPanel.this.bodyBaseRadius(this.rings);
+            this.natalFloor = this.bodyBase
+                - SkymapPanel.natalBandDepth(Math.max(1, this.bodyBase));
             this.pin = SkymapPanel.this.getPinLongitude();
         }
 
@@ -788,7 +792,9 @@ extends JPanel {
 
         int[] natalRadii() {
             if (this.natal == null) {
-                this.natal = SkymapPanel.this.natalRadii(this.bodyBase);
+                this.natal = SkymapPanel.bandRadii(SkymapPanel.this.bLon,
+                    SkymapPanel.this.bValid, this.bodyBase, this.natalFloor,
+                    SkymapPanel.NATAL_EDGE, SkymapPanel.NATAL_SPACING);
             }
             return this.natal;
         }
@@ -817,23 +823,18 @@ extends JPanel {
          * diameter and a sextile is still a sixth of the way round. What it loses is the leg
          * out to the glyph, which is the part that was doing the tangling.
          *
-         * Sized from where the innermost natal body actually is rather than from the ring
-         * chain, because the reader can move the bodies inward with the placement setting and
-         * a field drawn over the glyphs would be worse than the tangle it replaced.
+         * Sized from the natal band's floor, so the fields fill the space the bodies do not
+         * use and hold still while the chart changes.
          *
          * @param level 0 for the natal wheel, 1 for the ring outside it, 2 for the sky
          */
         int aspectDisc(int level) {
             if (this.discs == null) {
-                int ceiling = this.bodyBase;
-                int[] natal = this.natalRadii();
-                for (int i = 0; i < natal.length; i++) {
-                    if (SkymapPanel.this.bValid[i] && natal[i] < ceiling) {
-                        ceiling = natal[i];
-                    }
-                }
-                // Clear of the innermost glyph, and never so small there is nothing to draw.
-                int top = Math.max(30, ceiling - 18);
+                // <b>From the band's floor, not from the innermost body.</b> Measuring the
+                // bodies made the fields resize as the chart changed - switch a point off and
+                // every aspect line moves - which reads as the wheel breathing rather than as
+                // a layout. The floor is a property of the wheel, so the fields hold still.
+                int top = Math.max(30, this.natalFloor - 14);
                 this.discs = new int[] {
                     (int) Math.round(top * 0.52),
                     (int) Math.round(top * 0.76),
@@ -1536,10 +1537,36 @@ extends JPanel {
         return Math.max(MIN_BAND_DEPTH, Math.min(ideal, outer / 6));
     }
 
-    /** Radial distance between one ring and the next, natal wheel. */
-    private static final double NATAL_RING_GAP = 40.0;
+    /**
+     * Clearance and sub-ring spacing for the natal band.
+     *
+     * Wider than the outer rings' on both counts, because the natal wheel carries the largest
+     * glyphs and is the thing being read - the outer rings are context around it.
+     */
+    static final int NATAL_EDGE = 15;
+    private static final int NATAL_SUB_RING_GAP = 24;
+    private static final double NATAL_SPACING = 32.0;
+
+    /**
+     * How deep a band the natal wheel gets.
+     *
+     * <b>The natal wheel used to have no floor at all.</b> It ran from its ceiling inward at
+     * forty pixels a sub-ring with no lower bound, so twenty-nine bodies sprawled across a
+     * hundred and ten pixels - "not on a singular ring but all over the place", which is how
+     * David put it - and whatever was left over became the aspect area by accident. Giving it
+     * a floor does two things at once: the bodies gather onto three tight sub-rings, and the
+     * space inside the floor becomes a field the aspect lines can be laid out in deliberately.
+     *
+     * The forty-pixel gap was sized for nineteen-pixel glyphs. They are fourteen now.
+     *
+     * Capped at a third of its own ceiling, so the band cannot crowd out the fields inside it
+     * on a small wheel.
+     */
+    static int natalBandDepth(int natalTop) {
+        int ideal = (RING_COUNT - 1) * NATAL_SUB_RING_GAP + 2 * NATAL_EDGE;
+        return Math.max(MIN_BAND_DEPTH, Math.min(ideal, natalTop / 3));
+    }
     /** Stagger applied to a body that collides with one already placed in its ring. */
-    private static final double NATAL_RING_STEP = 16.0;
     /** The transit band is thinner than the natal wheel, so its rings sit closer. */
     private static final double TRANSIT_RING_GAP = 20.0;
     private static final double TRANSIT_RING_STEP = 12.0;
@@ -1632,19 +1659,6 @@ extends JPanel {
         return base - 14;
     }
 
-    private int[] natalRadii(int n) {
-        double d = (double)n - 30.0;
-        double d2 = (double)n - 14.0;
-        int[] nArray = this.ringedRadii(this.bLon, SkymapPanel.restrict(this.bValid, false),
-            d, NATAL_RING_GAP, NATAL_RING_STEP, 32.0, 34.0);
-        int[] nArray2 = this.radialLevels(this.bLon, SkymapPanel.restrict(this.bValid, true), d2, 22.0, 30.0);
-        int[] nArray3 = new int[BODY_COUNT];
-        for (int i = 0; i < BODY_COUNT; ++i) {
-            nArray3[i] = Bodies.at(i).isAngle() ? (int)Math.max(d2 - (double)nArray2[i] * 22.0, 40.0) : nArray[i];
-        }
-        return nArray3;
-    }
-
     /**
      * Where one outer band's bodies sit, contained inside the band by construction.
      *
@@ -1666,10 +1680,26 @@ extends JPanel {
      * @param bandInner the band's inner boundary
      */
     static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner) {
+        return SkymapPanel.bandRadii(lon, valid, bandOuter, bandInner, BAND_EDGE, 28.0);
+    }
+
+    /**
+     * As above, for a ring whose glyphs are a different size from the outer rings'.
+     *
+     * <b>The clearance and the spacing are the ring's, not the method's.</b> The natal wheel
+     * draws the largest glyphs on the chart and wants more room between them; hard-coding the
+     * outer rings' numbers here and calling it shared would be sharing the name and not the
+     * rule.
+     *
+     * @param maxEdge  the most clearance to keep at each boundary
+     * @param spacing  minimum glyph separation in pixels, before a body steps to a new level
+     */
+    static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner,
+                           int maxEdge, double spacing) {
         // On a band too shallow for full clearance, give up half of what there is at each
         // edge rather than letting top and floor cross - crossed bounds put every body on the
         // wrong side of the boundary, which is worse than a tight fit.
-        int edge = Math.min(BAND_EDGE, Math.max(0, (bandOuter - bandInner) / 2));
+        int edge = Math.min(maxEdge, Math.max(0, (bandOuter - bandInner) / 2));
         int top = bandOuter - edge;
         int floor = bandInner + edge;
         double usable = Math.max(0.0, top - floor);
@@ -1677,14 +1707,14 @@ extends JPanel {
         double step = Math.min(gap * 0.35, TRANSIT_RING_STEP);
 
         int[] bodies = SkymapPanel.ringedRadii(lon, SkymapPanel.restrict(valid, false),
-            top, gap, step, 28.0, floor);
+            top, gap, step, spacing, floor);
 
         // Angles ride the middle of the band, where they read as belonging to it rather than
         // to either neighbour.
         double mid = (top + floor) / 2.0;
         double angleStep = Math.min(gap * 0.5, 18.0);
         int[] levels = SkymapPanel.radialLevels(lon, SkymapPanel.restrict(valid, true),
-            mid, angleStep, 28.0);
+            mid, angleStep, spacing);
 
         int[] out = new int[BODY_COUNT];
         for (int i = 0; i < BODY_COUNT; i++) {

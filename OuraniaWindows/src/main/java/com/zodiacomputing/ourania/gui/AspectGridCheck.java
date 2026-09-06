@@ -91,6 +91,10 @@ public final class AspectGridCheck {
         report("Part J - the extracted ring radii are the wheel's own chain", before);
 
         before = failures.size();
+        bandsContainTheirBodies();
+        report("Part J2 - every band contains the bodies it lays out", before);
+
+        before = failures.size();
         synastryCrossBlock();
         report("Part K - the synastry cross-chart block is the panel's own output", before);
 
@@ -728,6 +732,13 @@ public final class AspectGridCheck {
      * the sub-rings have to be genuinely apart, which is what makes the band an area.
      */
     private static void bandsContainTheirBodies() {
+        // <b>This was written, committed, and never called.</b> Its only call site was inside
+        // ringGeometry and went out with that method's rewrite on 2026-09-06; the suite stayed
+        // green and its total went up for other reasons, so nothing said a word. A part of its
+        // own with its own report line is harder to lose, and the sweep counter below turns
+        // "it ran and asserted nothing" into a failure rather than a clear.
+        int swept = 0;
+        int[] spreadTested = new int[3];
         double[] lon = new double[Bodies.count()];
         boolean[] valid = new boolean[Bodies.count()];
         for (int i = 0; i < lon.length; i++) {
@@ -737,17 +748,37 @@ public final class AspectGridCheck {
         }
         for (int w = 200; w <= 2200; w += 173) {
             for (int h = 200; h <= 2200; h += 197) {
+                swept++;
                 int[] r = SkymapPanel.ringRadii(w, h, true, true);
+                int natalTop = r[SkymapPanel.RING_BODY_TOP];
+                int natalFloor = natalTop - SkymapPanel.natalBandDepth(Math.max(1, natalTop));
                 int[][] bands = {
                     {r[SkymapPanel.RING_TRI], r[SkymapPanel.RING_TRANSIT]},
-                    {r[SkymapPanel.RING_TRANSIT], r[SkymapPanel.RING_BODY_TOP]},
+                    {r[SkymapPanel.RING_TRANSIT], natalTop},
+                    {natalTop, natalFloor},
                 };
-                String[] names = {"the sky band", "the partner band"};
+                String[] names = {"the sky band", "the partner band", "the natal band"};
+
+                // <b>The natal band has to leave the aspect fields somewhere to be.</b> It had
+                // no floor at all until 2026-09-06 - it ran inward until it ran out of bodies,
+                // and whatever was left became the aspect area by accident. A band that eats
+                // its own inside is the failure this guards.
+                if (natalTop > 60) {
+                    ok("the natal band leaves a floor above the centre" + " (" + w + "x" + h + ")",
+                        natalFloor > 0);
+                    ok("and takes no more than a third of the wheel it sits in ("
+                        + w + "x" + h + "): depth " + (natalTop - natalFloor) + " of " + natalTop,
+                        natalTop - natalFloor <= natalTop / 3 + 1);
+                }
                 for (int b = 0; b < bands.length; b++) {
                     int hi = bands[b][0];
                     int lo = bands[b][1];
                     ok(names[b] + " is not inside out (" + w + "x" + h + ")", hi >= lo);
-                    int[] radii = SkymapPanel.bandRadii(lon, valid, hi, lo);
+                    boolean isNatal = b == 2;
+                    int[] radii = isNatal
+                        ? SkymapPanel.bandRadii(lon, valid, hi, lo,
+                            SkymapPanel.NATAL_EDGE, 32.0)
+                        : SkymapPanel.bandRadii(lon, valid, hi, lo);
                     int lowest = Integer.MAX_VALUE;
                     int highest = Integer.MIN_VALUE;
                     for (int i = 0; i < radii.length; i++) {
@@ -757,14 +788,52 @@ public final class AspectGridCheck {
                         lowest = Math.min(lowest, radii[i]);
                         highest = Math.max(highest, radii[i]);
                     }
-                    // Two sub-ring gaps' worth of depth, at any wheel big enough to have it.
-                    if (outerOf(w, h) > 200) {
+                    // <b>Only where the band actually got its ideal depth.</b> Below about
+                    // 800 pixels of window the bands are capped rather than ideal, the
+                    // sub-rings close up to fit, and the spread genuinely is small - at 546px
+                    // the natal band has four pixels of usable depth and puts all twenty-nine
+                    // bodies on one circle. That is a real limitation of a small wheel, not a
+                    // layout bug, and it is the second time an unconditional minimum has been
+                    // asserted against something built to compress. Gated on the depth the
+                    // band received rather than on the window size, because the depth is what
+                    // the claim is actually about.
+                    int ideal = isNatal ? 2 * 24 + 2 * 15 : 2 * 20 + 2 * 13;
+                    if (hi - lo == ideal) {
+                        spreadTested[b]++;
                         ok(names[b] + " is an area, not a line (" + w + "x" + h
                             + "): bodies span " + (highest - lowest) + "px",
                             highest - lowest >= 2 * 12);
                     }
                 }
             }
+        }
+    
+        ok("the band containment sweep actually swept something", swept > 50);
+        // <b>Per band, because one counter covering three of them proved worthless.</b> The
+        // spread assertion is gated on the band having received its ideal depth, and that gate
+        // reads the very number under test: collapsing natalBandDepth to its floor made the
+        // gate stop firing rather than the assertion fail, the suite stayed green, and only the
+        // total moving by 49 said anything at all. A single counter over all three bands was
+        // satisfied by the outer two on their own.
+        String[] bandNames = {"the sky band", "the partner band", "the natal band"};
+        for (int b = 0; b < spreadTested.length; b++) {
+            ok("wheels big enough to test " + bandNames[b] + "'s spread: " + spreadTested[b],
+                spreadTested[b] > 20);
+        }
+
+        // <b>And the depth formulas themselves, typed out rather than asked for.</b> The gate
+        // above can only ever say "at the sizes where the band is ideal, it spreads". What
+        // makes the band ideal at all is these two methods, and nothing was pinning natal's -
+        // Part J pins the outer one only because the ring chain is built from it.
+        for (int top = 60; top <= 1200; top += 37) {
+            int idealNatal = (3 - 1) * 24 + 2 * 15;
+            ok("natalBandDepth is its own formula at " + top,
+                SkymapPanel.natalBandDepth(top)
+                    == Math.max(22, Math.min(idealNatal, top / 3)));
+            int idealOuter = (3 - 1) * 20 + 2 * 13;
+            ok("outerBandDepth is its own formula at " + top,
+                SkymapPanel.outerBandDepth(top)
+                    == Math.max(22, Math.min(idealOuter, top / 6)));
         }
     }
 

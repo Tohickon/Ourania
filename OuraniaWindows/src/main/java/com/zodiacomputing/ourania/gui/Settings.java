@@ -284,10 +284,25 @@ public final class Settings {
     public static final String RING_DEFAULT = "Inside the sign ring";
     /** Bodies pulled into the middle, leaving the rings clear. */
     public static final String RING_CENTRE = "In the centre";
-    /** Bodies pushed outside the sign ring, the way many traditional charts print them. */
+    /**
+     * Bodies as far out as the natal wheel goes.
+     *
+     * <b>The stored value still says "outside the sign ring", and it is kept that way
+     * deliberately.</b> It used to be literally true - the natal bodies were drawn between the
+     * signs and the transit wheel - until the zodiac moved outermost on 2026-09-06 and there
+     * stopped being anywhere out there for them to go. Changing the constant would change what
+     * is written in every reader's settings file, and a preference that silently resets itself
+     * because a label was corrected is a worse outcome than a stale string on disk. The
+     * displayed name comes from {@link #bodyRingLabel} instead.
+     */
     public static final String RING_OUTSIDE = "Outside the sign ring";
 
     public static final String[] BODY_RINGS = {RING_DEFAULT, RING_CENTRE, RING_OUTSIDE};
+
+    /** What to show the reader for a placement, which is not always what is stored. */
+    public static String bodyRingLabel(String stored) {
+        return RING_OUTSIDE.equals(stored) ? "Against the ring above" : stored;
+    }
 
     public static String bodyRing() {
         String v = get(BODY_RING_KEY, RING_DEFAULT);

@@ -236,9 +236,16 @@ public class SettingsPanel extends JPanel {
         ringCombo.setSelectedItem(Settings.bodyRing());
         seeding = false;
         Widgets.styleCombo(ringCombo);
-        ringCombo.setToolTipText("<html>Where the glyphs are drawn. <b>Outside the sign ring</b> "
-            + "is the traditional printed layout; <b>in the centre</b> leaves the sign band and "
-            + "the degree ticks completely clear.</html>");
+        // The stored value and the shown name are not the same string for every placement -
+        // see Settings.bodyRingLabel. Rendering rather than renaming keeps settings files
+        // that were written before the rings were reordered working.
+        final javax.swing.ListCellRenderer<? super String> ringBase = ringCombo.getRenderer();
+        ringCombo.setRenderer((list, value, index, sel, focus) -> ringBase.getListCellRendererComponent(
+            list, value == null ? null : Settings.bodyRingLabel(String.valueOf(value)),
+            index, sel, focus));
+        ringCombo.setToolTipText("<html>Where the glyphs are drawn. <b>Against the ring above</b> "
+            + "pushes them as far out as the natal wheel goes; <b>in the centre</b> pulls them "
+            + "in, leaving the bands above them completely clear.</html>");
         ringCombo.addActionListener(e -> {
             Object picked = ringCombo.getSelectedItem();
             if (!constructing && !seeding && picked != null) {
