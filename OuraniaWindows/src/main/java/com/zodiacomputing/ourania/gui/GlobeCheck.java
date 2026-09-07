@@ -755,6 +755,61 @@ public final class GlobeCheck {
             eq("the middle of the globe is not a degree", -1,
                 GlobeRenderer.degreeAt(cam, w, h, panel, w / 2, h / 2));
 
+            // <b>House numbers are targets too, and by the same rule.</b> Pointing at one
+            // carves that house through the sphere, so a label that cannot be pointed at is a
+            // feature with no door - and the reader will try, because it looks like a button.
+            double[] cusps = panel.activeCusps;
+            java.lang.reflect.Method labelAt = GlobeRenderer.class.getDeclaredMethod(
+                "houseLabelAt", double[].class, int.class, double.class);
+            labelAt.setAccessible(true);
+            int found = 0;
+            for (double yaw : new double[] {0.0, 2.2, 4.4}) {
+                cam.yaw = yaw;
+                for (int house = 1; house <= 12; house++) {
+                    double[] at = (double[]) labelAt.invoke(null, cusps, house, origin);
+                    Globe.Projected q = cam.project(at[0], at[1], at[2], w, h);
+                    if (!q.visible) {
+                        continue;
+                    }
+                    found++;
+                    eq("pointing at house " + house + " finds it (yaw=" + yaw + ")", house,
+                        GlobeRenderer.houseNumberAt(cam, w, h, panel,
+                            (int) Math.round(q.x), (int) Math.round(q.y)));
+                }
+            }
+            yes("the house sweep reached some labels: " + found, found > 20);
+
+            // <b>And the label is where it ought to be, stated twice.</b> The sweep above
+            // proves the painter and the hit test agree, and it cannot prove more than that:
+            // both of them, and the check, ask houseLabelAt, so moving that method moves all
+            // three together and the sweep stays green. Mutating the label onto the cusp
+            // instead of the middle of the house survived it. So the position is written out
+            // here independently - the same trick Part J uses on the ring chain, and the only
+            // way a shared accessor can be pinned rather than merely agreed with.
+            for (int house = 1; house <= 12; house++) {
+                double from = cusps[house];
+                double to = cusps[house == 12 ? 1 : house + 1];
+                double span = ((to - from) % 360.0 + 360.0) % 360.0;
+                double expect = from + span / 2.0;
+                double[] at = (double[]) labelAt.invoke(null, cusps, house, origin);
+                double[] want = Globe.onShell(expect, origin, Globe.SHELL_HOUSE - 0.10, 0.0);
+                near("house " + house + " is labelled at its midpoint, x", want[0], at[0], 1e-9);
+                near("house " + house + " is labelled at its midpoint, y", want[1], at[1], 1e-9);
+                near("house " + house + " is labelled at its midpoint, z", want[2], at[2], 1e-9);
+                // Halfway means halfway: as far from one cusp as from the other.
+                near("house " + house + " label sits between its cusps",
+                    Globe.separation(expect, from), Globe.separation(expect, to), 1e-9);
+            }
+
+            cam.yaw = 0;
+            panel.setLayer(SkymapPanel.Layer.HOUSES, false);
+            Thread.sleep(1200);
+            double[] one = (double[]) labelAt.invoke(null, cusps, 1, origin);
+            Globe.Projected qh = cam.project(one[0], one[1], one[2], w, h);
+            eq("folded houses answer nothing", -1, GlobeRenderer.houseNumberAt(cam, w, h,
+                panel, (int) Math.round(qh.x), (int) Math.round(qh.y)));
+            panel.setLayer(SkymapPanel.Layer.HOUSES, true);
+
             // <b>Folded means unclickable.</b> A target the reader cannot see is worse than
             // no target: it answers when they meant to click through it.
             panel.setLayer(SkymapPanel.Layer.DEGREES, false);

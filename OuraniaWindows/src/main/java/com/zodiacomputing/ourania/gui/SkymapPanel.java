@@ -838,6 +838,29 @@ extends JPanel {
      */
     private int focusDegree = -1;
 
+    /**
+     * The house whose number the cursor is over, or -1.
+     *
+     * Beside focusBody and focusDegree for the same reason those are beside each other: a
+     * body, a degree and a house are three different things to be pointing at, and which of
+     * them a hover means depends on where the cursor is rather than on a mode.
+     */
+    private int focusHouse = -1;
+
+    /** The house the cursor is over, for the globe to carve. */
+    int focusedHouse() {
+        return this.focusHouse;
+    }
+
+    /** Records the house under the cursor. True when it changed and a repaint is due. */
+    boolean setFocusHouse(int house) {
+        if (this.focusHouse == house) {
+            return false;
+        }
+        this.focusHouse = house;
+        return true;
+    }
+
     /** The degree under the cursor, for the globe's scale to light. */
     int focusedDegree() {
         return this.focusDegree;
@@ -2278,14 +2301,23 @@ extends JPanel {
             @Override
             public void mouseMoved(MouseEvent mouseEvent) {
                 if (SkymapPanel.this.globeMode) {
-                    // A tick only wins when no body is nearer, so pointing at a glyph that
-                    // happens to sit near the rim still selects the glyph.
-                    int over = SkymapPanel.this.bodyAt(mouseEvent.getX(), mouseEvent.getY());
-                    int deg = over >= 0 ? -1 : GlobeRenderer.degreeAt(SkymapPanel.this.globe,
-                        SkymapPanel.this.chartPanel.getWidth(),
-                        SkymapPanel.this.chartPanel.getHeight(),
-                        SkymapPanel.this, mouseEvent.getX(), mouseEvent.getY());
+                    // <b>Body, then house number, then degree tick.</b> Nearest-first would
+                    // read better than a fixed order if the three shared a radius, and they
+                    // do not: a glyph is what the reader means when they are on one, and a
+                    // tick at the rim should never take a click aimed at the wheel.
+                    int x = mouseEvent.getX();
+                    int y = mouseEvent.getY();
+                    int w2 = SkymapPanel.this.chartPanel.getWidth();
+                    int h2 = SkymapPanel.this.chartPanel.getHeight();
+                    int over = SkymapPanel.this.bodyAt(x, y);
+                    int house = over >= 0 ? -1
+                        : GlobeRenderer.houseNumberAt(SkymapPanel.this.globe, w2, h2,
+                            SkymapPanel.this, x, y);
+                    int deg = over >= 0 || house >= 0 ? -1
+                        : GlobeRenderer.degreeAt(SkymapPanel.this.globe, w2, h2,
+                            SkymapPanel.this, x, y);
                     boolean moved = SkymapPanel.this.setFocusDegree(deg);
+                    moved |= SkymapPanel.this.setFocusHouse(house);
                     if (SkymapPanel.this.setFocus(over) || moved) {
                         SkymapPanel.this.chartPanel.repaint();
                     }
@@ -3556,9 +3588,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int hit = GlobeRenderer.bodyAt(this.globe, this.chartPanel.getWidth(),
                 this.chartPanel.getHeight(), this, n, n2);
             if (hit < 0) {
-                // Nothing under the cursor but the scale: open the degree it points at. The
-                // Sabian card is the reading of a degree, and the placements list has reached
-                // it by href all along - this is the wheel finally having a door to it too.
+                // Nothing under the cursor but the scaffolding: a house number opens its
+                // house, a tick opens its degree. Same order the hover uses, so what lights
+                // under the cursor is what opens when it is clicked.
+                int house = GlobeRenderer.houseNumberAt(this.globe,
+                    this.chartPanel.getWidth(), this.chartPanel.getHeight(), this, n, n2);
+                if (house >= 1 && this.window != null) {
+                    this.window.showInterpretationForHouse(house);
+                    return;
+                }
                 int deg = GlobeRenderer.degreeAt(this.globe, this.chartPanel.getWidth(),
                     this.chartPanel.getHeight(), this, n, n2);
                 if (deg >= 0 && this.window != null) {

@@ -470,16 +470,68 @@ final class GlobeRenderer {
      * labelling empty sky. In the middle of the sector it names is where the flat wheel puts
      * it and where a reader looks for it.
      */
+    /** Where house i's number is written, in world coordinates. */
+    private static double[] houseLabelAt(double[] cusps, int house, double origin) {
+        double span = ((cusps[house == 12 ? 1 : house + 1] - cusps[house]) % 360.0 + 360.0)
+            % 360.0;
+        return Globe.onShell(cusps[house] + span / 2.0, origin, Globe.SHELL_HOUSE - 0.10, 0.0);
+    }
+
+    /**
+     * Which house number the cursor is over, or -1.
+     *
+     * <b>Reads houseLabelAt, which is where the number is drawn.</b> Same agreement the body
+     * and degree hit tests keep: a label the reader can see and cannot point at is worse than
+     * no label, because they will try.
+     */
+    static int houseNumberAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+        double[] cusps = panel.activeCusps;
+        if (cusps == null || cusps.length < 13
+            || !panel.layerShown(SkymapPanel.Layer.HOUSES)) {
+            return -1;
+        }
+        double origin = panel.pinLongitude();
+        int best = -1;
+        double bestDist = 14.0;
+        for (int i = 1; i <= 12; i++) {
+            double[] pt = houseLabelAt(cusps, i, origin);
+            Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+            if (!q.visible) {
+                continue;
+            }
+            double dist = Math.hypot(q.x - px, q.y - py);
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = i;
+            }
+        }
+        return best;
+    }
+
     private void houseNumbers(double[] cusps) {
         if (cusps == null || cusps.length < 13) {
             return;
         }
+        int lit = this.panel.focusedHouse();
         for (int i = 1; i <= 12; i++) {
-            double span = arc(cusps[i], cusps[i == 12 ? 1 : i + 1]);
-            double mid = cusps[i] + span / 2.0;
-            billboard(Globe.onShell(mid, this.origin, Globe.SHELL_HOUSE - 0.10, 0.0),
-                String.valueOf(i),
-                faded(new Color(206, 208, 216), SkymapPanel.Layer.HOUSES), 12);
+            boolean here = i == lit;
+            billboard(houseLabelAt(cusps, i, this.origin), String.valueOf(i),
+                faded(here ? new Color(255, 238, 170) : new Color(206, 208, 216),
+                    SkymapPanel.Layer.HOUSES), here ? 15 : 12);
+        }
+
+        // <b>The house cut through the sphere, and only from its number.</b> A house is a
+        // division of the whole sky, so it does have a shape up there - but nothing else in
+        // this view gives the houses one, and carving the sphere every time a body was picked
+        // would put a second solid wedge over the sign wedge that body is standing in. Asking
+        // for it by pointing at the number is a deliberate act, and the only time the reader
+        // wants the house rather than the placement.
+        if (lit >= 1 && lit <= 12) {
+            double span = arc(cusps[lit], cusps[lit == 12 ? 1 : lit + 1]);
+            wedgeOnSphere(cusps[lit], cusps[lit] + span, Globe.SHELL_SIGN_INNER + 0.11,
+                faded(new Color(236, 224, 188, 66), SkymapPanel.Layer.HOUSES));
+            wedge(cusps[lit], cusps[lit] + span, 0.10, Globe.SHELL_HOUSE + 0.06,
+                faded(new Color(236, 224, 188, 74), SkymapPanel.Layer.HOUSES));
         }
     }
 
