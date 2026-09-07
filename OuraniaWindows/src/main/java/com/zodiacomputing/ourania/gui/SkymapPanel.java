@@ -2350,8 +2350,18 @@ extends JPanel {
                 // Focus follows the cursor. setFocus reports whether anything actually
                 // changed, so sweeping across one glyph repaints once rather than on every
                 // pixel of travel - the same guard setHighlightedAspect already uses.
-                if (SkymapPanel.this.setFocus(
-                        SkymapPanel.this.bodyAt(mouseEvent.getX(), mouseEvent.getY()))) {
+                int px = mouseEvent.getX();
+                int py = mouseEvent.getY();
+                int over = SkymapPanel.this.bodyAt(px, py);
+                boolean moved = SkymapPanel.this.setFocus(over);
+                // <b>And the lines themselves.</b> Until now the only place an aspect could
+                // be hovered was the grid in the drawer - the chords on the wheel, which is
+                // what a reader is actually looking at, lit nothing on any ring. A glyph wins
+                // the cursor when there is one under it, because a body is what someone
+                // resting on a body means.
+                moved |= SkymapPanel.this.setHighlightedChord(
+                    over >= 0 ? null : SkymapPanel.this.chordAt(px, py));
+                if (moved) {
                     SkymapPanel.this.chartPanel.repaint();
                 }
             }
@@ -3722,8 +3732,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int n10 = rings[RING_TRANSIT];
         int n11 = rings[RING_BODY_TOP];      // floor of the partner band, since the reorder
         int n12 = rings[RING_SIGN_OUTER];
-        int nTermInner = rings[RING_TERM_INNER];
-        int nDegreeInner = rings[RING_DEGREE_INNER];
         int n13 = g.bodyBase;
         double[] dArray = this.activeCusps;
         double d8 = g.pin;
@@ -3971,29 +3979,48 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.window.showInterpretationForHouse(n18);
             return;
         }
-        if (d6 >= (double)n13 && d6 < (double)n12) {
-            n3 = (int)(d9 / 30.0);
-            this.window.showInterpretationForSign(SIGN_NAMES[n3]);
-            return;
-        }
-        if (d6 >= (double)n12 && d6 < (double)n11) {
-            n3 = (int)(d9 / 30.0);
-            int n23 = (int)(d9 % 30.0 / 10.0) + 1;
-            this.window.showInterpretationForDecan(SIGN_NAMES[n3], n23);
-            return;
-        }
-        // <b>The inner degree scale reads a degree too.</b> It was drawn with 360 ticks and
-        // answered nothing - a scale the reader can count along and cannot ask. The outer rim
-        // has had a Sabian strip all along, but it is a sliver squeezed beside the mansions;
-        // this band is the whole depth of the inner scale, which makes it the easy one to hit
-        // and the reason David asked for a second ring rather than a better first one.
-        if (d6 >= (double)nDegreeInner && d6 < (double)nTermInner) {
-            n3 = (int)Math.round(d9) % 360;
-            if (n3 < 0) {
-                n3 += 360;
+        // <b>Each ring against its own two radii, outside in.</b> These tests were written
+        // for the old chain and never re-derived when the rings were reordered outward, so
+        // they had come to describe a wheel that no longer exists. The sign test ran from the
+        // body base all the way out to the sign ring's outer edge - one band swallowing the
+        // decans, the sign ring, the bounds and the inner degree scale - and the decan test
+        // read from the sign ring outward to the body top, which is inside it, so it covered
+        // nothing at all and the decan ring answered a click with silence. Measured with a
+        // probe that walks the wheel from the middle out and reports what each radius opens:
+        // every ring from 226 to 500 pixels said "Virgo", and the decan ring said nothing.
+        //
+        // Each band now names the two radii it lies between, so a ring that moves takes its
+        // own hit test with it. The open middle keeps the sign, which is what clicking inside
+        // a sign's wedge has always meant.
+        // Through bandAt, so the reading a ring opens and the radii it occupies cannot drift
+        // apart again. The inner degree scale reads a Sabian symbol: it was drawn with 360
+        // ticks and answered nothing - a scale the reader can count along and cannot ask.
+        // The bounds have no reading of their own yet, so they fall in with the open middle
+        // and name the sign, which is better than silence.
+        switch (SkymapPanel.bandAt(d6, rings, n13)) {
+            case BAND_DECAN: {
+                n3 = (int)(d9 / 30.0);
+                int n23 = (int)(d9 % 30.0 / 10.0) + 1;
+                this.window.showInterpretationForDecan(SIGN_NAMES[n3], n23);
+                return;
             }
-            this.window.showInterpretationForSabianSymbol(SIGN_NAMES[n3 / 30], n3 % 30 + 1);
-            return;
+            case BAND_SIGN:
+            case BAND_OPEN: {
+                n3 = (int)(d9 / 30.0);
+                this.window.showInterpretationForSign(SIGN_NAMES[n3]);
+                return;
+            }
+            case BAND_DEGREE: {
+                n3 = (int)Math.round(d9) % 360;
+                if (n3 < 0) {
+                    n3 += 360;
+                }
+                this.window.showInterpretationForSabianSymbol(
+                    SIGN_NAMES[n3 / 30], n3 % 30 + 1);
+                return;
+            }
+            default:
+                break;
         }
         // The lunar mansion ring, tested BEFORE the Sabian degree because the two share this
         // band and the ring is the half you can see.
@@ -5372,6 +5399,181 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return arrayList;
     }
 
+    /**
+     * How far a point is from the chord drawn between two longitudes, in pixels.
+     *
+     * <b>The one statement of where an aspect line is.</b> The click test carried this inline;
+     * the hover needs the same answer, and a second copy of it is how a line you can click
+     * becomes a line you cannot hover - or worse, the reverse, where the two disagree by a few
+     * pixels and the chart lights one line while opening another.
+     */
+    private static double chordDistance(int x, int y, int cx, int cy, double pin,
+            int discA, int discB, double lonA, double lonB) {
+        double ra = Math.toRadians(180.0 + pin - lonA);
+        double rb = Math.toRadians(180.0 + pin - lonB);
+        double ax = cx + discA * Math.cos(ra);
+        double ay = cy + discA * Math.sin(ra);
+        double bx = cx + discB * Math.cos(rb);
+        double by = cy + discB * Math.sin(rb);
+        double len = (ax - bx) * (ax - bx) + (ay - by) * (ay - by);
+        if (len <= 0.0) {
+            return Math.hypot(x - ax, y - ay);
+        }
+        double t = Math.max(0.0, Math.min(1.0,
+            ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / len));
+        return Math.hypot(x - (ax + t * (bx - ax)), y - (ay + t * (by - ay)));
+    }
+
+    /** How near the cursor has to be to a chord to have meant it. */
+    private static final double CHORD_GRAB = 8.0;
+
+    /** Nothing readable at this radius. */
+    static final int BAND_NONE = 0;
+    /** The decan ring. */
+    static final int BAND_DECAN = 1;
+    /** The sign ring. */
+    static final int BAND_SIGN = 2;
+    /** The inner degree scale, which reads a Sabian symbol. */
+    static final int BAND_DEGREE = 3;
+    /** The bounds ring and the open middle, which name the sign the wedge belongs to. */
+    static final int BAND_OPEN = 4;
+
+    /**
+     * Which readable ring a radius falls in.
+     *
+     * <b>One statement, because the tests had drifted from the rings.</b> The click handler
+     * carried these bounds inline and they were written for the chain as it stood before the
+     * rings were reordered outward: the sign test ran from the body base out to the sign
+     * ring's outer edge, one band swallowing the decans, the bounds and the whole inner degree
+     * scale, while the decan test read from the sign ring outward to the body top - which is
+     * inside it - so it described an empty band and the decan ring answered a click with
+     * silence. A probe walking the wheel from the middle out found every radius from 226 to
+     * 500 pixels saying "Virgo", and 500 to 520 saying nothing.
+     *
+     * Written as arithmetic over the ring chain so it can be checked without a window, and so
+     * a ring that moves takes its own hit test with it.
+     *
+     * @param r        distance from the centre, pixels
+     * @param rings    the ring chain from {@link #ringRadii}
+     * @param bodyBase the floor of the natal band, where the open middle starts
+     */
+    static int bandAt(double r, int[] rings, int bodyBase) {
+        if (r >= rings[RING_SIGN_OUTER] && r < rings[RING_DECAN_OUTER]) {
+            return BAND_DECAN;
+        }
+        if (r >= rings[RING_SIGN_INNER] && r < rings[RING_SIGN_OUTER]) {
+            return BAND_SIGN;
+        }
+        // Before the open middle, because it lies inside it: the degree scale is a drawn ring
+        // and the middle is the space around it.
+        if (r >= rings[RING_DEGREE_INNER] && r < rings[RING_TERM_INNER]) {
+            return BAND_DEGREE;
+        }
+        if (r >= bodyBase && r < rings[RING_SIGN_INNER]) {
+            return BAND_OPEN;
+        }
+        return BAND_NONE;
+    }
+
+    /**
+     * The aspect line under a point, as {wheel, outer body, natal body}, or null.
+     *
+     * <b>Hovering a line on the wheel lit nothing, on any ring.</b> mouseMoved asked only
+     * which body was under the cursor; the only place an aspect could be hovered was the grid
+     * in the drawer, so the chords themselves - the thing a reader is actually looking at -
+     * were inert. Every ring is walked here, so the sky ring's chords answer the cursor the
+     * same way the natal wheel's do.
+     *
+     * Nearest wins rather than first: the three fields are nested discs and a cursor between
+     * two lines meant the closer one.
+     *
+     * Gated on aspectInkFor, which is what the painter draws by, so only a line that is on
+     * screen can be pointed at.
+     */
+    private int[] chordAt(int x, int y) {
+        Geometry g = this.geometry();
+        if (g == null || !this.layerShown(Layer.ASPECTS)) {
+            return null;
+        }
+        // Outside the widest field there is nothing to test, which is most of the wheel and
+        // most of the mouse moves.
+        if (Math.hypot(x - g.cx, y - g.cy) > g.aspectDisc(2) + CHORD_GRAB) {
+            return null;
+        }
+        double pin = g.pin;
+        double near = CHORD_GRAB;
+        int[] found = null;
+        if (this.drawsNatalAspects()) {
+            int disc = g.aspectDisc(0);
+            for (int a = 0; a < BODY_COUNT; a++) {
+                if (!SkymapPanel.aspecting(a, this.bValid)) {
+                    continue;
+                }
+                for (int b = a + 1; b < BODY_COUNT; b++) {
+                    if (!SkymapPanel.aspecting(b, this.bValid)
+                        || Bodies.isOppositePair(a, b)
+                        || this.aspectInkFor(this.bLon[a], this.bLon[b], a, b, false) == null) {
+                        continue;
+                    }
+                    double d = chordDistance(x, y, g.cx, g.cy, pin, disc, disc,
+                        this.bLon[a], this.bLon[b]);
+                    if (d < near) {
+                        near = d;
+                        found = new int[] {WHEEL_NATAL, a, b};
+                    }
+                }
+            }
+        }
+        if (this.drawsCrossAspects()) {
+            for (int wheel = WHEEL_OUTER; wheel <= WHEEL_SKY; wheel++) {
+                if (wheel == WHEEL_OUTER ? !this.outerRingDrawn() : !this.triRingDrawn()) {
+                    continue;
+                }
+                int disc = g.aspectDisc(wheel);
+                double[] lon = this.wheelLon(wheel);
+                boolean[] valid = this.wheelValid(wheel);
+                for (int a = 0; a < BODY_COUNT; a++) {
+                    if (!SkymapPanel.aspecting(a, valid)) {
+                        continue;
+                    }
+                    for (int b = 0; b < BODY_COUNT; b++) {
+                        if (!SkymapPanel.aspecting(b, this.bValid)
+                            || this.aspectInkFor(lon[a], this.bLon[b], a, b,
+                                wheel == WHEEL_OUTER) == null) {
+                            continue;
+                        }
+                        double d = chordDistance(x, y, g.cx, g.cy, pin, disc, disc,
+                            lon[a], this.bLon[b]);
+                        if (d < near) {
+                            near = d;
+                            found = new int[] {wheel, a, b};
+                        }
+                    }
+                }
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Point the highlight at one chord, or clear it with null.
+     *
+     * Reports whether anything moved, the same contract setHighlightedAspect has, so sweeping
+     * the cursor along a line repaints once rather than on every pixel of travel.
+     */
+    private boolean setHighlightedChord(int[] chord) {
+        int a = chord == null ? -1 : chord[1];
+        int b = chord == null ? -1 : chord[2];
+        int wheel = chord == null ? WHEEL_NATAL : chord[0];
+        if (a == this.highlightA && b == this.highlightB && wheel == this.highlightWheel) {
+            return false;
+        }
+        this.highlightA = a;
+        this.highlightB = b;
+        this.highlightWheel = wheel;
+        return true;
+    }
+
     private boolean checkAspectHit(int n, int n2, int n3, int n4, double d, int n5, int n6, double d2, double d3, String string, String string2) {
         String string3;
         double d4 = Math.abs(d2 - d3);
@@ -5398,15 +5600,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             double d5;
             double d6;
             double d7;
-            double d8 = Math.toRadians(180.0 + d - d2);
-            double d9 = Math.toRadians(180.0 + d - d3);
-            double d10 = (double)n3 + (double)n5 * Math.cos(d8);
-            double d11 = (double)n4 + (double)n5 * Math.sin(d8);
-            double d12 = (double)n3 + (double)n6 * Math.cos(d9);
-            double d13 = Math.max(0.0, Math.min(1.0, (((double)n - d10) * (d12 - d10) + ((double)n2 - d11) * ((d7 = (double)n4 + (double)n6 * Math.sin(d9)) - d11)) / (d6 = Math.pow(d10 - d12, 2.0) + Math.pow(d11 - d7, 2.0))));
-            double d14 = d10 + d13 * (d12 - d10);
-            double d15 = Math.hypot((double)n - d14, (double)n2 - (d5 = d11 + d13 * (d7 - d11)));
-            if (d15 <= 8.0) {
+            // Through chordDistance, which the hover reads too - one statement of where a
+            // line is, so pointing at one and clicking it cannot come apart.
+            if (chordDistance(n, n2, n3, n4, d, n5, n6, d2, d3) <= CHORD_GRAB) {
                 this.window.showInterpretationForAspect(string, string2, string3);
                 return true;
             }

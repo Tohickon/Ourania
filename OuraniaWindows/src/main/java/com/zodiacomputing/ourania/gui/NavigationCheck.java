@@ -88,6 +88,10 @@ public final class NavigationCheck {
         hoveredLineEnds();
         report("Part F", before);
 
+        before = failures.size();
+        everyRingBandAnswers();
+        report("Part I - every drawn ring answers a click, and every chord a hover", before);
+
         System.out.println();
         System.out.println("=== Part G: each ring's glyphs say which ring they are on ===");
         before = failures.size();
@@ -598,6 +602,189 @@ public final class NavigationCheck {
      * halo appears on two bodies that are not in aspect at all - which looks exactly like a
      * working feature.
      */
+    /**
+     * Every drawn ring answers a click, and every drawn chord answers a hover.
+     *
+     * <b>Two defects with one shape: a surface the reader can see and cannot reach.</b>
+     *
+     * The click handler's ring bands were written for the chain as it stood before the rings
+     * were reordered outward and were never re-derived. The sign test ran from the body base
+     * out to the sign ring's outer edge - one band swallowing the decans, the bounds and the
+     * whole inner degree scale - while the decan test read from the sign ring outward to the
+     * body top, which is inside it, so it covered nothing and the decan ring answered with
+     * silence. Every radius from 226 to 500 pixels opened "Virgo"; 500 to 520 opened nothing.
+     *
+     * And the wheel had no aspect hover at all: mouseMoved asked only which body was under the
+     * cursor, so the chords - the thing a reader is looking at - lit nothing on any ring. The
+     * only place an aspect could be hovered was the grid in the drawer.
+     *
+     * The first half is checked against radii typed out from the ring chain rather than
+     * recomputed from it, so moving a bound fails rather than moving the expectation with it.
+     * The second walks a real tri-wheel and asks the panel what is under a point on each ring's
+     * chords - which is the assertion the sky ring could not have passed.
+     */
+    private static void everyRingBandAnswers() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+
+            // ---- half one: the bands, on the chain as the painter lays it out ----
+            int[] rings = SkymapPanel.ringRadii(1100, 1100, 1.0, 1.0);
+            int decanOuter = rings[SkymapPanel.RING_DECAN_OUTER];
+            int signOuter = rings[SkymapPanel.RING_SIGN_OUTER];
+            int signInner = rings[SkymapPanel.RING_SIGN_INNER];
+            int termInner = rings[SkymapPanel.RING_TERM_INNER];
+            int degreeInner = rings[SkymapPanel.RING_DEGREE_INNER];
+            int bodyBase = 226;
+
+            // The chain has to be in this order, or the bands below describe nothing.
+            ok("the ring chain runs outward", degreeInner < termInner
+                && termInner <= signInner && signInner < signOuter && signOuter < decanOuter);
+            ok("the open middle starts inside the degree scale", bodyBase < degreeInner);
+
+            eq("the decan ring reads a decan", SkymapPanel.BAND_DECAN,
+                SkymapPanel.bandAt((signOuter + decanOuter) / 2.0, rings, bodyBase));
+            eq("the sign ring reads a sign", SkymapPanel.BAND_SIGN,
+                SkymapPanel.bandAt((signInner + signOuter) / 2.0, rings, bodyBase));
+            eq("the inner degree scale reads a degree", SkymapPanel.BAND_DEGREE,
+                SkymapPanel.bandAt((degreeInner + termInner) / 2.0, rings, bodyBase));
+            eq("the bounds ring names its sign", SkymapPanel.BAND_OPEN,
+                SkymapPanel.bandAt((termInner + signInner) / 2.0, rings, bodyBase));
+            eq("the open middle names its sign", SkymapPanel.BAND_OPEN,
+                SkymapPanel.bandAt((bodyBase + degreeInner) / 2.0, rings, bodyBase));
+            eq("outside the decan ring is nothing", SkymapPanel.BAND_NONE,
+                SkymapPanel.bandAt(decanOuter + 2.0, rings, bodyBase));
+            eq("inside the natal band is nothing", SkymapPanel.BAND_NONE,
+                SkymapPanel.bandAt(bodyBase - 2.0, rings, bodyBase));
+
+            // <b>No band may swallow another.</b> This is the defect itself: one test wide
+            // enough to answer for four rings. Walking every pixel is what catches it, where
+            // five sample points in the middle of each band would not.
+            java.util.Map<Integer, Integer> width = new java.util.TreeMap<>();
+            for (int r = 0; r <= decanOuter + 20; r++) {
+                width.merge(SkymapPanel.bandAt(r, rings, bodyBase), 1, Integer::sum);
+            }
+            ok("the decan ring is as deep as it is drawn",
+                width.getOrDefault(SkymapPanel.BAND_DECAN, 0) == decanOuter - signOuter);
+            ok("the sign ring is as deep as it is drawn",
+                width.getOrDefault(SkymapPanel.BAND_SIGN, 0) == signOuter - signInner);
+            ok("the degree scale is as deep as it is drawn",
+                width.getOrDefault(SkymapPanel.BAND_DEGREE, 0) == termInner - degreeInner);
+            ok("the open middle is what is left",
+                width.getOrDefault(SkymapPanel.BAND_OPEN, 0)
+                    == (signInner - bodyBase) - (termInner - degreeInner));
+
+            // ---- half two: the chords, on a real tri-wheel ----
+            boolean[] every = new boolean[com.zodiacomputing.ourania.astro.Bodies.ALL.length];
+            java.util.Arrays.fill(every, true);
+            set(sky, "shown", every);
+            SwingUtilities.invokeAndWait(() -> w[0].applyChartSettings(
+                "1972-09-22", "18:38", "Los Angeles, USA", ChartMode.SYNASTRY,
+                "1975-03-14", "09:20", "Philadelphia, USA", true, true, "", ""));
+            Thread.sleep(7000);
+            java.awt.Component wheel = sky.chartComponent();
+            SwingUtilities.invokeAndWait(() -> {
+                wheel.setSize(1100, 1100);
+                wheel.doLayout();
+            });
+            java.awt.image.BufferedImage frame = new java.awt.image.BufferedImage(
+                1100, 1100, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            SwingUtilities.invokeAndWait(() -> {
+                java.awt.Graphics2D g2 = frame.createGraphics();
+                wheel.paint(g2);
+                g2.dispose();
+            });
+
+            ok("the chart under test draws all three rings",
+                sky.outerRingDrawn() && sky.triRingDrawn()
+                    && sky.drawsNatalAspects() && sky.drawsCrossAspects());
+
+            java.lang.reflect.Method geom = SkymapPanel.class.getDeclaredMethod("geometry");
+            geom.setAccessible(true);
+            Object g = geom.invoke(sky);
+            int cx = (Integer) fieldOf(g, "cx");
+            int cy = (Integer) fieldOf(g, "cy");
+            double pin = (Double) fieldOf(g, "pin");
+            java.lang.reflect.Method disc =
+                g.getClass().getDeclaredMethod("aspectDisc", int.class);
+            disc.setAccessible(true);
+            java.lang.reflect.Method chordAt = SkymapPanel.class.getDeclaredMethod(
+                "chordAt", int.class, int.class);
+            chordAt.setAccessible(true);
+            java.lang.reflect.Method inkFor = SkymapPanel.class.getDeclaredMethod(
+                "aspectInkFor", double.class, double.class, int.class, int.class,
+                boolean.class);
+            inkFor.setAccessible(true);
+
+            double[][] lons = {sky.bLon, sky.tLon, sky.cLon};
+            boolean[][] valids = {sky.bValid, sky.tValid, sky.cValid};
+            String[] named = {"natal", "partner", "sky"};
+            int[] reached = new int[3];
+            int consistent = 0;
+            int found = 0;
+
+            for (int ring = 0; ring < 3; ring++) {
+                int d = (Integer) disc.invoke(g, ring);
+                for (int a = 0; a < SkymapPanel.BODY_COUNT; a++) {
+                    if (!SkymapPanel.aspecting(a, valids[ring])) {
+                        continue;
+                    }
+                    for (int b = ring == 0 ? a + 1 : 0; b < SkymapPanel.BODY_COUNT; b++) {
+                        if (!SkymapPanel.aspecting(b, sky.bValid)
+                            || (ring == 0 && com.zodiacomputing.ourania.astro.Bodies.isOppositePair(a, b))
+                            || inkFor.invoke(sky, lons[ring][a], sky.bLon[b], a, b,
+                                ring == 1) == null) {
+                            continue;
+                        }
+                        double ra = Math.toRadians(180.0 + pin - lons[ring][a]);
+                        double rb = Math.toRadians(180.0 + pin - sky.bLon[b]);
+                        double ax = cx + d * Math.cos(ra);
+                        double ay = cy + d * Math.sin(ra);
+                        double bx = cx + d * Math.cos(rb);
+                        double by = cy + d * Math.sin(rb);
+                        // A quarter along, which keeps the sample off the middle where every
+                        // near-opposition crosses every other.
+                        int px = (int) Math.round(ax + 0.25 * (bx - ax));
+                        int py = (int) Math.round(ay + 0.25 * (by - ay));
+                        int[] hit = (int[]) chordAt.invoke(sky, px, py);
+                        if (hit == null) {
+                            continue;
+                        }
+                        found++;
+                        if (hit[0] == ring) {
+                            reached[ring]++;
+                        }
+                        // Whatever it names has to be a line that is really drawn there.
+                        consistent++;
+                        ok("what the cursor found on the " + named[ring]
+                            + " field is a line that is drawn",
+                            inkFor.invoke(sky, lons[hit[0]][hit[1]], sky.bLon[hit[2]],
+                                hit[1], hit[2], hit[0] == 1) != null);
+                    }
+                }
+            }
+            System.out.println("  chords under the cursor: " + found + " found, "
+                + consistent + " drawn where they were named; reached natal "
+                + reached[0] + ", partner " + reached[1] + ", sky " + reached[2]);
+            for (int ring = 0; ring < 3; ring++) {
+                ok("the " + named[ring] + " ring's chords can be hovered", reached[ring] > 0);
+            }
+            ok("nothing is hovered well outside the fields",
+                chordAt.invoke(sky, cx, cy - 540) == null);
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    private static Object fieldOf(Object o, String name) throws Exception {
+        java.lang.reflect.Field f = o.getClass().getDeclaredField(name);
+        f.setAccessible(true);
+        return f.get(o);
+    }
+
     private static void hoveredLineEnds() throws Exception {
         final OuraniaWindow[] w = new OuraniaWindow[1];
         SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
