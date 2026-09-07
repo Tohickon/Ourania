@@ -1040,7 +1040,11 @@ extends JPanel {
             // away still occupies its band until the fold ends - otherwise the whole wheel
             // resizes on the first frame of the fold and there is nothing left to animate.
             this.rings = SkymapPanel.ringRadii(w, h,
-                SkymapPanel.this.outerOpenFraction(), SkymapPanel.this.triOpenFraction());
+                SkymapPanel.this.outerOpenFraction(), SkymapPanel.this.triOpenFraction(),
+                SkymapPanel.this.layerOpen(Layer.DECANS),
+                SkymapPanel.this.layerOpen(Layer.SIGNS),
+                SkymapPanel.this.layerOpen(Layer.BOUNDS),
+                SkymapPanel.this.layerOpen(Layer.DEGREES));
             this.bodyBase = SkymapPanel.this.bodyBaseRadius(this.rings);
             this.natalFloor = this.bodyBase
                 - SkymapPanel.natalBandDepth(Math.max(1, this.bodyBase));
@@ -4446,18 +4450,40 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * band is therefore interpolated between the two layouts it actually has, not derived.
      */
     static int[] ringRadii(int width, int height, double outerOpen, double triOpen) {
+        return ringRadii(width, height, outerOpen, triOpen, 1.0, 1.0, 1.0, 1.0);
+    }
+
+    /**
+     * As above, with the zodiac's own bands able to fold away.
+     *
+     * <b>A folded band takes no room, so the wheel gets it back.</b> Fading a band's contents
+     * and leaving its width allocated would be a layer that hides without helping - the reader
+     * folds the decans because they want the space, and a gap where the decans were is not
+     * the space. Each band's depth is scaled by how far its layer is open, which is the same
+     * arithmetic the partner and sky bands already use.
+     *
+     * At all ones this is the chain exactly as it was, which is what lets AspectGridCheck go
+     * on asserting the formula it has always asserted.
+     */
+    static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
+                           double decanOpen, double signOpen, double boundOpen,
+                           double degreeOpen) {
         double o = Math.max(0.0, Math.min(1.0, outerOpen));
         double t = Math.max(0.0, Math.min(1.0, triOpen));
+        double dc = Math.max(0.0, Math.min(1.0, decanOpen));
+        double sg = Math.max(0.0, Math.min(1.0, signOpen));
+        double bd = Math.max(0.0, Math.min(1.0, boundOpen));
+        double dg = Math.max(0.0, Math.min(1.0, degreeOpen));
         int outer = Math.min(width, height) / 2 - 10;
         // Both body bands get the same depth, deep enough to hold their own sub-rings.
         int depth = SkymapPanel.outerBandDepth(outer);
         // The zodiac sits at fixed radii just inside the rim; it no longer moves when a body
         // ring opens, which is the point of putting it outside them.
         int decanOuter = outer - 20;
-        int signOuter = decanOuter - 20;
-        int signInner = signOuter - 35;
-        int termInner = signInner - TERM_BAND_DEPTH;
-        int degreeInner = termInner - DEGREE_RING_DEPTH;
+        int signOuter = (int) Math.round(decanOuter - 20 * dc);
+        int signInner = (int) Math.round(signOuter - 35 * sg);
+        int termInner = (int) Math.round(signInner - TERM_BAND_DEPTH * bd);
+        int degreeInner = (int) Math.round(termInner - DEGREE_RING_DEPTH * dg);
         // The body bands hang below the inner degree scale, each opening downward.
         int tri     = degreeInner;
         int transit = (int) Math.round((double) tri - (double) depth * t);
@@ -6047,9 +6073,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.drawLine(n12, n13 - 10, n12, n13 + 10);
             graphics2D.setColor(SkymapPanel.inkColor());
             graphics2D.setStroke(new BasicStroke(2.0f));
-            graphics2D.drawOval(n12 - n18, n13 - n18, n18 * 2, n18 * 2);
-            graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
-            graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
+            if (SkymapPanel.this.layerShown(Layer.SIGNS)) {
+                graphics2D.drawOval(n12 - n18, n13 - n18, n18 * 2, n18 * 2);
+                graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
+            }
+            if (SkymapPanel.this.layerShown(Layer.DECANS)) {
+                graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
+            }
             graphics2D.drawOval(n12 - nTermInner, n13 - nTermInner,
                 nTermInner * 2, nTermInner * 2);
             graphics2D.drawOval(n12 - nDegreeInner, n13 - nDegreeInner,
@@ -6069,7 +6099,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 graphics2D.drawOval(n12 - nTriOuter, n13 - nTriOuter, nTriOuter * 2, nTriOuter * 2);
             }
             graphics2D.setFont(new Font("SansSerif", 0, 12));
-            for (n8 = 0; n8 < 36; ++n8) {
+            for (n8 = 0; SkymapPanel.this.layerShown(Layer.DECANS) && n8 < 36; ++n8) {
                 d3 = (double)n8 * 10.0;
                 d2 = Math.toRadians(180.0 + d4 - d3);
                 n7 = n12 + (int)((double)n17 * Math.cos(d2));
@@ -6107,14 +6137,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // this wheel against another program found the terms simply missing. Sixty
             // segments, five to a sign, each ruled by one of the five non-luminary planets -
             // read from Dignity rather than from a second copy of the table.
-            SkymapPanel.this.drawBoundRing(graphics2D, n12, n13, n18, nTermInner, d4);
+            if (SkymapPanel.this.layerShown(Layer.BOUNDS)) {
+                SkymapPanel.this.drawBoundRing(graphics2D, n12, n13, n18, nTermInner, d4);
+            }
 
             // <b>The second degree scale, sitting directly above the wheels.</b> The outer
             // ticks are at the rim beside the lunar mansions, too far from any glyph to read
             // a body against; this one is where a body's leader line lands, so a reader can
             // follow a glyph out to the degree it actually occupies.
-            SkymapPanel.this.drawInnerDegreeRing(graphics2D, n12, n13, nTermInner,
-                nDegreeInner, d4);
+            if (SkymapPanel.this.layerShown(Layer.DEGREES)) {
+                SkymapPanel.this.drawInnerDegreeRing(graphics2D, n12, n13, nTermInner,
+                    nDegreeInner, d4);
+            }
 
             // The 28 lunar mansions, in the outermost band alongside the degree ticks.
             //
@@ -6125,7 +6159,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             SkymapPanel.this.drawMansionRing(graphics2D, n12, n13, n14, d4);
 
             graphics2D.setFont(new Font("SansSerif", 0, 22));
-            for (n8 = 0; n8 < 12; ++n8) {
+            for (n8 = 0; SkymapPanel.this.layerShown(Layer.SIGNS) && n8 < 12; ++n8) {
                 d3 = (double)n8 * 30.0;
                 d2 = Math.toRadians(180.0 + d4 - d3);
                 n7 = n12 + (int)((double)n18 * Math.cos(d2));
@@ -6142,7 +6176,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 graphics2D.drawString(ZODIAC_SYMBOLS[n8], n3 - 9, n2 + 6);
             }
             graphics2D.setColor(new Color(150, 150, 150));
-            for (n8 = 0; n8 < 360; ++n8) {
+            for (n8 = 0; SkymapPanel.this.layerShown(Layer.DEGREES) && n8 < 360; ++n8) {
                 d3 = Math.toRadians(180.0 + d4 - (double)n8);
                 int n21 = n14;
                 n = n8 % 10 == 0 ? n21 - 6 : (n8 % 5 == 0 ? n21 - 4 : n21 - 2);
@@ -6153,7 +6187,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 graphics2D.setStroke(new BasicStroke(n8 % 10 == 0 ? 1.5f : 0.5f));
                 graphics2D.drawLine(n7, n6, n5, n4);
             }
-            for (n8 = 1; n8 <= 12; ++n8) {
+            for (n8 = 1; SkymapPanel.this.layerShown(Layer.HOUSES) && n8 <= 12; ++n8) {
                 d3 = dArray[n8];
                 double d5 = Math.toRadians(180.0 + d4 - d3);
                 n7 = n12;
@@ -6230,8 +6264,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 g.natalFloor * 2, g.natalFloor * 2);
             int n24 = n18 - 60;
             graphics2D.setStroke(new BasicStroke(0.5f));
-            boolean bl = SkymapPanel.this.drawsNatalAspects();
-            int n25 = n = SkymapPanel.this.drawsCrossAspects() ? 1 : 0;
+            // <b>The layer folds the lines; the filter chooses which families.</b> Two
+            // different questions, and a reader who folded the aspects away expects all of
+            // them gone whatever the filter says.
+            boolean aspectLayer = SkymapPanel.this.layerShown(Layer.ASPECTS);
+            boolean bl = aspectLayer && SkymapPanel.this.drawsNatalAspects();
+            int n25 = n = aspectLayer && SkymapPanel.this.drawsCrossAspects() ? 1 : 0;
             if (bl) {
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
                     if (!SkymapPanel.aspecting(n7, SkymapPanel.this.bValid)) continue;
@@ -6312,7 +6350,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         d4, n12, n13, discNatal, discNatal, false, hlA, hlB);
                 }
             }
-            for (n7 = 0; n7 < BODY_COUNT; ++n7) {
+            for (n7 = 0; SkymapPanel.this.layerShown(Layer.NATAL) && n7 < BODY_COUNT; ++n7) {
                 if (!SkymapPanel.this.bValid[n7]) continue;
                 double d10 = Math.toRadians(180.0 + d4 - SkymapPanel.this.bLon[n7]);
                 n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));

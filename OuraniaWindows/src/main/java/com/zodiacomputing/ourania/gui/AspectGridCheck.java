@@ -1946,6 +1946,54 @@ public final class AspectGridCheck {
                     }
                 }
 
+                // <b>A folded band takes no room at all.</b> Fading a band's contents and
+                // leaving its width allocated would be a layer that hides without helping -
+                // a reader folds the decans because they want the space back, and a gap
+                // where the decans were is not the space. Each band is asserted to give up
+                // exactly its own depth and nothing else's.
+                if (outer > 200) {
+                    int[] full = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+                    int[] noDecans = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0);
+                    int[] noSigns = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0);
+                    int[] noBounds = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0);
+                    int[] noDegrees = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0);
+
+                    ok("folding the decans gives back twenty pixels" + at,
+                        noDecans[SkymapPanel.RING_SIGN_OUTER]
+                            - full[SkymapPanel.RING_SIGN_OUTER] == 20);
+                    ok("folding the signs gives back thirty-five" + at,
+                        noSigns[SkymapPanel.RING_SIGN_INNER]
+                            - full[SkymapPanel.RING_SIGN_INNER] == 35);
+                    ok("folding the bounds gives back eighteen" + at,
+                        noBounds[SkymapPanel.RING_TERM_INNER]
+                            - full[SkymapPanel.RING_TERM_INNER] == 18);
+                    ok("folding the degree scale gives back sixteen" + at,
+                        noDegrees[SkymapPanel.RING_DEGREE_INNER]
+                            - full[SkymapPanel.RING_DEGREE_INNER] == 16);
+
+                    // <b>And a folded band gives back only its own.</b> One band's depth
+                    // written into another's line is invisible until two are folded at once.
+                    ok("folding the decans leaves the tick ring alone" + at,
+                        noDecans[SkymapPanel.RING_DECAN_OUTER]
+                            == full[SkymapPanel.RING_DECAN_OUTER]);
+                    ok("folding the signs leaves the decan band its width" + at,
+                        noSigns[SkymapPanel.RING_DECAN_OUTER]
+                                - noSigns[SkymapPanel.RING_SIGN_OUTER]
+                            == full[SkymapPanel.RING_DECAN_OUTER]
+                                - full[SkymapPanel.RING_SIGN_OUTER]);
+                    ok("folding the bounds leaves the sign band its width" + at,
+                        noBounds[SkymapPanel.RING_SIGN_OUTER]
+                                - noBounds[SkymapPanel.RING_SIGN_INNER]
+                            == full[SkymapPanel.RING_SIGN_OUTER]
+                                - full[SkymapPanel.RING_SIGN_INNER]);
+
+                    // Everything folded reclaims all four, and the natal wheel gets it.
+                    int[] bare = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+                    ok("folding every band reclaims all of it" + at,
+                        bare[SkymapPanel.RING_DEGREE_INNER]
+                            - full[SkymapPanel.RING_DEGREE_INNER] == 20 + 35 + 18 + 16);
+                }
+
                 // <b>A single wheel must lay out exactly as it always has.</b> With nothing
                 // open the three body boundaries collapse onto the sign ring, so the natal
                 // wheel starts where it started before any of this existed.

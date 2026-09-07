@@ -319,9 +319,9 @@ final class GlobeRenderer {
      * wedge. This puts it back: rest on a body and its two wedges light up, so the answer is
      * the shape around it rather than something to work out.
      *
-     * <b>Bulged, because colour alone is not enough on a translucent globe.</b> Every surface
-     * here is see-through and half of them overlap, so a brighter patch reads as one more
-     * overlap. A wedge that stands proud of the sphere is unambiguous from any angle.
+     * <b>Bulged, because colour alone is not enough here.</b> Everything in this plane is
+     * translucent and half of it overlaps, so a brighter patch reads as one more overlap. A
+     * wedge that reaches past the ring it belongs to is unambiguous from any angle.
      */
     private void focusWedges(SkymapPanel panel) {
         int body = panel.focusedBody();
@@ -334,8 +334,8 @@ final class GlobeRenderer {
         }
         int sign = ((int) Math.floor(lon / 30.0) % 12 + 12) % 12;
         Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
-        wedge(sign * 30.0, sign * 30.0 + 30.0, Globe.SHELL_SIGN_INNER + 0.10,
-            new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 92));
+        wedge(sign * 30.0, sign * 30.0 + 30.0, 0.10, Globe.SHELL_SIGN_OUTER + 0.06,
+            new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 78));
 
         double[] cusps = panel.activeCusps;
         if (cusps == null || cusps.length < 13) {
@@ -345,34 +345,31 @@ final class GlobeRenderer {
         if (house >= 1 && house <= 12) {
             double from = cusps[house];
             double span = arc(from, cusps[house == 12 ? 1 : house + 1]);
-            wedge(from, from + span, Globe.SHELL_HOUSE + 0.10,
-                new Color(228, 216, 180, 70));
+            wedge(from, from + span, 0.10, Globe.SHELL_HOUSE + 0.06,
+                new Color(236, 224, 188, 66));
         }
     }
 
     /**
-     * A filled slice of a sphere between two longitudes, pole to pole.
+     * A filled sector of the plane between two longitudes, from one radius out to another.
      *
-     * Tessellated rather than drawn as one polygon: a sector of a sphere does not project to a
-     * quadrilateral, and the error is worst exactly where the slice is widest. The cells at
-     * the poles come out with two corners coincident and fill as triangles, which is how
-     * twelve of them tile a cap without overlapping.
+     * Flat, like everything else the reader measures against. It filled a slice of the sphere
+     * pole to pole until the divisions were flattened; a wedge standing up out of the plane
+     * was the same wireframe-globe mistake in a brighter colour.
+     *
+     * Tessellated along the arc rather than drawn as one polygon, because the outer edge is a
+     * curve and a single quadrilateral would cut the corner off it.
      */
-    private void wedge(double lon0, double lon1, double radius, Color fill) {
-        int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 11.0));
-        int rows = 7;
+    private void wedge(double lon0, double lon1, double r0, double r1, Color fill) {
+        int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 6.0));
         for (int i = 0; i < steps; i++) {
             double la = lon0 + ((lon1 - lon0) * i) / steps;
             double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;
-            for (int j = 0; j < rows; j++) {
-                double p0 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * j) / rows;
-                double p1 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * (j + 1)) / rows;
-                quad(Globe.onShell(la, this.origin, radius, radius * Math.sin(p0)),
-                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p0)),
-                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p1)),
-                    Globe.onShell(la, this.origin, radius, radius * Math.sin(p1)),
-                    fill);
-            }
+            quad(Globe.onShell(la, this.origin, r0, 0.0),
+                Globe.onShell(lb, this.origin, r0, 0.0),
+                Globe.onShell(lb, this.origin, r1, 0.0),
+                Globe.onShell(la, this.origin, r1, 0.0),
+                fill);
         }
     }
 
@@ -392,38 +389,68 @@ final class GlobeRenderer {
     private void signPlane() {
         for (int sign = 0; sign < 12; sign++) {
             Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
-            Color fill = faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 30),
-                SkymapPanel.Layer.SIGNS);
             double from = sign * 30.0;
-            int steps = 4;
-            for (int i = 0; i < steps; i++) {
-                double la = from + (30.0 * i) / steps;
-                double lb = from + (30.0 * (i + 1)) / steps;
-                // One ring of cells from the sign band in to the middle; the innermost cell
-                // stops short of dead centre, where every sector would fight for one pixel.
-                double[] radii = {Globe.SHELL_SIGN_INNER, 1.45, 1.00, 0.55, 0.12};
-                for (int r = 0; r + 1 < radii.length; r++) {
-                    quad(Globe.onShell(la, this.origin, radii[r], 0.0),
-                        Globe.onShell(lb, this.origin, radii[r], 0.0),
-                        Globe.onShell(lb, this.origin, radii[r + 1], 0.0),
-                        Globe.onShell(la, this.origin, radii[r + 1], 0.0),
-                        fill);
-                }
+
+            // <b>A wedge over the sphere, faint.</b> Twelve of these are the surface the
+            // bodies sit inside, and they carry their own edges - which is what the sign
+            // boundaries were being drawn twice for. Great circles on top of them read as the
+            // wireframe of a globe; the fills alone read as a sphere divided into signs.
+            wedgeOnSphere(from, from + 30.0, Globe.SHELL_SIGN_INNER,
+                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 26),
+                    SkymapPanel.Layer.SIGNS));
+
+            // <b>And a flat ring at the equator, brighter.</b> The plane is where a longitude
+            // means what it says, so the zodiac gets a band there that a reader can measure
+            // against - the degree scale hangs off its outer edge. This was a full disc from
+            // the band to the centre, which washed the whole chart in sign colour and left
+            // the aspect network to be read through it.
+            quadRing(from, from + 30.0, Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER,
+                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 96),
+                    SkymapPanel.Layer.SIGNS));
+        }
+    }
+
+    /** A translucent slice of the sphere between two longitudes, pole to pole. */
+    private void wedgeOnSphere(double lon0, double lon1, double radius, Color fill) {
+        int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 11.0));
+        int rows = 7;
+        for (int i = 0; i < steps; i++) {
+            double la = lon0 + ((lon1 - lon0) * i) / steps;
+            double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;
+            for (int j = 0; j < rows; j++) {
+                double p0 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * j) / rows;
+                double p1 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * (j + 1)) / rows;
+                quad(Globe.onShell(la, this.origin, radius, radius * Math.sin(p0)),
+                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p0)),
+                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p1)),
+                    Globe.onShell(la, this.origin, radius, radius * Math.sin(p1)),
+                    fill);
             }
         }
     }
 
+    /** One segment of a flat ring in the ecliptic plane. */
+    private void quadRing(double lon0, double lon1, double r0, double r1, Color fill) {
+        int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 6.0));
+        for (int i = 0; i < steps; i++) {
+            double la = lon0 + ((lon1 - lon0) * i) / steps;
+            double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;
+            quad(Globe.onShell(la, this.origin, r0, 0.0),
+                Globe.onShell(lb, this.origin, r0, 0.0),
+                Globe.onShell(lb, this.origin, r1, 0.0),
+                Globe.onShell(la, this.origin, r1, 0.0),
+                fill);
+        }
+    }
+
     /**
-     * The house numbers, ringed around the top of the globe and around the bottom.
+     * The house numbers, in the plane, each in the middle of its own house.
      *
-     * <b>Where the wedges converge, which is where a segment can be labelled.</b> They ran
-     * down the side of the globe while the houses were latitude bands, and a column of numbers
-     * top to bottom is not how anyone reads a sphere - it says the houses are stacked, when
-     * they are twelve slices around it. Near a pole every slice is present and narrow, so the
-     * twelve fit in a ring the way they do on the top of a beach ball.
-     *
-     * Both poles, because half a globe is always facing away: whichever end the reader is
-     * looking down, the ring nearest them is the readable one.
+     * <b>They followed the houses.</b> They were at the poles because the houses were wedges
+     * of a sphere and a pole is where those converge; with the cusps drawn as flat spokes the
+     * poles have nothing to do with a house any more, and a number floating there would be
+     * labelling empty sky. In the middle of the sector it names is where the flat wheel puts
+     * it and where a reader looks for it.
      */
     private void houseNumbers(double[] cusps) {
         if (cusps == null || cusps.length < 13) {
@@ -432,15 +459,9 @@ final class GlobeRenderer {
         for (int i = 1; i <= 12; i++) {
             double span = arc(cusps[i], cusps[i == 12 ? 1 : i + 1]);
             double mid = cusps[i] + span / 2.0;
-            String label = String.valueOf(i);
-            for (int pole = -1; pole <= 1; pole += 2) {
-                // Close to the pole, where the wedges are narrow and the twelve sit in a tight
-                // ring. Far enough off it that they do not pile onto the point itself.
-                double phi = pole * (Globe.FILL_SPAN - 0.30);
-                billboard(Globe.onShell(mid, this.origin, Globe.SHELL_HOUSE,
-                    Globe.SHELL_HOUSE * Math.sin(phi)), label,
-                    faded(new Color(206, 208, 216), SkymapPanel.Layer.HOUSES), 12);
-            }
+            billboard(Globe.onShell(mid, this.origin, Globe.SHELL_HOUSE - 0.10, 0.0),
+                String.valueOf(i),
+                faded(new Color(206, 208, 216), SkymapPanel.Layer.HOUSES), 12);
         }
     }
 
@@ -563,31 +584,42 @@ final class GlobeRenderer {
         if (cusps == null || cusps.length < 13) {
             return;                             // no chart cast yet; the shells still draw
         }
-        // <b>Lines rather than shading.</b> The houses were washed in grey, which said how big
-        // each one was and buried everything drawn inside them. A cusp is a boundary, and a
-        // boundary is a line - twelve of them, pole to pole, because a house divides the whole
-        // sky and not just the band around the ecliptic.
+        // <b>Flat spokes, not great circles.</b> They were drawn as meridians pole to pole,
+        // which is where a house boundary genuinely goes - a house divides the whole sky - and
+        // it was the wrong picture anyway: twelve great circles read as the wireframe of a
+        // globe rather than as the divisions of a chart, and they wrapped over a zodiac that
+        // is a flat plane. Everything the reader measures against is in the ecliptic plane, so
+        // the divisions of it belong there too. Same spokes the flat wheel draws, seen in
+        // perspective.
         for (int i = 1; i <= 12; i++) {
             boolean angle = i == 1 || i == 4 || i == 7 || i == 10;
-            polyline(Globe.meridian(cusps[i], this.origin, Globe.SHELL_HOUSE, 26, Math.PI / 2),
-                faded(angle ? new Color(226, 214, 184, 220) : new Color(150, 152, 164, 150),
+            segment(Globe.onShell(cusps[i], this.origin, 0.02, 0.0),
+                Globe.onShell(cusps[i], this.origin, Globe.SHELL_HOUSE, 0.0),
+                faded(angle ? new Color(226, 214, 184, 220) : new Color(150, 152, 164, 140),
                     SkymapPanel.Layer.HOUSES), angle ? 1.8f : 1.0f);
         }
+        // The rim the spokes end on, so the houses read as a ring rather than as loose lines.
+        polyline(Globe.equator(this.origin, Globe.SHELL_HOUSE, 96),
+            faded(new Color(150, 152, 164, 120), SkymapPanel.Layer.HOUSES), 0.9f);
     }
 
     /**
-     * The twelve sign boundaries, as great circles on the sphere.
+     * The twelve sign boundaries, in the plane.
      *
-     * The zodiac's own divisions, drawn the way the house cusps are so the two read as the
-     * same kind of thing - which they are, two ways of cutting the same sky. Cooler and
-     * thinner than the cusps, because a reader orienting themselves is looking for the angles
-     * first.
+     * <b>The zodiac is a flat plane, so its divisions are flat too.</b> These were great
+     * circles wrapping the sphere, which is what put a wireframe globe on screen the moment
+     * the sign layer was switched on - the one thing this view was supposed to stop being. A
+     * boundary of a disc is a radius of that disc.
+     *
+     * They run from the centre out through the whole plane rather than only across the sign
+     * band, so a body anywhere inside can be read against the sign it falls in - which is the
+     * job the flat wheel's sign spokes do.
      */
     private void signMeridians() {
         for (int sign = 0; sign < 12; sign++) {
-            polyline(Globe.meridian(sign * 30.0, this.origin, Globe.SHELL_SIGN_INNER, 26,
-                Math.PI / 2), faded(new Color(126, 146, 170, 150),
-                SkymapPanel.Layer.SIGNS), 0.9f);
+            segment(Globe.onShell(sign * 30.0, this.origin, Globe.SHELL_SIGN_INNER, 0.0),
+                Globe.onShell(sign * 30.0, this.origin, Globe.SHELL_SIGN_OUTER, 0.0),
+                faded(new Color(196, 204, 216, 190), SkymapPanel.Layer.SIGNS), 1.1f);
         }
     }
 
