@@ -3622,6 +3622,61 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * project has shipped several times - the copies do not diverge on the day they are
      * written, they diverge the day one of them is edited.
      */
+    /**
+     * The hue a ring's glyphs are pulled toward, so you can tell whose they are.
+     *
+     * <b>Extending a convention the wheel already half-had.</b> A partner's angle was already
+     * drawn in warm gold and a sky angle in cool blue - four glyphs out of twenty-nine on each
+     * ring - while every body on those rings took the same element colour as the natal wheel,
+     * differing only by how much it had been lightened. Lightness alone is not a distinction a
+     * reader can hold: with three rings of the same palette, a Venus is a Venus and there is
+     * nothing on the glyph that says which chart it belongs to.
+     *
+     * <b>Flat per ring, not the element colour tinted.</b> Blending was tried first and makes
+     * mud: a cyan Moon mixed halfway to gold comes out pale green, a red Sun mixed halfway to
+     * blue comes out grey, and the two outer rings ended up 67 apart in RGB - technically
+     * different, useless at a glance, and no longer saying "gold ring" or "blue ring" either.
+     * The flat hues are 136 apart and say exactly one thing each.
+     *
+     * The element colour is kept where it earns its place - the natal wheel, the chart being
+     * read. On an outer ring it was close to redundant anyway: a transiting Mars is fire
+     * because it is Mars, and the glyph already says so.
+     */
+    private static final Color BRIDGE_HUE = new Color(255, 210, 122);
+    private static final Color SKY_HUE = new Color(143, 208, 255);
+
+    /** A body's glyph colour on a given ring. ANCHOR keeps the element colour untouched. */
+    Color ringInk(int body, AngleRole role) {
+        if (role == AngleRole.ANCHOR) {
+            return this.bodyColor(body);
+        }
+        return role == AngleRole.BRIDGE ? BRIDGE_HUE : SKY_HUE;
+    }
+
+    /** The bead a ring's glyphs sit on, dark enough for its own ink to read against. */
+    static Color ringBead(AngleRole role) {
+        switch (role) {
+            case BRIDGE:
+                return new Color(62, 54, 38);
+            case SKY:
+                return new Color(24, 48, 74);
+            default:
+                return new Color(62, 66, 76);
+        }
+    }
+
+    /**
+     * The label colour for an angle on a ring - the same hue as its bodies.
+     *
+     * <b>Through ringInk, not beside it.</b> The angles and the bodies on one ring being two
+     * colour decisions is how the wheel got here: gold and blue existed for four glyphs a ring
+     * and nothing else. Body index -1 is not a body, and ANCHOR never reaches the branch that
+     * would use it.
+     */
+    Color ringAngleInk(AngleRole role) {
+        return role == AngleRole.ANCHOR ? new Color(255, 228, 160) : this.ringInk(-1, role);
+    }
+
     AngleRole angleRoleFor(boolean isSky, boolean isTransit) {
         if (isSky) {
             return AngleRole.SKY;
@@ -5652,6 +5707,23 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int discNatal = g.aspectDisc(0);
             int discOuter = g.aspectDisc(1);
             int discSky = g.aspectDisc(2);
+            // <b>One circle, where the lines stop and the bodies start.</b> Three nested
+            // fields of chords with nothing around them read as weather in the middle of the
+            // wheel; a single boundary at the natal band's floor turns them into a thing with
+            // an edge. Nothing has to be clipped to it: every chord has both ends on a disc
+            // inside this radius, so the widest line the wheel can draw is a diameter of the
+            // outermost field and still falls short of the circle around it.
+            //
+            // Alpha 190 rather than the 120 it was first drawn at. A circle sampled across ten
+            // spokes of the rendered wheel registered on six of them at 120, where every other
+            // ring line registered on ten - present in the file and absent to a reader, which
+            // is the one outcome a boundary cannot have. Still below the zodiac's full-weight
+            // strokes, because it marks an edge rather than another ring.
+            Color edge = SkymapPanel.inkColor();
+            graphics2D.setColor(new Color(edge.getRed(), edge.getGreen(), edge.getBlue(), 190));
+            graphics2D.setStroke(new BasicStroke(1.5f));
+            graphics2D.drawOval(n12 - g.natalFloor, n13 - g.natalFloor,
+                g.natalFloor * 2, g.natalFloor * 2);
             int n24 = n18 - 60;
             graphics2D.setStroke(new BasicStroke(0.5f));
             boolean bl = SkymapPanel.this.aspectFilter.equals("Natal-Natal") || SkymapPanel.this.aspectFilter.equals("Both");
@@ -5804,6 +5876,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     graphics2D.setComposite(
                         AlphaComposite.getInstance(AlphaComposite.SRC_OVER, outerA));
                 }
+                // The same question the angle cards ask, asked once for the whole ring: in a
+                // synastry this wheel is a second person, anywhere else it is a moment.
+                final AngleRole outerRole = SkymapPanel.this.angleRoleFor(false, true);
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
                     if (!SkymapPanel.this.tValid[n7]) continue;
                     double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.tLon[n7]);
@@ -5816,18 +5891,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                     if (Bodies.at(n7).isAngle()) {
                         graphics2D.setFont(ANGLE_FONT);
-                        this.drawBodyMarker(graphics2D, n4, n27, 13, new Color(94, 82, 46),
+                        this.drawBodyMarker(graphics2D, n4, n27, 13,
+                            SkymapPanel.ringBead(outerRole),
                             SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
-                        graphics2D.setColor(new Color(255, 228, 160));
+                        graphics2D.setColor(SkymapPanel.this.ringAngleInk(outerRole));
                         object = Bodies.at((int)n7).glyph;
                         graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n27 + 4);
                         continue;
                     }
                     GlyphSize glyphSize2 = SkymapPanel.transitSize(n7);
                     graphics2D.setFont(glyphSize2.font);
-                    object = SkymapPanel.lighten(SkymapPanel.this.bodyColor(n7), 0.45);
+                    object = SkymapPanel.this.ringInk(n7, outerRole);
                     this.drawBodyMarker(graphics2D, n4, n27, glyphSize2.radius,
-                        new Color(62, 66, 76),
+                        SkymapPanel.ringBead(outerRole),
                         SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
                     if (n7 == MOON && SkymapPanel.this.tValid[SUN]) {
                         double d13 = (SkymapPanel.this.tLon[MOON] - SkymapPanel.this.tLon[SUN]) % 360.0;
@@ -5860,18 +5936,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     int n28 = n13 + (int)((double)nArrayC[n7] * Math.sin(d14));
                     if (Bodies.at(n7).isAngle()) {
                         graphics2D.setFont(ANGLE_FONT);
-                        this.drawBodyMarker(graphics2D, n4, n28, 13, new Color(20, 60, 90),
-                            Settings.transitMarker());
-                        graphics2D.setColor(new Color(160, 210, 255));
+                        this.drawBodyMarker(graphics2D, n4, n28, 13,
+                            SkymapPanel.ringBead(AngleRole.SKY), Settings.transitMarker());
+                        graphics2D.setColor(SkymapPanel.this.ringAngleInk(AngleRole.SKY));
                         object = Bodies.at((int)n7).glyph;
                         graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n28 + 4);
                         continue;
                     }
                     GlyphSize glyphSize3 = SkymapPanel.transitSize(n7);
                     graphics2D.setFont(glyphSize3.font);
-                    Color cColor = SkymapPanel.lighten(SkymapPanel.this.bodyColor(n7), 0.6);
+                    Color cColor = SkymapPanel.this.ringInk(n7, AngleRole.SKY);
                     this.drawBodyMarker(graphics2D, n4, n28, glyphSize3.radius,
-                        new Color(20, 50, 80), Settings.transitMarker());
+                        SkymapPanel.ringBead(AngleRole.SKY), Settings.transitMarker());
                     if (n7 == MOON && SkymapPanel.this.cValid[SUN]) {
                         double d15 = (SkymapPanel.this.cLon[MOON] - SkymapPanel.this.cLon[SUN]) % 360.0;
                         if (d15 < 0.0) d15 += 360.0;

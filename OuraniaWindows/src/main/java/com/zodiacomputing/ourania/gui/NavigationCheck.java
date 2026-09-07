@@ -89,6 +89,12 @@ public final class NavigationCheck {
         report("Part F", before);
 
         System.out.println();
+        System.out.println("=== Part G: each ring's glyphs say which ring they are on ===");
+        before = failures.size();
+        ringColours();
+        report("Part G", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -633,6 +639,77 @@ public final class NavigationCheck {
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
+    }
+
+    /**
+     * A glyph has to say which chart it belongs to without being clicked.
+     *
+     * <b>Lightness is not a distinction.</b> Until 2026-09-06 all three rings drew the same
+     * element palette, differing only by how much it had been lightened - a Venus was a Venus
+     * and nothing on it said whose. Only the four angles per ring carried gold or blue.
+     *
+     * <b>The first attempt blended and this check is why it did not ship.</b> Mixing the
+     * element colour halfway to the ring's hue put the partner and sky rings 67 apart in RGB:
+     * different, and useless - a cyan Moon blended to gold comes out pale green, a red Sun
+     * blended to blue comes out grey, so neither ring read as its own colour either. Flat
+     * hues are 174 apart. The threshold below is set where the blended version fails.
+     */
+    private static void ringColours() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+            java.lang.reflect.Method ink = SkymapPanel.class.getDeclaredMethod(
+                "ringInk", int.class, SkymapPanel.AngleRole.class);
+            ink.setAccessible(true);
+            java.lang.reflect.Method bead = SkymapPanel.class.getDeclaredMethod(
+                "ringBead", SkymapPanel.AngleRole.class);
+            bead.setAccessible(true);
+            java.lang.reflect.Method bodyColor = SkymapPanel.class.getDeclaredMethod(
+                "bodyColor", int.class);
+            bodyColor.setAccessible(true);
+
+            for (int i = 0; i < com.zodiacomputing.ourania.astro.Bodies.count(); i++) {
+                java.awt.Color anchor =
+                    (java.awt.Color) ink.invoke(sky, i, SkymapPanel.AngleRole.ANCHOR);
+                java.awt.Color bridge =
+                    (java.awt.Color) ink.invoke(sky, i, SkymapPanel.AngleRole.BRIDGE);
+                java.awt.Color skyInk =
+                    (java.awt.Color) ink.invoke(sky, i, SkymapPanel.AngleRole.SKY);
+                String name = com.zodiacomputing.ourania.astro.Bodies.at(i).name;
+
+                // The natal wheel is where element colour earns its place - untouched.
+                ok("the natal wheel keeps " + name + "'s element colour",
+                    anchor.equals((java.awt.Color) bodyColor.invoke(sky, i)));
+                ok("the partner ring tells " + name + " apart from the sky ring: "
+                    + rgbGap(bridge, skyInk),
+                    rgbGap(bridge, skyInk) > 120);
+                ok("the partner ring tells " + name + " apart from the natal wheel",
+                    rgbGap(bridge, anchor) > 40);
+                ok("the sky ring tells " + name + " apart from the natal wheel",
+                    rgbGap(skyInk, anchor) > 40);
+            }
+
+            // The beads under the glyphs have to agree with them, or a gold glyph on the
+            // sky ring's bead is two claims about the same point.
+            java.awt.Color bBridge = (java.awt.Color) bead.invoke(null, SkymapPanel.AngleRole.BRIDGE);
+            java.awt.Color bSky = (java.awt.Color) bead.invoke(null, SkymapPanel.AngleRole.SKY);
+            ok("the beads differ between the two outer rings", rgbGap(bBridge, bSky) > 20);
+            ok("the partner bead is the warmer of the two",
+                bBridge.getRed() - bBridge.getBlue() > bSky.getRed() - bSky.getBlue());
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    /** Crude RGB distance - enough to say two colours are not the same colour. */
+    private static int rgbGap(java.awt.Color a, java.awt.Color b) {
+        int dr = a.getRed() - b.getRed();
+        int dg = a.getGreen() - b.getGreen();
+        int db = a.getBlue() - b.getBlue();
+        return (int) Math.round(Math.sqrt(dr * dr + dg * dg + db * db));
     }
 
     private static void set(Object target, String name, Object value) throws Exception {
