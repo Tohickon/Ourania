@@ -82,6 +82,12 @@ public final class GlobeCheck {
         report("Part K", before);
 
         System.out.println();
+        System.out.println("=== Part L: the mansion band fits, and names what it points at ===");
+        before = failures.size();
+        theMansionBand();
+        report("Part L", before);
+
+        System.out.println();
         System.out.println("=== Part J: a band is cut wherever it would lie across itself ===");
         before = failures.size();
         bandsDoNotCrossThemselves();
@@ -991,6 +997,149 @@ public final class GlobeCheck {
         java.lang.reflect.Field f = SkymapPanel.class.getDeclaredField(name);
         f.setAccessible(true);
         f.set(panel, value);
+    }
+
+    /**
+     * The lunar mansion band is whole at every angle, and answers with the right station.
+     *
+     * <b>Three things, and the first is the one that bit.</b> The band was first placed at
+     * 2.74 to 2.92, which looks right at the default tilt and reaches exactly a hundred per
+     * cent of the panel's half-width when the globe is turned edge-on - the view David
+     * specifically asked for. A ring that fits at one camera angle is not a ring that fits;
+     * this walks every pitch the reader can drag to and asks whether it is still on the panel.
+     *
+     * Second, the hit test has to agree with the engine: a point on the band at a longitude
+     * must resolve to the station LunarMansions puts that longitude in. The globe and the
+     * tables are two surfaces onto one fact, and this project's defects live in those seams.
+     *
+     * Third, the band has to clear the degree scale beneath it, including the one tick that
+     * grows when the reader points at it - the case that only appears while a cursor is
+     * somewhere, which is exactly the case a still frame never shows.
+     */
+    private static void theMansionBand() throws Exception {
+        int w = 1000;
+        int h = 1000;
+        double half = w / 2.0;
+
+        // 1. Whole at every angle. The threshold is typed out rather than derived from the
+        // shell, so moving the shell outward fails here instead of moving the goalposts.
+        double worst = 0;
+        double worstPitch = 0;
+        for (double pitch = 0.0; pitch <= Globe.MAX_PITCH + 1e-9; pitch += 0.02) {
+            Globe cam = new Globe();
+            cam.pitch = pitch;
+            // One assertion per angle rather than per sample: the sweep is here to find the
+            // worst reach, and forty-five thousand identical "it projects" checks would say
+            // nothing the count of failures could not, while making the suite too slow to run.
+            boolean whole = true;
+            for (double lon = 0; lon < 360; lon += 0.5) {
+                double[] pt = Globe.onShell(lon, 0.0, Globe.SHELL_MANSION_OUTER, 0.0);
+                Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                whole &= q.visible;
+                double reach = Math.max(Math.abs(q.x - half), Math.abs(q.y - half));
+                if (reach > worst) {
+                    worst = reach;
+                    worstPitch = pitch;
+                }
+            }
+            yes("the whole mansion band projects at pitch " + pitch, whole);
+        }
+        System.out.printf("  the band reaches %.0f px of %.0f at pitch %.2f (%.0f%%)%n",
+            worst, half, worstPitch, 100.0 * worst / half);
+        yes("the mansion band is whole at every angle the reader can drag to", worst < half);
+        yes("and keeps a margin, so a panel that is not square still holds it",
+            worst < half * 0.94);
+
+        // 2. It clears the degree scale, including the tick that grows under the cursor.
+        double tickInner = Globe.SHELL_SIGN_OUTER + 0.03;
+        yes("the longest degree tick stops short of the band",
+            tickInner + Globe.TICK_HOVER_REACH < Globe.SHELL_MANSION_INNER);
+        yes("a hovered tick is still the longest on the scale",
+            Globe.TICK_HOVER_REACH > 0.20);
+        yes("the band has depth to read as a band",
+            Globe.SHELL_MANSION_OUTER - Globe.SHELL_MANSION_INNER > 0.10);
+
+        // 3. What the cursor finds is the station the engine says it is standing in.
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+
+            // <b>Not while the ring is edge-on, and that is a fact about the view rather
+            // than a gap in the check.</b> A ring in the ecliptic plane seen from within that
+            // plane projects to a line: every longitude lands on the same few pixels, the far
+            // half lies on the near half, and the round trip below is asking the projection
+            // to be reversible when it is provably not. Part D learned this once already,
+            // comparing the two views edge-on and producing a hundred failures against code
+            // that was right; asserting it here would be the same mistake with a new name.
+            // What the reader sees at pitch 0 is a line of overlapping numbers - nothing
+            // legible to point at - so any station is as good an answer as any other.
+            Globe cam = new Globe();
+            double origin = panel.pinLongitude();
+            double mid = (Globe.SHELL_MANSION_INNER + Globe.SHELL_MANSION_OUTER) / 2.0;
+            int tested = 0;
+            for (double yaw : new double[] {0.0, 1.6, 3.3, 5.0}) {
+                cam.yaw = yaw;
+                for (double pitch : new double[] {0.32, 0.7, 1.1}) {
+                    cam.pitch = pitch;
+                    // Half a degree inside each station's edges as well as its middle, so a
+                    // boundary is tested from both sides rather than only the easy centre.
+                    for (int m = 1; m <= com.zodiacomputing.ourania.astro
+                            .LunarMansions.COUNT; m++) {
+                        double start = (m - 1) * com.zodiacomputing.ourania.astro
+                            .LunarMansions.WIDTH;
+                        double width = com.zodiacomputing.ourania.astro.LunarMansions.WIDTH;
+                        for (double at : new double[] {start + 0.4, start + width / 2.0,
+                                start + width - 0.4}) {
+                            double[] pt = Globe.onShell(at, origin, mid, 0.0);
+                            Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                            if (!q.visible) {
+                                continue;
+                            }
+                            int got = GlobeRenderer.mansionAt(cam, w, h, panel,
+                                (int) Math.round(q.x), (int) Math.round(q.y));
+                            int want = com.zodiacomputing.ourania.astro.LunarMansions
+                                .at(at).number;
+                            eq("a point at " + String.format("%.1f", at) + " degrees (yaw "
+                                + yaw + ", pitch " + pitch + ") is in its own station",
+                                want, got);
+                            tested++;
+                        }
+                    }
+                }
+            }
+            System.out.println("  " + tested + " points on the band resolved to a station");
+            yes("the band was actually walked", tested > 800);
+
+            // Edge-on, the band must still answer with a real station rather than with
+            // nothing or with nonsense - it is ambiguous there, not broken.
+            cam.pitch = 0.0;
+            cam.yaw = 0.0;
+            int answered = 0;
+            for (double at = 0.5; at < 360; at += 3.0) {
+                double[] pt = Globe.onShell(at, origin, mid, 0.0);
+                Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                if (!q.visible) {
+                    continue;
+                }
+                int got = GlobeRenderer.mansionAt(cam, w, h, panel,
+                    (int) Math.round(q.x), (int) Math.round(q.y));
+                yes("edge-on, a point on the band still names some station",
+                    got >= 1 && got <= com.zodiacomputing.ourania.astro.LunarMansions.COUNT);
+                answered++;
+            }
+            yes("the edge-on sweep reached the band", answered > 100);
+
+            // And the middle of the globe is not on the band, at any angle.
+            cam.pitch = 0.32;
+            yes("the centre of the view is not a station",
+                GlobeRenderer.mansionAt(cam, w, h, panel, w / 2, h / 2) < 0);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
     }
 
     /**

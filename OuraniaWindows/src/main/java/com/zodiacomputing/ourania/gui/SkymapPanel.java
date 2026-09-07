@@ -868,6 +868,43 @@ extends JPanel {
      */
     private int focusHouse = -1;
 
+    /**
+     * The lunar mansion the cursor is over, 1 to 28, or -1.
+     *
+     * Beside focusDegree and focusHouse for the reason those are beside each other: a station
+     * is a fourth thing to be pointing at, and which of the four a hover means depends on
+     * where the cursor is rather than on a mode.
+     */
+    private int focusMansion = -1;
+
+    /** The mansion the cursor is over, for the globe's band to light. */
+    int focusedMansion() {
+        return this.focusMansion;
+    }
+
+    /** Records the mansion under the cursor. True when it changed and a repaint is due. */
+    boolean setFocusMansion(int mansion) {
+        if (this.focusMansion == mansion) {
+            return false;
+        }
+        this.focusMansion = mansion;
+        return true;
+    }
+
+    /**
+     * Which station the Moon is in, or null when there is no Moon to place.
+     *
+     * <b>Asked once, because two rings draw it.</b> The flat wheel fills the Moon's station
+     * and the globe's band does the same, and a second copy of "which Moon" is how the two
+     * views come to disagree about the one station that is highlighted - the defect this
+     * project keeps finding in the seams between surfaces rather than in the arithmetic.
+     */
+    com.zodiacomputing.ourania.astro.LunarMansions.Mansion moonMansion() {
+        com.zodiacomputing.ourania.astro.ChartFrame frame = this.getCurrentChart();
+        return frame == null ? null
+            : com.zodiacomputing.ourania.astro.LunarMansions.ofMoon(frame);
+    }
+
     /** The house the cursor is over, for the globe to carve. */
     int focusedHouse() {
         return this.focusHouse;
@@ -2337,8 +2374,16 @@ extends JPanel {
                     int deg = over >= 0 || house >= 0 ? -1
                         : GlobeRenderer.degreeAt(SkymapPanel.this.globe, w2, h2,
                             SkymapPanel.this, x, y);
+                    // The mansion band is outside the degree scale, so the two never contend
+                    // for a pixel - but it is asked last for the same reason the others are
+                    // ordered: whatever lights under the cursor is what opens when it is
+                    // clicked, and the click asks in this order too.
+                    int station = over >= 0 || house >= 0 || deg >= 0 ? -1
+                        : GlobeRenderer.mansionAt(SkymapPanel.this.globe, w2, h2,
+                            SkymapPanel.this, x, y);
                     boolean moved = SkymapPanel.this.setFocusDegree(deg);
                     moved |= SkymapPanel.this.setFocusHouse(house);
+                    moved |= SkymapPanel.this.setFocusMansion(station);
                     if (SkymapPanel.this.setFocus(over) || moved) {
                         SkymapPanel.this.chartPanel.repaint();
                     }
@@ -3633,6 +3678,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 if (deg >= 0 && this.window != null) {
                     this.window.showInterpretationForSabianSymbol(
                         SIGN_NAMES[(deg / 30) % 12], deg % 30 + 1);
+                    return;
+                }
+                int station = GlobeRenderer.mansionAt(this.globe, this.chartPanel.getWidth(),
+                    this.chartPanel.getHeight(), this, n, n2);
+                if (station >= 1 && this.window != null) {
+                    this.window.showInterpretationForMansion(station);
                 }
                 return;
             }
@@ -5151,10 +5202,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         try {
             java.util.List<com.zodiacomputing.ourania.astro.LunarMansions.Mansion> all =
                 com.zodiacomputing.ourania.astro.LunarMansions.all();
-            com.zodiacomputing.ourania.astro.ChartFrame frame = this.getCurrentChart();
             com.zodiacomputing.ourania.astro.LunarMansions.Mansion moonMansion =
-                frame == null ? null
-                    : com.zodiacomputing.ourania.astro.LunarMansions.ofMoon(frame);
+                this.moonMansion();
 
             int bandOuter = outer;
             int bandInner = outer - 9;

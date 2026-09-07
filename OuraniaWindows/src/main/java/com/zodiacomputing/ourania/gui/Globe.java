@@ -55,6 +55,33 @@ final class Globe {
     static final double SHELL_TICK = 2.42;
 
     /**
+     * How far a hovered degree tick stands out of the scale.
+     *
+     * <b>Named because the mansion band is placed against it.</b> It was 0.34, which put the
+     * reach of the ticks at 2.67 and left no room outside them for another ring that the panel
+     * could still hold. At 0.21 the lit tick is still the longest on the scale - a sign
+     * boundary reaches 0.20 - and it stops a hair short of the band rather than crossing it.
+     */
+    static final double TICK_HOVER_REACH = 0.21;
+
+    /**
+     * The lunar mansion band, outside everything else.
+     *
+     * <b>Sized by what the panel can hold, measured rather than chosen.</b> The first attempt
+     * put it at 2.74 to 2.92, which looked right at the default tilt and reached exactly 100%
+     * of the panel's half-width when the globe is turned edge-on - the view David asked for.
+     * A probe sweeping every pitch the reader can drag to puts 2.70 at 90% and 2.92 at 100%,
+     * so this is the outermost the ring can sit and still be whole at every angle.
+     *
+     * The inner edge clears the degree scale: the ticks start at SHELL_SIGN_OUTER + 0.03 and
+     * the longest of them reaches TICK_HOVER_REACH beyond that, which is 2.54.
+     */
+    static final double SHELL_MANSION_INNER = 2.55;
+
+    /** The outside of that band. */
+    static final double SHELL_MANSION_OUTER = 2.70;
+
+    /**
      * How far above and below the equator a filled shell reaches, in radians of latitude.
      *
      * <b>All the way to the poles, so the sphere is closed.</b> This stopped at 1.02 radians

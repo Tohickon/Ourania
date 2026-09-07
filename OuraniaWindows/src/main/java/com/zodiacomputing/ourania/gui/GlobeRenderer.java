@@ -1,6 +1,7 @@
 package com.zodiacomputing.ourania.gui;
 
 import com.zodiacomputing.ourania.astro.Bodies;
+import com.zodiacomputing.ourania.astro.LunarMansions;
 import com.zodiacomputing.ourania.astro.Zodiac;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -120,6 +121,7 @@ final class GlobeRenderer {
         if (r.shown(SkymapPanel.Layer.DEGREES)) {
             r.degreeRing();
         }
+        r.mansionRing();
         if (r.shown(SkymapPanel.Layer.SIGNS)) {
             r.zodiacBand();
             r.signMeridians();
@@ -710,6 +712,103 @@ final class GlobeRenderer {
         return best;
     }
 
+    /**
+     * The lunar station under a point, 1 to 28, or -1.
+     *
+     * <b>Sampled along the arc rather than at a label.</b> The house numbers are hit-tested at
+     * the number itself, which is right for twelve of them - a house is read by its number and
+     * the number is what a reader points at. Twenty-eight stations in one thin band is a
+     * different problem: the numbers are small and close, and pointing at the band is the
+     * natural gesture. Sampling every degree across each station means anywhere on the band
+     * answers, and it needs no inverse projection - which is what keeps this honest under a
+     * camera the reader can turn to any angle.
+     */
+    static int mansionAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+        double origin = panel.pinLongitude();
+        double mid = (Globe.SHELL_MANSION_INNER + Globe.SHELL_MANSION_OUTER) / 2.0;
+        int best = -1;
+        double bestDist = 13.0;
+        for (int m = 1; m <= LunarMansions.COUNT; m++) {
+            double start = (m - 1) * LunarMansions.WIDTH;
+            for (double step = 0.5; step < LunarMansions.WIDTH; step += 1.0) {
+                double[] pt = Globe.onShell(start + step, origin, mid, 0.0);
+                Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                if (!q.visible) {
+                    continue;
+                }
+                double dist = Math.hypot(q.x - px, q.y - py);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = m;
+                }
+            }
+        }
+        return best;
+    }
+
+    /**
+     * The 28 lunar mansions, as the outermost band of the globe.
+     *
+     * <b>The flat wheel has had them all along and the globe had nothing.</b> Every other
+     * division of the zodiac this chart draws - signs, decans, bounds, degrees - was on the
+     * sphere already; the mansions were the one ring a reader could find in one view and not
+     * the other, which makes switching views lose information rather than change how it is
+     * shown.
+     *
+     * Drawn in the plane, like the degree scale and the sign ring, because a station is a span
+     * of longitude and nothing else - it says nothing about latitude, so wrapping it around
+     * the sphere would be claiming something the tradition does not.
+     *
+     * <b>Not folded by a chip, because the flat wheel's is not either.</b> The mansion ring is
+     * drawn unconditionally there, so gating this one would make the same button mean two
+     * things in two views.
+     */
+    private void mansionRing() {
+        double inner = Globe.SHELL_MANSION_INNER;
+        double outer = Globe.SHELL_MANSION_OUTER;
+        double mid = (inner + outer) / 2.0;
+        // The one hue, from the one place the flat ring reads it, so the two bands cannot
+        // drift to different lavenders.
+        Color base = ChartPalette.colorOr(ChartPalette.mansionHex(null),
+            new Color(181, 160, 227));
+        LunarMansions.Mansion moon = this.panel.moonMansion();
+        int lit = this.panel.focusedMansion();
+
+        // The Moon's own station, washed in first so the boundaries sit on top of it.
+        if (moon != null) {
+            quadRing(moon.start, moon.end(), inner, outer, shade(base, 70));
+        }
+        // And the station under the cursor, brighter, plus its slice of the sphere - the same
+        // answer a hovered degree tick gives, for the same reason: a band that lights only its
+        // own thickness is pointing at itself rather than at the sky it names.
+        if (lit >= 1) {
+            LunarMansions.Mansion m = LunarMansions.byNumber(lit);
+            quadRing(m.start, m.end(), inner, outer, shade(base, 130));
+            wedgeOnSphere(m.start, m.end(), Globe.SHELL_SIGN_INNER + 0.09, shade(base, 60));
+        }
+
+        // The band's two edges, so the stations read as divisions of something.
+        polyline(Globe.equator(this.origin, inner, 144), shade(base, 130), 1.0f);
+        polyline(Globe.equator(this.origin, outer, 144), shade(base, 130), 1.0f);
+
+        for (int i = 1; i <= LunarMansions.COUNT; i++) {
+            LunarMansions.Mansion m = LunarMansions.byNumber(i);
+            boolean here = i == lit;
+            boolean moonHere = moon != null && moon.number == i;
+            segment(Globe.onShell(m.start, this.origin, inner, 0.0),
+                Globe.onShell(m.start, this.origin, outer, 0.0),
+                shade(base, here || moonHere ? 235 : 150),
+                here ? 2.0f : (moonHere ? 1.6f : 0.9f));
+            // The number sits in the middle of the station, not on its cusp - a boundary
+            // belongs to neither side and a number on one reads as labelling both.
+            billboard(Globe.onShell(m.start + LunarMansions.WIDTH / 2.0, this.origin, mid, 0.0),
+                String.valueOf(i),
+                here ? new Color(255, 255, 255, 245)
+                    : (moonHere ? shade(base, 245) : shade(base, 185)),
+                here ? 11 : 9);
+        }
+    }
+
     private void degreeRing() {
         // <b>Outside the signs, where a scale belongs.</b> It sat inside the sign band, which
         // put the finest division of the zodiac underneath the coarsest and left the ticks
@@ -724,7 +823,8 @@ final class GlobeRenderer {
             // <b>The hovered tick stands out of the scale.</b> A degree is a hair's width on a
             // ring of three hundred and sixty, so brightening one is not enough to find it -
             // it has to be longer than its neighbours to be the one the reader is pointing at.
-            double depth = here ? 0.34 : (sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.05)));
+            double depth = here ? Globe.TICK_HOVER_REACH
+                : (sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.05)));
             Color ink = here ? new Color(255, 238, 170, 245)
                 : (sign ? new Color(214, 218, 226, 225)
                     : (ten ? new Color(172, 178, 190, 195) : new Color(138, 144, 156, 150)));
@@ -744,7 +844,7 @@ final class GlobeRenderer {
         if (lit >= 0) {
             wedgeOnSphere(lit, lit + 1.0, Globe.SHELL_SIGN_INNER + 0.09,
                 faded(new Color(255, 238, 170, 96), SkymapPanel.Layer.DEGREES));
-            quadRing(lit, lit + 1.0, 0.10, inner + 0.34,
+            quadRing(lit, lit + 1.0, 0.10, inner + Globe.TICK_HOVER_REACH,
                 faded(new Color(255, 238, 170, 70), SkymapPanel.Layer.DEGREES));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
