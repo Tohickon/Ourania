@@ -305,7 +305,7 @@ extends JPanel {
      * Natal is here rather than fixed because David asked for it to fold like the others, and
      * it can: hiding the natal glyphs does not stop the chart being a natal chart.
      */
-    enum Layer { NATAL, DEGREES, SIGNS, DECANS, BOUNDS, HOUSES, ASPECTS }
+    enum Layer { NATAL, DEGREES, SIGNS, DECANS, BOUNDS, MANSIONS, HOUSES, ASPECTS }
 
     private final java.util.EnumMap<Layer, Bloom> layerBlooms =
         new java.util.EnumMap<>(Layer.class);
@@ -4081,7 +4081,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // it, n9-15 to n9-9, where nothing is drawn - it is a per-degree reading with no ring
         // of its own, so it loses the contested pixels rather than the feature that has a
         // ring drawn on them.
-        if (SkymapPanel.inMansionBand(d6, n9)) {
+        // Gated on the layer, so a folded ring is not a ring you can still click. A hit test
+        // that outlives what it tests is the flat wheel's version of a glyph you can see and
+        // cannot click - the same defect from the other end.
+        if (this.layerShown(Layer.MANSIONS) && SkymapPanel.inMansionBand(d6, n9)) {
             this.window.showInterpretationForMansion(
                 com.zodiacomputing.ourania.astro.LunarMansions.at(d9).number);
             return;
@@ -6670,7 +6673,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // is load-bearing: the glyph rings, the hit test and natalRadii all derive from
             // the same chain, so carving out a new band would move the bodies. This band holds
             // only tick marks, so the mansions can share it without anything else shifting.
-            SkymapPanel.this.drawMansionRing(graphics2D, n12, n13, n14, d4);
+            if (SkymapPanel.this.layerShown(Layer.MANSIONS)) {
+                SkymapPanel.this.drawMansionRing(graphics2D, n12, n13, n14, d4);
+            }
 
             graphics2D.setFont(new Font("SansSerif", 0, 22));
             for (n8 = 0; SkymapPanel.this.layerShown(Layer.SIGNS) && n8 < 12; ++n8) {

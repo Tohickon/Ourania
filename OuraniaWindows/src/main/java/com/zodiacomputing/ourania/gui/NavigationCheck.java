@@ -92,6 +92,13 @@ public final class NavigationCheck {
         everyRingBandAnswers();
         report("Part I - every drawn ring answers a click, and every chord a hover", before);
 
+
+        before = failures.size();
+
+        oneChipFoldsBothViews();
+
+        report("Part J - one chip folds the mansions in both views", before);
+
         System.out.println();
         System.out.println("=== Part G: each ring's glyphs say which ring they are on ===");
         before = failures.size();
@@ -623,6 +630,199 @@ public final class NavigationCheck {
      * The second walks a real tri-wheel and asks the panel what is under a point on each ring's
      * chords - which is the assertion the sky ring could not have passed.
      */
+    /**
+     * The mansion chip folds the ring in the flat wheel and on the globe, and nothing else.
+     *
+     * <b>One rule, two painters, two hit tests - which is four places to forget.</b> The
+     * mansion ring was drawn unconditionally in both views, matching each other and matching
+     * nothing else: every ring beside it could be put away and this one could not. Wiring a
+     * chip to it means the flat wheel's painter, the globe's painter, the flat wheel's click
+     * band and the globe's hit test all have to read the same layer, and a chip that folds
+     * three of the four is worse than no chip at all - the reader puts the ring away and it
+     * still answers a click, or it vanishes from one view and stays in the other.
+     *
+     * The flat half is checked by painting the wheel twice and comparing: folding has to
+     * change the outer rim and leave the rest of the chart alone, which is the "hides it and
+     * changes nothing else" contract stated as pixels rather than as intent.
+     */
+    private static void oneChipFoldsBothViews() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+            boolean[] every = new boolean[com.zodiacomputing.ourania.astro.Bodies.ALL.length];
+            java.util.Arrays.fill(every, true);
+            set(sky, "shown", every);
+            SwingUtilities.invokeAndWait(() -> w[0].applyChartSettings(
+                "1972-09-22", "18:38", "Los Angeles, USA", ChartMode.TRANSIT,
+                "2026-09-06", "12:00", "Philadelphia, USA", true, false, "", ""));
+            awaitChart(sky, false);
+            Settings.setAnimateRings(false);
+            try {
+                java.awt.Component wheel = sky.chartComponent();
+                final int size = 1100;
+                SwingUtilities.invokeAndWait(() -> {
+                    wheel.setSize(size, size);
+                    wheel.doLayout();
+                });
+
+                ok("the mansion layer starts open",
+                    sky.layerWanted(SkymapPanel.Layer.MANSIONS)
+                        && sky.layerShown(SkymapPanel.Layer.MANSIONS));
+
+                java.awt.image.BufferedImage open = flatFrame(wheel, size);
+                SwingUtilities.invokeAndWait(
+                    () -> sky.setLayer(SkymapPanel.Layer.MANSIONS, false));
+                ok("the chip folds it", !sky.layerShown(SkymapPanel.Layer.MANSIONS));
+                java.awt.image.BufferedImage folded = flatFrame(wheel, size);
+
+                // Where the two frames differ, and how far out those pixels are.
+                //
+                // The window is the band plus a few pixels inward, because the station numbers
+                // are centred in a band nine pixels deep and drawn at nine points - a glyph
+                // taller than the band it sits in, overhanging its inner edge by two. Measured
+                // rather than assumed: the first window stopped at the band and this reported
+                // forty-three strays at radius 527 to 529, which is the numbers and nothing
+                // else. Widening it to hide a real leak would be the wrong move; widening it
+                // to describe the shape that is actually drawn is the right one.
+                int[] rings = SkymapPanel.ringRadii(size, size, 1.0, 1.0);
+                int outer = rings[SkymapPanel.RING_OUTER];
+                int changed = 0;
+                int strayed = 0;
+                double strayLo = Double.MAX_VALUE;
+                double strayHi = 0;
+                double half = size / 2.0;
+                for (int y = 0; y < size; y++) {
+                    for (int x = 0; x < size; x++) {
+                        if (open.getRGB(x, y) == folded.getRGB(x, y)) {
+                            continue;
+                        }
+                        changed++;
+                        // A pixel of the band, allowing a pixel of antialiasing either side.
+                        double r = Math.hypot(x - half, y - half);
+                        if (r < outer - 15 || r > outer + 2) {
+                            strayed++;
+                            strayLo = Math.min(strayLo, r);
+                            strayHi = Math.max(strayHi, r);
+                        }
+                    }
+                }
+                System.out.println("  folding the mansions changed " + changed
+                    + " pixels of the flat wheel, " + strayed + " of them outside the band"
+                    + (strayed == 0 ? "" : String.format(" (radius %.0f to %.0f, band is %d to %d)",
+                        strayLo, strayHi, outer - 15, outer + 2)));
+                ok("folding the mansions changes the flat wheel", changed > 500);
+                ok("and changes nothing outside the band it draws", strayed == 0);
+
+                // The flat wheel's click band goes with it.
+                java.lang.reflect.Method inBand = SkymapPanel.class.getDeclaredMethod(
+                    "inMansionBand", double.class, int.class);
+                inBand.setAccessible(true);
+                ok("the band the click reads is the band that was drawn",
+                    (Boolean) inBand.invoke(null, (double) (outer - 4), outer));
+
+                // And the globe's hit test, which is the half that could silently outlive it.
+                Globe cam = new Globe();
+                double origin = sky.pinLongitude();
+                double mid = (Globe.SHELL_MANSION_INNER + Globe.SHELL_MANSION_OUTER) / 2.0;
+                double[] pt = Globe.onShell(40.0, origin, mid, 0.0);
+                Globe.Projected q = cam.project(pt[0], pt[1], pt[2], size, size);
+                ok("the sample point is on screen", q.visible);
+                int px = (int) Math.round(q.x);
+                int py = (int) Math.round(q.y);
+                ok("a folded band answers no hover on the globe",
+                    GlobeRenderer.mansionAt(cam, size, size, sky, px, py) < 0);
+
+                SwingUtilities.invokeAndWait(
+                    () -> sky.setLayer(SkymapPanel.Layer.MANSIONS, true));
+                ok("the chip brings it back", sky.layerShown(SkymapPanel.Layer.MANSIONS));
+                ok("and the globe answers again",
+                    GlobeRenderer.mansionAt(cam, size, size, sky, px, py) >= 1);
+
+                java.awt.image.BufferedImage back = flatFrame(wheel, size);
+                int stillDifferent = 0;
+                for (int y = 0; y < size; y++) {
+                    for (int x = 0; x < size; x++) {
+                        if (open.getRGB(x, y) != back.getRGB(x, y)) {
+                            stillDifferent++;
+                        }
+                    }
+                }
+                ok("unfolding puts the wheel back exactly as it was", stillDifferent == 0);
+            } finally {
+                Settings.setAnimateRings(true);
+            }
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    /**
+     * Waits for the chart worker to finish, rather than sleeping and hoping.
+     *
+     * <b>A check whose totals move is a check that is measuring the machine.</b> These parts
+     * slept a fixed six or seven seconds after asking for a chart, which is long enough on an
+     * idle machine and not long enough while a compile is running: the same suite reported 417
+     * chords under the cursor on one run and 87 on the next, and passed both times because its
+     * assertions are per-ring rather than per-count. The assertions were fine; the sample was
+     * not, and a sample that shrinks by four fifths is not testing what it claims to.
+     *
+     * GlobeCheck Part E had this exact defect and was fixed the same way. Waiting on the
+     * arrays being populated, then letting the blooms settle, makes the count repeatable.
+     */
+    private static void awaitChart(SkymapPanel sky, boolean needSky) throws Exception {
+        // <b>Populated is not the same as finished.</b> Waiting for the arrays to be non-empty
+        // still caught the worker mid-flight - the sample came back 417, 417, then 407 - so
+        // this waits for the counts to stop moving, which is the only signal from outside that
+        // says the work is done rather than merely started.
+        long deadline = System.currentTimeMillis() + 40000;
+        String last = "";
+        int steady = 0;
+        while (System.currentTimeMillis() < deadline) {
+            String now = live(sky.bValid) + "/" + live(sky.tValid) + "/" + live(sky.cValid);
+            boolean enough = live(sky.bValid) > 0 && live(sky.tValid) > 0
+                && (!needSky || live(sky.cValid) > 0);
+            steady = now.equals(last) ? steady + 1 : 0;
+            last = now;
+            if (enough && steady >= 5) {
+                break;
+            }
+            Thread.sleep(100);
+        }
+        // The rings and layers animate open; a still taken mid-bloom is a still of a chart
+        // half drawn, and triRingDrawn is a bloom fraction rather than a flag.
+        Thread.sleep(1500);
+        ok("the chart under test finished computing: natal " + live(sky.bValid)
+            + ", outer " + live(sky.tValid) + ", sky " + live(sky.cValid),
+            live(sky.bValid) > 0 && live(sky.tValid) > 0
+                && (!needSky || live(sky.cValid) > 0));
+    }
+
+    private static int live(boolean[] valid) {
+        int n = 0;
+        for (boolean b : valid) {
+            if (b) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    /** One frame of the flat wheel, painted offscreen. */
+    private static java.awt.image.BufferedImage flatFrame(java.awt.Component wheel, int size)
+            throws Exception {
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(
+            size, size, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        SwingUtilities.invokeAndWait(() -> {
+            java.awt.Graphics2D g = img.createGraphics();
+            wheel.paint(g);
+            g.dispose();
+        });
+        return img;
+    }
+
     private static void everyRingBandAnswers() throws Exception {
         final OuraniaWindow[] w = new OuraniaWindow[1];
         SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
@@ -684,7 +884,7 @@ public final class NavigationCheck {
             SwingUtilities.invokeAndWait(() -> w[0].applyChartSettings(
                 "1972-09-22", "18:38", "Los Angeles, USA", ChartMode.SYNASTRY,
                 "1975-03-14", "09:20", "Philadelphia, USA", true, true, "", ""));
-            Thread.sleep(7000);
+            awaitChart(sky, true);
             java.awt.Component wheel = sky.chartComponent();
             SwingUtilities.invokeAndWait(() -> {
                 wheel.setSize(1100, 1100);

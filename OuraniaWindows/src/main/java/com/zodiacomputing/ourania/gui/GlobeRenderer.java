@@ -121,7 +121,9 @@ final class GlobeRenderer {
         if (r.shown(SkymapPanel.Layer.DEGREES)) {
             r.degreeRing();
         }
-        r.mansionRing();
+        if (r.shown(SkymapPanel.Layer.MANSIONS)) {
+            r.mansionRing();
+        }
         if (r.shown(SkymapPanel.Layer.SIGNS)) {
             r.zodiacBand();
             r.signMeridians();
@@ -724,6 +726,9 @@ final class GlobeRenderer {
      * camera the reader can turn to any angle.
      */
     static int mansionAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+        if (!panel.layerShown(SkymapPanel.Layer.MANSIONS)) {
+            return -1;
+        }
         double origin = panel.pinLongitude();
         double mid = (Globe.SHELL_MANSION_INNER + Globe.SHELL_MANSION_OUTER) / 2.0;
         int best = -1;
@@ -759,9 +764,10 @@ final class GlobeRenderer {
      * of longitude and nothing else - it says nothing about latitude, so wrapping it around
      * the sphere would be claiming something the tradition does not.
      *
-     * <b>Not folded by a chip, because the flat wheel's is not either.</b> The mansion ring is
-     * drawn unconditionally there, so gating this one would make the same button mean two
-     * things in two views.
+     * <b>Folded by its own chip, in both views.</b> It was drawn unconditionally in both to
+     * begin with, matching each other but matching nothing else - every neighbouring ring can
+     * be put away and this one could not. The chip drives Layer.MANSIONS, which the flat
+     * wheel's ring, this one, and both hit tests all read, so one button means one thing.
      */
     private void mansionRing() {
         double inner = Globe.SHELL_MANSION_INNER;
@@ -769,6 +775,10 @@ final class GlobeRenderer {
         double mid = (inner + outer) / 2.0;
         // The one hue, from the one place the flat ring reads it, so the two bands cannot
         // drift to different lavenders.
+        // <b>The fade goes on at each use, not once on the base.</b> shade() replaces an
+        // alpha rather than scaling it, so a base faded up front would have its bloom thrown
+        // away by the very next call - the ring would snap in and out instead of blooming
+        // with its chip the way every ring beside it does.
         Color base = ChartPalette.colorOr(ChartPalette.mansionHex(null),
             new Color(181, 160, 227));
         LunarMansions.Mansion moon = this.panel.moonMansion();
@@ -776,20 +786,20 @@ final class GlobeRenderer {
 
         // The Moon's own station, washed in first so the boundaries sit on top of it.
         if (moon != null) {
-            quadRing(moon.start, moon.end(), inner, outer, shade(base, 70));
+            quadRing(moon.start, moon.end(), inner, outer, wash(base, 70));
         }
         // And the station under the cursor, brighter, plus its slice of the sphere - the same
         // answer a hovered degree tick gives, for the same reason: a band that lights only its
         // own thickness is pointing at itself rather than at the sky it names.
         if (lit >= 1) {
             LunarMansions.Mansion m = LunarMansions.byNumber(lit);
-            quadRing(m.start, m.end(), inner, outer, shade(base, 130));
-            wedgeOnSphere(m.start, m.end(), Globe.SHELL_SIGN_INNER + 0.09, shade(base, 60));
+            quadRing(m.start, m.end(), inner, outer, wash(base, 130));
+            wedgeOnSphere(m.start, m.end(), Globe.SHELL_SIGN_INNER + 0.09, wash(base, 60));
         }
 
         // The band's two edges, so the stations read as divisions of something.
-        polyline(Globe.equator(this.origin, inner, 144), shade(base, 130), 1.0f);
-        polyline(Globe.equator(this.origin, outer, 144), shade(base, 130), 1.0f);
+        polyline(Globe.equator(this.origin, inner, 144), wash(base, 130), 1.0f);
+        polyline(Globe.equator(this.origin, outer, 144), wash(base, 130), 1.0f);
 
         for (int i = 1; i <= LunarMansions.COUNT; i++) {
             LunarMansions.Mansion m = LunarMansions.byNumber(i);
@@ -797,16 +807,21 @@ final class GlobeRenderer {
             boolean moonHere = moon != null && moon.number == i;
             segment(Globe.onShell(m.start, this.origin, inner, 0.0),
                 Globe.onShell(m.start, this.origin, outer, 0.0),
-                shade(base, here || moonHere ? 235 : 150),
+                wash(base, here || moonHere ? 235 : 150),
                 here ? 2.0f : (moonHere ? 1.6f : 0.9f));
             // The number sits in the middle of the station, not on its cusp - a boundary
             // belongs to neither side and a number on one reads as labelling both.
             billboard(Globe.onShell(m.start + LunarMansions.WIDTH / 2.0, this.origin, mid, 0.0),
                 String.valueOf(i),
-                here ? new Color(255, 255, 255, 245)
-                    : (moonHere ? shade(base, 245) : shade(base, 185)),
+                here ? wash(new Color(255, 255, 255), 245)
+                    : (moonHere ? wash(base, 245) : wash(base, 185)),
                 here ? 11 : 9);
         }
+    }
+
+    /** One of the mansion band's inks, at the alpha it wants and the bloom it is at. */
+    private Color wash(Color c, int alpha) {
+        return faded(shade(c, alpha), SkymapPanel.Layer.MANSIONS);
     }
 
     private void degreeRing() {

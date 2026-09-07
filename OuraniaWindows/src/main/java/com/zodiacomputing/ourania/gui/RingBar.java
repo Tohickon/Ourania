@@ -109,6 +109,8 @@ public final class RingBar extends JPanel {
             "The thirty-six decans, in whichever scheme Settings has chosen.");
         addLayer("Bounds", SkymapPanel.Layer.BOUNDS,
             "The Egyptian terms - five rulers to a sign.");
+        addLayer("Mansions", SkymapPanel.Layer.MANSIONS,
+            "The 28 lunar mansions - the Moon's nightly stations.");
         addLayer("Houses", SkymapPanel.Layer.HOUSES,
             "The twelve cusps and their numbers.");
         addLayer("Aspects", SkymapPanel.Layer.ASPECTS,
