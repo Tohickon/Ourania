@@ -261,6 +261,18 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /** Folds or unfolds one drawn layer of the chart. */
+    public void toggleLayer(SkymapPanel.Layer layer) {
+        if (skymapPanel != null) {
+            skymapPanel.setLayer(layer, !skymapPanel.layerWanted(layer));
+        }
+    }
+
+    /** Whether a drawn layer is currently open, for the chip that folds it. */
+    public boolean isLayerOpen(SkymapPanel.Layer layer) {
+        return skymapPanel == null || skymapPanel.layerWanted(layer);
+    }
+
     /**
      * Shows the chart flat or as a globe.
      *

@@ -285,6 +285,46 @@ extends JPanel {
      */
     private boolean globeMode;
 
+    /**
+     * The layers of the chart the reader can fold away, each with its own bloom.
+     *
+     * <b>Partner and Sky are not here, and that is the distinction.</b> Those two change what
+     * the chart <i>is</i> - opening the partner ring makes it a synastry, and the engine has to
+     * be told - so they go through ChartMode and keep the blooms that already drive the bands.
+     * These change only what is <i>drawn</i>. Mixing the two would put a second writer on the
+     * mode, which is the defect this panel has shipped twice.
+     *
+     * Natal is here rather than fixed because David asked for it to fold like the others, and
+     * it can: hiding the natal glyphs does not stop the chart being a natal chart.
+     */
+    enum Layer { NATAL, DEGREES, SIGNS, DECANS, BOUNDS, HOUSES, ASPECTS }
+
+    private final java.util.EnumMap<Layer, Bloom> layerBlooms =
+        new java.util.EnumMap<>(Layer.class);
+
+    /** How far a layer is open, 0 folded to 1 shown. */
+    double layerOpen(Layer layer) {
+        Bloom b = this.layerBlooms.get(layer);
+        return b == null ? 1.0 : b.value();
+    }
+
+    /** Whether a layer is drawn at all - folded layers are skipped rather than drawn at zero. */
+    boolean layerShown(Layer layer) {
+        return this.layerOpen(layer) > 0.004;
+    }
+
+    /** Whether the reader has this layer open, whatever the bloom is doing this instant. */
+    boolean layerWanted(Layer layer) {
+        Bloom b = this.layerBlooms.get(layer);
+        return b == null || b.opening();
+    }
+
+    /** Folds or unfolds a layer, animating either way. */
+    void setLayer(Layer layer, boolean open) {
+        this.layerBlooms.computeIfAbsent(layer,
+            k -> new Bloom(true, this::repaintWheel)).set(open);
+    }
+
     /** The camera, kept across a switch so returning to the globe finds it where it was. */
     private final Globe globe = new Globe();
 
@@ -786,6 +826,27 @@ extends JPanel {
 
     private static Color unusedAspectInkTail() {
         return null;
+    }
+
+    /** The body the cursor is resting on, or -1. Read by the globe to light its wedges. */
+    int focusedBody() {
+        return this.focusBody;
+    }
+
+    /**
+     * The focused body's longitude, or NaN when nothing is focused.
+     *
+     * <b>From the array the focus is actually on.</b> focusTransit says which ring the cursor
+     * found the body on, and reading bLon regardless would light the sign a natal body of the
+     * same index happens to occupy - a wedge confidently highlighting the wrong sign, which
+     * is worse than not highlighting at all.
+     */
+    double focusedLongitude() {
+        if (this.focusBody < 0) {
+            return Double.NaN;
+        }
+        double[] lon = this.focusTransit ? this.tLon : this.bLon;
+        return this.focusBody < lon.length ? lon[this.focusBody] : Double.NaN;
     }
 
     /** Whether the globe should light this body - the cursor is resting on it. */

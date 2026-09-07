@@ -41,6 +41,9 @@ public final class RingBar extends JPanel {
     private final Chip partner;
     private final Chip sky;
     private final Chip globe;
+    private final java.util.List<Chip> layerChips = new java.util.ArrayList<>();
+    private final java.util.Map<Chip, SkymapPanel.Layer> layerOf =
+        new java.util.HashMap<>();
 
     private boolean partnerOpen;
     private boolean skyOpen;
@@ -52,8 +55,14 @@ public final class RingBar extends JPanel {
         setLayout(new FlowLayout(FlowLayout.LEFT, 6, 2));
         setOpaque(false);
 
-        Chip natal = new Chip("Natal", null);
-        natal.fixed = true;
+        // <b>Natal folds now too.</b> It was fixed on the reasoning that a chart without it
+        // is not a chart - true of the data and not of the drawing, and a reader comparing two
+        // partners over one sky has good reason to take the anchor out of the picture for a
+        // moment. It folds what is drawn; the chart stays a natal chart.
+        Chip natal = layerChip("Natal", SkymapPanel.Layer.NATAL);
+        natal.setToolTipText("<html><b>Fold the natal wheel away.</b><br>"
+            + "The chart is still cast from it - this hides its glyphs, so a partner or the "
+            + "sky can be read on its own for a moment.</html>");
         add(natal);
 
         partner = new Chip("Partner", () -> {
@@ -85,10 +94,47 @@ public final class RingBar extends JPanel {
             }
         });
         globe.setToolTipText("<html><b>The same chart as nested shells.</b><br>"
-            + "Every ring becomes a sphere - natal inside, a partner around it, the sky on "
-            + "the outer skin - with the zodiac as a band at the equator.<br>"
+            + "Every ring becomes a sphere - natal inside, a partner around it, the sky "
+            + "around both - with the zodiac wrapped around all three.<br>"
             + "<i>Drag to turn, scroll to zoom.</i></html>");
         add(globe);
+
+        // The scaffolding layers. These change nothing about the chart, only what is drawn of
+        // it, so they never touch the mode - see the note on SkymapPanel.Layer.
+        addLayer("Degrees", SkymapPanel.Layer.DEGREES,
+            "The 360-degree scale around the outside.");
+        addLayer("Signs", SkymapPanel.Layer.SIGNS,
+            "The zodiac: its colour, its glyphs and its twelve boundaries.");
+        addLayer("Decans", SkymapPanel.Layer.DECANS,
+            "The thirty-six decans, in whichever scheme Settings has chosen.");
+        addLayer("Bounds", SkymapPanel.Layer.BOUNDS,
+            "The Egyptian terms - five rulers to a sign.");
+        addLayer("Houses", SkymapPanel.Layer.HOUSES,
+            "The twelve cusps and their numbers.");
+        addLayer("Aspects", SkymapPanel.Layer.ASPECTS,
+            "Every line between bodies in aspect.");
+    }
+
+    private void addLayer(String label, SkymapPanel.Layer layer, String what) {
+        Chip c = layerChip(label, layer);
+        c.setToolTipText("<html><b>" + label + "</b><br>" + what
+            + "<br><i>Folds away without changing the chart.</i></html>");
+        add(c);
+    }
+
+    /** A chip that folds one drawn layer. Its state lives on the panel, not here. */
+    private Chip layerChip(String label, SkymapPanel.Layer layer) {
+        Chip c = new Chip(label, null);
+        c.layer = layer;
+        c.onLayerClick = () -> {
+            if (window != null) {
+                window.toggleLayer(layer);
+            }
+            repaintChips();
+        };
+        layerChips.add(c);
+        layerOf.put(c, layer);
+        return c;
     }
 
     /** True when the wheel is currently drawn as a globe. */
@@ -129,6 +175,9 @@ public final class RingBar extends JPanel {
         partner.repaint();
         sky.repaint();
         globe.repaint();
+        for (Chip c : layerChips) {
+            c.repaint();
+        }
     }
 
     /** One ring, as a chip that reads as open or folded. */
@@ -137,6 +186,9 @@ public final class RingBar extends JPanel {
         String label;
         boolean fixed;
         boolean enabled = true;
+        /** Set on a chip that folds a drawn layer rather than opening a ring. */
+        SkymapPanel.Layer layer;
+        Runnable onLayerClick;
         private final Runnable onClick;
         private boolean hover;
 
@@ -144,6 +196,29 @@ public final class RingBar extends JPanel {
             this.label = label;
             this.onClick = onClick;
             setFont(Theme.SMALL);
+            if (onClick == null) {
+                setCursor(new Cursor(Cursor.HAND_CURSOR));
+                addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (onLayerClick != null) {
+                            onLayerClick.run();
+                        }
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        hover = true;
+                        repaint();
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        hover = false;
+                        repaint();
+                    }
+                });
+            }
             if (onClick != null) {
                 setCursor(new Cursor(Cursor.HAND_CURSOR));
                 addMouseListener(new MouseAdapter() {
@@ -170,6 +245,9 @@ public final class RingBar extends JPanel {
         }
 
         private boolean open() {
+            if (layer != null) {
+                return window == null || window.isLayerOpen(layer);
+            }
             if (fixed) {
                 return true;
             }

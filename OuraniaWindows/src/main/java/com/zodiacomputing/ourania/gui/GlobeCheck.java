@@ -64,6 +64,12 @@ public final class GlobeCheck {
         report("Part G", before);
 
         System.out.println();
+        System.out.println("=== Part H: folding a layer hides it and changes nothing else ===");
+        before = failures.size();
+        theLayers();
+        report("Part H", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -179,16 +185,23 @@ public final class GlobeCheck {
         // <b>The same order the flat wheel reads, outward.</b> Bounds inside the signs and
         // decans outside them is not decoration: it is the layout a reader already knows, and
         // a globe that put them the other way round would be a second thing to learn.
+        // <b>Every body ring inside the zodiac, and the zodiac inside its own scale.</b>
+        // The sky used to ride outside the sign plane, which put a transiting body outside the
+        // band that says which sign it is in.
         yes("the shells nest outward",
             Globe.SHELL_CORE < Globe.SHELL_NATAL
                 && Globe.SHELL_NATAL < Globe.SHELL_PARTNER
-                && Globe.SHELL_PARTNER < Globe.SHELL_HOUSE
+                && Globe.SHELL_PARTNER < Globe.SHELL_SKY
+                && Globe.SHELL_SKY < Globe.SHELL_HOUSE
                 && Globe.SHELL_HOUSE < Globe.SHELL_BOUND
                 && Globe.SHELL_BOUND < Globe.SHELL_SIGN_INNER
                 && Globe.SHELL_SIGN_INNER < Globe.SHELL_SIGN_OUTER
                 && Globe.SHELL_SIGN_OUTER < Globe.SHELL_DECAN
-                && Globe.SHELL_DECAN < Globe.SHELL_TICK
-                && Globe.SHELL_TICK < Globe.SHELL_SKY);
+                && Globe.SHELL_DECAN < Globe.SHELL_TICK);
+        yes("every body ring is inside the zodiac plane",
+            Globe.SHELL_SKY < Globe.SHELL_SIGN_INNER
+                && Globe.SHELL_PARTNER < Globe.SHELL_SIGN_INNER
+                && Globe.SHELL_NATAL < Globe.SHELL_SIGN_INNER);
         // <b>A filled shell closes the sphere.</b> It used to stop short, which left a
         // hole at each end; the cells at the pole degenerate to triangles and tile it.
         near("a filled shell reaches the pole", Math.PI / 2, Globe.FILL_SPAN, 1e-12);
@@ -600,6 +613,89 @@ public final class GlobeCheck {
             });
             eq("an emptied cache builds again", 1, calls[0]);
             eq("and hands back what was built", 5, rebuilt[0][1]);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * A folded layer stops being drawn, and the chart underneath it is untouched.
+     *
+     * <b>The whole point of the distinction.</b> Partner and Sky change what the chart is -
+     * opening the partner ring makes it a synastry and the engine has to be told - so they go
+     * through ChartMode. These layers change only what is drawn of it. If folding one moved
+     * the mode there would be a second writer on that field, which is the defect this panel
+     * has shipped twice: a control that quietly disagrees with the chart it drew.
+     *
+     * Also asserted: a layer folds gradually rather than blinking out, because that is what
+     * makes it read as folding away rather than as something failing to draw.
+     */
+    private static void theLayers() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+
+            java.lang.reflect.Field fm = SkymapPanel.class.getDeclaredField("chartMode");
+            fm.setAccessible(true);
+
+            // Everything starts open; a reader who has folded nothing sees the whole chart.
+            for (SkymapPanel.Layer layer : SkymapPanel.Layer.values()) {
+                yes(layer + " starts open", panel.layerWanted(layer));
+                yes(layer + " starts drawn", panel.layerShown(layer));
+                near(layer + " starts fully open", 1.0, panel.layerOpen(layer), 1e-9);
+            }
+
+            Settings.setAnimateRings(false);
+            try {
+                for (SkymapPanel.Layer layer : SkymapPanel.Layer.values()) {
+                    Object modeBefore = fm.get(panel);
+
+                    panel.setLayer(layer, false);
+                    yes(layer + " reports folded the moment it is asked",
+                        !panel.layerWanted(layer));
+                    yes(layer + " is not drawn once folded", !panel.layerShown(layer));
+                    near(layer + " is fully folded", 0.0, panel.layerOpen(layer), 1e-9);
+
+                    // <b>And nothing else moved.</b> A layer is a drawing decision.
+                    yes("folding " + layer + " leaves the chart mode alone",
+                        fm.get(panel) == modeBefore);
+
+                    // Its neighbours are untouched, so one chip cannot fold two things.
+                    for (SkymapPanel.Layer other : SkymapPanel.Layer.values()) {
+                        if (other != layer) {
+                            yes("folding " + layer + " leaves " + other + " open",
+                                panel.layerWanted(other));
+                        }
+                    }
+
+                    panel.setLayer(layer, true);
+                    yes(layer + " comes back", panel.layerWanted(layer)
+                        && panel.layerShown(layer));
+                }
+            } finally {
+                Settings.setAnimateRings(true);
+            }
+
+            // <b>It folds rather than blinking out.</b> With motion on, a layer caught
+            // mid-fold is partly there - which is what tells the reader it is leaving rather
+            // than that something failed to draw.
+            panel.setLayer(SkymapPanel.Layer.DECANS, false);
+            double partway = -1;
+            long deadline = System.currentTimeMillis() + 1500;
+            while (System.currentTimeMillis() < deadline) {
+                double v = panel.layerOpen(SkymapPanel.Layer.DECANS);
+                if (v > 0.05 && v < 0.95) {
+                    partway = v;
+                    break;
+                }
+                Thread.sleep(8);
+            }
+            yes("a folding layer passes through the middle, saw " + partway, partway > 0);
+            panel.setLayer(SkymapPanel.Layer.DECANS, true);
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }

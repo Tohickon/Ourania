@@ -50,14 +50,35 @@ final class GlobeRenderer {
     private final int w;
     private final int h;
     private final double origin;
+    private final SkymapPanel panel;
     private final List<Piece> pieces = new ArrayList<>();
 
-    private GlobeRenderer(Graphics2D g, Globe cam, int w, int h, double origin) {
+    private GlobeRenderer(Graphics2D g, Globe cam, int w, int h, double origin,
+                          SkymapPanel panel) {
         this.g = g;
         this.cam = cam;
         this.w = w;
         this.h = h;
         this.origin = origin;
+        this.panel = panel;
+    }
+
+    /**
+     * A colour faded by how far its layer is open.
+     *
+     * <b>Alpha rather than a flag, because a layer folds rather than vanishing.</b> Each layer
+     * carries a Bloom, so folding one is a movement the reader can follow - the same thing the
+     * ring blooms do to the bands, applied to everything else that is drawn. At zero the layer
+     * is skipped entirely, so a folded layer costs nothing to draw.
+     */
+    private Color faded(Color c, SkymapPanel.Layer layer) {
+        double open = this.panel.layerOpen(layer);
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(),
+            (int) Math.round(c.getAlpha() * open));
+    }
+
+    private boolean shown(SkymapPanel.Layer layer) {
+        return this.panel.layerShown(layer);
     }
 
     /**
@@ -72,7 +93,7 @@ final class GlobeRenderer {
     static void paint(Graphics2D g, Globe cam, int w, int h, SkymapPanel panel,
                       boolean turning) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        GlobeRenderer r = new GlobeRenderer(g, cam, w, h, panel.pinLongitude());
+        GlobeRenderer r = new GlobeRenderer(g, cam, w, h, panel.pinLongitude(), panel);
 
         double[] shells = shellRadii(panel);
         double natalR = shells[0];
@@ -91,18 +112,28 @@ final class GlobeRenderer {
         // drag from forty frames a second to twenty. Twenty is not a slow globe, it is a
         // globe that fights the hand moving it. The shells come back the moment the drag ends,
         // which is when a reader is actually looking at them rather than at the motion.
-        if (!turning) {
+        if (!turning && r.shown(SkymapPanel.Layer.SIGNS)) {
             r.signPlane();
         }
 
-        r.degreeRing();
-        r.zodiacBand();
-        r.boundRing();
-        r.decanRing();
-        r.houseMeridians(panel.activeCusps);
-        r.signMeridians();
-        r.houseNumbers(panel.activeCusps);
-        r.ringCircle(natalR, new Color(120, 132, 150, 90), 0.0);
+        r.focusWedges(panel);
+        if (r.shown(SkymapPanel.Layer.DEGREES)) {
+            r.degreeRing();
+        }
+        if (r.shown(SkymapPanel.Layer.SIGNS)) {
+            r.zodiacBand();
+            r.signMeridians();
+        }
+        if (r.shown(SkymapPanel.Layer.BOUNDS)) {
+            r.boundRing();
+        }
+        if (r.shown(SkymapPanel.Layer.DECANS)) {
+            r.decanRing();
+        }
+        if (r.shown(SkymapPanel.Layer.HOUSES)) {
+            r.houseMeridians(panel.activeCusps);
+            r.houseNumbers(panel.activeCusps);
+        }
         if (panel.outerRingDrawn()) {
             r.ringCircle(partnerR, new Color(190, 165, 110, 90), Globe.INCLINE_PARTNER);
         }
@@ -110,8 +141,14 @@ final class GlobeRenderer {
             r.ringCircle(skyR, new Color(120, 170, 215, 90), Globe.INCLINE_SKY);
         }
 
-        r.aspectChords(panel, shells);
-        r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel, false, 0);
+        if (r.shown(SkymapPanel.Layer.ASPECTS)) {
+            r.aspectChords(panel, shells);
+        }
+        if (r.shown(SkymapPanel.Layer.NATAL)) {
+            r.ringCircle(natalR, new Color(120, 132, 150, 90), 0.0);
+            r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
+                false, 0);
+        }
         if (panel.outerRingDrawn()) {
             r.bodies(panel.tLon, panel.tValid, partnerR,
                 panel.angleRoleFor(false, true), panel, true, 1);
@@ -151,7 +188,7 @@ final class GlobeRenderer {
         return new double[] {
             Globe.SHELL_NATAL - 0.08 * outerOpen - 0.06 * triOpen,
             lerp(Globe.SHELL_NATAL, Globe.SHELL_PARTNER, outerOpen),
-            lerp(Globe.SHELL_NATAL + 0.08, Globe.SHELL_SKY,
+            lerp(Globe.SHELL_PARTNER, Globe.SHELL_SKY,
                 triOpen > 0.001 ? triOpen : outerOpen),
         };
     }
@@ -247,7 +284,8 @@ final class GlobeRenderer {
                 arc[i] = Globe.onShell(from + (30.0 * i) / 24, this.origin,
                     Globe.SHELL_SIGN_OUTER, 0.0);
             }
-            polyline(arc, new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 190), 2.4f);
+            polyline(arc, faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 190),
+                SkymapPanel.Layer.SIGNS), 2.4f);
 
             // The division at the sign's start, drawn across the band's depth.
             double[] a = Globe.onShell(from, this.origin, Globe.SHELL_SIGN_INNER, 0.0);
@@ -273,6 +311,72 @@ final class GlobeRenderer {
 
 
     /**
+     * The sign and the house the hovered body stands in, lit and pushed outward.
+     *
+     * <b>The globe could not say where a body was.</b> A glyph sits on a ring at a longitude,
+     * and reading its sign off meant following the ring round to the zodiac by eye and its
+     * house by counting cusps - work the flat wheel does for you by putting the glyph inside a
+     * wedge. This puts it back: rest on a body and its two wedges light up, so the answer is
+     * the shape around it rather than something to work out.
+     *
+     * <b>Bulged, because colour alone is not enough on a translucent globe.</b> Every surface
+     * here is see-through and half of them overlap, so a brighter patch reads as one more
+     * overlap. A wedge that stands proud of the sphere is unambiguous from any angle.
+     */
+    private void focusWedges(SkymapPanel panel) {
+        int body = panel.focusedBody();
+        if (body < 0) {
+            return;
+        }
+        double lon = panel.focusedLongitude();
+        if (Double.isNaN(lon)) {
+            return;
+        }
+        int sign = ((int) Math.floor(lon / 30.0) % 12 + 12) % 12;
+        Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
+        wedge(sign * 30.0, sign * 30.0 + 30.0, Globe.SHELL_SIGN_INNER + 0.10,
+            new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 92));
+
+        double[] cusps = panel.activeCusps;
+        if (cusps == null || cusps.length < 13) {
+            return;
+        }
+        int house = Zodiac.houseOf(lon, cusps);
+        if (house >= 1 && house <= 12) {
+            double from = cusps[house];
+            double span = arc(from, cusps[house == 12 ? 1 : house + 1]);
+            wedge(from, from + span, Globe.SHELL_HOUSE + 0.10,
+                new Color(228, 216, 180, 70));
+        }
+    }
+
+    /**
+     * A filled slice of a sphere between two longitudes, pole to pole.
+     *
+     * Tessellated rather than drawn as one polygon: a sector of a sphere does not project to a
+     * quadrilateral, and the error is worst exactly where the slice is widest. The cells at
+     * the poles come out with two corners coincident and fill as triangles, which is how
+     * twelve of them tile a cap without overlapping.
+     */
+    private void wedge(double lon0, double lon1, double radius, Color fill) {
+        int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 11.0));
+        int rows = 7;
+        for (int i = 0; i < steps; i++) {
+            double la = lon0 + ((lon1 - lon0) * i) / steps;
+            double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;
+            for (int j = 0; j < rows; j++) {
+                double p0 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * j) / rows;
+                double p1 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * (j + 1)) / rows;
+                quad(Globe.onShell(la, this.origin, radius, radius * Math.sin(p0)),
+                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p0)),
+                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p1)),
+                    Globe.onShell(la, this.origin, radius, radius * Math.sin(p1)),
+                    fill);
+            }
+        }
+    }
+
+    /**
      * The zodiac as a coloured plane, running inward from the sign band.
      *
      * <b>A plane, not a wedge wrapped over the sphere.</b> The wedges filled the whole globe
@@ -288,7 +392,8 @@ final class GlobeRenderer {
     private void signPlane() {
         for (int sign = 0; sign < 12; sign++) {
             Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
-            Color fill = new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 30);
+            Color fill = faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 30),
+                SkymapPanel.Layer.SIGNS);
             double from = sign * 30.0;
             int steps = 4;
             for (int i = 0; i < steps; i++) {
@@ -333,7 +438,8 @@ final class GlobeRenderer {
                 // ring. Far enough off it that they do not pile onto the point itself.
                 double phi = pole * (Globe.FILL_SPAN - 0.30);
                 billboard(Globe.onShell(mid, this.origin, Globe.SHELL_HOUSE,
-                    Globe.SHELL_HOUSE * Math.sin(phi)), label, new Color(206, 208, 216), 12);
+                    Globe.SHELL_HOUSE * Math.sin(phi)), label,
+                    faded(new Color(206, 208, 216), SkymapPanel.Layer.HOUSES), 12);
             }
         }
     }
@@ -364,10 +470,11 @@ final class GlobeRenderer {
                 : (ten ? new Color(172, 178, 190, 195) : new Color(138, 144, 156, 150));
             segment(Globe.onShell(d, this.origin, inner, 0.0),
                 Globe.onShell(d, this.origin, inner + depth, 0.0),
-                ink, sign ? 1.4f : (ten ? 1.0f : 0.6f));
+                faded(ink, SkymapPanel.Layer.DEGREES), sign ? 1.4f : (ten ? 1.0f : 0.6f));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
-        polyline(Globe.equator(this.origin, inner, 144), new Color(158, 164, 176, 170), 1.0f);
+        polyline(Globe.equator(this.origin, inner, 144),
+            faded(new Color(158, 164, 176, 170), SkymapPanel.Layer.DEGREES), 1.0f);
     }
 
     /** One tessellation cell, filled flat. */
@@ -415,7 +522,8 @@ final class GlobeRenderer {
                     continue;
                 }
                 billboard(Globe.onShell(mid, this.origin, Globe.SHELL_BOUND, 0.0),
-                    SkymapPanel.glyphOf(bi), SkymapPanel.bodyInkFor(bi), 10);
+                    SkymapPanel.glyphOf(bi),
+                    faded(SkymapPanel.bodyInkFor(bi), SkymapPanel.Layer.BOUNDS), 10);
             }
         }
     }
@@ -431,14 +539,16 @@ final class GlobeRenderer {
                 int bi = Bodies.indexOfName(ruler);
                 if (bi >= 0) {
                     billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
-                        SkymapPanel.glyphOf(bi), SkymapPanel.bodyInkFor(bi), 10);
+                        SkymapPanel.glyphOf(bi),
+                        faded(SkymapPanel.bodyInkFor(bi), SkymapPanel.Layer.DECANS), 10);
                     continue;
                 }
             }
             int face = Zodiac.triplicityDecanSignIndex(sign, d % 3 + 1);
             billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
                 SkymapPanel.zodiacSymbol(face),
-                SkymapPanel.elementColorFor(Zodiac.elementIndex(face)), 10);
+                faded(SkymapPanel.elementColorFor(Zodiac.elementIndex(face)),
+                    SkymapPanel.Layer.DECANS), 10);
         }
     }
 
@@ -460,8 +570,8 @@ final class GlobeRenderer {
         for (int i = 1; i <= 12; i++) {
             boolean angle = i == 1 || i == 4 || i == 7 || i == 10;
             polyline(Globe.meridian(cusps[i], this.origin, Globe.SHELL_HOUSE, 26, Math.PI / 2),
-                angle ? new Color(226, 214, 184, 220) : new Color(150, 152, 164, 150),
-                angle ? 1.8f : 1.0f);
+                faded(angle ? new Color(226, 214, 184, 220) : new Color(150, 152, 164, 150),
+                    SkymapPanel.Layer.HOUSES), angle ? 1.8f : 1.0f);
         }
     }
 
@@ -476,7 +586,8 @@ final class GlobeRenderer {
     private void signMeridians() {
         for (int sign = 0; sign < 12; sign++) {
             polyline(Globe.meridian(sign * 30.0, this.origin, Globe.SHELL_SIGN_INNER, 26,
-                Math.PI / 2), new Color(126, 146, 170, 150), 0.9f);
+                Math.PI / 2), faded(new Color(126, 146, 170, 150),
+                SkymapPanel.Layer.SIGNS), 0.9f);
         }
     }
 
@@ -532,7 +643,7 @@ final class GlobeRenderer {
                 levels[ring][c[1]] * Globe.STACK_STEP, inclinationOf(ring));
             double[] to = Globe.onShell(panel.bLon[c[2]], origin, shells[0],
                 levels[0][c[2]] * Globe.STACK_STEP, 0.0);
-            segment(from, to, new Color(c[3], true), 1.0f);
+            segment(from, to, faded(new Color(c[3], true), SkymapPanel.Layer.ASPECTS), 1.0f);
         }
     }
 

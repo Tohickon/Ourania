@@ -34,17 +34,25 @@ final class Globe {
      * near and what is far.
      */
     static final double SHELL_CORE = 0.90;
-    static final double SHELL_NATAL = 1.26;
-    static final double SHELL_PARTNER = 1.56;
-    static final double SHELL_HOUSE = 1.72;
+    static final double SHELL_NATAL = 1.20;
+    static final double SHELL_PARTNER = 1.50;
+    /**
+     * The sky ring, now inside the zodiac rather than outside it.
+     *
+     * <b>The zodiac has to enclose everything it measures.</b> The sky rode the outer skin,
+     * beyond the sign plane, so a transiting body sat outside the band that says which sign it
+     * is in - which is the one thing the zodiac is for. Every body ring is inside the plane
+     * now: natal, partner and sky, in that order, with the zodiac wrapped around all three.
+     */
+    static final double SHELL_SKY = 1.80;
+    static final double SHELL_HOUSE = 1.92;
     /** Egyptian bounds, just inside the signs - the flat wheel's order, kept. */
-    static final double SHELL_BOUND = 1.86;
-    static final double SHELL_SIGN_INNER = 1.94;
-    static final double SHELL_SIGN_OUTER = 2.16;
+    static final double SHELL_BOUND = 1.99;
+    static final double SHELL_SIGN_INNER = 2.08;
+    static final double SHELL_SIGN_OUTER = 2.30;
     /** Decans, just outside the signs, as on the flat wheel. */
-    static final double SHELL_DECAN = 2.24;
-    static final double SHELL_TICK = 2.28;
-    static final double SHELL_SKY = 2.32;
+    static final double SHELL_DECAN = 2.38;
+    static final double SHELL_TICK = 2.42;
 
     /**
      * How far above and below the equator a filled shell reaches, in radians of latitude.
@@ -108,13 +116,12 @@ final class Globe {
     /**
      * Focal length as a multiple of the panel's smaller side.
      *
-     * <b>Set from the outermost shell, not chosen.</b> At 1.45 the sky shell projected to 660
-     * pixels of a 550-pixel half-frame and the globe ran off every edge - which looks like a
-     * broken camera rather than like a zoom. The largest thing in the scene is SHELL_SKY, so
-     * this is the value that puts it comfortably inside the frame at the default distance,
-     * and the reader scrolls from there.
+     * <b>Set from the outermost thing drawn, not chosen.</b> At 1.45 the outermost shell
+     * projected to 660 pixels of a 550-pixel half-frame and the globe ran off every edge -
+     * which looks like a broken camera rather than like a zoom. The far edge is now the degree
+     * scale outside the decans, further out than the old sky ring, so this came down with it.
      */
-    private static final double ZOOM = 0.95;
+    private static final double ZOOM = 0.82;
 
     /** The tilt beyond which the poles cross the view and the scene reads as inverted. */
     static final double MAX_PITCH = 1.25;
