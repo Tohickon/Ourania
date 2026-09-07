@@ -189,8 +189,19 @@ public final class GlobeCheck {
                 && Globe.SHELL_SIGN_OUTER < Globe.SHELL_DECAN
                 && Globe.SHELL_DECAN < Globe.SHELL_TICK
                 && Globe.SHELL_TICK < Globe.SHELL_SKY);
-        yes("a filled shell stops short of the poles",
-            Globe.FILL_SPAN < Math.PI / 2);
+        // <b>A filled shell closes the sphere.</b> It used to stop short, which left a
+        // hole at each end; the cells at the pole degenerate to triangles and tile it.
+        near("a filled shell reaches the pole", Math.PI / 2, Globe.FILL_SPAN, 1e-12);
+        double[] north = Globe.onShell(0, 0, Globe.SHELL_HOUSE,
+            Globe.SHELL_HOUSE * Math.sin(Globe.FILL_SPAN));
+        double[] alsoNorth = Globe.onShell(217.0, 0, Globe.SHELL_HOUSE,
+            Globe.SHELL_HOUSE * Math.sin(Globe.FILL_SPAN));
+        // Every longitude arrives at the same point there, which is what makes the polar
+        // cells triangles rather than overlapping quads.
+        near("every longitude meets at the pole, x", north[0], alsoNorth[0], 1e-9);
+        near("every longitude meets at the pole, y", north[1], alsoNorth[1], 1e-9);
+        near("every longitude meets at the pole, z", north[2], alsoNorth[2], 1e-9);
+        near("and the pole is on the shell", Globe.SHELL_HOUSE, north[1], 1e-9);
 
         // An equator closes on itself, and stays on its shell all the way round.
         double[][] eq = Globe.equator(origin, Globe.SHELL_SIGN_OUTER, 96);

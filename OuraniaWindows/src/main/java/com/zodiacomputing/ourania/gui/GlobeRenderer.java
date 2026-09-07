@@ -357,7 +357,9 @@ final class GlobeRenderer {
             double mid = cusps[i] + span / 2.0;
             String label = String.valueOf(i);
             for (int pole = -1; pole <= 1; pole += 2) {
-                double phi = pole * (Globe.FILL_SPAN - 0.10);
+                // Close to the pole, where the wedges are narrow and the twelve sit in a tight
+                // ring. Far enough off it that they do not pile onto the point itself.
+                double phi = pole * (Globe.FILL_SPAN - 0.30);
                 billboard(Globe.onShell(mid, this.origin, Globe.SHELL_HOUSE,
                     Globe.SHELL_HOUSE * Math.sin(phi)), label, new Color(206, 208, 216), 12);
             }
@@ -402,8 +404,13 @@ final class GlobeRenderer {
      * one, which is what makes the shell read as a surface rather than as a stencil.
      */
     private void sector(double lon0, double lon1, double radius, Color fill) {
+        // <b>The rows at the poles collapse to triangles, and that is the point.</b> At
+        // ninety degrees of latitude every longitude on a shell is the same point, so the top
+        // and bottom cells of each wedge come out with two corners coincident. Filled as
+        // polygons they are triangles, twelve of them tiling each cap with no overlap - which
+        // is why the cap can be closed without the wedges darkening where they meet.
         int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 11.0));
-        int rows = 5;
+        int rows = 7;
         for (int i = 0; i < steps; i++) {
             double la = lon0 + ((lon1 - lon0) * i) / steps;
             double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;

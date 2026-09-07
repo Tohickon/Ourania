@@ -49,12 +49,15 @@ final class Globe {
     /**
      * How far above and below the equator a filled shell reaches, in radians of latitude.
      *
-     * <b>Short of the poles, like the meridians.</b> A house or a sign is a slice of the sky
-     * that does converge at the poles, but filling all the way there stacks twelve translucent
-     * wedges on one point and the result is a black cap - which says nothing and hides the
-     * bodies behind it.
+     * <b>All the way to the poles, so the sphere is closed.</b> This stopped at 1.02 radians
+     * on the reasoning that twelve translucent wedges meeting at one point would stack into a
+     * black cap - which is true of wedges drawn as quads that all cover the pole, and not true
+     * of wedges that taper. A slice of a sphere converges to nothing at the pole, so the top
+     * row of cells is triangles that tile the cap exactly and overlap nowhere. The old value
+     * left the globe with a hole at each end, which read as unfinished rather than as
+     * restraint.
      */
-    static final double FILL_SPAN = 1.02;
+    static final double FILL_SPAN = Math.PI / 2;
 
     /** How far up the shell one collision level lifts a body. */
     static final double STACK_STEP = 0.085;
