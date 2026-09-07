@@ -553,12 +553,18 @@ final class GlobeRenderer {
                 here ? 2.2f : (sign ? 1.4f : (ten ? 1.0f : 0.6f)));
         }
 
-        // <b>And the degree's own wedge, so a tick names a place rather than a mark.</b> One
-        // degree of the plane, from the middle out past the scale - which is what the reader
-        // is asking about when they point at a tick: not the line, the slice behind it.
+        // <b>And the degree's own slice, so a tick names a place rather than a mark.</b>
+        // One degree of the chart, which is what the reader is asking about when they point
+        // at a tick: not the line, what stands behind it.
+        //
+        // <b>Through the sphere as well as across the plane.</b> Lighting only the flat sector
+        // made the same mistake the sign highlight made - the sphere is where the bodies are,
+        // so a degree that lights only the disc is pointing at half of itself.
         if (lit >= 0) {
+            wedgeOnSphere(lit, lit + 1.0, Globe.SHELL_SIGN_INNER + 0.09,
+                faded(new Color(255, 238, 170, 96), SkymapPanel.Layer.DEGREES));
             quadRing(lit, lit + 1.0, 0.10, inner + 0.34,
-                faded(new Color(255, 238, 170, 60), SkymapPanel.Layer.DEGREES));
+                faded(new Color(255, 238, 170, 70), SkymapPanel.Layer.DEGREES));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
         polyline(Globe.equator(this.origin, inner, 144),

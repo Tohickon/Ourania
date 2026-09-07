@@ -128,12 +128,14 @@ final class Globe {
 
     Globe() {
         this.yaw = 0.0;
-        // <b>Looking down at about fifty degrees.</b> At twenty-four the shells project to
-        // ellipses so flat that the scene reads as a squashed wheel rather than as a sphere -
-        // which loses the whole argument for the view. The prototype's camera sits at
-        // [0, 4.2, 3.5], which is this angle; matching it means the two look like the same
-        // idea rather than like two attempts at one.
-        this.pitch = 0.87;
+        // <b>Nearly edge-on, at about eighteen degrees.</b> This was fifty for a while, on
+        // the reasoning that a low angle made the shells project to ellipses flat enough that
+        // the scene read as a squashed wheel rather than a sphere. That was true when the
+        // shells were wireframes: a circle seen edge-on is a line, and a dozen of them are a
+        // scribble. It stopped being true when the signs became coloured wedges over the
+        // surface - a sphere with shading reads as a sphere from any angle, and the low camera
+        // is what makes the equatorial ring a ring rather than a disc seen from above.
+        this.pitch = 0.32;
     }
 
     /** Applies a drag, in pixels, and keeps the camera somewhere a reader can understand. */
