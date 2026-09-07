@@ -428,23 +428,67 @@ final class GlobeRenderer {
         }
     }
 
-    /** A translucent slice of the sphere between two longitudes, pole to pole. */
+    /**
+     * A translucent slice of the sphere between two longitudes, pole to pole.
+     *
+     * <b>Shaded by how much each cell faces the reader, which is what makes it round.</b> Flat
+     * fill on a tessellated wedge reads as a folded paper fan: the silhouette is a circle and
+     * nothing inside it says so. A cell turned toward the camera is nearest and strongest; one
+     * at the limb is edge-on and nearly gone. That single term is the difference between a
+     * faceted shape and a sphere.
+     *
+     * <b>And finer than it was.</b> Seven rows across a hundred and eighty degrees is
+     * twenty-six degrees of arc each, which the eye reads as flats. The cells are cheap; the
+     * shading was the missing thing, but the two together are what finish it.
+     */
     private void wedgeOnSphere(double lon0, double lon1, double radius, Color fill) {
-        int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 11.0));
-        int rows = 7;
+        int steps = Math.max(4, (int) Math.ceil(Math.abs(lon1 - lon0) / 6.0));
+        int rows = 14;
         for (int i = 0; i < steps; i++) {
             double la = lon0 + ((lon1 - lon0) * i) / steps;
             double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;
             for (int j = 0; j < rows; j++) {
                 double p0 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * j) / rows;
                 double p1 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * (j + 1)) / rows;
-                quad(Globe.onShell(la, this.origin, radius, radius * Math.sin(p0)),
-                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p0)),
-                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p1)),
-                    Globe.onShell(la, this.origin, radius, radius * Math.sin(p1)),
-                    fill);
+                double[] a = Globe.onShell(la, this.origin, radius, radius * Math.sin(p0));
+                double[] b = Globe.onShell(lb, this.origin, radius, radius * Math.sin(p0));
+                double[] c = Globe.onShell(lb, this.origin, radius, radius * Math.sin(p1));
+                double[] d = Globe.onShell(la, this.origin, radius, radius * Math.sin(p1));
+                quad(a, b, c, d, shadeByFacing(fill, a, b, c, d, radius));
             }
         }
+    }
+
+    /**
+     * A cell dimmed by how far it has turned away from the reader.
+     *
+     * The outward normal at a point on a sphere is the point itself, so how much a cell faces
+     * the camera is carried by its depth: a cell on the near face is one radius closer than
+     * the centre, one at the limb is level with it, one on the far face is a radius beyond.
+     * Reading it off the projection saves unrotating a normal per cell and cannot drift from
+     * the projection the way a separately derived one could.
+     *
+     * Never to nothing - the far side is meant to be seen through, not erased.
+     */
+    private Color shadeByFacing(Color fill, double[] a, double[] b, double[] c, double[] d,
+                                double radius) {
+        double depth = 0;
+        int seen = 0;
+        for (double[] pt : new double[][] {a, b, c, d}) {
+            Globe.Projected q = at(pt);
+            if (q.visible) {
+                depth += q.depth;
+                seen++;
+            }
+        }
+        if (seen == 0) {
+            return fill;
+        }
+        double away = ((depth / seen) - this.cam.distance) / Math.max(1e-6, radius);
+        double facing = Math.max(0.0, Math.min(1.0, 0.5 - 0.5 * away));
+        double lift = 0.30 + 0.70 * facing;
+        return new Color(fill.getRed(), fill.getGreen(), fill.getBlue(),
+            (int) Math.round(fill.getAlpha() * lift));
     }
 
     /** One segment of a flat ring in the ecliptic plane. */
@@ -863,9 +907,19 @@ final class GlobeRenderer {
             double far = q.depth > this.cam.distance ? 0.55 : 1.0;
             final int alpha = (int) Math.round(255 * far);
 
+            // <b>The planets themselves on the natal ring, when the reader asks for it.</b>
+            // Only the natal ring: the outer rings are told apart by their colour, and a
+            // partner's Jupiter drawn as Jupiter would be indistinguishable from the reader's.
+            final boolean asPlanet = !outer && Settings.globePlanets()
+                && PLANET_FACE[i] != FACE_NONE;
+            final int bodyIndex = i;
             final int half = this.g.getFontMetrics(font(13)).stringWidth(glyph) / 2;
             this.pieces.add(new Piece(q.depth, () -> {
                 int rad = lit ? 11 : 9;
+                if (asPlanet) {
+                    drawPlanet(bodyIndex, (int) q.x, (int) q.y, rad, alpha, lit);
+                    return;
+                }
                 this.g.setColor(shade(bead, alpha));
                 this.g.fillOval((int) q.x - rad, (int) q.y - rad, rad * 2, rad * 2);
                 this.g.setStroke(stroke(lit ? 2.0f : 1.0f));
@@ -876,6 +930,174 @@ final class GlobeRenderer {
                 this.g.drawString(glyph, (int) q.x - half, (int) q.y + 5);
             }));
         }
+    }
+
+    // ------------------------------------------------------------------ the planets
+
+    private static final int FACE_NONE = 0;
+    private static final int FACE_SUN = 1;
+    private static final int FACE_BANDED = 2;
+    private static final int FACE_RINGED = 3;
+    private static final int FACE_PLAIN = 4;
+
+    /**
+     * Which bodies are drawn as themselves, and how.
+     *
+     * <b>Only the ones that look like something.</b> A Sun with a corona, a banded Jupiter,
+     * Saturn with its rings and the plain worlds are recognisable at nine pixels. Much of the
+     * registry - the nodes, the Lots, the angles, most asteroids - is not a body anyone has a
+     * picture of, and inventing one would be worse than the glyph. Those keep the bead, and
+     * the two kinds sit on the ring together without the reader needing to be told which.
+     *
+     * Built against the registry rather than written as a switch at the call site, so a body
+     * added later lands here as FACE_NONE and keeps its glyph instead of falling through to
+     * whatever the last case happened to be.
+     */
+    private static final int[] PLANET_FACE = buildFaces();
+
+    private static int[] buildFaces() {
+        int[] faces = new int[SkymapPanel.BODY_COUNT];
+        for (int i = 0; i < faces.length; i++) {
+            switch (Bodies.at(i).name) {
+                case "Sun":
+                    faces[i] = FACE_SUN;
+                    break;
+                case "Jupiter":
+                    faces[i] = FACE_BANDED;
+                    break;
+                case "Saturn":
+                    faces[i] = FACE_RINGED;
+                    break;
+                case "Mercury":
+                case "Venus":
+                case "Mars":
+                case "Uranus":
+                case "Neptune":
+                case "Pluto":
+                    faces[i] = FACE_PLAIN;
+                    break;
+                default:
+                    faces[i] = FACE_NONE;
+                    break;
+            }
+        }
+        return faces;
+    }
+
+    /** The face colour of a body, warm to cold. */
+    private static Color faceColour(int body) {
+        switch (Bodies.at(body).name) {
+            case "Sun":
+                return new Color(255, 196, 84);
+            case "Mercury":
+                return new Color(178, 172, 160);
+            case "Venus":
+                return new Color(226, 200, 148);
+            case "Mars":
+                return new Color(198, 96, 66);
+            case "Jupiter":
+                return new Color(206, 176, 138);
+            case "Saturn":
+                return new Color(214, 194, 146);
+            case "Uranus":
+                return new Color(150, 206, 208);
+            case "Neptune":
+                return new Color(104, 138, 214);
+            case "Pluto":
+                return new Color(164, 146, 132);
+            default:
+                return new Color(190, 190, 196);
+        }
+    }
+
+    /**
+     * One body drawn as itself.
+     *
+     * <b>Lit from the upper left, all of them.</b> A disc needs a light to read as a sphere,
+     * and the direction has to be the same for every body - a ring of objects lit from
+     * different places reads as a mistake even when the reader could not say what is wrong.
+     */
+    private void drawPlanet(int body, int x, int y, int rad, int alpha, boolean lit) {
+        int face = PLANET_FACE[body];
+        Color base = faceColour(body);
+        int d = rad * 2;
+
+        if (face == FACE_SUN) {
+            // The corona first, so the disc sits inside it rather than on top of it.
+            for (int i = 3; i >= 1; i--) {
+                int glow = rad + i * 4;
+                this.g.setColor(new Color(255, 168, 60,
+                    Math.max(0, Math.min(255, (int) (alpha * 0.11 / i)))));
+                this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
+            }
+            this.g.setPaint(new java.awt.RadialGradientPaint(
+                new java.awt.geom.Point2D.Float(x - rad * 0.3f, y - rad * 0.3f),
+                Math.max(1f, rad * 1.6f), new float[] {0f, 0.55f, 1f},
+                new Color[] {shade(new Color(255, 246, 214), alpha),
+                    shade(new Color(255, 186, 72), alpha),
+                    shade(new Color(206, 92, 30), alpha)}));
+            this.g.fillOval(x - rad, y - rad, d, d);
+            this.g.setPaint(null);
+            this.g.setColor(shade(new Color(255, 214, 130), alpha));
+            this.g.setStroke(stroke(lit ? 2.0f : 1.0f));
+            this.g.drawOval(x - rad, y - rad, d, d);
+            return;
+        }
+
+        int rw = (int) Math.round(rad * 2.15);
+        int rh = Math.max(2, (int) Math.round(rad * 0.52));
+        if (face == FACE_RINGED) {
+            // Behind the planet, then the planet, then in front - which is the whole reason
+            // Saturn reads as Saturn rather than as a disc with a line through it.
+            this.g.setColor(shade(new Color(206, 186, 142), (int) (alpha * 0.72)));
+            this.g.setStroke(stroke(1.4f));
+            this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 0, 180);
+        }
+
+        this.g.setPaint(new java.awt.RadialGradientPaint(
+            new java.awt.geom.Point2D.Float(x - rad * 0.35f, y - rad * 0.35f),
+            Math.max(1f, rad * 1.5f), new float[] {0f, 1f},
+            new Color[] {shade(lighten(base, 0.45), alpha), shade(darken(base, 0.5), alpha)}));
+        this.g.fillOval(x - rad, y - rad, d, d);
+        this.g.setPaint(null);
+
+        if (face == FACE_BANDED) {
+            // Jupiter's belts, clipped to the disc so they end where it does.
+            java.awt.Shape was = this.g.getClip();
+            this.g.setClip(new java.awt.geom.Ellipse2D.Float(x - rad, y - rad, d, d));
+            this.g.setStroke(stroke(1.0f));
+            for (int i = -2; i <= 2; i++) {
+                if (i == 0) {
+                    continue;
+                }
+                int by = y + (int) Math.round(i * rad * 0.34);
+                this.g.setColor(shade(i % 2 == 0 ? darken(base, 0.72) : lighten(base, 0.25),
+                    (int) (alpha * 0.85)));
+                this.g.drawLine(x - rad, by, x + rad, by);
+            }
+            this.g.setClip(was);
+        }
+
+        if (face == FACE_RINGED) {
+            this.g.setColor(shade(new Color(232, 214, 170), alpha));
+            this.g.setStroke(stroke(1.6f));
+            this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 180, 180);
+        }
+
+        this.g.setColor(shade(lit ? new Color(255, 238, 170) : darken(base, 0.5), alpha));
+        this.g.setStroke(stroke(lit ? 2.0f : 0.8f));
+        this.g.drawOval(x - rad, y - rad, d, d);
+    }
+
+    private static Color lighten(Color c, double t) {
+        return new Color((int) (c.getRed() + (255 - c.getRed()) * t),
+            (int) (c.getGreen() + (255 - c.getGreen()) * t),
+            (int) (c.getBlue() + (255 - c.getBlue()) * t));
+    }
+
+    private static Color darken(Color c, double t) {
+        return new Color((int) (c.getRed() * t), (int) (c.getGreen() * t),
+            (int) (c.getBlue() * t));
     }
 
     // ------------------------------------------------------------------ drawing primitives

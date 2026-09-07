@@ -189,6 +189,25 @@ public final class Settings {
         set(SPHERES_KEY, on ? "true" : "false");
     }
 
+    /** Settings key for drawing the natal bodies as planets on the globe. */
+    public static final String GLOBE_PLANETS_KEY = "chart.globePlanets";
+
+    /**
+     * Whether the globe draws the natal bodies as the planets themselves.
+     *
+     * <b>The globe is the one view where this is not a costume.</b> On the flat wheel a body
+     * is a position and a glyph says which; on a sphere the reader is looking at a sky, and a
+     * banded Jupiter or a ringed Saturn is what is actually up there. Off gives the plain
+     * beads, which stay easier to read when every point is switched on.
+     */
+    public static boolean globePlanets() {
+        return !"false".equals(get(GLOBE_PLANETS_KEY, "true"));
+    }
+
+    public static void setGlobePlanets(boolean on) {
+        set(GLOBE_PLANETS_KEY, on ? "true" : "false");
+    }
+
     // ------------------------------------------------------------------- marker shapes
 
     /**

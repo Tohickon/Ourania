@@ -179,6 +179,23 @@ public class SettingsPanel extends JPanel {
         });
         body.add(spheres);
 
+        JCheckBox planets = new JCheckBox("On the globe, draw the planets themselves",
+            Settings.globePlanets());
+        planets.setForeground(TEXT);
+        planets.setBackground(Color.BLACK);
+        planets.setFont(Theme.BODY);
+        planets.setFocusPainted(false);
+        planets.setAlignmentX(Component.LEFT_ALIGNMENT);
+        planets.setToolTipText("<html>On: the natal bodies are drawn as themselves - a banded "
+            + "Jupiter, Saturn with its rings, a Sun with a corona.<br>Off: the plain beads, "
+            + "which stay easier to read with every point switched on.<br>"
+            + "<i>The globe only; the flat wheel is unaffected.</i></html>");
+        planets.addItemListener(e -> {
+            Settings.setGlobePlanets(planets.isSelected());
+            applyPalette();
+        });
+        body.add(planets);
+
         // <b>A shape per chart, because a tri-wheel draws three at once.</b> These say which
         // chart a body belongs to without the reader counting rings outward from the centre.
         // The checkbox above is the master switch: off, none of these are drawn.
