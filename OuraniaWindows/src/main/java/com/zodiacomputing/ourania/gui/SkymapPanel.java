@@ -828,6 +828,30 @@ extends JPanel {
         return null;
     }
 
+    /**
+     * The whole degree the cursor is over on the globe's scale, or -1.
+     *
+     * <b>Kept beside focusBody rather than inside it.</b> A body and a degree are different
+     * things to be pointing at - one is a placement, the other is a place - and the reader can
+     * be over a tick with no body anywhere near it. Folding the two into one field would mean
+     * choosing which of them a hover means, and the answer differs by where the cursor is.
+     */
+    private int focusDegree = -1;
+
+    /** The degree under the cursor, for the globe's scale to light. */
+    int focusedDegree() {
+        return this.focusDegree;
+    }
+
+    /** Records the degree under the cursor. True when it changed and a repaint is due. */
+    boolean setFocusDegree(int degree) {
+        if (this.focusDegree == degree) {
+            return false;
+        }
+        this.focusDegree = degree;
+        return true;
+    }
+
     /** The body the cursor is resting on, or -1. Read by the globe to light its wedges. */
     int focusedBody() {
         return this.focusBody;
@@ -2253,6 +2277,20 @@ extends JPanel {
 
             @Override
             public void mouseMoved(MouseEvent mouseEvent) {
+                if (SkymapPanel.this.globeMode) {
+                    // A tick only wins when no body is nearer, so pointing at a glyph that
+                    // happens to sit near the rim still selects the glyph.
+                    int over = SkymapPanel.this.bodyAt(mouseEvent.getX(), mouseEvent.getY());
+                    int deg = over >= 0 ? -1 : GlobeRenderer.degreeAt(SkymapPanel.this.globe,
+                        SkymapPanel.this.chartPanel.getWidth(),
+                        SkymapPanel.this.chartPanel.getHeight(),
+                        SkymapPanel.this, mouseEvent.getX(), mouseEvent.getY());
+                    boolean moved = SkymapPanel.this.setFocusDegree(deg);
+                    if (SkymapPanel.this.setFocus(over) || moved) {
+                        SkymapPanel.this.chartPanel.repaint();
+                    }
+                    return;
+                }
                 // The tooltip is no longer pushed from here. ChartPanel overrides
                 // getToolTipText(MouseEvent) and ToolTipManager asks it, which is the whole
                 // fix: see the note on that override.
@@ -3518,6 +3556,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int hit = GlobeRenderer.bodyAt(this.globe, this.chartPanel.getWidth(),
                 this.chartPanel.getHeight(), this, n, n2);
             if (hit < 0) {
+                // Nothing under the cursor but the scale: open the degree it points at. The
+                // Sabian card is the reading of a degree, and the placements list has reached
+                // it by href all along - this is the wheel finally having a door to it too.
+                int deg = GlobeRenderer.degreeAt(this.globe, this.chartPanel.getWidth(),
+                    this.chartPanel.getHeight(), this, n, n2);
+                if (deg >= 0 && this.window != null) {
+                    this.window.showInterpretationForSabianSymbol(
+                        SIGN_NAMES[(deg / 30) % 12], deg % 30 + 1);
+                }
                 return;
             }
             boolean outer = (hit & TRANSIT_BIT) != 0;

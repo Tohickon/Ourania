@@ -70,6 +70,12 @@ public final class GlobeCheck {
         report("Part H", before);
 
         System.out.println();
+        System.out.println("=== Part I: a degree tick can be pointed at ===");
+        before = failures.size();
+        theDegreeTicks();
+        report("Part I", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -696,6 +702,68 @@ public final class GlobeCheck {
             }
             yes("a folding layer passes through the middle, saw " + partway, partway > 0);
             panel.setLayer(SkymapPanel.Layer.DECANS, true);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * Every degree on the scale is findable at the pixel its tick is drawn at.
+     *
+     * <b>Three hundred and sixty targets on one ring, so this is where a hit test drifts.</b>
+     * The tick and the test derive their position the same way and from the same radius; if
+     * they ever stop doing that the scale becomes decorative, and a reader pointing at a
+     * degree gets its neighbour without anything looking wrong.
+     *
+     * Also: the scale answers nothing when its layer is folded. A tick that is not drawn but
+     * is still clickable is a target the reader cannot see.
+     */
+    private static void theDegreeTicks() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+
+            Globe cam = new Globe();
+            int w = 1000;
+            int h = 1000;
+            double origin = panel.pinLongitude();
+            double inner = Globe.SHELL_SIGN_OUTER + 0.03;
+
+            int tested = 0;
+            for (double yaw : new double[] {0.0, 1.7, 3.9}) {
+                cam.yaw = yaw;
+                for (int d = 0; d < 360; d += 7) {
+                    double[] pt = Globe.onShell(d + 0.5, origin, inner + 0.09, 0.0);
+                    Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                    if (!q.visible) {
+                        continue;
+                    }
+                    tested++;
+                    int got = GlobeRenderer.degreeAt(cam, w, h, panel,
+                        (int) Math.round(q.x), (int) Math.round(q.y));
+                    eq("pointing at degree " + d + " finds it (yaw=" + yaw + ")", d, got);
+                }
+            }
+            yes("the sweep reached some ticks: " + tested, tested > 100);
+
+            // Well inside the globe there is no scale, so nothing should answer.
+            cam.yaw = 0;
+            eq("the middle of the globe is not a degree", -1,
+                GlobeRenderer.degreeAt(cam, w, h, panel, w / 2, h / 2));
+
+            // <b>Folded means unclickable.</b> A target the reader cannot see is worse than
+            // no target: it answers when they meant to click through it.
+            panel.setLayer(SkymapPanel.Layer.DEGREES, false);
+            Thread.sleep(1200);
+            double[] pt = Globe.onShell(90.5, origin, inner + 0.09, 0.0);
+            Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+            eq("a folded scale answers nothing", -1, GlobeRenderer.degreeAt(cam, w, h, panel,
+                (int) Math.round(q.x), (int) Math.round(q.y)));
+            panel.setLayer(SkymapPanel.Layer.DEGREES, true);
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }

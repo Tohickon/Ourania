@@ -477,21 +477,70 @@ final class GlobeRenderer {
      * Ticks in four weights: every degree short, every fifth longer, every tenth longer and
      * brighter, and the sign boundaries reaching furthest.
      */
+    /**
+     * Which whole degree the cursor is over, or -1.
+     *
+     * <b>The same tick positions the ring draws, so the hover lands where the mark is.</b>
+     * Three hundred and sixty of them is too many to test one at a time from a mouse move, so
+     * this goes the other way round: turn the cursor back into a longitude by projecting the
+     * candidate degrees and taking the nearest. Cheap, and it cannot disagree with the drawing
+     * the way an independently derived angle would.
+     */
+    static int degreeAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+        if (!panel.layerShown(SkymapPanel.Layer.DEGREES)) {
+            return -1;
+        }
+        double origin = panel.pinLongitude();
+        double inner = Globe.SHELL_SIGN_OUTER + 0.03;
+        int best = -1;
+        double bestDist = 14.0;
+        for (int d = 0; d < 360; d++) {
+            // Measured at the middle of the tick, so a long tick and a short one are as easy
+            // to hit as each other.
+            double[] pt = Globe.onShell(d + 0.5, origin, inner + 0.09, 0.0);
+            Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+            if (!q.visible) {
+                continue;
+            }
+            double dist = Math.hypot(q.x - px, q.y - py);
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = d;
+            }
+        }
+        return best;
+    }
+
     private void degreeRing() {
         // <b>Outside the signs, where a scale belongs.</b> It sat inside the sign band, which
         // put the finest division of the zodiac underneath the coarsest and left the ticks
         // competing with the aspect network for the same space. Around the outside it is the
         // rim of the whole thing, which is where the flat wheel has always kept it.
         double inner = Globe.SHELL_SIGN_OUTER + 0.03;
+        int lit = this.panel.focusedDegree();
         for (int d = 0; d < 360; d++) {
             boolean sign = d % 30 == 0;
             boolean ten = d % 10 == 0;
-            double depth = sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.05));
-            Color ink = sign ? new Color(214, 218, 226, 225)
-                : (ten ? new Color(172, 178, 190, 195) : new Color(138, 144, 156, 150));
+            boolean here = d == lit;
+            // <b>The hovered tick stands out of the scale.</b> A degree is a hair's width on a
+            // ring of three hundred and sixty, so brightening one is not enough to find it -
+            // it has to be longer than its neighbours to be the one the reader is pointing at.
+            double depth = here ? 0.34 : (sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.05)));
+            Color ink = here ? new Color(255, 238, 170, 245)
+                : (sign ? new Color(214, 218, 226, 225)
+                    : (ten ? new Color(172, 178, 190, 195) : new Color(138, 144, 156, 150)));
             segment(Globe.onShell(d, this.origin, inner, 0.0),
                 Globe.onShell(d, this.origin, inner + depth, 0.0),
-                faded(ink, SkymapPanel.Layer.DEGREES), sign ? 1.4f : (ten ? 1.0f : 0.6f));
+                faded(ink, SkymapPanel.Layer.DEGREES),
+                here ? 2.2f : (sign ? 1.4f : (ten ? 1.0f : 0.6f)));
+        }
+
+        // <b>And the degree's own wedge, so a tick names a place rather than a mark.</b> One
+        // degree of the plane, from the middle out past the scale - which is what the reader
+        // is asking about when they point at a tick: not the line, the slice behind it.
+        if (lit >= 0) {
+            quadRing(lit, lit + 1.0, 0.10, inner + 0.34,
+                faded(new Color(255, 238, 170, 60), SkymapPanel.Layer.DEGREES));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
         polyline(Globe.equator(this.origin, inner, 144),
