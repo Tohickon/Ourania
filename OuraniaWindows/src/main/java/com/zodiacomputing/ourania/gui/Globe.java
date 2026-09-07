@@ -233,11 +233,24 @@ final class Globe {
      * and a dozen of them meeting reads as a knot rather than as a sphere.
      */
     static double[][] meridian(double lon, double origin, double radius, int segments) {
+        return meridian(lon, origin, radius, segments, MERIDIAN_SPAN);
+    }
+
+    /**
+     * As above, over a chosen half-height.
+     *
+     * <b>Pole to pole for a boundary, short of it for decoration.</b> A house cusp and a sign
+     * boundary are real divisions of the whole sky and stop nowhere, so they are drawn at
+     * PI/2 and meet at the poles the way they actually do. A wireframe meridian is there to
+     * suggest a surface, and a dozen of those converging is a knot.
+     */
+    static double[][] meridian(double lon, double origin, double radius, int segments,
+                               double span) {
         int n = Math.max(2, segments);
         double t = Math.toRadians(lon - origin);
         double[][] pts = new double[n + 1][];
         for (int i = 0; i <= n; i++) {
-            double phi = -MERIDIAN_SPAN + (2.0 * MERIDIAN_SPAN * i) / n;
+            double phi = -span + (2.0 * span * i) / n;
             double c = Math.cos(phi);
             pts[i] = new double[] {
                 -radius * Math.cos(t) * c, radius * Math.sin(phi), radius * Math.sin(t) * c};

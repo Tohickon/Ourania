@@ -92,7 +92,6 @@ final class GlobeRenderer {
         // globe that fights the hand moving it. The shells come back the moment the drag ends,
         // which is when a reader is actually looking at them rather than at the motion.
         if (!turning) {
-            r.houseShell(panel.activeCusps);
             r.signPlane();
         }
 
@@ -101,6 +100,7 @@ final class GlobeRenderer {
         r.boundRing();
         r.decanRing();
         r.houseMeridians(panel.activeCusps);
+        r.signMeridians();
         r.houseNumbers(panel.activeCusps);
         r.ringCircle(natalR, new Color(120, 132, 150, 90), 0.0);
         if (panel.outerRingDrawn()) {
@@ -266,34 +266,6 @@ final class GlobeRenderer {
         }
     }
 
-    /**
-     * The houses, as translucent slices of the sphere, grey to black.
-     *
-     * <b>Wedges again, now that the signs are a plane.</b> These were latitude bands for a
-     * while, which crossed the sign wedges into a readable grid but put the shading somewhere
-     * a house is not - a house divides the ecliptic, so a band of declination was a scale
-     * pretending to be a map. With the zodiac moved onto the horizontal plane the collision
-     * that forced that compromise is gone, and the houses can be what they are.
-     *
-     * An unequal house is a different size, and on a globe that is visible in a way a wedge of
-     * a disc never quite is: it is an amount of sky rather than a label.
-     */
-    private void houseShell(double[] cusps) {
-        if (cusps == null || cusps.length < 13) {
-            return;
-        }
-        for (int i = 1; i <= 12; i++) {
-            double from = cusps[i];
-            double span = arc(from, cusps[i == 12 ? 1 : i + 1]);
-            if (span < 0.01) {
-                continue;                       // a degenerate cusp pair; nothing to fill
-            }
-            int level = 112 - (i - 1) * 9;      // house 1 lightest, house 12 nearly black
-            sector(from, from + span, Globe.SHELL_HOUSE,
-                new Color(level, level, level + 6, 58));
-        }
-    }
-
     /** Degrees from one longitude round to the next, always forward. */
     private static double arc(double from, double to) {
         return ((to - from) % 360.0 + 360.0) % 360.0;
@@ -379,51 +351,23 @@ final class GlobeRenderer {
      * brighter, and the sign boundaries reaching furthest.
      */
     private void degreeRing() {
-        double outer = Globe.SHELL_SIGN_INNER - 0.02;
+        // <b>Outside the signs, where a scale belongs.</b> It sat inside the sign band, which
+        // put the finest division of the zodiac underneath the coarsest and left the ticks
+        // competing with the aspect network for the same space. Around the outside it is the
+        // rim of the whole thing, which is where the flat wheel has always kept it.
+        double inner = Globe.SHELL_SIGN_OUTER + 0.03;
         for (int d = 0; d < 360; d++) {
             boolean sign = d % 30 == 0;
             boolean ten = d % 10 == 0;
-            double depth = sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.045));
-            Color ink = sign ? new Color(196, 200, 210, 210)
-                : (ten ? new Color(160, 166, 178, 180) : new Color(128, 134, 146, 130));
-            segment(Globe.onShell(d, this.origin, outer, 0.0),
-                Globe.onShell(d, this.origin, outer - depth, 0.0),
+            double depth = sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.05));
+            Color ink = sign ? new Color(214, 218, 226, 225)
+                : (ten ? new Color(172, 178, 190, 195) : new Color(138, 144, 156, 150));
+            segment(Globe.onShell(d, this.origin, inner, 0.0),
+                Globe.onShell(d, this.origin, inner + depth, 0.0),
                 ink, sign ? 1.4f : (ten ? 1.0f : 0.6f));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
-        polyline(Globe.equator(this.origin, outer, 144), new Color(150, 156, 168, 150), 1.0f);
-    }
-
-    /**
-     * A filled slice of a shell, between two longitudes and short of both poles.
-     *
-     * <b>Tessellated rather than drawn as one polygon.</b> A sector of a sphere is not flat,
-     * so its projection is not a quadrilateral - filling it as one would give straight edges
-     * where the globe curves, and the error is worst exactly where the slice is widest. Small
-     * quads, each with its own depth, also let the painter's sort put a near slice over a far
-     * one, which is what makes the shell read as a surface rather than as a stencil.
-     */
-    private void sector(double lon0, double lon1, double radius, Color fill) {
-        // <b>The rows at the poles collapse to triangles, and that is the point.</b> At
-        // ninety degrees of latitude every longitude on a shell is the same point, so the top
-        // and bottom cells of each wedge come out with two corners coincident. Filled as
-        // polygons they are triangles, twelve of them tiling each cap with no overlap - which
-        // is why the cap can be closed without the wedges darkening where they meet.
-        int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 11.0));
-        int rows = 7;
-        for (int i = 0; i < steps; i++) {
-            double la = lon0 + ((lon1 - lon0) * i) / steps;
-            double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;
-            for (int j = 0; j < rows; j++) {
-                double p0 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * j) / rows;
-                double p1 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * (j + 1)) / rows;
-                quad(Globe.onShell(la, this.origin, radius, radius * Math.sin(p0)),
-                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p0)),
-                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p1)),
-                    Globe.onShell(la, this.origin, radius, radius * Math.sin(p1)),
-                    fill);
-            }
-        }
+        polyline(Globe.equator(this.origin, inner, 144), new Color(158, 164, 176, 170), 1.0f);
     }
 
     /** One tessellation cell, filled flat. */
@@ -509,11 +453,30 @@ final class GlobeRenderer {
         if (cusps == null || cusps.length < 13) {
             return;                             // no chart cast yet; the shells still draw
         }
+        // <b>Lines rather than shading.</b> The houses were washed in grey, which said how big
+        // each one was and buried everything drawn inside them. A cusp is a boundary, and a
+        // boundary is a line - twelve of them, pole to pole, because a house divides the whole
+        // sky and not just the band around the ecliptic.
         for (int i = 1; i <= 12; i++) {
             boolean angle = i == 1 || i == 4 || i == 7 || i == 10;
-            polyline(Globe.meridian(cusps[i], this.origin, Globe.SHELL_HOUSE, 20),
-                angle ? new Color(210, 200, 175, 190) : new Color(120, 120, 130, 110),
-                angle ? 1.6f : 0.8f);
+            polyline(Globe.meridian(cusps[i], this.origin, Globe.SHELL_HOUSE, 26, Math.PI / 2),
+                angle ? new Color(226, 214, 184, 220) : new Color(150, 152, 164, 150),
+                angle ? 1.8f : 1.0f);
+        }
+    }
+
+    /**
+     * The twelve sign boundaries, as great circles on the sphere.
+     *
+     * The zodiac's own divisions, drawn the way the house cusps are so the two read as the
+     * same kind of thing - which they are, two ways of cutting the same sky. Cooler and
+     * thinner than the cusps, because a reader orienting themselves is looking for the angles
+     * first.
+     */
+    private void signMeridians() {
+        for (int sign = 0; sign < 12; sign++) {
+            polyline(Globe.meridian(sign * 30.0, this.origin, Globe.SHELL_SIGN_INNER, 26,
+                Math.PI / 2), new Color(126, 146, 170, 150), 0.9f);
         }
     }
 

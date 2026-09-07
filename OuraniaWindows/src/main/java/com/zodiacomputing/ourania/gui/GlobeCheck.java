@@ -224,6 +224,22 @@ public final class GlobeCheck {
             -mer[0][1], mer[mer.length - 1][1], 1e-9);
         yes("and stops short of the pole",
             Math.abs(mer[0][1]) < Globe.SHELL_SIGN_OUTER * 0.95);
+
+        // <b>A boundary meridian does reach the pole, and that is a different call.</b> House
+        // cusps and sign divisions cut the whole sky, so they are drawn at PI/2 while the
+        // wireframe ones stop short - one method, two spans, and nothing was asserting that
+        // the span argument was read at all.
+        double[][] full = Globe.meridian(30.0, origin, Globe.SHELL_HOUSE, 26, Math.PI / 2);
+        near("a boundary meridian reaches the north pole",
+            Globe.SHELL_HOUSE, full[full.length - 1][1], 1e-9);
+        near("and the south pole", -Globe.SHELL_HOUSE, full[0][1], 1e-9);
+        for (double[] q : full) {
+            near("every point of it is still on the shell", Globe.SHELL_HOUSE,
+                Math.sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2]), 1e-9);
+        }
+        // And the default overload is the short one, which is what the wireframe wants.
+        near("the default span is the wireframe span", Globe.MERIDIAN_SPAN,
+            Math.asin(mer[mer.length - 1][1] / Globe.SHELL_SIGN_OUTER), 1e-9);
     }
 
     private static void theStack() {
