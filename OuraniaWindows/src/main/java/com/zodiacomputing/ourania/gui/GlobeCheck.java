@@ -76,6 +76,12 @@ public final class GlobeCheck {
         report("Part I", before);
 
         System.out.println();
+        System.out.println("=== Part J: a band is cut wherever it would lie across itself ===");
+        before = failures.size();
+        bandsDoNotCrossThemselves();
+        report("Part J", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -822,6 +828,139 @@ public final class GlobeCheck {
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
+    }
+
+    /**
+     * A filled band never lies across itself.
+     *
+     * <b>The defect this exists to catch.</b> A sign wedge on the sphere is a lune from pole
+     * to pole, and its projection folds over twice: once at the limb, where the far half lands
+     * on the near half, and again near the crown, where each meridian climbs to an apex short
+     * of the pole and comes back down. Java's fillPolygon uses the even-odd rule, so either
+     * fold came out as a hole rather than as paint - first the notches bitten out around the
+     * pole, then, once the limb was handled, a slit a band wide down the middle of the crown.
+     *
+     * Globe.bandRuns is the cut. Three properties make the polygons it describes simple, and
+     * all three are checked here on the depths and screen positions a real trace produces
+     * rather than on made-up numbers: the runs tile the trace exactly once and share their
+     * boundaries, so no gap opens between them; no run holds segments from both faces; and no
+     * run has an edge that reverses direction in screen y, which is what lets a scan line
+     * cross each side of the strip exactly once.
+     *
+     * The last two are the ones that bite, and they bite separately. Dropping the fold cut
+     * leaves the face rule true and fails the monotone one; collapsing bandRuns to a single
+     * run - the shape the painter had at first - fails both.
+     */
+    private static void bandsDoNotCrossThemselves() {
+        Globe cam = new Globe();
+        int w = 1000;
+        int h = 1000;
+        final int steps = 36;
+        int crossed = 0;
+        int folded = 0;
+
+        for (double yaw : new double[] {0.0, 0.9, 2.4, 4.1, 5.6}) {
+            cam.yaw = yaw;
+            for (double pitch : new double[] {0.0, 0.32, 0.9}) {
+                cam.pitch = pitch;
+                for (double lon = 0; lon < 360; lon += 15) {
+                    double radius = Globe.SHELL_SIGN_INNER;
+                    double[] mid = new double[steps];
+                    double[] ay = new double[steps + 1];
+                    double[] by = new double[steps + 1];
+                    double[] ad = new double[steps + 1];
+                    double[] bd = new double[steps + 1];
+                    for (int i = 0; i <= steps; i++) {
+                        Globe.Projected qa = trace(cam, lon, radius, i, steps, w, h);
+                        Globe.Projected qb = trace(cam, lon + 5, radius, i, steps, w, h);
+                        ay[i] = qa.y;
+                        by[i] = qb.y;
+                        ad[i] = qa.depth;
+                        bd[i] = qb.depth;
+                    }
+                    for (int j = 0; j < steps; j++) {
+                        mid[j] = (ad[j] + ad[j + 1] + bd[j] + bd[j + 1]) / 4.0;
+                    }
+                    int[] runs = Globe.bandRuns(mid, cam.distance, ay, by);
+                    String at = "yaw " + yaw + " pitch " + pitch + " lon " + lon;
+
+                    eq(at + ": runs start at the first vertex", 0, runs[0]);
+                    eq(at + ": runs end at the last vertex", steps, runs[runs.length - 1]);
+                    yes(at + ": runs advance", advancing(runs));
+
+                    for (int r = 0; r + 1 < runs.length; r++) {
+                        // One face per run, or the far half of the strip lies on the near.
+                        boolean near = mid[runs[r]] < cam.distance;
+                        boolean mixed = false;
+                        for (int j = runs[r]; j < runs[r + 1]; j++) {
+                            if ((mid[j] < cam.distance) != near) {
+                                mixed = true;
+                            }
+                        }
+                        yes(at + ": run " + r + " stays on one face", !mixed);
+
+                        // One direction per run, or the strip folds back over its own apex.
+                        yes(at + ": run " + r + " edge A does not turn back",
+                            monotone(ay, runs[r], runs[r + 1]));
+                        yes(at + ": run " + r + " edge B does not turn back",
+                            monotone(by, runs[r], runs[r + 1]));
+                    }
+
+                    // And these bands really do fold, both ways - otherwise the rules above
+                    // would be passing on traces that never had the problem.
+                    boolean crosses = false;
+                    for (int j = 1; j < steps; j++) {
+                        if ((mid[j] < cam.distance) != (mid[j - 1] < cam.distance)) {
+                            crosses = true;
+                        }
+                    }
+                    if (crosses) {
+                        crossed++;
+                    }
+                    if (!monotone(ay, 0, steps)) {
+                        folded++;
+                    }
+                }
+            }
+        }
+        System.out.println("  " + crossed + " bands cross the limb, "
+            + folded + " fold over an apex");
+        yes("bands cross the limb, so the face cut is exercised", crossed > 200);
+        yes("bands fold over an apex, so the turn cut is exercised", folded > 100);
+    }
+
+    /** One vertex of a pole-to-pole trace, as the painter computes it. */
+    private static Globe.Projected trace(Globe cam, double lon, double radius,
+            int i, int steps, int w, int h) {
+        double phi = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * i) / steps;
+        double[] pt = Globe.onShell(lon, 0.0, radius, radius * Math.sin(phi));
+        return cam.project(pt[0], pt[1], pt[2], w, h);
+    }
+
+    /** Whether a stretch of an edge only ever moves one way. */
+    private static boolean monotone(double[] v, int from, int to) {
+        int sign = 0;
+        for (int i = from + 1; i <= to; i++) {
+            double step = v[i] - v[i - 1];
+            if (step == 0) {
+                continue;
+            }
+            int now = step > 0 ? 1 : -1;
+            if (sign != 0 && now != sign) {
+                return false;
+            }
+            sign = now;
+        }
+        return true;
+    }
+
+    private static boolean advancing(int[] runs) {
+        for (int i = 1; i < runs.length; i++) {
+            if (runs[i] <= runs[i - 1]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void yes(String label, boolean condition) {

@@ -309,6 +309,73 @@ final class Globe {
         return level;
     }
 
+    /**
+     * Where a band traced from pole to pole has to be cut so that no piece overlaps itself.
+     *
+     * <b>A lune is not one shape on screen.</b> A band between two longitudes runs from the
+     * south pole to the north, which means half of it is on the near face and half on the far
+     * one, and the two halves land on top of each other in the projection. Filled as a single
+     * polygon that is a shape crossing itself, and an even-odd fill - which is what Java's
+     * fillPolygon does - subtracts the overlap instead of adding it. The sphere came out with
+     * black notches bitten out of it around the pole, where the far half of a band lay across
+     * the near half of the same band.
+     *
+     * So the band is cut where it crosses the limb and each side is filled separately. That
+     * also mends the shading and the depth sort, which had been averaging a near half and a
+     * far half into one number that described neither.
+     *
+     * @param mid   the mean depth of each segment of the trace, in order
+     * @param limit the depth of the sphere's centre; a segment nearer than this faces the
+     *              reader, one beyond it is on the far face
+     * @param edgeA the screen y of one edge of the band, one value per vertex
+     * @param edgeB the screen y of the other
+     * @return vertex indices bounding each run: always starts at 0 and ends at mid.length, so
+     *         neighbouring runs share their boundary vertex and leave no gap between them
+     */
+    static int[] bandRuns(double[] mid, double limit, double[] edgeA, double[] edgeB) {
+        int n = mid.length;
+        if (n == 0) {
+            return new int[] {0};
+        }
+        boolean[] cut = new boolean[n + 1];
+        cut[0] = true;
+        cut[n] = true;
+        for (int j = 1; j < n; j++) {
+            if ((mid[j] < limit) != (mid[j - 1] < limit)) {
+                cut[j] = true;
+            }
+        }
+        // <b>And wherever an edge turns back on itself.</b> Cutting at the limb alone was not
+        // enough, because a meridian's projection is not monotone even within one face: it
+        // climbs to an apex short of the pole and comes back down, so the strip folds across
+        // itself near the top of the sphere and the fold cancelled in exactly the same way.
+        // That was the slit left standing after the notches were gone - a hole the width of a
+        // band, running down the middle of the crown, that got thinner as the bands got
+        // narrower and never went away. A run whose edges only ever move one way in screen y
+        // meets every scan line once, which is what makes the polygon simple.
+        for (double[] edge : new double[][] {edgeA, edgeB}) {
+            for (int i = 1; i < n; i++) {
+                if ((edge[i] - edge[i - 1]) * (edge[i + 1] - edge[i]) < 0) {
+                    cut[i] = true;
+                }
+            }
+        }
+        int count = 0;
+        for (boolean b : cut) {
+            if (b) {
+                count++;
+            }
+        }
+        int[] out = new int[count];
+        int k = 0;
+        for (int i = 0; i <= n; i++) {
+            if (cut[i]) {
+                out[k++] = i;
+            }
+        }
+        return out;
+    }
+
     /** Shortest angular distance between two longitudes, 0 to 180. */
     static double separation(double a, double b) {
         double d = Math.abs(norm(a) - norm(b)) % 360.0;

@@ -468,43 +468,77 @@ final class GlobeRenderer {
      */
     private void bandPath(double lonA, double lonB, double radius, Color fill) {
         final int steps = 36;
-        int[] xs = new int[(steps + 1) * 2];
-        int[] ys = new int[(steps + 1) * 2];
-        int n = 0;
-        double depth = 0;
-        int seen = 0;
+        double[] ax = new double[steps + 1];
+        double[] ay = new double[steps + 1];
+        double[] ad = new double[steps + 1];
+        double[] bx = new double[steps + 1];
+        double[] by = new double[steps + 1];
+        double[] bd = new double[steps + 1];
         for (int i = 0; i <= steps; i++) {
             double phi = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * i) / steps;
-            double[] pt = Globe.onShell(lonA, this.origin, radius, radius * Math.sin(phi));
-            Globe.Projected q = at(pt);
-            if (!q.visible) {
+            double y = radius * Math.sin(phi);
+            Globe.Projected qa = at(Globe.onShell(lonA, this.origin, radius, y));
+            Globe.Projected qb = at(Globe.onShell(lonB, this.origin, radius, y));
+            if (!qa.visible || !qb.visible) {
                 return;                         // the band crosses the lens; skip it whole
             }
-            xs[n] = (int) Math.round(q.x);
-            ys[n] = (int) Math.round(q.y);
-            n++;
-            depth += q.depth;
-            seen++;
+            ax[i] = qa.x;
+            ay[i] = qa.y;
+            ad[i] = qa.depth;
+            bx[i] = qb.x;
+            by[i] = qb.y;
+            bd[i] = qb.depth;
         }
-        for (int i = steps; i >= 0; i--) {
-            double phi = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * i) / steps;
-            double[] pt = Globe.onShell(lonB, this.origin, radius, radius * Math.sin(phi));
-            Globe.Projected q = at(pt);
-            if (!q.visible) {
-                return;
-            }
-            xs[n] = (int) Math.round(q.x);
-            ys[n] = (int) Math.round(q.y);
-            n++;
-            depth += q.depth;
-            seen++;
+        // <b>Cut where the strip would lie across itself.</b> Filled whole, the far half of
+        // a band lands on the near half and the even-odd rule subtracts one from the other -
+        // those were the notches bitten out of the sphere - and the same thing happens again
+        // where each meridian folds over its apex near the crown. Globe.bandRuns says where
+        // to cut for both; each run is then its own polygon, its own shade and its own place
+        // in the depth sort, which is the honest answer to all three.
+        double[] mid = new double[steps];
+        for (int j = 0; j < steps; j++) {
+            mid[j] = (ad[j] + ad[j + 1] + bd[j] + bd[j + 1]) / 4.0;
         }
-        double away = ((depth / seen) - this.cam.distance) / Math.max(1e-6, radius);
+        int[] runs = Globe.bandRuns(mid, this.cam.distance, ay, by);
+        for (int r = 0; r + 1 < runs.length; r++) {
+            fillRun(ax, ay, ad, bx, by, bd, runs[r], runs[r + 1], radius, fill);
+        }
+    }
+
+    /**
+     * One same-facing stretch of a band, as a polygon that does not cross itself.
+     *
+     * Up one meridian from {@code from} to {@code to} and back down the other, so both long
+     * edges stay the arcs they are. Runs share their boundary vertex, so neighbours meet
+     * without a seam between them.
+     */
+    private void fillRun(double[] ax, double[] ay, double[] ad,
+            double[] bx, double[] by, double[] bd,
+            int from, int to, double radius, Color fill) {
+        int span = (to - from + 1) * 2;
+        int[] xs = new int[span];
+        int[] ys = new int[span];
+        double depth = 0;
+        int n = 0;
+        for (int i = from; i <= to; i++) {
+            xs[n] = (int) Math.round(ax[i]);
+            ys[n] = (int) Math.round(ay[i]);
+            depth += ad[i];
+            n++;
+        }
+        for (int i = to; i >= from; i--) {
+            xs[n] = (int) Math.round(bx[i]);
+            ys[n] = (int) Math.round(by[i]);
+            depth += bd[i];
+            n++;
+        }
+        double sits = depth / n;
+        double away = (sits - this.cam.distance) / Math.max(1e-6, radius);
         double facing = Math.max(0.0, Math.min(1.0, 0.5 - 0.5 * away));
         final Color ink = new Color(fill.getRed(), fill.getGreen(), fill.getBlue(),
             (int) Math.round(fill.getAlpha() * (0.30 + 0.70 * facing)));
         final int count = n;
-        this.pieces.add(new Piece(depth / seen, () -> {
+        this.pieces.add(new Piece(sits, () -> {
             this.g.setColor(ink);
             this.g.fillPolygon(xs, ys, count);
         }));
