@@ -154,7 +154,7 @@ public class OuraniaWindow extends JFrame {
         chartRail.addPage(SELECTION_PAGE, HtmlPanes.scroller(selectionPane));
         // Open on Chart at launch, without animating - the Natal section used to be the one
         // section open when the app started, and this is where that content went.
-        chartRail.revealImmediately(CHART_PAGE);
+        chartRail.prepare(CHART_PAGE);
         add(chartRail, BorderLayout.WEST);
 
         // Built here rather than beside the rail below, because SkymapPanel's constructor
@@ -219,7 +219,7 @@ public class OuraniaWindow extends JFrame {
         // Open on Menu at launch and without animating, which is what the drawer it replaced
         // did: an app that slides its own panel out on every start is animating at the one
         // moment nobody asked it to.
-        menuRail.revealImmediately(MENU_PAGE);
+        menuRail.prepare(MENU_PAGE);
         add(menuRail, BorderLayout.EAST);
         
         releasingPanel = new ReleasingPanel(this);

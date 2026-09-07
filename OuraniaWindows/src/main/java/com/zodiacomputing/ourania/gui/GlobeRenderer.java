@@ -442,21 +442,72 @@ final class GlobeRenderer {
      * shading was the missing thing, but the two together are what finish it.
      */
     private void wedgeOnSphere(double lon0, double lon1, double radius, Color fill) {
-        int steps = Math.max(4, (int) Math.ceil(Math.abs(lon1 - lon0) / 6.0));
-        int rows = 14;
-        for (int i = 0; i < steps; i++) {
-            double la = lon0 + ((lon1 - lon0) * i) / steps;
-            double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;
-            for (int j = 0; j < rows; j++) {
-                double p0 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * j) / rows;
-                double p1 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * (j + 1)) / rows;
-                double[] a = Globe.onShell(la, this.origin, radius, radius * Math.sin(p0));
-                double[] b = Globe.onShell(lb, this.origin, radius, radius * Math.sin(p0));
-                double[] c = Globe.onShell(lb, this.origin, radius, radius * Math.sin(p1));
-                double[] d = Globe.onShell(la, this.origin, radius, radius * Math.sin(p1));
-                quad(a, b, c, d, shadeByFacing(fill, a, b, c, d, radius));
-            }
+        // <b>Bands with curved edges, not a grid of flats.</b> A wedge was a mesh of
+        // quadrilaterals, and a quadrilateral has straight sides - so every cell boundary was
+        // a chord across an arc and the sphere came out faceted however many cells it was cut
+        // into. More cells made the facets smaller and never made them curves. Each band is
+        // one filled path now, its two long edges traced along the meridians themselves, so
+        // the edge is the curve rather than an approximation of it.
+        //
+        // It is also far cheaper: six bands to a sign instead of seventy cells, which is what
+        // paid for tracing thirty-six points down each edge.
+        int bands = Math.max(2, (int) Math.ceil(Math.abs(lon1 - lon0) / 5.0));
+        for (int i = 0; i < bands; i++) {
+            double la = lon0 + ((lon1 - lon0) * i) / bands;
+            double lb = lon0 + ((lon1 - lon0) * (i + 1)) / bands;
+            bandPath(la, lb, radius, fill);
         }
+    }
+
+    /**
+     * One band of a sphere between two longitudes, as a single filled path.
+     *
+     * The outline runs up one meridian and back down the other, so both long edges are the
+     * arcs they are meant to be. Shaded by the band's own facing, which is smooth enough at
+     * five degrees a band that the reader sees a gradient rather than steps.
+     */
+    private void bandPath(double lonA, double lonB, double radius, Color fill) {
+        final int steps = 36;
+        int[] xs = new int[(steps + 1) * 2];
+        int[] ys = new int[(steps + 1) * 2];
+        int n = 0;
+        double depth = 0;
+        int seen = 0;
+        for (int i = 0; i <= steps; i++) {
+            double phi = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * i) / steps;
+            double[] pt = Globe.onShell(lonA, this.origin, radius, radius * Math.sin(phi));
+            Globe.Projected q = at(pt);
+            if (!q.visible) {
+                return;                         // the band crosses the lens; skip it whole
+            }
+            xs[n] = (int) Math.round(q.x);
+            ys[n] = (int) Math.round(q.y);
+            n++;
+            depth += q.depth;
+            seen++;
+        }
+        for (int i = steps; i >= 0; i--) {
+            double phi = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * i) / steps;
+            double[] pt = Globe.onShell(lonB, this.origin, radius, radius * Math.sin(phi));
+            Globe.Projected q = at(pt);
+            if (!q.visible) {
+                return;
+            }
+            xs[n] = (int) Math.round(q.x);
+            ys[n] = (int) Math.round(q.y);
+            n++;
+            depth += q.depth;
+            seen++;
+        }
+        double away = ((depth / seen) - this.cam.distance) / Math.max(1e-6, radius);
+        double facing = Math.max(0.0, Math.min(1.0, 0.5 - 0.5 * away));
+        final Color ink = new Color(fill.getRed(), fill.getGreen(), fill.getBlue(),
+            (int) Math.round(fill.getAlpha() * (0.30 + 0.70 * facing)));
+        final int count = n;
+        this.pieces.add(new Piece(depth / seen, () -> {
+            this.g.setColor(ink);
+            this.g.fillPolygon(xs, ys, count);
+        }));
     }
 
     /**
@@ -918,6 +969,13 @@ final class GlobeRenderer {
                 int rad = lit ? 11 : 9;
                 if (asPlanet) {
                     drawPlanet(bodyIndex, (int) q.x, (int) q.y, rad, alpha, lit);
+                    // <b>The glyph stays, beside it.</b> A planet at nine pixels is
+                    // recognisable and not readable - two grey worlds are two grey worlds -
+                    // and the glyph is how this chart has always named a body. Set off to
+                    // the right so it labels the planet rather than sitting on it.
+                    this.g.setFont(font(12));
+                    this.g.setColor(shade(ink, (int) (alpha * 0.92)));
+                    this.g.drawString(glyph, (int) q.x + rad + 3, (int) q.y + 4);
                     return;
                 }
                 this.g.setColor(shade(bead, alpha));
@@ -1023,19 +1081,24 @@ final class GlobeRenderer {
         int d = rad * 2;
 
         if (face == FACE_SUN) {
-            // The corona first, so the disc sits inside it rather than on top of it.
-            for (int i = 3; i >= 1; i--) {
-                int glow = rad + i * 4;
-                this.g.setColor(new Color(255, 168, 60,
-                    Math.max(0, Math.min(255, (int) (alpha * 0.11 / i)))));
+            // <b>The corona reaches further and the core is white.</b> It read as one more
+            // orange bead: the glow was three faint rings inside the disc's own radius, which
+            // is not a corona, it is a soft edge. Five rings out to twice the radius, and a
+            // near-white centre, so the Sun is the brightest thing on the ring - which is the
+            // one fact about it nobody has to be taught.
+            for (int i = 5; i >= 1; i--) {
+                int glow = rad + i * 5;
+                this.g.setColor(new Color(255, 186, 82,
+                    Math.max(0, Math.min(255, (int) (alpha * 0.16 / i)))));
                 this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
             }
             this.g.setPaint(new java.awt.RadialGradientPaint(
-                new java.awt.geom.Point2D.Float(x - rad * 0.3f, y - rad * 0.3f),
-                Math.max(1f, rad * 1.6f), new float[] {0f, 0.55f, 1f},
-                new Color[] {shade(new Color(255, 246, 214), alpha),
-                    shade(new Color(255, 186, 72), alpha),
-                    shade(new Color(206, 92, 30), alpha)}));
+                new java.awt.geom.Point2D.Float(x - rad * 0.22f, y - rad * 0.22f),
+                Math.max(1f, rad * 1.5f), new float[] {0f, 0.35f, 0.75f, 1f},
+                new Color[] {shade(new Color(255, 255, 246), alpha),
+                    shade(new Color(255, 232, 158), alpha),
+                    shade(new Color(255, 168, 56), alpha),
+                    shade(new Color(214, 96, 28), alpha)}));
             this.g.fillOval(x - rad, y - rad, d, d);
             this.g.setPaint(null);
             this.g.setColor(shade(new Color(255, 214, 130), alpha));

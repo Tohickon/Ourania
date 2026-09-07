@@ -95,6 +95,12 @@ public final class NavigationCheck {
         report("Part G", before);
 
         System.out.println();
+        System.out.println("=== Part H: the app opens onto the chart ===");
+        before = failures.size();
+        opensOntoTheChart();
+        report("Part H", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -710,6 +716,57 @@ public final class NavigationCheck {
         int dg = a.getGreen() - b.getGreen();
         int db = a.getBlue() - b.getBlue();
         return (int) Math.round(Math.sqrt(dr * dr + dg * dg + db * db));
+    }
+
+    /**
+     * Nothing is open when the window appears except the chart.
+     *
+     * <b>Both rails were revealed at startup.</b> The first thing a reader saw was a chart
+     * with nearly six hundred pixels of panel taken off it - the app opening onto its own
+     * furniture. The rails still know which page they hold, so a first press of a tab opens
+     * onto the right one; they simply start closed.
+     *
+     * Asserted because it is the kind of thing a later convenience quietly undoes: one call
+     * to reveal a panel "so the reader can find it" and the chart is back behind the
+     * furniture, with nothing to say so.
+     */
+    private static void opensOntoTheChart() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            Thread.sleep(2500);
+            final java.util.List<DrawerRail> rails = new java.util.ArrayList<>();
+            final java.util.List<Drawer> drawers = new java.util.ArrayList<>();
+            SwingUtilities.invokeAndWait(() -> collectPanels(w[0].getContentPane(),
+                rails, drawers));
+
+            ok("the window has rails to be closed", !rails.isEmpty());
+            for (DrawerRail rail : rails) {
+                ok("a rail starts closed", !rail.isOpen());
+                // Closed but not empty: it knows the page it will open onto.
+                ok("and still knows which page it holds", rail.selected() != null);
+            }
+            for (Drawer d : drawers) {
+                ok("the " + d.side() + " drawer starts closed", !d.isOpen());
+            }
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    private static void collectPanels(Container c, java.util.List<DrawerRail> rails,
+                                      java.util.List<Drawer> drawers) {
+        for (Component child : c.getComponents()) {
+            if (child instanceof DrawerRail) {
+                rails.add((DrawerRail) child);
+            }
+            if (child instanceof Drawer) {
+                drawers.add((Drawer) child);
+            }
+            if (child instanceof Container) {
+                collectPanels((Container) child, rails, drawers);
+            }
+        }
     }
 
     private static void set(Object target, String name, Object value) throws Exception {

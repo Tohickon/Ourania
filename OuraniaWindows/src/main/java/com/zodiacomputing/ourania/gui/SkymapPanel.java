@@ -3701,6 +3701,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int n10 = rings[RING_TRANSIT];
         int n11 = rings[RING_BODY_TOP];      // floor of the partner band, since the reorder
         int n12 = rings[RING_SIGN_OUTER];
+        int nTermInner = rings[RING_TERM_INNER];
+        int nDegreeInner = rings[RING_DEGREE_INNER];
         int n13 = g.bodyBase;
         double[] dArray = this.activeCusps;
         double d8 = g.pin;
@@ -3940,6 +3942,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             n3 = (int)(d9 / 30.0);
             int n23 = (int)(d9 % 30.0 / 10.0) + 1;
             this.window.showInterpretationForDecan(SIGN_NAMES[n3], n23);
+            return;
+        }
+        // <b>The inner degree scale reads a degree too.</b> It was drawn with 360 ticks and
+        // answered nothing - a scale the reader can count along and cannot ask. The outer rim
+        // has had a Sabian strip all along, but it is a sliver squeezed beside the mansions;
+        // this band is the whole depth of the inner scale, which makes it the easy one to hit
+        // and the reason David asked for a second ring rather than a better first one.
+        if (d6 >= (double)nDegreeInner && d6 < (double)nTermInner) {
+            n3 = (int)Math.round(d9) % 360;
+            if (n3 < 0) {
+                n3 += 360;
+            }
+            this.window.showInterpretationForSabianSymbol(SIGN_NAMES[n3 / 30], n3 % 30 + 1);
             return;
         }
         // The lunar mansion ring, tested BEFORE the Sabian degree because the two share this

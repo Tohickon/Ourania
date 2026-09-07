@@ -221,7 +221,24 @@ public final class DrawerRail extends JPanel {
         }
     }
 
-    /** Opens without animating, for the state the app starts in. */
+    /**
+     * Chooses the page a closed rail will show, without opening it.
+     *
+     * <b>For the state the app starts in.</b> Both rails used to be revealed at startup, so
+     * the first thing a reader saw was a chart with six hundred pixels of panel taken off it -
+     * the app opening onto its own furniture rather than onto the chart. The rail still knows
+     * which page it holds, so the first press of a tab opens onto the right one rather than
+     * onto nothing.
+     */
+    public void prepare(String label) {
+        selected = label;
+        cards.show(pages, label);
+        targetWidth = 0;
+        applyWidth(0);
+        repaintTabs();
+    }
+
+    /** Opens without animating, for a caller that wants it open from the first frame. */
     public void revealImmediately(String label) {
         selected = label;
         cards.show(pages, label);
