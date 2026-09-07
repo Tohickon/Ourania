@@ -8,6 +8,7 @@ import com.zodiacomputing.ourania.astro.Aspects;
 import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.BodyScore;
 import com.zodiacomputing.ourania.astro.ChartFrame;
+import com.zodiacomputing.ourania.astro.Dignity;
 import com.zodiacomputing.ourania.astro.Convergence;
 import com.zodiacomputing.ourania.astro.Gestalt;
 import com.zodiacomputing.ourania.astro.Profection;
@@ -4024,6 +4025,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * with no outer ring open it still equals it exactly.
      */
     static final int RING_BODY_TOP = 6;
+    /**
+     * Boundary between the decan band and the bound (term) band.
+     *
+     * The decan band now runs from {@code RING_DECAN_OUTER} to here, and the bounds from here
+     * to {@code RING_SIGN_OUTER} - so the subdivisions sit outside the sign they subdivide,
+     * coarsest first: ten-degree decans, then the Egyptian bounds, then the sign itself.
+     */
+    static final int RING_TERM_OUTER = 7;
+
+    /** How deep the bound band is. Two degrees shallower than the decans, being finer. */
+    static final int TERM_BAND_DEPTH = 18;
 
     /**
      * The wheel's ring radii, outermost first, derived in one place.
@@ -4037,8 +4049,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      *
      * <b>The zodiac is the outermost thing, and the bodies nest underneath it.</b> Reading
      * inward from the rim: degree ticks inside {@code RING_OUTER}, then the decan band from
-     * {@code RING_DECAN_OUTER} to {@code RING_SIGN_OUTER}, then the sign band down to
-     * {@code RING_SIGN_INNER}. The body bands hang below that - the sky from
+     * {@code RING_DECAN_OUTER} to {@code RING_TERM_OUTER}, the Egyptian bounds from there to
+     * {@code RING_SIGN_OUTER}, then the sign band down to {@code RING_SIGN_INNER}. The body bands hang below that - the sky from
      * {@code RING_SIGN_INNER} (== {@code RING_TRI}) to {@code RING_TRANSIT}, the partner from
      * there to {@code RING_BODY_TOP}, and the natal wheel inside all of it.
      *
@@ -4083,13 +4095,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // The zodiac sits at fixed radii just inside the rim; it no longer moves when a body
         // ring opens, which is the point of putting it outside them.
         int decanOuter = outer - 20;
-        int signOuter = decanOuter - 20;
+        int termOuter = decanOuter - 20;
+        int signOuter = termOuter - TERM_BAND_DEPTH;
         int signInner = signOuter - 35;
         // The body bands hang below the zodiac, each opening downward into the wheel.
         int tri     = signInner;
         int transit = (int) Math.round((double) tri - (double) depth * t);
         int bodyTop = (int) Math.round((double) transit - (double) depth * o);
-        return new int[] { outer, tri, transit, decanOuter, signOuter, signInner, bodyTop };
+        return new int[] {
+            outer, tri, transit, decanOuter, signOuter, signInner, bodyTop, termOuter };
     }
 
     /** Overload for callers that pre-date the tri-wheel; preserves the old contract. */
@@ -4388,6 +4402,61 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      *
      * Defensive throughout: this is decoration on a chart that must draw with or without it.
      */
+    /**
+     * The Egyptian bounds, five segments a sign, in the band between decans and signs.
+     *
+     * <b>Both halves come from Dignity.</b> The edges from {@code boundEdges} and the ruler
+     * from {@code boundRulerOf}, so the ring cannot disagree with the score: a planet the
+     * dignity table says is in its own bound is a planet standing in the segment this ring
+     * draws for it. Writing the table out again here would have been a second statement of a
+     * rule whose whole point is being stated once - and the two would not diverge on the day
+     * it was copied, but on the day one of them was corrected.
+     *
+     * Drawn in the ruler's own body colour so the band is scannable at a glance: the run of
+     * Saturn segments at the ends of the signs reads as a band of one colour.
+     *
+     * @param outer the band's outer edge   (RING_TERM_OUTER)
+     * @param inner the band's inner edge   (RING_SIGN_OUTER)
+     */
+    private void drawBoundRing(Graphics2D g, int cx, int cy, int outer, int inner, double pin) {
+        java.awt.Font was = g.getFont();
+        g.setFont(new Font("SansSerif", 0, 11));
+        int mid = (outer + inner) / 2;
+        for (int sign = 0; sign < 12; sign++) {
+            double[] edges = Dignity.boundEdges(sign);
+            for (int i = 0; i < edges.length - 1; i++) {
+                double startLon = sign * 30.0 + edges[i];
+                double endLon = sign * 30.0 + edges[i + 1];
+
+                // The division at the segment's start. The sign boundary already has a line
+                // of its own, so the first edge of each sign is left to it.
+                if (i > 0) {
+                    double a = Math.toRadians(180.0 + pin - startLon);
+                    g.setColor(new Color(150, 150, 150, 140));
+                    g.setStroke(new BasicStroke(1.0f));
+                    g.drawLine(cx + (int) (outer * Math.cos(a)), cy + (int) (outer * Math.sin(a)),
+                        cx + (int) (inner * Math.cos(a)), cy + (int) (inner * Math.sin(a)));
+                }
+
+                // The ruler goes at the segment's midpoint, asked for at that longitude so
+                // this ring and the dignity score are answering the same question.
+                double centreLon = (startLon + endLon) / 2.0;
+                String ruler = Dignity.boundRulerOf(centreLon % 360.0);
+                int bi = Bodies.indexOfName(ruler);
+                if (bi < 0 || bi >= BODY_GLYPHS.length) {
+                    continue;                   // unresolvable ruler: leave the segment blank
+                }
+                double c = Math.toRadians(180.0 + pin - centreLon);
+                int gx = cx + (int) (mid * Math.cos(c));
+                int gy = cy + (int) (mid * Math.sin(c));
+                g.setColor(this.bodyColor(bi));
+                String glyph = BODY_GLYPHS[bi];
+                g.drawString(glyph, gx - g.getFontMetrics().stringWidth(glyph) / 2, gy + 4);
+            }
+        }
+        g.setFont(was);
+    }
+
     private void drawMansionRing(Graphics2D g, int cx, int cy, int outer, double pin) {
         try {
             java.util.List<com.zodiacomputing.ourania.astro.LunarMansions.Mansion> all =
@@ -5545,6 +5614,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int n17 = rings[RING_SIGN_OUTER];
             int n18 = rings[RING_SIGN_INNER];
             int nBodyTop = rings[RING_BODY_TOP];
+            int nTermOuter = rings[RING_TERM_OUTER];
             // <b>The disc, filled separately from the page.</b> One colour used to do both -
             // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
             // Filled before any ring is drawn, so every stroke below lands on top of it.
@@ -5563,6 +5633,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.setStroke(new BasicStroke(2.0f));
             graphics2D.drawOval(n12 - n18, n13 - n18, n18 * 2, n18 * 2);
             graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
+            graphics2D.drawOval(n12 - nTermOuter, n13 - nTermOuter,
+                nTermOuter * 2, nTermOuter * 2);
             graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
             if (SkymapPanel.this.outerRingDrawn()) {
                 // Both boundaries of the partner band. Since the reorder it hangs below the
@@ -5582,8 +5654,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             for (n8 = 0; n8 < 36; ++n8) {
                 d3 = (double)n8 * 10.0;
                 d2 = Math.toRadians(180.0 + d4 - d3);
-                n7 = n12 + (int)((double)n17 * Math.cos(d2));
-                n6 = n13 + (int)((double)n17 * Math.sin(d2));
+                // The decan band's inner edge is the term ring since the bounds were given a
+                // band of their own; it used to run all the way to the sign ring.
+                n7 = n12 + (int)((double)nTermOuter * Math.cos(d2));
+                n6 = n13 + (int)((double)nTermOuter * Math.sin(d2));
                 n5 = n12 + (int)((double)n16 * Math.cos(d2));
                 n4 = n13 + (int)((double)n16 * Math.sin(d2));
                 graphics2D.setColor(Color.LIGHT_GRAY);
@@ -5612,6 +5686,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n20)));
                 graphics2D.drawString(ZODIAC_SYMBOLS[n20], n3 - 4, n2 + 4);
             }
+            // <b>The Egyptian bounds, one glyph per segment.</b> Dignity has scored bound
+            // placements since it was written and nothing drew them, so a reader comparing
+            // this wheel against another program found the terms simply missing. Sixty
+            // segments, five to a sign, each ruled by one of the five non-luminary planets -
+            // read from Dignity rather than from a second copy of the table.
+            SkymapPanel.this.drawBoundRing(graphics2D, n12, n13, nTermOuter, n17, d4);
+
             // The 28 lunar mansions, in the outermost band alongside the degree ticks.
             //
             // Placed here rather than as a band of its own because every other ring's radius

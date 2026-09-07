@@ -198,6 +198,30 @@ public final class Dignity {
         return TRIPLICITY[Math.floorMod(signIndex, 12) % 4][2];
     }
 
+    /**
+     * Where one sign's Egyptian bounds begin, in degrees into the sign.
+     *
+     * <b>The edges only; the ruler still comes from {@link #boundRulerOf}.</b> The wheel
+     * needs both to draw a bound ring - where to put the divisions and what to write in each
+     * segment - and handing out the table itself would let a caller build a second copy of a
+     * rule this class exists to be the only statement of. Six values: five starts and the
+     * closing 30, so a caller can take pairs without special-casing the last one.
+     *
+     * <b>The bounds table had no reader outside this package.</b> Dignity has scored bound
+     * placements since it was written and the wheel drew nothing for them, which is why David
+     * could look at a chart, see a terms ring in another program, and find ours had none - the
+     * engine was there the whole time and had no door.
+     */
+    public static double[] boundEdges(int signIndex) {
+        Object[][] rows = BOUNDS[((signIndex % 12) + 12) % 12];
+        double[] edges = new double[rows.length + 1];
+        for (int i = 0; i < rows.length; i++) {
+            edges[i] = ((Integer) rows[i][1]).doubleValue();
+        }
+        edges[rows.length] = 30.0;
+        return edges;
+    }
+
     /** Egyptian bound ruler for a longitude. Inclusive start, exclusive end. */
     public static String boundRulerOf(double longitude) {
         int s = Zodiac.signIndex(longitude);

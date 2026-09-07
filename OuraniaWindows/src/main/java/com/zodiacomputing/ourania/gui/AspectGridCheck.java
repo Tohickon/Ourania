@@ -1851,7 +1851,8 @@ public final class AspectGridCheck {
                 // The zodiac is fixed just inside the rim and no longer moves when a body
                 // ring opens - that is what the 2026-09-06 reorder was for.
                 int decanOuter = outer - 20;
-                int signOuter = decanOuter - 20;
+                int termOuter = decanOuter - 20;
+                int signOuter = termOuter - 18;
                 int signInner = signOuter - 35;
                 String at = " (" + w + "x" + h + ")";
 
@@ -1863,10 +1864,12 @@ public final class AspectGridCheck {
                         String tag = at + " partner=" + partner + " sky=" + sky;
 
                         int[] got = SkymapPanel.ringRadii(w, h, partner, sky);
-                        ok("ring chain returns seven radii" + tag, got.length == 7);
+                        ok("ring chain returns eight radii" + tag, got.length == 8);
                         ok("outer matches" + tag, got[SkymapPanel.RING_OUTER] == outer);
                         ok("decan outer matches" + tag,
                             got[SkymapPanel.RING_DECAN_OUTER] == decanOuter);
+                        ok("the bound band hangs under the decans" + tag,
+                            got[SkymapPanel.RING_TERM_OUTER] == termOuter);
                         ok("sign outer matches" + tag,
                             got[SkymapPanel.RING_SIGN_OUTER] == signOuter);
                         ok("sign inner matches" + tag,
@@ -1889,13 +1892,17 @@ public final class AspectGridCheck {
                                 && got[SkymapPanel.RING_SIGN_OUTER]
                                     == shut[SkymapPanel.RING_SIGN_OUTER]
                                 && got[SkymapPanel.RING_SIGN_INNER]
-                                    == shut[SkymapPanel.RING_SIGN_INNER]);
+                                    == shut[SkymapPanel.RING_SIGN_INNER]
+                                && got[SkymapPanel.RING_TERM_OUTER]
+                                    == shut[SkymapPanel.RING_TERM_OUTER]);
 
                         // Everything nests, outermost first, at any size the window can be.
                         if (outer > 120) {
                             ok("rings nest outward-in" + tag,
                                 got[SkymapPanel.RING_OUTER] > got[SkymapPanel.RING_DECAN_OUTER]
                                     && got[SkymapPanel.RING_DECAN_OUTER]
+                                        > got[SkymapPanel.RING_TERM_OUTER]
+                                    && got[SkymapPanel.RING_TERM_OUTER]
                                         > got[SkymapPanel.RING_SIGN_OUTER]
                                     && got[SkymapPanel.RING_SIGN_OUTER]
                                         > got[SkymapPanel.RING_SIGN_INNER]

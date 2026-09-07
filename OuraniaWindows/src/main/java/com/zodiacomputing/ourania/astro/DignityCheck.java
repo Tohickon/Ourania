@@ -29,6 +29,8 @@ public final class DignityCheck {
         section("Part C: worked placements", DignityCheck::workedPlacements);
         section("Part D: peregrination, almuten, boundaries", DignityCheck::peregrineAndAlmuten);
         section("Part E: the scoring scale is ordered", DignityCheck::scaleIsOrdered);
+        section("Part F: the wheel's bound edges are the scoring table's",
+            DignityCheck::boundEdgesAgree);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -49,6 +51,58 @@ public final class DignityCheck {
      * degrees equals its traditional years. Moving any single boundary changes two
      * planets' totals at once, so this catches essentially any transcription slip.
      */
+    /**
+     * The edges the wheel draws and the ruler the score uses must be one table.
+     *
+     * <b>boundEdges exists because the bound ring had no way to know where a segment
+     * starts.</b> Two accessors onto one table is fine; two tables would not be, and the way
+     * that happens is someone corrects one of them. So this walks the zodiac degree by degree
+     * and asserts the ruler changes exactly at an edge and nowhere else - which is the same
+     * claim as "the ring's divisions land where the score changes", stated without either side
+     * being asked to trust the other.
+     *
+     * <b>The band was drawn for the first time on 2026-09-06.</b> Dignity had scored bound
+     * placements since it was written, and the wheel drew nothing for them - an engine with no
+     * door, found by David looking at another program's chart and noticing ours had no terms.
+     */
+    private static void boundEdgesAgree() {
+        for (int sign = 0; sign < 12; sign++) {
+            double[] edges = Dignity.boundEdges(sign);
+            eq("sign " + sign + " has five bounds", 6, edges.length);
+            eq("sign " + sign + " starts at 0", 0.0, edges[0]);
+            eq("sign " + sign + " closes at 30", 30.0, edges[edges.length - 1]);
+            for (int i = 1; i < edges.length; i++) {
+                yes("sign " + sign + " edge " + i + " moves outward",
+                    edges[i] > edges[i - 1]);
+            }
+
+            // Tenth-degree steps: fine enough to land either side of every edge, since the
+            // Egyptian bounds are whole degrees.
+            String previous = null;
+            for (int step = 0; step < 300; step++) {
+                double deg = step / 10.0;
+                double lon = sign * 30.0 + deg;
+                String ruler = Dignity.boundRulerOf(lon);
+                boolean atEdge = false;
+                for (int i = 1; i < edges.length - 1; i++) {
+                    if (Math.abs(deg - edges[i]) < 1e-9) {
+                        atEdge = true;
+                    }
+                }
+                if (previous != null) {
+                    if (atEdge) {
+                        yes("sign " + sign + ": the ruler changes at edge " + deg,
+                            !ruler.equals(previous));
+                    } else {
+                        yes("sign " + sign + ": the ruler holds at " + deg,
+                            ruler.equals(previous));
+                    }
+                }
+                previous = ruler;
+            }
+        }
+    }
+
     private static void boundsChecksum() {
         Map<String, Integer> totals = new HashMap<>();
         Object[][][] table = Dignity.boundsTable();
@@ -274,6 +328,14 @@ public final class DignityCheck {
         checks++;
         if (expected == null ? actual != null : !expected.equals(actual)) {
             failures.add(label + ": got " + actual + ", expected " + expected);
+        }
+    }
+
+    /** For claims that are not an equality - ordering, membership, a boundary landing. */
+    private static void yes(String label, boolean condition) {
+        checks++;
+        if (!condition) {
+            failures.add(label);
         }
     }
 }
