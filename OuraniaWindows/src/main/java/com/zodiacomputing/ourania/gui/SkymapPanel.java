@@ -4026,16 +4026,29 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      */
     static final int RING_BODY_TOP = 6;
     /**
-     * Boundary between the decan band and the bound (term) band.
+     * Floor of the bound (term) band, whose ceiling is {@code RING_SIGN_INNER}.
      *
-     * The decan band now runs from {@code RING_DECAN_OUTER} to here, and the bounds from here
-     * to {@code RING_SIGN_OUTER} - so the subdivisions sit outside the sign they subdivide,
-     * coarsest first: ten-degree decans, then the Egyptian bounds, then the sign itself.
+     * <b>The signs sit between their two subdivisions now, not under both.</b> Decans outside,
+     * signs, then the Egyptian bounds inside - so the sign band is framed by the two rings
+     * that divide it rather than carrying them both on one side.
      */
-    static final int RING_TERM_OUTER = 7;
+    static final int RING_TERM_INNER = 7;
 
-    /** How deep the bound band is. Two degrees shallower than the decans, being finer. */
+    /**
+     * Floor of the inner degree ring, whose ceiling is {@code RING_TERM_INNER}.
+     *
+     * <b>The second degree scale, and the one the bodies point at.</b> The outer ticks sit at
+     * the rim with the lunar mansions, a long way from any glyph; this one sits directly above
+     * the wheels, so a body's leader line has somewhere near to land. Everything between the
+     * two scales - decans, signs, bounds - is sandwiched by them.
+     */
+    static final int RING_DEGREE_INNER = 8;
+
+    /** How deep the bound band is. Two pixels shallower than the decans, being finer. */
     static final int TERM_BAND_DEPTH = 18;
+
+    /** How deep the inner degree scale is. Ticks only, so it needs little. */
+    static final int DEGREE_RING_DEPTH = 16;
 
     /**
      * The wheel's ring radii, outermost first, derived in one place.
@@ -4048,9 +4061,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * extraction cannot have silently moved the wheel.
      *
      * <b>The zodiac is the outermost thing, and the bodies nest underneath it.</b> Reading
-     * inward from the rim: degree ticks inside {@code RING_OUTER}, then the decan band from
-     * {@code RING_DECAN_OUTER} to {@code RING_TERM_OUTER}, the Egyptian bounds from there to
-     * {@code RING_SIGN_OUTER}, then the sign band down to {@code RING_SIGN_INNER}. The body bands hang below that - the sky from
+     * inward from the rim: degree ticks inside {@code RING_OUTER}, the decan band from
+     * {@code RING_DECAN_OUTER} to {@code RING_SIGN_OUTER}, the sign band from there to
+     * {@code RING_SIGN_INNER}, the Egyptian bounds down to {@code RING_TERM_INNER}, and the
+     * inner degree scale down to {@code RING_DEGREE_INNER}. The signs are framed by their two
+     * subdivisions, and the whole zodiac is framed by the two degree scales. The body bands hang below that - the sky from
      * {@code RING_SIGN_INNER} (== {@code RING_TRI}) to {@code RING_TRANSIT}, the partner from
      * there to {@code RING_BODY_TOP}, and the natal wheel inside all of it.
      *
@@ -4095,15 +4110,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // The zodiac sits at fixed radii just inside the rim; it no longer moves when a body
         // ring opens, which is the point of putting it outside them.
         int decanOuter = outer - 20;
-        int termOuter = decanOuter - 20;
-        int signOuter = termOuter - TERM_BAND_DEPTH;
+        int signOuter = decanOuter - 20;
         int signInner = signOuter - 35;
-        // The body bands hang below the zodiac, each opening downward into the wheel.
-        int tri     = signInner;
+        int termInner = signInner - TERM_BAND_DEPTH;
+        int degreeInner = termInner - DEGREE_RING_DEPTH;
+        // The body bands hang below the inner degree scale, each opening downward.
+        int tri     = degreeInner;
         int transit = (int) Math.round((double) tri - (double) depth * t);
         int bodyTop = (int) Math.round((double) transit - (double) depth * o);
         return new int[] {
-            outer, tri, transit, decanOuter, signOuter, signInner, bodyTop, termOuter };
+            outer, tri, transit, decanOuter, signOuter, signInner, bodyTop,
+            termInner, degreeInner };
     }
 
     /** Overload for callers that pre-date the tri-wheel; preserves the old contract. */
@@ -4415,9 +4432,52 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * Drawn in the ruler's own body colour so the band is scannable at a glance: the run of
      * Saturn segments at the ends of the signs reads as a band of one colour.
      *
-     * @param outer the band's outer edge   (RING_TERM_OUTER)
-     * @param inner the band's inner edge   (RING_SIGN_OUTER)
+     * @param outer the band's outer edge   (RING_SIGN_INNER)
+     * @param inner the band's inner edge   (RING_TERM_INNER)
      */
+    /**
+     * The inner degree scale: 360 ticks, sitting directly above the wheels.
+     *
+     * <b>A second scale rather than a busier first one.</b> The outer ticks live at the rim
+     * with the lunar mansions, and a body drawn near the middle of the wheel is a long way
+     * from them - the leader line that connects the two crossed the decans, the signs and the
+     * bounds to get there, which is a lot of chart for one thin line to survive. This scale is
+     * the near edge of the same measurement, so the leader has a short run and lands on ticks
+     * the reader can actually count.
+     *
+     * Marked in tens and fives like the outer one, with the degree-in-sign written at every
+     * ten so the number is readable without counting from the sign boundary.
+     *
+     * @param outer the scale's outer edge   (RING_TERM_INNER)
+     * @param inner the scale's inner edge   (RING_DEGREE_INNER)
+     */
+    private void drawInnerDegreeRing(Graphics2D g, int cx, int cy, int outer, int inner,
+                                     double pin) {
+        java.awt.Font was = g.getFont();
+        g.setColor(new Color(150, 150, 150));
+        for (int d = 0; d < 360; d++) {
+            double a = Math.toRadians(180.0 + pin - d);
+            int depth = d % 10 == 0 ? outer - inner : (d % 5 == 0 ? 6 : 3);
+            int from = outer - depth;
+            g.setStroke(new BasicStroke(d % 10 == 0 ? 1.2f : 0.5f));
+            g.drawLine(cx + (int) (from * Math.cos(a)), cy + (int) (from * Math.sin(a)),
+                cx + (int) (outer * Math.cos(a)), cy + (int) (outer * Math.sin(a)));
+        }
+        // The degree within its sign, at every ten. Written between the tens rather than on
+        // them, so a number never sits on the tick it labels.
+        g.setFont(new Font("SansSerif", 0, 8));
+        g.setColor(new Color(130, 138, 148));
+        for (int d = 0; d < 360; d += 10) {
+            double a = Math.toRadians(180.0 + pin - (d + 5.0));
+            int mid = (outer + inner) / 2;
+            String label = String.valueOf(d % 30);
+            g.drawString(label,
+                cx + (int) (mid * Math.cos(a)) - g.getFontMetrics().stringWidth(label) / 2,
+                cy + (int) (mid * Math.sin(a)) + 3);
+        }
+        g.setFont(was);
+    }
+
     private void drawBoundRing(Graphics2D g, int cx, int cy, int outer, int inner, double pin) {
         java.awt.Font was = g.getFont();
         g.setFont(new Font("SansSerif", 0, 11));
@@ -5614,7 +5674,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int n17 = rings[RING_SIGN_OUTER];
             int n18 = rings[RING_SIGN_INNER];
             int nBodyTop = rings[RING_BODY_TOP];
-            int nTermOuter = rings[RING_TERM_OUTER];
+            int nTermInner = rings[RING_TERM_INNER];
+            int nDegreeInner = rings[RING_DEGREE_INNER];
             // <b>The disc, filled separately from the page.</b> One colour used to do both -
             // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
             // Filled before any ring is drawn, so every stroke below lands on top of it.
@@ -5633,9 +5694,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.setStroke(new BasicStroke(2.0f));
             graphics2D.drawOval(n12 - n18, n13 - n18, n18 * 2, n18 * 2);
             graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
-            graphics2D.drawOval(n12 - nTermOuter, n13 - nTermOuter,
-                nTermOuter * 2, nTermOuter * 2);
             graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
+            graphics2D.drawOval(n12 - nTermInner, n13 - nTermInner,
+                nTermInner * 2, nTermInner * 2);
+            graphics2D.drawOval(n12 - nDegreeInner, n13 - nDegreeInner,
+                nDegreeInner * 2, nDegreeInner * 2);
             if (SkymapPanel.this.outerRingDrawn()) {
                 // Both boundaries of the partner band. Since the reorder it hangs below the
                 // zodiac rather than outside it, so its floor is a line of its own - without
@@ -5654,10 +5717,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             for (n8 = 0; n8 < 36; ++n8) {
                 d3 = (double)n8 * 10.0;
                 d2 = Math.toRadians(180.0 + d4 - d3);
-                // The decan band's inner edge is the term ring since the bounds were given a
-                // band of their own; it used to run all the way to the sign ring.
-                n7 = n12 + (int)((double)nTermOuter * Math.cos(d2));
-                n6 = n13 + (int)((double)nTermOuter * Math.sin(d2));
+                n7 = n12 + (int)((double)n17 * Math.cos(d2));
+                n6 = n13 + (int)((double)n17 * Math.sin(d2));
                 n5 = n12 + (int)((double)n16 * Math.cos(d2));
                 n4 = n13 + (int)((double)n16 * Math.sin(d2));
                 graphics2D.setColor(Color.LIGHT_GRAY);
@@ -5691,7 +5752,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // this wheel against another program found the terms simply missing. Sixty
             // segments, five to a sign, each ruled by one of the five non-luminary planets -
             // read from Dignity rather than from a second copy of the table.
-            SkymapPanel.this.drawBoundRing(graphics2D, n12, n13, nTermOuter, n17, d4);
+            SkymapPanel.this.drawBoundRing(graphics2D, n12, n13, n18, nTermInner, d4);
+
+            // <b>The second degree scale, sitting directly above the wheels.</b> The outer
+            // ticks are at the rim beside the lunar mansions, too far from any glyph to read
+            // a body against; this one is where a body's leader line lands, so a reader can
+            // follow a glyph out to the degree it actually occupies.
+            SkymapPanel.this.drawInnerDegreeRing(graphics2D, n12, n13, nTermInner,
+                nDegreeInner, d4);
 
             // The 28 lunar mansions, in the outermost band alongside the degree ticks.
             //
@@ -5943,11 +6011,28 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // alpha stays here because a solid leader would compete with the aspect lines.
                 graphics2D.setComposite(priorComposite);
                 if (Settings.showDegreeLines()) {
+                    // <b>To the near scale, not the far one.</b> These used to run to the sign
+                    // ring, which since the reorder is three bands away from the bodies; they
+                    // now stop at the inner degree scale, which is the thing they are pointing
+                    // at. A leader that crosses the decans and the bounds to reach a tick is a
+                    // line the reader has to trace rather than read.
+                    //
+                    // <b>The hovered body's leader is drawn to be seen.</b> At alpha 60 every
+                    // leader is a hint and none of them is an answer; the one the cursor is on
+                    // is the reader asking which degree this glyph occupies, so it is drawn
+                    // solid and the rest stay a background.
+                    boolean lit = SkymapPanel.this.focusBody == n7
+                        && !SkymapPanel.this.focusTransit;
                     Color leader = ChartPalette.colorOr(ChartPalette.leaderHex(null),
                         Color.WHITE);
+                    Stroke priorLeader = graphics2D.getStroke();
                     graphics2D.setColor(new Color(leader.getRed(), leader.getGreen(),
-                        leader.getBlue(), 60));
-                    graphics2D.drawLine(n4, n26, n12 + (int)((double)n18 * Math.cos(d10)), n13 + (int)((double)n18 * Math.sin(d10)));
+                        leader.getBlue(), lit ? 235 : 60));
+                    graphics2D.setStroke(new BasicStroke(lit ? 1.8f : 1.0f));
+                    graphics2D.drawLine(n4, n26,
+                        n12 + (int)((double)nDegreeInner * Math.cos(d10)),
+                        n13 + (int)((double)nDegreeInner * Math.sin(d10)));
+                    graphics2D.setStroke(priorLeader);
                 }
             }
             if (SkymapPanel.this.outerRingDrawn()) {
