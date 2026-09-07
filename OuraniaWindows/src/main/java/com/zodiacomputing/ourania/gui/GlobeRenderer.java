@@ -929,7 +929,20 @@ final class GlobeRenderer {
                 levels[ring][c[1]] * Globe.STACK_STEP, inclinationOf(ring));
             double[] to = Globe.onShell(panel.bLon[c[2]], origin, shells[0],
                 levels[0][c[2]] * Globe.STACK_STEP, 0.0);
-            segment(from, to, faded(new Color(c[3], true), SkymapPanel.Layer.ASPECTS), 1.0f);
+            // <b>The hovered chord, at full strength and on its own ring.</b> The globe drew
+            // every chord alike, so pointing at a cell of the grid lit the flat wheel and did
+            // nothing at all here - a reader who had switched views lost the one gesture that
+            // says which two points a line joins. The ring index is the same 0/1/2 the wheel
+            // now uses, so the sky ring lights when the sky ring is hovered and not when the
+            // partner ring is.
+            boolean lit = panel.lightsChord(c[1], c[2], ring);
+            Color ink = new Color(c[3], true);
+            if (lit) {
+                segment(from, to, faded(new Color(255, 255, 255, 110),
+                    SkymapPanel.Layer.ASPECTS), 4.0f);
+                ink = new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 255);
+            }
+            segment(from, to, faded(ink, SkymapPanel.Layer.ASPECTS), lit ? 2.4f : 1.0f);
         }
     }
 
@@ -956,7 +969,12 @@ final class GlobeRenderer {
                     if (!cross && Bodies.isOppositePair(a, b)) {
                         continue;
                     }
-                    Color ink = panel.aspectInkFor(lons[ring][a], panel.bLon[b], a, b, cross);
+                    // Only the partner ring is a synastry pair; the sky ring is a moment and
+                    // is judged at natal orbs, the same as the flat wheel and the grid judge
+                    // it. Passing "cross" for both halved the sky ring's orbs in a synastry
+                    // chart and dropped chords the flat view was drawing.
+                    Color ink = panel.aspectInkFor(lons[ring][a], panel.bLon[b], a, b,
+                        ring == SkymapPanel.WHEEL_OUTER);
                     if (ink != null) {
                         out.add(new int[] {ring, a, b, ink.getRGB()});
                     }

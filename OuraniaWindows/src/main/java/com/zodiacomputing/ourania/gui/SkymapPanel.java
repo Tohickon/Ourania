@@ -121,6 +121,14 @@ extends JPanel {
     private String outerRingWord() {
         return this.showProgressed() ? "progressed" : "transiting";
     }
+
+    /**
+     * What the sky ring's bodies are.
+     *
+     * The outer ring can be a second person or a later moment; the sky ring is only ever the
+     * sky, which is why this one is a constant and outerRingWord is not.
+     */
+    static final String SKY_RING_WORD = "sky";
     public ChartMode chartMode = ChartMode.SINGLE;
 
     /**
@@ -819,6 +827,19 @@ extends JPanel {
             Color base = Color.decode(SkymapPanel.getAspectColorHex(label));
             return new Color(base.getRed(), base.getGreen(), base.getBlue(), 150);
         });
+    }
+
+    /**
+     * Whether the globe should light this chord.
+     *
+     * <b>The same rule the flat wheel draws by, not a second one.</b> The globe reads the
+     * hover the aspect grid sets, so pointing at a cell lights the chord in whichever view is
+     * on screen - which is the whole reason the grid and the wheel share a highlight at all.
+     * A rule with two implementations is how the sky ring came to be lit by the partner ring's
+     * hover in the first place.
+     */
+    boolean lightsChord(int a, int b, int wheel) {
+        return this.isHighlighted(a, b, wheel);
     }
 
     private static final java.util.Map<String, Color> GLOBE_ASPECT_INK =
@@ -3914,6 +3935,23 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                 }
             }
+            // The sky ring's chords, which were drawn and were not clickable - the click walked
+            // the natal field and the partner field and stopped, so a reader could point at a
+            // sky aspect and get whatever happened to be behind it.
+            if (bl && this.triRingDrawn()) {
+                for (n18 = 0; n18 < BODY_COUNT; ++n18) {
+                    if (!SkymapPanel.aspecting(n18, this.cValid)) continue;
+                    for (int i = 0; i < BODY_COUNT; ++i) {
+                        if (!SkymapPanel.aspecting(i, this.bValid)
+                            || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(2),
+                                g.aspectDisc(2), this.cLon[n18], this.bLon[i],
+                                "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) {
+                            continue;
+                        }
+                        return;
+                    }
+                }
+            }
             n18 = 1;
             for (int i = 1; i <= 12; ++i) {
                 double d21;
@@ -4364,6 +4402,29 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     private static final String TRANSIT_PREFIX = "transit_";
 
     /**
+     * Which wheel an aspect line runs from.
+     *
+     * <b>One bit could not name three rings.</b> Every cross-chart aspect - partner and sky
+     * alike - was flagged with a single boolean called "transit", because when it was written
+     * there were only two wheels. The sky ring arrived with a field of its own and its own
+     * chords, and inherited that boolean: hovering a partner aspect lit the sky line of the
+     * same pair and hovering a sky aspect lit the partner line, and neither could be told
+     * apart because nothing in the highlight knew there was a third ring to tell apart. The
+     * sky ring had no rows in the grid at all, so in practice its lines could not be hovered
+     * from anywhere.
+     *
+     * These are the wheel a line leaves from; every line still lands on the natal wheel.
+     */
+    static final int WHEEL_NATAL = 0;
+    static final int WHEEL_OUTER = 1;
+    static final int WHEEL_SKY = 2;
+
+    /** The wheel a grid row label names, for the rows that predate the wheel field. */
+    static int wheelOfLabel(String label) {
+        return isTransitLabel(label) ? WHEEL_OUTER : WHEEL_NATAL;
+    }
+
+    /**
      * The natal half of the placement href, which was a bare literal in one place and is now
      * read by two: the placements list that writes it and the wheel click that sends it.
      */
@@ -4383,17 +4444,25 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * into each of the glyph loops, because the natal loop and the outer loop read the
      * highlight from opposite ends of the pair.
      */
-    private boolean onHighlightedLine(int body, boolean outerRing) {
+    private boolean onHighlightedLine(int body, int wheel) {
         if (this.highlightA < 0 || this.highlightB < 0) {
             return false;
         }
-        if (this.highlightTransit) {
-            // A cross-chart line: A is the outer body, B the natal one.
-            return outerRing ? body == this.highlightA : body == this.highlightB;
+        if (this.highlightWheel == WHEEL_NATAL) {
+            return wheel == WHEEL_NATAL
+                && (body == this.highlightA || body == this.highlightB);
         }
-        return !outerRing && (body == this.highlightA || body == this.highlightB);
+        // A cross-chart line: A is on the wheel the line leaves, B is the natal one it lands
+        // on. Asking by wheel rather than by a single outer/not-outer flag is what lets a
+        // partner glyph stay dark while the sky glyph of the same body lights.
+        if (wheel == this.highlightWheel) {
+            return body == this.highlightA;
+        }
+        return wheel == WHEEL_NATAL && body == this.highlightB;
     }
-    private boolean highlightTransit;
+
+    /** The wheel the hovered line leaves from. Meaningless while nothing is hovered. */
+    private int highlightWheel = WHEEL_NATAL;
 
     /** A ring of light around a glyph at the end of the hovered aspect line. */
     private static void drawHighlightHalo(Graphics2D g, int x, int y, int r) {
@@ -4612,7 +4681,20 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * drives the round trip through both, so neither can move alone.
      */
     static String aspectHref(String rowLabel, String columnBody, String aspectLabel) {
-        return "aspect|" + rowLabel + "|" + columnBody + "|" + aspectLabel;
+        return aspectHref(rowLabel, columnBody, aspectLabel, wheelOfLabel(rowLabel));
+    }
+
+    /**
+     * The same, saying which wheel the row body is on.
+     *
+     * <b>The prefix cannot carry this.</b> A sky row and a partner row both put the outer body
+     * first and both wear the transit prefix, so a reader hovering one got the other's line
+     * lit. The wheel is its own field rather than a third prefix because the prefix is read by
+     * five interpretation lookups that have no business knowing about rings, and a new prefix
+     * would have had to be taught to all of them.
+     */
+    static String aspectHref(String rowLabel, String columnBody, String aspectLabel, int wheel) {
+        return "aspect|" + rowLabel + "|" + columnBody + "|" + aspectLabel + "|" + wheel;
     }
 
     /**
@@ -4627,7 +4709,50 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             return null;
         }
         String[] parts = href.split("\\|");
-        return parts.length == 4 ? new String[]{parts[1], parts[2], parts[3]} : null;
+        if (parts.length == 5) {
+            // A wheel field that is not a wheel makes the whole href untrustworthy. Falling
+            // back to the natal wheel would light a natal line for a malformed link, which is
+            // worse than lighting nothing: it looks like an answer.
+            return readsAsWheel(parts[4])
+                ? new String[]{parts[1], parts[2], parts[3], parts[4]} : null;
+        }
+        // An href from before the wheel field, which only the two-wheel prefix can describe.
+        return parts.length == 4
+            ? new String[]{parts[1], parts[2], parts[3],
+                String.valueOf(wheelOfLabel(parts[1]))}
+            : null;
+    }
+
+    /** Whether this href field names a wheel. */
+    private static boolean readsAsWheel(String field) {
+        try {
+            int wheel = Integer.parseInt(field);
+            return wheel >= WHEEL_NATAL && wheel <= WHEEL_SKY;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /** The wheel field of a parsed href. Parsing already refused anything else. */
+    private static int wheelOf(String[] parsed) {
+        return readsAsWheel(parsed[3]) ? Integer.parseInt(parsed[3]) : WHEEL_NATAL;
+    }
+
+    /** The longitudes of one wheel. */
+    private double[] wheelLon(int wheel) {
+        return wheel == WHEEL_SKY ? this.cLon : (wheel == WHEEL_OUTER ? this.tLon : this.bLon);
+    }
+
+    /** The speeds of one wheel. */
+    private double[] wheelSpeed(int wheel) {
+        return wheel == WHEEL_SKY ? this.cSpeed
+            : (wheel == WHEEL_OUTER ? this.tSpeed : this.bSpeed);
+    }
+
+    /** Which points of one wheel are computed. */
+    private boolean[] wheelValid(int wheel) {
+        return wheel == WHEEL_SKY ? this.cValid
+            : (wheel == WHEEL_OUTER ? this.tValid : this.bValid);
     }
 
     /** The registry index for a grid label, which may carry the transit prefix. -1 if unknown. */
@@ -4655,16 +4780,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (parsed == null) {
             return null;
         }
-        boolean transit = parsed[0].startsWith(TRANSIT_PREFIX);
+        int wheel = wheelOf(parsed);
+        boolean transit = wheel != WHEEL_NATAL;
         int a = bodyIndexOfLabel(parsed[0]);
         int b = bodyIndexOfLabel(parsed[1]);
         Aspects.Type type = Aspects.Type.fromLabel(parsed[2]);
         if (a < 0 || b < 0 || type == null) {
             return null;
         }
-        double lonA = transit ? this.tLon[a] : this.bLon[a];
+        double lonA = this.wheelLon(wheel)[a];
         double lonB = this.bLon[b];
-        double speedA = transit ? this.tSpeed[a] : this.bSpeed[a];
+        double speedA = this.wheelSpeed(wheel)[a];
         double speedB = this.bSpeed[b];
 
         double sep = Math.abs(lonA - lonB);
@@ -4684,8 +4810,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;'>");
         sb.append("<div style='font-size:13px;'><b>").append(BODY_NAMES[a]);
         if (transit) {
+            // Named for its own ring: "(partner)" and "(sky)" are different claims about the
+            // same glyph, and the card used to say the outer wheel's word for both.
             sb.append(" <span style='color:#5A7FBF;'>(")
-                  .append(this.outerRingWord()).append(")</span>");
+                  .append(wheel == WHEEL_SKY ? SKY_RING_WORD : this.outerRingWord())
+                  .append(")</span>");
         }
         sb.append("</b> <span style='color:").append(this.getAspectColorHex(type.label))
           .append("; font-size:15px;'>").append(this.getAspectSymbol(type.label))
@@ -4706,7 +4835,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
           .append(SkymapPanel.degreeLabel(lonA)).append(" &nbsp;&mdash;&nbsp; ")
           .append(SkymapPanel.degreeLabel(lonB)).append("</div>");
 
-        String lead = aspectSummary(parsed[0], parsed[1], type.label, transit);
+        String lead = aspectSummary(parsed[0], parsed[1], type.label, wheel);
         if (lead != null && !lead.isEmpty()) {
             sb.append("<div style='margin-top:4px; color:#8FA98F;'>").append(lead).append("</div>");
         }
@@ -4741,7 +4870,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** The bold lead of the interpretation - the one-sentence finding - or null. */
-    private String aspectSummary(String rowLabel, String colBody, String type, boolean transit) {
+    private String aspectSummary(String rowLabel, String colBody, String type, int wheel) {
         try {
             InterpretationService svc = InterpretationService.getInstance();
             // <b>The same fork as the click handler, and it has to stay the same fork.</b> A
@@ -4749,7 +4878,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // to summarise a passing event for a standing relationship - while clicking the
             // identical cell now shows the synastry reading. Two surfaces, one rule.
             String body;
-            if (transit && this.isSynastryChart()) {
+            boolean transit = wheel != WHEEL_NATAL;
+            // <b>The sky ring is a moment, whatever chart it is drawn over.</b> A synastry
+            // chart with the sky ring open has two kinds of cross-chart row on the grid at
+            // once, and only the partner one is about two people.
+            if (wheel == WHEEL_OUTER && this.isSynastryChart()) {
                 // Same order of preference as the click, so the summary a reader hovers is the
                 // lead of the paragraph they get when they click. Two surfaces, one rule -
                 // this method has already been wrong about that once.
@@ -4780,9 +4913,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         String[] parsed = parseAspectHref(href);
         int a = -1;
         int b = -1;
-        boolean transit = false;
+        int wheel = WHEEL_NATAL;
         if (parsed != null) {
-            transit = parsed[0].startsWith(TRANSIT_PREFIX);
+            wheel = wheelOf(parsed);
             a = bodyIndexOfLabel(parsed[0]);
             b = bodyIndexOfLabel(parsed[1]);
             if (a < 0 || b < 0) {
@@ -4790,12 +4923,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 b = -1;
             }
         }
-        if (a == this.highlightA && b == this.highlightB && transit == this.highlightTransit) {
+        if (a == this.highlightA && b == this.highlightB && wheel == this.highlightWheel) {
             return false;
         }
         this.highlightA = a;
         this.highlightB = b;
-        this.highlightTransit = transit;
+        this.highlightWheel = wheel;
         if (this.chartPanel != null) {
             this.chartPanel.repaint();
         }
@@ -5072,17 +5205,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** True when this line is the one the grid is hovering, or part of the lit pattern. */
-    private boolean isHighlighted(int a, int b, boolean transit) {
-        if (isPatternMemberPair(a, b, transit)) {
+    private boolean isHighlighted(int a, int b, int wheel) {
+        if (isPatternMemberPair(a, b, wheel != WHEEL_NATAL)) {
             return true;
         }
-        if (this.highlightA < 0 || transit != this.highlightTransit) {
+        if (this.highlightA < 0 || wheel != this.highlightWheel) {
             return false;
         }
         // Natal lines are drawn once per unordered pair, so match either ordering.
-        return transit ? (a == this.highlightA && b == this.highlightB)
-                       : (a == this.highlightA && b == this.highlightB)
-                         || (a == this.highlightB && b == this.highlightA);
+        return wheel != WHEEL_NATAL
+            ? (a == this.highlightA && b == this.highlightB)
+            : (a == this.highlightA && b == this.highlightB)
+              || (a == this.highlightB && b == this.highlightA);
     }
 
     public void triggerPlanetInterpretation(String string) {
@@ -5098,14 +5232,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (aspectParts != null) {
                 // A transit row wants the transit reading, not the natal one. getAspect would
                 // be handed "transit_sun" as a body name and return "Interpretation not found".
-                if (aspectParts[0].startsWith(TRANSIT_PREFIX)) {
+                if (wheelOf(aspectParts) != WHEEL_NATAL) {
                     // <b>A synastry row is not a transit row.</b> Both carry the prefix,
                     // because both put the outer wheel first, and until 2026-08-24 both went
                     // to the transit reading - so clicking a cell about two people produced
                     // the heading "Transiting Mars Square natal Venus" and a paragraph about
                     // a passing event. The geometry is shared; the meaning is not.
                     String outer = aspectParts[0].substring(TRANSIT_PREFIX.length());
-                    if (this.isSynastryChart()) {
+                    // The sky ring is a moment even in a synastry chart. Same fork as
+                    // aspectSummary, which is what keeps hover and click saying one thing.
+                    if (wheelOf(aspectParts) == WHEEL_OUTER && this.isSynastryChart()) {
                         this.window.showInterpretationForSynastryAspect(
                             outer, aspectParts[1], aspectParts[2]);
                     } else {
@@ -5894,44 +6030,77 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             stringBuilder.append("<td style='color:").append(this.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
         }
         stringBuilder.append("</tr>");
-        for (n = 0; n < BODY_COUNT; ++n) {
-            n2 = (n3 != 0 ? SkymapPanel.aspecting(n, this.tValid) : SkymapPanel.aspecting(n, this.bValid)) ? 1 : 0;
-            if (n2 == 0) continue;
-            stringBuilder.append("<tr>");
-            stringBuilder.append("<td style='color:").append(this.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
-            for (int i = 0; i < BODY_COUNT; ++i) {
-                String string6;
-                double d;
-                if (!SkymapPanel.aspecting(i, this.bValid)) continue;
-                if (n3 == 0 && i >= n) {
-                    stringBuilder.append("<td style='background-color:#111;'></td>");
-                    continue;
-                }
-                if (Bodies.isOppositePair(n, i)) {
-                    stringBuilder.append("<td style='background-color:#111;'></td>");
-                    continue;
-                }
-                double d2 = n3 != 0 ? this.tLon[n] : this.bLon[n];
-                double d3 = Math.abs(d2 - (d = this.bLon[i]));
-                if (d3 > 180.0) {
-                    d3 = 360.0 - d3;
-                }
-                if ((string6 = this.getAspectType(d3, n, i, this.isSynastryPair(n3 != 0))) != null) {
-                    String string7 = n3 != 0 ? "transit_" + BODY_NAMES[n].toLowerCase() : BODY_NAMES[n];
-                    String string8 = BODY_NAMES[i];
-                    // Through aspectHref, never formatted inline: the parser is the only other
-                    // place that knows this format and the two must not be able to drift.
-                    String string9 = SkymapPanel.aspectHref(string7, string8, string6);
-                    stringBuilder.append("<td style='background-color:#222;'><a href='").append(string9).append("' style='text-decoration:none;'>").append("<span style='color:").append(this.getAspectColorHex(string6)).append("; font-size:").append(glyph).append("px;'>").append(this.getAspectSymbol(string6)).append("</span></a></td>");
-                    continue;
-                }
-                stringBuilder.append("<td style='background-color:#222;'></td>");
-            }
-            stringBuilder.append("</tr>");
+        this.appendGridRows(stringBuilder, n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL, cell, glyph);
+        // <b>The sky ring had no rows here at all.</b> It is drawn, it is hovered, it has its
+        // own field of chords - and the grid, which is where a reader goes to find an aspect
+        // by name rather than by eye, stopped at the ring below it. So its lines could be seen
+        // and never pointed at.
+        // Gated on the same n3 the partner rows are, and on the ring being drawn - the two
+        // gates the wheel's own sky chord loop uses. A grid that listed sky aspects while the
+        // reader's filter had cross-chart lines switched off would be naming pairs the wheel
+        // deliberately does not draw.
+        if (n3 != 0 && this.triRingDrawn()) {
+            stringBuilder.append("<tr><td colspan='").append(gridCols + 1)
+                .append("' style='color:#8FD0FF; font-size:10px; text-align:left; padding:3px 0 1px 2px; background-color:#111;'>")
+                .append("sky</td></tr>");
+            this.appendGridRows(stringBuilder, WHEEL_SKY, cell, glyph);
         }
         stringBuilder.append("</table>");
         stringBuilder.append("</body></html>");
         return stringBuilder.toString();
+    }
+
+    /**
+     * One wheel's worth of rows in the aspect grid.
+     *
+     * <b>Written once because there are three wheels now.</b> The rows used to be built inline
+     * with the wheel chosen by a boolean in three separate expressions, which is the shape the
+     * sky ring could not be added to without a fourth copy - and a fourth copy of a cell test
+     * is a fourth chance for the grid to disagree with the wheel about what is in aspect.
+     *
+     * Columns are always the natal points: every aspect on this grid is something aspecting
+     * the chart. The natal rows are the triangular half, since a natal pair appears once.
+     */
+    private void appendGridRows(StringBuilder out, int wheel, int cell, int glyph) {
+        double[] lon = this.wheelLon(wheel);
+        boolean[] valid = this.wheelValid(wheel);
+        for (int n = 0; n < BODY_COUNT; ++n) {
+            if (!SkymapPanel.aspecting(n, valid)) continue;
+            out.append("<tr>");
+            out.append("<td style='color:").append(this.bodyColorHex(n))
+               .append("; font-size:").append(glyph).append("px; width:").append(cell)
+               .append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
+            for (int i = 0; i < BODY_COUNT; ++i) {
+                if (!SkymapPanel.aspecting(i, this.bValid)) continue;
+                if ((wheel == WHEEL_NATAL && i >= n) || Bodies.isOppositePair(n, i)) {
+                    out.append("<td style='background-color:#111;'></td>");
+                    continue;
+                }
+                double sep = Math.abs(lon[n] - this.bLon[i]);
+                if (sep > 180.0) {
+                    sep = 360.0 - sep;
+                }
+                // Only the partner ring is a synastry pair. The sky ring is a moment and is
+                // judged at natal orbs - the same call the wheel and the hit test make.
+                String type = this.getAspectType(sep, n, i,
+                    this.isSynastryPair(wheel == WHEEL_OUTER));
+                if (type == null) {
+                    out.append("<td style='background-color:#222;'></td>");
+                    continue;
+                }
+                String row = wheel == WHEEL_NATAL ? BODY_NAMES[n]
+                    : TRANSIT_PREFIX + BODY_NAMES[n].toLowerCase();
+                // Through aspectHref, never formatted inline: the parser is the only other
+                // place that knows this format and the two must not be able to drift.
+                String href = SkymapPanel.aspectHref(row, BODY_NAMES[i], type, wheel);
+                out.append("<td style='background-color:#222;'><a href='").append(href)
+                   .append("' style='text-decoration:none;'>").append("<span style='color:")
+                   .append(this.getAspectColorHex(type)).append("; font-size:").append(glyph)
+                   .append("px;'>").append(this.getAspectSymbol(type))
+                   .append("</span></a></td>");
+            }
+            out.append("</tr>");
+        }
     }
 
     private String formatPlanetPlacement(int n, double d, double d2, String string) {
@@ -6375,7 +6544,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!SkymapPanel.aspecting(n7, SkymapPanel.this.bValid)) continue;
                     for (n6 = n7 + 1; n6 < BODY_COUNT; ++n6) {
                         if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid) || Bodies.isOppositePair(n7, n6)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, discNatal, discNatal, false, n7, n6);
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, discNatal, discNatal, WHEEL_NATAL, n7, n6);
                     }
                 }
             }
@@ -6384,7 +6553,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!SkymapPanel.aspecting(n7, SkymapPanel.this.tValid)) continue;
                     for (n6 = 0; n6 < BODY_COUNT; ++n6) {
                         if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.tLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, discOuter, discOuter, true, n7, n6);
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.tLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, discOuter, discOuter, WHEEL_OUTER, n7, n6);
                     }
                 }
             }
@@ -6399,7 +6568,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid)) continue;
                         this.drawAspectLine(graphics2D, SkymapPanel.this.cLon[n7],
                             SkymapPanel.this.bLon[n6], d4, n12, n13, discSky, discSky,
-                            true, n7, n6);
+                            WHEEL_SKY, n7, n6);
                     }
                 }
             }
@@ -6430,24 +6599,26 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         }
                         this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[pa],
                             SkymapPanel.this.bLon[pb], d4, n12, n13, discNatal, discNatal,
-                            false, pa, pb);
+                            WHEEL_NATAL, pa, pb);
                     }
                 }
             }
 
             int hlA = SkymapPanel.this.highlightA;
             int hlB = SkymapPanel.this.highlightB;
+            int hlWheel = SkymapPanel.this.highlightWheel;
             if (hlA >= 0 && hlB >= 0) {
-                if (SkymapPanel.this.highlightTransit) {
-                    if (SkymapPanel.aspecting(hlA, SkymapPanel.this.tValid)
-                        && SkymapPanel.aspecting(hlB, SkymapPanel.this.bValid)) {
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.tLon[hlA], SkymapPanel.this.bLon[hlB],
-                            d4, n12, n13, discOuter, discOuter, true, hlA, hlB);
-                    }
-                } else if (SkymapPanel.aspecting(hlA, SkymapPanel.this.bValid)
+                // <b>Off the ring it belongs to.</b> This redraw picked the outer wheel for
+                // every cross-chart line, so a hovered sky aspect was drawn again on the
+                // partner ring - a bright chord in the wrong field, next to the faint one it
+                // was meant to be.
+                int hlDisc = hlWheel == WHEEL_SKY ? discSky
+                    : (hlWheel == WHEEL_OUTER ? discOuter : discNatal);
+                if (SkymapPanel.aspecting(hlA, SkymapPanel.this.wheelValid(hlWheel))
                     && SkymapPanel.aspecting(hlB, SkymapPanel.this.bValid)) {
-                    this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[hlA], SkymapPanel.this.bLon[hlB],
-                        d4, n12, n13, discNatal, discNatal, false, hlA, hlB);
+                    this.drawAspectLine(graphics2D,
+                        SkymapPanel.this.wheelLon(hlWheel)[hlA], SkymapPanel.this.bLon[hlB],
+                        d4, n12, n13, hlDisc, hlDisc, hlWheel, hlA, hlB);
                 }
             }
             for (n7 = 0; SkymapPanel.this.layerShown(Layer.NATAL) && n7 < BODY_COUNT; ++n7) {
@@ -6455,7 +6626,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 double d10 = Math.toRadians(180.0 + d4 - SkymapPanel.this.bLon[n7]);
                 n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));
                 int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
-                if (SkymapPanel.this.onHighlightedLine(n7, false)) {
+                if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_NATAL)) {
                     SkymapPanel.drawHighlightHalo(graphics2D, n4, n26,
                         Bodies.at(n7).isAngle() ? 13 : SkymapPanel.natalSize(n7).radius);
                 }
@@ -6543,7 +6714,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.tLon[n7]);
                     n4 = n12 + (int)((double)nArray2[n7] * Math.cos(d12));
                     int n27 = n13 + (int)((double)nArray2[n7] * Math.sin(d12));
-                    if (SkymapPanel.this.onHighlightedLine(n7, true)) {
+                    if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_OUTER)) {
                         SkymapPanel.drawHighlightHalo(graphics2D, n4, n27,
                             Bodies.at(n7).isAngle() ? 13
                                 : SkymapPanel.transitSize(n7).radius);
@@ -6593,6 +6764,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     double d14 = Math.toRadians(180.0 + d4 - SkymapPanel.this.cLon[n7]);
                     n4 = n12 + (int)((double)nArrayC[n7] * Math.cos(d14));
                     int n28 = n13 + (int)((double)nArrayC[n7] * Math.sin(d14));
+                    // The sky ring never had this at all: its chords could light and the two
+                    // glyphs at their ends stayed dark, so a reader could see a sky aspect
+                    // and still have to work out which points it joined.
+                    if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_SKY)) {
+                        SkymapPanel.drawHighlightHalo(graphics2D, n4, n28,
+                            Bodies.at(n7).isAngle() ? 13
+                                : SkymapPanel.transitSize(n7).radius);
+                    }
                     if (Bodies.at(n7).isAngle()) {
                         graphics2D.setFont(ANGLE_FONT);
                         this.drawBodyMarker(graphics2D, n4, n28, 13,
@@ -6747,15 +6926,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
          */
         private static final int GLOW_PASSES = 3;
 
-        private void drawAspectLine(Graphics2D graphics2D, double d, double d2, double d3, int n, int n2, int n3, int n4, boolean bl, int n5, int n6) {
+        private void drawAspectLine(Graphics2D graphics2D, double d, double d2, double d3, int n, int n2, int n3, int n4, int wheel, int n5, int n6) {
             double d4 = Math.abs(d - d2);
             if (d4 > 180.0) {
                 d4 = 360.0 - d4;
             }
-            // bl is this method's existing "the first body is on the outer wheel" flag - the
-            // callers pass tLon/bLon with true and bLon/bLon with false - so the line is drawn
-            // on exactly the width the grid and the hit test judge the same pair by.
-            boolean syn = SkymapPanel.this.isSynastryPair(bl);
+            // wheel says which ring the first body is on, and used to be a boolean meaning
+            // "the outer one" - which could not tell the partner ring from the sky ring, so
+            // the two lit each other's lines. Only the partner ring is ever a synastry pair;
+            // the sky ring is a moment and is judged at natal orbs, the same as the grid and
+            // the hit test judge it.
+            boolean bl = wheel != SkymapPanel.WHEEL_NATAL;
+            boolean syn = SkymapPanel.this.isSynastryPair(wheel == SkymapPanel.WHEEL_OUTER);
             double d5 = SkymapPanel.this.getOrbFor(n5, n6, syn);
             Color color = null;
             double d6 = 0.0;
@@ -6799,7 +6981,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // A hovered line is drawn at full strength regardless of how wide its orb is.
                 // The normal alpha ramp fades a loose aspect almost to nothing, which is right
                 // for the background weave and useless for "show me the one I am pointing at".
-                boolean highlighted = SkymapPanel.this.isHighlighted(n5, n6, bl);
+                boolean highlighted = SkymapPanel.this.isHighlighted(n5, n6, wheel);
                 color = new Color(color.getRed(), color.getGreen(), color.getBlue(),
                     highlighted ? 255 : n7);
                 float f2 = highlighted ? 3.0f : 0.3f + 0.7f * f;

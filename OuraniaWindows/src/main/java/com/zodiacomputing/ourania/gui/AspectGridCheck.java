@@ -126,6 +126,10 @@ public final class AspectGridCheck {
         aspectSelectionIsPinned();
         report("Part R - this suite reads the code, not the user's settings", before);
 
+        before = failures.size();
+        eachRingLightsItsOwn();
+        report("Part S - three rings, and each lights only its own line", before);
+
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
@@ -143,10 +147,16 @@ public final class AspectGridCheck {
     }
 
     /**
-     * Every href the grid can emit, parsed back into its three fields.
+     * Every href the grid can emit, parsed back into its four fields.
      *
      * Built from the registry rather than a fixed list, so a new chart point with a space or
      * an awkward character in its name is covered the moment it is registered.
+     *
+     * <b>The wheel is the fourth field, and it is the one that had to exist.</b> A partner row
+     * and a sky row both put the outer body first and both wear the transit prefix, so with
+     * only the prefix to go on the two rings were indistinguishable - hovering one lit the
+     * other's line. Round-tripping the wheel is what stops the builder and the parser drifting
+     * apart on the field that tells them apart.
      */
     private static void hrefRoundTrip() throws Exception {
         Method parse = SkymapPanel.class.getDeclaredMethod("parseAspectHref", String.class);
@@ -157,24 +167,46 @@ public final class AspectGridCheck {
             String row = Bodies.at(i).name;
             String col = Bodies.at((i + 1) % Bodies.count()).name;
             for (String type : types) {
-                // natal row, and the transit row exactly as the grid builds it
-                for (String label : new String[]{row, "transit_" + row.toLowerCase()}) {
-                    String href = SkymapPanel.aspectHref(label, col, type);
+                // Every row the grid builds: natal, partner and sky, each on its own wheel.
+                for (int wheel : new int[] {SkymapPanel.WHEEL_NATAL, SkymapPanel.WHEEL_OUTER,
+                                            SkymapPanel.WHEEL_SKY}) {
+                    String label = wheel == SkymapPanel.WHEEL_NATAL
+                        ? row : "transit_" + row.toLowerCase();
+                    String href = SkymapPanel.aspectHref(label, col, type, wheel);
                     String[] p = (String[]) parse.invoke(null, href);
                     ok(href + " parses", p != null);
                     if (p != null) {
                         ok(href + " keeps its row label", label.equals(p[0]));
                         ok(href + " keeps its column body", col.equals(p[1]));
                         ok(href + " keeps its aspect", type.equals(p[2]));
+                        ok(href + " keeps its wheel", String.valueOf(wheel).equals(p[3]));
+                    }
+                }
+
+                // The three-field builder is still used by the interpretation panel, which
+                // writes natal pairs. It has to name a wheel too, read off the prefix.
+                for (String label : new String[]{row, "transit_" + row.toLowerCase()}) {
+                    String href = SkymapPanel.aspectHref(label, col, type);
+                    String[] p = (String[]) parse.invoke(null, href);
+                    ok(href + " parses without a wheel given", p != null);
+                    if (p != null) {
+                        String want = label.startsWith("transit_")
+                            ? String.valueOf(SkymapPanel.WHEEL_OUTER)
+                            : String.valueOf(SkymapPanel.WHEEL_NATAL);
+                        ok(href + " takes its wheel from the prefix", want.equals(p[3]));
                     }
                 }
             }
         }
 
         // Anything that is not an aspect href must be declined, so the placement hrefs
-        // ("base_0", "transit_1") still reach their own branch of the handler.
+        // ("base_0", "transit_1") still reach their own branch of the handler. A five-field
+        // href whose last field is not a wheel is declined for the same reason: falling back
+        // to the natal wheel would light a natal line for a malformed link, which looks like
+        // an answer rather than like nothing.
         for (String other : new String[]{"base_0", "transit_1", "", "aspect", "aspect|a|b",
-                                         "aspect|a|b|c|d", "aspect_Sun_Moon_Trine", null}) {
+                                         "aspect|a|b|c|d", "aspect|a|b|c|9", "aspect|a|b|c|-1",
+                                         "aspect|a|b|c|d|e", "aspect_Sun_Moon_Trine", null}) {
             ok("non-aspect href declined: " + other, parse.invoke(null, other) == null);
         }
     }
@@ -1620,6 +1652,158 @@ public final class AspectGridCheck {
             }
         }
         eq("every chart point is visible to this suite", 0, hidden);
+    }
+
+    /**
+     * Hovering an aspect lights the ring it belongs to, and only that ring.
+     *
+     * <b>The defect this exists to catch.</b> Every cross-chart line - partner and sky alike -
+     * carried one boolean called "transit", written when there were only two wheels. The sky
+     * ring arrived with a field of its own and inherited that flag, so the two rings were the
+     * same value: hovering a partner aspect lit the sky chord of the same pair as well, and
+     * the glyphs that lit were the partner ring's. Worse, the grid had no sky rows at all, so
+     * nothing could hover a sky aspect in the first place - the ring could be read and not
+     * pointed at.
+     *
+     * So this asks three questions of a live tri-wheel, one per ring: does the line light, do
+     * the two glyphs at its ends light, and do the other rings stay dark. The third is the one
+     * that fails if the wheel goes back to being a boolean.
+     */
+    private static void eachRingLightsItsOwn() throws Exception {
+        final Object[] out = new Object[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            try {
+                out[0] = skyOf(new OuraniaWindow());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        SkymapPanel sky = (SkymapPanel) out[0];
+        setField(sky, "chartMode", ChartMode.SYNASTRY);
+        setField(sky, "showTransitChart",
+            SkymapPanel.outerWheelShown(ChartMode.SYNASTRY, true));
+        setField(sky, "showTriWheel", SkymapPanel.triWheelShown(ChartMode.SYNASTRY, true));
+        double[] base = PANEL_CHARTS.get("base");
+        double[] tr = PANEL_CHARTS.get("transit");
+        setField(sky, "baseChartTime", utc(base));
+        setField(sky, "transitChartTime", utc(tr));
+        setField(sky, "baseLatitude", base[4]);
+        setField(sky, "baseLongitude", base[5]);
+        setField(sky, "transitLatitude", tr[4]);
+        setField(sky, "transitLongitude", tr[5]);
+        setField(sky, "houseSystem", (char) PANEL_HSYS);
+        // Cross-chart lines on, or there is nothing on the partner or sky rings to hover -
+        // and the grid is right not to list them, since the wheel does not draw them either.
+        setField(sky, "aspectFilter", "Both");
+        sky.updateChartData();
+
+        Method lit = SkymapPanel.class.getDeclaredMethod(
+            "isHighlighted", int.class, int.class, int.class);
+        lit.setAccessible(true);
+        Method onLine = SkymapPanel.class.getDeclaredMethod(
+            "onHighlightedLine", int.class, int.class);
+        onLine.setAccessible(true);
+
+        int[] wheels = {SkymapPanel.WHEEL_NATAL, SkymapPanel.WHEEL_OUTER,
+                        SkymapPanel.WHEEL_SKY};
+        String[] named = {"natal", "partner", "sky"};
+
+        // The grid emits a whole ring's worth of rows; hovering any of them is the same
+        // question, so a handful of pairs across the registry is enough breadth.
+        for (int a = 0; a < Bodies.count(); a += 5) {
+            for (int b = 1; b < Bodies.count(); b += 7) {
+                if (a == b) {
+                    continue;
+                }
+                for (int wi = 0; wi < wheels.length; wi++) {
+                    int wheel = wheels[wi];
+                    String row = wheel == SkymapPanel.WHEEL_NATAL
+                        ? Bodies.at(a).name
+                        : "transit_" + Bodies.at(a).name.toLowerCase();
+                    String href = SkymapPanel.aspectHref(
+                        row, Bodies.at(b).name, "Trine", wheel);
+                    ok("hovering " + named[wi] + " " + a + "-" + b + " is a change",
+                        sky.setHighlightedAspect(href));
+
+                    for (int oi = 0; oi < wheels.length; oi++) {
+                        boolean want = wheels[oi] == wheel;
+                        boolean got = (Boolean) lit.invoke(sky, a, b, wheels[oi]);
+                        ok("the " + named[wi] + " line of " + a + "-" + b
+                            + (want ? " lights on " : " stays dark on ") + named[oi] + " ring",
+                            got == want);
+                    }
+
+                    // And the glyphs at its two ends. A cross-chart line leaves the hovered
+                    // ring and lands on the natal one, so those are the two that light.
+                    if (wheel == SkymapPanel.WHEEL_NATAL) {
+                        ok("natal " + a + " lights", (Boolean) onLine.invoke(sky, a, wheel));
+                        ok("natal " + b + " lights", (Boolean) onLine.invoke(sky, b, wheel));
+                        ok("partner " + a + " stays dark", !(Boolean) onLine.invoke(
+                            sky, a, SkymapPanel.WHEEL_OUTER));
+                        ok("sky " + a + " stays dark", !(Boolean) onLine.invoke(
+                            sky, a, SkymapPanel.WHEEL_SKY));
+                    } else {
+                        int other = wheel == SkymapPanel.WHEEL_OUTER
+                            ? SkymapPanel.WHEEL_SKY : SkymapPanel.WHEEL_OUTER;
+                        ok(named[wi] + " " + a + " lights",
+                            (Boolean) onLine.invoke(sky, a, wheel));
+                        ok("natal " + b + " lights at the far end",
+                            (Boolean) onLine.invoke(sky, b, SkymapPanel.WHEEL_NATAL));
+                        ok("the other cross ring's " + a + " stays dark",
+                            !(Boolean) onLine.invoke(sky, a, other));
+                    }
+                }
+            }
+        }
+        sky.setHighlightedAspect(null);
+
+        // And the rows have to be there to hover. The sky block appears with the ring and
+        // goes with it - a grid that lists sky aspects on a two-wheel chart would be naming
+        // pairs that are not drawn anywhere.
+        Class<?> partType = Class.forName(
+            "com.zodiacomputing.ourania.gui.SkymapPanel$PlacementPart");
+        Object whole = Enum.valueOf(partType.asSubclass(Enum.class), "ALL");
+        Method grid = SkymapPanel.class.getDeclaredMethod(
+            "generatePlanetPlacementsHtml", partType);
+        grid.setAccessible(true);
+        String withSky = (String) grid.invoke(sky, whole);
+        int skyCells = countOccurrences(withSky, "|" + SkymapPanel.WHEEL_SKY + "'");
+        int outerCells = countOccurrences(withSky, "|" + SkymapPanel.WHEEL_OUTER + "'");
+        System.out.println("  tri-wheel grid: " + outerCells + " partner cells, "
+            + skyCells + " sky cells");
+        ok("the tri-wheel grid carries sky cells", skyCells > 0);
+        ok("the tri-wheel grid still carries partner cells", outerCells > 0);
+
+        setField(sky, "showTriWheel", Boolean.FALSE);
+        sky.updateChartData();
+        String noSky = (String) grid.invoke(sky, whole);
+        ok("a two-wheel grid carries no sky cells",
+            countOccurrences(noSky, "|" + SkymapPanel.WHEEL_SKY + "'") == 0);
+        ok("a two-wheel grid still carries partner cells",
+            countOccurrences(noSky, "|" + SkymapPanel.WHEEL_OUTER + "'") > 0);
+
+        // And the reader's aspect filter reaches the sky rows, as it reaches the sky chords.
+        // Listing a pair the wheel refuses to draw is the grid and the wheel disagreeing.
+        setField(sky, "showTriWheel", Boolean.TRUE);
+        setField(sky, "aspectFilter", "Natal-Natal");
+        sky.updateChartData();
+        String natalOnly = (String) grid.invoke(sky, whole);
+        ok("a natal-only filter drops the sky rows",
+            countOccurrences(natalOnly, "|" + SkymapPanel.WHEEL_SKY + "'") == 0);
+        ok("a natal-only filter drops the partner rows too",
+            countOccurrences(natalOnly, "|" + SkymapPanel.WHEEL_OUTER + "'") == 0);
+        ok("a natal-only filter keeps the natal rows",
+            countOccurrences(natalOnly, "|" + SkymapPanel.WHEEL_NATAL + "'") > 0);
+    }
+
+    private static int countOccurrences(String haystack, String needle) {
+        int n = 0;
+        int at = haystack.indexOf(needle);
+        while (at >= 0) {
+            n++;
+            at = haystack.indexOf(needle, at + needle.length());
+        }
+        return n;
     }
 
     private static SkymapPanel skyOf(OuraniaWindow w) throws Exception {

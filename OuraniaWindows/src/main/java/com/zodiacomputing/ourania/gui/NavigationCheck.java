@@ -606,42 +606,59 @@ public final class NavigationCheck {
             fs.setAccessible(true);
             SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
             java.lang.reflect.Method lit = SkymapPanel.class.getDeclaredMethod(
-                "onHighlightedLine", int.class, boolean.class);
+                "onHighlightedLine", int.class, int.class);
             lit.setAccessible(true);
+            final int natal = SkymapPanel.WHEEL_NATAL;
+            final int outer = SkymapPanel.WHEEL_OUTER;
+            final int sky3 = SkymapPanel.WHEEL_SKY;
 
-            // Nothing hovered: nothing lights, on either ring.
+            // Nothing hovered: nothing lights, on any ring.
             set(sky, "highlightA", -1);
             set(sky, "highlightB", -1);
-            set(sky, "highlightTransit", Boolean.FALSE);
+            set(sky, "highlightWheel", natal);
             for (int i = 0; i < 6; i++) {
                 ok("with no line hovered, body " + i + " stays dark",
-                    !(Boolean) lit.invoke(sky, i, false)
-                        && !(Boolean) lit.invoke(sky, i, true));
+                    !(Boolean) lit.invoke(sky, i, natal)
+                        && !(Boolean) lit.invoke(sky, i, outer)
+                        && !(Boolean) lit.invoke(sky, i, sky3));
             }
 
-            // A natal-to-natal line: both ends are on the natal wheel, neither on the outer.
+            // A natal-to-natal line: both ends are on the natal wheel, neither elsewhere.
             set(sky, "highlightA", 2);
             set(sky, "highlightB", 5);
-            set(sky, "highlightTransit", Boolean.FALSE);
-            ok("a natal line lights its first end", (Boolean) lit.invoke(sky, 2, false));
-            ok("a natal line lights its second end", (Boolean) lit.invoke(sky, 5, false));
+            set(sky, "highlightWheel", natal);
+            ok("a natal line lights its first end", (Boolean) lit.invoke(sky, 2, natal));
+            ok("a natal line lights its second end", (Boolean) lit.invoke(sky, 5, natal));
             ok("and lights nothing on the outer ring",
-                !(Boolean) lit.invoke(sky, 2, true) && !(Boolean) lit.invoke(sky, 5, true));
-            ok("and nothing that is not an end", !(Boolean) lit.invoke(sky, 3, false));
+                !(Boolean) lit.invoke(sky, 2, outer) && !(Boolean) lit.invoke(sky, 5, outer));
+            ok("and nothing on the sky ring",
+                !(Boolean) lit.invoke(sky, 2, sky3) && !(Boolean) lit.invoke(sky, 5, sky3));
+            ok("and nothing that is not an end", !(Boolean) lit.invoke(sky, 3, natal));
 
-            // A cross-chart line: A is the outer body, B the natal one, and not the reverse.
-            set(sky, "highlightA", 2);
-            set(sky, "highlightB", 5);
-            set(sky, "highlightTransit", Boolean.TRUE);
-            ok("a cross-chart line lights its outer end on the outer ring",
-                (Boolean) lit.invoke(sky, 2, true));
-            ok("and its natal end on the natal wheel",
-                (Boolean) lit.invoke(sky, 5, false));
-            ok("the outer end does not also light on the natal wheel",
-                !(Boolean) lit.invoke(sky, 2, false));
-            ok("the natal end does not also light on the outer ring",
-                !(Boolean) lit.invoke(sky, 5, true));
-            ok("and nothing that is not an end", !(Boolean) lit.invoke(sky, 3, true));
+            // <b>A cross-chart line names its ring, not merely "not natal".</b> Both cross
+            // rings shared one boolean until 2026-09-07, so a partner line lit the sky glyph
+            // of the same body and a sky line lit the partner one - two haloes on two rings
+            // for a line that touches one. Each ring is asked separately below.
+            for (int hovered : new int[] {outer, sky3}) {
+                int otherRing = hovered == outer ? sky3 : outer;
+                String named = hovered == outer ? "partner" : "sky";
+                set(sky, "highlightA", 2);
+                set(sky, "highlightB", 5);
+                set(sky, "highlightWheel", hovered);
+                ok("a " + named + " line lights its outer end on its own ring",
+                    (Boolean) lit.invoke(sky, 2, hovered));
+                ok("a " + named + " line lights its natal end on the natal wheel",
+                    (Boolean) lit.invoke(sky, 5, natal));
+                ok("a " + named + " line's outer end does not light on the natal wheel",
+                    !(Boolean) lit.invoke(sky, 2, natal));
+                ok("a " + named + " line's natal end does not light on its own ring",
+                    !(Boolean) lit.invoke(sky, 5, hovered));
+                ok("a " + named + " line lights nothing on the other cross ring",
+                    !(Boolean) lit.invoke(sky, 2, otherRing)
+                        && !(Boolean) lit.invoke(sky, 5, otherRing));
+                ok("a " + named + " line lights nothing that is not an end",
+                    !(Boolean) lit.invoke(sky, 3, hovered));
+            }
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }

@@ -76,6 +76,12 @@ public final class GlobeCheck {
         report("Part I", before);
 
         System.out.println();
+        System.out.println("=== Part K: the globe lights the ring the reader is pointing at ===");
+        before = failures.size();
+        theGlobeLightsOneRing();
+        report("Part K", before);
+
+        System.out.println();
         System.out.println("=== Part J: a band is cut wherever it would lie across itself ===");
         before = failures.size();
         bandsDoNotCrossThemselves();
@@ -828,6 +834,163 @@ public final class GlobeCheck {
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
+    }
+
+    /**
+     * Hovering an aspect lights it on the globe, on its own ring, at the flat wheel's orbs.
+     *
+     * <b>Two defects, one root.</b> The globe drew every chord alike: pointing at a cell of
+     * the aspect grid lit the flat wheel and did nothing at all here, so a reader who had
+     * switched views lost the one gesture that says which two points a line joins. And the
+     * globe judged every cross-chart chord as a synastry pair, so in a synastry chart the sky
+     * ring's orbs were halved on the globe and full on the wheel - the two views disagreeing
+     * about what is in aspect, which is the disagreement Part D exists to prevent for
+     * positions.
+     *
+     * The orb assertion names both candidate answers rather than recomputing the chosen one:
+     * the sky ring's chord count has to match what natal orbs give and differ from what
+     * synastry orbs give, so flipping the flag back fails rather than passes quietly.
+     */
+    private static void theGlobeLightsOneRing() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+            set(panel, "chartMode", ChartMode.SYNASTRY);
+            set(panel, "showTransitChart", Boolean.TRUE);
+            set(panel, "showTriWheel", Boolean.TRUE);
+            set(panel, "aspectFilter", "Both");
+            panel.updateChartData();
+            Thread.sleep(1500);
+
+            yes("the chart under test is a synastry tri-wheel", panel.isSynastryChart());
+
+            // <b>The lit figures are not the hover.</b> A grand trine lights its own legs
+            // whether or not anything is being pointed at, which is a separate feature with
+            // its own checks - left in, it would answer "lit" here for reasons that have
+            // nothing to do with the ring under test.
+            set(panel, "autoPatterns", new int[0][]);
+            set(panel, "highlightPattern", new int[0]);
+
+            // 1. The hover reaches the globe, and reaches one ring.
+            for (int a = 0; a < 12; a += 3) {
+                for (int b = 1; b < 12; b += 4) {
+                    for (int wheel : new int[] {SkymapPanel.WHEEL_NATAL,
+                            SkymapPanel.WHEEL_OUTER, SkymapPanel.WHEEL_SKY}) {
+                        String row = wheel == SkymapPanel.WHEEL_NATAL
+                            ? com.zodiacomputing.ourania.astro.Bodies.at(a).name : "transit_" + com.zodiacomputing.ourania.astro.Bodies.at(a).name.toLowerCase();
+                        panel.setHighlightedAspect(
+                            SkymapPanel.aspectHref(row, com.zodiacomputing.ourania.astro.Bodies.at(b).name, "Trine", wheel));
+                        for (int other : new int[] {SkymapPanel.WHEEL_NATAL,
+                                SkymapPanel.WHEEL_OUTER, SkymapPanel.WHEEL_SKY}) {
+                            yes("globe chord " + a + "-" + b + " on ring " + other
+                                + (other == wheel ? " lights" : " stays dark")
+                                + " when ring " + wheel + " is hovered",
+                                panel.lightsChord(a, b, other) == (other == wheel));
+                        }
+                    }
+                }
+            }
+            panel.setHighlightedAspect(null);
+
+            // 2. The sky ring is judged at natal orbs, as the flat wheel judges it.
+            int atNatal = 0;
+            int atSynastry = 0;
+            int built = 0;
+            for (int a = 0; a < SkymapPanel.BODY_COUNT; a++) {
+                if (!SkymapPanel.aspecting(a, panel.cValid)) {
+                    continue;
+                }
+                for (int b = 0; b < SkymapPanel.BODY_COUNT; b++) {
+                    if (!SkymapPanel.aspecting(b, panel.bValid)) {
+                        continue;
+                    }
+                    if (panel.aspectInkFor(panel.cLon[a], panel.bLon[b], a, b, false) != null) {
+                        atNatal++;
+                    }
+                    if (panel.aspectInkFor(panel.cLon[a], panel.bLon[b], a, b, true) != null) {
+                        atSynastry++;
+                    }
+                }
+            }
+            // The cache fills when the globe is painted, so paint one frame into an image.
+            // Reading the cache is the point: this has to be the array the renderer draws
+            // from, not a second computation of it that could agree while the first is wrong.
+            java.awt.image.BufferedImage frame = globeFrame(panel);
+            for (int[] c : panel.globeChords(() -> new int[0][])) {
+                if (c[0] == SkymapPanel.WHEEL_SKY) {
+                    built++;
+                }
+            }
+            System.out.println("  sky chords built " + built + "; natal orbs give " + atNatal
+                + ", synastry orbs give " + atSynastry);
+            yes("the two orb widths disagree, so the choice is a real one",
+                atNatal != atSynastry);
+            eq("the globe builds the sky ring at the flat wheel's orbs", atNatal, built);
+
+            // 3. And the highlight reaches the paint, not just the predicate. lightsChord is
+            // a door the renderer has to walk through; asking the door alone would leave a
+            // renderer that never opens it green.
+            int a0 = -1;
+            int b0 = -1;
+            for (int[] c : panel.globeChords(() -> new int[0][])) {
+                if (c[0] == SkymapPanel.WHEEL_SKY) {
+                    a0 = c[1];
+                    b0 = c[2];
+                    break;
+                }
+            }
+            yes("there is a sky chord to hover", a0 >= 0);
+            if (a0 >= 0) {
+                panel.setHighlightedAspect(null);
+                java.awt.image.BufferedImage dark = globeFrame(panel);
+                panel.setHighlightedAspect(SkymapPanel.aspectHref(
+                    "transit_" + com.zodiacomputing.ourania.astro.Bodies.at(a0).name
+                        .toLowerCase(),
+                    com.zodiacomputing.ourania.astro.Bodies.at(b0).name, "Trine",
+                    SkymapPanel.WHEEL_SKY));
+                java.awt.image.BufferedImage bright = globeFrame(panel);
+                panel.setHighlightedAspect(null);
+                System.out.println("  hovering a sky chord changes "
+                    + differingPixels(dark, bright) + " pixels of the globe");
+                yes("hovering a sky chord changes what the globe paints",
+                    differingPixels(dark, bright) > 40);
+            }
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /** One globe frame, painted offscreen. */
+    private static java.awt.image.BufferedImage globeFrame(SkymapPanel panel) {
+        java.awt.image.BufferedImage frame = new java.awt.image.BufferedImage(
+            600, 600, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D gg = frame.createGraphics();
+        GlobeRenderer.paint(gg, new Globe(), 600, 600, panel, false);
+        gg.dispose();
+        return frame;
+    }
+
+    private static int differingPixels(java.awt.image.BufferedImage a,
+            java.awt.image.BufferedImage b) {
+        int n = 0;
+        for (int y = 0; y < a.getHeight(); y++) {
+            for (int x = 0; x < a.getWidth(); x++) {
+                if (a.getRGB(x, y) != b.getRGB(x, y)) {
+                    n++;
+                }
+            }
+        }
+        return n;
+    }
+
+    private static void set(SkymapPanel panel, String name, Object value) throws Exception {
+        java.lang.reflect.Field f = SkymapPanel.class.getDeclaredField(name);
+        f.setAccessible(true);
+        f.set(panel, value);
     }
 
     /**
