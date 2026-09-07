@@ -334,19 +334,37 @@ final class GlobeRenderer {
         }
         int sign = ((int) Math.floor(lon / 30.0) % 12 + 12) % 12;
         Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
-        wedge(sign * 30.0, sign * 30.0 + 30.0, 0.10, Globe.SHELL_SIGN_OUTER + 0.06,
-            new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 78));
+
+        // <b>The sphere wedge is the thing that lights.</b> This lit only the flat sector for
+        // a while, which made the twelve wedges over the sphere decoration - they were the
+        // shape the body is actually standing in, and selecting it lit something else. The
+        // wedge brightens and swells past the surface, so it reads as the slice of sky coming
+        // forward rather than as a patch of colour changing.
+        if (this.shown(SkymapPanel.Layer.SIGNS)) {
+            wedgeOnSphere(sign * 30.0, sign * 30.0 + 30.0, Globe.SHELL_SIGN_INNER + 0.09,
+                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 74),
+                    SkymapPanel.Layer.SIGNS));
+            // And its segment of the flat ring, so the answer is legible from edge-on too -
+            // seen along the plane the sphere wedge is a sliver and the ring is not.
+            quadRing(sign * 30.0, sign * 30.0 + 30.0,
+                Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER + 0.07,
+                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 150),
+                    SkymapPanel.Layer.SIGNS));
+        }
 
         double[] cusps = panel.activeCusps;
         if (cusps == null || cusps.length < 13) {
             return;
         }
         int house = Zodiac.houseOf(lon, cusps);
-        if (house >= 1 && house <= 12) {
+        if (house >= 1 && house <= 12 && this.shown(SkymapPanel.Layer.HOUSES)) {
             double from = cusps[house];
             double span = arc(from, cusps[house == 12 ? 1 : house + 1]);
+            // The house stays flat because the houses are: they are spokes in the plane, and
+            // a house wedge standing up out of it would be claiming a shape nothing else in
+            // the view gives them.
             wedge(from, from + span, 0.10, Globe.SHELL_HOUSE + 0.06,
-                new Color(236, 224, 188, 66));
+                faded(new Color(236, 224, 188, 70), SkymapPanel.Layer.HOUSES));
         }
     }
 
