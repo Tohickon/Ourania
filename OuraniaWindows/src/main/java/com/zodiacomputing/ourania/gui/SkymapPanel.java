@@ -300,6 +300,15 @@ extends JPanel {
      */
     private boolean globeTurned;
 
+    /**
+     * True only while a button is down and the globe is actually moving.
+     *
+     * Separate from globeTurned, which lives on until the click that ends the drag is
+     * swallowed. This one clears on release, and the release repaints - so the full picture
+     * arrives the instant the hand stops.
+     */
+    private boolean globeDragging;
+
     /** The chips above the transport row, for the window to keep in step with the view. */
     RingBar ringBarComponent() {
         return this.ringBar;
@@ -679,6 +688,16 @@ extends JPanel {
         return c == null ? new Color(228, 229, 234) : c;
     }
 
+    /**
+     * A body's own colour, for surfaces with no panel instance to hand.
+     *
+     * The globe's bound and decan rings write a ruling planet's glyph, and it has to be the
+     * colour that planet is everywhere else - the same element lookup the wheel's glyphs use.
+     */
+    static Color bodyInkFor(int body) {
+        return SkymapPanel.elementColorFor(SkymapPanel.elementOfBody(body));
+    }
+
     /** Longitude the view is pinned to - the Ascendant unless the reader chose otherwise. */
     double pinLongitude() {
         return this.getPinLongitude();
@@ -701,8 +720,19 @@ extends JPanel {
         if (type == null || !this.drawsPair(a, b)) {
             return null;
         }
-        Color base = Color.decode(SkymapPanel.getAspectColorHex(type.label));
-        return new Color(base.getRed(), base.getGreen(), base.getBlue(), 150);
+        // Cached: this runs for every pair on every globe frame, and Color.decode parses a
+        // string each time. There are fifteen aspects.
+        return GLOBE_ASPECT_INK.computeIfAbsent(type.label, label -> {
+            Color base = Color.decode(SkymapPanel.getAspectColorHex(label));
+            return new Color(base.getRed(), base.getGreen(), base.getBlue(), 150);
+        });
+    }
+
+    private static final java.util.Map<String, Color> GLOBE_ASPECT_INK =
+        new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static Color unusedAspectInkTail() {
+        return null;
     }
 
     /** Whether the globe should light this body - the cursor is resting on it. */
@@ -2066,6 +2096,15 @@ extends JPanel {
             }
 
             @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+                SkymapPanel.this.dragFrom = null;
+                if (SkymapPanel.this.globeDragging) {
+                    SkymapPanel.this.globeDragging = false;
+                    SkymapPanel.this.chartPanel.repaint();
+                }
+            }
+
+            @Override
             public void mouseExited(MouseEvent mouseEvent) {
                 // Without this the chart stays dimmed around whatever the cursor left on,
                 // which reads as a rendering fault rather than as a selection.
@@ -2088,6 +2127,7 @@ extends JPanel {
                     return;
                 }
                 SkymapPanel.this.globeTurned = true;
+                SkymapPanel.this.globeDragging = true;
                 SkymapPanel.this.globe.drag(dx, dy, SkymapPanel.this.chartPanel.getWidth());
                 SkymapPanel.this.dragFrom = mouseEvent.getPoint();
                 SkymapPanel.this.chartPanel.repaint();
@@ -5846,7 +5886,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // is a flag threaded through five thousand lines of painter.
             if (SkymapPanel.this.globeMode) {
                 GlobeRenderer.paint(graphics2D, SkymapPanel.this.globe,
-                    this.getWidth(), this.getHeight(), SkymapPanel.this);
+                    this.getWidth(), this.getHeight(), SkymapPanel.this,
+                    SkymapPanel.this.globeDragging);
                 return;
             }
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

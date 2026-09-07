@@ -164,13 +164,21 @@ public final class GlobeCheck {
         }
 
         // Shells nest, and in the order the flat wheel reads them.
+        // <b>The same order the flat wheel reads, outward.</b> Bounds inside the signs and
+        // decans outside them is not decoration: it is the layout a reader already knows, and
+        // a globe that put them the other way round would be a second thing to learn.
         yes("the shells nest outward",
             Globe.SHELL_CORE < Globe.SHELL_NATAL
                 && Globe.SHELL_NATAL < Globe.SHELL_PARTNER
                 && Globe.SHELL_PARTNER < Globe.SHELL_HOUSE
-                && Globe.SHELL_HOUSE < Globe.SHELL_SIGN_INNER
+                && Globe.SHELL_HOUSE < Globe.SHELL_BOUND
+                && Globe.SHELL_BOUND < Globe.SHELL_SIGN_INNER
                 && Globe.SHELL_SIGN_INNER < Globe.SHELL_SIGN_OUTER
-                && Globe.SHELL_SIGN_OUTER < Globe.SHELL_SKY);
+                && Globe.SHELL_SIGN_OUTER < Globe.SHELL_DECAN
+                && Globe.SHELL_DECAN < Globe.SHELL_TICK
+                && Globe.SHELL_TICK < Globe.SHELL_SKY);
+        yes("a filled shell stops short of the poles",
+            Globe.FILL_SPAN < Math.PI / 2);
 
         // An equator closes on itself, and stays on its shell all the way round.
         double[][] eq = Globe.equator(origin, Globe.SHELL_SIGN_OUTER, 96);

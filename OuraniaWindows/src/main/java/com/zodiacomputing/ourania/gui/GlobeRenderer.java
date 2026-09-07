@@ -66,7 +66,11 @@ final class GlobeRenderer {
      * @param panel the chart this is a view of - read only, and read rather than copied so the
      *     two views cannot disagree about what the chart is
      */
-    static void paint(Graphics2D g, Globe cam, int w, int h, SkymapPanel panel) {
+    /**
+     * @param turning true while the reader is dragging the globe
+     */
+    static void paint(Graphics2D g, Globe cam, int w, int h, SkymapPanel panel,
+                      boolean turning) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         GlobeRenderer r = new GlobeRenderer(g, cam, w, h, panel.pinLongitude());
 
@@ -75,14 +79,33 @@ final class GlobeRenderer {
         double partnerR = shells[1];
         double skyR = shells[2];
 
+        // <b>The two translucent shells, innermost first.</b> Houses inside, signs outside,
+        // so looking in from anywhere the reader sees a sign colour laid over a house shade
+        // and the two read as one surface where they cross. That intersection is the thing
+        // the flat wheel cannot draw: there, a body is in a sign and in a house and the two
+        // facts sit in separate rings; here they are one colour.
+        //
+        // <b>Left out while the globe is being turned.</b> Measured across five panel sizes,
+        // a frame costs the same whatever the resolution - so this is per-call overhead, not
+        // pixels - and the two filled shells are about eighteen milliseconds of it, taking a
+        // drag from forty frames a second to twenty. Twenty is not a slow globe, it is a
+        // globe that fights the hand moving it. The shells come back the moment the drag ends,
+        // which is when a reader is actually looking at them rather than at the motion.
+        if (!turning) {
+            r.houseShell(panel.activeCusps);
+            r.signShell();
+        }
+
         r.zodiacBand();
+        r.boundRing();
+        r.decanRing();
         r.houseMeridians(panel.activeCusps);
-        r.shell(natalR, new Color(120, 132, 150, 60), 8, 3);
+        r.shell(natalR, new Color(120, 132, 150, 60), 6, 1);
         if (panel.outerRingDrawn()) {
-            r.shell(partnerR, new Color(150, 130, 90, 46), 8, 2);
+            r.shell(partnerR, new Color(150, 130, 90, 46), 6, 1);
         }
         if (panel.triRingDrawn()) {
-            r.shell(skyR, new Color(110, 150, 190, 38), 10, 2);
+            r.shell(skyR, new Color(110, 150, 190, 38), 8, 1);
         }
 
         r.aspectChords(panel, natalR);
@@ -183,20 +206,20 @@ final class GlobeRenderer {
 
     /** A great-circle wireframe, so a shell reads as a surface rather than as a hoop. */
     private void shell(double radius, Color ink, int meridians, int parallels) {
-        double[][] eq = Globe.equator(this.origin, radius, 120);
+        double[][] eq = Globe.equator(this.origin, radius, 72);
         polyline(eq, ink, 1.1f);
         for (int i = 0; i < meridians; i++) {
             polyline(Globe.meridian(this.origin + (360.0 * i) / meridians, this.origin,
-                radius, 28), ink, 0.7f);
+                radius, 20), ink, 0.7f);
         }
         // Latitude circles, thinning toward the poles the way a globe's do.
         for (int i = 1; i <= parallels; i++) {
             double phi = (Globe.MERIDIAN_SPAN * i) / (parallels + 1);
             for (int sign = -1; sign <= 1; sign += 2) {
                 double y = radius * Math.sin(phi * sign);
-                double[][] ring = new double[97][];
-                for (int k = 0; k <= 96; k++) {
-                    ring[k] = Globe.onShell(this.origin + (360.0 * k) / 96, this.origin,
+                double[][] ring = new double[73][];
+                for (int k = 0; k <= 72; k++) {
+                    ring[k] = Globe.onShell(this.origin + (360.0 * k) / 72, this.origin,
                         radius, y);
                 }
                 polyline(ring, ink, 0.5f);
@@ -241,6 +264,145 @@ final class GlobeRenderer {
     }
 
     /**
+     * The houses, as translucent slices of the sphere, grey to black.
+     *
+     * <b>An unequal house is a different size, and on a globe that is visible.</b> The flat
+     * wheel says so too, but a wedge of a disc reads as a label; a shaded slice of a sphere
+     * reads as an amount of sky. The shades run light to dark across the twelve so a reader
+     * can count round without the numbers, and stay dim enough that the bodies inside them
+     * still carry.
+     */
+    private void houseShell(double[] cusps) {
+        if (cusps == null || cusps.length < 13) {
+            return;
+        }
+        for (int i = 1; i <= 12; i++) {
+            double from = cusps[i];
+            double to = cusps[i == 12 ? 1 : i + 1];
+            double span = ((to - from) % 360.0 + 360.0) % 360.0;
+            if (span < 0.01) {
+                continue;                       // a degenerate cusp pair; nothing to fill
+            }
+            int level = 96 - (i - 1) * 7;       // house 1 lightest, house 12 nearly black
+            sector(from, from + span, Globe.SHELL_HOUSE,
+                new Color(level, level, level + 6, 58));
+        }
+    }
+
+    /**
+     * The zodiac as a translucent shell of colour, outside the houses.
+     *
+     * Each sign in its element's colour, faint enough that what lies behind it - a house
+     * shade, a body, another sign across the globe - still shows through.
+     */
+    private void signShell() {
+        for (int sign = 0; sign < 12; sign++) {
+            Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
+            sector(sign * 30.0, sign * 30.0 + 30.0, Globe.SHELL_SIGN_INNER,
+                new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 34));
+        }
+    }
+
+    /**
+     * A filled slice of a shell, between two longitudes and short of both poles.
+     *
+     * <b>Tessellated rather than drawn as one polygon.</b> A sector of a sphere is not flat,
+     * so its projection is not a quadrilateral - filling it as one would give straight edges
+     * where the globe curves, and the error is worst exactly where the slice is widest. Small
+     * quads, each with its own depth, also let the painter's sort put a near slice over a far
+     * one, which is what makes the shell read as a surface rather than as a stencil.
+     */
+    private void sector(double lon0, double lon1, double radius, Color fill) {
+        int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 11.0));
+        int rows = 5;
+        for (int i = 0; i < steps; i++) {
+            double la = lon0 + ((lon1 - lon0) * i) / steps;
+            double lb = lon0 + ((lon1 - lon0) * (i + 1)) / steps;
+            for (int j = 0; j < rows; j++) {
+                double p0 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * j) / rows;
+                double p1 = -Globe.FILL_SPAN + (2 * Globe.FILL_SPAN * (j + 1)) / rows;
+                quad(Globe.onShell(la, this.origin, radius, radius * Math.sin(p0)),
+                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p0)),
+                    Globe.onShell(lb, this.origin, radius, radius * Math.sin(p1)),
+                    Globe.onShell(la, this.origin, radius, radius * Math.sin(p1)),
+                    fill);
+            }
+        }
+    }
+
+    /** One tessellation cell, filled flat. */
+    private void quad(double[] a, double[] b, double[] c, double[] d, Color fill) {
+        Globe.Projected pa = at(a);
+        Globe.Projected pb = at(b);
+        Globe.Projected pc = at(c);
+        Globe.Projected pd = at(d);
+        if (!pa.visible || !pb.visible || !pc.visible || !pd.visible) {
+            return;
+        }
+        double depth = (pa.depth + pb.depth + pc.depth + pd.depth) / 4.0;
+        this.pieces.add(new Piece(depth, () -> {
+            // <b>Antialiasing off for the wash.</b> These are large translucent polygons and
+            // the smoothing is both the expensive part and invisible - each cell abuts its
+            // neighbours in the same colour, so the only edges that could show are the ones
+            // at the outside of a sector, and there the fill is faint enough that a hard edge
+            // reads as a boundary rather than as a jagged one. Lines and glyphs keep it.
+            java.awt.Polygon poly = new java.awt.Polygon();
+            poly.addPoint((int) Math.round(pa.x), (int) Math.round(pa.y));
+            poly.addPoint((int) Math.round(pb.x), (int) Math.round(pb.y));
+            poly.addPoint((int) Math.round(pc.x), (int) Math.round(pc.y));
+            poly.addPoint((int) Math.round(pd.x), (int) Math.round(pd.y));
+            this.g.setColor(fill);
+            this.g.fillPolygon(poly);
+        }));
+    }
+
+    /**
+     * The Egyptian bounds, on a shell just inside the signs.
+     *
+     * Both halves from Dignity, as on the flat wheel - boundEdges for where the divisions go,
+     * boundRulerOf for what is written in each - so the globe cannot disagree with the score
+     * about whose bound a body stands in.
+     */
+    private void boundRing() {
+        for (int sign = 0; sign < 12; sign++) {
+            double[] edges = com.zodiacomputing.ourania.astro.Dignity.boundEdges(sign);
+            for (int i = 0; i < edges.length - 1; i++) {
+                double mid = sign * 30.0 + (edges[i] + edges[i + 1]) / 2.0;
+                String ruler = com.zodiacomputing.ourania.astro.Dignity
+                    .boundRulerOf(mid % 360.0);
+                int bi = Bodies.indexOfName(ruler);
+                if (bi < 0) {
+                    continue;
+                }
+                billboard(Globe.onShell(mid, this.origin, Globe.SHELL_BOUND, 0.0),
+                    SkymapPanel.glyphOf(bi), SkymapPanel.bodyInkFor(bi), 10);
+            }
+        }
+    }
+
+    /** The decans, on a shell just outside the signs, in whichever scheme the reader chose. */
+    private void decanRing() {
+        boolean chaldean = Settings.DECAN_RING_CHALDEAN.equals(Settings.decanRing());
+        for (int d = 0; d < 36; d++) {
+            int sign = d / 3;
+            double mid = d * 10.0 + 5.0;
+            if (chaldean) {
+                String ruler = Zodiac.chaldeanDecanRuler(Zodiac.SIGNS[sign], d % 3 + 1);
+                int bi = Bodies.indexOfName(ruler);
+                if (bi >= 0) {
+                    billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
+                        SkymapPanel.glyphOf(bi), SkymapPanel.bodyInkFor(bi), 10);
+                    continue;
+                }
+            }
+            int face = Zodiac.triplicityDecanSignIndex(sign, d % 3 + 1);
+            billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
+                SkymapPanel.zodiacSymbol(face),
+                SkymapPanel.elementColorFor(Zodiac.elementIndex(face)), 10);
+        }
+    }
+
+    /**
      * The houses, as meridians from pole to pole.
      *
      * <b>A house is a slice of the sphere, not a wedge of a disc.</b> Drawing the cusps as
@@ -253,7 +415,7 @@ final class GlobeRenderer {
         }
         for (int i = 1; i <= 12; i++) {
             boolean angle = i == 1 || i == 4 || i == 7 || i == 10;
-            polyline(Globe.meridian(cusps[i], this.origin, Globe.SHELL_HOUSE, 26),
+            polyline(Globe.meridian(cusps[i], this.origin, Globe.SHELL_HOUSE, 20),
                 angle ? new Color(210, 200, 175, 190) : new Color(120, 120, 130, 110),
                 angle ? 1.6f : 0.8f);
         }
@@ -313,28 +475,92 @@ final class GlobeRenderer {
             double far = q.depth > this.cam.distance ? 0.55 : 1.0;
             final int alpha = (int) Math.round(255 * far);
 
+            final int half = this.g.getFontMetrics(font(13)).stringWidth(glyph) / 2;
             this.pieces.add(new Piece(q.depth, () -> {
                 int rad = lit ? 11 : 9;
                 this.g.setColor(shade(bead, alpha));
                 this.g.fillOval((int) q.x - rad, (int) q.y - rad, rad * 2, rad * 2);
-                this.g.setStroke(new BasicStroke(lit ? 2.0f : 1.0f));
+                this.g.setStroke(stroke(lit ? 2.0f : 1.0f));
                 this.g.setColor(shade(lit ? new Color(255, 238, 170) : ink, alpha));
                 this.g.drawOval((int) q.x - rad, (int) q.y - rad, rad * 2, rad * 2);
-                this.g.setFont(new Font("SansSerif", 0, 13));
+                this.g.setFont(font(13));
                 this.g.setColor(shade(ink, alpha));
-                this.g.drawString(glyph,
-                    (int) q.x - this.g.getFontMetrics().stringWidth(glyph) / 2,
-                    (int) q.y + 5);
+                this.g.drawString(glyph, (int) q.x - half, (int) q.y + 5);
             }));
         }
     }
 
     // ------------------------------------------------------------------ drawing primitives
 
+    /**
+     * A run of points as one stroked path, in a few chunks rather than one piece per segment.
+     *
+     * <b>This was one Piece per segment and it cost the view its interactivity.</b> A frame
+     * held roughly two thousand four hundred line segments, each a separate object with its
+     * own closure and its own freshly allocated stroke, and a globe at 1100 pixels took 141
+     * milliseconds - seven frames a second, which under a drag is not a slow globe but a
+     * broken one. Drawn as chunked polylines it is a few dozen pieces.
+     *
+     * <b>Chunked rather than whole</b>, because an equator wraps from the near side of the
+     * globe to the far side and back: one piece for the whole circle would take a single mean
+     * depth, and the half that is behind would sort as though it were in front. Twelve points
+     * a chunk is short enough that a chunk is entirely near or entirely far.
+     */
     private void polyline(double[][] pts, Color ink, float width) {
-        for (int i = 0; i + 1 < pts.length; i++) {
-            segment(pts[i], pts[i + 1], ink, width);
+        final int chunk = 12;
+        for (int start = 0; start + 1 < pts.length; start += chunk) {
+            int end = Math.min(pts.length - 1, start + chunk);
+            int n = end - start + 1;
+            int[] xs = new int[n];
+            int[] ys = new int[n];
+            double depth = 0;
+            int kept = 0;
+            for (int i = start; i <= end; i++) {
+                Globe.Projected q = at(pts[i]);
+                if (!q.visible) {
+                    continue;                   // a chunk crossing the lens is simply dropped
+                }
+                xs[kept] = (int) Math.round(q.x);
+                ys[kept] = (int) Math.round(q.y);
+                depth += q.depth;
+                kept++;
+            }
+            if (kept < 2) {
+                continue;
+            }
+            final int count = kept;
+            this.pieces.add(new Piece(depth / kept, () -> {
+                this.g.setStroke(stroke(width));
+                this.g.setColor(ink);
+                this.g.drawPolyline(xs, ys, count);
+            }));
         }
+    }
+
+    /**
+     * Strokes, cached by width.
+     *
+     * A new BasicStroke per segment was allocating thousands of identical objects a frame.
+     * There are four widths in this scene.
+     */
+    private static final java.util.Map<Float, Stroke> STROKES =
+        new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static Stroke stroke(float width) {
+        return STROKES.computeIfAbsent(width, BasicStroke::new);
+    }
+
+    /**
+     * Fonts, cached by point size, for the same reason as the strokes.
+     *
+     * A frame writes about two hundred glyphs - bodies, bounds, decans, signs - and each one
+     * was allocating a Font and asking for fresh FontMetrics. There are three sizes.
+     */
+    private static final java.util.Map<Integer, Font> FONTS =
+        new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static Font font(int points) {
+        return FONTS.computeIfAbsent(points, p -> new Font("SansSerif", 0, p));
     }
 
     private void segment(double[] a, double[] b, Color ink, float width) {
@@ -345,11 +571,9 @@ final class GlobeRenderer {
         }
         double depth = (pa.depth + pb.depth) / 2.0;
         this.pieces.add(new Piece(depth, () -> {
-            Stroke was = this.g.getStroke();
-            this.g.setStroke(new BasicStroke(width));
+            this.g.setStroke(stroke(width));
             this.g.setColor(ink);
             this.g.drawLine((int) pa.x, (int) pa.y, (int) pb.x, (int) pb.y);
-            this.g.setStroke(was);
         }));
     }
 
@@ -359,11 +583,13 @@ final class GlobeRenderer {
         if (!p.visible) {
             return;
         }
+        // Width measured once, here, rather than inside the draw - the draw runs after the
+        // sort and the metrics do not depend on it.
+        final int half = this.g.getFontMetrics(font(points)).stringWidth(text) / 2;
         this.pieces.add(new Piece(p.depth, () -> {
-            this.g.setFont(new Font("SansSerif", 0, points));
+            this.g.setFont(font(points));
             this.g.setColor(ink);
-            this.g.drawString(text,
-                (int) p.x - this.g.getFontMetrics().stringWidth(text) / 2, (int) p.y + points / 3);
+            this.g.drawString(text, (int) p.x - half, (int) p.y + points / 3);
         }));
     }
 

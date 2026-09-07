@@ -37,10 +37,24 @@ final class Globe {
     static final double SHELL_NATAL = 1.26;
     static final double SHELL_PARTNER = 1.56;
     static final double SHELL_HOUSE = 1.72;
+    /** Egyptian bounds, just inside the signs - the flat wheel's order, kept. */
+    static final double SHELL_BOUND = 1.86;
     static final double SHELL_SIGN_INNER = 1.94;
     static final double SHELL_SIGN_OUTER = 2.16;
-    static final double SHELL_TICK = 2.26;
+    /** Decans, just outside the signs, as on the flat wheel. */
+    static final double SHELL_DECAN = 2.24;
+    static final double SHELL_TICK = 2.28;
     static final double SHELL_SKY = 2.32;
+
+    /**
+     * How far above and below the equator a filled shell reaches, in radians of latitude.
+     *
+     * <b>Short of the poles, like the meridians.</b> A house or a sign is a slice of the sky
+     * that does converge at the poles, but filling all the way there stacks twelve translucent
+     * wedges on one point and the result is a black cap - which says nothing and hides the
+     * bodies behind it.
+     */
+    static final double FILL_SPAN = 1.02;
 
     /** How far up the shell one collision level lifts a body. */
     static final double STACK_STEP = 0.085;
