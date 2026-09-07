@@ -274,6 +274,54 @@ extends JPanel {
     private RingBar ringBar;
 
     /**
+     * Whether the chart screen is showing the globe instead of the flat wheel.
+     *
+     * <b>A mode of this screen, not a screen of its own.</b> The drawers, the controls, the
+     * readings and the ring chips all describe the chart rather than the drawing of it, so a
+     * separate screen would have needed a second copy of every one of them - and the copies
+     * would have drifted. Switching views changes what the wheel panel paints and nothing
+     * else; everything around it keeps working because nothing around it was ever about the
+     * flat projection.
+     */
+    private boolean globeMode;
+
+    /** The camera, kept across a switch so returning to the globe finds it where it was. */
+    private final Globe globe = new Globe();
+
+    /** Where the current drag started, or null when no button is down. */
+    private java.awt.Point dragFrom;
+
+    /**
+     * Whether the drag in progress has moved far enough to be a turn rather than a click.
+     *
+     * <b>Every drag ends in a click event too.</b> Without this, turning the globe and
+     * releasing opens whatever card happened to be under the cursor at the end of the turn,
+     * which reads as the globe selecting things at random.
+     */
+    private boolean globeTurned;
+
+    /** The chips above the transport row, for the window to keep in step with the view. */
+    RingBar ringBarComponent() {
+        return this.ringBar;
+    }
+
+    /** Whether the chart is being shown as a globe. */
+    boolean isGlobeMode() {
+        return this.globeMode;
+    }
+
+    /** Switches between the flat wheel and the globe, repainting either way. */
+    void setGlobeMode(boolean on) {
+        if (this.globeMode == on) {
+            return;
+        }
+        this.globeMode = on;
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+    }
+
+    /**
      * How far the outer ring is open, and the sky ring beyond it.
      *
      * <b>One bloom per ring that is DRAWN, not per idea it carries.</b> The outer ring holds a
@@ -608,7 +656,61 @@ extends JPanel {
         return font.canDisplay(def.glyph.codePointAt(0)) ? def.glyph : def.fallback;
     }
 
-    private static boolean aspecting(int n, boolean[] blArray) {
+    /**
+     * What the globe view needs from this panel, and nothing more.
+     *
+     * <b>Accessors rather than a copy of the chart.</b> The globe is a second view of one
+     * chart, not a second chart: it reads these, so it cannot drift from what the wheel draws.
+     * Each one already existed in some form - as a private method, an instance colour lookup,
+     * or a static array - and is exposed here rather than reimplemented there.
+     */
+    static String zodiacSymbol(int signIndex) {
+        return ZODIAC_SYMBOLS[((signIndex % 12) + 12) % 12];
+    }
+
+    /** A body's glyph, by registry index. */
+    static String glyphOf(int body) {
+        return body >= 0 && body < BODY_GLYPHS.length ? BODY_GLYPHS[body] : "?";
+    }
+
+    /** An element's colour, for surfaces that have no panel instance to hand. */
+    static Color elementColorFor(int elementIndex) {
+        Color c = ChartPalette.colorOr(SkymapPanel.elementTextHex(elementIndex), null);
+        return c == null ? new Color(228, 229, 234) : c;
+    }
+
+    /** Longitude the view is pinned to - the Ascendant unless the reader chose otherwise. */
+    double pinLongitude() {
+        return this.getPinLongitude();
+    }
+
+    /**
+     * The colour an aspect between two bodies is drawn in, or null when there is none.
+     *
+     * <b>Through visibleAspect and drawsPair, the same two gates drawAspectLine uses.</b> An
+     * aspect the reader has switched off, or one the aspect mode excludes, must be absent from
+     * the globe for the same reason it is absent from the wheel - otherwise the two views
+     * disagree about what is in aspect, which is worse than either being wrong alone.
+     */
+    Color aspectInkFor(double lonA, double lonB, int a, int b, boolean cross) {
+        double sep = Math.abs(lonA - lonB);
+        if (sep > 180.0) {
+            sep = 360.0 - sep;
+        }
+        Aspects.Type type = this.visibleAspect(sep, a, b, this.isSynastryPair(cross));
+        if (type == null || !this.drawsPair(a, b)) {
+            return null;
+        }
+        Color base = Color.decode(SkymapPanel.getAspectColorHex(type.label));
+        return new Color(base.getRed(), base.getGreen(), base.getBlue(), 150);
+    }
+
+    /** Whether the globe should light this body - the cursor is resting on it. */
+    boolean onGlobeFocus(int body, boolean outer) {
+        return this.focusBody == body && this.focusTransit == outer;
+    }
+
+    static boolean aspecting(int n, boolean[] blArray) {
         return blArray[n] && !Bodies.at(n).isAngle();
     }
 
@@ -709,6 +811,20 @@ extends JPanel {
     private String hoverTextAt(int x, int y) {
         if (this.sw == null || this.baseSd == null || this.chartPanel == null) {
             return null;
+        }
+        // The same three hit tests, in the same order, as bodyAt - and on the globe, the same
+        // one. The note on bodyAt says why the hover card and the focus highlight must agree.
+        if (this.globeMode) {
+            int hit = GlobeRenderer.bodyAt(this.globe, this.chartPanel.getWidth(),
+                this.chartPanel.getHeight(), this, x, y);
+            if (hit < 0) {
+                return null;
+            }
+            boolean outer = (hit & TRANSIT_BIT) != 0;
+            int i = hit & ~TRANSIT_BIT;
+            double[] lon = outer ? this.tLon : this.bLon;
+            double[] spd = outer ? this.tSpeed : this.bSpeed;
+            return i < lon.length ? this.hoverHtml(i, lon[i], spd[i], outer) : null;
         }
         Geometry g = this.geometry();
         if (g == null) {
@@ -911,6 +1027,14 @@ extends JPanel {
         if (this.sw == null || this.baseSd == null || this.chartPanel == null) {
             return -1;
         }
+        // <b>Whichever view is on screen answers.</b> The flat geometry below describes bands
+        // that are not being drawn when the globe is up, so asking it would light a body the
+        // reader is not looking at - and on a globe a wrong answer reads as the reader having
+        // missed rather than as the chart being wrong.
+        if (this.globeMode) {
+            return GlobeRenderer.bodyAt(this.globe, this.chartPanel.getWidth(),
+                this.chartPanel.getHeight(), this, x, y);
+        }
         Geometry g = this.geometry();
         if (g == null) {
             return -1;
@@ -934,7 +1058,7 @@ extends JPanel {
     }
 
     /** Marks a packed hit as belonging to the outer wheel. Above any registry index. */
-    private static final int TRANSIT_BIT = 1 << 16;
+    static final int TRANSIT_BIT = 1 << 16;
 
     /**
      * The body the cursor is resting on, or -1.
@@ -1926,7 +2050,19 @@ extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
+                // A drag on the globe turns it; a click still selects. The threshold is what
+                // separates the two, because every drag ends in a click event as well.
+                if (SkymapPanel.this.globeMode && SkymapPanel.this.globeTurned) {
+                    SkymapPanel.this.globeTurned = false;
+                    return;
+                }
                 SkymapPanel.this.handleChartClick(mouseEvent.getX(), mouseEvent.getY());
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                SkymapPanel.this.dragFrom = mouseEvent.getPoint();
+                SkymapPanel.this.globeTurned = false;
             }
 
             @Override
@@ -1941,6 +2077,23 @@ extends JPanel {
         this.chartPanel.addMouseMotionListener(new java.awt.event.MouseMotionAdapter(){
 
             @Override
+            public void mouseDragged(MouseEvent mouseEvent) {
+                if (!SkymapPanel.this.globeMode || SkymapPanel.this.dragFrom == null) {
+                    return;
+                }
+                int dx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
+                int dy = mouseEvent.getY() - SkymapPanel.this.dragFrom.y;
+                // Below a few pixels this is a click with a shaky hand, not a turn.
+                if (!SkymapPanel.this.globeTurned && dx * dx + dy * dy < 9) {
+                    return;
+                }
+                SkymapPanel.this.globeTurned = true;
+                SkymapPanel.this.globe.drag(dx, dy, SkymapPanel.this.chartPanel.getWidth());
+                SkymapPanel.this.dragFrom = mouseEvent.getPoint();
+                SkymapPanel.this.chartPanel.repaint();
+            }
+
+            @Override
             public void mouseMoved(MouseEvent mouseEvent) {
                 // The tooltip is no longer pushed from here. ChartPanel overrides
                 // getToolTipText(MouseEvent) and ToolTipManager asks it, which is the whole
@@ -1953,6 +2106,13 @@ extends JPanel {
                     SkymapPanel.this.chartPanel.repaint();
                 }
             }
+        });
+        this.chartPanel.addMouseWheelListener(e -> {
+            if (!SkymapPanel.this.globeMode) {
+                return;                         // the flat wheel has nothing to scroll
+            }
+            SkymapPanel.this.globe.zoom(e.getPreciseWheelRotation());
+            SkymapPanel.this.chartPanel.repaint();
         });
         // A chart is read by sweeping across it, so the default 750ms feels broken here.
         // <b>Registered once, with a non-null placeholder, and never unregistered.</b>
@@ -3193,6 +3353,33 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     private void handleChartClick(int n, int n2) {
+        // On the globe the only targets are the bodies; the bands the click dispatcher below
+        // resolves by radius are not drawn, so resolving against them would open a card for a
+        // ring the reader cannot see.
+        if (this.globeMode) {
+            int hit = GlobeRenderer.bodyAt(this.globe, this.chartPanel.getWidth(),
+                this.chartPanel.getHeight(), this, n, n2);
+            if (hit < 0) {
+                return;
+            }
+            boolean outer = (hit & TRANSIT_BIT) != 0;
+            int i = hit & ~TRANSIT_BIT;
+            double[] lon = outer ? this.tLon : this.bLon;
+            double[] spd = outer ? this.tSpeed : this.bSpeed;
+            if (i >= lon.length) {
+                return;
+            }
+            if (Bodies.at(i).isAngle()) {
+                this.showAngleAt(i, lon[i], this.angleRoleFor(false, outer));
+            } else if (this.window != null) {
+                // The same card the flat wheel opens, built by the same method. A second way
+                // of describing a body would be a second thing to keep in step with the
+                // interpretation panel, and it would drift the first time either changed.
+                this.setFocus(hit);
+                this.window.showSelection(this.selectionHtml(i, lon[i], spd[i], outer));
+            }
+            return;
+        }
         // <b>Pin first, before the branches below decide what was clicked.</b> This method has
         // several exits - angle, transit body, natal body, aspect line, empty space - and
         // pinning inside one of them would leave the others silently unpinned. Asked through
@@ -5653,6 +5840,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 return;
             }
             Graphics2D graphics2D = (Graphics2D)graphics;
+            // <b>The other view of the same chart.</b> Everything below this line draws the
+            // flat wheel; the globe reads the same arrays and paints them as shells. One
+            // branch, at the top, because the two share no drawing at all - the alternative
+            // is a flag threaded through five thousand lines of painter.
+            if (SkymapPanel.this.globeMode) {
+                GlobeRenderer.paint(graphics2D, SkymapPanel.this.globe,
+                    this.getWidth(), this.getHeight(), SkymapPanel.this);
+                return;
+            }
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             int n10 = this.getWidth();
             int n11 = this.getHeight();

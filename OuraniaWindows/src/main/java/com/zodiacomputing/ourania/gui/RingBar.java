@@ -40,6 +40,7 @@ public final class RingBar extends JPanel {
     private final OuraniaWindow window;
     private final Chip partner;
     private final Chip sky;
+    private final Chip globe;
 
     private boolean partnerOpen;
     private boolean skyOpen;
@@ -73,6 +74,31 @@ public final class RingBar extends JPanel {
             + "Over a natal chart that is the transit wheel; over a natal and a partner it is "
             + "the third ring - the sky above both of them at once.</html>");
         add(sky);
+
+        // <b>A view, not a ring - which is why it is last and reads differently.</b> The three
+        // chips before it say what is in the chart; this one says how the chart is drawn, and
+        // sits on the same strip because that is where a reader looking at the wheel already
+        // is. It carries no ring state and never calls setRings.
+        globe = new Chip("Globe", () -> {
+            if (window != null) {
+                window.setGlobeView(!globeOpen);
+            }
+        });
+        globe.setToolTipText("<html><b>The same chart as nested shells.</b><br>"
+            + "Every ring becomes a sphere - natal inside, a partner around it, the sky on "
+            + "the outer skin - with the zodiac as a band at the equator.<br>"
+            + "<i>Drag to turn, scroll to zoom.</i></html>");
+        add(globe);
+    }
+
+    /** True when the wheel is currently drawn as a globe. */
+    private boolean globeOpen;
+
+    /** Reflects the view actually being painted, the way syncFrom does for the rings. */
+    public void syncView(boolean showingGlobe) {
+        this.globeOpen = showingGlobe;
+        this.globe.label = showingGlobe ? "Wheel" : "Globe";
+        this.globe.repaint();
     }
 
     /** Reflects what is actually drawn, so the chips cannot drift from the wheel. */
@@ -102,6 +128,7 @@ public final class RingBar extends JPanel {
     private void repaintChips() {
         partner.repaint();
         sky.repaint();
+        globe.repaint();
     }
 
     /** One ring, as a chip that reads as open or folded. */
@@ -146,7 +173,10 @@ public final class RingBar extends JPanel {
             if (fixed) {
                 return true;
             }
-            return this == partner ? partnerOpen && partnerAvailable : skyOpen;
+            if (this == partner) {
+                return partnerOpen && partnerAvailable;
+            }
+            return this == globe ? globeOpen : skyOpen;
         }
 
         @Override

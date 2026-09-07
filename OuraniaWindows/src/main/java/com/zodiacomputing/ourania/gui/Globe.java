@@ -72,15 +72,28 @@ final class Globe {
     /** Camera distance in world units. The reader scrolls this. */
     double distance = 5.6;
 
-    /** How much of the panel the globe fills, as a fraction of its smaller side. */
-    private static final double ZOOM = 1.45;
+    /**
+     * Focal length as a multiple of the panel's smaller side.
+     *
+     * <b>Set from the outermost shell, not chosen.</b> At 1.45 the sky shell projected to 660
+     * pixels of a 550-pixel half-frame and the globe ran off every edge - which looks like a
+     * broken camera rather than like a zoom. The largest thing in the scene is SHELL_SKY, so
+     * this is the value that puts it comfortably inside the frame at the default distance,
+     * and the reader scrolls from there.
+     */
+    private static final double ZOOM = 0.95;
 
     /** The tilt beyond which the poles cross the view and the scene reads as inverted. */
     static final double MAX_PITCH = 1.25;
 
     Globe() {
         this.yaw = 0.0;
-        this.pitch = 0.42;
+        // <b>Looking down at about fifty degrees.</b> At twenty-four the shells project to
+        // ellipses so flat that the scene reads as a squashed wheel rather than as a sphere -
+        // which loses the whole argument for the view. The prototype's camera sits at
+        // [0, 4.2, 3.5], which is this angle; matching it means the two look like the same
+        // idea rather than like two attempts at one.
+        this.pitch = 0.87;
     }
 
     /** Applies a drag, in pixels, and keeps the camera somewhere a reader can understand. */

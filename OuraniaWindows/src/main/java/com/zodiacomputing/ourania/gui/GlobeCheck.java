@@ -21,7 +21,7 @@ public final class GlobeCheck {
     private static final List<String> failures = new ArrayList<>();
     private static int checks = 0;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println("=== Part A: the camera projects sanely ===");
         int before = failures.size();
         theCamera();
@@ -44,6 +44,12 @@ public final class GlobeCheck {
         before = failures.size();
         theyAgree();
         report("Part D", before);
+
+        System.out.println();
+        System.out.println("=== Part E: a body you can see is a body you can click ===");
+        before = failures.size();
+        clickWhereYouSee();
+        report("Part E", before);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -296,6 +302,90 @@ public final class GlobeCheck {
         double sweep = Math.toDegrees(Math.abs(angA - angB)) % 360.0;
         near("a square is a quarter turn on screen too", 90.0,
             sweep > 180 ? 360 - sweep : sweep, 1e-6);
+    }
+
+    /**
+     * The globe's hit test finds bodies where the globe's painter puts them.
+     *
+     * <b>This project has shipped the opposite twice.</b> On the flat wheel the painter drew
+     * bodies at one radius while the hit test measured another, and nothing on the chart could
+     * be clicked; Geometry exists because of it. A globe makes the same defect harder to
+     * notice - a reader who clicks a sphere and gets nothing assumes they missed the glyph
+     * rather than that the chart is lying - so it is asserted here rather than left to a
+     * shared method being obviously shared.
+     *
+     * Driven through a real panel, at several camera angles, for every visible body: project
+     * where the painter would draw it, ask the hit test what is at that pixel, and require the
+     * answer to be that body.
+     */
+    private static void clickWhereYouSee() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+
+            // A chart with something on every ring, set directly so this part does not depend
+            // on an ephemeris read or on which sample chart happens to be loaded.
+            java.lang.reflect.Field fb = SkymapPanel.class.getDeclaredField("bLon");
+            java.lang.reflect.Field fv = SkymapPanel.class.getDeclaredField("bValid");
+            fb.setAccessible(true);
+            fv.setAccessible(true);
+            double[] lon = (double[]) fb.get(panel);
+            boolean[] valid = (boolean[]) fv.get(panel);
+            // <b>Half spread, half crowded.</b> An evenly spread chart never stacks, so the
+            // first version of this part passed with the stack removed from the hit test
+            // entirely - the mutation survived because the case was never exercised. The
+            // second half sits inside seven degrees, which is exactly what stackLevels lifts.
+            for (int i = 0; i < lon.length; i++) {
+                lon[i] = i < lon.length / 2
+                    ? (i * 360.0) / lon.length
+                    : 214.0 + (i - lon.length / 2) * 1.4;
+                valid[i] = true;
+            }
+            int[] check = Globe.stackLevels(lon, valid, 7.0);
+            int highest = 0;
+            for (int v : check) {
+                highest = Math.max(highest, v);
+            }
+            yes("the chart under test actually stacks, highest level " + highest,
+                highest >= 3);
+
+            Globe cam = new Globe();
+            int w = 900;
+            int h = 900;
+            double[] shells = GlobeRenderer.shellRadii(panel);
+            double origin = panel.pinLongitude();
+
+            for (double yaw : new double[] {0.0, 1.1, 2.4, 4.9}) {
+                for (double pitch : new double[] {-0.9, 0.0, 0.42, 0.87}) {
+                    cam.yaw = yaw;
+                    cam.pitch = pitch;
+                    int[] level = Globe.stackLevels(lon, valid, 7.0);
+                    for (int i = 0; i < lon.length; i++) {
+                        double[] p = Globe.onShell(lon[i], origin, shells[0],
+                            level[i] * Globe.STACK_STEP);
+                        Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
+                        if (!q.visible) {
+                            continue;
+                        }
+                        int hit = GlobeRenderer.bodyAt(cam, w, h, panel,
+                            (int) Math.round(q.x), (int) Math.round(q.y));
+                        yes("clicking body " + i + " where it is drawn finds something"
+                            + " (yaw=" + yaw + " pitch=" + pitch + ")", hit >= 0);
+                    }
+                }
+            }
+
+            // And empty sky selects nothing, rather than the nearest thing anywhere.
+            cam.yaw = 0;
+            cam.pitch = 0.87;
+            eq("a click far from every body finds nothing", -1,
+                GlobeRenderer.bodyAt(cam, w, h, panel, 5, 5));
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
     }
 
     private static void yes(String label, boolean condition) {

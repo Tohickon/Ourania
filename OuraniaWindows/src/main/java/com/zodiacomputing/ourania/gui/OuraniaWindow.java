@@ -249,9 +249,30 @@ public class OuraniaWindow extends JFrame {
 
     /** Lets the wheel's chips show what is actually drawn rather than what was last clicked. */
     public void syncRingBar(RingBar bar) {
-        if (bar != null && chartSetupPanel != null) {
+        if (bar == null) {
+            return;
+        }
+        if (chartSetupPanel != null) {
             bar.syncFrom(chartSetupPanel.currentMode(), chartSetupPanel.skyWanted(),
                 chartSetupPanel.hasPartnerData());
+        }
+        if (skymapPanel != null) {
+            bar.syncView(skymapPanel.isGlobeMode());
+        }
+    }
+
+    /**
+     * Shows the chart flat or as a globe.
+     *
+     * <b>A view, so it goes nowhere near ChartMode.</b> Which rings are open is a fact about
+     * the chart and is written in exactly one place; how the chart is drawn is not, and
+     * routing it through the setup panel would have made the view a fourth thing that can
+     * change the mode.
+     */
+    public void setGlobeView(boolean globe) {
+        if (skymapPanel != null) {
+            skymapPanel.setGlobeMode(globe);
+            syncRingBar(skymapPanel.ringBarComponent());
         }
     }
 
