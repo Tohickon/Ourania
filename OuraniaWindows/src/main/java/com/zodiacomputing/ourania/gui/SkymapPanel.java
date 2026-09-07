@@ -288,6 +288,59 @@ extends JPanel {
     /** The camera, kept across a switch so returning to the globe finds it where it was. */
     private final Globe globe = new Globe();
 
+    /**
+     * The globe's aspect list, held between frames.
+     *
+     * <b>It was recomputed on every repaint, and that is what made the view slow.</b> Every
+     * frame walked up to two and a half thousand pairs, and each pair ran visibleAspect and
+     * drawsPair - orb lookups, a settings read, an enum scan - to answer a question whose
+     * inputs had not changed since the chart was cast. Dragging a globe is the one thing that
+     * repaints continuously, so the cost landed exactly where it hurt.
+     *
+     * Held as flat ints - ring, a, b, packed colour - because a list of small objects for
+     * something rebuilt on every chart change is a lot of garbage for no clarity.
+     *
+     * <b>Cleared rather than dated.</b> A timestamp would need every input to remember to
+     * touch it; one method that empties this, called from the places that change what an
+     * aspect is, is a thing that can be grepped for.
+     */
+    private int[][] globeChords;
+
+    /**
+     * Forget the cached aspect list. Called wherever the answer could have changed - the
+     * chart being recast, the reader's aspect selection, the filter, the aspect mode.
+     */
+    void invalidateGlobeChords() {
+        this.globeChords = null;
+    }
+
+    /**
+     * Whether natal-to-natal aspects are drawn, given the reader's filter.
+     *
+     * <b>Named because there are two views now.</b> This was an expression inside the flat
+     * painter, and the globe simply did not ask it - so setting the filter to Natal-Natal
+     * left the globe still drawing every transit chord. Two surfaces answering the same
+     * question differently is this project's most-found defect, and a filter that half works
+     * is worse than one that does not exist, because the reader believes it.
+     */
+    boolean drawsNatalAspects() {
+        return "Natal-Natal".equals(this.aspectFilter) || "Both".equals(this.aspectFilter);
+    }
+
+    /** As above, for aspects between an outer ring and the natal wheel. */
+    boolean drawsCrossAspects() {
+        return ("Transit-Natal".equals(this.aspectFilter) || "Both".equals(this.aspectFilter))
+            && this.showTransitChart;
+    }
+
+    /** The globe's aspects, computed once per chart rather than once per frame. */
+    int[][] globeChords(java.util.function.Supplier<int[][]> build) {
+        if (this.globeChords == null) {
+            this.globeChords = build.get();
+        }
+        return this.globeChords;
+    }
+
     /** Where the current drag started, or null when no button is down. */
     private java.awt.Point dragFrom;
 
@@ -4070,6 +4123,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
 
     /** The Settings screen changed which aspects are drawn. */
     public void reloadAspectSelection() {
+        // No invalidateGlobeChords here: updateChartData below does it, and a second call
+        // that a mutation cannot kill is not a safety net, it is a claim that the clearing
+        // happens in two places when it happens in one.
         this.aspectShown = Settings.loadAspectSelection();
         // Read here and not in updateChartData. Refreshing on every compute overwrote the pin
         // a suite had just set, so AspectGridCheck still drifted 6509 against 6522 with the
@@ -5139,6 +5195,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     public void updateChartData() {
+        this.invalidateGlobeChords();
         if (this.baseChartTime != null) {
             this.baseSd = this.createSweDate(this.baseChartTime);
         }
@@ -6112,8 +6169,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 g.natalFloor * 2, g.natalFloor * 2);
             int n24 = n18 - 60;
             graphics2D.setStroke(new BasicStroke(0.5f));
-            boolean bl = SkymapPanel.this.aspectFilter.equals("Natal-Natal") || SkymapPanel.this.aspectFilter.equals("Both");
-            int n25 = n = (SkymapPanel.this.aspectFilter.equals("Transit-Natal") || SkymapPanel.this.aspectFilter.equals("Both")) && SkymapPanel.this.showTransitChart ? 1 : 0;
+            boolean bl = SkymapPanel.this.drawsNatalAspects();
+            int n25 = n = SkymapPanel.this.drawsCrossAspects() ? 1 : 0;
             if (bl) {
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
                     if (!SkymapPanel.aspecting(n7, SkymapPanel.this.bValid)) continue;

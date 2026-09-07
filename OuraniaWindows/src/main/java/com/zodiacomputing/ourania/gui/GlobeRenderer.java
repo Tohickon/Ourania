@@ -93,13 +93,14 @@ final class GlobeRenderer {
         // which is when a reader is actually looking at them rather than at the motion.
         if (!turning) {
             r.houseShell(panel.activeCusps);
-            r.signShell();
+            r.signPlane();
         }
 
         r.zodiacBand();
         r.boundRing();
         r.decanRing();
         r.houseMeridians(panel.activeCusps);
+        r.houseNumbers();
         r.ringCircle(natalR, new Color(120, 132, 150, 90), 0.0);
         if (panel.outerRingDrawn()) {
             r.ringCircle(partnerR, new Color(190, 165, 110, 90), Globe.INCLINE_PARTNER);
@@ -108,7 +109,7 @@ final class GlobeRenderer {
             r.ringCircle(skyR, new Color(120, 170, 215, 90), Globe.INCLINE_SKY);
         }
 
-        r.aspectChords(panel, natalR);
+        r.aspectChords(panel, shells);
         r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel, false, 0);
         if (panel.outerRingDrawn()) {
             r.bodies(panel.tLon, panel.tValid, partnerR,
@@ -309,16 +310,67 @@ final class GlobeRenderer {
     }
 
     /**
-     * The zodiac as a translucent shell of colour, outside the houses.
+     * The zodiac as a coloured plane, running inward from the sign band.
      *
-     * Each sign in its element's colour, faint enough that what lies behind it - a house
-     * shade, a body, another sign across the globe - still shows through.
+     * <b>A plane, not a wedge wrapped over the sphere.</b> The wedges filled the whole globe
+     * pole to pole, so a sign's colour claimed sky that has nothing to do with that sign - the
+     * zodiac is a band around the ecliptic, and everything above and below it was being
+     * painted anyway. As a disc the colour starts at the sign it belongs to and runs in toward
+     * the centre, which is both what the sign actually covers and what the flat wheel has
+     * always drawn. It also leaves the house bands the whole sphere to be read against instead
+     * of competing with them for it.
+     *
+     * Faint, because the aspect network lives in this plane and has to be read through it.
      */
-    private void signShell() {
+    private void signPlane() {
         for (int sign = 0; sign < 12; sign++) {
             Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
-            sector(sign * 30.0, sign * 30.0 + 30.0, Globe.SHELL_SIGN_INNER,
-                new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 34));
+            Color fill = new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 30);
+            double from = sign * 30.0;
+            int steps = 4;
+            for (int i = 0; i < steps; i++) {
+                double la = from + (30.0 * i) / steps;
+                double lb = from + (30.0 * (i + 1)) / steps;
+                // One ring of cells from the sign band in to the middle; the innermost cell
+                // stops short of dead centre, where every sector would fight for one pixel.
+                double[] radii = {Globe.SHELL_SIGN_INNER, 1.45, 1.00, 0.55, 0.12};
+                for (int r = 0; r + 1 < radii.length; r++) {
+                    quad(Globe.onShell(la, this.origin, radii[r], 0.0),
+                        Globe.onShell(lb, this.origin, radii[r], 0.0),
+                        Globe.onShell(lb, this.origin, radii[r + 1], 0.0),
+                        Globe.onShell(la, this.origin, radii[r + 1], 0.0),
+                        fill);
+                }
+            }
+        }
+    }
+
+    /**
+     * The house number on each band, at the top and the bottom of the globe.
+     *
+     * <b>Written twice, front and back.</b> A number placed once sits on whichever side of the
+     * globe it started on and disappears the moment the reader turns past it; two, half a turn
+     * apart, mean one is always facing. They ride the band's own latitude, so reading down the
+     * globe reads the houses in order - which is the thing the bands are for.
+     */
+    private void houseNumbers() {
+        int bands = 12;
+        for (int i = 0; i < bands; i++) {
+            double p0 = Globe.FILL_SPAN - (2 * Globe.FILL_SPAN * i) / bands;
+            double p1 = Globe.FILL_SPAN - (2 * Globe.FILL_SPAN * (i + 1)) / bands;
+            double mid = (p0 + p1) / 2.0;
+            double y = Globe.SHELL_HOUSE * Math.sin(mid);
+            String label = String.valueOf(i + 1);
+            // <b>Always light, because every band is dark.</b> The bands are drawn at alpha 62
+            // over a black ground, so the lightest of them - level 112 - actually renders at
+            // about 27. Choosing the ink from the band's nominal level put dark numbers on
+            // houses one through six and they simply were not there: the first six labels
+            // were invisible and the globe looked like it started at house seven.
+            Color ink = new Color(212, 214, 222);
+            for (int side = 0; side < 2; side++) {
+                billboard(Globe.onShell(this.origin + 90 + side * 180, this.origin,
+                    Globe.SHELL_HOUSE, y), label, ink, 12);
+            }
         }
     }
 
@@ -448,61 +500,85 @@ final class GlobeRenderer {
      * the figure from the side - which is the one thing the flat chart genuinely cannot show.
      * Drawn on the core shell so they stay inside every body ring rather than crossing them.
      */
-    private void aspectChords(SkymapPanel panel, double natalR) {
-        double core = Math.min(Globe.SHELL_CORE, natalR - 0.12);
+    private void aspectChords(SkymapPanel panel, double[] shells) {
+        // <b>Body to body, so every glyph is a node.</b> The chords were drawn on nested
+        // circles inside the wheels, which is what the flat chart has to do - a line between
+        // two glyphs on a disc crosses everything between them. A sphere does not have that
+        // problem: the lines have depth to spread into, they pass through the middle rather
+        // than across the face, and a chord that starts and ends on a visible glyph says which
+        // two bodies it joins without the reader tracing an angle. Drawn to the same stacked
+        // positions the glyphs use, so a line lands on a bead rather than near it.
+        //
+        // A cross-chart chord now visibly leaves one tilted plane and arrives on another,
+        // which is the clearest thing this view does: a synastry contact looks like a contact.
+        int[][] chords = panel.globeChords(() -> buildChords(panel));
+        double origin = this.origin;
+        int[][] levels = {
+            Globe.stackLevels(panel.bLon, panel.bValid, 7.0),
+            Globe.stackLevels(panel.tLon, panel.tValid, 7.0),
+            Globe.stackLevels(panel.cLon, panel.cValid, 7.0),
+        };
+        double[][] lons = {panel.bLon, panel.tLon, panel.cLon};
 
-        // <b>One core per ring, nested, the way the flat wheel nests its three fields.</b>
-        // Three sets of chords sharing one sphere is the tangle the flat wheel had before the
-        // discs were separated, and it would be worse here because a chord passes through the
-        // middle rather than across a disc.
-        chordSet(panel, panel.bLon, panel.bValid, core * 0.42, 0, false);
-        if (panel.outerRingDrawn()) {
-            chordSet(panel, panel.tLon, panel.tValid, core * 0.70, 1, true);
-        }
-        if (panel.triRingDrawn()) {
-            // <b>The sky ring's chords, which the globe did not draw at all.</b> Same gap the
-            // flat wheel had: the ring was drawn, hovered and read, and the one thing a chart
-            // is for stopped at the ring below it.
-            chordSet(panel, panel.cLon, panel.cValid, core, 2, true);
+        // <b>The reader's filter, applied when drawing rather than when building.</b> It
+        // decides which families are shown, not which pairs are in aspect, so it belongs here
+        // - and keeping it out of the cache means changing it costs a repaint rather than a
+        // recompute of every pair.
+        boolean natal = panel.drawsNatalAspects();
+        boolean cross = panel.drawsCrossAspects();
+        for (int[] c : chords) {
+            int ring = c[0];
+            if (ring == 0 && !natal) {
+                continue;
+            }
+            if (ring > 0 && !cross) {
+                continue;
+            }
+            if (ring == 1 && !panel.outerRingDrawn()) {
+                continue;
+            }
+            if (ring == 2 && !panel.triRingDrawn()) {
+                continue;
+            }
+            double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
+                levels[ring][c[1]] * Globe.STACK_STEP, inclinationOf(ring));
+            double[] to = Globe.onShell(panel.bLon[c[2]], origin, shells[0],
+                levels[0][c[2]] * Globe.STACK_STEP, 0.0);
+            segment(from, to, new Color(c[3], true), 1.0f);
         }
     }
 
     /**
-     * Every aspect one ring makes back to the natal wheel, as chords through the globe.
+     * Which pairs are in aspect, and in what colour - built once per chart, not per frame.
      *
-     * <b>This is the view's argument for itself.</b> On the flat wheel an aspect is a line
-     * across a disc; here it is a chord through a sphere, and a reader turning the globe sees
-     * the figure from the side - the one thing the flat chart genuinely cannot show.
-     *
-     * A cross-chart chord runs between two planes, so it leaves its ring's circle and arrives
-     * on the natal one, which is what makes a synastry contact look like a contact rather than
-     * like two unrelated glyphs.
+     * Every ring back to the natal wheel. Within one chart a pair is counted once; across two
+     * charts the pairing is directional, so every body meets every body.
      */
-    private void chordSet(SkymapPanel panel, double[] lon, boolean[] valid, double radius,
-                          int ring, boolean cross) {
-        double incline = inclinationOf(ring);
-        for (int a = 0; a < SkymapPanel.BODY_COUNT && a < lon.length; a++) {
-            if (!SkymapPanel.aspecting(a, valid)) {
-                continue;
-            }
-            // Within one chart every pair is counted once; across two charts the pairing is
-            // directional, so every body meets every body.
-            int from = cross ? 0 : a + 1;
-            for (int b = from; b < SkymapPanel.BODY_COUNT; b++) {
-                if (!SkymapPanel.aspecting(b, panel.bValid)) {
+    private static int[][] buildChords(SkymapPanel panel) {
+        java.util.List<int[]> out = new java.util.ArrayList<>();
+        double[][] lons = {panel.bLon, panel.tLon, panel.cLon};
+        boolean[][] valids = {panel.bValid, panel.tValid, panel.cValid};
+        for (int ring = 0; ring < 3; ring++) {
+            boolean cross = ring > 0;
+            for (int a = 0; a < SkymapPanel.BODY_COUNT && a < lons[ring].length; a++) {
+                if (!SkymapPanel.aspecting(a, valids[ring])) {
                     continue;
                 }
-                if (!cross && Bodies.isOppositePair(a, b)) {
-                    continue;
+                for (int b = cross ? 0 : a + 1; b < SkymapPanel.BODY_COUNT; b++) {
+                    if (!SkymapPanel.aspecting(b, panel.bValid)) {
+                        continue;
+                    }
+                    if (!cross && Bodies.isOppositePair(a, b)) {
+                        continue;
+                    }
+                    Color ink = panel.aspectInkFor(lons[ring][a], panel.bLon[b], a, b, cross);
+                    if (ink != null) {
+                        out.add(new int[] {ring, a, b, ink.getRGB()});
+                    }
                 }
-                Color ink = panel.aspectInkFor(lon[a], panel.bLon[b], a, b, cross);
-                if (ink == null) {
-                    continue;
-                }
-                segment(Globe.onShell(lon[a], this.origin, radius, 0.0, incline),
-                    Globe.onShell(panel.bLon[b], this.origin, radius, 0.0, 0.0), ink, 1.0f);
             }
         }
+        return out.toArray(new int[0][]);
     }
 
     /** One ring of bodies on its shell, stacked up the shell where longitudes crowd. */

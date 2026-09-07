@@ -58,6 +58,12 @@ public final class GlobeCheck {
         report("Part F", before);
 
         System.out.println();
+        System.out.println("=== Part G: the cached aspects belong to the chart on screen ===");
+        before = failures.size();
+        theCacheClears();
+        report("Part G", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -486,6 +492,89 @@ public final class GlobeCheck {
             near("no tilt is the old behaviour, x", flat[0], zero[0], 1e-12);
             near("no tilt is the old behaviour, y", flat[1], zero[1], 1e-12);
             near("no tilt is the old behaviour, z", flat[2], zero[2], 1e-12);
+        }
+    }
+
+    /**
+     * A cache that outlives its chart draws the previous reading over the current one.
+     *
+     * <b>The worst kind of wrong.</b> The aspects are computed once and held between frames -
+     * without that, dragging the globe recomputed two and a half thousand pairs sixty times a
+     * second - but a cache is only ever as good as the thing that empties it. A stale one here
+     * does not crash or look broken: it draws a confident, plausible network of aspects
+     * belonging to a chart the reader has already moved on from.
+     *
+     * Removing the invalidation from updateChartData survived every other check in this suite.
+     * That is the definition of an untested rule, so it is tested by the shape of the thing
+     * rather than by its effect: the field is watched directly, because "the chart changed" is
+     * exactly the moment there is nothing on screen to compare against.
+     */
+    private static void theCacheClears() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+
+            java.lang.reflect.Field fc = SkymapPanel.class.getDeclaredField("globeChords");
+            fc.setAccessible(true);
+
+            // It computes once and then holds - which is the point of it existing.
+            final int[] calls = new int[1];
+            int[][] first = panel.globeChords(() -> {
+                calls[0]++;
+                return new int[][] {{0, 1, 2, 0xFF00FF00}};
+            });
+            int[][] second = panel.globeChords(() -> {
+                calls[0]++;
+                return new int[][] {{0, 3, 4, 0xFF0000FF}};
+            });
+            eq("the aspects are built once, not once a frame", 1, calls[0]);
+            yes("and the held list is handed back unchanged", first == second);
+
+            // Every door that changes what an aspect is has to empty it.
+            fc.set(panel, new int[][] {{0, 1, 2, 0}});
+            panel.invalidateGlobeChords();
+            yes("invalidating empties the cache", fc.get(panel) == null);
+
+            fc.set(panel, new int[][] {{0, 1, 2, 0}});
+            javax.swing.SwingUtilities.invokeAndWait(() -> panel.updateChartData());
+            yes("recasting the chart empties the cache", fc.get(panel) == null);
+
+            fc.set(panel, new int[][] {{0, 1, 2, 0}});
+            javax.swing.SwingUtilities.invokeAndWait(() -> panel.reloadAspectSelection());
+            yes("changing which aspects are shown empties the cache", fc.get(panel) == null);
+
+            // <b>And the filter must NOT empty it.</b> It decides which families are drawn,
+            // not which pairs are in aspect, so it is applied when drawing - which is what
+            // makes flipping it a repaint rather than a recompute of every pair.
+            java.lang.reflect.Field ff = SkymapPanel.class.getDeclaredField("aspectFilter");
+            ff.setAccessible(true);
+            String wasFilter = (String) ff.get(panel);
+            try {
+                ff.set(panel, "Natal-Natal");
+                yes("Natal-Natal draws the natal aspects", panel.drawsNatalAspects());
+                yes("and not the cross-chart ones", !panel.drawsCrossAspects());
+                ff.set(panel, "Transit-Natal");
+                yes("Transit-Natal drops the natal aspects", !panel.drawsNatalAspects());
+                ff.set(panel, "Both");
+                yes("Both draws the natal aspects", panel.drawsNatalAspects());
+            } finally {
+                ff.set(panel, wasFilter);
+            }
+
+            // And having been emptied, it really does build again rather than hand back null.
+            calls[0] = 0;
+            int[][] rebuilt = panel.globeChords(() -> {
+                calls[0]++;
+                return new int[][] {{0, 5, 6, 0xFFFF0000}};
+            });
+            eq("an emptied cache builds again", 1, calls[0]);
+            eq("and hands back what was built", 5, rebuilt[0][1]);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
     }
 
