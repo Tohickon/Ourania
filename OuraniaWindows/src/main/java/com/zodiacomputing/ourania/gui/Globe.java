@@ -59,6 +59,22 @@ final class Globe {
     /** How far up the shell one collision level lifts a body. */
     static final double STACK_STEP = 0.085;
 
+    /**
+     * How far the partner and sky rings are tilted out of the natal plane, in radians.
+     *
+     * <b>Tilted about the Ascendant axis, so all three rings still cross there.</b> Every ring
+     * is on the ecliptic in fact - this is presentation, not astronomy - so the tilt has to be
+     * the kind that gives up nothing: rotating about the line through the Ascendant and the
+     * Descendant leaves both of those fixed on every ring, and the three great circles meet at
+     * the two points a reader uses to orient themselves. Opposed, so the partner rides above
+     * the horizon where the sky rides below it and neither hides the other.
+     *
+     * At zero this is the old behaviour exactly, which is what lets the flat wheel and the
+     * natal ring go on agreeing.
+     */
+    static final double INCLINE_PARTNER = 0.48;
+    static final double INCLINE_SKY = -0.48;
+
     /** Half-height of a meridian arc, in radians of latitude. Matches the prototype's 0.92. */
     static final double MERIDIAN_SPAN = 0.92;
 
@@ -163,20 +179,46 @@ final class Globe {
      * @param y      height above the shell's equator, for stacked bodies
      */
     static double[] onShell(double lon, double origin, double radius, double y) {
+        return onShell(lon, origin, radius, y, 0.0);
+    }
+
+    /**
+     * As above, on a ring tilted out of the horizontal.
+     *
+     * <b>Rotated about the x axis, which is the Ascendant-Descendant line.</b> Those two
+     * points are at -x and +x, so they are exactly the points an x rotation leaves alone: a
+     * tilted ring still crosses the horizontal one where the reader is looking to orient
+     * themselves, and only the quarters in between rise and fall.
+     */
+    static double[] onShell(double lon, double origin, double radius, double y,
+                            double inclination) {
         double t = Math.toRadians(lon - origin);
         // The equatorial radius shrinks as a body rides up the shell, so a stacked body stays
         // on the sphere instead of floating off it.
         double lift = Math.max(-radius, Math.min(radius, y));
         double ring = Math.sqrt(Math.max(0.0, radius * radius - lift * lift));
-        return new double[] {-ring * Math.cos(t), lift, ring * Math.sin(t)};
+        double x = -ring * Math.cos(t);
+        double yy = lift;
+        double z = ring * Math.sin(t);
+        if (inclination == 0.0) {
+            return new double[] {x, yy, z};
+        }
+        double c = Math.cos(inclination);
+        double sn = Math.sin(inclination);
+        return new double[] {x, yy * c - z * sn, yy * sn + z * c};
     }
 
     /** The full circle of a shell's equator, as world points. */
     static double[][] equator(double origin, double radius, int segments) {
+        return equator(origin, radius, segments, 0.0);
+    }
+
+    /** As above, on a ring tilted out of the horizontal. */
+    static double[][] equator(double origin, double radius, int segments, double inclination) {
         int n = Math.max(3, segments);
         double[][] pts = new double[n + 1][];
         for (int i = 0; i <= n; i++) {
-            pts[i] = onShell(origin + (360.0 * i) / n, origin, radius, 0.0);
+            pts[i] = onShell(origin + (360.0 * i) / n, origin, radius, 0.0, inclination);
         }
         return pts;
     }

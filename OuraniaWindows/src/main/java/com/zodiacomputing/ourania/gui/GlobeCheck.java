@@ -52,6 +52,12 @@ public final class GlobeCheck {
         report("Part E", before);
 
         System.out.println();
+        System.out.println("=== Part F: tilted rings still meet at the Ascendant ===");
+        before = failures.size();
+        theTilt();
+        report("Part F", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -340,6 +346,11 @@ public final class GlobeCheck {
             java.lang.reflect.Field fv = SkymapPanel.class.getDeclaredField("bValid");
             fb.setAccessible(true);
             fv.setAccessible(true);
+            // <b>Let the chart settle first.</b> A new window casts its chart on a worker,
+            // and a validity array written before that lands is quietly overwritten - which
+            // showed up as the check returning a different total on consecutive runs, the one
+            // symptom that makes every other number in a suite untrustworthy.
+            Thread.sleep(2500);
             double[] lon = (double[]) fb.get(panel);
             boolean[] valid = (boolean[]) fv.get(panel);
             // <b>Half spread, half crowded.</b> An evenly spread chart never stacks, so the
@@ -363,25 +374,54 @@ public final class GlobeCheck {
             Globe cam = new Globe();
             int w = 900;
             int h = 900;
-            double[] shells = GlobeRenderer.shellRadii(panel);
             double origin = panel.pinLongitude();
+
+            // <b>Every ring, not just the flat one.</b> Part E passed on the day the
+            // partner and sky rings were tilted out of the natal plane, because it only ever
+            // tested ring zero - whose inclination is zero, so the entire tilt was untested.
+            // A hit test that knew the radius and not the plane is the same
+            // see-it-cannot-click-it defect, in the half that is harder to notice.
+            java.lang.reflect.Field ft = SkymapPanel.class.getDeclaredField("tLon");
+            java.lang.reflect.Field ftv = SkymapPanel.class.getDeclaredField("tValid");
+            ft.setAccessible(true);
+            ftv.setAccessible(true);
+            double[] tlon = (double[]) ft.get(panel);
+            boolean[] tvalid = (boolean[]) ftv.get(panel);
+            System.arraycopy(lon, 0, tlon, 0, lon.length);
+            java.util.Arrays.fill(tvalid, true);
+            java.lang.reflect.Field fst =
+                SkymapPanel.class.getDeclaredField("showTransitChart");
+            fst.setAccessible(true);
+            fst.set(panel, Boolean.TRUE);
+
+            // <b>Read after the flag, not before it.</b> shellRadii asks the panel which rings
+            // are open, so taking it first put the partner shell at the natal radius while the
+            // hit test looked at the real one - 277 failures that said the code was wrong when
+            // the check was. The one line of ordering is the whole of it.
+            double[] shells = GlobeRenderer.shellRadii(panel);
 
             for (double yaw : new double[] {0.0, 1.1, 2.4, 4.9}) {
                 for (double pitch : new double[] {-0.9, 0.0, 0.42, 0.87}) {
                     cam.yaw = yaw;
                     cam.pitch = pitch;
-                    int[] level = Globe.stackLevels(lon, valid, 7.0);
-                    for (int i = 0; i < lon.length; i++) {
-                        double[] p = Globe.onShell(lon[i], origin, shells[0],
-                            level[i] * Globe.STACK_STEP);
-                        Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
-                        if (!q.visible) {
-                            continue;
+                    for (int ring = 0; ring <= 1; ring++) {
+                        double[] rlon = ring == 0 ? lon : tlon;
+                        boolean[] rvalid = ring == 0 ? valid : tvalid;
+                        double incline = GlobeRenderer.inclinationOf(ring);
+                        int[] level = Globe.stackLevels(rlon, rvalid, 7.0);
+                        for (int i = 0; i < rlon.length; i++) {
+                            double[] p = Globe.onShell(rlon[i], origin, shells[ring],
+                                level[i] * Globe.STACK_STEP, incline);
+                            Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
+                            if (!q.visible) {
+                                continue;
+                            }
+                            int hit = GlobeRenderer.bodyAt(cam, w, h, panel,
+                                (int) Math.round(q.x), (int) Math.round(q.y));
+                            yes("clicking ring " + ring + " body " + i + " where it is drawn"
+                                + " finds something (yaw=" + yaw + " pitch=" + pitch + ")",
+                                hit >= 0);
                         }
-                        int hit = GlobeRenderer.bodyAt(cam, w, h, panel,
-                            (int) Math.round(q.x), (int) Math.round(q.y));
-                        yes("clicking body " + i + " where it is drawn finds something"
-                            + " (yaw=" + yaw + " pitch=" + pitch + ")", hit >= 0);
                     }
                 }
             }
@@ -393,6 +433,59 @@ public final class GlobeCheck {
                 GlobeRenderer.bodyAt(cam, w, h, panel, 5, 5));
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * A tilted ring gives up nothing the reader was using.
+     *
+     * <b>The Ascendant is the point the whole view is oriented from</b>, so a tilt that moved
+     * it would cost the reader their bearings on two rings out of three. Rotating about the
+     * Ascendant-Descendant line is the tilt that leaves both fixed, and this asserts it rather
+     * than the comment claiming it.
+     */
+    private static void theTilt() {
+        double origin = 88.5;
+        for (double incline : new double[] {0.0, Globe.INCLINE_PARTNER, Globe.INCLINE_SKY}) {
+            double[] asc = Globe.onShell(origin, origin, Globe.SHELL_PARTNER, 0.0, incline);
+            near("the Ascendant is fixed however the ring tilts, x",
+                -Globe.SHELL_PARTNER, asc[0], 1e-9);
+            near("and stays level, y", 0.0, asc[1], 1e-9);
+            near("and stays on the axis, z", 0.0, asc[2], 1e-9);
+
+            double[] dsc = Globe.onShell(origin + 180, origin, Globe.SHELL_PARTNER, 0.0,
+                incline);
+            near("the Descendant is fixed too", Globe.SHELL_PARTNER, dsc[0], 1e-9);
+            near("and stays level", 0.0, dsc[1], 1e-9);
+
+            for (double lon = 0; lon < 360; lon += 9) {
+                double[] p = Globe.onShell(lon, origin, Globe.SHELL_PARTNER, 0.0, incline);
+                near("a tilted ring stays on its shell", Globe.SHELL_PARTNER,
+                    Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]), 1e-9);
+            }
+        }
+
+        // <b>The two outer rings are opposed, not merely different.</b> Tilted the same way
+        // they would sit on top of each other, which is the arrangement this replaced.
+        yes("the partner and sky rings tilt opposite ways",
+            Globe.INCLINE_PARTNER * Globe.INCLINE_SKY < 0);
+        near("and by the same amount", Math.abs(Globe.INCLINE_PARTNER),
+            Math.abs(Globe.INCLINE_SKY), 1e-12);
+
+        double[] up = Globe.onShell(origin + 90, origin, Globe.SHELL_PARTNER, 0.0,
+            Globe.INCLINE_PARTNER);
+        double[] down = Globe.onShell(origin + 90, origin, Globe.SHELL_PARTNER, 0.0,
+            Globe.INCLINE_SKY);
+        yes("a quarter turn on, the two rings are either side of the natal plane",
+            up[1] * down[1] < 0);
+
+        // No tilt is the old behaviour to the bit, which is what keeps Part D true.
+        for (double lon = 0; lon < 360; lon += 13) {
+            double[] flat = Globe.onShell(lon, origin, Globe.SHELL_NATAL, 0.0);
+            double[] zero = Globe.onShell(lon, origin, Globe.SHELL_NATAL, 0.0, 0.0);
+            near("no tilt is the old behaviour, x", flat[0], zero[0], 1e-12);
+            near("no tilt is the old behaviour, y", flat[1], zero[1], 1e-12);
+            near("no tilt is the old behaviour, z", flat[2], zero[2], 1e-12);
         }
     }
 

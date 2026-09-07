@@ -100,22 +100,22 @@ final class GlobeRenderer {
         r.boundRing();
         r.decanRing();
         r.houseMeridians(panel.activeCusps);
-        r.shell(natalR, new Color(120, 132, 150, 60), 6, 1);
+        r.ringCircle(natalR, new Color(120, 132, 150, 90), 0.0);
         if (panel.outerRingDrawn()) {
-            r.shell(partnerR, new Color(150, 130, 90, 46), 6, 1);
+            r.ringCircle(partnerR, new Color(190, 165, 110, 90), Globe.INCLINE_PARTNER);
         }
         if (panel.triRingDrawn()) {
-            r.shell(skyR, new Color(110, 150, 190, 38), 8, 1);
+            r.ringCircle(skyR, new Color(120, 170, 215, 90), Globe.INCLINE_SKY);
         }
 
         r.aspectChords(panel, natalR);
-        r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel, false);
+        r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel, false, 0);
         if (panel.outerRingDrawn()) {
             r.bodies(panel.tLon, panel.tValid, partnerR,
-                panel.angleRoleFor(false, true), panel, true);
+                panel.angleRoleFor(false, true), panel, true, 1);
         }
         if (panel.triRingDrawn()) {
-            r.bodies(panel.cLon, panel.cValid, skyR, SkymapPanel.AngleRole.SKY, panel, true);
+            r.bodies(panel.cLon, panel.cValid, skyR, SkymapPanel.AngleRole.SKY, panel, true, 2);
         }
 
         r.flush();
@@ -132,6 +132,17 @@ final class GlobeRenderer {
      *
      * @return natal, partner and sky radii, in that order
      */
+    /**
+     * The plane each ring rides in: natal horizontal, partner and sky opposed either side.
+     *
+     * <b>Beside shellRadii, and for the same reason.</b> Where a body is on the globe is a
+     * radius and a plane; if the hit test knew one and not the other it would be the
+     * see-it-but-cannot-click-it defect again, in the half that is easier to miss.
+     */
+    static double inclinationOf(int ring) {
+        return ring == 1 ? Globe.INCLINE_PARTNER : (ring == 2 ? Globe.INCLINE_SKY : 0.0);
+    }
+
     static double[] shellRadii(SkymapPanel panel) {
         double outerOpen = panel.outerOpenFraction();
         double triOpen = panel.triOpenFraction();
@@ -177,7 +188,7 @@ final class GlobeRenderer {
                     continue;
                 }
                 double[] p = Globe.onShell(lon[i], origin, shells[ring],
-                    level[i] * Globe.STACK_STEP);
+                    level[i] * Globe.STACK_STEP, inclinationOf(ring));
                 Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
                 if (!q.visible) {
                     continue;
@@ -204,27 +215,17 @@ final class GlobeRenderer {
         return this.cam.project(world[0], world[1], world[2], this.w, this.h);
     }
 
-    /** A great-circle wireframe, so a shell reads as a surface rather than as a hoop. */
-    private void shell(double radius, Color ink, int meridians, int parallels) {
-        double[][] eq = Globe.equator(this.origin, radius, 72);
-        polyline(eq, ink, 1.1f);
-        for (int i = 0; i < meridians; i++) {
-            polyline(Globe.meridian(this.origin + (360.0 * i) / meridians, this.origin,
-                radius, 20), ink, 0.7f);
-        }
-        // Latitude circles, thinning toward the poles the way a globe's do.
-        for (int i = 1; i <= parallels; i++) {
-            double phi = (Globe.MERIDIAN_SPAN * i) / (parallels + 1);
-            for (int sign = -1; sign <= 1; sign += 2) {
-                double y = radius * Math.sin(phi * sign);
-                double[][] ring = new double[73][];
-                for (int k = 0; k <= 72; k++) {
-                    ring[k] = Globe.onShell(this.origin + (360.0 * k) / 72, this.origin,
-                        radius, y);
-                }
-                polyline(ring, ink, 0.5f);
-            }
-        }
+    /**
+     * One body ring, as the single great circle it rides on.
+     *
+     * <b>A circle, not a wireframe sphere.</b> The shells stopped needing to be drawn as
+     * surfaces once the houses and signs were filled - three wireframe globes inside two
+     * translucent ones was a thicket. What a reader needs from a body ring is its plane, and
+     * one bright circle says that better than sixty faint lines, especially now the three
+     * planes are tilted apart and the crossing points are the thing to see.
+     */
+    private void ringCircle(double radius, Color ink, double inclination) {
+        polyline(Globe.equator(this.origin, radius, 96, inclination), ink, 1.4f);
     }
 
     /**
@@ -273,19 +274,37 @@ final class GlobeRenderer {
      * still carry.
      */
     private void houseShell(double[] cusps) {
-        if (cusps == null || cusps.length < 13) {
-            return;
+        // <b>Latitude bands, crossing the signs rather than lying under them.</b> David's
+        // call, and it is the right one for reading: two sets of longitude wedges at
+        // different radii mostly hide each other, while bands across wedges give a grid where
+        // every cell is one sign and one house.
+        //
+        // <b>What it gives up, said plainly.</b> A house is a division of the ecliptic, so a
+        // band of latitude is not where that house is - the shading is a scale, not a map.
+        // The house cusps are still drawn as great circles by houseMeridians, and those are
+        // the true positions; a reader wanting to know which house a body is in reads the
+        // meridians, not the bands.
+        int bands = 12;
+        for (int i = 0; i < bands; i++) {
+            // House 1 at the top, running down to 12 - light to nearly black.
+            double p0 = Globe.FILL_SPAN - (2 * Globe.FILL_SPAN * i) / bands;
+            double p1 = Globe.FILL_SPAN - (2 * Globe.FILL_SPAN * (i + 1)) / bands;
+            int level = 112 - i * 9;            // 112 down to 13
+            band(p1, p0, Globe.SHELL_HOUSE, new Color(level, level, level + 6, 62));
         }
-        for (int i = 1; i <= 12; i++) {
-            double from = cusps[i];
-            double to = cusps[i == 12 ? 1 : i + 1];
-            double span = ((to - from) % 360.0 + 360.0) % 360.0;
-            if (span < 0.01) {
-                continue;                       // a degenerate cusp pair; nothing to fill
-            }
-            int level = 96 - (i - 1) * 7;       // house 1 lightest, house 12 nearly black
-            sector(from, from + span, Globe.SHELL_HOUSE,
-                new Color(level, level, level + 6, 58));
+    }
+
+    /** A ring of the shell between two latitudes, all the way round. */
+    private void band(double phi0, double phi1, double radius, Color fill) {
+        int steps = 24;
+        for (int i = 0; i < steps; i++) {
+            double la = this.origin + (360.0 * i) / steps;
+            double lb = this.origin + (360.0 * (i + 1)) / steps;
+            quad(Globe.onShell(la, this.origin, radius, radius * Math.sin(phi0)),
+                Globe.onShell(lb, this.origin, radius, radius * Math.sin(phi0)),
+                Globe.onShell(lb, this.origin, radius, radius * Math.sin(phi1)),
+                Globe.onShell(la, this.origin, radius, radius * Math.sin(phi1)),
+                fill);
         }
     }
 
@@ -430,36 +449,73 @@ final class GlobeRenderer {
      * Drawn on the core shell so they stay inside every body ring rather than crossing them.
      */
     private void aspectChords(SkymapPanel panel, double natalR) {
-        double r = Math.min(Globe.SHELL_CORE, natalR - 0.12);
-        for (int a = 0; a < SkymapPanel.BODY_COUNT; a++) {
-            if (!SkymapPanel.aspecting(a, panel.bValid)) {
+        double core = Math.min(Globe.SHELL_CORE, natalR - 0.12);
+
+        // <b>One core per ring, nested, the way the flat wheel nests its three fields.</b>
+        // Three sets of chords sharing one sphere is the tangle the flat wheel had before the
+        // discs were separated, and it would be worse here because a chord passes through the
+        // middle rather than across a disc.
+        chordSet(panel, panel.bLon, panel.bValid, core * 0.42, 0, false);
+        if (panel.outerRingDrawn()) {
+            chordSet(panel, panel.tLon, panel.tValid, core * 0.70, 1, true);
+        }
+        if (panel.triRingDrawn()) {
+            // <b>The sky ring's chords, which the globe did not draw at all.</b> Same gap the
+            // flat wheel had: the ring was drawn, hovered and read, and the one thing a chart
+            // is for stopped at the ring below it.
+            chordSet(panel, panel.cLon, panel.cValid, core, 2, true);
+        }
+    }
+
+    /**
+     * Every aspect one ring makes back to the natal wheel, as chords through the globe.
+     *
+     * <b>This is the view's argument for itself.</b> On the flat wheel an aspect is a line
+     * across a disc; here it is a chord through a sphere, and a reader turning the globe sees
+     * the figure from the side - the one thing the flat chart genuinely cannot show.
+     *
+     * A cross-chart chord runs between two planes, so it leaves its ring's circle and arrives
+     * on the natal one, which is what makes a synastry contact look like a contact rather than
+     * like two unrelated glyphs.
+     */
+    private void chordSet(SkymapPanel panel, double[] lon, boolean[] valid, double radius,
+                          int ring, boolean cross) {
+        double incline = inclinationOf(ring);
+        for (int a = 0; a < SkymapPanel.BODY_COUNT && a < lon.length; a++) {
+            if (!SkymapPanel.aspecting(a, valid)) {
                 continue;
             }
-            for (int b = a + 1; b < SkymapPanel.BODY_COUNT; b++) {
-                if (!SkymapPanel.aspecting(b, panel.bValid)
-                    || Bodies.isOppositePair(a, b)) {
+            // Within one chart every pair is counted once; across two charts the pairing is
+            // directional, so every body meets every body.
+            int from = cross ? 0 : a + 1;
+            for (int b = from; b < SkymapPanel.BODY_COUNT; b++) {
+                if (!SkymapPanel.aspecting(b, panel.bValid)) {
                     continue;
                 }
-                Color ink = panel.aspectInkFor(panel.bLon[a], panel.bLon[b], a, b, false);
+                if (!cross && Bodies.isOppositePair(a, b)) {
+                    continue;
+                }
+                Color ink = panel.aspectInkFor(lon[a], panel.bLon[b], a, b, cross);
                 if (ink == null) {
                     continue;
                 }
-                segment(Globe.onShell(panel.bLon[a], this.origin, r, 0.0),
-                    Globe.onShell(panel.bLon[b], this.origin, r, 0.0), ink, 1.0f);
+                segment(Globe.onShell(lon[a], this.origin, radius, 0.0, incline),
+                    Globe.onShell(panel.bLon[b], this.origin, radius, 0.0, 0.0), ink, 1.0f);
             }
         }
     }
 
     /** One ring of bodies on its shell, stacked up the shell where longitudes crowd. */
     private void bodies(double[] lon, boolean[] valid, double radius,
-                        SkymapPanel.AngleRole role, SkymapPanel panel, boolean outer) {
+                        SkymapPanel.AngleRole role, SkymapPanel panel, boolean outer,
+                        int ring) {
         int[] level = Globe.stackLevels(lon, valid, 7.0);
         for (int i = 0; i < SkymapPanel.BODY_COUNT && i < lon.length; i++) {
             if (!valid[i]) {
                 continue;
             }
             double y = level[i] * Globe.STACK_STEP;
-            double[] p = Globe.onShell(lon[i], this.origin, radius, y);
+            double[] p = Globe.onShell(lon[i], this.origin, radius, y, inclinationOf(ring));
             Globe.Projected q = at(p);
             if (!q.visible) {
                 continue;
