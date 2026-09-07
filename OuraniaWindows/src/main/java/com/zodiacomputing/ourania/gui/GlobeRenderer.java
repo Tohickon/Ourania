@@ -96,11 +96,12 @@ final class GlobeRenderer {
             r.signPlane();
         }
 
+        r.degreeRing();
         r.zodiacBand();
         r.boundRing();
         r.decanRing();
         r.houseMeridians(panel.activeCusps);
-        r.houseNumbers();
+        r.houseNumbers(panel.activeCusps);
         r.ringCircle(natalR, new Color(120, 132, 150, 90), 0.0);
         if (panel.outerRingDrawn()) {
             r.ringCircle(partnerR, new Color(190, 165, 110, 90), Globe.INCLINE_PARTNER);
@@ -268,46 +269,36 @@ final class GlobeRenderer {
     /**
      * The houses, as translucent slices of the sphere, grey to black.
      *
-     * <b>An unequal house is a different size, and on a globe that is visible.</b> The flat
-     * wheel says so too, but a wedge of a disc reads as a label; a shaded slice of a sphere
-     * reads as an amount of sky. The shades run light to dark across the twelve so a reader
-     * can count round without the numbers, and stay dim enough that the bodies inside them
-     * still carry.
+     * <b>Wedges again, now that the signs are a plane.</b> These were latitude bands for a
+     * while, which crossed the sign wedges into a readable grid but put the shading somewhere
+     * a house is not - a house divides the ecliptic, so a band of declination was a scale
+     * pretending to be a map. With the zodiac moved onto the horizontal plane the collision
+     * that forced that compromise is gone, and the houses can be what they are.
+     *
+     * An unequal house is a different size, and on a globe that is visible in a way a wedge of
+     * a disc never quite is: it is an amount of sky rather than a label.
      */
     private void houseShell(double[] cusps) {
-        // <b>Latitude bands, crossing the signs rather than lying under them.</b> David's
-        // call, and it is the right one for reading: two sets of longitude wedges at
-        // different radii mostly hide each other, while bands across wedges give a grid where
-        // every cell is one sign and one house.
-        //
-        // <b>What it gives up, said plainly.</b> A house is a division of the ecliptic, so a
-        // band of latitude is not where that house is - the shading is a scale, not a map.
-        // The house cusps are still drawn as great circles by houseMeridians, and those are
-        // the true positions; a reader wanting to know which house a body is in reads the
-        // meridians, not the bands.
-        int bands = 12;
-        for (int i = 0; i < bands; i++) {
-            // House 1 at the top, running down to 12 - light to nearly black.
-            double p0 = Globe.FILL_SPAN - (2 * Globe.FILL_SPAN * i) / bands;
-            double p1 = Globe.FILL_SPAN - (2 * Globe.FILL_SPAN * (i + 1)) / bands;
-            int level = 112 - i * 9;            // 112 down to 13
-            band(p1, p0, Globe.SHELL_HOUSE, new Color(level, level, level + 6, 62));
+        if (cusps == null || cusps.length < 13) {
+            return;
+        }
+        for (int i = 1; i <= 12; i++) {
+            double from = cusps[i];
+            double span = arc(from, cusps[i == 12 ? 1 : i + 1]);
+            if (span < 0.01) {
+                continue;                       // a degenerate cusp pair; nothing to fill
+            }
+            int level = 112 - (i - 1) * 9;      // house 1 lightest, house 12 nearly black
+            sector(from, from + span, Globe.SHELL_HOUSE,
+                new Color(level, level, level + 6, 58));
         }
     }
 
-    /** A ring of the shell between two latitudes, all the way round. */
-    private void band(double phi0, double phi1, double radius, Color fill) {
-        int steps = 24;
-        for (int i = 0; i < steps; i++) {
-            double la = this.origin + (360.0 * i) / steps;
-            double lb = this.origin + (360.0 * (i + 1)) / steps;
-            quad(Globe.onShell(la, this.origin, radius, radius * Math.sin(phi0)),
-                Globe.onShell(lb, this.origin, radius, radius * Math.sin(phi0)),
-                Globe.onShell(lb, this.origin, radius, radius * Math.sin(phi1)),
-                Globe.onShell(la, this.origin, radius, radius * Math.sin(phi1)),
-                fill);
-        }
+    /** Degrees from one longitude round to the next, always forward. */
+    private static double arc(double from, double to) {
+        return ((to - from) % 360.0 + 360.0) % 360.0;
     }
+
 
     /**
      * The zodiac as a coloured plane, running inward from the sign band.
@@ -346,32 +337,59 @@ final class GlobeRenderer {
     }
 
     /**
-     * The house number on each band, at the top and the bottom of the globe.
+     * The house numbers, ringed around the top of the globe and around the bottom.
      *
-     * <b>Written twice, front and back.</b> A number placed once sits on whichever side of the
-     * globe it started on and disappears the moment the reader turns past it; two, half a turn
-     * apart, mean one is always facing. They ride the band's own latitude, so reading down the
-     * globe reads the houses in order - which is the thing the bands are for.
+     * <b>Where the wedges converge, which is where a segment can be labelled.</b> They ran
+     * down the side of the globe while the houses were latitude bands, and a column of numbers
+     * top to bottom is not how anyone reads a sphere - it says the houses are stacked, when
+     * they are twelve slices around it. Near a pole every slice is present and narrow, so the
+     * twelve fit in a ring the way they do on the top of a beach ball.
+     *
+     * Both poles, because half a globe is always facing away: whichever end the reader is
+     * looking down, the ring nearest them is the readable one.
      */
-    private void houseNumbers() {
-        int bands = 12;
-        for (int i = 0; i < bands; i++) {
-            double p0 = Globe.FILL_SPAN - (2 * Globe.FILL_SPAN * i) / bands;
-            double p1 = Globe.FILL_SPAN - (2 * Globe.FILL_SPAN * (i + 1)) / bands;
-            double mid = (p0 + p1) / 2.0;
-            double y = Globe.SHELL_HOUSE * Math.sin(mid);
-            String label = String.valueOf(i + 1);
-            // <b>Always light, because every band is dark.</b> The bands are drawn at alpha 62
-            // over a black ground, so the lightest of them - level 112 - actually renders at
-            // about 27. Choosing the ink from the band's nominal level put dark numbers on
-            // houses one through six and they simply were not there: the first six labels
-            // were invisible and the globe looked like it started at house seven.
-            Color ink = new Color(212, 214, 222);
-            for (int side = 0; side < 2; side++) {
-                billboard(Globe.onShell(this.origin + 90 + side * 180, this.origin,
-                    Globe.SHELL_HOUSE, y), label, ink, 12);
+    private void houseNumbers(double[] cusps) {
+        if (cusps == null || cusps.length < 13) {
+            return;
+        }
+        for (int i = 1; i <= 12; i++) {
+            double span = arc(cusps[i], cusps[i == 12 ? 1 : i + 1]);
+            double mid = cusps[i] + span / 2.0;
+            String label = String.valueOf(i);
+            for (int pole = -1; pole <= 1; pole += 2) {
+                double phi = pole * (Globe.FILL_SPAN - 0.10);
+                billboard(Globe.onShell(mid, this.origin, Globe.SHELL_HOUSE,
+                    Globe.SHELL_HOUSE * Math.sin(phi)), label, new Color(206, 208, 216), 12);
             }
         }
+    }
+
+    /**
+     * The full 360-degree scale, lying flat in the plane of the ecliptic.
+     *
+     * <b>Horizontal, because that is the plane every position is measured in.</b> The flat
+     * wheel has always carried a degree ring; the globe had tick marks at every ten on a
+     * shell, which is enough to orient by and not enough to read a degree off. This is the
+     * same scale in the one plane where a longitude means what it says, so a body on any of
+     * the three rings can be dropped onto it by eye.
+     *
+     * Ticks in four weights: every degree short, every fifth longer, every tenth longer and
+     * brighter, and the sign boundaries reaching furthest.
+     */
+    private void degreeRing() {
+        double outer = Globe.SHELL_SIGN_INNER - 0.02;
+        for (int d = 0; d < 360; d++) {
+            boolean sign = d % 30 == 0;
+            boolean ten = d % 10 == 0;
+            double depth = sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.045));
+            Color ink = sign ? new Color(196, 200, 210, 210)
+                : (ten ? new Color(160, 166, 178, 180) : new Color(128, 134, 146, 130));
+            segment(Globe.onShell(d, this.origin, outer, 0.0),
+                Globe.onShell(d, this.origin, outer - depth, 0.0),
+                ink, sign ? 1.4f : (ten ? 1.0f : 0.6f));
+        }
+        // The scale itself, so the ticks hang off a line rather than floating.
+        polyline(Globe.equator(this.origin, outer, 144), new Color(150, 156, 168, 150), 1.0f);
     }
 
     /**
