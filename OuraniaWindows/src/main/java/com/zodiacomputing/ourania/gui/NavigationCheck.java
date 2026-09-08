@@ -44,6 +44,9 @@ public final class NavigationCheck {
     private static SidePanel side;
 
     public static void main(String[] args) throws Exception {
+        // Never the reader's own settings file: a suite that generates a chart persists it,
+        // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
+        Settings.useScratchFile();
         SwingUtilities.invokeAndWait(() -> {
             try {
                 side = new SidePanel(null);
@@ -111,6 +114,35 @@ public final class NavigationCheck {
 
 
             before);
+
+
+
+
+        before = failures.size();
+
+
+
+        eachWheelReadsItsOwnSubject();
+
+
+
+        report("Part L - each wheel reads its own subject, and a chip moves no data", before);
+
+
+
+
+
+        before = failures.size();
+
+
+
+
+        theSelectionCardIsReadable();
+
+
+
+
+        report("Part M - the selection card carries its own contrast", before);
 
         System.out.println();
         System.out.println("=== Part G: each ring's glyphs say which ring they are on ===");
@@ -678,6 +710,218 @@ public final class NavigationCheck {
      * use, and a chip whose chart does not exist is not live. A control that looks pressable
      * and changes nothing is the Step-dropdown defect this project keeps logging.
      */
+    /**
+     * Every per-wheel field comes from the subject that wheel belongs to, and nothing else.
+     *
+     * <b>This is the assertion the old code could not make.</b> The wheel's three charts were
+     * nine loose fields filled by eleven positional strings, and which string meant what
+     * depended on the chart mode - so the sky was cast for the second person's birthplace, the
+     * partner ring drew this moment, and pressing Play walked a birth time forward. Four
+     * faults, one cause: nothing anywhere said that "Chart B" and "the sky" were different
+     * things, so writing one into the other was ordinary code.
+     *
+     * The check is blunt on purpose. Three subjects are built with values that could not be
+     * confused - different years, different hemispheres, different zones - installed, and then
+     * every field is read back and matched against the subject it names. Swap any two lines of
+     * installSubjects and this fails; that is the whole point of it.
+     *
+     * It also pins the two properties that follow from the type: a subject nobody entered
+     * leaves its wheel's moment null rather than defaulting to now, and moving the sky moves
+     * only the sky.
+     */
+    /**
+     * The card that opens when a point is clicked is readable where it is shown.
+     *
+     * <b>Measured off pixels, because a colour in a stylesheet is an intention.</b> The card
+     * is built by hoverHtml and set neither a background nor an ink colour, so it inherited
+     * whatever it landed on. As a tooltip over the wheel the default black was fine; the
+     * Selection drawer builds on the same fragment and is dark, so the point's name - "Sun",
+     * "Saturn" - came out black on near-black. David could not read it.
+     *
+     * One fragment on two surfaces has to carry its own contrast rather than borrow one.
+     * Removing either declaration puts the ground back to white and the contrast to nothing,
+     * which is what this measures rather than asserts.
+     */
+    private static void theSelectionCardIsReadable() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+            awaitChart(sky, false);
+
+            java.lang.reflect.Method card = SkymapPanel.class.getDeclaredMethod(
+                "selectionHtml", int.class, double.class, double.class, boolean.class);
+            card.setAccessible(true);
+            String html = (String) card.invoke(sky, 0, 165.0, 0.98, false);
+            ok("the selection card has content", html != null && html.length() > 200);
+
+            final javax.swing.JEditorPane pane = new javax.swing.JEditorPane();
+            final String doc = html;
+            SwingUtilities.invokeAndWait(() -> {
+                pane.setContentType("text/html");
+                pane.setText(doc);
+                pane.setSize(300, 900);
+                pane.doLayout();
+            });
+            Thread.sleep(500);
+            java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(
+                300, 300, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            SwingUtilities.invokeAndWait(() -> {
+                java.awt.Graphics2D g = img.createGraphics();
+                pane.paint(g);
+                g.dispose();
+            });
+
+            // The strip where the point's name sits: its commonest luminance is the ground,
+            // and the lightest is the ink.
+            java.util.Map<Integer, Integer> tally = new java.util.HashMap<>();
+            int lightest = 0;
+            for (int y = 0; y < 40; y++) {
+                for (int x = 0; x < 300; x++) {
+                    int rgb = img.getRGB(x, y);
+                    int lum = (((rgb >> 16) & 255) * 30 + ((rgb >> 8) & 255) * 59
+                        + (rgb & 255) * 11) / 100;
+                    lightest = Math.max(lightest, lum);
+                    tally.merge(lum, 1, Integer::sum);
+                }
+            }
+            int ground = 0;
+            int most = 0;
+            for (java.util.Map.Entry<Integer, Integer> e : tally.entrySet()) {
+                if (e.getValue() > most) {
+                    most = e.getValue();
+                    ground = e.getKey();
+                }
+            }
+            int contrast = Math.abs(lightest - ground);
+            System.out.println("  the point's name: ground " + ground + ", ink up to "
+                + lightest + ", contrast " + contrast);
+            ok("the card paints its own dark ground rather than a borrowed white one",
+                ground < 80);
+            ok("and its name stands off that ground", contrast > 90);
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    private static void eachWheelReadsItsOwnSubject() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+
+            com.zodiacomputing.ourania.astro.ChartSubject a =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart A",
+                    java.time.ZonedDateTime.of(1911, 1, 11, 1, 11, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Aaa", 11.0, -11.0, "America/New_York", true);
+            com.zodiacomputing.ourania.astro.ChartSubject b =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart B",
+                    java.time.ZonedDateTime.of(1922, 2, 22, 2, 22, 0, 0,
+                        java.time.ZoneId.of("Europe/Paris")),
+                    "Bbb", 22.0, -22.0, "Europe/Paris", false);
+            com.zodiacomputing.ourania.astro.ChartSubject s =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Sky",
+                    java.time.ZonedDateTime.of(1933, 3, 3, 3, 33, 0, 0,
+                        java.time.ZoneId.of("Asia/Tokyo")),
+                    "Sss", 33.0, -33.0, "Asia/Tokyo", false);
+
+            java.lang.reflect.Method install = SkymapPanel.class.getDeclaredMethod(
+                "installSubjects", com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class);
+            install.setAccessible(true);
+            install.invoke(sky, a, b, s);
+
+            // Chart A's fields hold Chart A, and Chart A is the only place they could
+            // have come from - 11 is not 22 and is not 33.
+            same("Chart A's moment", a.moment, get(sky, "baseChartTime"));
+            same("Chart A's latitude", a.latitude, get(sky, "baseLatitude"));
+            same("Chart A's longitude", a.longitude, get(sky, "baseLongitude"));
+            same("Chart A's place", a.placeName, get(sky, "baseLocationName"));
+            same("Chart A's zone", a.zoneId, get(sky, "baseTimeZoneId"));
+            same("Chart A's time-unknown flag", a.timeUnknown, get(sky, "baseTimeUnknown"));
+
+            same("Chart B's moment", b.moment, get(sky, "transitChartTime"));
+            same("Chart B's latitude", b.latitude, get(sky, "transitLatitude"));
+            same("Chart B's longitude", b.longitude, get(sky, "transitLongitude"));
+            same("Chart B's place", b.placeName, get(sky, "transitLocationName"));
+            same("Chart B's zone", b.zoneId, get(sky, "transitTimeZoneId"));
+
+            same("the sky's moment", s.moment, get(sky, "skyChartTime"));
+            same("the sky's latitude", s.latitude, get(sky, "skyLatitude"));
+            same("the sky's longitude", s.longitude, get(sky, "skyLongitude"));
+            same("the sky's zone", s.zoneId, get(sky, "skyTimeZoneId"));
+
+            // And the subjects themselves come back as they went in.
+            ok("Chart A reads back", a.equals(sky.chartASubject()));
+            ok("Chart B reads back", b.equals(sky.chartBSubject()));
+            ok("the sky reads back", s.equals(sky.skySubject()));
+
+            // A subject nobody entered is not a chart of this instant.
+            install.invoke(sky,
+                com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A"), b, s);
+            ok("an unentered Chart A leaves its moment null",
+                get(sky, "baseChartTime") == null);
+            ok("and the panel says it has no Chart A", !sky.hasChartA());
+            ok("without disturbing Chart B", b.moment.equals(get(sky, "transitChartTime")));
+            ok("or the sky", s.moment.equals(get(sky, "skyChartTime")));
+
+            // Moving the sky moves the sky.
+            install.invoke(sky, a, b, s);
+            java.lang.reflect.Method move = SkymapPanel.class.getDeclaredMethod(
+                "moveSky", java.time.ZonedDateTime.class);
+            move.setAccessible(true);
+            java.time.ZonedDateTime later = s.moment.plusDays(400);
+            move.invoke(sky, later);
+            same("the sky moved", later, get(sky, "skyChartTime"));
+            same("Chart A did not", a.moment, get(sky, "baseChartTime"));
+            same("Chart B did not", b.moment, get(sky, "transitChartTime"));
+            same("and the sky kept its place", s.latitude, get(sky, "skyLatitude"));
+
+            // A chip changes which wheels are drawn and touches nothing on them.
+            //
+            // Animation off: outerRingDrawn reads a bloom fraction, so a ring that has been
+            // told to fold is still partly open for as long as the fold takes. This part is
+            // about what the flag says, not how long the animation runs.
+            Settings.setAnimateRings(false);
+            install.invoke(sky, a, b, s);
+            SwingUtilities.invokeAndWait(
+                () -> sky.applyChartMode(ChartMode.SYNASTRY, true));
+            Thread.sleep(400);
+            ok("switching mode draws the outer wheel", sky.outerRingDrawn());
+            ok("switching mode draws the sky ring", sky.triRingDrawn());
+            ok("and Chart A is untouched", a.equals(sky.chartASubject()));
+            ok("and Chart B is untouched", b.equals(sky.chartBSubject()));
+            ok("and the sky is untouched", s.equals(sky.skySubject()));
+            SwingUtilities.invokeAndWait(
+                () -> sky.applyChartMode(ChartMode.SINGLE, false));
+            Thread.sleep(400);
+            ok("switching back folds the outer wheel", !sky.outerRingDrawn());
+            ok("and still nothing moved", a.equals(sky.chartASubject())
+                && b.equals(sky.chartBSubject()) && s.equals(sky.skySubject()));
+            Settings.setAnimateRings(true);
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    private static Object get(SkymapPanel sky, String name) throws Exception {
+        java.lang.reflect.Field f = SkymapPanel.class.getDeclaredField(name);
+        f.setAccessible(true);
+        return f.get(sky);
+    }
+
+    /** Object equality with the value printed, since eq here is for ints. */
+    private static void same(String label, Object expected, Object actual) {
+        ok(label + ": expected " + expected + ", got " + actual,
+            expected == null ? actual == null : expected.equals(actual));
+    }
+
     private static void theWheelAgreesWithTheForm() throws Exception {
         final OuraniaWindow[] w = new OuraniaWindow[1];
         SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());

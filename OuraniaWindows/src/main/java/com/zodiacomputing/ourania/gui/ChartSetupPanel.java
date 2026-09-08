@@ -64,6 +64,18 @@ public class ChartSetupPanel extends JPanel {
     private JComboBox<String> baseZone;
 
     /**
+     * The zone overrides for Chart B and the Sky.
+     *
+     * <b>Only Chart A had one, and there was no reason for that but the order things were
+     * written in.</b> An ambiguous place name moves the Ascendant about fifteen degrees per
+     * hour of error, and Chart B is a birth chart with an Ascendant exactly like Chart A's.
+     * Every subject is the same shape - that is the whole argument for ChartSubject - so
+     * every subject gets the same controls.
+     */
+    private JComboBox<String> transitZone;
+    private JComboBox<String> skyZone;
+
+    /**
      * Where to recast the houses, leaving the moment alone. Blank means the birthplace.
      *
      * A relocated chart is the standard technique for "what does this place do to me" - the
@@ -358,6 +370,7 @@ public class ChartSetupPanel extends JPanel {
 
         transitTimeField = createField(transitPanel, "Time (HH:MM):", "");
         transitLocationField = createField(transitPanel, "Location:", "");
+        transitZone = zoneBox(transitPanel);
 
         // The reference place for a midpoint composite. Enabled only in that mode - see
         // syncTransitsCheck - because it means nothing in any other, and a control that
@@ -459,6 +472,7 @@ public class ChartSetupPanel extends JPanel {
         skyLocationField.setToolTipText("<html><b>Where the sky is being read from.</b><br>"
             + "Its own field rather than Chart B's, so a transit ring is never cast for "
             + "somebody's birthplace.</html>");
+        skyZone = zoneBox(skyPanel);
 
         // <b>Seeded from the clock, not from the network.</b> Calling setSkyToNow here would
         // geocode the home location while the panel is still being built - a startup that
@@ -687,8 +701,20 @@ public class ChartSetupPanel extends JPanel {
      * overwrite birth data nobody can retype.
      */
     private boolean savesNatalData() {
-        return subject != Subject.SKY_NOW;
+        return subject != Subject.SKY_NOW && !redrawingSavedChart;
     }
+
+    /**
+     * True while the startup redraw is running, so it does not re-save what it just read.
+     *
+     * <b>Drawing a saved chart is not entering one.</b> The startup draw goes through
+     * generateChart, which persists Chart A - so every launch wrote the natal chart back over
+     * itself. Harmless while the value is right, and not harmless otherwise: after a check run
+     * had left the wrong birth data in settings.properties and it was repaired by hand, the
+     * still-running app wrote its stale copy straight back over the repair. A read that writes
+     * is a read that can undo a fix.
+     */
+    private boolean redrawingSavedChart;
 
     /** Which engines a subject's step 2 offers. The memory is only written through this. */
     /**
@@ -779,7 +805,26 @@ public class ChartSetupPanel extends JPanel {
 
     /** The chosen zone id, or "" to keep the one the location gave. */
     String baseZoneOverride() {
-        Object v = baseZone == null ? null : baseZone.getSelectedItem();
+        return zoneOverrideOf(baseZone);
+    }
+
+    /** Chart B's, by the same rule. */
+    String transitZoneOverride() {
+        return zoneOverrideOf(transitZone);
+    }
+
+    /** The sky's, by the same rule. */
+    String skyZoneOverride() {
+        return zoneOverrideOf(skyZone);
+    }
+
+    /**
+     * One reading of a zone box, because there are three of them now.
+     *
+     * Three copies of four lines is how the three rows came to differ in the first place.
+     */
+    private String zoneOverrideOf(JComboBox<String> box) {
+        Object v = box == null ? null : box.getSelectedItem();
         return v == null || ZONE_FROM_PLACE.equals(v) ? "" : String.valueOf(v);
     }
 
@@ -814,7 +859,15 @@ public class ChartSetupPanel extends JPanel {
         }
         transitsCheck.setSelected(skyRing);
         syncTransitsCheck();
-        generateChart();
+        // <b>Change which rings are drawn, not what is on them.</b> This called generateChart,
+        // which re-read every field of this form, re-ran the geocoder and re-parsed both
+        // dates - so a chip meaning "show me the sky as well" went out to the network and
+        // rebuilt two birth charts to answer it. It is also where the crossing lived: the
+        // rows meant different things in different modes, so re-reading them under a new mode
+        // is what let a chip change what a field meant.
+        if (parentWindow != null) {
+            parentWindow.applyChartMode(selectedMode, transitsCheck.isSelected());
+        }
     }
 
     /** True when Chart B has enough entered to draw a ring from. */
@@ -837,8 +890,16 @@ public class ChartSetupPanel extends JPanel {
      * back into panels that do not exist until the window has finished building itself.
      */
     void drawSavedChartA() {
-        if (hasChartA()) {
+        if (!hasChartA()) {
+            return;
+        }
+        // Held for the whole call, including the lambda inside generateChart that does the
+        // persisting - which is why this is a field and not an argument.
+        redrawingSavedChart = true;
+        try {
             generateChart();
+        } finally {
+            redrawingSavedChart = false;
         }
     }
 
@@ -1385,10 +1446,12 @@ public class ChartSetupPanel extends JPanel {
         }
         // The rating is not decoration: X casts for noon and withholds the angles.
         parentWindow.applySkySettings(skyDateField.getText().trim(),
-            skyTimeField.getText().trim(), skyLocationField.getText().trim());
+            skyTimeField.getText().trim(), skyLocationField.getText().trim(),
+            skyZoneOverride());
         parentWindow.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc,
             transitsCheck.isSelected(), baseRodden().timeUnknown(), baseZoneOverride(),
-            relocateField == null ? "" : relocateField.getText().trim());
+            relocateField == null ? "" : relocateField.getText().trim(),
+            transitZoneOverride());
     }
 
     /** Base-side "Set to Now", corrected to the base location's zone the same way. */

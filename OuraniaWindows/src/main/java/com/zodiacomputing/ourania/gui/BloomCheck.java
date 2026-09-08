@@ -23,6 +23,9 @@ public final class BloomCheck {
     private static int checks = 0;
 
     public static void main(String[] args) throws Exception {
+        // Never the reader's own settings file: a suite that generates a chart persists it,
+        // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
+        Settings.useScratchFile();
         System.out.println("=== Part A: the shape of the curve ===");
         int before = failures.size();
         theCurve();

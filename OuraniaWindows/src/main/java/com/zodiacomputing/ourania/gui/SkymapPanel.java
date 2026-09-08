@@ -506,11 +506,14 @@ extends JPanel {
      * Its own entry point rather than three more parameters on applyChartSettings, which
      * already carries eleven: the sky is a third chart now, not a variation on the second.
      */
-    public void applySkySettings(String date, String time, String location) {
+    public void applySkySettings(String date, String time, String location,
+            String zoneOverride) {
         final String loc = location == null ? "" : location.trim();
         final String d = date == null ? "" : date.trim();
         final String t = time == null ? "" : time.trim();
+        final String zone = zoneOverride == null ? "" : zoneOverride.trim();
         if (loc.isEmpty()) {
+            this.applySkyZone(zone);
             this.setSkyMoment(d, t);
             return;
         }
@@ -533,6 +536,8 @@ extends JPanel {
                     // An unreachable geocoder leaves the sky where it was, which is better
                     // than moving it somewhere wrong.
                 }
+                // The reader's zone wins over the geocoder's, exactly as it does for Chart A.
+                SkymapPanel.this.applySkyZone(zone);
                 SkymapPanel.this.setSkyMoment(d, t);
                 // <b>This worker can finish before the panel exists.</b> A geocoder that
                 // answers quickly - or, in a sandbox, fails instantly - brings done() back on
@@ -547,6 +552,18 @@ extends JPanel {
                 SkymapPanel.this.chartPanel.repaint();
             }
         }.execute();
+    }
+
+    /** The sky's chosen zone, when the reader has overridden what the place resolved to. */
+    private void applySkyZone(String zoneOverride) {
+        if (zoneOverride == null || zoneOverride.isEmpty()) {
+            return;
+        }
+        try {
+            this.skyTimeZoneId = ZoneId.of(zoneOverride).getId();
+        } catch (Exception bad) {
+            System.out.println("Ignoring unknown sky time zone \"" + zoneOverride + "\"");
+        }
     }
 
     /** The sky's moment, or now in the sky's own zone when the fields are blank. */
@@ -565,6 +582,240 @@ extends JPanel {
         this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
     }
 
+    // ---------------------------------------------------------------- the three subjects
+    //
+    // <b>One record per chart, and the loose fields below are written from them in one
+    // place.</b> The wheel's three charts were nine separate fields filled by eleven
+    // positional strings, and which string meant what depended on the mode - so the sky could
+    // be handed Chart B's birthplace, the partner ring could be handed this moment, and
+    // pressing Play could walk somebody's birth time forward. Every one of those was writeable
+    // because nothing knew that "Chart B" and "the sky" were different things.
+    //
+    // The loose fields stay, because seven thousand lines read them and rewriting all of that
+    // would be a larger risk than the bug. What changes is that nothing else assigns them:
+    // installSubjects is the only writer, and it takes each value from the subject it belongs
+    // to. A crossing now has to be written into one visible method rather than being possible
+    // anywhere.
+
+    /** Chart A - the person or event the chart is cast for. */
+    private com.zodiacomputing.ourania.astro.ChartSubject subjectA =
+        com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A");
+
+    /** Chart B - the second person, in a synastry or a composite. */
+    private com.zodiacomputing.ourania.astro.ChartSubject subjectB =
+        com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart B");
+
+    /** The sky - this moment, where the reader is, and what transits are read from. */
+    private com.zodiacomputing.ourania.astro.ChartSubject subjectSky =
+        com.zodiacomputing.ourania.astro.ChartSubject.empty("Sky");
+
+    /** Chart A, for anything that needs to ask what is on the inner wheel. */
+    public com.zodiacomputing.ourania.astro.ChartSubject chartASubject() {
+        return this.subjectA;
+    }
+
+    /** Chart B. */
+    public com.zodiacomputing.ourania.astro.ChartSubject chartBSubject() {
+        return this.subjectB;
+    }
+
+    /** The sky. */
+    public com.zodiacomputing.ourania.astro.ChartSubject skySubject() {
+        return this.subjectSky;
+    }
+
+    /**
+     * Which wheels are drawn, without touching what is on them.
+     *
+     * <b>Pressing a ring chip used to rebuild the chart from the setup form.</b> applyRings
+     * set the mode and then called generateChart, which re-read eleven fields, re-ran the
+     * geocoder and re-parsed every date - so a button meaning "show me the sky as well" went
+     * out to the network and re-derived two birth charts to answer it. That is also where the
+     * crossing lived: re-reading a form whose rows meant different things in different modes
+     * is precisely what let a chip change what a field meant.
+     *
+     * A chart is a function of its subjects. The mode chooses which subjects are drawn; it
+     * does not decide what they are. That separation is the whole lesson from the libraries
+     * that do this well, and this is the door for it - which is also why a chip press is now
+     * instant and needs no network.
+     */
+    public void applyChartMode(ChartMode mode, boolean transits) {
+        this.installMode(mode, transits);
+        this.updateChartData();
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+        if (this.window != null && this.ringBar != null) {
+            this.window.syncRingBar(this.ringBar);
+        }
+    }
+
+    /**
+     * The mode, and everything that follows from it. One statement, two callers.
+     *
+     * Generating a chart and switching which rings it shows had two copies of this, which is
+     * how they came to differ - and the difference was that only one of them rebuilt the
+     * subjects, so which of the two you went through decided whether your chart survived.
+     */
+    private void installMode(ChartMode mode, boolean transits) {
+        this.chartMode = mode;
+        this.transitsEnabled = transits;
+        this.showTransitChart = SkymapPanel.outerWheelShown(mode, transits);
+        this.showTriWheel    = SkymapPanel.triWheelShown(mode, transits);
+        // The rings open or fold to match. Set after the flags, so a bloom never disagrees
+        // with the thing it is animating.
+        this.outerBloom.set(this.showTransitChart);
+        this.triBloom.set(this.showTriWheel);
+        this.cachedFrame = null;
+        this.relationshipFrame = null;
+        this.relationshipCacheKey = null;
+        if (this.showTransitChart) {
+            this.animateTarget = "Both";
+            if (this.animateCombo != null) {
+                this.animateCombo.setSelectedItem("Both");
+            }
+            this.aspectFilter = "Both";
+            if (this.filterCombo != null) {
+                this.filterCombo.setSelectedItem("Both");
+            }
+            if (this.alignCombo != null) {
+                this.alignCombo.setEnabled(true);
+            }
+        } else {
+            this.animateTarget = "Natal";
+            if (this.animateCombo != null) {
+                this.animateCombo.setSelectedItem("Natal");
+            }
+            this.aspectFilter = "Natal-Natal";
+            if (this.filterCombo != null) {
+                this.filterCombo.setSelectedItem("Natal-Natal");
+            }
+            this.houseAlignment = "Natal";
+            if (this.alignCombo != null) {
+                this.alignCombo.setSelectedItem("Natal");
+                this.alignCombo.setEnabled(false);
+            }
+            this.syncPinToTransitAvailability();
+        }
+    }
+
+    /**
+     * Installs the three subjects, and writes every per-wheel field from its own subject.
+     *
+     * <b>The one writer.</b> Each line below takes a value from the subject whose name it
+     * carries and from no other, which is the property the old code could not state and
+     * therefore could not keep. NavigationCheck asserts it by installing three deliberately
+     * distinct subjects and reading back every field: swap any two of these lines and it
+     * fails.
+     *
+     * A subject nobody has entered leaves its wheel's moment null rather than defaulting to
+     * now, so "no chart" and "a chart of this instant" stay different answers.
+     */
+    void installSubjects(com.zodiacomputing.ourania.astro.ChartSubject a,
+            com.zodiacomputing.ourania.astro.ChartSubject b,
+            com.zodiacomputing.ourania.astro.ChartSubject sky) {
+        this.subjectA = a;
+        this.subjectB = b;
+        this.subjectSky = sky;
+
+        this.baseChartTime = a.moment;
+        this.baseLatitude = a.latitude;
+        this.baseLongitude = a.longitude;
+        this.baseLocationName = a.placeName;
+        this.baseTimeZoneId = a.zoneId;
+        this.baseTimeUnknown = a.timeUnknown;
+        this.chartALoaded = a.entered();
+
+        this.transitChartTime = b.moment;
+        this.transitLatitude = b.latitude;
+        this.transitLongitude = b.longitude;
+        this.transitLocationName = b.placeName;
+        this.transitTimeZoneId = b.zoneId;
+
+        this.skyChartTime = sky.moment;
+        this.skyLatitude = sky.latitude;
+        this.skyLongitude = sky.longitude;
+        this.skyTimeZoneId = sky.zoneId;
+    }
+
+    /**
+     * Moves the sky to a new moment, keeping its place.
+     *
+     * The transport's door. It used to step whichever field the mode pointed at, which is how
+     * Play came to walk a birth time; there is one thing it can move now and it is named.
+     */
+    void moveSky(ZonedDateTime when) {
+        this.installSubjects(this.subjectA, this.subjectB, this.subjectSky.at(when));
+    }
+
+    /**
+     * One subject, from the strings a form supplies and the lookups they imply.
+     *
+     * <b>The same construction for every wheel, which is the point.</b> Chart A used to get a
+     * zone override and a relocation and Chart B got neither, because the code that built them
+     * was written twice and only one copy grew the features. Passing empty strings for the two
+     * that do not apply is how a caller says "not this one" without there being a second path.
+     *
+     * A date that will not parse yields a subject that was never entered, rather than one
+     * quietly dated today - which is the distinction the whole class exists to keep.
+     *
+     * @param fallback the subject to keep the place of when the lookup fails, so an
+     *                 unreachable geocoder leaves a chart where it was rather than at zero
+     */
+    private com.zodiacomputing.ourania.astro.ChartSubject subjectFrom(String label,
+            String date, String time, String place, String zoneOverride, String relocateTo,
+            boolean timeUnknown,
+            com.zodiacomputing.ourania.astro.ChartSubject fallback) {
+        double lat = fallback.latitude;
+        double lon = fallback.longitude;
+        String name = fallback.placeName;
+        String zone = fallback.zoneId;
+
+        Geocoder.Result found = this.syncGeocode(place);
+        if (found != null) {
+            lat = found.lat;
+            lon = found.lon;
+            name = found.name;
+            zone = found.tzId;
+        }
+        // <b>The reader's zone wins over the geocoder's.</b> Applied after the lookup rather
+        // than instead of it, because the place still supplies the latitude and longitude the
+        // houses are cast from - it is only the zone that was in doubt. Validated here: an id
+        // Java does not know would throw inside ZonedDateTime.of below, on a worker, and lose
+        // the whole chart to a stack trace.
+        if (zoneOverride != null && !zoneOverride.isEmpty()) {
+            try {
+                zone = ZoneId.of(zoneOverride).getId();
+            } catch (Exception bad) {
+                System.out.println("Ignoring unknown time zone \"" + zoneOverride + "\"");
+            }
+        }
+        // <b>Relocation, applied after the birthplace and before the time is read.</b> The
+        // coordinates move and the zone does not. Ordering matters: the zone above was
+        // resolved from the BIRTHPLACE, which is what the birth time was written in, and
+        // taking the new place's zone here would shift the instant as well as the houses.
+        if (relocateTo != null && !relocateTo.isEmpty()) {
+            Geocoder.Result there = this.syncGeocode(relocateTo);
+            if (there != null) {
+                lat = there.lat;
+                lon = there.lon;
+                name = there.name + " (relocated)";
+            }
+        }
+        try {
+            java.time.LocalDate d = LocalDate.parse(date,
+                DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            LocalTime t = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
+            return com.zodiacomputing.ourania.astro.ChartSubject.of(label,
+                ZonedDateTime.of(d, t, ZoneId.of(zone)), name, lat, lon, zone, timeUnknown);
+        } catch (Exception notADate) {
+            // Half a date is not a moment. The place is kept, so a reader who has typed a
+            // location and not yet a birthday does not lose the location too.
+            return com.zodiacomputing.ourania.astro.ChartSubject.empty(label)
+                .movedTo(name, lat, lon, zone);
+        }
+    }
+
     /** Repaints just the wheel, for a bloom frame. */
     private void repaintWheel() {
         if (this.chartPanel != null) {
@@ -581,6 +832,9 @@ extends JPanel {
      * the reader had no vote. Empty means "trust the location", which is still the default.
      */
     private String baseZoneOverride = "";
+
+    /** Chart B's chosen zone, by the same rule as Chart A's. */
+    private String transitZoneOverride = "";
 
     /**
      * Where the chart is relocated to, or empty for the birthplace.
@@ -1809,7 +2063,14 @@ extends JPanel {
         int decan = Zodiac.decan(lon);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;'>");
+        // <b>Its own background and its own ink, because this card lands in two places.</b>
+        // It is a tooltip over the wheel and it is also the top of the Selection drawer -
+        // selectionHtml builds on it - and it set neither colour, so it inherited whatever it
+        // landed on. Over a pale tooltip the default black read fine; in the dark drawer the
+        // point's name was black on near-black, which is what David saw. A fragment reused on
+        // two surfaces has to carry its own contrast rather than borrow one.
+        sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;"
+            + " background:#12151A; color:#E0E0E0;'>");
         sb.append("<div style='font-size:13px;'><b>").append(def.name).append("</b>");
         if (transit) {
             sb.append(" <span style='color:#5A7FBF;'>(")
@@ -2570,120 +2831,40 @@ extends JPanel {
      * @param relocate a place to recast the houses for, or empty for the birthplace.
      */
     public void applyChartSettings(final String string, final String string2, final String string3, ChartMode chartMode, final String string4, final String string5, final String string6, final boolean transits, final boolean baseUnknown, final String zoneOverride, final String relocate) {
+        this.applyChartSettings(string, string2, string3, chartMode, string4, string5, string6,
+            transits, baseUnknown, zoneOverride, relocate, "");
+    }
+
+    /** As above, with Chart B's own zone override - every subject has one now. */
+    public void applyChartSettings(final String string, final String string2, final String string3, ChartMode chartMode, final String string4, final String string5, final String string6, final boolean transits, final boolean baseUnknown, final String zoneOverride, final String relocate, final String tZoneOverride) {
         this.baseTimeUnknown = baseUnknown;
         this.baseZoneOverride = zoneOverride == null ? "" : zoneOverride.trim();
+        this.transitZoneOverride = tZoneOverride == null ? "" : tZoneOverride.trim();
         this.relocateTo = relocate == null ? "" : relocate.trim();
-        this.chartMode = chartMode;
         final boolean bl = chartMode != ChartMode.SINGLE;
-        this.transitsEnabled = transits;
-        this.showTransitChart = SkymapPanel.outerWheelShown(chartMode, transits);
-        this.showTriWheel    = SkymapPanel.triWheelShown(chartMode, transits);
-        // The rings open or fold to match. Set after the flags, so a bloom never disagrees
-        // with the thing it is animating.
-        this.outerBloom.set(this.showTransitChart);
-        this.triBloom.set(this.showTriWheel);
-        this.cachedFrame = null;
-        this.relationshipFrame = null;
-        this.relationshipCacheKey = null;
-        if (this.showTransitChart) {
-            this.animateTarget = "Both";
-            if (this.animateCombo != null) {
-                this.animateCombo.setSelectedItem("Both");
-            }
-            this.aspectFilter = "Both";
-            if (this.filterCombo != null) {
-                this.filterCombo.setSelectedItem("Both");
-            }
-            if (this.alignCombo != null) {
-                this.alignCombo.setEnabled(true);
-            }
-        } else {
-            this.animateTarget = "Natal";
-            if (this.animateCombo != null) {
-                this.animateCombo.setSelectedItem("Natal");
-            }
-            this.aspectFilter = "Natal-Natal";
-            if (this.filterCombo != null) {
-                this.filterCombo.setSelectedItem("Natal-Natal");
-            }
-            this.houseAlignment = "Natal";
-            if (this.alignCombo != null) {
-                this.alignCombo.setSelectedItem("Natal");
-                this.alignCombo.setEnabled(false);
-            }
-            this.syncPinToTransitAvailability();
-        }
+        this.installMode(chartMode, transits);
         final boolean bl2 = this.isPlaying;
         this.isPlaying = false;
         SwingWorker<Void, Void> swingWorker = new SwingWorker<Void, Void>(){
 
             @Override
             protected Void doInBackground() throws Exception {
-                Object comparable;
-                Object object;
-                Geocoder.Result result = SkymapPanel.this.syncGeocode(string3);
-                if (result != null) {
-                    SkymapPanel.this.baseLatitude = result.lat;
-                    SkymapPanel.this.baseLongitude = result.lon;
-                    SkymapPanel.this.baseLocationName = result.name;
-                    SkymapPanel.this.baseTimeZoneId = result.tzId;
-                }
-                // <b>The reader's zone wins over the geocoder's.</b> Applied after the lookup
-                // rather than instead of it, because the place still supplies the latitude and
-                // longitude the houses are cast from - it is only the zone that was in doubt.
-                // Validated here: an id Java does not know would throw inside ZonedDateTime.of
-                // below, on a worker, and lose the whole chart to a stack trace.
-                String chosen = SkymapPanel.this.baseZoneOverride;
-                if (chosen != null && !chosen.isEmpty()) {
-                    try {
-                        SkymapPanel.this.baseTimeZoneId = ZoneId.of(chosen).getId();
-                    } catch (Exception bad) {
-                        System.out.println("Ignoring unknown time zone \"" + chosen + "\"");
-                    }
-                }
-                // <b>Relocation, applied after the birthplace and before the time is read.</b>
-                // The coordinates move and the zone does not - see relocateTo. Ordering
-                // matters: the zone above was resolved from the BIRTHPLACE, which is what the
-                // birth time was written in, and taking the new place's zone here would shift
-                // the instant as well as the houses.
-                String moveTo = SkymapPanel.this.relocateTo;
-                if (moveTo != null && !moveTo.isEmpty()) {
-                    Geocoder.Result there = SkymapPanel.this.syncGeocode(moveTo);
-                    if (there != null) {
-                        SkymapPanel.this.baseLatitude = there.lat;
-                        SkymapPanel.this.baseLongitude = there.lon;
-                        SkymapPanel.this.baseLocationName = there.name + " (relocated)";
-                    }
-                }
-                try {
-                    object = LocalDate.parse(string, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    comparable = (Object) LocalTime.parse(string2, DateTimeFormatter.ofPattern("HH:mm"));
-                    SkymapPanel.this.baseChartTime = ZonedDateTime.of((LocalDate)object, (LocalTime)comparable, ZoneId.of(SkymapPanel.this.baseTimeZoneId));
-                    // A Chart A exists exactly when one parsed. Set here rather than on entry
-                    // to the method, so a half-typed date does not count as a chart.
-                    SkymapPanel.this.chartALoaded = true;
-                }
-                catch (Exception exception) {
-                    SkymapPanel.this.chartALoaded = false;
-                    exception.printStackTrace();
-                }
-                if (bl) {
-                    object = SkymapPanel.this.syncGeocode(string6);
-                    if (object != null) {
-                        SkymapPanel.this.transitLatitude = ((Geocoder.Result)object).lat;
-                        SkymapPanel.this.transitLongitude = ((Geocoder.Result)object).lon;
-                        SkymapPanel.this.transitLocationName = ((Geocoder.Result)object).name;
-                        SkymapPanel.this.transitTimeZoneId = ((Geocoder.Result)object).tzId;
-                    }
-                    try {
-                        comparable = (Object) LocalDate.parse(string4, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                        LocalTime localTime = LocalTime.parse(string5, DateTimeFormatter.ofPattern("HH:mm"));
-                        SkymapPanel.this.transitChartTime = ZonedDateTime.of((LocalDate)comparable, localTime, ZoneId.of(SkymapPanel.this.transitTimeZoneId));
-                    }
-                    catch (Exception exception) {
-                        exception.printStackTrace();
-                    }
-                }
+                // <b>Two subjects are built here and installed together.</b> This method used
+                // to write fourteen fields one at a time, interleaved with the lookups that
+                // produced them, and which field a value landed in was decided by where in the
+                // sequence it appeared. That is how the sky came to be cast for Chart B's
+                // birthplace: not a wrong line, a value written into the wrong wheel because
+                // nothing said which wheel it belonged to. A subject carries its own name.
+                com.zodiacomputing.ourania.astro.ChartSubject a =
+                    SkymapPanel.this.subjectFrom("Chart A", string, string2, string3,
+                        SkymapPanel.this.baseZoneOverride, SkymapPanel.this.relocateTo,
+                        SkymapPanel.this.baseTimeUnknown, SkymapPanel.this.subjectA);
+                com.zodiacomputing.ourania.astro.ChartSubject b = bl
+                    ? SkymapPanel.this.subjectFrom("Chart B", string4, string5, string6,
+                        SkymapPanel.this.transitZoneOverride, "", false,
+                        SkymapPanel.this.subjectB)
+                    : SkymapPanel.this.subjectB;
+                SkymapPanel.this.installSubjects(a, b, SkymapPanel.this.subjectSky);
                 return null;
             }
 
@@ -5001,7 +5182,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         boolean applying = Aspects.isApplying(lonA, speedA, lonB, speedB, type);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;'>");
+        // <b>Its own background and its own ink, because this card lands in two places.</b>
+        // It is a tooltip over the wheel and it is also the top of the Selection drawer -
+        // selectionHtml builds on it - and it set neither colour, so it inherited whatever it
+        // landed on. Over a pale tooltip the default black read fine; in the dark drawer the
+        // point's name was black on near-black, which is what David saw. A fragment reused on
+        // two surfaces has to carry its own contrast rather than borrow one.
+        sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;"
+            + " background:#12151A; color:#E0E0E0;'>");
         sb.append("<div style='font-size:13px;'><b>").append(BODY_NAMES[a]);
         if (transit) {
             // Named for its own ring: "(partner)" and "(sky)" are different claims about the

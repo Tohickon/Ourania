@@ -49,6 +49,9 @@ public final class AspectGridCheck {
     private static int checks = 0;
 
     public static void main(String[] args) throws Exception {
+        // Never the reader's own settings file: a suite that generates a chart persists it,
+        // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
+        Settings.useScratchFile();
         System.out.println("build: " + AspectGridCheck.class.getProtectionDomain().getCodeSource().getLocation());
         int before = failures.size();
         hrefRoundTrip();

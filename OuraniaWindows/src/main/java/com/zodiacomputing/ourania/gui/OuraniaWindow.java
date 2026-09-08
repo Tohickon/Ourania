@@ -386,9 +386,18 @@ public class OuraniaWindow extends JFrame {
     public void applyChartSettings(String bDate, String bTime, String bLoc, ChartMode mode,
                                    String tDate, String tTime, String tLoc, boolean transits,
                                    boolean baseUnknown, String zoneOverride, String relocate) {
+        applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc, transits,
+            baseUnknown, zoneOverride, relocate, "");
+    }
+
+    /** As above, with Chart B's own zone override - every subject carries one. */
+    public void applyChartSettings(String bDate, String bTime, String bLoc, ChartMode mode,
+                                   String tDate, String tTime, String tLoc, boolean transits,
+                                   boolean baseUnknown, String zoneOverride, String relocate,
+                                   String tZoneOverride) {
         if (skymapPanel != null) {
             skymapPanel.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc,
-                transits, baseUnknown, zoneOverride, relocate);
+                transits, baseUnknown, zoneOverride, relocate, tZoneOverride);
             // Generating a chart shows the chart. Dropped for a moment when this method was
             // split in two, which would have left Generate looking like it did nothing.
             switchScreen("SKYMAP");
@@ -926,6 +935,13 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /** Changes which rings are drawn, leaving the three subjects as they are. */
+    public void applyChartMode(ChartMode mode, boolean transits) {
+        if (skymapPanel != null) {
+            skymapPanel.applyChartMode(mode, transits);
+        }
+    }
+
     /** Draws the saved Chart A, if there is one. Called when the application starts. */
     public void drawSavedChart() {
         if (chartSetupPanel != null) {
@@ -934,9 +950,10 @@ public class OuraniaWindow extends JFrame {
     }
 
     /** Where and when the sky is, from the Sky row of the setup form. */
-    public void applySkySettings(String date, String time, String location) {
+    public void applySkySettings(String date, String time, String location,
+            String zoneOverride) {
         if (skymapPanel != null) {
-            skymapPanel.applySkySettings(date, time, location);
+            skymapPanel.applySkySettings(date, time, location, zoneOverride);
         }
     }
 

@@ -30,6 +30,9 @@ public final class ChartBookCheck {
     private static File backup;
 
     public static void main(String[] args) throws Exception {
+        // Never the reader's own settings file: a suite that generates a chart persists it,
+        // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
+        Settings.useScratchFile();
         // The suite writes to the real store, so the real one is set aside first and put back
         // in a finally - a check that eats the user's charts would be worse than no check.
         File live = new File(FILE);

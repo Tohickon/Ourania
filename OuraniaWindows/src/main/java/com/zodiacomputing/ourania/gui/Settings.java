@@ -24,7 +24,29 @@ import java.util.function.Consumer;
 public final class Settings {
 
     /** Beside the working directory, which is where the app is launched from. */
-    private static final String FILE = "settings.properties";
+    /**
+     * The reader's settings file - or, for a check suite, a scratch copy of it.
+     *
+     * <b>The suites were writing this file, and one of them overwrote a saved birth
+     * chart.</b> settings.properties held David's natal data; a run of NavigationCheck left it
+     * holding the suite's fixture instead, 1972-09-22 in Los Angeles where 1982-08-10 in
+     * Philadelphia had been. Separately, `aspects.enabled` was found empty - which this file's
+     * own comment says means "the reader unticked every aspect" - and every check that read it
+     * then saw no aspects at all and reported failures against code that was fine.
+     *
+     * Per-suite discipline is not the fix, because the writes happen four layers down from
+     * anything a suite can see: generating a chart persists it, and generating a chart is what
+     * half these panels do when they are built. So the path itself is redirectable, and the
+     * suites point it at a temporary copy. A check cannot damage what it cannot address.
+     *
+     * The application never sets this property, so it always gets the real file.
+     */
+    static final String FILE_PROPERTY = "ourania.settings";
+
+    private static String file() {
+        String override = System.getProperty(FILE_PROPERTY);
+        return override == null || override.isEmpty() ? "settings.properties" : override;
+    }
 
     /** Comma-separated body ids; see {@link Bodies#parse}. */
     public static final String BODIES_KEY = "bodies.enabled";
@@ -52,9 +74,40 @@ public final class Settings {
     private static volatile boolean lastLoadFailed;
 
     /** Everything currently on disk, or an empty set if there is no file yet. */
+    /**
+     * Points this process at a scratch copy of the reader's settings.
+     *
+     * <b>For check suites, and the reason is a repair rather than a precaution.</b> A run of
+     * NavigationCheck left settings.properties holding the suite's fixture birth data instead
+     * of David's - 1972-09-22 in Los Angeles where 1982-08-10 in Philadelphia had been - and
+     * separately `aspects.enabled` was found written empty, which this file reads as "the
+     * reader unticked every aspect" and which then failed three checks against correct code.
+     *
+     * The writes are not something a suite can simply refrain from: generating a chart
+     * persists it, and building half these panels generates a chart. Copying the file and
+     * redirecting to the copy is the only version of this that cannot be forgotten in one
+     * place. There is no cache to invalidate - load() reads the file every time.
+     */
+    public static void useScratchFile() {
+        try {
+            File real = new File("settings.properties");
+            File scratch = File.createTempFile("ourania-settings-", ".properties");
+            scratch.deleteOnExit();
+            if (real.exists()) {
+                java.nio.file.Files.copy(real.toPath(), scratch.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+            System.setProperty(FILE_PROPERTY, scratch.getAbsolutePath());
+        } catch (Exception ex) {
+            // A suite that cannot get a scratch file must not silently write the real one.
+            throw new IllegalStateException(
+                "could not isolate settings.properties for this run", ex);
+        }
+    }
+
     public static Properties load() {
         Properties p = new Properties();
-        File f = new File(FILE);
+        File f = new File(file());
         lastLoadFailed = false;
         if (f.exists()) {
             try (FileInputStream fis = new FileInputStream(f)) {
@@ -108,7 +161,7 @@ public final class Settings {
             }
             mutation.accept(p);
             p.setProperty(SCHEMA_KEY, String.valueOf(SCHEMA));
-            try (FileOutputStream fos = new FileOutputStream(FILE)) {
+            try (FileOutputStream fos = new FileOutputStream(file())) {
                 p.store(fos, "Ourania Settings");
             }
         } catch (Exception ex) {
@@ -118,13 +171,13 @@ public final class Settings {
 
     /** Moves an unreadable settings file aside so the next write does not destroy it. */
     private static void preserveCorrupt() {
-        File f = new File(FILE);
+        File f = new File(file());
         if (!f.exists()) {
             return;
         }
-        File aside = new File(FILE + ".corrupt");
+        File aside = new File(file() + ".corrupt");
         for (int i = 2; aside.exists() && i < 100; i++) {
-            aside = new File(FILE + ".corrupt." + i);
+            aside = new File(file() + ".corrupt." + i);
         }
         if (f.renameTo(aside)) {
             System.out.println("Settings file could not be read; kept as " + aside.getName());
