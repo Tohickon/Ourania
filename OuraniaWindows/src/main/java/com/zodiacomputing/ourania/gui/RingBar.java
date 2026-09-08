@@ -48,7 +48,7 @@ public final class RingBar extends JPanel {
     private boolean partnerOpen;
     private boolean skyOpen;
     /** True when a second chart has been entered at all; without one the ring has nothing. */
-    private boolean partnerAvailable = true;
+    private Chip chartA;
 
     public RingBar(OuraniaWindow window) {
         this.window = window;
@@ -59,17 +59,22 @@ public final class RingBar extends JPanel {
         // is not a chart - true of the data and not of the drawing, and a reader comparing two
         // partners over one sky has good reason to take the anchor out of the picture for a
         // moment. It folds what is drawn; the chart stays a natal chart.
-        Chip natal = layerChip("Natal", SkymapPanel.Layer.NATAL);
-        natal.setToolTipText("<html><b>Fold the natal wheel away.</b><br>"
-            + "The chart is still cast from it - this hides its glyphs, so a partner or the "
+        // <b>Named for the rows they draw.</b> "Natal", "Partner" and "Sky" were three
+        // different vocabularies for the same three charts that the setup form calls Chart A,
+        // Chart B and Sky, and the bottom readout called something else again. One name each,
+        // everywhere, so a reader never has to work out which of three words means the wheel
+        // in front of them.
+        chartA = layerChip("Chart A", SkymapPanel.Layer.NATAL);
+        chartA.setToolTipText("<html><b>Fold Chart A's wheel away.</b><br>"
+            + "The chart is still cast from it - this hides its glyphs, so Chart B or the "
             + "sky can be read on its own for a moment.</html>");
-        add(natal);
+        add(chartA);
 
-        partner = new Chip("Partner", () -> {
+        partner = new Chip("Chart B", () -> {
             partnerOpen = !partnerOpen;
             apply();
         });
-        partner.setToolTipText("<html><b>Bloom a second person around the natal wheel.</b><br>"
+        partner.setToolTipText("<html><b>Bloom a second person around Chart A.</b><br>"
             + "Chart B's placements arrive in their own ring; the aspects between the two "
             + "charts are what a synastry is read for.<br>"
             + "<i>Needs Chart B filled in on the setup screen.</i></html>");
@@ -80,8 +85,10 @@ public final class RingBar extends JPanel {
             apply();
         });
         sky.setToolTipText("<html><b>Bloom the sky around whatever is already drawn.</b><br>"
-            + "Over a natal chart that is the transit wheel; over a natal and a partner it is "
-            + "the third ring - the sky above both of them at once.</html>");
+            + "Over Chart A that is the transit wheel; over Chart A and Chart B it is the "
+            + "third ring - the sky above both of them at once.<br>"
+            + "<i>Always this moment, at the sky's own location - it has its own row on the "
+            + "setup screen and borrows nobody's birth data.</i></html>");
         add(sky);
 
         // <b>A view, not a ring - which is why it is last and reads differently.</b> The three
@@ -150,19 +157,32 @@ public final class RingBar extends JPanel {
     }
 
     /** Reflects what is actually drawn, so the chips cannot drift from the wheel. */
-    public void syncFrom(ChartMode mode, boolean transits, boolean hasPartnerData) {
+    public void syncFrom(ChartMode mode, boolean transits, boolean hasPartnerData,
+            boolean hasChartA) {
         this.partnerOpen = mode == ChartMode.SYNASTRY;
         this.skyOpen = mode == ChartMode.TRANSIT
             || (transits && (mode == ChartMode.SYNASTRY
                 || mode == ChartMode.COMPOSITE_MIDPOINT
                 || mode == ChartMode.COMPOSITE_DAVISON));
-        this.partnerAvailable = hasPartnerData;
+        partner.available = hasPartnerData;
+        // <b>A chip for a chart nobody has entered does nothing, so it says so.</b> David:
+        // "If Chart A has no info loaded into it from Chart setup then the button shouldn't
+        // work, Chart b should be chart b same principle." A control that looks pressable and
+        // changes nothing is the Step-dropdown defect this project keeps logging.
+        chartA.available = hasChartA;
+        chartA.setToolTipText(hasChartA
+            ? "<html><b>Fold Chart A's wheel away.</b><br>"
+                + "The chart is still cast from it - this hides its glyphs, so Chart B or the "
+                + "sky can be read on its own for a moment.</html>"
+            : "<html><b>There is no Chart A yet.</b><br>"
+                + "Enter a birth date, time and place on the Chart Setup screen and press "
+                + "Generate. Until then the wheel shows the sky.</html>");
         // A composite is one derived wheel rather than two people side by side, so the
         // partner ring is not a thing that can be opened or folded there.
         boolean composite = mode == ChartMode.COMPOSITE_MIDPOINT
             || mode == ChartMode.COMPOSITE_DAVISON;
         partner.enabled = !composite;
-        partner.label = composite ? "In composite" : "Partner";
+        partner.label = composite ? "In composite" : "Chart B";
         repaintChips();
     }
 
@@ -174,6 +194,7 @@ public final class RingBar extends JPanel {
     }
 
     private void repaintChips() {
+        chartA.repaint();
         partner.repaint();
         sky.repaint();
         globe.repaint();
@@ -188,6 +209,16 @@ public final class RingBar extends JPanel {
         String label;
         boolean fixed;
         boolean enabled = true;
+
+        /**
+         * Whether the chart this chip names exists at all.
+         *
+         * <b>Separate from {@code enabled}, which is about the mode.</b> The partner chip is
+         * disabled in a composite because a composite has no second wheel to fold; it is
+         * unavailable when nobody has entered a Chart B. Those are different sentences and a
+         * reader deserves the right one - "not here" rather than "not now".
+         */
+        boolean available = true;
         /** Set on a chip that folds a drawn layer rather than opening a ring. */
         SkymapPanel.Layer layer;
         Runnable onLayerClick;
@@ -254,7 +285,7 @@ public final class RingBar extends JPanel {
                 return true;
             }
             if (this == partner) {
-                return partnerOpen && partnerAvailable;
+                return partnerOpen && partner.available;
             }
             return this == globe ? globeOpen : skyOpen;
         }
@@ -271,7 +302,7 @@ public final class RingBar extends JPanel {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
             boolean on = open();
-            boolean live = enabled && (fixed || partnerAvailable || this != partner);
+            boolean live = enabled && available;
 
             g2.setColor(on ? Theme.SURFACE_3 : Theme.SURFACE);
             g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);

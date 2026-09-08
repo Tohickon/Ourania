@@ -534,6 +534,15 @@ extends JPanel {
                     // than moving it somewhere wrong.
                 }
                 SkymapPanel.this.setSkyMoment(d, t);
+                // <b>This worker can finish before the panel exists.</b> A geocoder that
+                // answers quickly - or, in a sandbox, fails instantly - brings done() back on
+                // the event thread while the constructor is still running, and updateChartData
+                // then reaches for a SwissEph that has not been made yet. Recording the moment
+                // is safe; drawing with it is not, and the constructor's own update is a few
+                // lines behind and will use what was just stored.
+                if (SkymapPanel.this.sw == null || SkymapPanel.this.chartPanel == null) {
+                    return;
+                }
                 SkymapPanel.this.updateChartData();
                 SkymapPanel.this.chartPanel.repaint();
             }
@@ -624,6 +633,25 @@ extends JPanel {
      * The sky now has its own row on the setup form and its own three fields here, so nothing
      * it needs is shared with a birth chart.
      */
+    /**
+     * Whether a Chart A has actually been entered.
+     *
+     * <b>A cold open drew the current sky and called it the natal wheel.</b> baseChartTime is
+     * initialised to now, so before anything is generated the inner wheel holds this moment -
+     * and the setup form disagreed with it from the first frame, since the form's own base
+     * date read 1990-01-01. Two surfaces, one chart, and neither of them right.
+     *
+     * With no Chart A the inner wheel now draws the sky, and everything that names it says so:
+     * the chip is greyed with a reason, and the readout calls it Sky. Drawing the sky is not
+     * the defect - claiming it is somebody's birth chart was.
+     */
+    private boolean chartALoaded;
+
+    /** True when a Chart A has been generated, for the chip that folds it. */
+    public boolean hasChartA() {
+        return this.chartALoaded;
+    }
+
     private double skyLatitude = 51.4779;
     private double skyLongitude = 0.0;
     private String skyTimeZoneId = ZoneId.systemDefault().getId();
@@ -2631,8 +2659,12 @@ extends JPanel {
                     object = LocalDate.parse(string, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                     comparable = (Object) LocalTime.parse(string2, DateTimeFormatter.ofPattern("HH:mm"));
                     SkymapPanel.this.baseChartTime = ZonedDateTime.of((LocalDate)object, (LocalTime)comparable, ZoneId.of(SkymapPanel.this.baseTimeZoneId));
+                    // A Chart A exists exactly when one parsed. Set here rather than on entry
+                    // to the method, so a half-typed date does not count as a chart.
+                    SkymapPanel.this.chartALoaded = true;
                 }
                 catch (Exception exception) {
+                    SkymapPanel.this.chartALoaded = false;
                     exception.printStackTrace();
                 }
                 if (bl) {
@@ -3407,10 +3439,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("d MMM yyyy  HH:mm");
         StringBuilder out = new StringBuilder();
-        if (this.baseChartTime != null) {
-            out.append(this.baseChartTime.format(fmt));
+        // <b>The inner wheel is named too.</b> It printed a bare timestamp, so a reader had
+        // no way to tell a birth chart from the sky standing in for one - which is exactly
+        // the confusion a cold open produced.
+        ZonedDateTime inner = this.chartALoaded ? this.baseChartTime : this.skyChartTime;
+        if (inner != null) {
+            out.append(this.chartALoaded ? "Chart A: " : "Sky: ").append(inner.format(fmt));
         }
-        out.append(String.format("   %.2f, %.2f", this.baseLatitude, this.baseLongitude));
+        out.append(String.format("   %.2f, %.2f",
+            this.chartALoaded ? this.baseLatitude : this.skyLatitude,
+            this.chartALoaded ? this.baseLongitude : this.skyLongitude));
         // The outer wheel is a second moment, and it is the one the transport usually moves,
         // so it is named rather than left for the reader to infer from a changing number.
         // Named for what it is rather than for where it sits: the outer wheel is Chart B in
@@ -5873,9 +5911,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
         }
 
+        // <b>With no Chart A the inner wheel is the sky.</b> Not a birth chart cast from
+        // whatever moment the field happened to hold - there is no chart, and the honest
+        // thing to draw is the one thing that always exists.
+        if (!this.chartALoaded && !relationship && this.skySd != null) {
+            this.baseSd = this.skySd;
+            this.baseChartTime = this.skyChartTime;
+        }
         double[] dArray = new double[10];
         if (this.baseSd != null && !relationship) {
-            this.sw.swe_houses(this.baseSd.getJulDay(), 2, this.baseLatitude, this.baseLongitude, this.houseSystem, this.baseCusps, dArray);
+            double innerLat = this.chartALoaded ? this.baseLatitude : this.skyLatitude;
+            double innerLon = this.chartALoaded ? this.baseLongitude : this.skyLongitude;
+            this.sw.swe_houses(this.baseSd.getJulDay(), 2, innerLat, innerLon, this.houseSystem, this.baseCusps, dArray);
             this.baseAscendant = dArray[0];
         }
         // <b>The outer wheel is a second person only in a synastry.</b> Everywhere else it

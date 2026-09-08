@@ -240,8 +240,10 @@ public class ChartSetupPanel extends JPanel {
         basePanel.add(baseHeader);
         basePanel.add(Box.createRigidArea(new Dimension(0, 15)));
         
-        baseDateField = createField(basePanel, "Date (YYYY-MM-DD):", "1990-01-01");
-        baseTimeField = createField(basePanel, "Time (HH:MM):", "12:00");
+        // Empty, not a plausible-looking placeholder - see hasChartA. A form that opens with
+        // a date in it is a form claiming to hold a chart.
+        baseDateField = createField(basePanel, "Date (YYYY-MM-DD):", "");
+        baseTimeField = createField(basePanel, "Time (HH:MM):", "");
         baseRodden = roddenBox(basePanel, baseTimeField);
         baseZone = zoneBox(basePanel);
         relocateField = createField(basePanel, "Relocate to (blank = birthplace):", "");
@@ -819,6 +821,38 @@ public class ChartSetupPanel extends JPanel {
     boolean hasPartnerData() {
         return transitDateField != null
             && !transitDateField.getText().trim().isEmpty();
+    }
+
+    /**
+     * Draws the saved Chart A once the window exists, if there is one.
+     *
+     * <b>The saved chart was in the form and had never reached the wheel.</b> Nothing called
+     * generateChart at startup, so applyChartSettings never ran, so the wheel kept the moment
+     * its own constructor had defaulted to - this one. David opened the app to his own natal
+     * chart displaying today's sky, with the setup screen beside it showing 1982-08-10 the
+     * whole time. The form was right, the wheel was wrong, and no single piece of code was:
+     * they had simply never been introduced.
+     *
+     * Called from the window rather than from this constructor, because generateChart calls
+     * back into panels that do not exist until the window has finished building itself.
+     */
+    void drawSavedChartA() {
+        if (hasChartA()) {
+            generateChart();
+        }
+    }
+
+    /**
+     * True when a Chart A has actually been entered.
+     *
+     * <b>The date field used to open holding "1990-01-01", which is not a hint, it is a
+     * date.</b> A fresh install therefore looked like it held a birth chart, and the wheel
+     * drew something from a moment nobody had chosen. The field opens empty now, so an empty
+     * field means what it says.
+     */
+    boolean hasChartA() {
+        return baseDateField != null
+            && !baseDateField.getText().trim().isEmpty();
     }
 
     /** The mode currently chosen, for the wheel's ring chips to reflect. */

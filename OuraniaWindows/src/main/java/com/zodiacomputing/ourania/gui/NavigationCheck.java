@@ -99,6 +99,19 @@ public final class NavigationCheck {
 
         report("Part J - one chip folds the mansions in both views", before);
 
+
+
+        before = failures.size();
+
+
+        theWheelAgreesWithTheForm();
+
+
+        report("Part K - a cold open draws the chart the form holds, and the chips name it",
+
+
+            before);
+
         System.out.println();
         System.out.println("=== Part G: each ring's glyphs say which ring they are on ===");
         before = failures.size();
@@ -645,6 +658,134 @@ public final class NavigationCheck {
      * change the outer rim and leave the rest of the chart alone, which is the "hides it and
      * changes nothing else" contract stated as pixels rather than as intent.
      */
+    /**
+     * On a cold open the wheel draws the chart the setup form holds, and the chips say so.
+     *
+     * <b>The defect this exists to catch.</b> The saved Chart A was restored into the setup
+     * form at startup and never handed to the wheel: nothing called generateChart, so
+     * applyChartSettings never ran, and the wheel kept the moment its own constructor had
+     * defaulted to - now. David opened the app to his natal wheel showing today's sky with the
+     * setup screen beside it reading 1982-08-10 the whole time. **The form was right and the
+     * wheel was wrong, and neither piece of code was: they had never been introduced.**
+     *
+     * The invariant asserted here is the one that catches that without depending on what
+     * happens to be in this machine's settings.properties - which would be a check measuring
+     * its environment rather than the code. **Whatever the form holds, the wheel must agree
+     * with it.** Empty and empty is as good a pass as full and full; disagreeing is the
+     * failure, and disagreeing is exactly what the defect was.
+     *
+     * Also pinned: the three chips carry the three names the setup form and the bottom readout
+     * use, and a chip whose chart does not exist is not live. A control that looks pressable
+     * and changes nothing is the Step-dropdown defect this project keeps logging.
+     */
+    private static void theWheelAgreesWithTheForm() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+            java.lang.reflect.Field fc =
+                OuraniaWindow.class.getDeclaredField("chartSetupPanel");
+            fc.setAccessible(true);
+            Object setup = fc.get(w[0]);
+
+            // <b>Through the same door the application uses.</b> main calls drawSavedChart
+            // after making the window visible; constructing a window does not draw anything,
+            // which is what keeps four other suites out of the ephemeris. Calling it here is
+            // this check standing where the reader stands.
+            SwingUtilities.invokeAndWait(() -> w[0].drawSavedChart());
+            awaitChart(sky, false);
+
+            java.lang.reflect.Method formHasA = setup.getClass()
+                .getDeclaredMethod("hasChartA");
+            formHasA.setAccessible(true);
+            boolean formA = (Boolean) formHasA.invoke(setup);
+            System.out.println("  cold open: the form holds a Chart A = " + formA
+                + ", the wheel holds one = " + sky.hasChartA());
+            ok("the wheel and the form agree about whether there is a Chart A",
+                formA == sky.hasChartA());
+
+            // And when there is one, the wheel is drawing it rather than this moment.
+            if (formA) {
+                java.lang.reflect.Field fd = setup.getClass()
+                    .getDeclaredField("baseDateField");
+                fd.setAccessible(true);
+                String formDate =
+                    ((javax.swing.text.JTextComponent) fd.get(setup)).getText().trim();
+                java.lang.reflect.Field bt =
+                    SkymapPanel.class.getDeclaredField("baseChartTime");
+                bt.setAccessible(true);
+                Object drawn = bt.get(sky);
+                ok("the wheel has a moment to draw", drawn != null);
+                String drawnDate = drawn == null ? "" : drawn.toString().substring(0, 10);
+                System.out.println("  the form says " + formDate
+                    + ", the wheel is drawing " + drawnDate);
+                eq("the wheel draws the date the form holds", formDate, drawnDate);
+                ok("and it is not simply today",
+                    !drawnDate.equals(java.time.LocalDate.now().toString()));
+            }
+
+            // The chips carry the names the form and the readout use.
+            java.lang.reflect.Field fr = SkymapPanel.class.getDeclaredField("ringBar");
+            fr.setAccessible(true);
+            RingBar bar = (RingBar) fr.get(sky);
+            ok("the wheel has a ring bar", bar != null);
+            java.util.List<String> labels = chipLabels(bar);
+            System.out.println("  chips: " + labels);
+            for (String want : new String[] {"Chart A", "Chart B", "Sky"}) {
+                ok("a chip is named " + want, labels.contains(want));
+            }
+            for (String gone : new String[] {"Natal", "Partner"}) {
+                ok("no chip is still named " + gone, !labels.contains(gone));
+            }
+
+            // A chip for a chart that does not exist is not live.
+            java.lang.reflect.Method formHasB = setup.getClass()
+                .getDeclaredMethod("hasPartnerData");
+            formHasB.setAccessible(true);
+            ok("the Chart A chip is available exactly when a Chart A is",
+                chipAvailable(bar, "Chart A") == formA);
+            ok("the Chart B chip is available exactly when a Chart B is",
+                chipAvailable(bar, "Chart B") == (Boolean) formHasB.invoke(setup));
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    /** Every chip's label, in the order the bar holds them. */
+    private static java.util.List<String> chipLabels(RingBar bar) throws Exception {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        for (java.awt.Component c : bar.getComponents()) {
+            String label = labelOf(c);
+            if (label != null) {
+                out.add(label);
+            }
+        }
+        return out;
+    }
+
+    private static boolean chipAvailable(RingBar bar, String label) throws Exception {
+        for (java.awt.Component c : bar.getComponents()) {
+            if (label.equals(labelOf(c))) {
+                java.lang.reflect.Field f = c.getClass().getDeclaredField("available");
+                f.setAccessible(true);
+                return (Boolean) f.get(c);
+            }
+        }
+        return false;
+    }
+
+    private static String labelOf(java.awt.Component c) throws Exception {
+        try {
+            java.lang.reflect.Field f = c.getClass().getDeclaredField("label");
+            f.setAccessible(true);
+            return (String) f.get(c);
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
+    }
+
     private static void oneChipFoldsBothViews() throws Exception {
         final OuraniaWindow[] w = new OuraniaWindow[1];
         SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
@@ -655,10 +796,7 @@ public final class NavigationCheck {
             boolean[] every = new boolean[com.zodiacomputing.ourania.astro.Bodies.ALL.length];
             java.util.Arrays.fill(every, true);
             set(sky, "shown", every);
-            SwingUtilities.invokeAndWait(() -> w[0].applyChartSettings(
-                "1972-09-22", "18:38", "Los Angeles, USA", ChartMode.TRANSIT,
-                "2026-09-06", "12:00", "Philadelphia, USA", true, false, "", ""));
-            awaitChart(sky, false);
+            buildChart(sky, ChartMode.TRANSIT, false);
             Settings.setAnimateRings(false);
             try {
                 java.awt.Component wheel = sky.chartComponent();
@@ -760,6 +898,50 @@ public final class NavigationCheck {
     }
 
     /**
+     * Builds a chart by writing the panel's own fields, without a geocoder.
+     *
+     * <b>These parts used to go through applyChartSettings, which geocodes.</b> That reaches
+     * nominatim.openstreetmap.org, and a suite that needs the internet is a suite measuring
+     * the machine it runs on - the same defect as a suite reading the user's settings, which
+     * this project has logged twice. When the network was up Part I found 417 chords; when it
+     * was down it found nought and reported three failures against code that was fine.
+     *
+     * Coordinates are typed in, so the chart is the same chart on any machine, on any network.
+     */
+    private static void buildChart(SkymapPanel sky, ChartMode mode, boolean sky3)
+            throws Exception {
+        set(sky, "chartMode", mode);
+        set(sky, "showTransitChart", SkymapPanel.outerWheelShown(mode, true));
+        set(sky, "showTriWheel", SkymapPanel.triWheelShown(mode, sky3));
+        set(sky, "chartALoaded", Boolean.TRUE);
+        set(sky, "baseChartTime", java.time.ZonedDateTime.of(
+            1972, 9, 22, 18, 38, 0, 0, java.time.ZoneId.of("America/Los_Angeles")));
+        set(sky, "baseLatitude", 34.0522);
+        set(sky, "baseLongitude", -118.2437);
+        set(sky, "baseTimeZoneId", "America/Los_Angeles");
+        set(sky, "transitChartTime", java.time.ZonedDateTime.of(
+            1975, 3, 14, 9, 20, 0, 0, java.time.ZoneId.of("America/New_York")));
+        set(sky, "transitLatitude", 39.9526);
+        set(sky, "transitLongitude", -75.1652);
+        set(sky, "transitTimeZoneId", "America/New_York");
+        set(sky, "skyChartTime", java.time.ZonedDateTime.now(
+            java.time.ZoneId.of("America/Los_Angeles")));
+        set(sky, "skyLatitude", 34.0522);
+        set(sky, "skyLongitude", -118.2437);
+        set(sky, "skyTimeZoneId", "America/Los_Angeles");
+        set(sky, "aspectFilter", "Both");
+        // <b>And the aspects themselves, for the same reason as the coordinates.</b> Which
+        // aspects are drawn is a reader's preference; a suite that inherits it is measuring
+        // the machine, and AspectGridCheck pins this already for exactly that reason.
+        boolean[] allAspects =
+            new boolean[com.zodiacomputing.ourania.astro.Aspects.Type.values().length];
+        java.util.Arrays.fill(allAspects, true);
+        set(sky, "aspectShown", allAspects);
+        SwingUtilities.invokeAndWait(sky::updateChartData);
+        Thread.sleep(1200);
+    }
+
+    /**
      * Waits for the chart worker to finish, rather than sleeping and hoping.
      *
      * <b>A check whose totals move is a check that is measuring the machine.</b> These parts
@@ -794,9 +976,13 @@ public final class NavigationCheck {
         // The rings and layers animate open; a still taken mid-bloom is a still of a chart
         // half drawn, and triRingDrawn is a bloom fraction rather than a flag.
         Thread.sleep(1500);
+        // <b>Only the wheels this chart actually has.</b> Demanding an outer wheel of every
+        // chart fails a single chart for not being two - which is what it reported on the
+        // cold-open part, where SINGLE is the whole point.
         ok("the chart under test finished computing: natal " + live(sky.bValid)
             + ", outer " + live(sky.tValid) + ", sky " + live(sky.cValid),
-            live(sky.bValid) > 0 && live(sky.tValid) > 0
+            live(sky.bValid) > 0
+                && (!sky.outerRingDrawn() || live(sky.tValid) > 0)
                 && (!needSky || live(sky.cValid) > 0));
     }
 
@@ -881,10 +1067,7 @@ public final class NavigationCheck {
             boolean[] every = new boolean[com.zodiacomputing.ourania.astro.Bodies.ALL.length];
             java.util.Arrays.fill(every, true);
             set(sky, "shown", every);
-            SwingUtilities.invokeAndWait(() -> w[0].applyChartSettings(
-                "1972-09-22", "18:38", "Los Angeles, USA", ChartMode.SYNASTRY,
-                "1975-03-14", "09:20", "Philadelphia, USA", true, true, "", ""));
-            awaitChart(sky, true);
+            buildChart(sky, ChartMode.SYNASTRY, true);
             java.awt.Component wheel = sky.chartComponent();
             SwingUtilities.invokeAndWait(() -> {
                 wheel.setSize(1100, 1100);

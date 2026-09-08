@@ -1824,6 +1824,12 @@ public final class AspectGridCheck {
         boolean[] every = new boolean[Bodies.ALL.length];
         java.util.Arrays.fill(every, true);
         setField(sky, "shown", every);
+        // <b>This harness builds a Chart A, so it says so.</b> With no Chart A the panel draws
+        // the sky in the inner wheel rather than a birth chart nobody entered - which is right
+        // for a cold open and wrong for a suite that has just written a birth moment into the
+        // fields by hand. Declaring it is what tells the panel these are somebody's, not the
+        // constructor's defaults.
+        setField(sky, "chartALoaded", Boolean.TRUE);
         java.lang.reflect.Method reload =
             SkymapPanel.class.getDeclaredMethod("updateChartData");
         reload.setAccessible(true);

@@ -254,7 +254,7 @@ public class OuraniaWindow extends JFrame {
         }
         if (chartSetupPanel != null) {
             bar.syncFrom(chartSetupPanel.currentMode(), chartSetupPanel.skyWanted(),
-                chartSetupPanel.hasPartnerData());
+                chartSetupPanel.hasPartnerData(), chartSetupPanel.hasChartA());
         }
         if (skymapPanel != null) {
             bar.syncView(skymapPanel.isGlobeMode());
@@ -926,6 +926,13 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /** Draws the saved Chart A, if there is one. Called when the application starts. */
+    public void drawSavedChart() {
+        if (chartSetupPanel != null) {
+            chartSetupPanel.drawSavedChartA();
+        }
+    }
+
     /** Where and when the sky is, from the Sky row of the setup form. */
     public void applySkySettings(String date, String time, String location) {
         if (skymapPanel != null) {
@@ -971,6 +978,18 @@ public class OuraniaWindow extends JFrame {
             
             OuraniaWindow window = new OuraniaWindow();
             window.setVisible(true);
+
+            // <b>Draw the chart the reader already has.</b> The saved Chart A was restored
+            // into the setup form at startup and never handed to the wheel, so the app opened
+            // on a natal wheel holding this moment while the form beside it showed the real
+            // birth data - the form right, the wheel wrong, and the two never introduced.
+            //
+            // Here rather than in the constructor, and that is the point: constructing a
+            // window is not starting an application. Four check suites build windows to
+            // inspect them, one of them a subclass that only records what it is asked, and a
+            // constructor that generates a chart drags every one of them into casting an
+            // ephemeris they never wanted. Starting the app is a thing main does.
+            window.drawSavedChart();
         });
     }
 }
