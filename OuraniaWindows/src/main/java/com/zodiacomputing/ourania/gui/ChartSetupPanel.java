@@ -142,6 +142,21 @@ public class ChartSetupPanel extends JPanel {
     /** Chart A's contents while The Sky Now is borrowing those fields. Null otherwise. */
     private String[] stashedBase;
 
+    /**
+     * The Sky row: where and when "now" is.
+     *
+     * <b>A third chart, because there were always three and only two rows.</b> Chart B's
+     * fields carried the second person in a synastry and this moment everywhere else, and the
+     * ring chips switched which of those two things they meant without switching the value in
+     * them - so pressing Sky after setting up a partner drew the partner's birth chart, and
+     * pressing Partner after looking at the sky drew this moment. The heading even renamed
+     * itself between "Chart B (Partner)" and "Chart B (Transit)", which was the form saying
+     * out loud that one row was doing two jobs.
+     */
+    private javax.swing.JTextField skyDateField;
+    private javax.swing.JTextField skyTimeField;
+    private javax.swing.JTextField skyLocationField;
+
     public ChartSetupPanel(OuraniaWindow parentWindow) {
         this.parentWindow = parentWindow;
         setLayout(new BorderLayout());
@@ -159,7 +174,7 @@ public class ChartSetupPanel extends JPanel {
         northPanel.add(buildStepChooser());
         add(northPanel, BorderLayout.NORTH);
         
-        JPanel formPanel = new JPanel(new GridLayout(1, 2, Theme.GAP_L, 0));
+        JPanel formPanel = new JPanel(new GridLayout(1, 3, Theme.GAP_L, 0));
         formPanel.setBackground(Theme.BG);
         formPanel.setBorder(Theme.pad(Theme.GAP, Theme.GAP_L, Theme.GAP_L, Theme.GAP_L));
         
@@ -183,7 +198,7 @@ public class ChartSetupPanel extends JPanel {
         };
         baseHeader.setBackground(Theme.SURFACE);
         
-        JLabel baseTitle = new JLabel("Chart A (Base)");
+        JLabel baseTitle = new JLabel("Chart A");
         baseTitle.setForeground(Theme.TEXT);
         baseTitle.setFont(Theme.TITLE);
         baseHeader.add(baseTitle);
@@ -260,7 +275,7 @@ public class ChartSetupPanel extends JPanel {
         // The mode control used to live here as a flat five-entry combo. It is now the
         // two-step subject/engine chooser at the top of the panel - see buildStepChooser -
         // and this column just says what it is currently holding.
-        transitTitle = new JLabel("Chart B (Transit)");
+        transitTitle = new JLabel("Chart B");
         transitTitle.setForeground(Theme.TEXT);
         transitTitle.setFont(Theme.TITLE);
         transitHeader.add(transitTitle);
@@ -387,7 +402,11 @@ public class ChartSetupPanel extends JPanel {
             baseLocationField.setText(settings.getProperty("natal.location", homeLocation));
         }
 
-        setTransitToNow();
+        // <b>Chart B is no longer seeded here.</b> Seeding it was what made hasPartnerData
+        // answer yes on a cold open - the question "is there a second person" was being
+        // answered by a field that always had something in it, so the Partner chip looked
+        // usable when there was no partner. An empty field is the honest answer to a chart
+        // nobody has entered. The sky is seeded instead, below, once its fields exist.
 
         // <b>Seeded through the same method the buttons call, not by hand.</b> The Step
         // dropdown was built with a literal before its listener existed, so it displayed a
@@ -400,11 +419,62 @@ public class ChartSetupPanel extends JPanel {
         // distributes leftover height between its children, so a column of fixed-height fields
         // in a tall card drifted to the middle with a gap above them that looked like a
         // rendering fault. Glue takes the slack, and the fields sit under their heading.
+        // --- SKY FORM ---
+        JPanel skyPanel = new JPanel();
+        skyPanel.setLayout(new BoxLayout(skyPanel, BoxLayout.Y_AXIS));
+        skyPanel.setBackground(Theme.SURFACE);
+        skyPanel.setBorder(Theme.card(Theme.EDGE, Theme.GAP_L));
+
+        JPanel skyHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)) {
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
+        skyHeader.setBackground(Theme.SURFACE);
+
+        JLabel skyTitle = new JLabel("Sky");
+        skyTitle.setForeground(Theme.TEXT);
+        skyTitle.setFont(Theme.TITLE);
+        skyHeader.add(skyTitle);
+
+        JPanel skyFiller = new JPanel();
+        skyFiller.setBackground(Color.BLACK);
+        skyFiller.setPreferredSize(new Dimension(15, 10));
+        skyHeader.add(skyFiller);
+
+        JButton skyNowBtn = smallButton("Now");
+        skyNowBtn.setToolTipText("Set the sky to this moment at its location");
+        skyNowBtn.addActionListener(e -> setSkyToNow());
+        skyHeader.add(skyNowBtn);
+
+        skyPanel.add(skyHeader);
+        skyPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        skyDateField = createField(skyPanel, "Date (YYYY-MM-DD):", "");
+        skyTimeField = createField(skyPanel, "Time (HH:MM):", "");
+        skyLocationField = createField(skyPanel, "Location:", "");
+        skyLocationField.setToolTipText("<html><b>Where the sky is being read from.</b><br>"
+            + "Its own field rather than Chart B's, so a transit ring is never cast for "
+            + "somebody's birthplace.</html>");
+
+        // <b>Seeded from the clock, not from the network.</b> Calling setSkyToNow here would
+        // geocode the home location while the panel is still being built - a startup that
+        // needs the internet to finish, which two check suites found the moment it existed
+        // (UnknownHostException on nominatim, and a sandbox refusing the socket outright).
+        // The fields are filled from the system clock and the remembered home; the zone is
+        // corrected the first time the reader presses Now or Generate, which is when a lookup
+        // is something they asked for rather than something the app does behind them.
+        applySkyInstant(ZonedDateTime.now());
+        skyLocationField.setText(homeLocation);
+
         basePanel.add(Box.createVerticalGlue());
         transitPanel.add(Box.createVerticalGlue());
+        skyPanel.add(Box.createVerticalGlue());
 
         formPanel.add(basePanel);
         formPanel.add(transitPanel);
+        formPanel.add(skyPanel);
         
         // <b>The saved charts belong beside the fields they fill.</b> They were a section in
         // the menu drawer, which meant choosing whose chart to draw happened in one place and
@@ -828,7 +898,10 @@ public class ChartSetupPanel extends JPanel {
      */
     private void updateColumnTitles() {
         boolean partner = isRelationship(selectedMode);
-        transitTitle.setText(partner ? "Chart B (Partner)" : "Chart B (Transit)");
+        // <b>One name, because it is one thing now.</b> The heading renamed itself between
+        // "Chart B (Partner)" and "Chart B (Transit)" precisely because the row meant two
+        // things; the sky has its own row, so this one is Chart B in every mode.
+        transitTitle.setText("Chart B");
         transitTitle.setToolTipText(partner
             ? "The second person's birth date, time and place."
             : "The moment and place the outer wheel is drawn for.");
@@ -991,6 +1064,49 @@ public class ChartSetupPanel extends JPanel {
      * from the system zone first so the field is never blank, then corrected once the
      * location's zone is known.
      */
+    /** The Sky row's "Now", corrected to the sky location's zone the same way. */
+    private void setSkyToNow() {
+        applySkyInstant(ZonedDateTime.now());
+        if (skyLocationField.getText().trim().isEmpty()) {
+            skyLocationField.setText(homeLocation);
+        }
+        final String loc = skyLocationField.getText().trim();
+        if (loc.isEmpty()) {
+            return;
+        }
+        final String seededDate = skyDateField.getText();
+        final String seededTime = skyTimeField.getText();
+        new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() {
+                Geocoder.Result r = Geocoder.lookup(loc);
+                return r == null ? null : r.tzId;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    String tz = get();
+                    if (tz == null) {
+                        return;
+                    }
+                    if (!skyDateField.getText().equals(seededDate)
+                        || !skyTimeField.getText().equals(seededTime)) {
+                        return;
+                    }
+                    applySkyInstant(Instant.now().atZone(ZoneId.of(tz)));
+                } catch (Exception ex) {
+                    // An unreachable geocoder just leaves the system-clock seed in place.
+                }
+            }
+        }.execute();
+    }
+
+    private void applySkyInstant(ZonedDateTime when) {
+        skyDateField.setText(when.format(DATE_FMT));
+        skyTimeField.setText(when.format(TIME_FMT));
+    }
+
     private void setTransitToNow() {
         applyTransitInstant(ZonedDateTime.now());
 
@@ -1234,6 +1350,8 @@ public class ChartSetupPanel extends JPanel {
             return;
         }
         // The rating is not decoration: X casts for noon and withholds the angles.
+        parentWindow.applySkySettings(skyDateField.getText().trim(),
+            skyTimeField.getText().trim(), skyLocationField.getText().trim());
         parentWindow.applyChartSettings(bDate, bTime, bLoc, mode, tDate, tTime, tLoc,
             transitsCheck.isSelected(), baseRodden().timeUnknown(), baseZoneOverride(),
             relocateField == null ? "" : relocateField.getText().trim());

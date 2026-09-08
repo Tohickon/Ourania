@@ -239,15 +239,36 @@ public final class ChartSetupCheck {
                 && ref.getToolTipText().toLowerCase().contains("davison"));
     }
 
-    /** In the three two-person modes the second column is a person, not a moment. */
+    /**
+     * The second column is Chart B in every mode, and the sky has a column of its own.
+     *
+     * <b>This used to pin the opposite, and the opposite was the defect.</b> The heading
+     * renamed itself between "Chart B (Partner)" and "Chart B (Transit)" because one row of
+     * fields carried two different things - the second person in a synastry, and this moment
+     * everywhere else. The ring chips switched which of those the row meant without switching
+     * the value in it, so pressing Sky after setting up a partner drew that partner's birth
+     * chart where the current sky belonged, and pressing Partner after looking at the sky drew
+     * the sky where the partner belonged. A heading that renames itself is a row admitting it
+     * is two rows.
+     *
+     * The sky has its own column now, so this one is Chart B always - and the check that used
+     * to guarantee the renaming now guarantees it cannot come back.
+     */
     private static void columnTitle() throws Exception {
         JLabel title = (JLabel) field("transitTitle");
         for (ChartMode m : ChartMode.values()) {
             setMode(m);
-            boolean partner = m == ChartMode.SYNASTRY || m == ChartMode.COMPOSITE_MIDPOINT
-                || m == ChartMode.COMPOSITE_DAVISON;
-            eq(m + ": the second column's name", partner ? "Chart B (Partner)"
-                : "Chart B (Transit)", title.getText());
+            eq(m + ": the second column's name", "Chart B", title.getText());
+        }
+        ok("the sky has a date field of its own", field("skyDateField") != null);
+        ok("the sky has a time field of its own", field("skyTimeField") != null);
+        ok("the sky has a location field of its own", field("skyLocationField") != null);
+        // Nothing the sky needs may be a Chart B field, which is the whole point.
+        for (String sky : new String[] {"skyDateField", "skyTimeField", "skyLocationField"}) {
+            for (String b : new String[] {"transitDateField", "transitTimeField",
+                    "transitLocationField"}) {
+                ok(sky + " is not " + b, field(sky) != field(b));
+            }
         }
     }
 

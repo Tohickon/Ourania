@@ -198,7 +198,7 @@ public final class HarmonicCheck {
                     Boolean.valueOf(SkymapPanel.outerWheelShown(mode, false)));
                 set(p, "baseChartTime", ta);
                 set(p, "transitChartTime", tb);
-                set(p, "compositeTransitTime",
+                set(p, "skyChartTime",
                     ZonedDateTime.of(2026, 8, 26, 12, 0, 0, 0, ZoneId.of("UTC")));
                 set(p, "baseSd", new SweDate(1982, 8, 10, 19 + 1.0 / 60.0));
                 set(p, "transitSd", new SweDate(1972, 9, 23, 1 + 28.0 / 60.0));

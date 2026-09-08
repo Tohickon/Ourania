@@ -926,6 +926,13 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /** Where and when the sky is, from the Sky row of the setup form. */
+    public void applySkySettings(String date, String time, String location) {
+        if (skymapPanel != null) {
+            skymapPanel.applySkySettings(date, time, location);
+        }
+    }
+
     /** The hover card for an aspect-grid cell, or null when the cursor is not over one. */
     public String aspectHoverHtml(String href) {
         return skymapPanel != null ? skymapPanel.aspectHoverHtml(href) : null;

@@ -136,7 +136,7 @@ extends JPanel {
      *
      * <b>Separate from {@link #showTransitChart}.</b> In SYNASTRY mode that flag means
      * "chart B exists" and is always true; this flag means "the sky is wrapped around
-     * both people". The sky data lives in {@link #compositeTransitTime}, which already
+     * both people". The sky data lives in {@link #skyChartTime}, which already
      * exists for exactly this purpose and whose javadoc says the same thing.
      */
     public boolean showTriWheel = false;
@@ -500,6 +500,62 @@ extends JPanel {
         return this.triBloom.value();
     }
 
+    /**
+     * Where and when the sky is, from the Sky row of the setup form.
+     *
+     * Its own entry point rather than three more parameters on applyChartSettings, which
+     * already carries eleven: the sky is a third chart now, not a variation on the second.
+     */
+    public void applySkySettings(String date, String time, String location) {
+        final String loc = location == null ? "" : location.trim();
+        final String d = date == null ? "" : date.trim();
+        final String t = time == null ? "" : time.trim();
+        if (loc.isEmpty()) {
+            this.setSkyMoment(d, t);
+            return;
+        }
+        new javax.swing.SwingWorker<Geocoder.Result, Void>() {
+            @Override
+            protected Geocoder.Result doInBackground() {
+                return Geocoder.lookup(loc);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    Geocoder.Result r = get();
+                    if (r != null) {
+                        SkymapPanel.this.skyLatitude = r.lat;
+                        SkymapPanel.this.skyLongitude = r.lon;
+                        SkymapPanel.this.skyTimeZoneId = r.tzId;
+                    }
+                } catch (Exception ignored) {
+                    // An unreachable geocoder leaves the sky where it was, which is better
+                    // than moving it somewhere wrong.
+                }
+                SkymapPanel.this.setSkyMoment(d, t);
+                SkymapPanel.this.updateChartData();
+                SkymapPanel.this.chartPanel.repaint();
+            }
+        }.execute();
+    }
+
+    /** The sky's moment, or now in the sky's own zone when the fields are blank. */
+    private void setSkyMoment(String date, String time) {
+        try {
+            if (!date.isEmpty() && !time.isEmpty()) {
+                this.skyChartTime = ZonedDateTime.of(
+                    java.time.LocalDate.parse(date),
+                    java.time.LocalTime.parse(time),
+                    ZoneId.of(this.skyTimeZoneId));
+                return;
+            }
+        } catch (Exception ignored) {
+            // A half-typed date is not a moment; fall through to now.
+        }
+        this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+    }
+
     /** Repaints just the wheel, for a bloom frame. */
     private void repaintWheel() {
         if (this.chartPanel != null) {
@@ -554,6 +610,23 @@ extends JPanel {
     private String compositeRefPlace;
     private String transitLocationName = "Los Angeles, CA";
     private String transitTimeZoneId = ZoneId.systemDefault().getId();
+
+    /**
+     * Where the sky is read from, and when.
+     *
+     * <b>The sky borrowed Chart B's place, and that is the same crossing as borrowing its
+     * moment.</b> transitLatitude and transitLongitude are the second person's birthplace in a
+     * synastry, so the third ring - the sky over both of them - was being cast for wherever
+     * Chart B was born rather than for where the reader is. It looked right whenever the two
+     * happened to be the same city and was wrong the rest of the time, which is the worst way
+     * for a coordinate to be wrong.
+     *
+     * The sky now has its own row on the setup form and its own three fields here, so nothing
+     * it needs is shared with a birth chart.
+     */
+    private double skyLatitude = 51.4779;
+    private double skyLongitude = 0.0;
+    private String skyTimeZoneId = ZoneId.systemDefault().getId();
     private String animateTarget = "Transit";
     private String aspectFilter = "Natal-Natal";
     /** The chart's own settings, shown on the Settings screen rather than under the wheel. */
@@ -691,8 +764,8 @@ extends JPanel {
      * Defaults to now, and the existing Now / Play / step controls drive it while a composite
      * is on screen, which is how someone actually reads composite transits - by sweeping.
      */
-    private ZonedDateTime compositeTransitTime;
-    private SweDate compositeTransitSd;
+    private ZonedDateTime skyChartTime;
+    private SweDate skySd;
     private Timer refreshDebounce;
     public static final String[] SIGN_NAMES;
     private static final double ANGLE_SPEED = 361.0;
@@ -3340,10 +3413,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         out.append(String.format("   %.2f, %.2f", this.baseLatitude, this.baseLongitude));
         // The outer wheel is a second moment, and it is the one the transport usually moves,
         // so it is named rather than left for the reader to infer from a changing number.
-        ZonedDateTime outer = this.isRelationshipChart()
-            ? this.compositeTransitTime : this.transitChartTime;
+        // Named for what it is rather than for where it sits: the outer wheel is Chart B in
+        // a synastry and the sky everywhere else, and calling both of them "sky" is how a
+        // reader comes to believe a birth chart is this moment.
+        ZonedDateTime outer = this.isSynastryChart() ? this.transitChartTime : this.skyChartTime;
         if (this.showTransitChart && outer != null) {
-            out.append("      sky: ").append(outer.format(fmt));
+            out.append(this.isSynastryChart() ? "      Chart B: " : "      Sky: ")
+               .append(outer.format(fmt));
+        }
+        if (this.showTriWheel && this.skyChartTime != null && this.isSynastryChart()) {
+            out.append("      Sky: ").append(this.skyChartTime.format(fmt));
         }
         this.timeDrawer.setLabel(out.toString());
     }
@@ -3419,11 +3498,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.baseChartTime = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
             }
             if (bl) {
-                if (this.isRelationshipChart()) {
-                    this.compositeTransitTime = ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId));
-                } else {
-                    this.transitChartTime = ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId));
-                }
+                this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
             }
             this.updateChartData();
             this.chartPanel.repaint();
@@ -5667,14 +5742,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int n = this.animationDirection;
         boolean bl2 = this.animateTarget.equals("Natal") || this.animateTarget.equals("Both") || !this.showTransitChart;
         boolean bl3 = bl = (this.animateTarget.equals("Transit") || this.animateTarget.equals("Both")) && this.showTransitChart;
-        // <b>In a composite mode the outer wheel is the third time, not the second person.</b>
-        // Animating "Transit" there must move the sky, not one of the two birth charts - moving
-        // a birth time would silently rebuild the composite under the reader.
-        if (this.isRelationshipChart()) {
+        // <b>The transport moves the sky, and never a birth time.</b> This guarded the
+        // composite modes only - "animating Transit there must move the sky, not one of the
+        // two birth charts" - and the same sentence is true of a synastry, where the outer
+        // wheel is the second person. It was not guarded, so pressing Play on a synastry
+        // walked person B's birth moment forward a day at a time and rebuilt their chart
+        // under the reader. Every mode but the synastry's own Chart B now steps the sky.
+        if (this.isRelationshipChart() || this.isSynastryChart()) {
             if (bl) {
-                this.compositeTransitTime = "Real Time".equals(this.stepAmount)
-                    ? ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId))
-                    : this.stepped(this.compositeTransitTime, n);
+                this.skyChartTime = "Real Time".equals(this.stepAmount)
+                    ? ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId))
+                    : this.stepped(this.skyChartTime, n);
             }
             return;
         }
@@ -5683,7 +5761,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.baseChartTime = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
             }
             if (bl) {
-                this.transitChartTime = ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId));
+                this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
             }
             return;
         }
@@ -5693,7 +5771,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     this.baseChartTime = this.baseChartTime.plusMinutes(n);
                 }
                 if (!bl) break;
-                this.transitChartTime = this.transitChartTime.plusMinutes(n);
+                this.skyChartTime = this.skyChartTime.plusMinutes(n);
                 break;
             }
             case "1 Hour": {
@@ -5701,7 +5779,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     this.baseChartTime = this.baseChartTime.plusHours(n);
                 }
                 if (!bl) break;
-                this.transitChartTime = this.transitChartTime.plusHours(n);
+                this.skyChartTime = this.skyChartTime.plusHours(n);
                 break;
             }
             case "1 Day": {
@@ -5709,7 +5787,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     this.baseChartTime = this.baseChartTime.plusDays(n);
                 }
                 if (!bl) break;
-                this.transitChartTime = this.transitChartTime.plusDays(n);
+                this.skyChartTime = this.skyChartTime.plusDays(n);
                 break;
             }
             case "1 Week": {
@@ -5717,7 +5795,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     this.baseChartTime = this.baseChartTime.plusWeeks(n);
                 }
                 if (!bl) break;
-                this.transitChartTime = this.transitChartTime.plusWeeks(n);
+                this.skyChartTime = this.skyChartTime.plusWeeks(n);
                 break;
             }
             case "1 Month": {
@@ -5725,7 +5803,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     this.baseChartTime = this.baseChartTime.plusMonths(n);
                 }
                 if (!bl) break;
-                this.transitChartTime = this.transitChartTime.plusMonths(n);
+                this.skyChartTime = this.skyChartTime.plusMonths(n);
                 break;
             }
             case "1 Year": {
@@ -5733,7 +5811,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     this.baseChartTime = this.baseChartTime.plusYears(n);
                 }
                 if (!bl) break;
-                this.transitChartTime = this.transitChartTime.plusYears(n);
+                this.skyChartTime = this.skyChartTime.plusYears(n);
             }
         }
     }
@@ -5776,10 +5854,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.sw == null) {
             return;
         }
-        if (this.compositeTransitTime == null) {
-            this.compositeTransitTime = ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId));
+        if (this.skyChartTime == null) {
+            this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
         }
-        this.compositeTransitSd = this.createSweDate(this.compositeTransitTime);
+        this.skySd = this.createSweDate(this.skyChartTime);
 
         // <b>In a composite mode the INNER wheel is the composite itself.</b> Everything below
         // reads the base arrays, so the composite is loaded into them rather than special-cased
@@ -5800,7 +5878,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.sw.swe_houses(this.baseSd.getJulDay(), 2, this.baseLatitude, this.baseLongitude, this.houseSystem, this.baseCusps, dArray);
             this.baseAscendant = dArray[0];
         }
-        SweDate outerSd = relationship ? this.compositeTransitSd : this.transitSd;
+        // <b>The outer wheel is a second person only in a synastry.</b> Everywhere else it
+        // is the sky, and it was reading the Chart B fields to find out when the sky was -
+        // which is why pressing Sky after setting up a partner drew that partner's birth
+        // chart where this moment should have been, and pressing Partner after looking at the
+        // sky drew this moment where the partner should have been. One pair of fields, two
+        // meanings, and the chips switched the meaning without switching the value.
+        SweDate outerSd = this.isSynastryChart() ? this.transitSd : this.skySd;
+        // The place follows the moment: Chart B's birthplace for Chart B, the sky's own
+        // location for the sky.
+        double outerLat = this.isSynastryChart() ? this.transitLatitude : this.skyLatitude;
+        double outerLon = this.isSynastryChart() ? this.transitLongitude : this.skyLongitude;
         // A day of ephemeris for a year of life. Everything downstream - houses, bodies, the
         // ring, the aspect lines - is unchanged; only the moment it is asked about moves.
         boolean progressedRing = this.showProgressed() && !relationship
@@ -5811,7 +5899,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         if (this.showTransitChart && outerSd != null && !progressedRing) {
             double[] dArray2 = new double[10];
-            this.sw.swe_houses(outerSd.getJulDay(), 2, this.transitLatitude, this.transitLongitude, this.houseSystem, this.transitCusps, dArray2);
+            this.sw.swe_houses(outerSd.getJulDay(), 2, outerLat, outerLon, this.houseSystem, this.transitCusps, dArray2);
             this.transitAscendant = dArray2[0];
         } else {
             System.arraycopy(this.baseCusps, 0, this.transitCusps, 0, this.transitCusps.length);
@@ -5826,16 +5914,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             Arrays.fill(this.tValid, false);
             Arrays.fill(this.tOk, false);
         }
-        // Tri-wheel: the sky at compositeTransitTime wrapped around the synastry pair.
-        // compositeTransitTime defaults to now and is driven by the same Now/Play controls,
+        // Tri-wheel: the sky at skyChartTime wrapped around the synastry pair.
+        // skyChartTime defaults to now and is driven by the same Now/Play controls,
         // so the animation sweeps the sky without touching either person's birth data.
-        if (this.showTriWheel && this.compositeTransitSd != null) {
+        if (this.showTriWheel && this.skySd != null) {
             double[] triAux = new double[10];
-            this.sw.swe_houses(this.compositeTransitSd.getJulDay(), 2,
-                this.transitLatitude, this.transitLongitude, this.houseSystem,
+            this.sw.swe_houses(this.skySd.getJulDay(), 2,
+                this.skyLatitude, this.skyLongitude, this.houseSystem,
                 this.triCusps, triAux);
             this.triAscendant = triAux[0];
-            this.computeBodies(this.compositeTransitSd, this.triCusps,
+            this.computeBodies(this.skySd, this.triCusps,
                 this.cLon, this.cSpeed, this.cOk, this.cValid);
         } else {
             Arrays.fill(this.cValid, false);
@@ -6210,7 +6298,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         if (wantTransits && this.showTriWheel) {
             stringBuilder.append("<br><h2 style='color:#a0d2ff; margin-bottom: 2px;'>Sky (Transiting)</h2>");
-            String stringSkyTime = this.compositeTransitTime != null ? this.compositeTransitTime.format(dateTimeFormatter) : "";
+            String stringSkyTime = this.skyChartTime != null ? this.skyChartTime.format(dateTimeFormatter) : "";
             String stringSkyLoc = String.format("%.2f, %.2f", this.transitLatitude, this.transitLongitude);
             stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(stringSkyTime).append("<br>").append(stringSkyLoc).append("</div>");
             stringBuilder.append("<h3 style='color:#a0d2ff;'>Placements</h3>");

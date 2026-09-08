@@ -920,7 +920,7 @@ public final class AspectGridCheck {
             setField(sky, "cachedFrame", null);
             setField(sky, "baseChartTime", utc(base));
             setField(sky, "transitChartTime", utc(tr));
-            setField(sky, "compositeTransitTime",
+            setField(sky, "skyChartTime",
                 java.time.ZonedDateTime.of(2026, 8, 24, 20, 0, 0, 0, java.time.ZoneOffset.UTC));
             setField(sky, "baseLatitude", base[4]);
             setField(sky, "baseLongitude", base[5]);
