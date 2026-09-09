@@ -128,6 +128,22 @@ public final class ChartSubject {
         return this.at(ZonedDateTime.now(ZoneId.of(this.zoneId)));
     }
 
+    /**
+     * One short line naming this chart, for a control that has to say what it will draw.
+     *
+     * <b>Not toString.</b> That one is for a log and prints the coordinates; this is for a
+     * tooltip and prints what a reader would recognise - the date they typed and the place
+     * they named. A subject nobody has entered says so rather than showing a default.
+     */
+    public String summary() {
+        if (this.moment == null) {
+            return "not entered";
+        }
+        String when = this.moment.format(
+            java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm"));
+        return this.placeName.isEmpty() ? when : when + "  \u00b7  " + this.placeName;
+    }
+
     @Override
     public String toString() {
         return this.label + (this.moment == null ? " (not entered)"

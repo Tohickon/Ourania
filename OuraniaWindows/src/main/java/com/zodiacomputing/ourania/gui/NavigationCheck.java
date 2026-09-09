@@ -990,6 +990,33 @@ public final class NavigationCheck {
             formHasB.setAccessible(true);
             ok("the Chart A chip is available exactly when a Chart A is",
                 chipAvailable(bar, "Chart A") == formA);
+
+            // <b>And each chip names the chart it would draw.</b> They described what pressing
+            // them did and never which chart it was, so the only way to learn what sat on a
+            // wheel was to open the setup screen - in an app whose defining bug was a
+            // confusion about exactly that. The summary is the subject's own, so a tooltip
+            // that drifts from the wheel fails here.
+            SwingUtilities.invokeAndWait(() -> w[0].drawSavedChart());
+            awaitChart(sky, false);
+            for (Object[] pair : new Object[][] {
+                    {"Chart A", sky.chartASubject()},
+                    {"Chart B", sky.chartBSubject()},
+                    {"Sky", sky.skySubject()}}) {
+                String name = (String) pair[0];
+                com.zodiacomputing.ourania.astro.ChartSubject subject =
+                    (com.zodiacomputing.ourania.astro.ChartSubject) pair[1];
+                String tip = chipTip(bar, name);
+                ok(name + "'s chip has hover text", tip != null && !tip.isEmpty());
+                String plain = tip == null ? "" : tip.replaceAll("<[^>]*>", " ");
+                ok(name + "'s chip names itself", plain.contains(name));
+                if (subject.entered()) {
+                    ok(name + "'s chip names the chart it would draw: " + subject.summary(),
+                        plain.contains(subject.summary()));
+                } else {
+                    ok(name + "'s chip says there is no chart yet",
+                        plain.contains("not entered"));
+                }
+            }
             ok("the Chart B chip is available exactly when a Chart B is",
                 chipAvailable(bar, "Chart B") == (Boolean) formHasB.invoke(setup));
         } finally {
@@ -1007,6 +1034,16 @@ public final class NavigationCheck {
             }
         }
         return out;
+    }
+
+    /** One chip's hover text, or null. */
+    private static String chipTip(RingBar bar, String label) throws Exception {
+        for (java.awt.Component c : bar.getComponents()) {
+            if (label.equals(labelOf(c))) {
+                return ((javax.swing.JComponent) c).getToolTipText();
+            }
+        }
+        return null;
     }
 
     private static boolean chipAvailable(RingBar bar, String label) throws Exception {

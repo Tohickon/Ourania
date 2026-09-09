@@ -528,9 +528,9 @@ extends JPanel {
                 try {
                     Geocoder.Result r = get();
                     if (r != null) {
-                        SkymapPanel.this.skyLatitude = r.lat;
-                        SkymapPanel.this.skyLongitude = r.lon;
-                        SkymapPanel.this.skyTimeZoneId = r.tzId;
+                        SkymapPanel.this.installSubjects(SkymapPanel.this.subjectA,
+                            SkymapPanel.this.subjectB,
+                            SkymapPanel.this.subjectSky.movedTo(r.name, r.lat, r.lon, r.tzId));
                     }
                 } catch (Exception ignored) {
                     // An unreachable geocoder leaves the sky where it was, which is better
@@ -560,7 +560,9 @@ extends JPanel {
             return;
         }
         try {
-            this.skyTimeZoneId = ZoneId.of(zoneOverride).getId();
+            this.installSubjects(this.subjectA, this.subjectB,
+                this.subjectSky.movedTo(this.subjectSky.placeName, this.skyLatitude,
+                    this.skyLongitude, ZoneId.of(zoneOverride).getId()));
         } catch (Exception bad) {
             System.out.println("Ignoring unknown sky time zone \"" + zoneOverride + "\"");
         }
@@ -568,18 +570,26 @@ extends JPanel {
 
     /** The sky's moment, or now in the sky's own zone when the fields are blank. */
     private void setSkyMoment(String date, String time) {
+        // <b>Through the subject, not past it.</b> This wrote skyChartTime directly and left
+        // subjectSky empty, so the two disagreed about what the sky was - the field said this
+        // evening and the record said "not entered", and the chip that reads the record could
+        // not name the chart it draws. A loose field written beside its own record is the
+        // divergence ChartSubject exists to prevent, arriving by the back door.
+        ZonedDateTime when;
         try {
-            if (!date.isEmpty() && !time.isEmpty()) {
-                this.skyChartTime = ZonedDateTime.of(
-                    java.time.LocalDate.parse(date),
-                    java.time.LocalTime.parse(time),
-                    ZoneId.of(this.skyTimeZoneId));
-                return;
-            }
-        } catch (Exception ignored) {
-            // A half-typed date is not a moment; fall through to now.
+            when = date.isEmpty() || time.isEmpty() ? null : ZonedDateTime.of(
+                java.time.LocalDate.parse(date),
+                java.time.LocalTime.parse(time),
+                ZoneId.of(this.skyTimeZoneId));
+        } catch (Exception notAMoment) {
+            when = null;                    // a half-typed date is not a moment
         }
-        this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+        if (when == null) {
+            when = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+        }
+        this.installSubjects(this.subjectA, this.subjectB,
+            this.subjectSky.movedTo(this.subjectSky.placeName, this.skyLatitude,
+                this.skyLongitude, this.skyTimeZoneId).at(when));
     }
 
     // ---------------------------------------------------------------- the three subjects
@@ -2873,6 +2883,11 @@ extends JPanel {
                 SkymapPanel.this.updateChartData();
                 SkymapPanel.this.chartPanel.repaint();
                 SkymapPanel.this.isPlaying = bl2;
+                // The chips name the charts they would draw, so they have to be told when the
+                // charts change. Without this they kept the text their constructor gave them.
+                if (SkymapPanel.this.window != null && SkymapPanel.this.ringBar != null) {
+                    SkymapPanel.this.window.syncRingBar(SkymapPanel.this.ringBar);
+                }
             }
         };
         swingWorker.execute();

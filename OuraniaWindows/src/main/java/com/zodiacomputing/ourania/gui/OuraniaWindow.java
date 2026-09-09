@@ -252,9 +252,13 @@ public class OuraniaWindow extends JFrame {
         if (bar == null) {
             return;
         }
-        if (chartSetupPanel != null) {
+        // <b>The subjects the wheel is actually holding, not the text in the form.</b> A chip
+        // says what it will draw, so it has to read what is drawn - a form can hold a half-typed
+        // Chart B that no wheel has ever seen.
+        if (chartSetupPanel != null && skymapPanel != null) {
             bar.syncFrom(chartSetupPanel.currentMode(), chartSetupPanel.skyWanted(),
-                chartSetupPanel.hasPartnerData(), chartSetupPanel.hasChartA());
+                skymapPanel.chartASubject(), skymapPanel.chartBSubject(),
+                skymapPanel.skySubject());
         }
         if (skymapPanel != null) {
             bar.syncView(skymapPanel.isGlobeMode());

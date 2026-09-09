@@ -131,6 +131,17 @@ public final class RingBar extends JPanel {
         add(c);
     }
 
+    /**
+     * A place name is whatever the reader typed, and these tooltips are HTML.
+     *
+     * A location with an ampersand in it would otherwise end the tooltip early - the sort of
+     * thing that shows up once, in somebody else's chart, and looks like a rendering fault.
+     */
+    private static String escape(String s) {
+        return s == null ? "" : s.replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;");
+    }
+
     /** A chip that folds one drawn layer. Its state lives on the panel, not here. */
     private Chip layerChip(String label, SkymapPanel.Layer layer) {
         Chip c = new Chip(label, null);
@@ -157,8 +168,12 @@ public final class RingBar extends JPanel {
     }
 
     /** Reflects what is actually drawn, so the chips cannot drift from the wheel. */
-    public void syncFrom(ChartMode mode, boolean transits, boolean hasPartnerData,
-            boolean hasChartA) {
+    public void syncFrom(ChartMode mode, boolean transits,
+            com.zodiacomputing.ourania.astro.ChartSubject subjectA,
+            com.zodiacomputing.ourania.astro.ChartSubject subjectB,
+            com.zodiacomputing.ourania.astro.ChartSubject subjectSky) {
+        boolean hasChartA = subjectA != null && subjectA.entered();
+        boolean hasPartnerData = subjectB != null && subjectB.entered();
         this.partnerOpen = mode == ChartMode.SYNASTRY;
         this.skyOpen = mode == ChartMode.TRANSIT
             || (transits && (mode == ChartMode.SYNASTRY
@@ -170,13 +185,28 @@ public final class RingBar extends JPanel {
         // work, Chart b should be chart b same principle." A control that looks pressable and
         // changes nothing is the Step-dropdown defect this project keeps logging.
         chartA.available = hasChartA;
+        // <b>Each chip names the chart it would draw.</b> They described what pressing them
+        // did and never which chart it was, so the only way to find out what was on a wheel
+        // was to open the setup screen - and it was exactly a confusion about which chart sat
+        // on which wheel that sent us here. A control that draws a chart should say which.
         chartA.setToolTipText(hasChartA
-            ? "<html><b>Fold Chart A's wheel away.</b><br>"
-                + "The chart is still cast from it - this hides its glyphs, so Chart B or the "
-                + "sky can be read on its own for a moment.</html>"
-            : "<html><b>There is no Chart A yet.</b><br>"
+            ? "<html><b>Chart A</b> &middot; " + escape(subjectA.summary()) + "<br>"
+                + "Press to fold this wheel away and back. The chart is still cast from it - "
+                + "this only hides its glyphs.</html>"
+            : "<html><b>Chart A</b> &middot; not entered<br>"
                 + "Enter a birth date, time and place on the Chart Setup screen and press "
                 + "Generate. Until then the wheel shows the sky.</html>");
+        partner.setToolTipText(hasPartnerData
+            ? "<html><b>Chart B</b> &middot; " + escape(subjectB.summary()) + "<br>"
+                + "Press to bloom them around Chart A - a synastry, and the aspects between "
+                + "the two charts are what it is read for.</html>"
+            : "<html><b>Chart B</b> &middot; not entered<br>"
+                + "Fill in Chart B on the Chart Setup screen to draw a synastry.</html>");
+        sky.setToolTipText("<html><b>Sky</b> &middot; "
+            + escape(subjectSky == null ? "not set" : subjectSky.summary()) + "<br>"
+            + "Press to wrap the sky around what is drawn - transits over Chart A, or a third "
+            + "ring above Chart A and Chart B at once.<br>"
+            + "<i>Its own row on the setup screen; it borrows nobody's birth data.</i></html>");
         // A composite is one derived wheel rather than two people side by side, so the
         // partner ring is not a thing that can be opened or folded there.
         boolean composite = mode == ChartMode.COMPOSITE_MIDPOINT
