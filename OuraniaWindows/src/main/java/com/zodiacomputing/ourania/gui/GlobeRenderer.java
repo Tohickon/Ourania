@@ -138,18 +138,20 @@ final class GlobeRenderer {
             r.houseMeridians(panel.activeCusps);
             r.houseNumbers(panel.activeCusps);
         }
+        // The three charts as ribbons, each lying in its own plane. Painted before the
+        // chords and the bodies so they read as the ground those sit on.
         if (panel.outerRingDrawn()) {
-            r.ringCircle(partnerR, new Color(190, 165, 110, 90), Globe.INCLINE_PARTNER);
+            r.ribbon(partnerR, shade(chartInk(1), 54), Globe.INCLINE_PARTNER);
         }
         if (panel.triRingDrawn()) {
-            r.ringCircle(skyR, new Color(120, 170, 215, 90), Globe.INCLINE_SKY);
+            r.ribbon(skyR, shade(chartInk(2), 54), Globe.INCLINE_SKY);
         }
 
         if (r.shown(SkymapPanel.Layer.ASPECTS)) {
             r.aspectChords(panel, shells);
         }
         if (r.shown(SkymapPanel.Layer.NATAL)) {
-            r.ringCircle(natalR, new Color(120, 132, 150, 90), 0.0);
+            r.ribbon(natalR, r.faded(shade(chartInk(0), 54), SkymapPanel.Layer.NATAL), 0.0);
             r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
                 false, 0);
         }
@@ -269,6 +271,67 @@ final class GlobeRenderer {
      */
     private void ringCircle(double radius, Color ink, double inclination) {
         polyline(Globe.equator(this.origin, radius, 96, inclination), ink, 1.4f);
+    }
+
+    /** How far a chart's ribbon reaches either side of the circle its bodies sit on. */
+    private static final double RIBBON_HALF = 0.085;
+
+    /**
+     * One chart's ring as a ribbon: a flat band lying in that chart's own plane.
+     *
+     * <b>A line does not say which way a plane faces.</b> The three charts were three thin
+     * circles, and two of them are tilted - partner one way, sky the other - so the only cue
+     * to which plane a body belonged to was how its circle happened to cross the others at
+     * that camera angle. Turn the globe and the cue changes. David: "it will be easier to
+     * distinguish the differing planes of each chart to make them more readable."
+     *
+     * A band has an inside and an outside and it foreshortens as it turns away, which is what
+     * makes a plane read as a plane. Drawn flat at y=0 in the ring's inclined frame rather
+     * than wrapped on the sphere, because a chart is a circle of longitude and nothing else -
+     * the same reason the sign ring and the mansion band are flat.
+     *
+     * It sits under the bodies rather than through them: a stacked body rides up its shell in
+     * y, so it stands off its own ribbon, which is the separation that makes a crowd legible.
+     */
+    private void ribbon(double radius, Color fill, double inclination) {
+        final int steps = 96;
+        double inner = radius - RIBBON_HALF;
+        double outer = radius + RIBBON_HALF;
+        for (int i = 0; i < steps; i++) {
+            double la = (i * 360.0) / steps;
+            double lb = ((i + 1) * 360.0) / steps;
+            quad(Globe.onShell(la, this.origin, inner, 0.0, inclination),
+                Globe.onShell(lb, this.origin, inner, 0.0, inclination),
+                Globe.onShell(lb, this.origin, outer, 0.0, inclination),
+                Globe.onShell(la, this.origin, outer, 0.0, inclination),
+                fill);
+        }
+        // Both edges, so the band has a boundary rather than fading into the wash.
+        Color edge = shade(fill, Math.min(255, fill.getAlpha() * 3));
+        polyline(Globe.equator(this.origin, inner, steps, inclination), edge, 1.0f);
+        polyline(Globe.equator(this.origin, outer, steps, inclination), edge, 1.0f);
+    }
+
+    /**
+     * The colour each chart's ribbon is drawn in - Chart A gold, Chart B blue, the sky silver.
+     *
+     * <b>One statement for the three ribbons.</b> David named these three, and they live in
+     * one place so that renaming them is one edit rather than three.
+     *
+     * The glyphs are deliberately not on this palette: their colour comes from AngleRole and
+     * encodes a different fact - whether a point is an anchor, a second person or a passing
+     * sky - which stays true whatever a ribbon is tinted. Two palettes for two questions is
+     * not the duplication this project keeps finding; it would only become that if one were
+     * made to stand in for the other.
+     */
+    static Color chartInk(int ring) {
+        if (ring == 1) {
+            return new Color(120, 170, 225);        // Chart B, blue
+        }
+        if (ring == 2) {
+            return new Color(198, 206, 216);        // the sky, silver
+        }
+        return new Color(226, 196, 96);             // Chart A, gold
     }
 
     /**
