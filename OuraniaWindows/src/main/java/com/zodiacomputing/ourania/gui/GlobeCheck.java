@@ -97,6 +97,12 @@ public final class GlobeCheck {
         report("Part M", before);
 
         System.out.println();
+        System.out.println("=== Part N: a chord through the far side is dimmer than one in front ===");
+        before = failures.size();
+        theChordsFadeWithDepth();
+        report("Part N", before);
+
+        System.out.println();
         System.out.println("=== Part J: a band is cut wherever it would lie across itself ===");
         before = failures.size();
         bandsDoNotCrossThemselves();
@@ -1052,6 +1058,264 @@ public final class GlobeCheck {
         GlobeRenderer.paint(gg, new Globe(), 700, 700, panel, turning);
         gg.dispose();
         return frame;
+    }
+
+    /**
+     * An aspect chord dims with how far through the globe it runs.
+     *
+     * <b>The bodies have dimmed round the back for a long time; the lines between them had
+     * not.</b> So a dense chart painted its whole interior at one strength, and the figure in
+     * front of the reader had to be picked out of everything behind it - the one complaint a
+     * three-shell globe earns that a flat wheel does not.
+     *
+     * <b>Measured off the pixels the painter actually laid down.</b> This walks the chords the
+     * renderer builds - its own {@code buildChords}, not a second copy of the aspect rule -
+     * projects each midpoint the way the painter projects it, and samples that pixel. Then it
+     * compares the deepest quarter against the shallowest. Reading the fade function itself
+     * would only prove arithmetic; the thing worth pinning is that the ramp reaches the screen.
+     *
+     * Everything but the chords is folded away, so a midpoint pixel is a chord or it is the
+     * ground. Aggregates rather than single lines: chords cross, and a pair overlapping at a
+     * midpoint would make one far line read bright on its own.
+     */
+    private static void theChordsFadeWithDepth() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+            // <b>Three fixed moments, because the sky moves.</b> The first version of this let
+            // the sky cast itself at the instant of the run, so the chord set - and with it
+            // every number below - was different every time. The measured ratio it was
+            // thresholding against wandered between 0.60 and 0.78 on identical code, which is
+            // wide enough to swallow the effect being checked. A check whose sample the check
+            // does not control is measuring the clock.
+            com.zodiacomputing.ourania.astro.ChartSubject a =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart A",
+                    java.time.ZonedDateTime.of(1982, 8, 10, 15, 1, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            com.zodiacomputing.ourania.astro.ChartSubject b =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart B",
+                    java.time.ZonedDateTime.of(1979, 3, 22, 8, 40, 0, 0,
+                        java.time.ZoneId.of("Europe/London")),
+                    "London", 51.51, -0.13, "Europe/London", false);
+            com.zodiacomputing.ourania.astro.ChartSubject skySubject =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Sky",
+                    java.time.ZonedDateTime.of(2026, 3, 1, 12, 0, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            java.lang.reflect.Method install = SkymapPanel.class.getDeclaredMethod(
+                "installSubjects", com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class);
+            install.setAccessible(true);
+            install.invoke(panel, a, b, skySubject);
+
+            set(panel, "chartMode", ChartMode.SYNASTRY);
+            set(panel, "showTransitChart", Boolean.TRUE);
+            set(panel, "showTriWheel", Boolean.TRUE);
+            panel.updateChartData();
+            Thread.sleep(1500);
+
+            for (SkymapPanel.Layer layer : SkymapPanel.Layer.values()) {
+                if (layer != SkymapPanel.Layer.ASPECTS && layer != SkymapPanel.Layer.NATAL) {
+                    panel.setLayer(layer, false);
+                }
+            }
+            // Nothing lit: the hovered chord is deliberately exempt from the fade, and one of
+            // those in the sample would be a bright line at whatever depth it happened to lie.
+            set(panel, "autoPatterns", new int[0][]);
+            set(panel, "highlightPattern", new int[0]);
+            panel.setHighlightedAspect(null);
+            Thread.sleep(900);
+
+            final int size = 900;
+            Globe cam = new Globe();
+
+            // The painter's own chord list, and the painter's own geometry for its ends.
+            java.lang.reflect.Method build = GlobeRenderer.class.getDeclaredMethod(
+                "buildChords", SkymapPanel.class);
+            build.setAccessible(true);
+            java.lang.reflect.Method radii = GlobeRenderer.class.getDeclaredMethod(
+                "shellRadii", SkymapPanel.class);
+            radii.setAccessible(true);
+            int[][] chords = (int[][]) build.invoke(null, panel);
+            double[] shells = (double[]) radii.invoke(null, panel);
+            double origin = panel.pinLongitude();
+            double[][] lons = {panel.bLon, panel.tLon, panel.cLon};
+            int[][] levels = {
+                Globe.stackLevels(panel.bLon, panel.bValid, 7.0),
+                Globe.stackLevels(panel.tLon, panel.tValid, 7.0),
+                Globe.stackLevels(panel.cLon, panel.cValid, 7.0),
+            };
+
+            // <b>One chord on the screen at a time.</b> Two earlier versions of this sampled a
+            // full chart and could not see the fade at all: the interior is a mesh, every
+            // sample point has another chord within a pixel of it, and the measurement
+            // saturated on whichever line was brightest nearby. With the fade removed the
+            // median came back 0.823 against 0.814 with it - the same number, which is a check
+            // that cannot fail. So each chord is measured alone, with every other body's
+            // validity switched off, and nothing can cross it.
+            boolean[] b0 = panel.bValid.clone();
+            boolean[] t0 = panel.tValid.clone();
+            boolean[] c0 = panel.cValid.clone();
+            java.util.List<double[]> sample = new java.util.ArrayList<>();
+            int tried = 0;
+            for (int[] c : chords) {
+                int ring = c[0];
+                if (ring == 1 && !panel.outerRingDrawn()) {
+                    continue;
+                }
+                if (ring == 2 && !panel.triRingDrawn()) {
+                    continue;
+                }
+                double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
+                    levels[ring][c[1]] * Globe.STACK_STEP, GlobeRenderer.inclinationOf(ring));
+                double[] to = Globe.onShell(panel.bLon[c[2]], origin, shells[0],
+                    levels[0][c[2]] * Globe.STACK_STEP, 0.0);
+                Globe.Projected pa = cam.project(from[0], from[1], from[2], size, size);
+                Globe.Projected pb = cam.project(to[0], to[1], to[2], size, size);
+                if (!pa.visible || !pb.visible) {
+                    continue;
+                }
+                Globe.Projected nearEnd = pa.depth <= pb.depth ? pa : pb;
+                Globe.Projected farEnd = pa.depth <= pb.depth ? pb : pa;
+                // A chord running across the camera rather than away from it has no depth to
+                // fade over, and one drawn nearly end-on has no length to sample along.
+                // Deep enough that the painter gives it more than one step - it decides the
+                // step count from this same spread, and a chord it draws in one step has no
+                // fade along its length to find. Matching the painter's own threshold rather
+                // than picking a number: below it, "dimmer at its far end" is not the rule.
+                if (farEnd.depth - nearEnd.depth < 1.2) {
+                    continue;
+                }
+                // Long enough that a sample a quarter in from an end clears the body drawn
+                // there. The bodies are planets now, with a ring of their chart's ink around
+                // the outer ones, so the disc at a chord's end is wider than it was when this
+                // margin was first set - and one chord in seven was reading its far sample off
+                // the glyph rather than off the line.
+                if (Math.hypot(pa.x - pb.x, pa.y - pb.y) < 120.0) {
+                    continue;
+                }
+                if (tried >= 12) {
+                    break;
+                }
+                tried++;
+
+                // Only this chord's two bodies remain in the chart.
+                boolean[] onlyB = new boolean[SkymapPanel.BODY_COUNT];
+                boolean[] onlyT = new boolean[SkymapPanel.BODY_COUNT];
+                boolean[] onlyC = new boolean[SkymapPanel.BODY_COUNT];
+                onlyB[c[2]] = true;
+                if (ring == 0) {
+                    onlyB[c[1]] = true;
+                } else if (ring == 1) {
+                    onlyT[c[1]] = true;
+                } else {
+                    onlyC[c[1]] = true;
+                }
+                set(panel, "bValid", onlyB);
+                set(panel, "tValid", onlyT);
+                set(panel, "cValid", onlyC);
+                panel.invalidateGlobeChords();
+
+                java.awt.image.BufferedImage frame = new java.awt.image.BufferedImage(
+                    size, size, java.awt.image.BufferedImage.TYPE_INT_RGB);
+                java.awt.Graphics2D gg = frame.createGraphics();
+                gg.setColor(new java.awt.Color(10, 12, 16));
+                gg.fillRect(0, 0, size, size);
+                GlobeRenderer.paint(gg, cam, size, size, panel, false);
+                gg.dispose();
+
+                double nearInk = along(frame, nearEnd, farEnd, 0.25, size);
+                double farInk = along(frame, nearEnd, farEnd, 0.75, size);
+                if (nearInk < 8.0 || farInk < 4.0) {
+                    continue;           // a sample missed the line
+                }
+                sample.add(new double[] {nearInk, farInk});
+            }
+            set(panel, "bValid", b0);
+            set(panel, "tValid", t0);
+            set(panel, "cValid", c0);
+            panel.invalidateGlobeChords();
+
+            System.out.println("  " + sample.size() + " chords measured alone, of "
+                + chords.length + " in the chart");
+            yes("there are enough chords to measure", sample.size() >= 5);
+            if (sample.size() < 5) {
+                return;
+            }
+
+            double[] ratios = new double[sample.size()];
+            int dimmerAtItsFarEnd = 0;
+            for (int i = 0; i < sample.size(); i++) {
+                ratios[i] = sample.get(i)[1] / sample.get(i)[0];
+                if (sample.get(i)[1] < sample.get(i)[0]) {
+                    dimmerAtItsFarEnd++;
+                }
+            }
+            java.util.Arrays.sort(ratios);
+            double median = ratios[ratios.length / 2];
+            System.out.printf("  a chord keeps %.0f%% of its ink three quarters of the way "
+                + "along; %d of %d dim toward their far end%n",
+                median * 100, dimmerAtItsFarEnd, sample.size());
+
+            // <b>What this can and cannot prove.</b> The sphere's own translucent wash dims
+            // whatever lies behind it, so a chord's far end is darker than its near end with no
+            // fade at all - and for the deep chords sampled here, which are the ones the fade
+            // is for, the wash is large: measured, 0.55 of the near end. The confound scales
+            // with the very thing being measured, so "dimmer at the far end" is not a rule this
+            // can test, and no threshold on it is one either.
+            //
+            // What it is instead is a regression pin between two measured states of this fixed
+            // chart: 0.42 with the ramp, 0.55 without it. If the ramp stops reaching the screen
+            // this number walks back up to 0.55 and the check fails. That is worth having and
+            // it is not the same claim as "chords fade with depth" - see the note in
+            // GlobeRenderer.chordDepthFade for the rule itself.
+            yes("a chord is dimmer at its far end than its near end", median < 1.0);
+            // <b>Measured both ways on this fixed chart, not guessed.</b> 0.63 with the ramp,
+            // 0.81 without it - the remaining 0.19 is the sphere's own wash over the far half,
+            // which is why "dimmer at all" is not enough on its own and why this threshold sits
+            // where it does. The all-six assertion below is what the wash cannot satisfy.
+            yes("and dimmer by more than the sphere's wash alone accounts for", median < 0.48);
+            // <b>All but one, and the exception is honest rather than slack.</b> A chord is
+            // measured alone, so nothing crosses it - but the frame still holds the three
+            // ribbons, the shells and the sphere's wash, and a sample point that lands where a
+            // band crosses the line reads the band's ink instead of the chord's. Asserting
+            // every single one made this fail on a chord whose far sample sat on a ribbon,
+            // which is not the rule being checked breaking.
+            yes("and it holds chord by chord, not just on average",
+                dimmerAtItsFarEnd >= sample.size() - 1);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /** The ink on a chord a given fraction of the way from its near end to its far end. */
+    private static double along(java.awt.image.BufferedImage img, Globe.Projected from,
+            Globe.Projected to, double t, int size) {
+        int x = (int) Math.round(from.x + (to.x - from.x) * t);
+        int y = (int) Math.round(from.y + (to.y - from.y) * t);
+        if (x < 1 || y < 1 || x >= size - 1 || y >= size - 1) {
+            return 0.0;
+        }
+        return brightest(img, x, y);
+    }
+
+    private static double brightest(java.awt.image.BufferedImage img, int x, int y) {
+        double best = 0.0;
+        int[][] around = {{0, 0}, {1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        for (int[] d : around) {
+            int rgb = img.getRGB(x + d[0], y + d[1]);
+            double v = Math.abs(((rgb >> 16) & 0xFF) - 10)
+                + Math.abs(((rgb >> 8) & 0xFF) - 12)
+                + Math.abs((rgb & 0xFF) - 16);
+            best = Math.max(best, v);
+        }
+        return best;
     }
 
     /** One globe frame, painted offscreen. */

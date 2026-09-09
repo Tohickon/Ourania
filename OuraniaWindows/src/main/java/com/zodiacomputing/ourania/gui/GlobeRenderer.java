@@ -95,6 +95,7 @@ final class GlobeRenderer {
                       boolean turning) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         GlobeRenderer r = new GlobeRenderer(g, cam, w, h, panel.pinLongitude(), panel);
+        r.turning = turning;
 
         double[] shells = shellRadii(panel);
         double natalR = shells[0];
@@ -241,7 +242,7 @@ final class GlobeRenderer {
                 double d = Math.hypot(q.x - px, q.y - py);
                 if (d < bestDist) {
                     bestDist = d;
-                    best = ring == 0 ? i : (i | SkymapPanel.TRANSIT_BIT);
+                    best = SkymapPanel.packHit(i, ring);
                 }
             }
         }
@@ -1162,11 +1163,11 @@ final class GlobeRenderer {
             boolean lit = panel.lightsChord(c[1], c[2], ring);
             Color ink = new Color(c[3], true);
             if (lit) {
-                segment(from, to, faded(new Color(255, 255, 255, 110),
-                    SkymapPanel.Layer.ASPECTS), 4.0f);
+                chord(from, to, faded(new Color(255, 255, 255, 110),
+                    SkymapPanel.Layer.ASPECTS), 4.0f, false);
                 ink = new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 255);
             }
-            segment(from, to, faded(ink, SkymapPanel.Layer.ASPECTS), lit ? 2.4f : 1.0f);
+            chord(from, to, faded(ink, SkymapPanel.Layer.ASPECTS), lit ? 2.4f : 1.0f, !lit);
         }
     }
 
@@ -1523,6 +1524,112 @@ final class GlobeRenderer {
 
     private static Font font(int points) {
         return FONTS.computeIfAbsent(points, p -> new Font("SansSerif", 0, p));
+    }
+
+    /**
+     * How much of its colour a chord keeps at a given depth.
+     *
+     * <b>A chord through the far side was as bright as one across the front.</b> The bodies
+     * have dimmed round the back since they were drawn - a reader turning the globe should see
+     * what is coming round, not have it appear - but the lines between them never got the same
+     * treatment, so a dense chart painted its whole interior at one strength and the figure in
+     * front of the reader had to be picked out of everything behind it.
+     *
+     * The ramp is smooth rather than the bodies' hard step. A body is at one depth and reads as
+     * near or far; a chord spans depth, and stepping it at the centre would make lines flicker
+     * between two strengths as the globe turns through the moment their midpoint crosses over.
+     *
+     * @param depth distance from the camera - {@code cam.distance} is the globe's own centre
+     * @return 1.0 in front, falling to {@link #CHORD_BEHIND} at the back of the sphere
+     */
+    private double chordDepthFade(double depth) {
+        // <b>Across the whole sphere, not just the half behind its centre.</b> The first
+        // version ramped from cam.distance - the centre - which measured as very nearly a
+        // no-op: a chord's depth is the mean of its two ends, and a chord with one end in
+        // front and one behind averages back to the centre and came out at full strength.
+        // Only chords with both ends well round the back faded at all, which is a small
+        // minority, and the picture barely changed. Front of the sphere to back of it is the
+        // range a chord actually varies over, so that is the range the ramp covers.
+        double front = this.cam.distance - Globe.SHELL_SKY;
+        double t = (depth - front) / (2.0 * Globe.SHELL_SKY);
+        t = Math.max(0.0, Math.min(1.0, t));
+        return 1.0 - (1.0 - CHORD_BEHIND) * t;
+    }
+
+    /** What a chord at the very back of the sphere keeps of its colour. */
+    private static final double CHORD_BEHIND = 0.28;
+
+    /** How many solid steps stand in for a gradient along a chord, when not turning. */
+    private static final int CHORD_STEPS = 6;
+
+    /**
+     * One aspect chord, dimmed by how far through the globe it runs.
+     *
+     * Beside {@link #segment} rather than a flag on it: the cusps, the sign boundaries and the
+     * mansion ticks are drawn on the surface and have their own treatment, and fading those by
+     * depth would dim the scaffolding a reader uses to place what they are looking at.
+     *
+     * @param dim false for the chord under the cursor, which is the reader's own gesture and
+     *     stays at full strength wherever it runs
+     */
+    /** True while the reader is dragging - what every "draw less" decision here reads. */
+    private boolean turning;
+
+    private void chord(double[] a, double[] b, Color ink, float width, boolean dim) {
+        Globe.Projected pa = at(a);
+        Globe.Projected pb = at(b);
+        if (!pa.visible || !pb.visible) {
+            return;
+        }
+        double depth = (pa.depth + pb.depth) / 2.0;
+        if (!dim) {
+            this.pieces.add(new Piece(depth, () -> {
+                this.g.setStroke(stroke(width));
+                this.g.setColor(ink);
+                this.g.drawLine((int) pa.x, (int) pa.y, (int) pb.x, (int) pb.y);
+            }));
+            return;
+        }
+        // <b>Along the line, in steps, and with a solid colour on every one of them.</b>
+        // A single alpha for the whole chord is not enough - one taken at the mean separated
+        // the deepest chords from the shallowest by twelve percent, because a chord from a near
+        // body to a far one averages back to the centre and comes out middling when its far
+        // half is exactly the half doing the cluttering.
+        //
+        // <b>The obvious answer, a GradientPaint, is unaffordable here, and measured rather
+        // than assumed.</b> One per chord took a frame from 45ms to 182ms at rest and a drag
+        // from 13ms to 78ms - four times over, because any Paint that is not a solid Color
+        // drops Java2D off its fast path, and this view's cost has always been per drawing
+        // call. Steps of a solid colour buy most of the gradient at a stroke's price, and the
+        // step count drops to one while the globe is turning, the way the bands and the sign
+        // shells already thin out under the hand.
+        // <b>Steps where the depth changes, and one step where it does not.</b> Six steps for
+        // every chord doubled the resting frame, and most of that bought nothing: a chord lying
+        // across the camera runs at one depth from end to end, so its six pieces are six copies
+        // of the same colour. The count follows the depth the chord actually covers, which puts
+        // the cost on the chords that plunge through the globe - the ones this is for.
+        double spread = Math.abs(pb.depth - pa.depth) / (2.0 * Globe.SHELL_SKY);
+        final int steps = this.turning ? 1
+            : Math.max(1, (int) Math.round(spread * CHORD_STEPS));
+        for (int i = 0; i < steps; i++) {
+            double t0 = i / (double) steps;
+            double t1 = (i + 1) / (double) steps;
+            double mid = (t0 + t1) / 2.0;
+            Color step = shade(ink, (int) Math.round(ink.getAlpha()
+                * chordDepthFade(pa.depth + (pb.depth - pa.depth) * mid)));
+            int x0 = (int) Math.round(pa.x + (pb.x - pa.x) * t0);
+            int y0 = (int) Math.round(pa.y + (pb.y - pa.y) * t0);
+            int x1 = (int) Math.round(pa.x + (pb.x - pa.x) * t1);
+            int y1 = (int) Math.round(pa.y + (pb.y - pa.y) * t1);
+            // Each step sorts at its own depth, so a chord that dives through the middle is
+            // correctly overpainted piece by piece rather than all at its mean.
+            double stepDepth = pa.depth + (pb.depth - pa.depth) * mid;
+            this.pieces.add(new Piece(stepDepth, () -> {
+                this.g.setStroke(stroke(width));
+                this.g.setColor(step);
+                this.g.drawLine(x0, y0, x1, y1);
+            }));
+        }
     }
 
     private void segment(double[] a, double[] b, Color ink, float width) {

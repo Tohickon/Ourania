@@ -129,6 +129,27 @@ extends JPanel {
      * sky, which is why this one is a constant and outerRingWord is not.
      */
     static final String SKY_RING_WORD = "sky";
+
+    /**
+     * What to call the ring a body sits on, or null for the natal ring, which needs no tag.
+     *
+     * <b>The hover card had one boolean where there are three rings.</b> It said "transiting"
+     * for anything that was not the inner wheel, so in a synastry Chart B's Sun was labelled a
+     * transit and the sky's Sun was labelled the same thing. The distinction already existed -
+     * the aspect readout has drawn it since the sky got its own row - it had simply never
+     * reached the tooltip. One statement of it now, and both read it.
+     */
+    String ringWord(int ring) {
+        if (ring == WHEEL_NATAL) {
+            return null;
+        }
+        if (ring == WHEEL_SKY) {
+            return SKY_RING_WORD;
+        }
+        // The outer ring is a second person in a synastry and a later moment everywhere else -
+        // the same rule updateChartData follows when it decides which moment to cast it from.
+        return this.isSynastryChart() ? "Chart B" : this.outerRingWord();
+    }
     public ChartMode chartMode = ChartMode.SINGLE;
 
     /**
@@ -1534,11 +1555,16 @@ extends JPanel {
             if (hit < 0) {
                 return null;
             }
-            boolean outer = (hit & TRANSIT_BIT) != 0;
-            int i = hit & ~TRANSIT_BIT;
-            double[] lon = outer ? this.tLon : this.bLon;
-            double[] spd = outer ? this.tSpeed : this.bSpeed;
-            return i < lon.length ? this.hoverHtml(i, lon[i], spd[i], outer) : null;
+            int ring = hitRing(hit);
+            int i = hitBody(hit);
+            // <b>Its own ring's numbers.</b> This chose between two arrays on a boolean, so a
+            // body found on the sky ring was described with Chart B's longitude and speed -
+            // the same card, twice, for two different charts.
+            double[] lon = ring == WHEEL_SKY ? this.cLon
+                : (ring == WHEEL_OUTER ? this.tLon : this.bLon);
+            double[] spd = ring == WHEEL_SKY ? this.cSpeed
+                : (ring == WHEEL_OUTER ? this.tSpeed : this.bSpeed);
+            return i < lon.length ? this.hoverHtml(i, lon[i], spd[i], ring) : null;
         }
         Geometry g = this.geometry();
         if (g == null) {
@@ -1548,19 +1574,19 @@ extends JPanel {
             int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.cLon, this.cValid,
                 g.triRadii(), true);
             if (i >= 0) {
-                return this.hoverHtml(i, this.cLon[i], this.cSpeed[i], true);
+                return this.hoverHtml(i, this.cLon[i], this.cSpeed[i], WHEEL_SKY);
             }
         }
         if (this.outerRingDrawn()) {
             int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.tLon, this.tValid,
                 g.transitRadii(), true);
             if (i >= 0) {
-                return this.hoverHtml(i, this.tLon[i], this.tSpeed[i], true);
+                return this.hoverHtml(i, this.tLon[i], this.tSpeed[i], WHEEL_OUTER);
             }
         }
         int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.bLon, this.bValid,
             g.natalRadii(), false);
-        return i >= 0 ? this.hoverHtml(i, this.bLon[i], this.bSpeed[i], false) : null;
+        return i >= 0 ? this.hoverHtml(i, this.bLon[i], this.bSpeed[i], WHEEL_NATAL) : null;
     }
 
     /**
@@ -1779,6 +1805,39 @@ extends JPanel {
     static final int TRANSIT_BIT = 1 << 16;
 
     /**
+     * Set alongside {@link #TRANSIT_BIT} when the hit was on the sky ring.
+     *
+     * <b>One bit could not say which of three rings.</b> Every hit test packed "not the natal
+     * ring" and stopped there, so the sky ring and Chart B came back indistinguishable - and
+     * the globe's hover then read the outer ring's longitudes for both, which is why David saw
+     * Chart B's Sun and the sky's Sun describing the same degree. Added as a second bit rather
+     * than a new encoding so that every existing reader of TRANSIT_BIT still answers the
+     * question it was asking; the ring is available to whoever needs the finer answer.
+     */
+    static final int SKY_BIT = 1 << 17;
+
+    /** Packs a body index and the ring it was found on, the way every hit test returns it. */
+    static int packHit(int body, int ring) {
+        if (ring == WHEEL_NATAL) {
+            return body;
+        }
+        return ring == WHEEL_SKY ? (body | TRANSIT_BIT | SKY_BIT) : (body | TRANSIT_BIT);
+    }
+
+    /** The body index out of a packed hit. */
+    static int hitBody(int packed) {
+        return packed & (TRANSIT_BIT - 1);
+    }
+
+    /** Which wheel a packed hit was on - WHEEL_NATAL, WHEEL_OUTER or WHEEL_SKY. */
+    static int hitRing(int packed) {
+        if ((packed & TRANSIT_BIT) == 0) {
+            return WHEEL_NATAL;
+        }
+        return (packed & SKY_BIT) != 0 ? WHEEL_SKY : WHEEL_OUTER;
+    }
+
+    /**
      * The body the cursor is resting on, or -1.
      *
      * <b>Hover, not click.</b> Focus follows the cursor and lets go when it leaves, so a reader
@@ -1904,7 +1963,8 @@ extends JPanel {
      * for expanders, and hoverHtml stays the one description of a body that both share.
      */
     String selectionHtml(int n, double lon, double speed, boolean transit) {
-        StringBuilder sb = new StringBuilder(this.hoverHtml(n, lon, speed, transit));
+        StringBuilder sb = new StringBuilder(this.hoverHtml(n, lon, speed,
+            transit ? WHEEL_OUTER : WHEEL_NATAL));
         int close = sb.lastIndexOf("</body>");
         if (close < 0) {
             close = sb.length();
@@ -2164,7 +2224,8 @@ extends JPanel {
         }
     }
 
-    private String hoverHtml(int n, double lon, double speed, boolean transit) {
+    private String hoverHtml(int n, double lon, double speed, int ring) {
+        final boolean transit = ring != WHEEL_NATAL;
         Bodies.Def def = Bodies.at(n);
         int signIdx = Zodiac.signIndex(lon);
         String sign = Zodiac.SIGNS[signIdx];
@@ -2184,7 +2245,7 @@ extends JPanel {
         sb.append("<div style='font-size:13px;'><b>").append(def.name).append("</b>");
         if (transit) {
             sb.append(" <span style='color:#5A7FBF;'>(")
-                  .append(this.outerRingWord()).append(")</span>");
+                  .append(this.ringWord(ring)).append(")</span>");
         }
         if (!def.isAngle() && speed < 0.0) {
             sb.append(" <span style='color:#B03030;'><b>R</b></span>");
