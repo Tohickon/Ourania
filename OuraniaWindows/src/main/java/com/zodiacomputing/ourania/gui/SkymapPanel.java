@@ -6459,6 +6459,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         } else if (this.chartMode == ChartMode.COMPOSITE_MIDPOINT
                 || this.chartMode == ChartMode.COMPOSITE_DAVISON) {
             string = "Composite Chart";
+        } else if (!this.chartALoaded) {
+            // <b>No Chart A means no natal chart, and this is the last place that said
+            // otherwise.</b> David: "if no persons data is selected to go into a or b then
+            // neither would be selectable nor cast a chart - only thing that could is the sky
+            // because it defaults to current astrological chart." The wheel already draws the
+            // sky when Chart A is empty; calling that drawing somebody's natal chart is the
+            // same mislabelling from the other end, and it is what a reader would believe.
+            string = "The Sky Now";
         } else {
             string = who + "Natal Chart";
         }
@@ -6549,7 +6557,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (wantTransits && this.showTriWheel) {
             stringBuilder.append("<br><h2 style='color:#a0d2ff; margin-bottom: 2px;'>Sky (Transiting)</h2>");
             String stringSkyTime = this.skyChartTime != null ? this.skyChartTime.format(dateTimeFormatter) : "";
-            String stringSkyLoc = String.format("%.2f, %.2f", this.transitLatitude, this.transitLongitude);
+            // Its own coordinates. This printed Chart B's, which is the same borrowing the
+            // houses were doing until the sky got a row of its own - right whenever the two
+            // happened to be the same city and quietly wrong otherwise.
+            String stringSkyLoc = String.format("%.2f, %.2f", this.skyLatitude, this.skyLongitude);
             stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(stringSkyTime).append("<br>").append(stringSkyLoc).append("</div>");
             stringBuilder.append("<h3 style='color:#a0d2ff;'>Placements</h3>");
             for (int k = 0; k < BODY_COUNT; ++k) {
@@ -6580,7 +6591,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>Transit to Natal Grid</h3>");
             }
         } else {
-            stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>Natal Aspects Grid</h3>");
+            stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>")
+                .append(this.chartALoaded ? "Natal Aspects Grid" : "Sky Aspects Grid")
+                .append("</h3>");
         }
         stringBuilder.append("<div style='font-size:10px; margin-bottom:10px;'>");
         // Quincunx belongs here: the grid has always emitted quincunx cells, so leaving it out

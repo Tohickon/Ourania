@@ -144,6 +144,25 @@ public final class NavigationCheck {
 
         report("Part M - the selection card carries its own contrast", before);
 
+
+
+
+
+
+        before = failures.size();
+
+
+
+
+
+        anEmptyChartCastsNothing();
+
+
+
+
+
+        report("Part N - an empty Chart A behaves exactly like an empty Chart B", before);
+
         System.out.println();
         System.out.println("=== Part G: each ring's glyphs say which ring they are on ===");
         before = failures.size();
@@ -742,6 +761,101 @@ public final class NavigationCheck {
      * Removing either declaration puts the ground back to white and the contrast to nothing,
      * which is what this measures rather than asserts.
      */
+    /**
+     * A chart with nobody in it is not drawn, and is not called somebody's.
+     *
+     * <b>David's rule, and it is a symmetry.</b> "If no chart B is seen no chart B should be
+     * formed - such should be the same for chart A as well. If no persons data is selected to
+     * go into a or b then neither would be selectable nor cast a chart, only thing that could
+     * is the sky because it defaults to current astrological chart."
+     *
+     * Chart B already behaved: no data, no ring. Chart A did not, and the ways it did not were
+     * all namings rather than drawings - the wheel drew the sky when Chart A was empty, which
+     * is right, and then the placements drawer headed it "Natal Chart" and the grid called
+     * itself the "Natal Aspects Grid". A reader would have believed the sky was their birth
+     * chart, which is the same mislabelling that started this week, from the other end.
+     *
+     * Driven by installing subjects rather than by typing in the form, so it needs no
+     * geocoder and says the same thing on any machine.
+     */
+    private static void anEmptyChartCastsNothing() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
+            java.lang.reflect.Field fr = SkymapPanel.class.getDeclaredField("ringBar");
+            fr.setAccessible(true);
+            RingBar bar = (RingBar) fr.get(sky);
+
+            java.lang.reflect.Method install = SkymapPanel.class.getDeclaredMethod(
+                "installSubjects", com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class);
+            install.setAccessible(true);
+
+            com.zodiacomputing.ourania.astro.ChartSubject skyNow =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Sky",
+                    java.time.ZonedDateTime.now(java.time.ZoneId.of("America/Los_Angeles")),
+                    "Los Angeles", 34.05, -118.24, "America/Los_Angeles", false);
+            com.zodiacomputing.ourania.astro.ChartSubject person =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart A",
+                    java.time.ZonedDateTime.of(1982, 8, 10, 15, 1, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+
+            Class<?> partType = Class.forName(
+                "com.zodiacomputing.ourania.gui.SkymapPanel$PlacementPart");
+            Object whole = Enum.valueOf(partType.asSubclass(Enum.class), "ALL");
+            java.lang.reflect.Method drawer = SkymapPanel.class.getDeclaredMethod(
+                "generatePlanetPlacementsHtml", partType);
+            drawer.setAccessible(true);
+
+            // ---- nobody in either chart ----
+            install.invoke(sky,
+                com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A"),
+                com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart B"), skyNow);
+            SwingUtilities.invokeAndWait(() -> sky.updateChartData());
+            Thread.sleep(1500);
+            SwingUtilities.invokeAndWait(() -> w[0].syncRingBar(bar));
+
+            ok("with nobody entered, Chart A is not selectable",
+                !chipAvailable(bar, "Chart A"));
+            ok("with nobody entered, Chart B is not selectable",
+                !chipAvailable(bar, "Chart B"));
+            ok("the sky is always selectable, because it defaults to now",
+                chipAvailable(bar, "Sky"));
+            ok("the wheel does not claim to hold a Chart A", !sky.hasChartA());
+            ok("Chart B forms no outer ring", live(sky.tValid) == 0);
+
+            String empty = (String) drawer.invoke(sky, whole);
+            ok("nothing calls the wheel a natal chart", !empty.contains("Natal Chart"));
+            ok("nor its grid a natal grid", !empty.contains("Natal Aspects Grid"));
+            ok("the drawer names it as the sky", empty.contains("The Sky Now"));
+            ok("and its grid as the sky's", empty.contains("Sky Aspects Grid"));
+            ok("the wheel is drawing the sky's own moment",
+                skyNow.moment.equals(get(sky, "baseChartTime")));
+
+            // ---- and with somebody in Chart A, the naming comes back ----
+            install.invoke(sky, person,
+                com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart B"), skyNow);
+            SwingUtilities.invokeAndWait(() -> sky.updateChartData());
+            Thread.sleep(1500);
+            SwingUtilities.invokeAndWait(() -> w[0].syncRingBar(bar));
+
+            ok("with a Chart A entered it is selectable", chipAvailable(bar, "Chart A"));
+            ok("and Chart B is still not", !chipAvailable(bar, "Chart B"));
+            String filled = (String) drawer.invoke(sky, whole);
+            ok("and now it is a natal chart", filled.contains("Natal Chart"));
+            ok("with a natal grid", filled.contains("Natal Aspects Grid"));
+            ok("drawing the person's moment",
+                person.moment.equals(get(sky, "baseChartTime")));
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
     private static void theSelectionCardIsReadable() throws Exception {
         final OuraniaWindow[] w = new OuraniaWindow[1];
         SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
