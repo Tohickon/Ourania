@@ -30,9 +30,30 @@ public final class Geocoder {
 
     private Geocoder() { }
 
-    /** Blocking lookup. Never call this on the event dispatch thread. */
+    /**
+     * Blocking lookup. Never call this on the event dispatch thread.
+     *
+     * <b>The atlas first, and the network only for what the atlas does not have.</b> Two round
+     * trips used to run for every place name - Nominatim for the coordinates, a second service
+     * for the zone - which meant no chart could be cast offline, and the zone arrived from a
+     * service that had never heard of the place, only of a latitude and longitude near it.
+     * A hundred and sixty-eight thousand towns are on disk with the zone GeoNames records for
+     * each one, so the common case is now a binary search rather than two HTTP calls.
+     *
+     * The network stays for the rest: a street, a hospital, a hamlet under a thousand people.
+     * Falling back rather than replacing is what keeps those working.
+     */
     public static Result lookup(String query) {
         if (query == null || query.trim().isEmpty()) return null;
+        Atlas.Place known = Atlas.resolve(query);
+        if (known != null) {
+            Result res = new Result();
+            res.lat = known.latitude;
+            res.lon = known.longitude;
+            res.name = known.label();
+            res.tzId = known.zoneId;
+            return res;
+        }
         try {
             String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
             URL url = new URL("https://nominatim.openstreetmap.org/search?q=" + encodedQuery + "&format=json&limit=1");

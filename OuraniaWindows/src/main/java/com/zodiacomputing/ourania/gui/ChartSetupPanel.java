@@ -370,6 +370,7 @@ public class ChartSetupPanel extends JPanel {
 
         transitTimeField = createField(transitPanel, "Time (HH:MM):", "");
         transitLocationField = createField(transitPanel, "Location:", "");
+        PlaceField.attach(transitLocationField);
         transitZone = zoneBox(transitPanel);
 
         // The reference place for a midpoint composite. Enabled only in that mode - see
@@ -406,6 +407,9 @@ public class ChartSetupPanel extends JPanel {
         // Both sides open at home rather than at whatever place was last generated,
         // which is what left the form showing one city beside another city's clock.
         baseLocationField = createField(basePanel, "Location:", homeLocation);
+        // The atlas offers places as they are typed - see PlaceField for why all three boxes
+        // get it and why choosing one writes coordinates rather than a name.
+        PlaceField.attach(baseLocationField);
         transitLocationField.setText(homeLocation);
 
         // Restore the last natal chart. Only overwrite the placeholder defaults when a
@@ -469,6 +473,7 @@ public class ChartSetupPanel extends JPanel {
         skyDateField = createField(skyPanel, "Date (YYYY-MM-DD):", "");
         skyTimeField = createField(skyPanel, "Time (HH:MM):", "");
         skyLocationField = createField(skyPanel, "Location:", "");
+        PlaceField.attach(skyLocationField);
         skyLocationField.setToolTipText("<html><b>Where the sky is being read from.</b><br>"
             + "Its own field rather than Chart B's, so a transit ring is never cast for "
             + "somebody's birthplace.</html>");
