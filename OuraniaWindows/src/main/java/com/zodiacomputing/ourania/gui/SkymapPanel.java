@@ -650,6 +650,21 @@ extends JPanel {
      * instant and needs no network.
      */
     public void applyChartMode(ChartMode mode, boolean transits) {
+        this.applyChartMode(mode, transits, this.ringAOn, this.ringBOn);
+    }
+
+    /**
+     * The mode and who is in it, applied as one thing.
+     *
+     * <b>Two calls would be two frames.</b> Setting the composition and then the mode casts
+     * once with the old pairing - a synastry ring around a chart that no longer has two people
+     * in it - and the reader sees that frame before the second call corrects it.
+     */
+    public void applyChartMode(ChartMode mode, boolean transits, boolean chartAIn,
+            boolean chartBIn) {
+        this.ringAOn = chartAIn;
+        this.ringBOn = chartBIn;
+        this.castRoles();
         this.installMode(mode, transits);
         this.updateChartData();
         if (this.chartPanel != null) {
@@ -727,25 +742,95 @@ extends JPanel {
         this.subjectA = a;
         this.subjectB = b;
         this.subjectSky = sky;
+        this.castRoles();
+    }
 
-        this.baseChartTime = a.moment;
-        this.baseLatitude = a.latitude;
-        this.baseLongitude = a.longitude;
-        this.baseLocationName = a.placeName;
-        this.baseTimeZoneId = a.zoneId;
-        this.baseTimeUnknown = a.timeUnknown;
-        this.chartALoaded = a.entered();
+    /** Whether Chart A and Chart B are in the chart at all, as opposed to merely entered. */
+    private boolean ringAOn = true;
+    private boolean ringBOn = true;
 
-        this.transitChartTime = b.moment;
-        this.transitLatitude = b.latitude;
-        this.transitLongitude = b.longitude;
-        this.transitLocationName = b.placeName;
-        this.transitTimeZoneId = b.zoneId;
+    /** Which subject is on the inner wheel - Chart A, or Chart B, or nobody and it is the sky. */
+    private com.zodiacomputing.ourania.astro.ChartSubject anchorSubject;
+
+    /**
+     * Which chart is on which wheel, given which chips the reader has open.
+     *
+     * <b>Who is in the chart and who is drawn were the same switch, and they are not the same
+     * question.</b> Chart A's chip only folded its glyphs away: deselect it in a synastry and
+     * the wheel still cast a synastry, still computed cross-aspects to a chart it was no longer
+     * showing, and still called itself one. David described what it should do instead, and it
+     * is a rule about roles rather than about drawing: "I deselect Chart A, now I'm no longer
+     * seeing a synastry, I'm seeing a natal-transit chart... I then deselect Chart B, I am
+     * seeing a current time and place natal chart."
+     *
+     * So the innermost chart still selected is the natal one, and the rest ring outward.
+     * Deselecting the inner wheel promotes whatever was outside it rather than leaving a hole.
+     * The sky is last in that order and always available, which is what makes every combination
+     * land on a chart that exists - there is no selection that means "draw nothing".
+     *
+     * <b>The identity does not move with the role.</b> subjectA stays Chart A even when Chart B
+     * is the one being cast, so a chip still describes its own chart and the readout names the
+     * wheel by the label of whoever is actually on it.
+     */
+    private void castRoles() {
+        com.zodiacomputing.ourania.astro.ChartSubject a = this.subjectA;
+        com.zodiacomputing.ourania.astro.ChartSubject b = this.subjectB;
+        com.zodiacomputing.ourania.astro.ChartSubject sky = this.subjectSky;
+
+        boolean useA = this.ringAOn && a.entered();
+        boolean useB = this.ringBOn && b.entered();
+        com.zodiacomputing.ourania.astro.ChartSubject anchor = useA ? a : (useB ? b : null);
+        // Only ever Chart B: the engine's outer wheel is a second person in a synastry and the
+        // sky everywhere else, and the sky reaches it through its own slot rather than this one.
+        com.zodiacomputing.ourania.astro.ChartSubject outer =
+            useA && useB ? b : com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart B");
+
+        this.anchorSubject = anchor;
+        this.innerIsBirthChart = anchor != null;
+        com.zodiacomputing.ourania.astro.ChartSubject inner =
+            anchor == null ? com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A")
+                : anchor;
+
+        this.baseChartTime = inner.moment;
+        this.baseLatitude = inner.latitude;
+        this.baseLongitude = inner.longitude;
+        this.baseLocationName = inner.placeName;
+        this.baseTimeZoneId = inner.zoneId;
+        this.baseTimeUnknown = inner.timeUnknown;
+
+        this.transitChartTime = outer.moment;
+        this.transitLatitude = outer.latitude;
+        this.transitLongitude = outer.longitude;
+        this.transitLocationName = outer.placeName;
+        this.transitTimeZoneId = outer.zoneId;
 
         this.skyChartTime = sky.moment;
         this.skyLatitude = sky.latitude;
         this.skyLongitude = sky.longitude;
         this.skyTimeZoneId = sky.zoneId;
+    }
+
+    /**
+     * Puts Chart A and Chart B in or out of the chart, and re-casts from what is left.
+     *
+     * The rings' door. The mode that goes with a composition is still decided in Chart Setup -
+     * this says who is in the chart, not what kind of chart it is, and those two have to be set
+     * together or the wheel draws a synastry ring for a chart with one person in it.
+     */
+    void setComposition(boolean chartAIn, boolean chartBIn) {
+        this.ringAOn = chartAIn;
+        this.ringBOn = chartBIn;
+        this.castRoles();
+    }
+
+    /** Whether Chart A is in the chart, for a chip that has to show what it did. */
+    boolean chartAIn() {
+        return this.ringAOn;
+    }
+
+    /** Whether Chart B is in the chart. */
+    boolean chartBIn() {
+        return this.ringBOn;
     }
 
     /**
@@ -909,11 +994,26 @@ extends JPanel {
      * the chip is greyed with a reason, and the readout calls it Sky. Drawing the sky is not
      * the defect - claiming it is somebody's birth chart was.
      */
-    private boolean chartALoaded;
+    /**
+     * Whether the inner wheel is somebody's birth chart, as opposed to the sky.
+     *
+     * <b>This was called chartALoaded and answered two questions.</b> It meant "there is a
+     * Chart A" and it meant "the inner wheel is a real chart", which were the same sentence
+     * only while Chart A was the only chart that could sit there. Chart B can be promoted onto
+     * that wheel now, so they have come apart: the readouts, the houses and the aspect grid all
+     * want this one, and a chip wants hasChartA. One field with two meanings is the defect this
+     * project logs most often, so it is two.
+     */
+    private boolean innerIsBirthChart;
 
     /** True when a Chart A has been generated, for the chip that folds it. */
     public boolean hasChartA() {
-        return this.chartALoaded;
+        return this.subjectA != null && this.subjectA.entered();
+    }
+
+    /** Whether the inner wheel is a birth chart rather than the sky. */
+    public boolean innerIsBirthChart() {
+        return this.innerIsBirthChart;
     }
 
     private double skyLatitude = 51.4779;
@@ -3638,13 +3738,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // <b>The inner wheel is named too.</b> It printed a bare timestamp, so a reader had
         // no way to tell a birth chart from the sky standing in for one - which is exactly
         // the confusion a cold open produced.
-        ZonedDateTime inner = this.chartALoaded ? this.baseChartTime : this.skyChartTime;
+        ZonedDateTime inner = this.innerIsBirthChart ? this.baseChartTime : this.skyChartTime;
         if (inner != null) {
-            out.append(this.chartALoaded ? "Chart A: " : "Sky: ").append(inner.format(fmt));
+            // Whoever is actually on the inner wheel. This said "Chart A" for anything that
+            // was not the sky, which was true while Chart A was the only chart that could be
+            // cast and became a lie the moment Chart B could be promoted into that place.
+            out.append(this.anchorSubject == null ? "Sky: " : this.anchorSubject.label + ": ")
+                .append(inner.format(fmt));
         }
         out.append(String.format("   %.2f, %.2f",
-            this.chartALoaded ? this.baseLatitude : this.skyLatitude,
-            this.chartALoaded ? this.baseLongitude : this.skyLongitude));
+            this.innerIsBirthChart ? this.baseLatitude : this.skyLatitude,
+            this.innerIsBirthChart ? this.baseLongitude : this.skyLongitude));
         // The outer wheel is a second moment, and it is the one the transport usually moves,
         // so it is named rather than left for the reader to infer from a changing number.
         // Named for what it is rather than for where it sits: the outer wheel is Chart B in
@@ -6117,14 +6221,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // <b>With no Chart A the inner wheel is the sky.</b> Not a birth chart cast from
         // whatever moment the field happened to hold - there is no chart, and the honest
         // thing to draw is the one thing that always exists.
-        if (!this.chartALoaded && !relationship && this.skySd != null) {
+        if (!this.innerIsBirthChart && !relationship && this.skySd != null) {
             this.baseSd = this.skySd;
             this.baseChartTime = this.skyChartTime;
         }
         double[] dArray = new double[10];
         if (this.baseSd != null && !relationship) {
-            double innerLat = this.chartALoaded ? this.baseLatitude : this.skyLatitude;
-            double innerLon = this.chartALoaded ? this.baseLongitude : this.skyLongitude;
+            double innerLat = this.innerIsBirthChart ? this.baseLatitude : this.skyLatitude;
+            double innerLon = this.innerIsBirthChart ? this.baseLongitude : this.skyLongitude;
             this.sw.swe_houses(this.baseSd.getJulDay(), 2, innerLat, innerLon, this.houseSystem, this.baseCusps, dArray);
             this.baseAscendant = dArray[0];
         }
@@ -6459,7 +6563,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         } else if (this.chartMode == ChartMode.COMPOSITE_MIDPOINT
                 || this.chartMode == ChartMode.COMPOSITE_DAVISON) {
             string = "Composite Chart";
-        } else if (!this.chartALoaded) {
+        } else if (!this.innerIsBirthChart) {
             // <b>No Chart A means no natal chart, and this is the last place that said
             // otherwise.</b> David: "if no persons data is selected to go into a or b then
             // neither would be selectable nor cast a chart - only thing that could is the sky
@@ -6467,6 +6571,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // sky when Chart A is empty; calling that drawing somebody's natal chart is the
             // same mislabelling from the other end, and it is what a reader would believe.
             string = "The Sky Now";
+        } else if (this.anchorSubject == this.subjectB) {
+            // <b>And a promoted Chart B is not the reader's own chart either.</b> "who" is the
+            // saved profile's name, which belongs to Chart A - printing it over Chart B's
+            // placements is the same fault as calling the sky a natal chart, one seat along.
+            string = "Chart B · Natal Chart";
         } else {
             string = who + "Natal Chart";
         }
@@ -6592,7 +6701,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
         } else {
             stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>")
-                .append(this.chartALoaded ? "Natal Aspects Grid" : "Sky Aspects Grid")
+                .append(this.innerIsBirthChart ? "Natal Aspects Grid" : "Sky Aspects Grid")
                 .append("</h3>");
         }
         stringBuilder.append("<div style='font-size:10px; margin-bottom:10px;'>");

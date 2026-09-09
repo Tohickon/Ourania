@@ -1832,7 +1832,7 @@ public final class AspectGridCheck {
         // for a cold open and wrong for a suite that has just written a birth moment into the
         // fields by hand. Declaring it is what tells the panel these are somebody's, not the
         // constructor's defaults.
-        setField(sky, "chartALoaded", Boolean.TRUE);
+        setField(sky, "innerIsBirthChart", Boolean.TRUE);
         java.lang.reflect.Method reload =
             SkymapPanel.class.getDeclaredMethod("updateChartData");
         reload.setAccessible(true);

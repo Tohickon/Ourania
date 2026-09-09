@@ -241,9 +241,9 @@ public class OuraniaWindow extends JFrame {
      * Delegates to Chart Setup rather than touching the mode, so there is still exactly one
      * writer - see {@code ChartSetupPanel.applyRings}.
      */
-    public void setRings(boolean partnerRing, boolean skyRing) {
+    public void setRings(boolean chartARing, boolean partnerRing, boolean skyRing) {
         if (chartSetupPanel != null) {
-            chartSetupPanel.applyRings(partnerRing, skyRing);
+            chartSetupPanel.applyRings(chartARing, partnerRing, skyRing);
         }
     }
 
@@ -258,7 +258,8 @@ public class OuraniaWindow extends JFrame {
         if (chartSetupPanel != null && skymapPanel != null) {
             bar.syncFrom(chartSetupPanel.currentMode(), chartSetupPanel.skyWanted(),
                 skymapPanel.chartASubject(), skymapPanel.chartBSubject(),
-                skymapPanel.skySubject());
+                skymapPanel.skySubject(),
+                skymapPanel.chartAIn(), skymapPanel.chartBIn());
         }
         if (skymapPanel != null) {
             bar.syncView(skymapPanel.isGlobeMode());
@@ -941,8 +942,26 @@ public class OuraniaWindow extends JFrame {
 
     /** Changes which rings are drawn, leaving the three subjects as they are. */
     public void applyChartMode(ChartMode mode, boolean transits) {
+        this.applyChartMode(mode, transits, true, true);
+    }
+
+    /** Whether the wheel is actually holding a Chart A - the entered chart, not the typing. */
+    public boolean wheelHasChartA() {
+        return skymapPanel != null && skymapPanel.chartASubject() != null
+            && skymapPanel.chartASubject().entered();
+    }
+
+    /** Whether the wheel is actually holding a Chart B. */
+    public boolean wheelHasChartB() {
+        return skymapPanel != null && skymapPanel.chartBSubject() != null
+            && skymapPanel.chartBSubject().entered();
+    }
+
+    /** The mode and which of the two charts are in it, so the wheel never casts a mismatch. */
+    public void applyChartMode(ChartMode mode, boolean transits, boolean chartAIn,
+            boolean chartBIn) {
         if (skymapPanel != null) {
-            skymapPanel.applyChartMode(mode, transits);
+            skymapPanel.applyChartMode(mode, transits, chartAIn, chartBIn);
         }
     }
 

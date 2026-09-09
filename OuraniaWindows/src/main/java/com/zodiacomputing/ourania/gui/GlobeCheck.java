@@ -91,6 +91,12 @@ public final class GlobeCheck {
         report("Part L", before);
 
         System.out.println();
+        System.out.println("=== Part M: a chart's band survives being turned ===");
+        before = failures.size();
+        theBandWhileTurning();
+        report("Part M", before);
+
+        System.out.println();
         System.out.println("=== Part J: a band is cut wherever it would lie across itself ===");
         before = failures.size();
         bandsDoNotCrossThemselves();
@@ -971,6 +977,81 @@ public final class GlobeCheck {
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
+    }
+
+    /**
+     * A chart's band costs less while the reader is dragging, and still reads as a band.
+     *
+     * <b>Cheaper is only half the rule.</b> Three filled bands are two hundred and
+     * eighty-eight quads a frame, and measured, they took a drag at 1100 pixels from 24ms to
+     * 40ms - so the fill is left out while turning, the way the sign shells already are. But
+     * "leave it out" and "leave it visible" are two halves of one rule: pin only the cheapness
+     * and someone can delete the rims and still pass, at which point a chart's plane vanishes
+     * exactly while the reader is turning the globe to look for it.
+     *
+     * <b>The bodies are switched off, not a layer folded.</b> The first version of this counted
+     * gold pixels of the whole scene, and passed under both mutations - the gold it was
+     * counting was glyphs and sign shells, and folding Layer.NATAL takes the natal bodies away
+     * with the band because they share a guard. Emptying the validity arrays leaves the rings
+     * drawn and nothing riding on them, so what changes between two frames is the band and
+     * only the band.
+     */
+    private static void theBandWhileTurning() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+            set(panel, "chartMode", ChartMode.SYNASTRY);
+            set(panel, "showTransitChart", Boolean.TRUE);
+            set(panel, "showTriWheel", Boolean.TRUE);
+            panel.updateChartData();
+            Thread.sleep(1500);
+
+            // Everything that is not a band, out of the frame.
+            for (SkymapPanel.Layer layer : SkymapPanel.Layer.values()) {
+                if (layer != SkymapPanel.Layer.NATAL) {
+                    panel.setLayer(layer, false);
+                }
+            }
+            Thread.sleep(900);
+            for (String field : new String[] {"bValid", "tValid", "cValid"}) {
+                set(panel, field, new boolean[SkymapPanel.BODY_COUNT]);
+            }
+
+            java.awt.image.BufferedImage rest = bandFrame(panel, false);
+            java.awt.image.BufferedImage turning = bandFrame(panel, true);
+            int fill = differingPixels(rest, turning);
+            System.out.println("  the fill the bands drop while turning: " + fill + " px");
+            yes("a band's fill is left out while the globe is turning", fill > 3000);
+
+            // What is left when the bands are gone entirely - so what the turning frame still
+            // paints over it is the rims, with nothing else able to account for it.
+            panel.setLayer(SkymapPanel.Layer.NATAL, false);
+            set(panel, "showTransitChart", Boolean.FALSE);
+            set(panel, "showTriWheel", Boolean.FALSE);
+            Thread.sleep(900);
+            java.awt.image.BufferedImage bare = bandFrame(panel, true);
+            int rims = differingPixels(turning, bare);
+            System.out.println("  what a turning band still paints: " + rims + " px");
+            yes("a turning band still paints its rims", rims > 600);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /** One frame on a flat ground, so a band's own ink is what differs between two of them. */
+    private static java.awt.image.BufferedImage bandFrame(SkymapPanel panel, boolean turning) {
+        java.awt.image.BufferedImage frame = new java.awt.image.BufferedImage(
+            700, 700, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D gg = frame.createGraphics();
+        gg.setColor(new java.awt.Color(10, 12, 16));
+        gg.fillRect(0, 0, 700, 700);
+        GlobeRenderer.paint(gg, new Globe(), 700, 700, panel, turning);
+        gg.dispose();
+        return frame;
     }
 
     /** One globe frame, painted offscreen. */

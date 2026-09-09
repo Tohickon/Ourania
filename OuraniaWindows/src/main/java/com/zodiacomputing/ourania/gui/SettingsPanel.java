@@ -196,6 +196,25 @@ public class SettingsPanel extends JPanel {
         });
         body.add(planets);
 
+        JCheckBox planetsAll = new JCheckBox("    ...on Chart B and the sky as well",
+            Settings.globePlanetsAllRings());
+        planetsAll.setForeground(TEXT);
+        planetsAll.setBackground(Color.BLACK);
+        planetsAll.setFont(Theme.BODY);
+        planetsAll.setFocusPainted(false);
+        planetsAll.setAlignmentX(Component.LEFT_ALIGNMENT);
+        planetsAll.setToolTipText("<html>On: all three rings draw the planets, each circled in "
+            + "its own chart's colour - gold for Chart A, blue for Chart B, silver for the "
+            + "sky.<br>Off: only Chart A, so a partner's Jupiter cannot be mistaken for "
+            + "yours.<br><i>Needs the setting above.</i></html>");
+        planetsAll.setEnabled(planets.isSelected());
+        planets.addItemListener(e -> planetsAll.setEnabled(planets.isSelected()));
+        planetsAll.addItemListener(e -> {
+            Settings.setGlobePlanetsAllRings(planetsAll.isSelected());
+            applyPalette();
+        });
+        body.add(planetsAll);
+
         // <b>A shape per chart, because a tri-wheel draws three at once.</b> These say which
         // chart a body belongs to without the reader counting rings outward from the centre.
         // The checkbox above is the master switch: off, none of these are drawn.

@@ -261,6 +261,27 @@ public final class Settings {
         set(GLOBE_PLANETS_KEY, on ? "true" : "false");
     }
 
+    /** Settings key for drawing Chart B's and the sky's bodies as planets too. */
+    public static final String GLOBE_PLANETS_ALL_KEY = "chart.globePlanetsAllRings";
+
+    /**
+     * Whether every ring gets the planets, or only Chart A.
+     *
+     * <b>The objection this answers is real, so it is answered rather than dropped.</b> Only
+     * Chart A drew planets, on the reasoning that a partner's Jupiter drawn as Jupiter is
+     * indistinguishable from the reader's - the ring colour was the only thing telling three
+     * Jupiters apart, and a photograph of Jupiter overrides a colour. David asked for all three
+     * anyway, so the planet keeps a ring of its own chart's ink around it: whose it is stays a
+     * colour, and what it is becomes a picture. Off restores Chart A only.
+     */
+    public static boolean globePlanetsAllRings() {
+        return !"false".equals(get(GLOBE_PLANETS_ALL_KEY, "true"));
+    }
+
+    public static void setGlobePlanetsAllRings(boolean on) {
+        set(GLOBE_PLANETS_ALL_KEY, on ? "true" : "false");
+    }
+
     // ------------------------------------------------------------------- marker shapes
 
     /**

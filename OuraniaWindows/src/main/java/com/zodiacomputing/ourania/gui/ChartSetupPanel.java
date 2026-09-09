@@ -840,11 +840,28 @@ public class ChartSetupPanel extends JPanel {
      * so "fold the partner away" has no meaning there; the sky ring still applies and is the
      * only half of this that acts.
      */
-    void applyRings(boolean partnerRing, boolean skyRing) {
+    void applyRings(boolean chartARing, boolean partnerRing, boolean skyRing) {
         boolean composite = selectedMode == ChartMode.COMPOSITE_MIDPOINT
             || selectedMode == ChartMode.COMPOSITE_DAVISON;
+        // <b>Two charts make a synastry; one and the sky make a transit chart.</b> Which two
+        // they are is not the mode's business - deselecting Chart A from a synastry leaves one
+        // person and the sky, which is a natal-transit chart however that person got there.
+        // The panel promotes whoever is left onto the inner wheel; this only has to say what
+        // kind of chart that combination is.
+        // <b>Ask the wheel, not the form.</b> hasChartA reads the text in the date box, which
+        // answers "could a chart be generated from this" - a different question from "is there
+        // a chart on screen", and they disagree for every half-typed entry that has not been
+        // generated yet. The panel promotes whoever it is actually holding, so a chip deciding
+        // the mode from the form would pick SYNASTRY for two people the wheel does not have.
+        boolean wheelA = parentWindow == null ? hasChartA() : parentWindow.wheelHasChartA();
+        boolean wheelB = parentWindow == null ? hasPartnerData() : parentWindow.wheelHasChartB();
+        boolean twoPeople = chartARing && wheelA && partnerRing && wheelB;
+        boolean onePerson = (chartARing && wheelA) || (partnerRing && wheelB);
+        // Nobody selected leaves the sky, which is always castable - so it comes on rather
+        // than the reader reaching a selection that draws nothing.
+        boolean sky = skyRing || !onePerson;
         if (!composite) {
-            if (partnerRing) {
+            if (twoPeople) {
                 setSubject(Subject.PARTNERSHIP);
                 setMode(ChartMode.SYNASTRY);
             } else {
@@ -854,10 +871,10 @@ public class ChartSetupPanel extends JPanel {
                 // to SINGLE would have drawn no sky ring at all - the chip would light up and
                 // the wheel would not change. Caught by the probe; reading the mapping alone
                 // it looks obviously right.
-                setMode(skyRing ? ChartMode.TRANSIT : ChartMode.SINGLE);
+                setMode(sky && onePerson ? ChartMode.TRANSIT : ChartMode.SINGLE);
             }
         }
-        transitsCheck.setSelected(skyRing);
+        transitsCheck.setSelected(sky);
         syncTransitsCheck();
         // <b>Change which rings are drawn, not what is on them.</b> This called generateChart,
         // which re-read every field of this form, re-ran the geocoder and re-parsed both
@@ -866,7 +883,8 @@ public class ChartSetupPanel extends JPanel {
         // rows meant different things in different modes, so re-reading them under a new mode
         // is what let a chip change what a field meant.
         if (parentWindow != null) {
-            parentWindow.applyChartMode(selectedMode, transitsCheck.isSelected());
+            parentWindow.applyChartMode(selectedMode, transitsCheck.isSelected(),
+                chartARing, partnerRing);
         }
     }
 

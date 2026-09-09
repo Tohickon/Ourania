@@ -141,17 +141,17 @@ final class GlobeRenderer {
         // The three charts as ribbons, each lying in its own plane. Painted before the
         // chords and the bodies so they read as the ground those sit on.
         if (panel.outerRingDrawn()) {
-            r.ribbon(partnerR, shade(chartInk(1), 54), Globe.INCLINE_PARTNER);
+            r.ribbon(partnerR, shade(chartInk(1), 54), Globe.INCLINE_PARTNER, turning);
         }
         if (panel.triRingDrawn()) {
-            r.ribbon(skyR, shade(chartInk(2), 54), Globe.INCLINE_SKY);
+            r.ribbon(skyR, shade(chartInk(2), 54), Globe.INCLINE_SKY, turning);
         }
 
         if (r.shown(SkymapPanel.Layer.ASPECTS)) {
             r.aspectChords(panel, shells);
         }
         if (r.shown(SkymapPanel.Layer.NATAL)) {
-            r.ribbon(natalR, r.faded(shade(chartInk(0), 54), SkymapPanel.Layer.NATAL), 0.0);
+            r.ribbon(natalR, r.faded(shade(chartInk(0), 54), SkymapPanel.Layer.NATAL), 0.0, turning);
             r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
                 false, 0);
         }
@@ -273,43 +273,89 @@ final class GlobeRenderer {
         polyline(Globe.equator(this.origin, radius, 96, inclination), ink, 1.4f);
     }
 
-    /** How far a chart's ribbon reaches either side of the circle its bodies sit on. */
-    private static final double RIBBON_HALF = 0.085;
+    /** Half the width of a chart's band - the part you see looking at it from the side. */
+    private static final double RIBBON_HALF = 0.075;
 
     /**
-     * One chart's ring as a ribbon: a flat band lying in that chart's own plane.
+     * One point on a chart's band: at its radius, standing a height above its own plane.
+     *
+     * <b>A cylinder, not a sphere.</b> Globe.onShell puts a point on a sphere of the given
+     * radius, so its horizontal reach shrinks as it rises - which is right for a body stacked
+     * up its shell and wrong for a band, whose wall has to stay the same distance out all the
+     * way round. The tilt is the same x-axis rotation onShell applies, so a band and the
+     * bodies riding on it agree about where the plane is.
+     */
+    private double onBand(double lon, double radius, double height, double inclination,
+            int axis) {
+        double t = Math.toRadians(lon - this.origin);
+        double x = -radius * Math.cos(t);
+        double z = radius * Math.sin(t);
+        double c = Math.cos(inclination);
+        double s = Math.sin(inclination);
+        if (axis == 0) {
+            return x;
+        }
+        return axis == 1 ? height * c - z * s : height * s + z * c;
+    }
+
+    private double[] bandPoint(double lon, double radius, double height, double inclination) {
+        return new double[] {
+            onBand(lon, radius, height, inclination, 0),
+            onBand(lon, radius, height, inclination, 1),
+            onBand(lon, radius, height, inclination, 2),
+        };
+    }
+
+    /**
+     * One chart's ring as a band standing in its own plane, the way a ring sits on a finger.
      *
      * <b>A line does not say which way a plane faces.</b> The three charts were three thin
      * circles, and two of them are tilted - partner one way, sky the other - so the only cue
      * to which plane a body belonged to was how its circle happened to cross the others at
-     * that camera angle. Turn the globe and the cue changes. David: "it will be easier to
-     * distinguish the differing planes of each chart to make them more readable."
+     * that camera angle. Turn the globe and the cue changes.
      *
-     * A band has an inside and an outside and it foreshortens as it turns away, which is what
-     * makes a plane read as a plane. Drawn flat at y=0 in the ring's inclined frame rather
-     * than wrapped on the sphere, because a chart is a circle of longitude and nothing else -
-     * the same reason the sign ring and the mansion band are flat.
+     * <b>Standing, not lying.</b> The first attempt was a flat washer in the plane, which is
+     * a disc seen edge-on from the side and vanishes exactly where the camera spends most of
+     * its time. David: "like how a ring wraps flat around a finger, the thinness only visible
+     * looking up and down at it from the side view." So it is the wall of a very short
+     * cylinder: full width from the side, a paper edge from directly above. That is the way
+     * round that shows a plane at the angles this globe is actually read at.
      *
-     * It sits under the bodies rather than through them: a stacked body rides up its shell in
-     * y, so it stands off its own ribbon, which is the separation that makes a crowd legible.
+     * Each longitude step is its own quad rather than one polygon round the whole circle -
+     * the wall's near half and far half overlap in projection, and a single polygon under an
+     * even-odd fill would cancel where they meet. That is the same defect that once tore holes
+     * in the sphere; separate quads cannot express it, and they depth-sort individually so the
+     * near wall paints over the far one.
      */
-    private void ribbon(double radius, Color fill, double inclination) {
+    private void ribbon(double radius, Color fill, double inclination, boolean turning) {
         final int steps = 96;
-        double inner = radius - RIBBON_HALF;
-        double outer = radius + RIBBON_HALF;
-        for (int i = 0; i < steps; i++) {
+        // <b>Rims only while the hand is moving.</b> Three bands are two hundred and
+        // eighty-eight quads a frame, and measuring rather than assuming: they took a drag at
+        // 1100 pixels from 24ms to 40ms, which is the difference between turning a globe and
+        // fighting one. The filled shells are already left out for exactly this reason. The
+        // rims are two polylines and they carry the shape on their own, so a band still reads
+        // as a plane mid-drag and fills back in the moment the hand stops - which is when a
+        // reader is looking at it rather than at the motion.
+        for (int i = 0; !turning && i < steps; i++) {
             double la = (i * 360.0) / steps;
             double lb = ((i + 1) * 360.0) / steps;
-            quad(Globe.onShell(la, this.origin, inner, 0.0, inclination),
-                Globe.onShell(lb, this.origin, inner, 0.0, inclination),
-                Globe.onShell(lb, this.origin, outer, 0.0, inclination),
-                Globe.onShell(la, this.origin, outer, 0.0, inclination),
+            quad(bandPoint(la, radius, -RIBBON_HALF, inclination),
+                bandPoint(lb, radius, -RIBBON_HALF, inclination),
+                bandPoint(lb, radius, RIBBON_HALF, inclination),
+                bandPoint(la, radius, RIBBON_HALF, inclination),
                 fill);
         }
-        // Both edges, so the band has a boundary rather than fading into the wash.
+        // The two rims, which are what a band reads by when it turns edge-on.
         Color edge = shade(fill, Math.min(255, fill.getAlpha() * 3));
-        polyline(Globe.equator(this.origin, inner, steps, inclination), edge, 1.0f);
-        polyline(Globe.equator(this.origin, outer, steps, inclination), edge, 1.0f);
+        double[][] top = new double[steps + 1][];
+        double[][] bottom = new double[steps + 1][];
+        for (int i = 0; i <= steps; i++) {
+            double lon = (i * 360.0) / steps;
+            top[i] = bandPoint(lon, radius, RIBBON_HALF, inclination);
+            bottom[i] = bandPoint(lon, radius, -RIBBON_HALF, inclination);
+        }
+        polyline(top, edge, 1.0f);
+        polyline(bottom, edge, 1.0f);
     }
 
     /**
@@ -1188,17 +1234,30 @@ final class GlobeRenderer {
             double far = q.depth > this.cam.distance ? 0.55 : 1.0;
             final int alpha = (int) Math.round(255 * far);
 
-            // <b>The planets themselves on the natal ring, when the reader asks for it.</b>
-            // Only the natal ring: the outer rings are told apart by their colour, and a
-            // partner's Jupiter drawn as Jupiter would be indistinguishable from the reader's.
-            final boolean asPlanet = !outer && Settings.globePlanets()
-                && PLANET_FACE[i] != FACE_NONE;
+            // <b>The planets themselves, when the reader asks for it.</b> This was Chart A
+            // alone, because three Jupiters drawn as Jupiter are one Jupiter three times over
+            // and the ring colour was all that told them apart. The answer is not to keep the
+            // other two as beads but to keep the colour: a planet on Chart B or the sky is
+            // circled in its own chart's ink below, so what it is and whose it is are two
+            // different marks and neither has to carry the other.
+            final boolean asPlanet = Settings.globePlanets() && PLANET_FACE[i] != FACE_NONE
+                && (!outer || Settings.globePlanetsAllRings());
+            final Color chartRim = shade(chartInk(ring), alpha);
             final int bodyIndex = i;
             final int half = this.g.getFontMetrics(font(13)).stringWidth(glyph) / 2;
             this.pieces.add(new Piece(q.depth, () -> {
                 int rad = lit ? 11 : 9;
                 if (asPlanet) {
                     drawPlanet(bodyIndex, (int) q.x, (int) q.y, rad, alpha, lit);
+                    // Whose planet it is. Only on the outer rings: Chart A is the reader's own
+                    // and needs no telling apart, and a circle round every body on a full
+                    // three-ring globe is the clutter this drawing is trying to avoid.
+                    if (outer) {
+                        this.g.setStroke(stroke(lit ? 2.0f : 1.4f));
+                        this.g.setColor(lit ? shade(new Color(255, 238, 170), alpha) : chartRim);
+                        this.g.drawOval((int) q.x - rad - 2, (int) q.y - rad - 2,
+                            (rad + 2) * 2, (rad + 2) * 2);
+                    }
                     // <b>The glyph stays, beside it.</b> A planet at nine pixels is
                     // recognisable and not readable - two grey worlds are two grey worlds -
                     // and the glyph is how this chart has always named a body. Set off to

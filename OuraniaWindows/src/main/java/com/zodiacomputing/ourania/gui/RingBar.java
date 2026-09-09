@@ -45,6 +45,7 @@ public final class RingBar extends JPanel {
     private final java.util.Map<Chip, SkymapPanel.Layer> layerOf =
         new java.util.HashMap<>();
 
+    private boolean chartAOpen = true;
     private boolean partnerOpen;
     private boolean skyOpen;
     /** True when a second chart has been entered at all; without one the ring has nothing. */
@@ -64,10 +65,14 @@ public final class RingBar extends JPanel {
         // Chart B and Sky, and the bottom readout called something else again. One name each,
         // everywhere, so a reader never has to work out which of three words means the wheel
         // in front of them.
-        chartA = layerChip("Chart A", SkymapPanel.Layer.NATAL);
-        chartA.setToolTipText("<html><b>Fold Chart A's wheel away.</b><br>"
-            + "The chart is still cast from it - this hides its glyphs, so Chart B or the "
-            + "sky can be read on its own for a moment.</html>");
+        // <b>A ring, not a fold.</b> This chip hid Chart A's glyphs and left it in the chart,
+        // so a synastry with Chart A deselected was still a synastry - still cast from two
+        // people, still drawing cross-aspects to a wheel that was not on screen. It takes
+        // Chart A out of the chart now, and whatever is left moves inward to be the natal one.
+        chartA = new Chip("Chart A", () -> {
+            chartAOpen = !chartAOpen;
+            apply();
+        });
         add(chartA);
 
         partner = new Chip("Chart B", () -> {
@@ -171,11 +176,24 @@ public final class RingBar extends JPanel {
     public void syncFrom(ChartMode mode, boolean transits,
             com.zodiacomputing.ourania.astro.ChartSubject subjectA,
             com.zodiacomputing.ourania.astro.ChartSubject subjectB,
-            com.zodiacomputing.ourania.astro.ChartSubject subjectSky) {
+            com.zodiacomputing.ourania.astro.ChartSubject subjectSky,
+            boolean chartAIn, boolean chartBIn) {
         boolean hasChartA = subjectA != null && subjectA.entered();
         boolean hasPartnerData = subjectB != null && subjectB.entered();
-        this.partnerOpen = mode == ChartMode.SYNASTRY;
-        this.skyOpen = mode == ChartMode.TRANSIT
+        // <b>Read the membership, not the mode.</b> The mode used to be enough because only a
+        // synastry had a Chart B in it; now Chart A can be taken out and Chart B promoted onto
+        // the inner wheel, which is a TRANSIT chart with Chart B very much in it. Inferring the
+        // chips from the mode would leave Chart B's chip dark while its chart was on screen -
+        // the chip disagreeing with the wheel, which is what this method exists to prevent.
+        this.chartAOpen = chartAIn && hasChartA;
+        this.partnerOpen = chartBIn && hasPartnerData;
+        // <b>And the sky on its own is still the sky.</b> With neither person selected the sky
+        // is the whole chart - it is cast, it is drawn, it is the inner wheel - and the mode is
+        // SINGLE, which is the one combination this expression read as "no sky". The chip went
+        // dark over a wheel showing nothing but the sky.
+        boolean skyIsTheChart = !this.chartAOpen && !this.partnerOpen;
+        this.skyOpen = skyIsTheChart
+            || mode == ChartMode.TRANSIT
             || (transits && (mode == ChartMode.SYNASTRY
                 || mode == ChartMode.COMPOSITE_MIDPOINT
                 || mode == ChartMode.COMPOSITE_DAVISON));
@@ -191,8 +209,8 @@ public final class RingBar extends JPanel {
         // on which wheel that sent us here. A control that draws a chart should say which.
         chartA.setToolTipText(hasChartA
             ? "<html><b>Chart A</b> &middot; " + escape(subjectA.summary()) + "<br>"
-                + "Press to fold this wheel away and back. The chart is still cast from it - "
-                + "this only hides its glyphs.</html>"
+                + "Press to take this chart in or out. Out, whatever is left moves inward - "
+                + "Chart B becomes the natal chart, or the sky does.</html>"
             : "<html><b>Chart A</b> &middot; not entered<br>"
                 + "Enter a birth date, time and place on the Chart Setup screen and press "
                 + "Generate. Until then the wheel shows the sky.</html>");
@@ -218,7 +236,7 @@ public final class RingBar extends JPanel {
 
     private void apply() {
         if (window != null) {
-            window.setRings(partnerOpen, skyOpen);
+            window.setRings(chartAOpen, partnerOpen, skyOpen);
         }
         repaintChips();
     }
@@ -316,6 +334,9 @@ public final class RingBar extends JPanel {
             }
             if (this == partner) {
                 return partnerOpen && partner.available;
+            }
+            if (this == chartA) {
+                return chartAOpen && chartA.available;
             }
             return this == globe ? globeOpen : skyOpen;
         }

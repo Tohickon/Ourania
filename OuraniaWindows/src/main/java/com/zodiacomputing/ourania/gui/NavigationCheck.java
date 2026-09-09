@@ -164,6 +164,12 @@ public final class NavigationCheck {
         report("Part N - an empty Chart A behaves exactly like an empty Chart B", before);
 
         System.out.println();
+        System.out.println("=== Part O: deselecting a chart promotes the next one inward ===");
+        before = failures.size();
+        theCompositionFollowsTheChips();
+        report("Part O - the chart is whoever is still selected", before);
+
+        System.out.println();
         System.out.println("=== Part G: each ring's glyphs say which ring they are on ===");
         before = failures.size();
         ringColours();
@@ -976,13 +982,19 @@ public final class NavigationCheck {
             ok("Chart B reads back", b.equals(sky.chartBSubject()));
             ok("the sky reads back", s.equals(sky.skySubject()));
 
-            // A subject nobody entered is not a chart of this instant.
+            // <b>A chart nobody entered is not a chart, and what is left moves inward.</b>
+            // This used to pin the base slot as null with Chart B left on its own outer ring,
+            // which was right while Chart A was the only chart that could be the natal one.
+            // Chart B is promoted now - the same rule the chips follow, and the reason Part O
+            // exists - so an absent Chart A reads as a Chart B natal chart rather than as a
+            // hole with a partner ring around it.
             install.invoke(sky,
                 com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A"), b, s);
-            ok("an unentered Chart A leaves its moment null",
-                get(sky, "baseChartTime") == null);
-            ok("and the panel says it has no Chart A", !sky.hasChartA());
-            ok("without disturbing Chart B", b.moment.equals(get(sky, "transitChartTime")));
+            ok("an unentered Chart A promotes Chart B onto the inner wheel",
+                b.moment.equals(get(sky, "baseChartTime")));
+            ok("and the panel still says there is no Chart A", !sky.hasChartA());
+            ok("but the inner wheel is a birth chart", sky.innerIsBirthChart());
+            ok("with nothing left on the outer ring", get(sky, "transitChartTime") == null);
             ok("or the sky", s.moment.equals(get(sky, "skyChartTime")));
 
             // Moving the sky moves the sky.
@@ -1139,6 +1151,149 @@ public final class NavigationCheck {
     }
 
     /** Every chip's label, in the order the bar holds them. */
+    /**
+     * Taking a chart out of the selection changes what kind of chart it is.
+     *
+     * <b>Chart A's chip used to hide its glyphs and leave it in the chart.</b> So a synastry
+     * with Chart A deselected was still a synastry: still cast from two people, still drawing
+     * cross-aspects to a wheel that was not on screen, still calling itself one in the readout.
+     * David walked the sequence he expected instead - "I deselect Chart A, now I am no longer
+     * seeing a synastry, I am seeing a natal-transit chart... I then decide to deselect Chart
+     * B, I am seeing a current time and place natal chart... now I select back on Chart A and
+     * the chart now becomes a natal transit chart again" - and this is that walk, step for
+     * step.
+     *
+     * The chips are checked at each step in the same breath as the mode, because "the chart
+     * changed" and "the control says so" are the two halves that this panel has repeatedly had
+     * come apart, always in the direction of a lit chip over a wheel that does not have it.
+     */
+    private static void theCompositionFollowsTheChips() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            java.lang.reflect.Field fc = OuraniaWindow.class.getDeclaredField("chartSetupPanel");
+            fc.setAccessible(true);
+            ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
+            Thread.sleep(2500);
+
+            // Coordinates rather than place names: a check that geocodes is a check that fails
+            // on a train. Two real charts, so both chips have something behind them.
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                textField(setup, "baseDateField").setText("1982-08-10");
+                textField(setup, "baseTimeField").setText("15:01");
+                textField(setup, "baseLocationField").setText("39.95, -75.16");
+                textField(setup, "transitDateField").setText("1979-03-22");
+                textField(setup, "transitTimeField").setText("08:40");
+                textField(setup, "transitLocationField").setText("51.51, -0.13");
+            });
+            Class<?> subj = Class.forName(
+                "com.zodiacomputing.ourania.gui.ChartSetupPanel$Subject");
+            java.lang.reflect.Method setSubject =
+                ChartSetupPanel.class.getDeclaredMethod("setSubject", subj);
+            setSubject.setAccessible(true);
+            Object partnership = null;
+            for (Object o : subj.getEnumConstants()) {
+                if (((Enum<?>) o).name().equals("PARTNERSHIP")) {
+                    partnership = o;
+                }
+            }
+            final Object ps = partnership;
+            java.lang.reflect.Method gen =
+                ChartSetupPanel.class.getDeclaredMethod("generateChart");
+            gen.setAccessible(true);
+            final Exception[] blew = new Exception[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                try {
+                    setSubject.invoke(setup, ps);
+                    gen.invoke(setup);
+                } catch (Exception e) {
+                    blew[0] = e;
+                }
+            });
+            ok("the two charts generate", blew[0] == null);
+            Thread.sleep(3000);
+            ok("the wheel is holding a Chart A", hold[0].wheelHasChartA());
+            ok("the wheel is holding a Chart B", hold[0].wheelHasChartB());
+
+            java.lang.reflect.Field fr = SkymapPanel.class.getDeclaredField("ringBar");
+            fr.setAccessible(true);
+            RingBar bar = (RingBar) fr.get(panel);
+
+            step(hold[0], panel, bar, true, true, true, ChartMode.SYNASTRY, "Chart A", true);
+            ok("all three rings are drawn in a synastry with the sky", panel.triRingDrawn());
+
+            step(hold[0], panel, bar, false, true, true, ChartMode.TRANSIT, "Chart B", true);
+            ok("Chart B's transit chart has no third ring", !panel.triRingDrawn());
+
+            step(hold[0], panel, bar, false, false, true, ChartMode.SINGLE, null, true);
+            ok("the sky alone has no outer ring", !panel.outerRingDrawn());
+
+            step(hold[0], panel, bar, true, false, true, ChartMode.TRANSIT, "Chart A", true);
+            step(hold[0], panel, bar, true, false, false, ChartMode.SINGLE, "Chart A", false);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * One press of the chips, and everything that should follow from it.
+     *
+     * @param anchorLabel whose chart is on the inner wheel, or null when it is the sky
+     */
+    private static void step(OuraniaWindow w, SkymapPanel panel, RingBar bar, boolean a,
+            boolean b, boolean sky, ChartMode mode, String anchorLabel, boolean skyExpected)
+            throws Exception {
+        javax.swing.SwingUtilities.invokeAndWait(() -> w.setRings(a, b, sky));
+        Thread.sleep(1600);
+        String what = (a ? "A" : "-") + (b ? "B" : "-") + (sky ? "S" : "-");
+
+        java.lang.reflect.Field fm = SkymapPanel.class.getDeclaredField("chartMode");
+        fm.setAccessible(true);
+        java.lang.reflect.Field fa = SkymapPanel.class.getDeclaredField("anchorSubject");
+        fa.setAccessible(true);
+        Object anchor = fa.get(panel);
+        String on = anchor == null ? null
+            : ((com.zodiacomputing.ourania.astro.ChartSubject) anchor).label;
+        System.out.println("  " + what + " -> " + fm.get(panel) + ", inner wheel "
+            + (on == null ? "the sky" : on));
+
+        ok(what + " casts a " + mode, fm.get(panel) == mode);
+        ok(what + " puts " + (anchorLabel == null ? "the sky" : anchorLabel)
+            + " on the inner wheel", java.util.Objects.equals(on, anchorLabel));
+
+        // And the chips agree with it. A lit chip over a chart the wheel does not have is the
+        // defect this whole part exists to catch, so it is checked in both directions.
+        ok(what + ": Chart A's chip is " + (a ? "lit" : "dark"), chipLit(bar, "Chart A") == a);
+        ok(what + ": Chart B's chip is " + (b ? "lit" : "dark"), chipLit(bar, "Chart B") == b);
+        ok(what + ": the Sky chip is " + (skyExpected ? "lit" : "dark"),
+            chipLit(bar, "Sky") == skyExpected);
+    }
+
+    /** Whether a chip is drawn as open - the same call its own painter makes. */
+    private static boolean chipLit(RingBar bar, String label) throws Exception {
+        for (java.awt.Component c : bar.getComponents()) {
+            if (label.equals(labelOf(c))) {
+                java.lang.reflect.Method m = c.getClass().getDeclaredMethod("open");
+                m.setAccessible(true);
+                return (Boolean) m.invoke(c);
+            }
+        }
+        return false;
+    }
+
+    private static javax.swing.JTextField textField(ChartSetupPanel p, String name) {
+        try {
+            java.lang.reflect.Field f = ChartSetupPanel.class.getDeclaredField(name);
+            f.setAccessible(true);
+            return (javax.swing.JTextField) f.get(p);
+        } catch (Exception e) {
+            throw new RuntimeException(name, e);
+        }
+    }
+
     private static java.util.List<String> chipLabels(RingBar bar) throws Exception {
         java.util.List<String> out = new java.util.ArrayList<>();
         for (java.awt.Component c : bar.getComponents()) {
@@ -1308,7 +1463,7 @@ public final class NavigationCheck {
         set(sky, "chartMode", mode);
         set(sky, "showTransitChart", SkymapPanel.outerWheelShown(mode, true));
         set(sky, "showTriWheel", SkymapPanel.triWheelShown(mode, sky3));
-        set(sky, "chartALoaded", Boolean.TRUE);
+        set(sky, "innerIsBirthChart", Boolean.TRUE);
         set(sky, "baseChartTime", java.time.ZonedDateTime.of(
             1972, 9, 22, 18, 38, 0, 0, java.time.ZoneId.of("America/Los_Angeles")));
         set(sky, "baseLatitude", 34.0522);
