@@ -94,6 +94,12 @@ public final class ChartSetupCheck {
         report("Part G", before);
 
         System.out.println();
+        System.out.println("=== the clocks: a time that never happened, and one that happened twice ===");
+        int beforeClock = failures.size();
+        theClockNotice();
+        report("Clock notice", beforeClock);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -536,6 +542,182 @@ public final class ChartSetupCheck {
         ok("both composites are relationships",
             ChartSetupPanel.isRelationship(ChartMode.COMPOSITE_MIDPOINT)
                 && ChartSetupPanel.isRelationship(ChartMode.COMPOSITE_DAVISON));
+    }
+
+    /**
+     * A birth time in an hour the clocks changed says so, and offers the other reading.
+     *
+     * <b>Moments.resolve had no callers at all.</b> It was written, documented and covered by
+     * its own 65 checks, and nothing in the app ever asked it anything - an engine with no
+     * door, which is this project's most-logged defect and the reason a reader whose birth
+     * time fell in a repeated hour was never told the chart had picked one of the two for
+     * them. These are the two dates that exercise it, chosen because the answer is a matter of
+     * public record rather than of this code's opinion:
+     *
+     * <ul>
+     *   <li>2 April 2006, 02:30 in New York - the clocks went forward at 02:00, so 02:30 did
+     *       not exist that morning.</li>
+     *   <li>29 October 2006, 01:30 in New York - the clocks went back at 02:00, so 01:30
+     *       happened twice, once on EDT and once on EST.</li>
+     * </ul>
+     */
+    private static void theClockNotice() throws Exception {
+        java.time.ZoneId ny = java.time.ZoneId.of("America/New_York");
+
+        // First the engine, so a failure below can be read as the wiring rather than the rule.
+        com.zodiacomputing.ourania.astro.Moments.Resolved gap =
+            com.zodiacomputing.ourania.astro.Moments.resolve(
+                java.time.LocalDate.of(2006, 4, 2), java.time.LocalTime.of(2, 30), ny);
+        ok("an hour the clocks skipped is reported as skipped",
+            gap.kind == com.zodiacomputing.ourania.astro.Moments.Kind.SKIPPED);
+        ok("and it says so in a sentence", gap.note != null && !gap.note.isEmpty());
+        ok("and offers no second reading, because there is none", gap.other == null);
+
+        com.zodiacomputing.ourania.astro.Moments.Resolved twice =
+            com.zodiacomputing.ourania.astro.Moments.resolve(
+                java.time.LocalDate.of(2006, 10, 29), java.time.LocalTime.of(1, 30), ny);
+        ok("an hour that happened twice is reported as repeated",
+            twice.kind == com.zodiacomputing.ourania.astro.Moments.Kind.REPEATED);
+        ok("and it offers the second reading", twice.other != null);
+        ok("which is an hour later in real time", twice.other != null
+            && twice.other.toInstant().toEpochMilli()
+                - twice.when.toInstant().toEpochMilli() == 3600000L);
+
+        // Now the door: the same two times, entered the way a reader enters them.
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            java.lang.reflect.Field fc = OuraniaWindow.class.getDeclaredField("chartSetupPanel");
+            fc.setAccessible(true);
+            ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
+            Thread.sleep(2000);
+
+            ok("a repeated hour reaches the wheel as an uncertain subject",
+                generateAt(hold[0], setup, panel, "2006-10-29", "01:30"));
+            com.zodiacomputing.ourania.astro.ChartSubject a = panel.chartASubject();
+            ok("and the subject carries the sentence", a != null && a.timeIsUncertain());
+            ok("and carries the other reading a reader could switch to",
+                a != null && a.timeAlternative != null);
+
+            // The strip is visible, and it is visible because of this chart.
+            ok("the form shows a notice", awaitNotice(setup, true));
+
+            ok("a skipped hour also reaches the wheel",
+                generateAt(hold[0], setup, panel, "2006-04-02", "02:30"));
+            com.zodiacomputing.ourania.astro.ChartSubject skipped = panel.chartASubject();
+            ok("and is also reported", skipped != null && skipped.timeIsUncertain());
+            ok("with no second reading offered",
+                skipped != null && skipped.timeAlternative == null);
+
+            // <b>And an ordinary birth time says nothing at all.</b> A notice that is always up
+            // is a notice nobody reads, and this is the case that proves the strip is driven by
+            // the chart rather than merely switched on once and left.
+            ok("an ordinary time generates",
+                generateAt(hold[0], setup, panel, "1982-08-10", "15:01"));
+            com.zodiacomputing.ourania.astro.ChartSubject plain = panel.chartASubject();
+            ok("an unremarkable birth time raises nothing",
+                plain != null && !plain.timeIsUncertain());
+            ok("and the notice goes away", awaitNotice(setup, false));
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /** Types a date and time into Chart A, presses Generate, and waits for the wheel. */
+    private static boolean generateAt(OuraniaWindow window, ChartSetupPanel setup,
+            SkymapPanel panel, String date, String time) throws Exception {
+        final Exception[] blew = new Exception[1];
+        java.lang.reflect.Method gen =
+            ChartSetupPanel.class.getDeclaredMethod("generateChart");
+        gen.setAccessible(true);
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            try {
+                field(setup, "baseDateField").setText(date);
+                field(setup, "baseTimeField").setText(time);
+                // Coordinates, so nothing here needs the network.
+                field(setup, "baseLocationField").setText("40.71, -74.01");
+                gen.invoke(setup);
+            } catch (Exception e) {
+                blew[0] = e;
+            }
+        });
+        // <b>Wait for the chart, not for a number of seconds.</b> The cast runs on a worker and
+        // the notice is updated in its done() on the event thread, so a fixed sleep is a race:
+        // this check failed once and passed the next run on identical code, which is the worst
+        // way for a check to behave. Poll for the subject the form was told to build, then let
+        // the event queue drain - after which everything done() queued has actually happened.
+        long deadline = System.currentTimeMillis() + 20000;
+        boolean arrived = false;
+        while (System.currentTimeMillis() < deadline && !arrived) {
+            final boolean[] ready = {false};
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                com.zodiacomputing.ourania.astro.ChartSubject a = panel.chartASubject();
+                ready[0] = a != null && a.moment != null
+                    && a.moment.toLocalDate().toString().equals(date);
+            });
+            arrived = ready[0];
+            if (!arrived) {
+                Thread.sleep(100);
+            }
+        }
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        return blew[0] == null && arrived;
+    }
+
+    private static javax.swing.JTextField field(ChartSetupPanel p, String name) {
+        try {
+            java.lang.reflect.Field f = ChartSetupPanel.class.getDeclaredField(name);
+            f.setAccessible(true);
+            return (javax.swing.JTextField) f.get(p);
+        } catch (Exception e) {
+            throw new RuntimeException(name, e);
+        }
+    }
+
+    /**
+     * Waits for the notice to reach a state, and says whether it got there.
+     *
+     * <b>The chart arriving does not mean the notice has caught up.</b> The subjects are
+     * installed inside the worker and the strip is updated in its done() on the event thread,
+     * so a check that waits for the subject and then reads the strip is reading it one hop too
+     * early - which is exactly how this failed on two runs in three and passed on the third,
+     * on identical code. Waiting for the assertion's own subject is the fix; a timeout rather
+     * than a sleep is what keeps it a real assertion, because a notice that never clears
+     * still fails.
+     */
+    private static boolean awaitNotice(ChartSetupPanel setup, boolean wanted)
+            throws Exception {
+        long deadline = System.currentTimeMillis() + 15000;
+        boolean seen = !wanted;
+        while (System.currentTimeMillis() < deadline) {
+            javax.swing.JPanel strip = clockStrip(setup);
+            seen = strip != null && strip.isVisible();
+            if (seen == wanted) {
+                return true;
+            }
+            Thread.sleep(100);
+        }
+        System.out.println("  the notice never became " + (wanted ? "visible" : "hidden"));
+        return false;
+    }
+
+    /** The notice strip, read on the event thread that owns it. */
+    private static javax.swing.JPanel clockStrip(ChartSetupPanel p) throws Exception {
+        final javax.swing.JPanel[] out = new javax.swing.JPanel[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            try {
+                java.lang.reflect.Field f =
+                    ChartSetupPanel.class.getDeclaredField("clockPanel");
+                f.setAccessible(true);
+                out[0] = (javax.swing.JPanel) f.get(p);
+            } catch (Exception e) {
+                out[0] = null;
+            }
+        });
+        return out[0];
     }
 
     private static void ok(String label, boolean condition) {

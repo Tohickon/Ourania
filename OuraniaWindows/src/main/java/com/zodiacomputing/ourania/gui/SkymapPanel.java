@@ -922,8 +922,18 @@ extends JPanel {
             java.time.LocalDate d = LocalDate.parse(date,
                 DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             LocalTime t = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
+            // <b>Through Moments, which had been written and never called.</b> Twice a year a
+            // local time is not one instant: the clocks go forward and an hour never happens,
+            // or they go back and it happens twice. ZonedDateTime.of resolves both silently -
+            // it shifts the first and takes the earlier of the second - so a birth in that hour
+            // was cast on an assumption nobody was told about. Moments.resolve returns the same
+            // instant Java would, deliberately, so no saved chart moves; what it adds is that
+            // the assumption now has a sentence and the other reading has a handle.
+            com.zodiacomputing.ourania.astro.Moments.Resolved r =
+                com.zodiacomputing.ourania.astro.Moments.resolve(d, t, ZoneId.of(zone));
             return com.zodiacomputing.ourania.astro.ChartSubject.of(label,
-                ZonedDateTime.of(d, t, ZoneId.of(zone)), name, lat, lon, zone, timeUnknown);
+                r.when, name, lat, lon, zone, timeUnknown)
+                .withTimeNote(r.note, r.other);
         } catch (Exception notADate) {
             // Half a date is not a moment. The place is kept, so a reader who has typed a
             // location and not yet a birthday does not lose the location too.
@@ -3048,6 +3058,13 @@ extends JPanel {
                 // charts change. Without this they kept the text their constructor gave them.
                 if (SkymapPanel.this.window != null && SkymapPanel.this.ringBar != null) {
                     SkymapPanel.this.window.syncRingBar(SkymapPanel.this.ringBar);
+                }
+                // <b>And the setup form is told what had to be assumed.</b> Moments.resolve
+                // computes it, subjectFrom keeps it, and until this line nothing showed it -
+                // which is how it came to be written, checked, and never once seen by a reader.
+                if (SkymapPanel.this.window != null) {
+                    SkymapPanel.this.window.showClockNotice(
+                        SkymapPanel.this.subjectA, SkymapPanel.this.subjectB);
                 }
             }
         };

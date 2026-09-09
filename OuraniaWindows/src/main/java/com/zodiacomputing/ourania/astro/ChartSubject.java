@@ -67,8 +67,30 @@ public final class ChartSubject {
      */
     public final boolean timeUnknown;
 
+    /**
+     * What had to be assumed to turn the written time into an instant, or null when nothing was.
+     *
+     * <b>Derived, but not recoverable, which is why it is stored.</b> Everything else here is
+     * enough to re-run {@link com.zodiacomputing.ourania.astro.Moments#resolve} - except for a
+     * time the clocks skipped, where the moment held is the shifted one and asking again about
+     * <em>that</em> local time answers "normal". The doubt would be lost exactly in the case
+     * where it matters most, so it travels with the subject.
+     */
+    public final String timeNote;
+
+    /** The other reading of a repeated hour, or null. What a reader can switch to. */
+    public final ZonedDateTime timeAlternative;
+
     private ChartSubject(String label, ZonedDateTime moment, String placeName,
             double latitude, double longitude, String zoneId, boolean timeUnknown) {
+        this(label, moment, placeName, latitude, longitude, zoneId, timeUnknown, null, null);
+    }
+
+    private ChartSubject(String label, ZonedDateTime moment, String placeName,
+            double latitude, double longitude, String zoneId, boolean timeUnknown,
+            String timeNote, ZonedDateTime timeAlternative) {
+        this.timeNote = timeNote;
+        this.timeAlternative = timeAlternative;
         this.label = label == null ? "" : label;
         this.moment = moment;
         this.placeName = placeName == null ? "" : placeName;
@@ -83,6 +105,24 @@ public final class ChartSubject {
     public static ChartSubject empty(String label) {
         return new ChartSubject(label, null, "", 0.0, 0.0,
             ZoneId.systemDefault().getId(), false);
+    }
+
+    /**
+     * The same subject, carrying what had to be assumed about its time.
+     *
+     * <b>Not part of what makes two subjects the same.</b> The note describes the moment
+     * rather than adding to it - two subjects with the same instant, place and zone are the
+     * same chart whether or not one of them remembers being asked - so equals and hashCode
+     * leave it out, and a check comparing subjects does not have to know it exists.
+     */
+    public ChartSubject withTimeNote(String note, ZonedDateTime alternative) {
+        return new ChartSubject(this.label, this.moment, this.placeName, this.latitude,
+            this.longitude, this.zoneId, this.timeUnknown, note, alternative);
+    }
+
+    /** True when the clocks did something to this time that a reader might want to correct. */
+    public boolean timeIsUncertain() {
+        return this.timeNote != null && !this.timeNote.isEmpty();
     }
 
     /** A subject with everything known. */

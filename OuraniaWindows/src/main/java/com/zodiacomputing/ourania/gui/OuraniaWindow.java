@@ -945,6 +945,14 @@ public class OuraniaWindow extends JFrame {
         this.applyChartMode(mode, transits, true, true);
     }
 
+    /** Passes what had to be assumed about a chart's time back to the form that set it. */
+    public void showClockNotice(com.zodiacomputing.ourania.astro.ChartSubject a,
+            com.zodiacomputing.ourania.astro.ChartSubject b) {
+        if (chartSetupPanel != null) {
+            chartSetupPanel.showClockNotice(a, b);
+        }
+    }
+
     /** Whether the wheel is actually holding a Chart A - the entered chart, not the typing. */
     public boolean wheelHasChartA() {
         return skymapPanel != null && skymapPanel.chartASubject() != null

@@ -542,7 +542,114 @@ public class ChartSetupPanel extends JPanel {
         buttonPanel.add(swapBtn);
         buttonPanel.add(Box.createRigidArea(new Dimension(20, 0)));
         buttonPanel.add(generateBtn);
-        add(buttonPanel, BorderLayout.SOUTH);
+
+        // <b>Above the button that casts the chart, because that is when it matters.</b> The
+        // clock notice is empty and invisible almost always; it appears for the two hours a
+        // year when a written birth time is not one instant, and it appears where the reader is
+        // already looking rather than in a dialog they have to dismiss before they can think.
+        JPanel south = new JPanel(new BorderLayout());
+        south.setOpaque(false);
+        south.add(clockNotice(), BorderLayout.NORTH);
+        south.add(buttonPanel, BorderLayout.CENTER);
+        add(south, BorderLayout.SOUTH);
+    }
+
+    /** The clock-change notice, and the button that takes the other reading. */
+    private JPanel clockPanel;
+    private JLabel clockText;
+    private JButton clockSwitch;
+    /** The reading the switch would move to, or null when there is nothing to switch to. */
+    private java.time.ZonedDateTime clockOther;
+
+    private JPanel clockNotice() {
+        clockPanel = new JPanel(new BorderLayout(10, 0));
+        clockPanel.setBorder(Theme.pad(8, 12, 8, 12));
+        clockPanel.setBackground(new Color(58, 46, 18));
+        clockText = new JLabel();
+        clockText.setForeground(new Color(240, 224, 170));
+        clockText.setFont(Theme.SMALL);
+        clockSwitch = new JButton("Use the other reading");
+        clockSwitch.setFont(Theme.SMALL);
+        clockSwitch.setFocusPainted(false);
+        clockSwitch.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        clockSwitch.addActionListener(e -> takeOtherReading());
+        clockPanel.add(clockText, BorderLayout.CENTER);
+        clockPanel.add(clockSwitch, BorderLayout.EAST);
+        clockPanel.setVisible(false);
+        return clockPanel;
+    }
+
+    /**
+     * Shows what had to be assumed about a chart's time, or hides the strip when nothing was.
+     *
+     * <b>Read off the subject the wheel is holding, not off the form.</b> The form holds text;
+     * whether that text was an hour the clocks skipped is a fact about the chart that was
+     * actually cast, and asking the wheel is what keeps the notice from describing a chart
+     * nobody generated.
+     */
+    void showClockNotice(com.zodiacomputing.ourania.astro.ChartSubject a,
+            com.zodiacomputing.ourania.astro.ChartSubject b) {
+        if (clockPanel == null) {
+            return;
+        }
+        com.zodiacomputing.ourania.astro.ChartSubject which =
+            a != null && a.timeIsUncertain() ? a
+                : (b != null && b.timeIsUncertain() ? b : null);
+        if (which == null) {
+            clockPanel.setVisible(false);
+            clockOther = null;
+            revalidate();
+            repaint();
+            return;
+        }
+        clockText.setText("<html><b>" + which.label + "</b> &middot; " + which.timeNote
+            + "</html>");
+        clockOther = which.timeAlternative;
+        // A skipped hour has no second reading to offer - the time did not happen, and the only
+        // honest options are to accept the shift or to correct the date or the place. Offering
+        // a switch there would be offering a choice that does not exist.
+        clockSwitch.setVisible(clockOther != null);
+        clockSwitchLabel = which.label;
+        clockPanel.setVisible(true);
+        revalidate();
+        repaint();
+    }
+
+    /** Whose time the switch would change - Chart A's or Chart B's. */
+    private String clockSwitchLabel = "";
+
+    /**
+     * Takes the second reading of a repeated hour.
+     *
+     * Written back into the time field rather than pushed straight at the wheel, so the change
+     * is visible in the form the reader is looking at and survives the next Generate - the
+     * alternative would be a chart that disagrees with the boxes that produced it, which is the
+     * defect this panel has already been through twice.
+     */
+    private void takeOtherReading() {
+        if (clockOther == null) {
+            return;
+        }
+        JTextField timeField = "Chart B".equals(clockSwitchLabel)
+            ? transitTimeField : baseTimeField;
+        JComboBox<String> zoneBox = "Chart B".equals(clockSwitchLabel)
+            ? transitZone : baseZone;
+        // <b>The same local time in the other offset is a different instant, and the form has
+        // no box for an offset.</b> So the switch is expressed the only way the form can hold
+        // it: as the zone the reader is pinned to, with the clock time left alone. Setting the
+        // offset id rather than the region id is what makes the second reading stick - the
+        // region would resolve back to the first.
+        if (zoneBox != null) {
+            String offset = clockOther.getOffset().getId();
+            String id = "Z".equals(offset) ? "UTC" : ("UTC" + offset);
+            zoneBox.setEditable(true);
+            zoneBox.setSelectedItem(id);
+        }
+        if (timeField != null) {
+            timeField.setText(clockOther.toLocalTime().toString().substring(0, 5));
+        }
+        clockPanel.setVisible(false);
+        generateChart();
     }
 
     // ------------------------------------------------------------------ the step chooser
