@@ -252,6 +252,40 @@ public final class Atlas {
         return out;
     }
 
+    /**
+     * The known place closest to a coordinate pair, or null when the atlas is empty.
+     *
+     * <b>What a pair of coordinates is for: its time zone.</b> Latitude and longitude are
+     * enough to cast houses and nothing else - the moment still has to be read in some zone,
+     * and a bare pair carries none. The nearest town's zone is the answer, and it is right
+     * everywhere except within a few kilometres of a zone boundary, where nothing short of a
+     * boundary polygon would be.
+     *
+     * A linear scan of 168,549 rows, which is a few milliseconds and happens once per chart.
+     * An index would be faster and would be one more thing that can disagree with the data.
+     */
+    public static synchronized Place nearest(double lat, double lon) {
+        load();
+        if (folded == null || folded.length == 0) {
+            return null;
+        }
+        int best = -1;
+        double bestD = Double.MAX_VALUE;
+        // Longitude degrees are narrower away from the equator; without this the nearest place
+        // to somewhere in Scandinavia is chosen as though a degree of longitude were 111km.
+        double squash = Math.cos(Math.toRadians(lat));
+        for (int i = 0; i < folded.length; i++) {
+            double dy = lats[i] - lat;
+            double dx = (lons[i] - lon) * squash;
+            double d = dy * dy + dx * dx;
+            if (d < bestD) {
+                bestD = d;
+                best = i;
+            }
+        }
+        return best < 0 ? null : at(best);
+    }
+
     /** The one place a typed name most likely means, or null when the atlas has none. */
     public static Place resolve(String query) {
         List<Place> hits = search(query, 1);

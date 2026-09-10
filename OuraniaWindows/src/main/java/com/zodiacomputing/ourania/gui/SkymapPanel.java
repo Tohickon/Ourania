@@ -274,7 +274,34 @@ extends JPanel {
      * be a fourth ring in every other mode that already has an outer wheel.
      */
     public static boolean triWheelShown(ChartMode mode, boolean transits) {
-        return mode == ChartMode.SYNASTRY && transits;
+        return triWheelShown(mode, transits, false);
+    }
+
+    /**
+     * Whether a third ring is drawn, given what the middle one is carrying.
+     *
+     * <b>A third ring appears when the middle one is occupied by something that is not the
+     * sky.</b> That was only ever true of a synastry - the middle ring is the second person and
+     * the sky goes outside them both - so the rule was written as "synastry and transits", which
+     * is the same answer arrived at by naming the one case rather than the reason.
+     *
+     * Progressions are the second case. The middle ring carries the progressed chart, cast at
+     * {@link com.zodiacomputing.ourania.astro.Progressions#progressedJd} rather than at the
+     * transit date; before this it and the sky competed for that one ring, so the reader could
+     * have progressions or transits and never both. Natal inner, progressed middle, transits
+     * outer is the standard way the technique is read, and every piece of it already existed -
+     * what was missing was permission for the sky to take a ring of its own.
+     *
+     * @param progressed whether the middle ring is carrying the progressed chart
+     */
+    public static boolean triWheelShown(ChartMode mode, boolean transits, boolean progressed) {
+        if (mode == ChartMode.SYNASTRY) {
+            return transits;
+        }
+        // Only where the middle ring is genuinely the progressed chart: a composite already
+        // derives its inner wheel from two people, and progressing that is a different
+        // technique from the one this draws.
+        return progressed && transits && mode == ChartMode.TRANSIT;
     }
 
     /**
@@ -706,12 +733,7 @@ extends JPanel {
     private void installMode(ChartMode mode, boolean transits) {
         this.chartMode = mode;
         this.transitsEnabled = transits;
-        this.showTransitChart = SkymapPanel.outerWheelShown(mode, transits);
-        this.showTriWheel    = SkymapPanel.triWheelShown(mode, transits);
-        // The rings open or fold to match. Set after the flags, so a bloom never disagrees
-        // with the thing it is animating.
-        this.outerBloom.set(this.showTransitChart);
-        this.triBloom.set(this.showTriWheel);
+        this.applyRingFlags();
         this.cachedFrame = null;
         this.relationshipFrame = null;
         this.relationshipCacheKey = null;
@@ -1069,6 +1091,51 @@ extends JPanel {
     public double[] tSpeed = new double[BODY_COUNT];
     public boolean[] tValid = new boolean[BODY_COUNT];
     private final boolean[] tOk = new boolean[BODY_COUNT];
+    /**
+     * Which rings are drawn, from the mode, the transits flag and what the middle ring carries.
+     *
+     * <b>Extracted because a second caller appeared and copying it would have been the bug.</b>
+     * The Settings screen can change whether the middle ring is progressed, which changes
+     * whether the sky gets a ring of its own - and the hook that reloads that setting recomputed
+     * the flag it reads and not the flags that follow from it, so choosing Progressions left the
+     * third ring off until something else happened to change the mode. One statement, two
+     * callers, and neither can drift from the other.
+     */
+    private void applyRingFlags() {
+        this.showTransitChart = SkymapPanel.outerWheelShown(this.chartMode, this.transitsEnabled);
+        this.showTriWheel = SkymapPanel.triWheelShown(this.chartMode, this.transitsEnabled,
+            this.showProgressed());
+        // The rings open or fold to match. Set after the flags, so a bloom never disagrees
+        // with the thing it is animating.
+        this.outerBloom.set(this.showTransitChart);
+        this.triBloom.set(this.showTriWheel);
+    }
+
+    /**
+     * The moment the middle ring was cast at, whatever it is carrying.
+     *
+     * Chart B's birth moment in a synastry, this moment for a transit ring, and a date a few
+     * weeks after birth for a progressed one. Written by updateChartData, read by anything that
+     * wants to print what the ring is showing.
+     */
+    private SweDate outerCastAt;
+
+    /** The middle ring's moment as text, or empty when there is nothing on that ring. */
+    private String outerCastLabel() {
+        SweDate d = this.outerCastAt;
+        if (d == null || !this.showTransitChart) {
+            return "";
+        }
+        int hour = (int) d.getHour();
+        int minute = (int) Math.round((d.getHour() - hour) * 60.0);
+        if (minute == 60) {
+            minute = 0;
+            hour = (hour + 1) % 24;
+        }
+        return String.format("%04d-%02d-%02d %02d:%02d UT",
+            d.getYear(), d.getMonth(), d.getDay(), hour, minute);
+    }
+
     /** Tri-wheel sky positions. Only populated when {@link #showTriWheel} is true. */
     public double[] cLon = new double[BODY_COUNT];
     public double[] cSpeed = new double[BODY_COUNT];
@@ -3833,11 +3900,20 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // a synastry and the sky everywhere else, and calling both of them "sky" is how a
         // reader comes to believe a birth chart is this moment.
         ZonedDateTime outer = this.isSynastryChart() ? this.transitChartTime : this.skyChartTime;
-        if (this.showTransitChart && outer != null) {
-            out.append(this.isSynastryChart() ? "      Chart B: " : "      Sky: ")
-               .append(outer.format(fmt));
+        // <b>Each ring named by what is on it, and the moment it was cast at.</b> This chose
+        // between two labels on isSynastryChart and printed the entered field beside them -
+        // which said "Sky" over the progressed ring, printed Chart B's birth moment for a ring
+        // showing this instant, and dropped the sky row entirely from any tri-wheel that was
+        // not a synastry. Three faults, one boolean, and ringWord already existed.
+        if (this.showTransitChart) {
+            String when = this.outerCastLabel();
+            if (when.isEmpty() && outer != null) {
+                when = outer.format(fmt);
+            }
+            out.append("      ").append(capitalise(this.ringWord(WHEEL_OUTER)))
+               .append(": ").append(when);
         }
-        if (this.showTriWheel && this.skyChartTime != null && this.isSynastryChart()) {
+        if (this.triRingDrawn() && this.skyChartTime != null) {
             out.append("      Sky: ").append(this.skyChartTime.format(fmt));
         }
         this.timeDrawer.setLabel(out.toString());
@@ -4908,6 +4984,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // none, because the suite goes green either way. This is the hook SettingsPanel calls
         // when anything it owns changes, which is exactly when this needs re-reading.
         this.showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+        // And the rings that follow from it. Without this, choosing Progressions here changed
+        // what the middle ring carried and not whether the sky had anywhere to go.
+        this.applyRingFlags();
         this.aspectMode = Settings.aspectMode();
         this.updateChartData();
         if (this.chartPanel != null) {
@@ -6329,6 +6408,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             outerSd = new SweDate(com.zodiacomputing.ourania.astro.Progressions.progressedJd(
                 this.baseSd.getJulDay(), outerSd.getJulDay()));
         }
+        // <b>What the middle ring was actually cast at, kept.</b> The readouts printed
+        // transitChartTime beside it, which is Chart B's birth moment - right in a synastry and
+        // wrong everywhere else, and wrong in a new way for a progressed ring, whose moment is
+        // a date in the reader's infancy that no field on the form holds. One place computes
+        // this; now one place remembers it, and the readouts ask rather than guess.
+        this.outerCastAt = outerSd;
         if (this.showTransitChart && outerSd != null && !progressedRing) {
             double[] dArray2 = new double[10];
             this.sw.swe_houses(outerSd.getJulDay(), 2, outerLat, outerLon, this.houseSystem, this.transitCusps, dArray2);
@@ -6730,9 +6815,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         }
         if (wantTransits && this.showTransitChart) {
-            String string4 = this.chartMode == ChartMode.SYNASTRY ? "Chart B (Outer)" : "Transit Chart";
+            // The third copy of the same choice, and the one that called a progressed ring a
+            // transit chart. ringWord is the statement of it; this only capitalises.
+            String string4 = this.chartMode == ChartMode.SYNASTRY ? "Chart B (Outer)"
+                : (this.showProgressed() ? "Progressed Chart" : "Transit Chart");
             stringBuilder.append("<br><h2 style='color:#ffa500; margin-bottom: 2px;'>").append(string4).append("</h2>");
-            stringArray = this.transitChartTime != null ? this.transitChartTime.format(dateTimeFormatter) : "";
+            stringArray = this.outerCastLabel();
+            if (stringArray.isEmpty() && this.transitChartTime != null) {
+                stringArray = this.transitChartTime.format(dateTimeFormatter);
+            }
             String stringArray2 = String.format("%.2f, %.2f", this.transitLatitude, this.transitLongitude);
             stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(stringArray).append("<br>").append(stringArray2).append("</div>");
             stringBuilder.append("<h3 style='color:#ffa500;'>Placements</h3>");

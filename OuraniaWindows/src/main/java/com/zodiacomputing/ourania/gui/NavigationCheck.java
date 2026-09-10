@@ -170,6 +170,12 @@ public final class NavigationCheck {
         report("Part O - the chart is whoever is still selected", before);
 
         System.out.println();
+        System.out.println("=== Part P: natal inside, progressed in the middle, the sky outside ===");
+        before = failures.size();
+        theProgressedTriWheel();
+        report("Part P - a progressed chart and the sky can be drawn at once", before);
+
+        System.out.println();
         System.out.println("=== Part G: each ring's glyphs say which ring they are on ===");
         before = failures.size();
         ringColours();
@@ -1291,6 +1297,147 @@ public final class NavigationCheck {
             return (javax.swing.JTextField) f.get(p);
         } catch (Exception e) {
             throw new RuntimeException(name, e);
+        }
+    }
+
+    /**
+     * A progressed chart and the sky, on the same wheel.
+     *
+     * <b>They used to compete for one ring.</b> The middle ring carried transits or
+     * progressions - a Settings choice between them - so natal, progressed and transiting could
+     * not be read together, which is the standard way the technique is read. Everything needed
+     * already existed: Progressions.progressedJd casts the ring, the third ring exists for
+     * synastry, and the reason the third ring was refused was that its rule named the synastry
+     * case rather than the reason for it.
+     *
+     * The engine half is asserted through {@code Progressions.progressedJd} itself rather than
+     * against numbers written here - a day of ephemeris for a year of life is the definition,
+     * and a check that restates the arithmetic is a check that passes when the arithmetic and
+     * the restatement are wrong together.
+     */
+    private static void theProgressedTriWheel() throws Exception {
+        // The rule, first, so a failure below reads as the wiring rather than the rule.
+        ok("a synastry with transits is still a tri-wheel",
+            SkymapPanel.triWheelShown(ChartMode.SYNASTRY, true, false));
+        ok("a progressed transit chart is now one too",
+            SkymapPanel.triWheelShown(ChartMode.TRANSIT, true, true));
+        ok("but a plain transit chart is not",
+            !SkymapPanel.triWheelShown(ChartMode.TRANSIT, true, false));
+        ok("and neither is a progressed chart with no sky asked for",
+            !SkymapPanel.triWheelShown(ChartMode.TRANSIT, false, true));
+        ok("a composite is left alone",
+            !SkymapPanel.triWheelShown(ChartMode.COMPOSITE_MIDPOINT, true, true));
+
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+
+            com.zodiacomputing.ourania.astro.ChartSubject a =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart A",
+                    java.time.ZonedDateTime.of(1982, 8, 10, 15, 1, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            com.zodiacomputing.ourania.astro.ChartSubject sky =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Sky",
+                    java.time.ZonedDateTime.of(2026, 3, 1, 12, 0, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            java.lang.reflect.Method install = SkymapPanel.class.getDeclaredMethod(
+                "installSubjects", com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class);
+            install.setAccessible(true);
+            install.invoke(panel, a,
+                com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart B"), sky);
+
+            // Progressions on, the way the Settings screen turns them on.
+            Settings.setOuterWheel(Settings.OUTER_PROGRESSED);
+            panel.reloadAspectSelection();
+            set(panel, "chartMode", ChartMode.TRANSIT);
+            set(panel, "transitsEnabled", Boolean.TRUE);
+            java.lang.reflect.Method flags =
+                SkymapPanel.class.getDeclaredMethod("applyRingFlags");
+            flags.setAccessible(true);
+            flags.invoke(panel);
+            panel.updateChartData();
+            Thread.sleep(1500);
+
+            ok("the middle ring is drawn", panel.outerRingDrawn());
+            ok("and the sky has a ring of its own", panel.triRingDrawn());
+
+            // <b>Three rings with three different sets of positions.</b> The rings could all be
+            // drawn and two of them be the same chart - which is what would happen if the
+            // progressed ring were cast at the transit date after all.
+            int sameAsNatal = 0;
+            int sameAsSky = 0;
+            int compared = 0;
+            for (int i = 0; i < SkymapPanel.BODY_COUNT; i++) {
+                if (!panel.bValid[i] || !panel.tValid[i] || !panel.cValid[i]) {
+                    continue;
+                }
+                // <b>The angles are supposed to match.</b> A progressed bi-wheel is progressed
+                // bodies around the NATAL frame - the cusps are deliberately copied rather than
+                // recast, which is a documented choice in updateChartData - so the Ascendant
+                // and Midheaven on the middle ring are the natal ones and always will be.
+                // Counting them as "the natal chart again" asserted against the technique.
+                if (com.zodiacomputing.ourania.astro.Bodies.at(i).isAngle()) {
+                    continue;
+                }
+                compared++;
+                if (Math.abs(panel.tLon[i] - panel.bLon[i]) < 0.001) {
+                    sameAsNatal++;
+                }
+                if (Math.abs(panel.tLon[i] - panel.cLon[i]) < 0.001) {
+                    sameAsSky++;
+                }
+            }
+            System.out.println("  " + compared + " bodies on all three rings; middle matches "
+                + "natal for " + sameAsNatal + ", matches the sky for " + sameAsSky);
+            ok("there are bodies on all three rings", compared > 5);
+            ok("the middle ring is not the natal chart again", sameAsNatal == 0);
+            ok("nor the sky again", sameAsSky == 0);
+
+            // <b>And it is progressed, not merely different.</b> A day for a year: the Sun moves
+            // about a degree a progressed year, so forty-three years of life is a Sun somewhere
+            // between thirty and fifty degrees on from birth - and nothing else the middle ring
+            // could be carrying puts it there.
+            double sunMoved = ((panel.tLon[0] - panel.bLon[0]) % 360.0 + 360.0) % 360.0;
+            System.out.printf("  the progressed Sun has moved %.1f degrees from natal%n",
+                sunMoved);
+            ok("the progressed Sun has moved about a degree per year of life",
+                sunMoved > 30.0 && sunMoved < 55.0);
+
+            // The readouts name the ring rather than calling it a transit chart.
+            java.lang.reflect.Method word = SkymapPanel.class.getDeclaredMethod(
+                "ringWord", int.class);
+            word.setAccessible(true);
+            ok("the middle ring is called progressed",
+                "progressed".equals(word.invoke(panel, SkymapPanel.WHEEL_OUTER)));
+            ok("and the outer one is still the sky",
+                "sky".equals(word.invoke(panel, SkymapPanel.WHEEL_SKY)));
+
+            // <b>And back.</b> Turning progressions off has to give the ring back to the sky,
+            // or the reader is left with a third ring and nothing on it.
+            Settings.setOuterWheel(Settings.OUTER_TRANSITS);
+            panel.reloadAspectSelection();
+            // <b>Wait for the ring to finish closing, not for a number of milliseconds.</b>
+            // triRingDrawn asks whether the ring is on SCREEN, and a ring that has been told to
+            // close is still on screen while it folds - so a fixed sleep here is a race between
+            // this check and an animation, which is the same mistake the clock notice check
+            // made. Poll, with a timeout, so a ring that never closes still fails.
+            long deadline = System.currentTimeMillis() + 8000;
+            while (panel.triRingDrawn() && System.currentTimeMillis() < deadline) {
+                Thread.sleep(100);
+            }
+            ok("turning progressions off closes the third ring", !panel.triRingDrawn());
+            ok("and the sky is back on the middle one", panel.outerRingDrawn());
+        } finally {
+            Settings.setOuterWheel(Settings.OUTER_TRANSITS);
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
     }
 

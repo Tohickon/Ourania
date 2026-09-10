@@ -45,6 +45,21 @@ public final class Geocoder {
      */
     public static Result lookup(String query) {
         if (query == null || query.trim().isEmpty()) return null;
+        // <b>Coordinates are already an answer.</b> The location boxes accept "lat, lon", and
+        // since the typeahead landed they are what a reader who picks a suggestion ends up
+        // with - so this path is the common one, not an edge case. It was going out to
+        // Nominatim to be told what it had just been given, which is a round trip, a rate
+        // limit, and a chart that cannot be cast offline for exactly the places the atlas
+        // knows best. Only the zone has to be looked up, and the atlas answers that too.
+        Atlas.Place pair = fromCoordinates(query);
+        if (pair != null) {
+            Result res = new Result();
+            res.lat = pair.latitude;
+            res.lon = pair.longitude;
+            res.name = pair.name;
+            res.tzId = pair.zoneId;
+            return res;
+        }
         Atlas.Place known = Atlas.resolve(query);
         if (known != null) {
             Result res = new Result();
@@ -97,6 +112,39 @@ public final class Geocoder {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Reads "39.95, -75.16" as a place, taking its zone from the nearest town the atlas knows.
+     *
+     * Returns null for anything that is not a pair of numbers, which is how a place name falls
+     * through to the lookups below. The bounds are checked rather than assumed: "12, 2000" is
+     * two numbers and is not a coordinate, and a chart cast at longitude 2000 fails somewhere
+     * far less legible than here.
+     */
+    static Atlas.Place fromCoordinates(String query) {
+        String[] parts = query.split(",");
+        if (parts.length != 2) {
+            return null;
+        }
+        double lat;
+        double lon;
+        try {
+            lat = Double.parseDouble(parts[0].trim());
+            lon = Double.parseDouble(parts[1].trim());
+        } catch (NumberFormatException notANumber) {
+            return null;
+        }
+        if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+            return null;
+        }
+        Atlas.Place near = Atlas.nearest(lat, lon);
+        String zone = near == null ? "UTC" : near.zoneId;
+        String name = near == null ? String.format(java.util.Locale.ROOT, "%.4f, %.4f", lat, lon)
+            : near.label();
+        // The coordinates the reader gave, not the town's - a birth place is not its nearest
+        // city centre, and the houses are cast from these.
+        return new Atlas.Place(name, "", "", lat, lon, zone, 0);
     }
 
     /** IANA zone id for a coordinate pair, or "UTC" if the service cannot be reached. */

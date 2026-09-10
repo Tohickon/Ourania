@@ -65,6 +65,12 @@ public final class AtlasCheck {
         report("Part G", before);
 
         System.out.println();
+        System.out.println("=== Part I: a coordinate pair is already an answer ===");
+        before = failures.size();
+        theCoordinates();
+        report("Part I", before);
+
+        System.out.println();
         System.out.println("=== Part H: the form's location boxes offer the atlas ===");
         before = failures.size();
         theForm();
@@ -365,6 +371,61 @@ public final class AtlasCheck {
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
+    }
+
+    /**
+     * "39.95, -75.16" resolves without asking anyone.
+     *
+     * <b>This was the common path and it was going out to the network.</b> The typeahead writes
+     * coordinates into the box when a reader picks a place - deliberately, so the name is not
+     * geocoded a second time and cannot come back a different Springfield - and those
+     * coordinates then missed the atlas by name and fell through to Nominatim, to be told what
+     * they had just said. A chart could not be cast offline for exactly the places the atlas
+     * knows best.
+     *
+     * The zone is the one thing a bare pair does not carry, and the nearest known town supplies
+     * it. Checked here at three latitudes because the nearest-place search has to squash
+     * longitude by the cosine of latitude - without that, the nearest town to somewhere far
+     * north is chosen as though a degree of longitude were as wide as a degree of latitude.
+     */
+    private static void theCoordinates() {
+        pair("39.95, -75.16", 39.95, -75.16, "America/New_York");
+        pair("51.51, -0.13", 51.51, -0.13, "Europe/London");
+        pair("-33.87, 151.21", -33.87, 151.21, "Australia/Sydney");
+        pair("64.14, -21.90", 64.14, -21.90, "Atlantic/Reykjavik");
+        pair("35.69,139.69", 35.69, 139.69, "Asia/Tokyo");
+
+        // <b>The coordinates the reader gave, not the town's.</b> A birth place is not its
+        // nearest city centre, and the houses are cast from these numbers.
+        Geocoder.Result r = Geocoder.lookup("39.95, -75.16");
+        ok("a pair keeps the exact coordinates it was given",
+            r != null && r.lat == 39.95 && r.lon == -75.16);
+
+        // Two numbers are not a coordinate pair. This has to fall through rather than cast a
+        // chart at a longitude that does not exist.
+        ok("a longitude out of range is not read as a coordinate",
+            Geocoder.fromCoordinates("12, 2000") == null);
+        ok("nor a latitude out of range",
+            Geocoder.fromCoordinates("100, 20") == null);
+        ok("and a place name is still a place name",
+            Geocoder.fromCoordinates("Philadelphia") == null);
+    }
+
+    private static void pair(String typed, double lat, double lon, String zone) {
+        long t0 = System.currentTimeMillis();
+        Geocoder.Result r = Geocoder.lookup(typed);
+        long ms = System.currentTimeMillis() - t0;
+        ok(typed + " resolves", r != null);
+        if (r == null) {
+            return;
+        }
+        ok(typed + " keeps its latitude", Math.abs(r.lat - lat) < 0.0001);
+        ok(typed + " keeps its longitude", Math.abs(r.lon - lon) < 0.0001);
+        ok(typed + " takes the zone of the nearest town (" + zone + ")",
+            zone.equals(r.tzId));
+        // A network round trip cannot happen in this long; the atlas load is the only thing
+        // here that costs anything, and it happens once.
+        ok(typed + " answered from disk", ms < 2000);
     }
 
     private static void ok(String label, boolean condition) {
