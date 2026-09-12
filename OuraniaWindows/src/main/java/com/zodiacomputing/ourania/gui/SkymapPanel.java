@@ -2019,6 +2019,22 @@ extends JPanel {
      * anything cleverer renders as literal markup, which is the same defect the Snapshot
      * panel was carrying until it was fixed.
      */
+    /**
+     * The body the selection card on screen is describing, so the card can redraw itself.
+     *
+     * <b>The card used to redraw from the hover focus, which is not the same thing.</b> The
+     * focus follows the cursor; the card stays where it was put. Every expander on it was a
+     * round trip through the focus, so a card whose body was no longer under the mouse either
+     * redrew as a different body or, with the focus on nothing, did not redraw at all - which
+     * is what a reader sees as a heading that will not open. Recorded where the card is built,
+     * so any path that opens one gets working expanders rather than only the paths that
+     * remembered to pin.
+     */
+    private int selectionBody = -1;
+    private double selectionLon;
+    private double selectionSpeed;
+    private boolean selectionTransit;
+
     /** Which sections of the selection card the reader has opened. Survives re-selection. */
     private final java.util.Set<String> selectionOpen = new java.util.LinkedHashSet<>();
 
@@ -2040,6 +2056,10 @@ extends JPanel {
      * for expanders, and hoverHtml stays the one description of a body that both share.
      */
     String selectionHtml(int n, double lon, double speed, boolean transit) {
+        this.selectionBody = n;
+        this.selectionLon = lon;
+        this.selectionSpeed = speed;
+        this.selectionTransit = transit;
         StringBuilder sb = new StringBuilder(this.hoverHtml(n, lon, speed,
             transit ? WHEEL_OUTER : WHEEL_NATAL));
         int close = sb.lastIndexOf("</body>");
@@ -2280,8 +2300,10 @@ extends JPanel {
     /**
      * Opens or closes one section of the card and redraws it in place.
      *
-     * Redrawn from the focused body rather than from anything the link carries, so the card
-     * cannot end up describing one body with another's sections open.
+     * Redrawn from the body the card is describing rather than from anything the link carries,
+     * so the card cannot end up describing one body with another's sections open - and rather
+     * than from the hover focus, which is where it used to come from and is a different fact:
+     * the focus follows the cursor, and the cursor has to leave the wheel to reach the card.
      */
     public void toggleSelectionSection(String key) {
         if (key == null || this.window == null) {
@@ -2290,15 +2312,11 @@ extends JPanel {
         if (!this.selectionOpen.remove(key)) {
             this.selectionOpen.add(key);
         }
-        if (this.focusBody < 0) {
+        if (this.selectionBody < 0) {
             return;
         }
-        double[] lon = this.focusTransit ? this.tLon : this.bLon;
-        double[] spd = this.focusTransit ? this.tSpeed : this.bSpeed;
-        if (this.focusBody < lon.length) {
-            this.window.showSelection(this.selectionHtml(
-                this.focusBody, lon[this.focusBody], spd[this.focusBody], this.focusTransit));
-        }
+        this.window.showSelection(this.selectionHtml(this.selectionBody, this.selectionLon,
+            this.selectionSpeed, this.selectionTransit));
     }
 
     private String hoverHtml(int n, double lon, double speed, int ring) {
@@ -4267,7 +4285,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // The same card the flat wheel opens, built by the same method. A second way
                 // of describing a body would be a second thing to keep in step with the
                 // interpretation panel, and it would drift the first time either changed.
-                this.setFocus(hit);
+                //
+                // <b>Pinned, the way the flat wheel pins.</b> This called setFocus, which does
+                // not pin - so the focus stayed loose and the first mouse movement after the
+                // click, which is the movement toward the card that just opened, put it back
+                // on nothing. The glyph unlit itself on the way to reading about it, and every
+                // expander on the card went dead, because the card redraws from the focus and
+                // there was no longer a focus to redraw from.
+                if (this.pinFocus(hit) && this.chartPanel != null) {
+                    this.chartPanel.repaint();
+                }
                 this.window.showSelection(this.selectionHtml(i, lon[i], spd[i], outer));
             }
             return;
@@ -5069,6 +5096,56 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     static final int WHEEL_NATAL = 0;
     static final int WHEEL_OUTER = 1;
     static final int WHEEL_SKY = 2;
+
+    /** The globe's three decks: this chart in the middle, Chart B below, the sky above. */
+    static final int DECK_MIDDLE = 0;
+    static final int DECK_LOWER = 1;
+    static final int DECK_UPPER = 2;
+
+    /**
+     * Which deck of the globe a wheel's bodies belong on.
+     *
+     * <b>A wheel is a role and a deck is a chart, and the globe was drawing the role.</b> The
+     * engine has three slots - inner, outer, sky - and which chart sits in which slot moves
+     * with the selection: take Chart A out and Chart B is promoted to the inner slot, take
+     * Chart B out of a synastry and the sky moves into the outer one. That promotion is
+     * deliberate and it is about what kind of chart is being cast. Drawing straight from the
+     * slot index made it a visual promotion too, so a chip that took one chart out sent the
+     * other two climbing between decks - and David, watching it, could not tell whether he had
+     * deselected the chart he meant to.
+     *
+     * So the deck is decided by whose chart it is rather than by which slot holds it. The sky
+     * is always the top ring when it is transits, Chart B always the bottom one, and the chart
+     * being read is always the middle - which is stable under every selection, because the
+     * only thing a chip can do is empty a deck.
+     *
+     * The three values are the same 0/1/2 the globe already used for natal, partner and sky
+     * radii and planes, so nothing downstream has to learn a second vocabulary - the callers
+     * pass this instead of the wheel index and everything else is as it was.
+     */
+    int ringDeck(int wheel) {
+        if (wheel == WHEEL_SKY) {
+            return DECK_UPPER;
+        }
+        if (wheel == WHEEL_OUTER) {
+            // The outer slot is a second person in a synastry and the sky in every other mode
+            // - the same rule outerRingMarker states, read here for the same reason.
+            return this.isSynastryChart() ? DECK_LOWER : DECK_UPPER;
+        }
+        // <b>The inner slot is the middle deck unless Chart B has been promoted into it.</b>
+        // A composite is its own chart rather than either person's and belongs in the middle;
+        // so does the sky when the sky is the whole chart, because then it is not transits
+        // over something, it is the thing being read, and a lone ring floating above an empty
+        // middle would say otherwise.
+        boolean chartBIsTheChart = !this.isRelationshipChart()
+            && this.anchorSubject != null && this.anchorSubject == this.subjectB;
+        // <b>Two wheels must never land on one deck.</b> They would be drawn at one radius in
+        // one plane and the reader would see one ring holding two charts. A synastry already
+        // has Chart B on the lower deck, and a chart with two people in it has Chart A on the
+        // inner wheel anyway - so this only ever fires for a half-built state, and it fires
+        // toward the middle rather than into a collision.
+        return chartBIsTheChart && !this.isSynastryChart() ? DECK_LOWER : DECK_MIDDLE;
+    }
 
     /** The wheel a grid row label names, for the rows that predate the wheel field. */
     static int wheelOfLabel(String label) {

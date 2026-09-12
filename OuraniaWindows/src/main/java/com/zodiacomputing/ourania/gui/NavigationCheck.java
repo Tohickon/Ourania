@@ -927,6 +927,40 @@ public final class NavigationCheck {
             ok("the card paints its own dark ground rather than a borrowed white one",
                 ground < 80);
             ok("and its name stands off that ground", contrast > 90);
+
+            // <b>And its headings open, after the cursor has left the wheel.</b> David: "there
+            // are these expanders but none of them open." They opened from the hover focus,
+            // and the hover focus is not the card - it follows the cursor, and the cursor has
+            // to cross the wheel to reach the drawer the card is in. The move put the focus on
+            // nothing, the redraw bailed out on that, and every heading on the card went dead
+            // without any of them looking dead. So the card is rebuilt here from a focus that
+            // has already gone, which is the state the reader is always in by the time they
+            // click one.
+            java.lang.reflect.Method setFocus = SkymapPanel.class.getDeclaredMethod(
+                "setFocus", int.class);
+            setFocus.setAccessible(true);
+            java.lang.reflect.Field fb = SkymapPanel.class.getDeclaredField("focusBody");
+            fb.setAccessible(true);
+            java.lang.reflect.Field sp = OuraniaWindow.class.getDeclaredField("selectionPane");
+            sp.setAccessible(true);
+            javax.swing.JEditorPane live = (javax.swing.JEditorPane) sp.get(w[0]);
+
+            SwingUtilities.invokeAndWait(() -> w[0].showSelection(doc));
+            setFocus.invoke(sky, Integer.valueOf(-1));
+            same("the cursor has left every body", Integer.valueOf(-1), fb.get(sky));
+            final String[] seen = new String[2];
+            SwingUtilities.invokeAndWait(() -> seen[0] = live.getText());
+            SwingUtilities.invokeAndWait(() ->
+                w[0].handlePlacementClick(SkymapPanel.SELECT_EXPAND + "core"));
+            SwingUtilities.invokeAndWait(() -> seen[1] = live.getText());
+            ok("a heading opens even though nothing is under the cursor",
+                seen[0] != null && !seen[0].equals(seen[1]));
+            // And closes again, so the same click is a toggle rather than a one-way door.
+            SwingUtilities.invokeAndWait(() ->
+                w[0].handlePlacementClick(SkymapPanel.SELECT_EXPAND + "core"));
+            final String[] shut = new String[1];
+            SwingUtilities.invokeAndWait(() -> shut[0] = live.getText());
+            ok("and closes again on a second click", shut[0].equals(seen[0]));
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }

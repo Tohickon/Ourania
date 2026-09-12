@@ -282,6 +282,54 @@ public final class Settings {
         set(GLOBE_PLANETS_ALL_KEY, on ? "true" : "false");
     }
 
+    /** Settings key for bowing the globe's aspect lines over the centre. */
+    public static final String GLOBE_ASPECT_ARCS_KEY = "chart.globeAspectArcs";
+
+    /**
+     * Whether an aspect on the globe arcs over the middle or runs straight through it.
+     *
+     * <b>The straight line is the true one and the arc is the readable one.</b> Two bodies in
+     * aspect are joined by a chord, and on a flat wheel that is all a line can be. On a sphere
+     * the chord spends its length in the crowded interior, and an opposition - the aspect a
+     * reader most wants to see - is the diameter that goes through the exact middle, where
+     * every other line already is. Arced, it climbs over the centre instead, so the widest
+     * aspects ride highest and the figure a chart makes has a shape from the side. Off gives
+     * the chords back, which stay easier to trace when only two or three are drawn.
+     */
+    public static boolean globeAspectArcs() {
+        return !"false".equals(get(GLOBE_ASPECT_ARCS_KEY, "true"));
+    }
+
+    public static void setGlobeAspectArcs(boolean on) {
+        set(GLOBE_ASPECT_ARCS_KEY, on ? "true" : "false");
+    }
+
+    /** Settings key for stacking the globe rings instead of crossing them. */
+    public static final String GLOBE_STACKED_RINGS_KEY = "chart.globeStackedRings";
+
+    /**
+     * Whether the partner and sky rings are stacked above and below the natal plane, or tilted
+     * across it.
+     *
+     * <b>Two ways to keep three rings apart, and they keep different promises.</b> Crossed is
+     * the older one: the partner tips one way and the sky the other, so the three planes are
+     * unmistakably three planes and all of them meet at the Ascendant. What it costs is that a
+     * tilted ring turns longitude into something other than the angle you see, so a transit
+     * conjunct a natal planet sits over it only at the Ascendant and the Descendant.
+     *
+     * Stacked lifts the sky just above the natal plane and the partner just below it, leaving
+     * all three parallel. Every degree keeps the direction it has on the natal ring, so a
+     * conjunction across charts is one body directly above another and can be read at a
+     * glance. Nothing crosses anything any more, which is the trade.
+     */
+    public static boolean globeStackedRings() {
+        return !"false".equals(get(GLOBE_STACKED_RINGS_KEY, "true"));
+    }
+
+    public static void setGlobeStackedRings(boolean on) {
+        set(GLOBE_STACKED_RINGS_KEY, on ? "true" : "false");
+    }
+
     // ------------------------------------------------------------------- marker shapes
 
     /**

@@ -113,6 +113,34 @@ final class Globe {
     static final double INCLINE_PARTNER = 0.48;
     static final double INCLINE_SKY = -0.48;
 
+    /**
+     * How far the partner and sky rings sit above and below the natal plane, when they are
+     * stacked rather than crossed.
+     *
+     * <b>The other way of keeping three rings apart, and it keeps a different promise.</b>
+     * Tilting separates the planes and costs the one thing a reader crosses rings to do:
+     * a tilted ring turns longitude into something other than the angle you see, so a transit
+     * conjunct a natal planet is only over it at the Ascendant and the Descendant, and drifts
+     * away from it everywhere else. Lifted instead, each ring stays a circle of latitude on
+     * its own shell, every degree keeps the direction it has on the natal ring, and a
+     * conjunction across charts is a body directly above another body.
+     *
+     * What it gives up is the crossing: three parallel rings meet nowhere, so the Ascendant is
+     * no longer a place where all three visibly agree. It does not need to be, because now
+     * they agree everywhere.
+     *
+     * <b>A height rather than an angle.</b> Latitude would put the outer ring further up than
+     * the inner one for the same tilt; a height puts all three at the same remove, which is
+     * what "just above" and "just below" mean when you look at the globe edge-on. At 0.40 the
+     * gap is about five times a body's bead, and the horizontal reach of the sky ring shrinks
+     * by 0.045 of its radius to stay on its shell - the same arithmetic that keeps a stacked
+     * body on the sphere.
+     */
+    static final double LIFT_SKY = 0.40;
+
+    /** The partner ring, the same distance the other way. */
+    static final double LIFT_PARTNER = -0.40;
+
     /** Half-height of a meridian arc, in radians of latitude. Matches the prototype's 0.92. */
     static final double MERIDIAN_SPAN = 0.92;
 
@@ -292,6 +320,120 @@ final class Globe {
                 -radius * Math.cos(t) * c, radius * Math.sin(phi), radius * Math.sin(t) * c};
         }
         return pts;
+    }
+
+
+    /**
+     * How far an aspect line bows out of the straight chord, as a fraction of the geometric
+     * answer.
+     *
+     * <b>One is not a taste, it is the arc that touches the shell.</b> Two bodies on a shell of
+     * radius R separated by an angle are half a chord apart, and that half-chord is exactly the
+     * height a bow has to reach for its apex to land back on R: an opposition rises a full
+     * radius and passes over the pole, a trine rises to 0.87 of one, a conjunction barely
+     * leaves the surface. So every arc in a ring, whatever its aspect, has its top on the same
+     * sphere - which is the thing being drawn here, a globe of aspects inside the globe of
+     * bodies. Lowering this flattens them back toward chords; raising it puts arcs through the
+     * rings outside them.
+     */
+    static final double ARC_RISE = 1.0;
+
+    /**
+     * An aspect as an arc over the middle, rather than a chord through it.
+     *
+     * <b>The chord is honest and unreadable.</b> A line between two bodies on a sphere runs
+     * through the interior, and a dozen of them are a ball of wool: an opposition is the worst
+     * of them, a diameter that passes through the exact centre where every other line is
+     * already crowding. Lifted into a bow, the same opposition goes up and over the middle and
+     * a reader turning the globe sees it as one long span rather than as a line ending
+     * somewhere behind the far bodies. It also puts the widest aspects highest, so the figure
+     * a chart makes has a silhouette.
+     *
+     * <b>Vertical, and perpendicular to the chord.</b> The bow could lie in the plane
+     * through both bodies and the centre, which is the plane a great circle would use - but for
+     * two bodies on the ecliptic that plane is the ecliptic, so the arc would hug the ring it
+     * came from and read as a wider ring rather than as a span. Rotating it to the vertical is
+     * a presentational choice, made once here so that every arc in the scene bows the same way
+     * and the eye reads them as a family. It is also the only choice that stays continuous at
+     * an exact opposition, where the two bodies are antipodal and the plane through them and
+     * the centre is undefined.
+     *
+     * <b>Up by default, down for a negative rise.</b> The sign flips the bow through the chord
+     * and changes nothing else, so a downward arc is the mirror of the upward one with its
+     * lowest point on the same shell - which is what lets one chart's network sit as a bowl
+     * under the sign plane while another's is a dome over it. GlobeRenderer.riseFor says
+     * which way each line goes.
+     *
+     * @param segments how many straight pieces stand in for the curve
+     * @return segments + 1 world points, starting at a and ending at b
+     */
+    static double[][] arc(double[] a, double[] b, int segments) {
+        return arc(a, b, segments, ARC_RISE);
+    }
+
+    /**
+     * As above, over a chosen rise - zero for the straight chord.
+     *
+     * <b>One method for both, because the painter draws both.</b> The reader can switch the
+     * bow off, and a straight line built by a second code path is a straight line that fades,
+     * sorts and steps by different arithmetic than the curved one - which is this project's
+     * most common defect wearing a new hat. At a rise of zero this returns the chord exactly.
+     */
+    static double[][] arc(double[] a, double[] b, int segments, double rise) {
+        int n = Math.max(1, segments);
+        double[] lift = arcLift(a, b, rise);
+        double[][] pts = new double[n + 1][];
+        for (int i = 0; i <= n; i++) {
+            double t = i / (double) n;
+            // A half sine: zero at both bodies, so the arc lands on the glyphs rather than
+            // near them, and steepest where it leaves them.
+            double bow = Math.sin(Math.PI * t);
+            pts[i] = new double[] {
+                a[0] + (b[0] - a[0]) * t + lift[0] * bow,
+                a[1] + (b[1] - a[1]) * t + lift[1] * bow,
+                a[2] + (b[2] - a[2]) * t + lift[2] * bow,
+            };
+        }
+        return pts;
+    }
+
+    /**
+     * The vector added at the top of an arc: which way it bows, times how far.
+     *
+     * Separate from {@link #arc} because the painter sizes its curve from the height and the
+     * check suite asserts the height, and neither wants the whole polyline to get one number.
+     */
+    static double[] arcLift(double[] a, double[] b) {
+        return arcLift(a, b, ARC_RISE);
+    }
+
+    /** As above, over a chosen rise. */
+    static double[] arcLift(double[] a, double[] b, double rise) {
+        double dx = b[0] - a[0];
+        double dy = b[1] - a[1];
+        double dz = b[2] - a[2];
+        double len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (len < 1e-9) {
+            return new double[] {0.0, 0.0, 0.0};
+        }
+        double ux = dx / len;
+        double uy = dy / len;
+        double uz = dz / len;
+        // Up, with the part of it that runs along the chord taken out - so the bow is square
+        // to the line it leaves, whatever plane that line lies in.
+        double px = -uy * ux;
+        double py = 1.0 - uy * uy;
+        double pz = -uy * uz;
+        double pl = Math.sqrt(px * px + py * py + pz * pz);
+        if (pl < 1e-6) {
+            // A chord that already points at the pole has no upward to bow into. Nothing in
+            // this scene draws one - every shell shares a centre, so two bodies are never
+            // stacked vertically - but a fallback that returns a flat chord is better than one
+            // that returns a division by nothing.
+            return new double[] {0.0, 0.0, 0.0};
+        }
+        double h = rise * len / 2.0;
+        return new double[] {px / pl * h, py / pl * h, pz / pl * h};
     }
 
     /**

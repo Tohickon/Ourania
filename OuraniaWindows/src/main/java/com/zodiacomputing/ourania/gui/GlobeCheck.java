@@ -97,6 +97,24 @@ public final class GlobeCheck {
         report("Part M", before);
 
         System.out.println();
+        System.out.println("=== Part Q: taking a chart out does not move the others ===");
+        before = failures.size();
+        theDecksHoldStill();
+        report("Part Q", before);
+
+        System.out.println();
+        System.out.println("=== Part P: stacked rings line their degrees up ===");
+        before = failures.size();
+        theStackedRings();
+        report("Part P", before);
+
+        System.out.println();
+        System.out.println("=== Part O: an aspect goes over the middle, not through it ===");
+        before = failures.size();
+        theArcGoesOver();
+        report("Part O", before);
+
+        System.out.println();
         System.out.println("=== Part N: a chord through the far side is dimmer than one in front ===");
         before = failures.size();
         theChordsFadeWithDepth();
@@ -485,31 +503,47 @@ public final class GlobeCheck {
             // the check was. The one line of ordering is the whole of it.
             double[] shells = GlobeRenderer.shellRadii(panel);
 
-            for (double yaw : new double[] {0.0, 1.1, 2.4, 4.9}) {
-                for (double pitch : new double[] {-0.9, 0.0, 0.42, 0.87}) {
-                    cam.yaw = yaw;
-                    cam.pitch = pitch;
-                    for (int ring = 0; ring <= 1; ring++) {
-                        double[] rlon = ring == 0 ? lon : tlon;
-                        boolean[] rvalid = ring == 0 ? valid : tvalid;
-                        double incline = GlobeRenderer.inclinationOf(ring);
-                        int[] level = Globe.stackLevels(rlon, rvalid, 7.0);
-                        for (int i = 0; i < rlon.length; i++) {
-                            double[] p = Globe.onShell(rlon[i], origin, shells[ring],
-                                level[i] * Globe.STACK_STEP, incline);
-                            Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
-                            if (!q.visible) {
-                                continue;
+            // <b>Both ring layouts, because either is a plane the hit test has to know.</b>
+            // The rings can be crossed - the partner tipped one way and the sky the other - or
+            // stacked, one just above the natal plane and one just below. A body drawn at a
+            // height and clicked at zero is the same see-it-cannot-click-it defect as a body
+            // drawn on a tilt and clicked flat, and the layout is a setting, so the sweep runs
+            // under both rather than under whichever one happens to be saved.
+            boolean layoutWas = Settings.globeStackedRings();
+            for (boolean stacked : new boolean[] {false, true}) {
+                Settings.setGlobeStackedRings(stacked);
+                String plan = stacked ? "stacked" : "crossed";
+                for (double yaw : new double[] {0.0, 1.1, 2.4, 4.9}) {
+                    for (double pitch : new double[] {-0.9, 0.0, 0.42, 0.87}) {
+                        cam.yaw = yaw;
+                        cam.pitch = pitch;
+                        for (int ring = 0; ring <= 1; ring++) {
+                            double[] rlon = ring == 0 ? lon : tlon;
+                            boolean[] rvalid = ring == 0 ? valid : tvalid;
+                            // The deck the painter would put this wheel on, not the wheel
+                            // index - the two part company the moment a chart is taken out.
+                            int deck = panel.ringDeck(ring);
+                            double incline = GlobeRenderer.inclinationOf(deck, stacked);
+                            double lift = GlobeRenderer.liftOf(deck, stacked);
+                            int[] level = Globe.stackLevels(rlon, rvalid, 7.0);
+                            for (int i = 0; i < rlon.length; i++) {
+                                double[] p = Globe.onShell(rlon[i], origin, shells[ring],
+                                    lift + level[i] * Globe.STACK_STEP, incline);
+                                Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
+                                if (!q.visible) {
+                                    continue;
+                                }
+                                int hit = GlobeRenderer.bodyAt(cam, w, h, panel,
+                                    (int) Math.round(q.x), (int) Math.round(q.y));
+                                yes("clicking " + plan + " ring " + ring + " body " + i
+                                    + " where it is drawn finds something (yaw=" + yaw
+                                    + " pitch=" + pitch + ")", hit >= 0);
                             }
-                            int hit = GlobeRenderer.bodyAt(cam, w, h, panel,
-                                (int) Math.round(q.x), (int) Math.round(q.y));
-                            yes("clicking ring " + ring + " body " + i + " where it is drawn"
-                                + " finds something (yaw=" + yaw + " pitch=" + pitch + ")",
-                                hit >= 0);
                         }
                     }
                 }
             }
+            Settings.setGlobeStackedRings(layoutWas);
 
             // And empty sky selects nothing, rather than the nearest thing anywhere.
             cam.yaw = 0;
@@ -1061,6 +1095,481 @@ public final class GlobeCheck {
     }
 
     /**
+     * Taking one chart out does not move the others between decks.
+     *
+     * <b>This is the complaint, stated as an assertion.</b> David: "something confusing is
+     * happening when I select or deselect chart a chart b and sky - I don't know if it's that
+     * when one chart is deselected it changes levels, or that the same chart keeps being
+     * deselected even though a different button is pressed." It was the first: the engine's
+     * three slots are roles, and which chart sits in which slot moves with the selection, so
+     * the globe - which drew straight from the slot - sent the remaining charts climbing
+     * between rings whenever a chip was pressed. A reader cannot tell that apart from having
+     * pressed the wrong chip.
+     *
+     * So the deck is a fact about the chart and not about the slot, and this walks every
+     * combination of the two chips asking the only questions that matter: Chart A in the
+     * middle whenever it is drawn, Chart B below whenever it is drawn, the sky above whenever
+     * it is transits rather than the whole chart - and never two wheels on one deck.
+     */
+    private static void theDecksHoldStill() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+            com.zodiacomputing.ourania.astro.ChartSubject a =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart A",
+                    java.time.ZonedDateTime.of(1982, 8, 10, 15, 1, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            com.zodiacomputing.ourania.astro.ChartSubject b =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart B",
+                    java.time.ZonedDateTime.of(1979, 3, 22, 8, 40, 0, 0,
+                        java.time.ZoneId.of("Europe/London")),
+                    "London", 51.51, -0.13, "Europe/London", false);
+            com.zodiacomputing.ourania.astro.ChartSubject sky =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Sky",
+                    java.time.ZonedDateTime.of(2026, 3, 1, 12, 0, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            java.lang.reflect.Method install = SkymapPanel.class.getDeclaredMethod(
+                "installSubjects", com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class);
+            install.setAccessible(true);
+            install.invoke(panel, a, b, sky);
+            java.lang.reflect.Method compose = SkymapPanel.class.getDeclaredMethod(
+                "setComposition", boolean.class, boolean.class);
+            compose.setAccessible(true);
+
+            for (boolean chartA : new boolean[] {true, false}) {
+                for (boolean chartB : new boolean[] {true, false}) {
+                    compose.invoke(panel, chartA, chartB);
+                    // The mode follows the composition in the app; here it is set beside it,
+                    // because this is asking about the decks and not about the routing.
+                    set(panel, "chartMode", chartA && chartB
+                        ? ChartMode.SYNASTRY : ChartMode.TRANSIT);
+                    set(panel, "showTransitChart", Boolean.TRUE);
+                    set(panel, "showTriWheel", Boolean.valueOf(chartA && chartB));
+                    panel.updateChartData();
+                    String state = "A " + (chartA ? "in" : "out")
+                        + ", B " + (chartB ? "in" : "out");
+
+                    int inner = panel.ringDeck(SkymapPanel.WHEEL_NATAL);
+                    int outer = panel.ringDeck(SkymapPanel.WHEEL_OUTER);
+                    int tri = panel.ringDeck(SkymapPanel.WHEEL_SKY);
+
+                    // Whoever is on the inner wheel, the sky is above it whenever it is
+                    // transits rather than the chart itself.
+                    eq("with " + state + " the sky ring is the upper deck",
+                        SkymapPanel.DECK_UPPER, chartA && chartB ? tri : outer);
+                    if (chartA) {
+                        eq("with " + state + " Chart A keeps the middle deck",
+                            SkymapPanel.DECK_MIDDLE, inner);
+                    } else if (chartB) {
+                        eq("with " + state + " Chart B keeps the lower deck",
+                            SkymapPanel.DECK_LOWER, inner);
+                    } else {
+                        eq("with " + state + " the sky is the chart and takes the middle",
+                            SkymapPanel.DECK_MIDDLE, inner);
+                    }
+                    if (chartA && chartB) {
+                        eq("with " + state + " Chart B is on the lower deck",
+                            SkymapPanel.DECK_LOWER, outer);
+                    }
+
+                    // <b>And never two wheels on one deck.</b> Two rings at one radius in one
+                    // plane is one ring holding two charts, which is worse than the shuffling
+                    // this replaced.
+                    java.util.List<Integer> drawn = new java.util.ArrayList<>();
+                    drawn.add(inner);
+                    if (panel.outerRingDrawn()) {
+                        drawn.add(outer);
+                    }
+                    if (panel.triRingDrawn()) {
+                        drawn.add(tri);
+                    }
+                    eq("with " + state + " no two drawn rings share a deck",
+                        drawn.size(), new java.util.HashSet<Integer>(drawn).size());
+
+                    // <b>And Chart B's lines bow toward its deck.</b> Down wherever Chart B is
+                    // the chart on a wheel, up for everything else - the sky's transits to a
+                    // promoted Chart B included, because those are the sky's lines.
+                    for (int wheel = 0; wheel < 3; wheel++) {
+                        boolean partner = panel.ringDeck(wheel) == SkymapPanel.DECK_LOWER;
+                        double rise = GlobeRenderer.riseFor(panel, wheel, true);
+                        yes("with " + state + " wheel " + wheel + " bows "
+                            + (partner ? "down, toward Chart B" : "up"),
+                            partner ? rise < 0.0 : rise > 0.0);
+                    }
+                    near("with " + state + " no line bows at all with arcs off", 0.0,
+                        GlobeRenderer.riseFor(panel, 1, false), 0.0);
+
+                    // The radii follow the decks, so a ring that keeps its deck keeps its
+                    // place - which is the whole of what was asked for.
+                    double[] shells = GlobeRenderer.shellRadii(panel);
+                    near("with " + state + " the inner wheel sits at its deck's radius",
+                        inner == SkymapPanel.DECK_MIDDLE ? Globe.SHELL_NATAL
+                            : (inner == SkymapPanel.DECK_LOWER ? Globe.SHELL_PARTNER
+                                : Globe.SHELL_SKY), shells[0], 1e-12);
+                }
+            }
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * Stacked rings keep the promise the crossed ones cannot.
+     *
+     * <b>What a reader crosses rings to do is compare a degree.</b> Tilting the partner one way
+     * and the sky the other separates the three planes and makes them meet at the Ascendant,
+     * which is handsome - and it costs the comparison, because a tilted ring turns longitude
+     * into something other than the angle you see. A transit at 15 Leo and a natal planet at 15
+     * Leo are over each other at the Ascendant and the Descendant and nowhere else. In between
+     * the sky ring swings through eight tenths of a world unit of height, and its degrees skew
+     * three and a half degrees round the wheel. Those are the two numbers this measures rather
+     * than describes.
+     *
+     * Stacked, the two outer rings are circles of latitude on their own shells, so every degree
+     * keeps the direction it has on the natal ring and a conjunction across charts is one body
+     * directly above another. What it gives up is the crossing, which is also asserted: three
+     * parallel rings meet nowhere.
+     */
+    private static void theStackedRings() {
+        boolean was = Settings.globeStackedRings();
+        try {
+            double origin = 0.0;
+            double inner = Globe.SHELL_NATAL;
+            double outer = Globe.SHELL_SKY;
+
+            // <b>The drift, measured on the layout that has it.</b>
+            Settings.setGlobeStackedRings(false);
+            double worstCrossed = 0.0;
+            for (double lon = 0.0; lon < 360.0; lon += 1.0) {
+                worstCrossed = Math.max(worstCrossed,
+                    apart(lon, origin, inner, outer, GlobeRenderer.inclinationOf(2, Settings.globeStackedRings()),
+                        GlobeRenderer.liftOf(2, Settings.globeStackedRings())));
+            }
+            System.out.printf("  crossed: a degree on the sky ring is up to %.1f degrees round "
+                + "from the same degree on the natal ring%n", worstCrossed);
+            yes("crossed rings do not line their degrees up", worstCrossed > 3.0);
+
+            // <b>And its absence on the layout that fixes it.</b>
+            Settings.setGlobeStackedRings(true);
+            double worstStacked = 0.0;
+            for (double lon = 0.0; lon < 360.0; lon += 1.0) {
+                worstStacked = Math.max(worstStacked,
+                    apart(lon, origin, inner, outer, GlobeRenderer.inclinationOf(2, Settings.globeStackedRings()),
+                        GlobeRenderer.liftOf(2, Settings.globeStackedRings())));
+            }
+            System.out.printf("  stacked: the worst that gap gets is %.2e degrees%n",
+                worstStacked);
+            yes("stacked rings put every degree over the same degree", worstStacked < 1e-12);
+
+            // <b>The height swing, which is the bigger half of the complaint.</b> The skew
+            // above is three degrees and a reader might live with it; a tilted ring also
+            // carries the same longitude up and down through most of a world unit as it goes
+            // round, so a transit conjunct a natal planet sits well above it in one quarter of
+            // the wheel and well below it in the next. Stacked, that distance is one number
+            // everywhere.
+            Settings.setGlobeStackedRings(false);
+            double high = -Double.MAX_VALUE;
+            double low = Double.MAX_VALUE;
+            for (double lon = 0.0; lon < 360.0; lon += 1.0) {
+                double[] sky = Globe.onShell(lon, origin, outer, GlobeRenderer.liftOf(2, Settings.globeStackedRings()),
+                    GlobeRenderer.inclinationOf(2, Settings.globeStackedRings()));
+                high = Math.max(high, sky[1]);
+                low = Math.min(low, sky[1]);
+            }
+            System.out.printf("  crossed: the sky ring swings through %.2f world units of "
+                + "height; stacked it holds %.2f%n", high - low, Globe.LIFT_SKY);
+            yes("a crossed ring changes height as it goes round", high - low > 1.0);
+            Settings.setGlobeStackedRings(true);
+
+            // Which way round: the sky above this chart, the partner below it. Named rather
+            // than implied, because the two constants are a sign apart and nothing else would
+            // catch them being swapped.
+            yes("the sky rides above the natal plane", GlobeRenderer.liftOf(2, Settings.globeStackedRings()) > 0.0);
+            yes("and the partner below it", GlobeRenderer.liftOf(1, Settings.globeStackedRings()) < 0.0);
+            near("by the same distance", Math.abs(GlobeRenderer.liftOf(2, Settings.globeStackedRings())),
+                Math.abs(GlobeRenderer.liftOf(1, Settings.globeStackedRings())), 1e-12);
+            near("with this chart on the plane itself", 0.0, GlobeRenderer.liftOf(0, Settings.globeStackedRings()), 1e-12);
+            for (int ring = 0; ring < 3; ring++) {
+                near("stacked ring " + ring + " has no tilt left in it", 0.0,
+                    GlobeRenderer.inclinationOf(ring, Settings.globeStackedRings()), 1e-12);
+            }
+
+            // <b>Parallel means they meet nowhere, which is the trade.</b> Every point of the
+            // sky ring stands the same height above every point of the natal one, so there is
+            // no Ascendant where all three visibly agree any more - they agree everywhere
+            // instead.
+            double lowest = Double.MAX_VALUE;
+            for (double lon = 0.0; lon < 360.0; lon += 1.0) {
+                double[] sky = Globe.onShell(lon, origin, outer, GlobeRenderer.liftOf(2, Settings.globeStackedRings()),
+                    GlobeRenderer.inclinationOf(2, Settings.globeStackedRings()));
+                double[] natal = Globe.onShell(lon, origin, inner, GlobeRenderer.liftOf(0, Settings.globeStackedRings()),
+                    GlobeRenderer.inclinationOf(0, Settings.globeStackedRings()));
+                lowest = Math.min(lowest, sky[1] - natal[1]);
+                near("the sky ring is level at " + (int) lon + " degrees",
+                    Globe.LIFT_SKY, sky[1], 1e-12);
+            }
+            yes("and always above the natal ring", lowest > 0.0);
+
+            // A lifted ring is still on its shell: the horizontal reach shrinks to pay for the
+            // height, the same way a stacked body stays on the sphere rather than floating off
+            // it. Without this the ring would stand outside the band drawn under it.
+            double[] lifted = Globe.onShell(90.0, origin, outer, Globe.LIFT_SKY, 0.0);
+            near("a lifted ring stays on the shell it belongs to", outer,
+                Math.sqrt(lifted[0] * lifted[0] + lifted[1] * lifted[1]
+                    + lifted[2] * lifted[2]), 1e-12);
+        } finally {
+            Settings.setGlobeStackedRings(was);
+        }
+    }
+
+    /**
+     * How far round the globe a longitude on an outer ring lands from the same longitude on the
+     * natal one, in degrees of apparent angle.
+     *
+     * Measured as the angle between the two points seen from the axis, which is what a reader
+     * looking down at the globe sees as "over it" or "off to one side of it". The heights are
+     * thrown away deliberately: the question is whether the two line up around the wheel, not
+     * whether one is higher.
+     */
+    private static double apart(double lon, double origin, double inner, double outer,
+            double incline, double lift) {
+        double[] a = Globe.onShell(lon, origin, inner, 0.0, 0.0);
+        double[] b = Globe.onShell(lon, origin, outer, lift, incline);
+        // <b>atan2 of the cross and the dot, not acos of the dot.</b> acos near one is where
+        // rounding turns into angle: two points that agree to the last bit came back 1.2e-6
+        // degrees apart, which is nothing and is also not zero, and would have needed a
+        // threshold chosen to hide it. This form is exact at zero.
+        double dot = a[0] * b[0] + a[2] * b[2];
+        double cross = a[0] * b[2] - a[2] * b[0];
+        return Math.abs(Math.toDegrees(Math.atan2(cross, dot)));
+    }
+
+    /**
+     * An aspect goes over the middle rather than through it.
+     *
+     * <b>The arc is a presentational lie and has to be a disciplined one.</b> The true line
+     * between two bodies is the chord; the bow is there because the chord hides in the
+     * interior, and an opposition - the aspect a reader most wants to see - is the diameter
+     * that runs through the exact centre where every other line already is. What keeps the lie
+     * honest is that it changes nothing a reader could measure: the arc starts and ends on the
+     * two bodies to the last decimal, and its height is not a taste but the one number that
+     * puts every apex, whatever the aspect, on the same sphere.
+     *
+     * <b>The assertion that earned its place is the one about 179 degrees.</b> The obvious way
+     * to arc a line on a sphere is a great circle, in the plane through the two bodies and the
+     * centre - and that plane does not exist when the bodies are opposed, because three points
+     * on a line define no plane. An implementation that used it would be stable at 170, stable
+     * at 179, and would flip its arc through ninety degrees somewhere in the last fraction of
+     * a degree before opposition, which is exactly the orb where a reader is watching. Bowing
+     * upward instead is continuous everywhere, and this walks up to the singularity that is not
+     * there to prove it.
+     */
+    private static void theArcGoesOver() {
+        double r = Globe.SHELL_NATAL;
+        double origin = 0.0;
+
+        // An opposition: the chord is the diameter, so its middle is the centre of the globe.
+        double[] a = Globe.onShell(0.0, origin, r, 0.0);
+        double[] b = Globe.onShell(180.0, origin, r, 0.0);
+        near("an opposition's chord passes through the centre",
+            0.0, length(mid(a, b)), 1e-9);
+
+        double[][] arc = Globe.arc(a, b, 64);
+        near("the arc starts on the first body", 0.0, distance(arc[0], a), 1e-12);
+        near("and ends on the second", 0.0, distance(arc[arc.length - 1], b), 1e-12);
+        near("and its top stands a full radius above the centre",
+            r, length(arc[32]), 1e-9);
+        yes("above the equator rather than below it", arc[32][1] > 0.0);
+
+        // <b>Every aspect's top on the same sphere.</b> This is what makes the network read as
+        // a globe inside the globe rather than as a heap of unrelated bows: the rise is half
+        // the chord, and half a chord is exactly the height that puts the apex back on the
+        // shell the two bodies sit on.
+        double worst = 0.0;
+        double over = 0.0;
+        for (double sep : new double[] {30, 45, 60, 72, 90, 120, 135, 150, 180}) {
+            double[] p = Globe.onShell(0.0, origin, r, 0.0);
+            double[] q = Globe.onShell(sep, origin, r, 0.0);
+            double[][] path = Globe.arc(p, q, 96);
+            worst = Math.max(worst, Math.abs(length(path[48]) - r));
+            for (double[] point : path) {
+                over = Math.max(over, length(point) - r);
+            }
+        }
+        System.out.printf("  the furthest any apex sits from the shell is %.2e world units%n",
+            worst);
+        yes("every aspect's arc tops out on the shell its bodies ride",  worst < 1e-9);
+        yes("and no part of one leaves that shell", over < 1e-9);
+
+        // <b>Continuous at the opposition, which a great-circle arc would not be.</b>
+        double[] near179 = Globe.arc(Globe.onShell(0.0, origin, r, 0.0),
+            Globe.onShell(179.99, origin, r, 0.0), 64)[32];
+        double[] at180 = Globe.arc(Globe.onShell(0.0, origin, r, 0.0),
+            Globe.onShell(180.0, origin, r, 0.0), 64)[32];
+        System.out.printf("  the top of a 179.99 arc sits %.4f from the top of a 180 arc%n",
+            distance(near179, at180));
+        yes("an arb a hundredth of a degree off opposition tops out beside the opposition's",
+            distance(near179, at180) < 0.01);
+
+        // Rise zero is the chord, exactly - which is what the reader gets with the arc
+        // switched off, and it has to be the old picture rather than a nearly flat curve.
+        double[][] flat = Globe.arc(a, b, 8, 0.0);
+        double straightest = 0.0;
+        for (int i = 0; i <= 8; i++) {
+            double t = i / 8.0;
+            straightest = Math.max(straightest, distance(flat[i], new double[] {
+                a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t}));
+        }
+        yes("with the arc switched off the line is the chord again", straightest < 1e-12);
+
+        // A conjunction has almost no chord to bow out of, so it stays on the surface.
+        double[][] tight = Globe.arc(Globe.onShell(0.0, origin, r, 0.0),
+            Globe.onShell(2.0, origin, r, 0.0), 32);
+        yes("a conjunction barely leaves the ring", tight[16][1] < 0.03);
+
+        // <b>Across two charts, where the bodies are on different shells and different
+        // planes.</b> The synastry chord is the one this view exists for, and it is the one
+        // where a bow could quietly detach from a glyph - the tilt means the two ends are not
+        // symmetrical about anything.
+        double[] partner = Globe.onShell(40.0, origin, Globe.SHELL_PARTNER,
+            Globe.STACK_STEP, Globe.INCLINE_PARTNER);
+        double[] natal = Globe.onShell(220.0, origin, r, 0.0, 0.0);
+        double[][] cross = Globe.arc(partner, natal, 48);
+        near("a cross-chart arc starts on the partner's body",
+            0.0, distance(cross[0], partner), 1e-12);
+        near("and ends on this chart's", 0.0, distance(cross[48], natal), 1e-12);
+        yes("and rises above both of them",
+            cross[24][1] > Math.max(partner[1], natal[1]));
+
+        // <b>A downward arc is the upward one reflected, and nothing else.</b> Chart B's lines
+        // bow down so its network sits as a bowl under the sign plane. That only reads as the
+        // same family of lines if the bowl is the dome's mirror - same ends, same depth, lowest
+        // point on the same shell - rather than some other curve that happens to go down.
+        double[][] up = Globe.arc(a, b, 64, Globe.ARC_RISE);
+        double[][] down = Globe.arc(a, b, 64, -Globe.ARC_RISE);
+        double mirrored = 0.0;
+        for (int i = 0; i <= 64; i++) {
+            mirrored = Math.max(mirrored, distance(down[i],
+                new double[] {up[i][0], -up[i][1], up[i][2]}));
+        }
+        yes("a downward opposition is the upward one reflected through the plane",
+            mirrored < 1e-12);
+        yes("its lowest point is below the equator", down[32][1] < 0.0);
+        near("and on the same shell as the dome's highest", r, length(down[32]), 1e-9);
+
+        // <b>How far the painted line strays from the arc it stands for.</b> The bow was first
+        // drawn as one straight segment per coloured piece, and a polyline is smooth where a
+        // curve is lazy and hinged where it is tight - which on an arc is the apex, the part
+        // the whole idea is about. This walks the shape the painter actually strokes and
+        // measures the worst gap in pixels, rather than trusting that more points are
+        // smoother.
+        Globe cam = new Globe();
+        int size = 900;
+        for (double sep : new double[] {60, 120, 180}) {
+            double[] e0 = Globe.onShell(0.0, origin, r, 0.0);
+            double[] e1 = Globe.onShell(sep, origin, r, 0.0);
+            Globe.Projected q0 = cam.project(e0[0], e0[1], e0[2], size, size);
+            Globe.Projected q1 = cam.project(e1[0], e1[1], e1[2], size, size);
+            int atRest = GlobeRenderer.stepsFor(q0, q1, true, false);
+            int dragging = GlobeRenderer.stepsFor(q0, q1, true, true);
+            int fine = GlobeRenderer.subdivisions(q0, q1, atRest, false);
+            int coarse = GlobeRenderer.subdivisions(q0, q1, dragging, true);
+            double still = strayed(cam, e0, e1,
+                painted(cam, e0, e1, atRest, fine, size), size);
+            double moving = strayed(cam, e0, e1,
+                painted(cam, e0, e1, dragging, coarse, size), size);
+            // One straight segment per piece is the mutant: it is what the bow was drawn as
+            // first, and it is what put visible corners at the apex. Without this the check
+            // would pass on any subdivision at all, including none.
+            double hinged = strayed(cam, e0, e1, painted(cam, e0, e1, atRest, 1, size), size);
+            System.out.printf("  %3.0f degrees: %d pieces of %d stray %.2fpx, %d of %d while "
+                + "turning %.2fpx, unsubdivided %.2fpx%n",
+                sep, atRest, fine, still, dragging, coarse, moving, hinged);
+            yes("at " + (int) sep + " degrees the painted line holds the arc to half a pixel",
+                still < 0.5);
+            yes("and to a pixel while the globe is being turned", moving < 1.0);
+            yes("and the points inside a piece are doing that, not the piece count",
+                hinged > 1.0);
+        }
+    }
+
+    /**
+     * The path one aspect line is stroked as, cut up the way GlobeRenderer cuts it.
+     *
+     * Both numbers come from the painter - how many pieces, and how many points inside one - so
+     * the suite measures the shape that ships rather than a second copy of it that could be
+     * smooth while the shipped one hinges.
+     */
+    private static java.awt.geom.Path2D.Double painted(Globe cam, double[] a, double[] b,
+            int pieces, int sub, int size) {
+        double[][] path = Globe.arc(a, b, pieces * sub);
+        java.awt.geom.Path2D.Double whole = new java.awt.geom.Path2D.Double();
+        for (int i = 0; i < path.length; i++) {
+            Globe.Projected q = cam.project(path[i][0], path[i][1], path[i][2], size, size);
+            if (i == 0) {
+                whole.moveTo(q.x, q.y);
+            } else {
+                whole.lineTo(q.x, q.y);
+            }
+        }
+        return whole;
+    }
+
+    /**
+     * The furthest that path lies from the arc it stands for, in pixels.
+     *
+     * The path is flattened to a hundredth of a pixel and every point of a finely walked arc
+     * is measured against it. Measuring the two by their own parameters would compare points
+     * that are not opposite each other and would report a gap where there is none.
+     */
+    private static double strayed(Globe cam, double[] a, double[] b,
+            java.awt.geom.Path2D.Double painted, int size) {
+        java.util.List<double[]> flat = new java.util.ArrayList<>();
+        double[] seg = new double[6];
+        double[] last = null;
+        java.awt.geom.PathIterator it = painted.getPathIterator(null, 0.01);
+        while (!it.isDone()) {
+            int kind = it.currentSegment(seg);
+            if (kind == java.awt.geom.PathIterator.SEG_LINETO && last != null) {
+                flat.add(new double[] {last[0], last[1], seg[0], seg[1]});
+            }
+            last = new double[] {seg[0], seg[1]};
+            it.next();
+        }
+        double worst = 0.0;
+        for (double[] w : Globe.arc(a, b, 512)) {
+            Globe.Projected q = cam.project(w[0], w[1], w[2], size, size);
+            double best = Double.MAX_VALUE;
+            for (double[] s : flat) {
+                best = Math.min(best,
+                    java.awt.geom.Line2D.ptSegDist(s[0], s[1], s[2], s[3], q.x, q.y));
+            }
+            worst = Math.max(worst, best);
+        }
+        return worst;
+    }
+
+    private static double[] mid(double[] a, double[] b) {
+        return new double[] {(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2};
+    }
+
+    private static double length(double[] v) {
+        return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    }
+
+    private static double distance(double[] a, double[] b) {
+        return length(new double[] {a[0] - b[0], a[1] - b[1], a[2] - b[2]});
+    }
+
+    /**
      * An aspect chord dims with how far through the globe it runs.
      *
      * <b>The bodies have dimmed round the back for a long time; the lines between them had
@@ -1117,6 +1626,10 @@ public final class GlobeCheck {
             set(panel, "chartMode", ChartMode.SYNASTRY);
             set(panel, "showTransitChart", Boolean.TRUE);
             set(panel, "showTriWheel", Boolean.TRUE);
+            // Both families drawn, so the sample reaches the cross-chart lines as well - the
+            // ones that leave a tilted plane, which are the arcs with the least symmetry and
+            // the most to go wrong.
+            set(panel, "aspectFilter", "Both");
             panel.updateChartData();
             Thread.sleep(1500);
 
@@ -1166,16 +1679,37 @@ public final class GlobeCheck {
             int tried = 0;
             for (int[] c : chords) {
                 int ring = c[0];
+                // <b>Only the lines the painter would draw.</b> The reader's filter decides
+                // which families reach the screen, and it is applied where they are drawn
+                // rather than where they are built - so a suite that walks the built list
+                // and not the filter spends most of its twelve tries sampling background
+                // where a cross-chart line was never painted, and finds too few to judge.
+                if (ring == 0 && !panel.drawsNatalAspects()) {
+                    continue;
+                }
+                if (ring > 0 && !panel.drawsCrossAspects()) {
+                    continue;
+                }
                 if (ring == 1 && !panel.outerRingDrawn()) {
                     continue;
                 }
                 if (ring == 2 && !panel.triRingDrawn()) {
                     continue;
                 }
+                // The painter's own plane for the ring, height and tilt both - a sample that
+                // knew the tilt and not the height would look for the ink where the ring
+                // sits under the other layout, and read the background.
+                boolean stacked = Settings.globeStackedRings();
+                int deck = panel.ringDeck(ring);
+                int innerDeck = panel.ringDeck(0);
                 double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
-                    levels[ring][c[1]] * Globe.STACK_STEP, GlobeRenderer.inclinationOf(ring));
+                    GlobeRenderer.liftOf(deck, stacked)
+                        + levels[ring][c[1]] * Globe.STACK_STEP,
+                    GlobeRenderer.inclinationOf(deck, stacked));
                 double[] to = Globe.onShell(panel.bLon[c[2]], origin, shells[0],
-                    levels[0][c[2]] * Globe.STACK_STEP, 0.0);
+                    GlobeRenderer.liftOf(innerDeck, stacked)
+                        + levels[0][c[2]] * Globe.STACK_STEP,
+                    GlobeRenderer.inclinationOf(innerDeck, stacked));
                 Globe.Projected pa = cam.project(from[0], from[1], from[2], size, size);
                 Globe.Projected pb = cam.project(to[0], to[1], to[2], size, size);
                 if (!pa.visible || !pb.visible) {
@@ -1183,12 +1717,13 @@ public final class GlobeCheck {
                 }
                 Globe.Projected nearEnd = pa.depth <= pb.depth ? pa : pb;
                 Globe.Projected farEnd = pa.depth <= pb.depth ? pb : pa;
-                // A chord running across the camera rather than away from it has no depth to
+                // A line running across the camera rather than away from it has no depth to
                 // fade over, and one drawn nearly end-on has no length to sample along.
-                // Deep enough that the painter gives it more than one step - it decides the
-                // step count from this same spread, and a chord it draws in one step has no
-                // fade along its length to find. Matching the painter's own threshold rather
-                // than picking a number: below it, "dimmer at its far end" is not the rule.
+                // Deep enough that the fade has somewhere to go: below this the near and far
+                // halves of a line sit at nearly one depth and "dimmer at its far end" is not
+                // the rule. The threshold predates the arc, where it also picked out the lines
+                // the painter drew in more than one step; the arc gives every line at least
+                // three, and this now only says which lines have a fade worth measuring.
                 if (farEnd.depth - nearEnd.depth < 1.2) {
                     continue;
                 }
@@ -1230,8 +1765,17 @@ public final class GlobeCheck {
                 GlobeRenderer.paint(gg, cam, size, size, panel, false);
                 gg.dispose();
 
-                double nearInk = along(frame, nearEnd, farEnd, 0.25, size);
-                double farInk = along(frame, nearEnd, farEnd, 0.75, size);
+                // <b>Sampled along the arc the painter drew, not along the straight line
+                // between its ends.</b> An aspect bows over the middle now, so a point a
+                // quarter of the way along the chord is nowhere near the ink - which is not a
+                // fade failing, it is a check looking in the wrong place. The painter strokes
+                // curves that follow the arc to a tenth of a pixel, which Part O asserts, so
+                // walking the arc finely lands on ink the painter laid down.
+                double[][] path = Globe.arc(from, to, 128,
+                    GlobeRenderer.riseFor(panel, ring, Settings.globeAspectArcs()));
+                boolean backwards = pb.depth < pa.depth;
+                double nearInk = along(frame, cam, path, backwards, 0.25, size);
+                double farInk = along(frame, cam, path, backwards, 0.75, size);
                 if (nearInk < 8.0 || farInk < 4.0) {
                     continue;           // a sample missed the line
                 }
@@ -1264,23 +1808,24 @@ public final class GlobeCheck {
                 median * 100, dimmerAtItsFarEnd, sample.size());
 
             // <b>What this can and cannot prove.</b> The sphere's own translucent wash dims
-            // whatever lies behind it, so a chord's far end is darker than its near end with no
-            // fade at all - and for the deep chords sampled here, which are the ones the fade
-            // is for, the wash is large: measured, 0.55 of the near end. The confound scales
-            // with the very thing being measured, so "dimmer at the far end" is not a rule this
-            // can test, and no threshold on it is one either.
+            // whatever lies behind it, so a line's far end is darker than its near end with no
+            // fade at all. That confound used to be large - measured at 0.55 of the near end
+            // when the lines were chords lying in the equatorial clutter - and it shrank when
+            // they became arcs, because a bow spends its middle above the band rather than
+            // behind it.
             //
-            // What it is instead is a regression pin between two measured states of this fixed
-            // chart: 0.42 with the ramp, 0.55 without it. If the ramp stops reaching the screen
-            // this number walks back up to 0.55 and the check fails. That is worth having and
-            // it is not the same claim as "chords fade with depth" - see the note in
+            // What this is is a regression pin between two measured states of this fixed
+            // chart: 0.80 with the ramp, 1.01 without it, on a sample that now includes the
+            // cross-chart lines as well. If the ramp stops reaching the screen this number
+            // walks back up past 1.0 and the check fails. That is worth having and it is not
+            // the same claim as "lines fade with depth" - see the note in
             // GlobeRenderer.chordDepthFade for the rule itself.
-            yes("a chord is dimmer at its far end than its near end", median < 1.0);
-            // <b>Measured both ways on this fixed chart, not guessed.</b> 0.63 with the ramp,
-            // 0.81 without it - the remaining 0.19 is the sphere's own wash over the far half,
-            // which is why "dimmer at all" is not enough on its own and why this threshold sits
-            // where it does. The all-six assertion below is what the wash cannot satisfy.
-            yes("and dimmer by more than the sphere's wash alone accounts for", median < 0.48);
+            yes("a line is dimmer at its far end than its near end", median < 1.0);
+            // <b>Measured both ways on this fixed chart, not guessed.</b> 0.80 with the ramp,
+            // 1.01 without it, and this sits between them. The gap is narrower than the old
+            // one because the arcs carry less of the sphere's wash, and the count below is
+            // what makes up the difference: without the ramp only five of eleven dim at all.
+            yes("and dimmer by more than the sphere's wash alone accounts for", median < 0.90);
             // <b>All but one, and the exception is honest rather than slack.</b> A chord is
             // measured alone, so nothing crosses it - but the frame still holds the three
             // ribbons, the shells and the sphere's wash, and a sample point that lands where a
@@ -1294,11 +1839,28 @@ public final class GlobeCheck {
         }
     }
 
-    /** The ink on a chord a given fraction of the way from its near end to its far end. */
-    private static double along(java.awt.image.BufferedImage img, Globe.Projected from,
-            Globe.Projected to, double t, int size) {
-        int x = (int) Math.round(from.x + (to.x - from.x) * t);
-        int y = (int) Math.round(from.y + (to.y - from.y) * t);
+    /**
+     * The ink on an aspect line a given fraction of the way from its near end to its far end.
+     *
+     * <b>On the polyline, between two of its vertices.</b> The line is bowed, so a fraction of
+     * the way along it is not a fraction of the way along the straight line between its ends.
+     * The point is found on the segment the painter actually stroked - interpolated between
+     * two projected vertices rather than on the ideal curve, which passes up to a pixel away
+     * from the chord that stands in for it.
+     */
+    private static double along(java.awt.image.BufferedImage img, Globe cam, double[][] path,
+            boolean backwards, double t, int size) {
+        double u = (backwards ? 1.0 - t : t) * (path.length - 1);
+        int i = Math.max(0, Math.min(path.length - 2, (int) Math.floor(u)));
+        double f = u - i;
+        Globe.Projected q0 = cam.project(path[i][0], path[i][1], path[i][2], size, size);
+        Globe.Projected q1 = cam.project(
+            path[i + 1][0], path[i + 1][1], path[i + 1][2], size, size);
+        if (!q0.visible || !q1.visible) {
+            return 0.0;
+        }
+        int x = (int) Math.round(q0.x + (q1.x - q0.x) * f);
+        int y = (int) Math.round(q0.y + (q1.y - q0.y) * f);
         if (x < 1 || y < 1 || x >= size - 1 || y >= size - 1) {
             return 0.0;
         }

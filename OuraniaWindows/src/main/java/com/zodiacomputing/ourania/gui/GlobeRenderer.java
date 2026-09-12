@@ -96,6 +96,8 @@ final class GlobeRenderer {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         GlobeRenderer r = new GlobeRenderer(g, cam, w, h, panel.pinLongitude(), panel);
         r.turning = turning;
+        r.stacked = Settings.globeStackedRings();
+        r.bowed = Settings.globeAspectArcs();
 
         double[] shells = shellRadii(panel);
         double natalR = shells[0];
@@ -142,17 +144,23 @@ final class GlobeRenderer {
         // The three charts as ribbons, each lying in its own plane. Painted before the
         // chords and the bodies so they read as the ground those sit on.
         if (panel.outerRingDrawn()) {
-            r.ribbon(partnerR, shade(chartInk(1), 54), Globe.INCLINE_PARTNER, turning);
+            int outerDeck = panel.ringDeck(1);
+            r.ribbon(partnerR, shade(chartInk(outerDeck), 54),
+                inclinationOf(outerDeck, r.stacked), liftOf(outerDeck, r.stacked), turning);
         }
         if (panel.triRingDrawn()) {
-            r.ribbon(skyR, shade(chartInk(2), 54), Globe.INCLINE_SKY, turning);
+            int triDeck = panel.ringDeck(2);
+            r.ribbon(skyR, shade(chartInk(triDeck), 54),
+                inclinationOf(triDeck, r.stacked), liftOf(triDeck, r.stacked), turning);
         }
 
         if (r.shown(SkymapPanel.Layer.ASPECTS)) {
             r.aspectChords(panel, shells);
         }
         if (r.shown(SkymapPanel.Layer.NATAL)) {
-            r.ribbon(natalR, r.faded(shade(chartInk(0), 54), SkymapPanel.Layer.NATAL), 0.0, turning);
+            int innerDeck = panel.ringDeck(0);
+            r.ribbon(natalR, r.faded(shade(chartInk(innerDeck), 54), SkymapPanel.Layer.NATAL),
+                inclinationOf(innerDeck, r.stacked), liftOf(innerDeck, r.stacked), turning);
             r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
                 false, 0);
         }
@@ -168,36 +176,71 @@ final class GlobeRenderer {
     }
 
     /**
-     * Where the three body shells are, given which rings are open.
+     * Where each wheel's bodies ride, given which chart is on it.
      *
      * <b>One statement of it, because the painter and the hit test both need it.</b> This is
      * the flat wheel's Geometry problem in a second view: a shell radius computed twice is a
      * body you can see and cannot click, and that defect has already been found in this panel
-     * once. The blooms are the same numbers that widen a band, so a ring half open is a shell
-     * half way out and switching views mid-animation does not jump.
+     * once.
      *
-     * @return natal, partner and sky radii, in that order
+     * <b>By chart rather than by slot, and fixed rather than bloomed.</b> These used to slide
+     * inward as rings were folded, so the space was always filled - and the cost was that
+     * taking one chart out moved the other two. On a globe that reads as the remaining charts
+     * changing rank, which is exactly the confusion the decks were introduced to end. Chart A
+     * is at the natal radius whenever it is drawn, Chart B at the partner radius, the sky at
+     * the sky radius, and folding one leaves a gap where it was rather than closing ranks.
+     *
+     * @return the radius for wheel 0, 1 and 2, in that order
      */
+    static double[] shellRadii(SkymapPanel panel) {
+        return new double[] {
+            DECK_RADIUS[panel.ringDeck(0)],
+            DECK_RADIUS[panel.ringDeck(1)],
+            DECK_RADIUS[panel.ringDeck(2)],
+        };
+    }
+
+    /** The radius of each deck, middle then lower then upper. */
+    private static final double[] DECK_RADIUS = {
+        Globe.SHELL_NATAL, Globe.SHELL_PARTNER, Globe.SHELL_SKY,
+    };
+
     /**
-     * The plane each ring rides in: natal horizontal, partner and sky opposed either side.
+     * Which plane a deck rides in: the middle one flat, the other two either tilted across it
+     * or stacked above and below it.
      *
      * <b>Beside shellRadii, and for the same reason.</b> Where a body is on the globe is a
      * radius and a plane; if the hit test knew one and not the other it would be the
-     * see-it-but-cannot-click-it defect again, in the half that is easier to miss.
+     * see-it-but-cannot-click-it defect again, in the half that is easier to miss. Both take a
+     * deck rather than a wheel, so which chart a chip has taken out cannot move the others.
+     *
+     * <b>The layout comes in as an argument rather than being read here.</b> Settings.get
+     * opens and parses the file on every call, and this is asked once per body, once per
+     * aspect line and once per ribbon - so reading it inside would put several hundred file
+     * reads in a frame that is meant to take forty milliseconds. It is read once where a frame
+     * or a click begins and carried down.
      */
-    static double inclinationOf(int ring) {
-        return ring == 1 ? Globe.INCLINE_PARTNER : (ring == 2 ? Globe.INCLINE_SKY : 0.0);
+    static double inclinationOf(int deck, boolean stacked) {
+        if (stacked) {
+            return 0.0;
+        }
+        return deck == SkymapPanel.DECK_LOWER ? Globe.INCLINE_PARTNER
+            : (deck == SkymapPanel.DECK_UPPER ? Globe.INCLINE_SKY : 0.0);
     }
 
-    static double[] shellRadii(SkymapPanel panel) {
-        double outerOpen = panel.outerOpenFraction();
-        double triOpen = panel.triOpenFraction();
-        return new double[] {
-            Globe.SHELL_NATAL - 0.08 * outerOpen - 0.06 * triOpen,
-            lerp(Globe.SHELL_NATAL, Globe.SHELL_PARTNER, outerOpen),
-            lerp(Globe.SHELL_PARTNER, Globe.SHELL_SKY,
-                triOpen > 0.001 ? triOpen : outerOpen),
-        };
+    /**
+     * How far off the middle plane a deck sits, in world units.
+     *
+     * Only one of this and the tilt is ever non-zero: the rings are crossed or they are
+     * stacked, never both. The height joins a body stack rather than replacing it, so a crowd
+     * on a lifted ring still steps up its shell from wherever that ring starts.
+     */
+    static double liftOf(int deck, boolean stacked) {
+        if (!stacked) {
+            return 0.0;
+        }
+        return deck == SkymapPanel.DECK_LOWER ? Globe.LIFT_PARTNER
+            : (deck == SkymapPanel.DECK_UPPER ? Globe.LIFT_SKY : 0.0);
     }
 
     /**
@@ -214,6 +257,8 @@ final class GlobeRenderer {
     static int bodyAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
         double origin = panel.pinLongitude();
         double[] shells = shellRadii(panel);
+        // Once for the whole hit test, for the reason set out on inclinationOf.
+        boolean stacked = Settings.globeStackedRings();
         int best = -1;
         double bestDist = 15.0;                 // a glyph's bead, in pixels
 
@@ -233,8 +278,10 @@ final class GlobeRenderer {
                 if (!valid[i]) {
                     continue;
                 }
+                int deck = panel.ringDeck(ring);
                 double[] p = Globe.onShell(lon[i], origin, shells[ring],
-                    level[i] * Globe.STACK_STEP, inclinationOf(ring));
+                    liftOf(deck, stacked) + level[i] * Globe.STACK_STEP,
+                    inclinationOf(deck, stacked));
                 Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
                 if (!q.visible) {
                     continue;
@@ -285,25 +332,33 @@ final class GlobeRenderer {
      * up its shell and wrong for a band, whose wall has to stay the same distance out all the
      * way round. The tilt is the same x-axis rotation onShell applies, so a band and the
      * bodies riding on it agree about where the plane is.
+     *
+     * <b>A lifted band is a cylinder cut from higher up the same sphere.</b> The bodies on a
+     * stacked ring ride at a latitude, so their horizontal reach has already shrunk; a band
+     * drawn at the full radius would stand outside its own planets by the whole difference.
+     * The shrink is taken once, here, from the same square root onShell uses.
      */
     private double onBand(double lon, double radius, double height, double inclination,
-            int axis) {
+            double lift, int axis) {
         double t = Math.toRadians(lon - this.origin);
-        double x = -radius * Math.cos(t);
-        double z = radius * Math.sin(t);
+        double reach = Math.sqrt(Math.max(0.0, radius * radius - lift * lift));
+        double x = -reach * Math.cos(t);
+        double z = reach * Math.sin(t);
+        double y = height + lift;
         double c = Math.cos(inclination);
         double s = Math.sin(inclination);
         if (axis == 0) {
             return x;
         }
-        return axis == 1 ? height * c - z * s : height * s + z * c;
+        return axis == 1 ? y * c - z * s : y * s + z * c;
     }
 
-    private double[] bandPoint(double lon, double radius, double height, double inclination) {
+    private double[] bandPoint(double lon, double radius, double height, double inclination,
+            double lift) {
         return new double[] {
-            onBand(lon, radius, height, inclination, 0),
-            onBand(lon, radius, height, inclination, 1),
-            onBand(lon, radius, height, inclination, 2),
+            onBand(lon, radius, height, inclination, lift, 0),
+            onBand(lon, radius, height, inclination, lift, 1),
+            onBand(lon, radius, height, inclination, lift, 2),
         };
     }
 
@@ -328,7 +383,8 @@ final class GlobeRenderer {
      * in the sphere; separate quads cannot express it, and they depth-sort individually so the
      * near wall paints over the far one.
      */
-    private void ribbon(double radius, Color fill, double inclination, boolean turning) {
+    private void ribbon(double radius, Color fill, double inclination, double lift,
+                        boolean turning) {
         final int steps = 96;
         // <b>Rims only while the hand is moving.</b> Three bands are two hundred and
         // eighty-eight quads a frame, and measuring rather than assuming: they took a drag at
@@ -340,10 +396,10 @@ final class GlobeRenderer {
         for (int i = 0; !turning && i < steps; i++) {
             double la = (i * 360.0) / steps;
             double lb = ((i + 1) * 360.0) / steps;
-            quad(bandPoint(la, radius, -RIBBON_HALF, inclination),
-                bandPoint(lb, radius, -RIBBON_HALF, inclination),
-                bandPoint(lb, radius, RIBBON_HALF, inclination),
-                bandPoint(la, radius, RIBBON_HALF, inclination),
+            quad(bandPoint(la, radius, -RIBBON_HALF, inclination, lift),
+                bandPoint(lb, radius, -RIBBON_HALF, inclination, lift),
+                bandPoint(lb, radius, RIBBON_HALF, inclination, lift),
+                bandPoint(la, radius, RIBBON_HALF, inclination, lift),
                 fill);
         }
         // The two rims, which are what a band reads by when it turns edge-on.
@@ -352,8 +408,8 @@ final class GlobeRenderer {
         double[][] bottom = new double[steps + 1][];
         for (int i = 0; i <= steps; i++) {
             double lon = (i * 360.0) / steps;
-            top[i] = bandPoint(lon, radius, RIBBON_HALF, inclination);
-            bottom[i] = bandPoint(lon, radius, -RIBBON_HALF, inclination);
+            top[i] = bandPoint(lon, radius, RIBBON_HALF, inclination, lift);
+            bottom[i] = bandPoint(lon, radius, -RIBBON_HALF, inclination, lift);
         }
         polyline(top, edge, 1.0f);
         polyline(bottom, edge, 1.0f);
@@ -1103,12 +1159,18 @@ final class GlobeRenderer {
     }
 
     /**
-     * Aspect chords, drawn through the globe rather than around it.
+     * Aspect lines, drawn through the globe rather than around it.
      *
      * <b>This is the view's argument for itself.</b> On the flat wheel an aspect is a line
-     * across a disc; here it is a chord through a sphere, and a reader turning the globe sees
-     * the figure from the side - which is the one thing the flat chart genuinely cannot show.
-     * Drawn on the core shell so they stay inside every body ring rather than crossing them.
+     * across a disc; here it is a span over a sphere, and a reader turning the globe sees the
+     * figure from the side - which is the one thing the flat chart genuinely cannot show.
+     *
+     * <b>Bowed rather than straight, and the bow is what makes it legible.</b> A chord is the
+     * honest line and it is the one that hides: it runs through the crowded interior, and an
+     * opposition is the diameter that goes through the exact centre where every other line
+     * already is. Lifted, each aspect climbs over the middle to a height set by how wide it is
+     * - see Globe.arc - so the widest ride highest and the figure has a silhouette from the
+     * side as well as a shape from above.
      */
     private void aspectChords(SkymapPanel panel, double[] shells) {
         // <b>Body to body, so every glyph is a node.</b> The chords were drawn on nested
@@ -1150,10 +1212,14 @@ final class GlobeRenderer {
             if (ring == 2 && !panel.triRingDrawn()) {
                 continue;
             }
+            int deck = panel.ringDeck(ring);
+            int innerDeck = panel.ringDeck(0);
             double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
-                levels[ring][c[1]] * Globe.STACK_STEP, inclinationOf(ring));
+                liftOf(deck, this.stacked) + levels[ring][c[1]] * Globe.STACK_STEP,
+                inclinationOf(deck, this.stacked));
             double[] to = Globe.onShell(panel.bLon[c[2]], origin, shells[0],
-                levels[0][c[2]] * Globe.STACK_STEP, 0.0);
+                liftOf(innerDeck, this.stacked) + levels[0][c[2]] * Globe.STACK_STEP,
+                inclinationOf(innerDeck, this.stacked));
             // <b>The hovered chord, at full strength and on its own ring.</b> The globe drew
             // every chord alike, so pointing at a cell of the grid lit the flat wheel and did
             // nothing at all here - a reader who had switched views lost the one gesture that
@@ -1162,12 +1228,14 @@ final class GlobeRenderer {
             // partner ring is.
             boolean lit = panel.lightsChord(c[1], c[2], ring);
             Color ink = new Color(c[3], true);
+            double rise = riseFor(panel, ring, this.bowed);
             if (lit) {
-                chord(from, to, faded(new Color(255, 255, 255, 110),
+                chord(from, to, rise, faded(new Color(255, 255, 255, 110),
                     SkymapPanel.Layer.ASPECTS), 4.0f, false);
                 ink = new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 255);
             }
-            chord(from, to, faded(ink, SkymapPanel.Layer.ASPECTS), lit ? 2.4f : 1.0f, !lit);
+            chord(from, to, rise, faded(ink, SkymapPanel.Layer.ASPECTS), lit ? 2.4f : 1.0f,
+                !lit);
         }
     }
 
@@ -1218,8 +1286,10 @@ final class GlobeRenderer {
             if (!valid[i]) {
                 continue;
             }
-            double y = level[i] * Globe.STACK_STEP;
-            double[] p = Globe.onShell(lon[i], this.origin, radius, y, inclinationOf(ring));
+            int deck = this.panel.ringDeck(ring);
+            double y = liftOf(deck, this.stacked) + level[i] * Globe.STACK_STEP;
+            double[] p = Globe.onShell(lon[i], this.origin, radius, y,
+                inclinationOf(deck, this.stacked));
             Globe.Projected q = at(p);
             if (!q.visible) {
                 continue;
@@ -1559,11 +1629,12 @@ final class GlobeRenderer {
     /** What a chord at the very back of the sphere keeps of its colour. */
     private static final double CHORD_BEHIND = 0.28;
 
-    /** How many solid steps stand in for a gradient along a chord, when not turning. */
+    /** The most solid steps a straight chord is drawn in, when not turning. */
     private static final int CHORD_STEPS = 6;
 
     /**
-     * One aspect chord, dimmed by how far through the globe it runs.
+     * One aspect line - bowed over the middle by default, straight through it if the reader
+     * has asked for that - dimmed by how far through the globe it runs.
      *
      * Beside {@link #segment} rather than a flag on it: the cusps, the sign boundaries and the
      * mansion ticks are drawn on the surface and have their own treatment, and fading those by
@@ -1572,65 +1643,210 @@ final class GlobeRenderer {
      * @param dim false for the chord under the cursor, which is the reader's own gesture and
      *     stays at full strength wherever it runs
      */
+    /**
+     * Which way an aspect line bows, and how far: up for the sky and this chart, down for
+     * Chart B.
+     *
+     * <b>David's call, and it does two things at once.</b> "For partner B we had the aspect
+     * arch lines on the bottom so it doesn't get cluttered with the lines from chart A and sky
+     * lines, plus it would give the center a more rounded look." Every bow went up, so a
+     * synastry put three charts' worth of arcs into one dome over the middle and nothing
+     * below it. Chart B already lives on the lower deck; its lines now bow toward it, so the
+     * partner's network is a bowl under the sign plane, the rest is a dome over it, and the
+     * two together close the middle into something round.
+     *
+     * <b>Decided by the deck of the line's own wheel.</b> Wheel 0's deck is lower only when
+     * Chart B has been promoted to be the chart, so that one rule covers a synastry's partner
+     * lines and a promoted Chart B's own lines alike, while the sky's transits to either stay
+     * up with the sky. Shared with the check suite for the same reason inclinationOf is: a
+     * sample that bowed the other way would look for ink on the wrong side of the globe.
+     *
+     * @param bowed false when the reader has switched arcs off, which is the chord either way
+     */
+    static double riseFor(SkymapPanel panel, int ring, boolean bowed) {
+        if (!bowed) {
+            return 0.0;
+        }
+        return panel.ringDeck(ring) == SkymapPanel.DECK_LOWER ? -Globe.ARC_RISE : Globe.ARC_RISE;
+    }
+
     /** True while the reader is dragging - what every "draw less" decision here reads. */
     private boolean turning;
 
-    private void chord(double[] a, double[] b, Color ink, float width, boolean dim) {
+    /**
+     * The two globe settings this frame was painted under, read once each.
+     *
+     * <b>Read where the frame begins, not where they are used.</b> Settings.get opens and
+     * parses the file on every call, and these are wanted once per body and once per aspect
+     * line - several hundred file reads in a frame that is meant to take forty milliseconds.
+     * Reading them once also means one frame cannot be painted half under each answer, if the
+     * reader flips a checkbox while it is being drawn.
+     */
+    private boolean stacked;
+
+    /** Whether an aspect bows over the middle in this frame. */
+    private boolean bowed;
+
+    private void chord(double[] a, double[] b, double rise, Color ink, float width,
+                       boolean dim) {
         Globe.Projected pa = at(a);
         Globe.Projected pb = at(b);
         if (!pa.visible || !pb.visible) {
             return;
         }
-        double depth = (pa.depth + pb.depth) / 2.0;
+        // <b>Bowed or straight, the same path either way.</b> The reader can switch the arc
+        // off, and the chord it goes back to is this method with a rise of zero rather than a
+        // second route through the painter - so the fade, the depth sort and the step count
+        // cannot drift apart between the two looks.
+        int steps = stepsFor(pa, pb, this.bowed, this.turning);
+        // <b>Each piece is a short polyline, not one straight segment.</b> That is what makes
+        // the bow smooth without making it expensive: the pieces are what get sorted, coloured
+        // and handed to Java2D, and a polyline of a dozen points is one drawing call exactly as
+        // a single segment is. See subdivisions for how fine.
+        int sub = bowed ? subdivisions(pa, pb, steps, this.turning) : 1;
+        double[][] path = Globe.arc(a, b, steps * sub, rise);
+        Globe.Projected[] p = new Globe.Projected[path.length];
+        for (int i = 0; i < path.length; i++) {
+            p[i] = at(path[i]);
+            if (!p[i].visible) {
+                return;
+            }
+        }
         if (!dim) {
-            this.pieces.add(new Piece(depth, () -> {
+            // <b>The lit line as one piece, at its mean depth.</b> It is the reader gesture
+            // and it is drawn at full strength wherever it runs, so it has no gradient to sort
+            // piece by piece - and one polyline is one drawing call for the whole curve.
+            int[] xs = new int[p.length];
+            int[] ys = new int[p.length];
+            double sum = 0.0;
+            for (int i = 0; i < p.length; i++) {
+                xs[i] = (int) Math.round(p[i].x);
+                ys[i] = (int) Math.round(p[i].y);
+                sum += p[i].depth;
+            }
+            final double mean = sum / p.length;
+            this.pieces.add(new Piece(mean, () -> {
                 this.g.setStroke(stroke(width));
                 this.g.setColor(ink);
-                this.g.drawLine((int) pa.x, (int) pa.y, (int) pb.x, (int) pb.y);
+                this.g.drawPolyline(xs, ys, xs.length);
             }));
             return;
         }
         // <b>Along the line, in steps, and with a solid colour on every one of them.</b>
-        // A single alpha for the whole chord is not enough - one taken at the mean separated
-        // the deepest chords from the shallowest by twelve percent, because a chord from a near
-        // body to a far one averages back to the centre and comes out middling when its far
-        // half is exactly the half doing the cluttering.
+        // A single alpha for the whole line is not enough - one taken at the mean separated
+        // the deepest from the shallowest by twelve percent, because a line from a near body
+        // to a far one averages back to the centre and comes out middling when its far half is
+        // exactly the half doing the cluttering.
         //
         // <b>The obvious answer, a GradientPaint, is unaffordable here, and measured rather
         // than assumed.</b> One per chord took a frame from 45ms to 182ms at rest and a drag
         // from 13ms to 78ms - four times over, because any Paint that is not a solid Color
-        // drops Java2D off its fast path, and this view's cost has always been per drawing
-        // call. Steps of a solid colour buy most of the gradient at a stroke's price, and the
-        // step count drops to one while the globe is turning, the way the bands and the sign
-        // shells already thin out under the hand.
-        // <b>Steps where the depth changes, and one step where it does not.</b> Six steps for
-        // every chord doubled the resting frame, and most of that bought nothing: a chord lying
-        // across the camera runs at one depth from end to end, so its six pieces are six copies
-        // of the same colour. The count follows the depth the chord actually covers, which puts
-        // the cost on the chords that plunge through the globe - the ones this is for.
-        double spread = Math.abs(pb.depth - pa.depth) / (2.0 * Globe.SHELL_SKY);
-        final int steps = this.turning ? 1
-            : Math.max(1, (int) Math.round(spread * CHORD_STEPS));
+        // drops Java2D off its fast path, and this view has always cost per drawing call.
+        // Steps of a solid colour buy most of the gradient at a stroke price.
         for (int i = 0; i < steps; i++) {
-            double t0 = i / (double) steps;
-            double t1 = (i + 1) / (double) steps;
-            double mid = (t0 + t1) / 2.0;
-            Color step = shade(ink, (int) Math.round(ink.getAlpha()
-                * chordDepthFade(pa.depth + (pb.depth - pa.depth) * mid)));
-            int x0 = (int) Math.round(pa.x + (pb.x - pa.x) * t0);
-            int y0 = (int) Math.round(pa.y + (pb.y - pa.y) * t0);
-            int x1 = (int) Math.round(pa.x + (pb.x - pa.x) * t1);
-            int y1 = (int) Math.round(pa.y + (pb.y - pa.y) * t1);
-            // Each step sorts at its own depth, so a chord that dives through the middle is
-            // correctly overpainted piece by piece rather than all at its mean.
-            double stepDepth = pa.depth + (pb.depth - pa.depth) * mid;
+            int lo = i * sub;
+            // Each step sorts at its own depth, so a line that dives through the middle is
+            // correctly overpainted piece by piece rather than all at its mean. The middle of
+            // the piece is the depth its colour is mixed at.
+            final double stepDepth = p[lo + sub / 2].depth;
+            final Color step = shade(ink, (int) Math.round(ink.getAlpha()
+                * chordDepthFade(stepDepth)));
+            final int[] xs = new int[sub + 1];
+            final int[] ys = new int[sub + 1];
+            for (int k = 0; k <= sub; k++) {
+                xs[k] = (int) Math.round(p[lo + k].x);
+                ys[k] = (int) Math.round(p[lo + k].y);
+            }
             this.pieces.add(new Piece(stepDepth, () -> {
                 this.g.setStroke(stroke(width));
                 this.g.setColor(step);
-                this.g.drawLine(x0, y0, x1, y1);
+                this.g.drawPolyline(xs, ys, xs.length);
             }));
         }
     }
+
+    /**
+     * How many straight pieces one piece of a bow is drawn from.
+     *
+     * <b>Smoothness and cost are separate knobs, and this is the cheap one.</b> The piece count
+     * is what costs: every piece is a sort, a colour and a drawing call. The points inside a
+     * piece ride in the same call, so buying smoothness here is nearly free where buying it by
+     * cutting more pieces is not. One straight piece per colour left a long line eight pixels
+     * out at its apex and the corners read plainly.
+     *
+     * <b>As the square root of the span, because that is how the error falls.</b> A polyline
+     * across a curve is out by about the span over the square of the segment count - measured
+     * on this arc at 0.5 times that - so holding a fixed error as lines get longer costs only
+     * the root of the extra length. A line spanning the globe takes about twenty-four segments
+     * and a short one takes ten, where anything proportional would have given the long line
+     * three times what it needed or the short one a third of it.
+     *
+     * <b>Curves were the other answer, and they were measured and dropped.</b> A quadratic
+     * pinned to three points of the arc is a tenth of a pixel out with no subdivision at all -
+     * better than this - but any shape that is not a line or a polyline leaves Java2D on its
+     * general path. Stroking 240 of them costs 3.9ms against 1.8ms for 240 seven-point
+     * polylines and 0.13ms for 240 straight lines, all at width one and antialiased. So a
+     * polyline is half the price of the curve for a third of a pixel more, and a straight line
+     * is a tenth of either - which is why the arc costs a few milliseconds a frame more than
+     * the chord did and not a few tens of them. It is the lesson the GradientPaint taught one
+     * change earlier, in a new costume.
+     */
+    static int subdivisions(Globe.Projected pa, Globe.Projected pb, int steps,
+                            boolean turning) {
+        double span = Math.hypot(pb.x - pa.x, pb.y - pa.y);
+        double fineness = turning ? ARC_FINENESS_TURNING : ARC_FINENESS;
+        int most = turning ? 8 : 16;
+        return Math.max(2,
+            Math.min(most, (int) Math.ceil(fineness * Math.sqrt(span) / steps)));
+    }
+
+    /** Segments per root pixel of span, at rest - set to hold the line within a third of one. */
+    private static final double ARC_FINENESS = 1.3;
+
+    /** As above, while the globe is being turned, where a gap of half a pixel does not read. */
+    private static final double ARC_FINENESS_TURNING = 0.95;
+
+    /**
+     * How many pieces one aspect line is drawn in.
+     *
+     * <b>One job again, now that the points inside a piece carry the shape.</b> For a while the
+     * count served two masters: the gradient wants steps where the line changes depth and none
+     * where it does not, and the bow wanted steps wherever the line was long on screen, because
+     * a straight piece was the only piece there was. So a long arc took fourteen pieces it did
+     * not need for colour and paid a sort and a drawing call for each. A piece is a short
+     * polyline now, so the shape is bought inside the call - see subdivisions - and this goes
+     * back to the depth rule it had before the arc, which is why the arc costs about what the
+     * chord did.
+     *
+     * <b>The floor is about the bow and the ceiling is about the colour.</b> One piece would
+     * put the whole gradient of a line at one alpha, which is the thing the fade exists to
+     * stop, so a bowed line takes four even when its depth does not ask for them. Six is where
+     * the gradient stopped being worth another call, and that number predates the arc.
+     *
+     * <b>And fewer under the hand.</b> The bands and the sign shells already thin out while
+     * the globe is being dragged, for the reason set out in paint: eighteen milliseconds of a
+     * frame is the difference between a globe that follows the hand and one that fights it.
+     *
+     * <b>Static, because the check suite has to build the same pieces.</b> It asserts that the
+     * painted line stays within half a pixel of the arc it stands for, and it cannot do that
+     * without knowing how the painter cut the arc up.
+     */
+    static int stepsFor(Globe.Projected pa, Globe.Projected pb, boolean bowed,
+                        boolean turning) {
+        double spread = Math.abs(pb.depth - pa.depth) / (2.0 * Globe.SHELL_SKY);
+        int wanted = (int) Math.round(spread * CHORD_STEPS);
+        if (!bowed) {
+            return Math.max(1, Math.min(CHORD_STEPS, wanted));
+        }
+        return Math.max(turning ? ARC_PIECES_TURNING : ARC_PIECES_LEAST,
+            Math.min(CHORD_STEPS, wanted));
+    }
+
+    /** The fewest pieces a bow is cut into at rest - the gradient, rather than the shape. */
+    private static final int ARC_PIECES_LEAST = 4;
+
+    /** As above, while the globe is being turned. */
+    private static final int ARC_PIECES_TURNING = 3;
 
     private void segment(double[] a, double[] b, Color ink, float width) {
         Globe.Projected pa = at(a);

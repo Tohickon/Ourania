@@ -215,6 +215,43 @@ public class SettingsPanel extends JPanel {
         });
         body.add(planetsAll);
 
+        JCheckBox arcs = new JCheckBox("On the globe, arc the aspect lines over the centre",
+            Settings.globeAspectArcs());
+        arcs.setForeground(TEXT);
+        arcs.setBackground(Color.BLACK);
+        arcs.setFont(Theme.BODY);
+        arcs.setFocusPainted(false);
+        arcs.setAlignmentX(Component.LEFT_ALIGNMENT);
+        arcs.setToolTipText("<html>On: an aspect bows up and over the middle of the globe, so "
+            + "an opposition is a span across the top rather than a line through the centre "
+            + "where every other line already is.<br>Off: the straight chords, which stay "
+            + "easier to trace when only two or three are drawn.<br>"
+            + "<i>The globe only; the flat wheel is unaffected.</i></html>");
+        arcs.addItemListener(e -> {
+            Settings.setGlobeAspectArcs(arcs.isSelected());
+            applyPalette();
+        });
+        body.add(arcs);
+
+        JCheckBox stacked = new JCheckBox("On the globe, stack the rings instead of crossing "
+            + "them", Settings.globeStackedRings());
+        stacked.setForeground(TEXT);
+        stacked.setBackground(Color.BLACK);
+        stacked.setFont(Theme.BODY);
+        stacked.setFocusPainted(false);
+        stacked.setAlignmentX(Component.LEFT_ALIGNMENT);
+        stacked.setToolTipText("<html>On: the sky sits just above this chart and Chart B just "
+            + "below it, all three parallel - so a transit conjunct a natal planet is directly "
+            + "over it, at every degree of the wheel.<br>Off: the two outer rings tip opposite "
+            + "ways and meet this chart at the Ascendant, which shows three distinct planes but "
+            + "only lines the degrees up where they cross.<br>"
+            + "<i>The globe only; the flat wheel is unaffected.</i></html>");
+        stacked.addItemListener(e -> {
+            Settings.setGlobeStackedRings(stacked.isSelected());
+            applyPalette();
+        });
+        body.add(stacked);
+
         // <b>A shape per chart, because a tri-wheel draws three at once.</b> These say which
         // chart a body belongs to without the reader counting rings outward from the centre.
         // The checkbox above is the master switch: off, none of these are drawn.
