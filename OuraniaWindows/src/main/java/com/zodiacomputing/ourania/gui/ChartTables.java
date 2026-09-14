@@ -611,6 +611,53 @@ public final class ChartTables {
         return h.toString();
     }
 
+    /**
+     * Fixed stars: the chart points standing on a star, then where every listed star is.
+     * Master list D9. Facts only - the corpus has no star prose.
+     */
+    public static String fixedStars(ChartFrame natal, SwissEph sw) {
+        com.zodiacomputing.ourania.astro.FixedStars.Result r =
+            com.zodiacomputing.ourania.astro.FixedStars.of(sw, natal);
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Fixed stars</h1>");
+        if (r.stars.isEmpty()) {
+            h.append("<p>No star could be placed. The star catalogue, sefstars.txt, is not in ")
+             .append(com.zodiacomputing.ourania.astro.Ephemeris.PATH).append(".</p>");
+            return h.toString();
+        }
+        h.append("<p>The fifteen Behenian stars, the four royal stars and the bright stars read ")
+         .append("most often, at this chart's moment. A chart point within ")
+         .append(trim(com.zodiacomputing.ourania.astro.FixedStars.orb))
+         .append("&deg; of a star's longitude stands on it.</p>");
+
+        h.append("<h2>On a star</h2>");
+        if (r.contacts.isEmpty()) {
+            h.append("<p><i>No chart point stands on a listed star within orb.</i></p>");
+        } else {
+            h.append("<table cellpadding=\"4\">");
+            h.append(row3("th", "Point", "Star", "Orb"));
+            for (com.zodiacomputing.ourania.astro.FixedStars.Contact c : r.contacts) {
+                h.append(row3("td", c.point, c.star.name, String.format("%.2f&deg;", c.off)));
+            }
+            h.append("</table>");
+        }
+
+        h.append("<h2>The stars</h2>");
+        h.append("<table cellpadding=\"4\">");
+        h.append(row3("th", "Star", "Position", "Tradition"));
+        for (com.zodiacomputing.ourania.astro.FixedStars.Star s : r.stars) {
+            h.append(row3("td", s.name, position(s.longitude), s.tradition));
+        }
+        h.append("</table>");
+        if (!r.missing.isEmpty()) {
+            h.append("<p><i>Not in the catalogue: ").append(String.join(", ", r.missing))
+             .append(".</i></p>");
+        }
+        h.append("<p style='color:#9AA5B1; font-size:11px;'>Conjunction by longitude only. ")
+         .append("Parans, a star rising or culminating with a planet, are not computed.</p>");
+        return h.toString();
+    }
+
     /** A declination the way almanacs print it: degrees and minutes, N or S. */
     static String declination(double dec) {
         double a = Math.abs(dec);

@@ -113,6 +113,8 @@ public final class SidePanel extends JPanel {
             "North and south of the equator: planets out of bounds, parallels and contraparallels"));
         tables.add(tableButton("Antiscia", "ANTISCIA",
             "Each point mirrored across the solstice and equinox axes, and who stands on the mirrors"));
+        tables.add(tableButton("Fixed Stars", "FIXED_STARS",
+            "The Behenian, royal and bright stars, and which chart points stand on them"));
         tables.add(tableButton("Progressed", "PROGRESSED",
             "The secondary progressed chart: a day of ephemeris for a year of life"));
         tables.add(tableButton("Solar Arc", "SOLARARC",
