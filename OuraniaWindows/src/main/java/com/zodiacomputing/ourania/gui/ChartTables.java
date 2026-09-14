@@ -514,6 +514,73 @@ public final class ChartTables {
         return h.toString();
     }
 
+    /**
+     * Declinations, the planets out of bounds, and the parallels. Master list D4.
+     *
+     * Facts, with no prose beside them: the corpus holds nothing on out-of-bounds planets or
+     * parallels, and a sentence invented here to fill the column would be the kind of text
+     * the provenance note warns about.
+     */
+    public static String declinations(ChartFrame natal) {
+        com.zodiacomputing.ourania.astro.Declinations.Result r =
+            com.zodiacomputing.ourania.astro.Declinations.of(natal);
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Declinations</h1>");
+        h.append("<p>How far north or south of the equator each planet stands. A planet past ")
+         .append("the Sun's furthest reach - ").append(declination(r.obliquity).replace("N", ""))
+         .append(" at this chart's date - is out of bounds.</p>");
+        // No bold or colour mid-sentence in these panes: Swing's HTML swallows the space at the
+        // edge of a styled run, and "is <b>out of bounds</b>" rendered as "iout of bounds".
+
+        h.append("<table cellpadding=\"4\">");
+        h.append(row3("th", "Body", "Declination", ""));
+        for (com.zodiacomputing.ourania.astro.Declinations.Entry e : r.entries) {
+            h.append(row3("td", e.name, declination(e.declination),
+                e.outOfBounds
+                    ? "<font color='#E2B258'>out of bounds, "
+                        + String.format("%.2f&deg;", e.beyond) + " past</font>"
+                    : ""));
+        }
+        h.append("</table>");
+
+        List<com.zodiacomputing.ourania.astro.Declinations.Entry> oob = r.outOfBounds();
+        if (oob.isEmpty()) {
+            h.append("<p><i>Nothing in this chart is out of bounds.</i></p>");
+        }
+
+        h.append("<h2>Parallels and contraparallels</h2>");
+        h.append("<p>Two planets at the same declination: on the same side of the equator a ")
+         .append("parallel, read like a conjunction; on opposite sides a contraparallel, read ")
+         .append("like an opposition. Within ")
+         .append(trim(com.zodiacomputing.ourania.astro.Declinations.parallelOrb))
+         .append("&deg;.</p>");
+        if (r.contacts.isEmpty()) {
+            h.append("<p><i>No parallels or contraparallels within orb.</i></p>");
+            return h.toString();
+        }
+        h.append("<table cellpadding=\"4\">");
+        h.append(row3("th", "Pair", "Contact", "Orb"));
+        for (com.zodiacomputing.ourania.astro.Declinations.Contact c : r.contacts) {
+            h.append(row3("td", c.a + " &ndash; " + c.b,
+                c.contra ? "contraparallel" : "parallel",
+                String.format("%.2f&deg;", c.off)));
+        }
+        h.append("</table>");
+        return h.toString();
+    }
+
+    /** A declination the way almanacs print it: degrees and minutes, N or S. */
+    static String declination(double dec) {
+        double a = Math.abs(dec);
+        int deg = (int) a;
+        int min = (int) Math.round((a - deg) * 60.0);
+        if (min == 60) {
+            deg++;
+            min = 0;
+        }
+        return String.format("%d&deg;%02d' %s", deg, min, dec < 0 ? "S" : "N");
+    }
+
     public static String solarArc(ChartFrame natal, SwissEph sw, double natalJd, double nowJd) {
         StringBuilder h = new StringBuilder();
         h.append("<h1>Solar arc directions</h1>");
