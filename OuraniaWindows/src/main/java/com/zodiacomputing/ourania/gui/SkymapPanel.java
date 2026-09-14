@@ -3151,9 +3151,83 @@ extends JPanel {
                     SkymapPanel.this.window.showClockNotice(
                         SkymapPanel.this.subjectA, SkymapPanel.this.subjectB);
                 }
+                SkymapPanel.this.refreshPrecisionNotice();
             }
         };
         swingWorker.execute();
+    }
+
+    /** Hands the setup form what the ephemeris could not do for the charts now drawn. */
+    void refreshPrecisionNotice() {
+        if (this.window != null) {
+            this.window.showPrecisionNotice(this.precisionNotes());
+        }
+    }
+
+    /**
+     * What the ephemeris substituted for the rings actually on the wheel, one sentence each.
+     *
+     * <b>Asked of the rings the painter draws, by the rule the painter uses.</b> The wheel casts
+     * its own cusps in updateChartData rather than reading a ChartFrame, so a flag on the frame
+     * would describe a chart the wheel is not showing whenever the two disagree about which
+     * moment or place a ring stands for. The branches below are that method's: the inner ring
+     * is Chart A or the sky, the outer is Chart B only in a synastry, the third ring is the sky.
+     *
+     * A composite's inner ring is left out. Its cusps come from swe_houses_armc at a reference
+     * latitude, which is a separate cast with its own failure; saying nothing there is a gap,
+     * saying the wrong thing would be worse.
+     */
+    java.util.List<String> precisionNotes() {
+        java.util.LinkedHashSet<String> notes = new java.util.LinkedHashSet<>();
+        if (this.sw == null) {
+            return new java.util.ArrayList<>();
+        }
+        boolean relationship = this.isRelationshipChart();
+        double bodiesAt = Double.NaN;
+        if (this.baseSd != null && !relationship) {
+            String label = this.innerIsBirthChart ? "Chart A" : "Sky";
+            double lat = this.innerIsBirthChart ? this.baseLatitude : this.skyLatitude;
+            double lon = this.innerIsBirthChart ? this.baseLongitude : this.skyLongitude;
+            bodiesAt = this.baseSd.getJulDay();
+            if (com.zodiacomputing.ourania.astro.Precision.housesFellBack(
+                    this.sw, bodiesAt, lat, lon, this.houseSystem)) {
+                notes.add(com.zodiacomputing.ourania.astro.Precision.housesNote(
+                    label, lat, this.houseSystem));
+            }
+        }
+        SweDate outerSd = this.isSynastryChart() ? this.transitSd : this.skySd;
+        if (this.showTransitChart && outerSd != null && !this.showProgressed()) {
+            boolean synastry = this.isSynastryChart();
+            double lat = synastry ? this.transitLatitude : this.skyLatitude;
+            double lon = synastry ? this.transitLongitude : this.skyLongitude;
+            if (com.zodiacomputing.ourania.astro.Precision.housesFellBack(
+                    this.sw, outerSd.getJulDay(), lat, lon, this.houseSystem)) {
+                notes.add(com.zodiacomputing.ourania.astro.Precision.housesNote(
+                    synastry ? "Chart B" : "Sky", lat, this.houseSystem));
+            }
+        }
+        if (this.showTriWheel && this.skySd != null
+                && com.zodiacomputing.ourania.astro.Precision.housesFellBack(this.sw,
+                    this.skySd.getJulDay(), this.skyLatitude, this.skyLongitude,
+                    this.houseSystem)) {
+            notes.add(com.zodiacomputing.ourania.astro.Precision.housesNote(
+                "Sky", this.skyLatitude, this.houseSystem));
+        }
+        // A missing data file loses the same bodies from every ring, so one moment is enough to
+        // find them. Chiron's date limits are the exception, and the inner ring is the one a
+        // reader is most likely to have cast at an unusual date.
+        if (Double.isNaN(bodiesAt) && this.skySd != null) {
+            bodiesAt = this.skySd.getJulDay();
+        }
+        if (!Double.isNaN(bodiesAt)) {
+            String bodies = com.zodiacomputing.ourania.astro.Precision.bodiesNote(
+                com.zodiacomputing.ourania.astro.Precision.unplaceable(
+                    this.sw, bodiesAt, Settings.loadBodySelection()));
+            if (bodies != null) {
+                notes.add(bodies);
+            }
+        }
+        return new java.util.ArrayList<>(notes);
     }
 
     private Geocoder.Result syncGeocode(String string) {
@@ -4205,6 +4279,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             Settings.set("default.house.system", string);
             this.updateChartData();
             this.chartPanel.repaint();
+            // Placidus can fail where Whole Sign cannot, so the notice is a fact about this choice.
+            this.refreshPrecisionNotice();
         });
         SkymapPanel.styleCompactCombo(jComboBox2);
         JLabel jLabel6 = compactLabel("Houses:", "House System");

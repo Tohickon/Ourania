@@ -953,6 +953,13 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /** Passes what the ephemeris could not do for the drawn charts back to the form. */
+    public void showPrecisionNotice(java.util.List<String> notes) {
+        if (chartSetupPanel != null) {
+            chartSetupPanel.showPrecisionNotice(notes);
+        }
+    }
+
     /** Whether the wheel is actually holding a Chart A - the entered chart, not the typing. */
     public boolean wheelHasChartA() {
         return skymapPanel != null && skymapPanel.chartASubject() != null

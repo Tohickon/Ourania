@@ -100,6 +100,12 @@ public final class ChartSetupCheck {
         report("Clock notice", beforeClock);
 
         System.out.println();
+        System.out.println("=== what the ephemeris could not do: polar houses, missing bodies ===");
+        int beforePrecision = failures.size();
+        thePrecisionNotice();
+        report("Precision notice", beforePrecision);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -626,9 +632,125 @@ public final class ChartSetupCheck {
         }
     }
 
+    /**
+     * A chart the ephemeris had to change says so; an ordinary one says nothing.
+     *
+     * <b>Both substitutions were silent before.</b> Placidus above the polar circle came back as
+     * Porphyry with one line on stderr, and a body whose data file was missing was simply not
+     * drawn. The latitudes are chosen either side of the boundary, which is 90 degrees less the
+     * obliquity - about 66.56 - rather than far from it, so a rule that tested "above 60" or
+     * "above 70" would fail here.
+     */
+    private static void thePrecisionNotice() throws Exception {
+        de.thmac.swisseph.SwissEph sw =
+            new de.thmac.swisseph.SwissEph(com.zodiacomputing.ourania.astro.Ephemeris.PATH);
+        double jd = de.thmac.swisseph.SweDate.getJulDay(1982, 8, 10, 22.0167);
+
+        // The engine first.
+        ok("Placidus at 66.0 N has a solution",
+            !com.zodiacomputing.ourania.astro.Precision.housesFellBack(sw, jd, 66.0, 15.6, 'P'));
+        ok("Placidus at 66.6 N does not",
+            com.zodiacomputing.ourania.astro.Precision.housesFellBack(sw, jd, 66.6, 15.6, 'P'));
+        ok("nor Koch at 70 S",
+            com.zodiacomputing.ourania.astro.Precision.housesFellBack(sw, jd, -70.0, 15.6, 'K'));
+        ok("Whole Sign never fails, even at 89.9 N",
+            !com.zodiacomputing.ourania.astro.Precision.housesFellBack(sw, jd, 89.9, 15.6, 'W'));
+        String note = com.zodiacomputing.ourania.astro.Precision.housesNote("Chart A", 69.65, 'P');
+        ok("the house sentence names the system, the place and the substitute: " + note,
+            note.contains("Placidus") && note.contains("69.7°N") && note.contains("Porphyry"));
+
+        com.zodiacomputing.ourania.astro.ChartFrame polar =
+            com.zodiacomputing.ourania.astro.ChartFrame.compute(sw, jd, 69.65, 18.96, 'P', false, 0.0);
+        ok("a polar frame carries the flag", polar.housesFellBack);
+        ok("and the sentence, not a line on stderr", polar.warnings.stream()
+            .anyMatch(w -> w.contains("Porphyry")));
+        com.zodiacomputing.ourania.astro.ChartFrame plain =
+            com.zodiacomputing.ourania.astro.ChartFrame.compute(sw, jd, 39.95, -75.17, 'P', false, 0.0);
+        ok("an ordinary frame carries neither", !plain.housesFellBack
+            && plain.warnings.stream().noneMatch(w -> w.contains("Porphyry")));
+
+        boolean[] all = new boolean[com.zodiacomputing.ourania.astro.Bodies.count()];
+        java.util.Arrays.fill(all, true);
+        ok("with the real directory every selectable body can be placed",
+            com.zodiacomputing.ourania.astro.Precision.unplaceable(sw, jd, all).isEmpty());
+
+        // A directory that does not exist is the case the audit named: Moshier covers the
+        // planets and nothing covers the asteroids.
+        de.thmac.swisseph.SwissEph lost = new de.thmac.swisseph.SwissEph("C:/no-such-ephemeris");
+        java.util.List<com.zodiacomputing.ourania.astro.Precision.Missing> gone =
+            com.zodiacomputing.ourania.astro.Precision.unplaceable(lost, jd, all);
+        java.util.Set<String> names = new java.util.HashSet<>();
+        for (com.zodiacomputing.ourania.astro.Precision.Missing m : gone) {
+            names.add(m.name);
+        }
+        ok("without its files Ceres cannot be placed, got " + names, names.contains("Ceres"));
+        ok("nor Chiron", names.contains("Chiron"));
+        ok("but the Sun still can, on Moshier", !names.contains("Sun"));
+        ok("and the reason is a missing file",
+            gone.stream().allMatch(m -> m.fileMissing));
+        String bodies = com.zodiacomputing.ourania.astro.Precision.bodiesNote(gone);
+        ok("the bodies sentence says where it looked: " + bodies,
+            bodies != null && bodies.contains("Ceres")
+                && bodies.contains(com.zodiacomputing.ourania.astro.Ephemeris.PATH));
+
+        boolean[] onlySun = new boolean[all.length];
+        onlySun[com.zodiacomputing.ourania.astro.Bodies.indexOfName("Sun")] = true;
+        ok("a body nobody selected is not reported missing",
+            com.zodiacomputing.ourania.astro.Precision.unplaceable(lost, jd, onlySun).isEmpty());
+        ok("and nothing missing is no sentence",
+            com.zodiacomputing.ourania.astro.Precision.bodiesNote(
+                new java.util.ArrayList<>()) == null);
+
+        // Now the door: a birth in Tromso, cast the way a reader casts it.
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            java.lang.reflect.Field fc = OuraniaWindow.class.getDeclaredField("chartSetupPanel");
+            fc.setAccessible(true);
+            ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
+            Thread.sleep(2000);
+
+            ok("a Tromso chart generates",
+                generateAt(hold[0], setup, panel, "1990-01-15", "12:00", "69.65, 18.96"));
+            String shown = awaitPrecision(setup, true);
+            ok("and the form says its houses are Porphyry: " + shown,
+                shown.contains("Chart A") && shown.contains("Porphyry"));
+
+            ok("a Philadelphia chart generates",
+                generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
+            ok("and the notice goes away", awaitPrecision(setup, false).isEmpty());
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /** Waits for the precision strip to show or hide, and returns its text. */
+    private static String awaitPrecision(ChartSetupPanel setup, boolean wanted) throws Exception {
+        long deadline = System.currentTimeMillis() + 15000;
+        final String[] text = {""};
+        while (System.currentTimeMillis() < deadline) {
+            javax.swing.SwingUtilities.invokeAndWait(() -> text[0] = setup.precisionNoticeText());
+            if (text[0].isEmpty() != wanted) {
+                return text[0];
+            }
+            Thread.sleep(100);
+        }
+        System.out.println("  the precision notice never became " + (wanted ? "visible" : "hidden"));
+        return text[0];
+    }
+
     /** Types a date and time into Chart A, presses Generate, and waits for the wheel. */
     private static boolean generateAt(OuraniaWindow window, ChartSetupPanel setup,
             SkymapPanel panel, String date, String time) throws Exception {
+        return generateAt(window, setup, panel, date, time, "40.71, -74.01");
+    }
+
+    /** The same, at a place given as coordinates. */
+    private static boolean generateAt(OuraniaWindow window, ChartSetupPanel setup,
+            SkymapPanel panel, String date, String time, String place) throws Exception {
         final Exception[] blew = new Exception[1];
         java.lang.reflect.Method gen =
             ChartSetupPanel.class.getDeclaredMethod("generateChart");
@@ -638,7 +760,7 @@ public final class ChartSetupCheck {
                 field(setup, "baseDateField").setText(date);
                 field(setup, "baseTimeField").setText(time);
                 // Coordinates, so nothing here needs the network.
-                field(setup, "baseLocationField").setText("40.71, -74.01");
+                field(setup, "baseLocationField").setText(place);
                 gen.invoke(setup);
             } catch (Exception e) {
                 blew[0] = e;

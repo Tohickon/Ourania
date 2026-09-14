@@ -549,7 +549,11 @@ public class ChartSetupPanel extends JPanel {
         // already looking rather than in a dialog they have to dismiss before they can think.
         JPanel south = new JPanel(new BorderLayout());
         south.setOpaque(false);
-        south.add(clockNotice(), BorderLayout.NORTH);
+        JPanel notices = new JPanel(new BorderLayout());
+        notices.setOpaque(false);
+        notices.add(clockNotice(), BorderLayout.NORTH);
+        notices.add(precisionNotice(), BorderLayout.SOUTH);
+        south.add(notices, BorderLayout.NORTH);
         south.add(buttonPanel, BorderLayout.CENTER);
         add(south, BorderLayout.SOUTH);
     }
@@ -613,6 +617,60 @@ public class ChartSetupPanel extends JPanel {
         clockPanel.setVisible(true);
         revalidate();
         repaint();
+    }
+
+    /** What the ephemeris could not do for the charts on the wheel; hidden when it did it all. */
+    private JPanel precisionPanel;
+    private JLabel precisionText;
+
+    private JPanel precisionNotice() {
+        precisionPanel = new JPanel(new BorderLayout());
+        precisionPanel.setBorder(Theme.pad(8, 12, 8, 12));
+        precisionPanel.setBackground(new Color(58, 46, 18));
+        precisionText = new JLabel();
+        precisionText.setForeground(new Color(240, 224, 170));
+        precisionText.setFont(Theme.SMALL);
+        precisionPanel.add(precisionText, BorderLayout.CENTER);
+        precisionPanel.setVisible(false);
+        return precisionPanel;
+    }
+
+    /**
+     * Shows what had to be substituted when the charts were cast, or hides the strip.
+     *
+     * <b>The same strip as the clock notice, and for the same reason.</b> A polar Placidus chart
+     * and a wheel short of the asteroids the reader selected both look exactly like correct
+     * charts; the only place the difference exists is this sentence.
+     */
+    void showPrecisionNotice(java.util.List<String> notes) {
+        if (precisionPanel == null) {
+            return;
+        }
+        if (notes == null || notes.isEmpty()) {
+            precisionPanel.setVisible(false);
+            precisionText.setText("");
+        } else {
+            StringBuilder sb = new StringBuilder("<html>");
+            for (int i = 0; i < notes.size(); i++) {
+                if (i > 0) {
+                    sb.append("<br>");
+                }
+                sb.append(escapeHtml(notes.get(i)));
+            }
+            precisionText.setText(sb.append("</html>").toString());
+            precisionPanel.setVisible(true);
+        }
+        revalidate();
+        repaint();
+    }
+
+    /** The notice text, for checks; empty when the strip is hidden. */
+    String precisionNoticeText() {
+        return precisionPanel != null && precisionPanel.isVisible() ? precisionText.getText() : "";
+    }
+
+    private static String escapeHtml(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     /** Whose time the switch would change - Chart A's or Chart B's. */

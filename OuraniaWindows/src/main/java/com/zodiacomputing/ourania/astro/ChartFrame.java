@@ -71,6 +71,8 @@ public final class ChartFrame {
     public boolean syzygyWasNewMoon;
     /** Non-fatal warnings from the ephemeris, e.g. falling back to Moshier when .se1 files are absent. */
     public final java.util.List<String> warnings = new java.util.ArrayList<>();
+    /** True when the house system had no solution at this latitude and the cusps are Porphyry. */
+    public boolean housesFellBack;
     public boolean moonVoidOfCourse;
     public boolean diurnal;
 
@@ -218,8 +220,11 @@ public final class ChartFrame {
         //    the polar circle and substitutes Porphyry, so the return value matters.
         double[] ascmc = new double[10];
         int hret = sw.swe_houses(tjdUt, base, geoLat, geoLon, hsys, f.cusps, ascmc);
-        if (hret < 0) {
-            System.err.println("swe_houses failed or fell back for hsys '" + (char) hsys + "'");
+        // Kept on the frame and said in words, not printed to a console nobody reads - see
+        // Precision for what the substitute is and where the boundary falls.
+        f.housesFellBack = hret < 0;
+        if (f.housesFellBack) {
+            f.warnings.add(Precision.housesNote("This chart", geoLat, hsys));
         }
         f.asc = Zodiac.normalise(ascmc[0]);
         f.mc = Zodiac.normalise(ascmc[1]);
