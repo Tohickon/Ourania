@@ -118,6 +118,12 @@ public final class ChartSetupCheck {
         report("Zodiac label", beforeZodiac);
 
         System.out.println();
+        System.out.println("=== D10: the wheel places the new points where the frame does ===");
+        int beforePoints = failures.size();
+        theNewPointsOnTheWheel();
+        report("Vertex, East Point and lots on the wheel", beforePoints);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -869,6 +875,59 @@ public final class ChartSetupCheck {
             ok("and there is no tag", gold[0] == 0);
         } finally {
             Settings.setZodiac("Tropical");
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * The wheel casts its own houses and derives its own points; the frame does both again for
+     * the readings. Two routes to the Vertex is the defect this project logs most, so the two
+     * are held to each other on a real chart with every new point switched on.
+     */
+    private static void theNewPointsOnTheWheel() throws Exception {
+        boolean[] was = Settings.loadBodySelection();
+        boolean[] on = was.clone();
+        String[] ids = {"vertex", "east_point", "lot_eros", "lot_necessity", "lot_courage",
+            "lot_victory", "lot_nemesis"};
+        for (String id : ids) {
+            on[com.zodiacomputing.ourania.astro.Bodies.indexOf(id)] = true;
+        }
+        for (String id : new String[]{"sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn"}) {
+            on[com.zodiacomputing.ourania.astro.Bodies.indexOf(id)] = true;
+        }
+        Settings.saveBodySelection(on);
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            java.lang.reflect.Field fc = OuraniaWindow.class.getDeclaredField("chartSetupPanel");
+            fc.setAccessible(true);
+            ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
+            Thread.sleep(2000);
+            ok("a chart generates",
+                generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
+            Thread.sleep(1500);
+            final double[][] got = new double[ids.length][];
+            final com.zodiacomputing.ourania.astro.ChartFrame[] frame = {null};
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                frame[0] = hold[0].radixChartForSearch();
+                for (int k = 0; k < ids.length; k++) {
+                    int i = com.zodiacomputing.ourania.astro.Bodies.indexOf(ids[k]);
+                    got[k] = new double[]{panel.bLon[i], panel.bValid[i] ? 1 : 0};
+                }
+            });
+            for (int k = 0; k < ids.length; k++) {
+                int i = com.zodiacomputing.ourania.astro.Bodies.indexOf(ids[k]);
+                com.zodiacomputing.ourania.astro.ChartFrame.Body b = frame[0].bodies[i];
+                ok(ids[k] + " is drawn on the wheel", got[k][1] == 1);
+                double off = com.zodiacomputing.ourania.astro.Aspects.separation(got[k][0], b.lon);
+                ok(ids[k] + " is where the frame puts it, off by " + String.format("%.4f", off),
+                    b.ok && off < 0.01);
+            }
+        } finally {
+            Settings.saveBodySelection(was);
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
     }

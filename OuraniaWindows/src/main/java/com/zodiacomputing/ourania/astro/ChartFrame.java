@@ -161,10 +161,10 @@ public final class ChartFrame {
             if (b == null) {
                 continue;
             }
-            // The angles themselves, and the two Lots, which are measured from the Ascendant
-            // and so inherit its whole error.
-            if (Bodies.at(i).isAngle()
-                    || "Part of Fortune".equals(b.name) || "Part of Spirit".equals(b.name)) {
+            // The angles themselves, and every point measured from the Ascendant or the local
+            // sky - the lots, the Vertex, the East Point - which inherit its whole error. Asked
+            // of the registry rather than by name, so a point added later is withheld with them.
+            if (Bodies.needsBirthTime(Bodies.at(i).source)) {
                 b.ok = false;
             }
         }
@@ -527,6 +527,10 @@ public final class ChartFrame {
         setAngle(f, "Descendant", f.dsc);
         setAngle(f, "MC", f.mc);
         setAngle(f, "IC", f.ic);
+        // The Vertex and East Point come out of the same derived house frame, so they follow
+        // the angles rather than being averaged like the planets (D10, 2026-09-14).
+        setAngle(f, "Vertex", f.vertex);
+        setAngle(f, "East Point", f.equatorialAsc);
 
         // Which points are standing on a coin edge, named once on the frame so a reader can
         // be told rather than having to know.
@@ -664,10 +668,14 @@ public final class ChartFrame {
         lotOfFortune = Sect.lotOfFortune(diurnal, asc, sun, moon);
         lotOfSpirit = Sect.lotOfSpirit(diurnal, asc, sun, moon);
 
+        double[] lonByIndex = new double[Bodies.count()];
+        for (int i = 0; i < Bodies.count(); i++) {
+            lonByIndex[i] = bodies[i] == null ? Double.NaN : bodies[i].lon;
+        }
         for (int i = 0; i < Bodies.count(); i++) {
             Bodies.Def d = Bodies.at(i);
             if (d.source == Bodies.Source.EPHEMERIS) continue;
-            bodies[i].lon = Bodies.derive(d.source, asc, mc, sun, moon, bodies[Bodies.indexOf("north_node")].lon);
+            bodies[i].lon = Bodies.derive(d.source, asc, mc, vertex, equatorialAsc, lonByIndex);
             bodies[i].ok = !Double.isNaN(bodies[i].lon);
         }
 

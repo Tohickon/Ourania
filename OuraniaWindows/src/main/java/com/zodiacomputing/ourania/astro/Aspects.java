@@ -215,6 +215,13 @@ public final class Aspects {
                                      "Part of Fortune", "Part of Spirit", "Black Moon Lilith"}) {
             m.put(n, 2.0);
         }
+        // D10's points take the calculated points' width for the same reason, and not the
+        // angles' 8: the Vertex and East Point are sensitive points rather than angles of the
+        // chart, and five more lots at an angle's orb would swamp the wheel.
+        for (String n : new String[]{"Vertex", "East Point", "Lot of Eros", "Lot of Necessity",
+                                     "Lot of Courage", "Lot of Victory", "Lot of Nemesis"}) {
+            m.put(n, 2.0);
+        }
         // Entered explicitly so that "is an angle" and "is unrecognised" stop being the
         // same branch. Descendant and IC are new here only in the sense of being named:
         // toAngles has always passed all four and taken this width from the default.

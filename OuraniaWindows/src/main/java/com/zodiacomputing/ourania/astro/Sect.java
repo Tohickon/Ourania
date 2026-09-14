@@ -104,6 +104,24 @@ public final class Sect {
             : Zodiac.normalise(ascLon + sunLon - moonLon);
     }
 
+    /**
+     * A Hermetic lot: the arc from one point to another by day, projected from the Ascendant,
+     * and the arc the other way by night.
+     *
+     * The same construction Fortune is - from the Sun to the Moon by day - so
+     * {@code hermeticLot(d, asc, sun, moon)} is {@link #lotOfFortune} exactly, which is how the
+     * convention is checked. The five that follow Fortune and Spirit are Paulus Alexandrinus'
+     * (Introduction, ch. 23), in the tabulation of Brennan, Hellenistic Astrology (2017):
+     * Eros from Spirit to Venus, Necessity from Mercury to Fortune, Courage from Mars to
+     * Fortune, Victory from Spirit to Jupiter, Nemesis from Saturn to Fortune - each by day.
+     */
+    public static double hermeticLot(boolean diurnal, double ascLon, double fromLon,
+                                     double toLon) {
+        return diurnal
+            ? Zodiac.normalise(ascLon + toLon - fromLon)
+            : Zodiac.normalise(ascLon + fromLon - toLon);
+    }
+
     /** The Lot of Spirit: Fortune with the luminaries exchanged. */
     public static double lotOfSpirit(boolean diurnal, double ascLon,
                                      double sunLon, double moonLon) {

@@ -93,7 +93,33 @@ public final class Bodies {
          * point, and guarded by BodyCheck the whole time - registering it here is what gives
          * it a glyph, aspects and prose rather than what makes it exist.
          */
-        SPIRIT
+        SPIRIT,
+        /**
+         * The Vertex: where the prime vertical meets the ecliptic in the west. From swe_houses
+         * (ascmc[3]), which every chart already asked for and discarded. Master list D10.
+         */
+        VERTEX,
+        /** The East Point, or equatorial Ascendant: swe_houses ascmc[4]. */
+        EAST_POINT,
+        /** Lot of Eros: from Spirit to Venus by day. See {@link Sect#hermeticLot}. */
+        LOT_EROS,
+        /** Lot of Necessity: from Mercury to Fortune by day. */
+        LOT_NECESSITY,
+        /** Lot of Courage: from Mars to Fortune by day. */
+        LOT_COURAGE,
+        /** Lot of Victory: from Spirit to Jupiter by day. */
+        LOT_VICTORY,
+        /** Lot of Nemesis: from Saturn to Fortune by day. */
+        LOT_NEMESIS
+    }
+
+    /**
+     * True for a derived point measured from the Ascendant or the local sky, which a chart with
+     * no birth time cannot place: the angles, the Vertex, the East Point and every lot. The
+     * south node is the one derived point that needs no time.
+     */
+    public static boolean needsBirthTime(Source source) {
+        return source != Source.EPHEMERIS && source != Source.SOUTH_NODE;
     }
 
     /** A point with no elemental nature of its own. Renders in the neutral grey. */
@@ -321,6 +347,32 @@ public final class Bodies {
         eph("lilith", "Black Moon Lilith", "⚸", "Li", Kind.POINT, Group.POINTS,
             SweConst.SE_MEAN_APOG, NO_ELEMENT, false,
             "The lunar apogee: repressed desire, raw feminine power, and refusal."),
+
+        // Master list D10, 2026-09-14. Appended rather than placed beside Fortune: indices are
+        // held in arrays across the wheel and the checks, and settings key by id, so an append
+        // moves nothing that already exists. All off by default - a reader's chart does not
+        // change until they ask for these.
+        derived("vertex", "Vertex", "Vx", "Vx", Kind.POINT, Group.POINTS,
+            Source.VERTEX, NO_ELEMENT, false,
+            "Where the prime vertical meets the ecliptic in the west: fated encounters."),
+        derived("east_point", "East Point", "EP", "EP", Kind.POINT, Group.POINTS,
+            Source.EAST_POINT, NO_ELEMENT, false,
+            "The equatorial Ascendant: the self as it rises apart from latitude."),
+        derived("lot_eros", "Lot of Eros", "Er", "Er", Kind.POINT, Group.POINTS,
+            Source.LOT_EROS, NO_ELEMENT, false,
+            "A Hermetic lot, Spirit to Venus: desire, and what is longed for."),
+        derived("lot_necessity", "Lot of Necessity", "Nc", "Nc", Kind.POINT, Group.POINTS,
+            Source.LOT_NECESSITY, NO_ELEMENT, false,
+            "A Hermetic lot, Mercury to Fortune: constraint, and what cannot be avoided."),
+        derived("lot_courage", "Lot of Courage", "Co", "Co", Kind.POINT, Group.POINTS,
+            Source.LOT_COURAGE, NO_ELEMENT, false,
+            "A Hermetic lot, Mars to Fortune: boldness, and where force is spent."),
+        derived("lot_victory", "Lot of Victory", "Vi", "Vi", Kind.POINT, Group.POINTS,
+            Source.LOT_VICTORY, NO_ELEMENT, false,
+            "A Hermetic lot, Spirit to Jupiter: success, faith, and what is won."),
+        derived("lot_nemesis", "Lot of Nemesis", "Nm", "Nm", Kind.POINT, Group.POINTS,
+            Source.LOT_NEMESIS, NO_ELEMENT, false,
+            "A Hermetic lot, Saturn to Fortune: reckoning, and what is owed."),
     };
 
     private Bodies() { }
@@ -531,6 +583,50 @@ public final class Bodies {
      */
     public static double derive(Source source, double asc, double mc,
                                 double sunLon, double moonLon, double northNode) {
+        // The points that need more than these five numbers are NaN here; the overload below
+        // carries the whole chart.
+        if (source.ordinal() >= Source.VERTEX.ordinal()) {
+            return Double.NaN;
+        }
+        return deriveBasic(source, asc, mc, sunLon, moonLon, northNode);
+    }
+
+    /**
+     * Every derived point, given the whole chart: the angles and their partners, the Vertex
+     * and East Point from swe_houses, and every lot from the positions it is measured between.
+     *
+     * @param vertex    swe_houses ascmc[3]
+     * @param eastPoint swe_houses ascmc[4]
+     * @param lon       longitudes by registry index; the ephemeris points must already be in it
+     */
+    public static double derive(Source source, double asc, double mc, double vertex,
+                                double eastPoint, double[] lon) {
+        double sun = lon[indexOf("sun")];
+        double moon = lon[indexOf("moon")];
+        switch (source) {
+            case VERTEX:     return Zodiac.normalise(vertex);
+            case EAST_POINT: return Zodiac.normalise(eastPoint);
+            default:         break;
+        }
+        if (source.ordinal() < Source.VERTEX.ordinal()) {
+            return deriveBasic(source, asc, mc, sun, moon, lon[indexOf("north_node")]);
+        }
+        boolean day = Sect.isDiurnal(sun, asc);
+        double fortune = Sect.lotOfFortune(day, asc, sun, moon);
+        double spirit = Sect.lotOfSpirit(day, asc, sun, moon);
+        switch (source) {
+            case LOT_EROS:      return Sect.hermeticLot(day, asc, spirit, lon[indexOf("venus")]);
+            case LOT_NECESSITY: return Sect.hermeticLot(day, asc, lon[indexOf("mercury")], fortune);
+            case LOT_COURAGE:   return Sect.hermeticLot(day, asc, lon[indexOf("mars")], fortune);
+            case LOT_VICTORY:   return Sect.hermeticLot(day, asc, spirit, lon[indexOf("jupiter")]);
+            case LOT_NEMESIS:   return Sect.hermeticLot(day, asc, lon[indexOf("saturn")], fortune);
+            default:            return Double.NaN;
+        }
+    }
+
+    /** The five-number derivations: the angles, the south node, Fortune and Spirit. */
+    private static double deriveBasic(Source source, double asc, double mc,
+                                      double sunLon, double moonLon, double northNode) {
         switch (source) {
             case ASC:        return Zodiac.normalise(asc);
             case DSC:        return Zodiac.opposite(asc);

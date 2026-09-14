@@ -1324,6 +1324,24 @@ extends JPanel {
         return nArray;
     }
 
+    /**
+     * A body's label centred on its marker.
+     *
+     * <b>A two-letter label is drawn smaller.</b> The font is sized for one glyph on a sphere; a
+     * fallback like Nessus' "Ns", or the Vertex's "Vx" and the lots added on 2026-09-14, drawn at
+     * that size spilled past the marker on both sides and ran into its neighbours.
+     */
+    static void drawBodyLabel(Graphics2D g2, String text, int x, int y, int baseline) {
+        Font was = g2.getFont();
+        boolean wide = text.codePointCount(0, text.length()) > 1;
+        if (wide) {
+            g2.setFont(was.deriveFont(was.getSize2D() * 0.62f));
+        }
+        java.awt.FontMetrics fm = g2.getFontMetrics();
+        g2.drawString(text, x - fm.stringWidth(text) / 2, wide ? y + fm.getAscent() / 2 - 1 : y + baseline);
+        g2.setFont(was);
+    }
+
     private static String glyphFor(int n, Font font) {
         Bodies.Def def = Bodies.at(n);
         return font.canDisplay(def.glyph.codePointAt(0)) ? def.glyph : def.fallback;
@@ -6909,6 +6927,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             double innerLon = this.innerIsBirthChart ? this.baseLongitude : this.skyLongitude;
             this.sw.swe_houses(this.baseSd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), innerLat, innerLon, this.houseSystem, this.baseCusps, dArray);
             this.baseAscendant = dArray[0];
+            System.arraycopy(dArray, 0, this.baseAscmc, 0, this.baseAscmc.length);
         }
         // <b>The outer wheel is a second person only in a synastry.</b> Everywhere else it
         // is the sky, and it was reading the Chart B fields to find out when the sky was -
@@ -6939,9 +6958,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             double[] dArray2 = new double[10];
             this.sw.swe_houses(outerSd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), outerLat, outerLon, this.houseSystem, this.transitCusps, dArray2);
             this.transitAscendant = dArray2[0];
+            System.arraycopy(dArray2, 0, this.transitAscmc, 0, this.transitAscmc.length);
         } else {
             System.arraycopy(this.baseCusps, 0, this.transitCusps, 0, this.transitCusps.length);
             this.transitAscendant = this.baseAscendant;
+            System.arraycopy(this.baseAscmc, 0, this.transitAscmc, 0, this.transitAscmc.length);
         }
         if (this.baseSd != null && !relationship) {
             this.computeBodies(this.baseSd, this.baseCusps, this.bLon, this.bSpeed, this.bOk, this.bValid);
@@ -6961,6 +6982,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.skyLatitude, this.skyLongitude, this.houseSystem,
                 this.triCusps, triAux);
             this.triAscendant = triAux[0];
+            System.arraycopy(triAux, 0, this.triAscmc, 0, this.triAscmc.length);
             this.computeBodies(this.skySd, this.triCusps,
                 this.cLon, this.cSpeed, this.cOk, this.cValid);
         } else {
@@ -7061,10 +7083,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         double d2 = Zodiac.normalise(dArray[1]);
         double d3 = Zodiac.normalise(dArray[10]);
+        // The Vertex and East Point come from the same swe_houses call as these cusps, whose
+        // ascmc array was kept beside them for exactly this.
+        double[] ascmc = this.ascmcFor(dArray);
         for (n = 0; n < BODY_COUNT; ++n) {
             Bodies.Def def = Bodies.at(n);
             if (def.source == Bodies.Source.EPHEMERIS) continue;
-            dArray2[n] = Bodies.derive(def.source, d2, d3, dArray2[SUN], dArray2[MOON], dArray2[NORTH_NODE]);
+            dArray2[n] = Bodies.derive(def.source, d2, d3, ascmc[3], ascmc[4], dArray2);
             blArray[n] = !Double.isNaN(dArray2[n]) && this.derivable(def.source, blArray);
             dArray3[n] = def.source == Bodies.Source.SOUTH_NODE ? dArray3[NORTH_NODE] : 361.0;
         }
@@ -7078,11 +7103,39 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             case SOUTH_NODE: {
                 return blArray[NORTH_NODE];
             }
-            case FORTUNE: {
+            case FORTUNE:
+            case SPIRIT: {
                 return blArray[SUN] && blArray[MOON];
             }
+            case LOT_EROS:
+                return blArray[SUN] && blArray[MOON] && blArray[Bodies.indexOf("venus")];
+            case LOT_NECESSITY:
+                return blArray[SUN] && blArray[MOON] && blArray[Bodies.indexOf("mercury")];
+            case LOT_COURAGE:
+                return blArray[SUN] && blArray[MOON] && blArray[Bodies.indexOf("mars")];
+            case LOT_VICTORY:
+                return blArray[SUN] && blArray[MOON] && blArray[Bodies.indexOf("jupiter")];
+            case LOT_NEMESIS:
+                return blArray[SUN] && blArray[MOON] && blArray[Bodies.indexOf("saturn")];
+            default:
+                break;
         }
         return true;
+    }
+
+    /** The ascmc array of the wheel whose cusps these are: {asc, mc, armc, vertex, east point}. */
+    private double[] baseAscmc = new double[10];
+    private double[] transitAscmc = new double[10];
+    private double[] triAscmc = new double[10];
+
+    private double[] ascmcFor(double[] cusps) {
+        if (cusps == this.transitCusps) {
+            return this.transitAscmc;
+        }
+        if (cusps == this.triCusps) {
+            return this.triAscmc;
+        }
+        return this.baseAscmc;
     }
 
     public void reloadBodySelection() {
@@ -8082,7 +8135,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 } else {
                     graphics2D.setColor(SkymapPanel.this.bodyColor(n7));
                     object = SkymapPanel.glyphFor(n7, glyphSize.font);
-                    graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n26 + glyphSize.baseline);
+                    SkymapPanel.drawBodyLabel(graphics2D, (String)object, n4, n26, glyphSize.baseline);
                 }
                 graphics2D.setTransform(bodyTx);
                 // The leader from the glyph to the degree it actually occupies. Bodies are
@@ -8164,7 +8217,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                     graphics2D.setColor((Color)object);
                     String string = SkymapPanel.glyphFor(n7, glyphSize2.font);
-                    graphics2D.drawString(string, n4 - graphics2D.getFontMetrics().stringWidth(string) / 2, n27 + glyphSize2.baseline);
+                    SkymapPanel.drawBodyLabel(graphics2D, string, n4, n27, glyphSize2.baseline);
                 }
                 graphics2D.setComposite(outerWas);
             }
@@ -8214,7 +8267,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     }
                     graphics2D.setColor(cColor);
                     String stringC = SkymapPanel.glyphFor(n7, glyphSize3.font);
-                    graphics2D.drawString(stringC, n4 - graphics2D.getFontMetrics().stringWidth(stringC) / 2, n28 + glyphSize3.baseline);
+                    SkymapPanel.drawBodyLabel(graphics2D, stringC, n4, n28, glyphSize3.baseline);
                 }
                 graphics2D.setComposite(triWas);
             }

@@ -323,6 +323,12 @@ public final class AspectGridCheck {
         pane.setEditable(false);
         pane.setText(html);
         pane.setSize(760, 4000);
+        // <b>At the table's natural size, as the app shows it.</b> The grid sits in a pane that
+        // keeps its size and scrolls. A fixed 760 x 4000 held until the registry grew by seven
+        // points on 2026-09-14 (D10); every point is switched on here, the grid grew past the
+        // fixed box, and the cells beyond it answered nothing - in this fixture, not on screen.
+        pane.setSize(Math.max(760, pane.getPreferredSize().width),
+            Math.max(4000, pane.getPreferredSize().height));
         pane.addNotify();
         pane.validate();
 
