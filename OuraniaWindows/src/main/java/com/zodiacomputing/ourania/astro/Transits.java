@@ -763,7 +763,7 @@ public final class Transits {
         StringBuffer err = new StringBuffer();
         int flags = de.thmac.swisseph.SweConst.SEFLG_SWIEPH
             | de.thmac.swisseph.SweConst.SEFLG_SPEED;
-        if (sw.swe_calc_ut(jd, ipl, flags, xx, err) == de.thmac.swisseph.SweConst.ERR) {
+        if (sw.swe_calc_ut(jd, ipl, Ephemeris.flags(sw, flags), xx, err) == de.thmac.swisseph.SweConst.ERR) {
             return Double.NaN;
         }
         return xx[3];

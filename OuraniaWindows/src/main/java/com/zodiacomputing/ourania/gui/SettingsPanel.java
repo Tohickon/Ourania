@@ -1076,7 +1076,28 @@ public class SettingsPanel extends JPanel {
         row.add(nodeCombo);
         row.add(lLilith);
         row.add(lilithCombo);
-        
+
+        // The zodiac: every position in the app moves with it, not only the wheel - see
+        // Ephemeris.flags. Saved and applied at once, like the node and Lilith beside it.
+        String[] zodiacOpts = new String[com.zodiacomputing.ourania.astro.Ephemeris.ZODIACS.length];
+        for (int i = 0; i < zodiacOpts.length; i++) {
+            zodiacOpts[i] = com.zodiacomputing.ourania.astro.Ephemeris.ZODIACS[i][0];
+        }
+        JComboBox<String> zodiacCombo = new JComboBox<>(zodiacOpts);
+        zodiacCombo.setSelectedItem(com.zodiacomputing.ourania.astro.Ephemeris.zodiacLabel());
+        zodiacCombo.setToolTipText("<html>Tropical measures the signs from the equinox; sidereal "
+            + "from the stars, which have drifted about 24&deg; since the two agreed.<br>"
+            + "Changes every position in the app: the wheel, readings, transits and searches.</html>");
+        zodiacCombo.addActionListener(e -> {
+            Settings.setZodiac((String) zodiacCombo.getSelectedItem());
+            status.setText("Saved");
+            if (window != null) window.applyBodySelection();
+        });
+        JLabel lZodiac = new JLabel("Zodiac: ");
+        lZodiac.setForeground(TEXT);
+        row.add(lZodiac);
+        row.add(zodiacCombo);
+
         p.add(row);
         return p;
     }

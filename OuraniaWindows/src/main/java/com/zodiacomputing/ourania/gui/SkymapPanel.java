@@ -3604,7 +3604,10 @@ extends JPanel {
     }
 
     private static String frameKey(double d, double d2, double d3, int n) {
-        return d + "|" + d2 + "|" + d3 + "|" + n;
+        // The zodiac is part of the chart: without it, switching to sidereal served the cached
+        // tropical frame to every reading until something else changed.
+        return d + "|" + d2 + "|" + d3 + "|" + n
+            + "|z" + com.zodiacomputing.ourania.astro.Ephemeris.siderealMode();
     }
 
     private ChartFrame frameForCurrentChart(double d, double d2, double d3, int n) {
@@ -6545,7 +6548,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.baseSd != null && !relationship) {
             double innerLat = this.innerIsBirthChart ? this.baseLatitude : this.skyLatitude;
             double innerLon = this.innerIsBirthChart ? this.baseLongitude : this.skyLongitude;
-            this.sw.swe_houses(this.baseSd.getJulDay(), 2, innerLat, innerLon, this.houseSystem, this.baseCusps, dArray);
+            this.sw.swe_houses(this.baseSd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), innerLat, innerLon, this.houseSystem, this.baseCusps, dArray);
             this.baseAscendant = dArray[0];
         }
         // <b>The outer wheel is a second person only in a synastry.</b> Everywhere else it
@@ -6575,7 +6578,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         this.outerCastAt = outerSd;
         if (this.showTransitChart && outerSd != null && !progressedRing) {
             double[] dArray2 = new double[10];
-            this.sw.swe_houses(outerSd.getJulDay(), 2, outerLat, outerLon, this.houseSystem, this.transitCusps, dArray2);
+            this.sw.swe_houses(outerSd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), outerLat, outerLon, this.houseSystem, this.transitCusps, dArray2);
             this.transitAscendant = dArray2[0];
         } else {
             System.arraycopy(this.baseCusps, 0, this.transitCusps, 0, this.transitCusps.length);
@@ -6595,7 +6598,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // so the animation sweeps the sky without touching either person's birth data.
         if (this.showTriWheel && this.skySd != null) {
             double[] triAux = new double[10];
-            this.sw.swe_houses(this.skySd.getJulDay(), 2,
+            this.sw.swe_houses(this.skySd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2),
                 this.skyLatitude, this.skyLongitude, this.houseSystem,
                 this.triCusps, triAux);
             this.triAscendant = triAux[0];
@@ -6689,7 +6692,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (Bodies.at((int)i).source != Bodies.Source.EPHEMERIS) continue;
             double[] dArray4 = new double[6];
             StringBuffer stringBuffer = new StringBuffer();
-            if (this.sw.swe_calc_ut(d, Bodies.at(i).getIpl(), 258, dArray4, stringBuffer) != -1) {
+            if (this.sw.swe_calc_ut(d, Bodies.at(i).getIpl(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 258), dArray4, stringBuffer) != -1) {
                 dArray2[i] = Zodiac.normalise(dArray4[0]);
                 dArray3[i] = dArray4[3];
                 blArray[i] = true;

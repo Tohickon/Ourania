@@ -197,7 +197,7 @@ public final class Almanac {
     private static double[] pos(SwissEph sw, double jd, int ipl) {
         double[] xx = new double[6];
         StringBuffer err = new StringBuffer();
-        if (sw.swe_calc_ut(jd, ipl, FLAGS, xx, err) == SweConst.ERR) {
+        if (sw.swe_calc_ut(jd, ipl, Ephemeris.flags(sw, FLAGS), xx, err) == SweConst.ERR) {
             return null;
         }
         return new double[]{Zodiac.normalise(xx[0]), xx[3]};
@@ -473,7 +473,7 @@ public final class Almanac {
         OfTime f = x -> {
             double[] cusps = new double[13];
             double[] ascmc = new double[10];
-            sw.swe_houses(x, SweConst.SEFLG_SWIEPH, lat, lon, hsys, cusps, ascmc);
+            sw.swe_houses(x, Ephemeris.flags(sw, SweConst.SEFLG_SWIEPH), lat, lon, hsys, cusps, ascmc);
             return signedDelta(ascmc[0], targetLongitude);
         };
         // The Ascendant laps the zodiac daily, so the step must be well under a day.

@@ -76,4 +76,114 @@ public final class Ephemeris {
     public static boolean overridden() {
         return !DEFAULT.equals(PATH);
     }
+
+    // ------------------------------------------------------------------ zodiac
+
+    /**
+     * The zodiacs the app offers: tropical, and four sidereal ayanamsas. Master list D3.
+     *
+     * Label to Swiss Ephemeris sidereal mode, -1 for tropical. Lahiri is India's official
+     * ayanamsa and the default for Vedic work; Fagan-Bradley is the Western sidereal standard;
+     * Krishnamurti and Raman are the two other ayanamsas in common Jyotish use.
+     */
+    public static final String[][] ZODIACS = {
+        {"Tropical", "-1"},
+        {"Sidereal (Lahiri)", String.valueOf(de.thmac.swisseph.SweConst.SE_SIDM_LAHIRI)},
+        {"Sidereal (Fagan-Bradley)", String.valueOf(de.thmac.swisseph.SweConst.SE_SIDM_FAGAN_BRADLEY)},
+        {"Sidereal (Krishnamurti)", String.valueOf(de.thmac.swisseph.SweConst.SE_SIDM_KRISHNAMURTI)},
+        {"Sidereal (Raman)", String.valueOf(de.thmac.swisseph.SweConst.SE_SIDM_RAMAN)},
+    };
+
+    /**
+     * The sidereal mode in force, or -1 for tropical.
+     *
+     * <b>One switch, read at every ephemeris call</b> through {@link #flags}. Every longitude in
+     * the app - the wheel, the chart frame, the almanac, transits, returns, progressions, the
+     * transit search - comes from one of about twenty calls, and all of them have to agree:
+     * a sidereal natal chart read against tropical transits is out by the precession between
+     * birth and now, about a degree in seventy years, which moves exact dates by weeks for the
+     * slow planets. A static rather than a settings read, because the hot paths make hundreds
+     * of thousands of calls and settings are a file.
+     *
+     * Tropical by default, so nothing changes until a reader chooses otherwise, and every check
+     * suite - which never sets it - runs tropical.
+     */
+    private static volatile int siderealMode = -1;
+
+    /** Instances already told the current mode; see {@link #flags}. */
+    private static final java.util.Map<de.thmac.swisseph.SwissEph, Integer> TOLD =
+        java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+    public static int siderealMode() {
+        return siderealMode;
+    }
+
+    public static boolean sidereal() {
+        return siderealMode >= 0;
+    }
+
+    /** Sets the zodiac by its label from {@link #ZODIACS}; an unknown label means tropical. */
+    public static void setZodiac(String label) {
+        int mode = -1;
+        for (String[] z : ZODIACS) {
+            if (z[0].equals(label)) {
+                mode = Integer.parseInt(z[1]);
+            }
+        }
+        siderealMode = mode;
+    }
+
+    /** The label of the zodiac in force. */
+    public static String zodiacLabel() {
+        for (String[] z : ZODIACS) {
+            if (Integer.parseInt(z[1]) == siderealMode) {
+                return z[0];
+            }
+        }
+        return ZODIACS[0][0];
+    }
+
+    /**
+     * Ephemeris flags for a longitude call in the zodiac in force.
+     *
+     * <b>The instance is told the ayanamsa once per change, not per call.</b>
+     * {@code swe_set_sid_mode} ends in {@code swi_force_app_pos_etc}, which throws away the
+     * instance's cached positions; setting it on every call would defeat the cache the scans
+     * depend on.
+     *
+     * Not for obliquity, nutation or equatorial coordinates: those are defined against the true
+     * equinox, and the callers asking for them keep their tropical flags.
+     */
+    public static int flags(de.thmac.swisseph.SwissEph sw, int base) {
+        int mode = siderealMode;
+        if (mode < 0) {
+            return base;
+        }
+        Integer told = TOLD.get(sw);
+        if (told == null || told != mode) {
+            sw.swe_set_sid_mode(mode);
+            TOLD.put(sw, mode);
+        }
+        return base | de.thmac.swisseph.SweConst.SEFLG_SIDEREAL;
+    }
+
+    /**
+     * Tropical longitude less sidereal longitude at a moment, in degrees; zero when tropical.
+     *
+     * <b>The ayanamsa plus the nutation in longitude, not the ayanamsa alone.</b>
+     * {@code swe_get_ayanamsa_ut} is the mean figure, while a sidereal position from
+     * {@code swe_calc_ut} has the nutation removed with it - so subtracting the bare ayanamsa
+     * from a tropical position missed by up to 17 arcseconds (measured 0.0044 degrees on
+     * 1982-08-10). This is the figure a conversion between the two needs.
+     */
+    public static double ayanamsa(de.thmac.swisseph.SwissEph sw, double jdUt) {
+        if (siderealMode < 0) {
+            return 0.0;
+        }
+        flags(sw, 0);
+        double[] eclnut = new double[6];
+        sw.swe_calc_ut(jdUt, de.thmac.swisseph.SweConst.SE_ECL_NUT,
+            de.thmac.swisseph.SweConst.SEFLG_SWIEPH, eclnut, new StringBuffer());
+        return sw.swe_get_ayanamsa_ut(jdUt) + eclnut[2];
+    }
 }

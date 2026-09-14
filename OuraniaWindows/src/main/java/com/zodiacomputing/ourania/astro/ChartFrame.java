@@ -71,6 +71,8 @@ public final class ChartFrame {
     public boolean syzygyWasNewMoon;
     /** Non-fatal warnings from the ephemeris, e.g. falling back to Moshier when .se1 files are absent. */
     public final java.util.List<String> warnings = new java.util.ArrayList<>();
+    /** Degrees subtracted from tropical to give this frame's longitudes; zero when tropical. */
+    public double ayanamsa;
     /** True when the house system had no solution at this latitude and the cusps are Porphyry. */
     public boolean housesFellBack;
     public boolean moonVoidOfCourse;
@@ -193,6 +195,8 @@ public final class ChartFrame {
         //    rather than hardcoding 23 deg 26 min.
         double[] eclnut = new double[6];
         StringBuffer serr = new StringBuffer();
+        // Obliquity is measured against the true equinox whatever zodiac the chart is read in,
+        // so this call keeps the tropical flags; everything after it takes the zodiac in force.
         if (sw.swe_calc_ut(tjdUt, SweConst.SE_ECL_NUT, base, eclnut, serr) >= 0) {
             f.trueObliquity = eclnut[0];
             f.meanObliquity = eclnut[1];
@@ -200,6 +204,8 @@ public final class ChartFrame {
             f.trueObliquity = 23.4392911;   // fallback only; flagged by the zero-speed check below
             f.meanObliquity = f.trueObliquity;
         }
+        base = Ephemeris.flags(sw, base);
+        f.ayanamsa = Ephemeris.ayanamsa(sw, tjdUt);
 
         // 2. Each body twice: ecliptic with speed, then equatorial for declination.
         for (int i = 0; i < Bodies.count(); i++) {
@@ -470,8 +476,12 @@ public final class ChartFrame {
         // library wants the MC as right ascension, so convert: the MC is the ecliptic point on
         // the meridian, so RAMC = atan2(sin(lambda) cos(eps), cos(lambda)).
         double compMc = midpoint(c1.mc, c2.mc);
+        // <b>The RAMC conversion is tropical geometry.</b> In a sidereal chart the midpoint MC is
+        // taken back to the tropical frame first, and the library's tropical cusps brought
+        // forward again after - otherwise the whole house frame is turned by the ayanamsa.
+        f.ayanamsa = (c1.ayanamsa + c2.ayanamsa) / 2.0;
         double eps = Math.toRadians(f.trueObliquity);
-        double lam = Math.toRadians(compMc);
+        double lam = Math.toRadians(compMc + f.ayanamsa);
         double ramc = Math.toDegrees(Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam)));
         f.armc = Zodiac.normalise(ramc);
 
@@ -479,10 +489,13 @@ public final class ChartFrame {
         int hret = sw == null ? -1
             : sw.swe_houses_armc(f.armc, f.geoLat, f.trueObliquity, f.hsys, f.cusps, ascmc);
         if (hret >= 0) {
-            f.asc = Zodiac.normalise(ascmc[0]);
-            f.mc = Zodiac.normalise(ascmc[1]);
-            f.vertex = Zodiac.normalise(ascmc[3]);
-            f.equatorialAsc = Zodiac.normalise(ascmc[4]);
+            for (int i = 1; i <= 12; i++) {
+                f.cusps[i] = Zodiac.normalise(f.cusps[i] - f.ayanamsa);
+            }
+            f.asc = Zodiac.normalise(ascmc[0] - f.ayanamsa);
+            f.mc = Zodiac.normalise(ascmc[1] - f.ayanamsa);
+            f.vertex = Zodiac.normalise(ascmc[3] - f.ayanamsa);
+            f.equatorialAsc = Zodiac.normalise(ascmc[4] - f.ayanamsa);
         } else {
             // No ephemeris, or a house system with no solution at this latitude. Fall back to
             // whole-sign-ish equal houses off the midpoint MC so the frame is still usable, and
@@ -611,7 +624,10 @@ public final class ChartFrame {
 
         double[] eq = new double[6];
         StringBuffer serr2 = new StringBuffer();
-        if (sw.swe_calc_ut(tjdUt, ipl, baseFlags | SweConst.SEFLG_EQUATORIAL, eq, serr2) < 0) {
+        // Right ascension and declination are against the true equinox; a sidereal flag has no
+        // place on an equatorial call, so it is taken off whatever the ecliptic call carried.
+        int eqFlags = (baseFlags & ~SweConst.SEFLG_SIDEREAL) | SweConst.SEFLG_EQUATORIAL;
+        if (sw.swe_calc_ut(tjdUt, ipl, eqFlags, eq, serr2) < 0) {
             b.ok = false;
             b.error = serr2.toString();
             return b;

@@ -42,10 +42,22 @@ public final class Antiscia {
         public final double contraAntiscion;
 
         Point(String name, double longitude) {
+            this(name, longitude, 0.0);
+        }
+
+        /**
+         * <b>The mirrors are tropical whatever zodiac the chart is in.</b> An antiscion is
+         * defined by the solstices - equal declination either side of one - and the solstices
+         * are at 0 Cancer and 0 Capricorn tropical. In a sidereal chart the degree is taken
+         * back to tropical, mirrored, and brought forward again, so the pair still shares a
+         * declination; mirroring about sidereal 0 Cancer would not.
+         */
+        Point(String name, double longitude, double ayanamsa) {
             this.name = name;
             this.longitude = longitude;
-            this.antiscion = Zodiac.antiscion(longitude);
-            this.contraAntiscion = Zodiac.contraAntiscion(longitude);
+            this.antiscion = Zodiac.normalise(Zodiac.antiscion(longitude + ayanamsa) - ayanamsa);
+            this.contraAntiscion = Zodiac.normalise(
+                Zodiac.contraAntiscion(longitude + ayanamsa) - ayanamsa);
         }
     }
 
@@ -83,7 +95,7 @@ public final class Antiscia {
             if (b == null || !b.ok || !covered(Bodies.at(i))) {
                 continue;
             }
-            r.points.add(new Point(b.name, b.lon));
+            r.points.add(new Point(b.name, b.lon, f.ayanamsa));
         }
         for (int i = 0; i < r.points.size(); i++) {
             for (int j = i + 1; j < r.points.size(); j++) {

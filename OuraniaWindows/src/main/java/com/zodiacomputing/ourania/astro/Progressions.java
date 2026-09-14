@@ -317,7 +317,7 @@ public final class Progressions {
         StringBuffer err = new StringBuffer();
         int flags = de.thmac.swisseph.SweConst.SEFLG_SWIEPH
             | de.thmac.swisseph.SweConst.SEFLG_SPEED;
-        if (sw.swe_calc_ut(progressedJd(natalJd, jd), ipl, flags, xx, err)
+        if (sw.swe_calc_ut(progressedJd(natalJd, jd), ipl, Ephemeris.flags(sw, flags), xx, err)
                 == de.thmac.swisseph.SweConst.ERR) {
             return Double.NaN;
         }

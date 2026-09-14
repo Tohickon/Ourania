@@ -101,6 +101,8 @@ public class OuraniaWindow extends JFrame {
     }
 
     public OuraniaWindow() {
+        // Before anything casts a chart: the zodiac is read by every ephemeris call.
+        com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(Settings.zodiac());
         setTitle("Ourania+ (Windows Edition)");
         setSize(1024, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

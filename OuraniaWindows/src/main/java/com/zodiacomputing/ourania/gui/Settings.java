@@ -622,6 +622,19 @@ public final class Settings {
         return "true".equals(get(LILITH_VARIANT_KEY, "false"));
     }
 
+    /** Tropical, or one of the sidereal ayanamsas; the labels are Ephemeris.ZODIACS. */
+    public static final String ZODIAC_KEY = "chart.zodiac";
+
+    public static String zodiac() {
+        return get(ZODIAC_KEY, com.zodiacomputing.ourania.astro.Ephemeris.ZODIACS[0][0]);
+    }
+
+    /** Saves the zodiac and puts it in force for every calculation from here on. */
+    public static void setZodiac(String label) {
+        set(ZODIAC_KEY, label);
+        com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(label);
+    }
+
     public static void setTrueNode(boolean useTrue) {
         set(NODE_VARIANT_KEY, useTrue ? "true" : "mean");
     }
