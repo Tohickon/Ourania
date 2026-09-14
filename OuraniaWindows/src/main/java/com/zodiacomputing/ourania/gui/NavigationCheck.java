@@ -35,7 +35,8 @@ public final class NavigationCheck {
      * the place that has to change, and the failure says so.
      */
     private static final String[] SCREENS = {
-        "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "SETTINGS",
+        "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH",
+        "SETTINGS",
     };
 
     private static final List<String> failures = new ArrayList<>();
@@ -316,10 +317,14 @@ public final class NavigationCheck {
 
         // "Search Transit" opened the SEARCH card, which is ChartSetupPanel - the screen
         // titled "Chart Setup". The label had been stale since the two-step chooser replaced
-        // the mode combo; this pins that it does not come back.
+        // the mode combo; this pins that it does not come back. Since 2026-09-13 there is a
+        // real transit search, so the rule is narrower than it was: a row may say "transit"
+        // only if it opens that screen.
         for (JButton row : rows(side)) {
-            ok("no row calls the setup screen a transit search: " + row.getText(),
-                !row.getText().toLowerCase().contains("transit"));
+            if (row.getText().toLowerCase().contains("transit")) {
+                ok("a row that says transit opens the transit search, not setup: "
+                    + row.getText(), "TRANSIT_SEARCH".equals(screenOf(row.getText())));
+            }
         }
     }
 

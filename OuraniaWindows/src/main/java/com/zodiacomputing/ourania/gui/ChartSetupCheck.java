@@ -106,6 +106,12 @@ public final class ChartSetupCheck {
         report("Precision notice", beforePrecision);
 
         System.out.println();
+        System.out.println("=== transit search: the screen asks the engine and shows its answer ===");
+        int beforeSearch = failures.size();
+        theTransitSearchScreen();
+        report("Transit search screen", beforeSearch);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -722,6 +728,74 @@ public final class ChartSetupCheck {
             ok("a Philadelphia chart generates",
                 generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
             ok("and the notice goes away", awaitPrecision(setup, false).isEmpty());
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * A reader casts a chart, opens Transit Search, asks about Saturn and the Moon, and gets
+     * the passages the engine finds - the same number, and the season told as one row.
+     *
+     * TransitSearchCheck proves the engine; this proves the door reaches it with the chart on
+     * the wheel rather than some other one, and that what comes back is laid out, not dropped.
+     */
+    private static void theTransitSearchScreen() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            java.lang.reflect.Field fc = OuraniaWindow.class.getDeclaredField("chartSetupPanel");
+            fc.setAccessible(true);
+            ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
+            java.lang.reflect.Field ft = OuraniaWindow.class.getDeclaredField("transitSearchPanel");
+            ft.setAccessible(true);
+            TransitSearchPanel search = (TransitSearchPanel) ft.get(hold[0]);
+            Thread.sleep(2000);
+
+            ok("David's chart generates",
+                generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                hold[0].switchScreen("TRANSIT_SEARCH");
+                search.choose("Saturn", "Moon", 2027, 2028, 1.0);
+                search.search();
+            });
+            long deadline = System.currentTimeMillis() + 60000;
+            final int[] count = {-1};
+            while (System.currentTimeMillis() < deadline && count[0] < 0) {
+                Thread.sleep(200);
+                javax.swing.SwingUtilities.invokeAndWait(() -> count[0] = search.lastCount());
+            }
+            ok("the search finishes", count[0] >= 0);
+
+            com.zodiacomputing.ourania.astro.ChartFrame natal = hold[0].radixChartForSearch();
+            java.time.ZoneId zone = java.time.ZoneId.systemDefault();
+            double from = java.time.LocalDate.of(2027, 1, 1).atStartOfDay(zone).toInstant()
+                .toEpochMilli() / 86400000.0 + 2440587.5;
+            double to = java.time.LocalDate.of(2029, 1, 1).atStartOfDay(zone).toInstant()
+                .toEpochMilli() / 86400000.0 + 2440587.5;
+            java.util.List<com.zodiacomputing.ourania.astro.TransitSearch.Passage> engine =
+                com.zodiacomputing.ourania.astro.TransitSearch.search(
+                    new de.thmac.swisseph.SwissEph(com.zodiacomputing.ourania.astro.Ephemeris.PATH),
+                    natal, java.util.List.of("Saturn"), java.util.List.of("Moon"),
+                    java.util.Arrays.asList(com.zodiacomputing.ourania.astro.TransitSearch.MAJOR),
+                    1.0, from, to);
+            engine = com.zodiacomputing.ourania.astro.TransitSearch.perfectingIn(engine, from, to);
+            ok("the screen found what the engine finds: " + count[0] + " against "
+                + engine.size(), count[0] == engine.size() && !engine.isEmpty());
+
+            final String[] html = {""};
+            javax.swing.SwingUtilities.invokeAndWait(() -> html[0] = search.resultsHtml());
+            String text = html[0].replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ");
+            ok("the answer names the transit: " + text.substring(0, Math.min(200, text.length())),
+                text.contains("Saturn") && text.contains("conjunction") && text.contains("Moon"));
+            ok("the retrograde exact is marked", text.contains("retrograde"));
+            ok("and the stations are listed", text.contains("turns retrograde")
+                && text.contains("turns direct"));
+            ok("the season is one row, not three",
+                html[0].split("<tr").length - 2 == engine.size());
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }

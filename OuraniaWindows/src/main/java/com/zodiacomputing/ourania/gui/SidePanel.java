@@ -60,6 +60,8 @@ public final class SidePanel extends JPanel {
             "The active chart as tables: longitudes, house cusps and the aspect list"},
         {"Interpretation", "INTERPRETATION", "Show or hide the reading panel"},
         {"Zodiacal Releasing", "RELEASING", "Periods of Fortune and Spirit for this chart"},
+        {"Transit Search", "TRANSIT_SEARCH",
+            "When a transiting planet aspects a point in Chart A, over a span of years"},
         {"Settings", "SETTINGS",
             "Which points the chart shows, house system defaults and the rest"},
     };

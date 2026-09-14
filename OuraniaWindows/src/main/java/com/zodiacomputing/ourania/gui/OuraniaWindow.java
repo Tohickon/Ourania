@@ -11,6 +11,7 @@ public class OuraniaWindow extends JFrame {
     private InterpretationPanel interpretationPanel;
     private NameListPanel nameListPanel;
     private ReleasingPanel releasingPanel;
+    private TransitSearchPanel transitSearchPanel;
 
     private ChartSetupPanel chartSetupPanel;
     private SidePanel sidePanel;
@@ -224,6 +225,9 @@ public class OuraniaWindow extends JFrame {
         
         releasingPanel = new ReleasingPanel(this);
         contentPanel.add(releasingPanel, "RELEASING");
+
+        transitSearchPanel = new TransitSearchPanel(this);
+        contentPanel.add(transitSearchPanel, "TRANSIT_SEARCH");
         
         // <b>Share, Sync, Connect and Help are gone.</b> All four were placeholder cards
         // reading "(Under Construction)" behind live menu entries. A menu that offers ten
@@ -345,7 +349,10 @@ public class OuraniaWindow extends JFrame {
         if ("RELEASING".equals(screenName) && releasingPanel != null && skymapPanel != null) {
             releasingPanel.setChart(skymapPanel.getCurrentChart());
         }
-        
+        if ("TRANSIT_SEARCH".equals(screenName) && transitSearchPanel != null) {
+            transitSearchPanel.refreshChart();
+        }
+
         cardLayout.show(contentPanel, screenName);
         contentPanel.revalidate();
         contentPanel.repaint();
@@ -951,6 +958,16 @@ public class OuraniaWindow extends JFrame {
         if (chartSetupPanel != null) {
             chartSetupPanel.showClockNotice(a, b);
         }
+    }
+
+    /**
+     * The chart a transit search reads: Chart A as cast, or the composite in a composite mode.
+     *
+     * The radix and not the current chart - the current chart carries the harmonic, and a
+     * transit to an H5 position is a transit to a degree nothing occupies.
+     */
+    com.zodiacomputing.ourania.astro.ChartFrame radixChartForSearch() {
+        return skymapPanel == null ? null : skymapPanel.radixChart();
     }
 
     /** Passes what the ephemeris could not do for the drawn charts back to the form. */
