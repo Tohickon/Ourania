@@ -426,6 +426,7 @@ public class OuraniaWindow extends JFrame {
         if (interpretationPanel != null) {
             interpretationPanel.showPlanetInterpretation(planetName, signName, degree, decanNum, houseNum, activeAspects, lon);
             interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -443,6 +444,7 @@ public class OuraniaWindow extends JFrame {
             interpretationPanel.showAngleInterpretation(angleName, signName, degree,
                 activeAspects, role, hostHouse);
             interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -540,6 +542,25 @@ public class OuraniaWindow extends JFrame {
      * this uses reveal and not select - select would close the rail when the page it wants is
      * already the one showing, and clicking a second planet would put the panel away.
      */
+    /**
+     * Brings the Interpretation tab forward for a reading a click just wrote.
+     *
+     * <b>Every wheel click wrote its reading into a tab nobody could see.</b> A body click
+     * reveals Selection; a sign, decan, house, degree, mansion, aspect or angle click wrote into
+     * Interpretation and left the rail as it was - closed on a cold open, or showing the
+     * Selection card after any body had been clicked. Measured with a scripted click test on
+     * 2026-09-14: every such click changed the hidden page and nothing on screen, which David
+     * reported as "if a decan is selected no other decan can be selected after it" and "some
+     * things just won't click". {@code reveal}, not {@code select}: select toggles the rail shut
+     * when the tab is already showing, and regenerates the page through onSelect, which would
+     * overwrite the reading that was just written.
+     */
+    private void revealReading() {
+        if (chartRail != null) {
+            chartRail.reveal(READING_PAGE);
+        }
+    }
+
     public void showSelection(String html) {
         if (selectionPane != null) {
             HtmlPanes.setHtml(selectionPane, html);
@@ -742,6 +763,7 @@ public class OuraniaWindow extends JFrame {
         if (interpretationPanel != null) {
             interpretationPanel.showSignInterpretation(signName);
             interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -752,6 +774,7 @@ public class OuraniaWindow extends JFrame {
         if (interpretationPanel != null) {
             interpretationPanel.showMansionDetail(number);
             interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -761,6 +784,18 @@ public class OuraniaWindow extends JFrame {
         if (interpretationPanel != null) {
             interpretationPanel.showDecanInterpretation(signName, decanNum);
             interpretationPanel.setVisible(true);
+            revealReading();
+            revalidate();
+            repaint();
+        }
+    }
+
+    /** Clicking the bounds ring: the Egyptian bound at this longitude. */
+    public void showInterpretationForBound(double longitude) {
+        if (interpretationPanel != null) {
+            interpretationPanel.showBoundInterpretation(longitude);
+            interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -770,6 +805,7 @@ public class OuraniaWindow extends JFrame {
         if (interpretationPanel != null) {
             interpretationPanel.showSabianInterpretation(signName, degree);
             interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -909,6 +945,7 @@ public class OuraniaWindow extends JFrame {
         if (interpretationPanel != null) {
             interpretationPanel.showHouseInterpretation(houseNum);
             interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -918,6 +955,7 @@ public class OuraniaWindow extends JFrame {
         if (interpretationPanel != null) {
             interpretationPanel.showAspectInterpretation(planet1, planet2, aspectType);
             interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }

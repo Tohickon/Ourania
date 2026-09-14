@@ -898,6 +898,41 @@ public class InterpretationPanel extends JPanel {
         }
     }
 
+    /**
+     * One Egyptian bound: its stretch of the sign, its ruler, what a bound is, and who is in it.
+     *
+     * <b>The bounds ring was drawn and had no page.</b> A click on it named the sign, for want of
+     * anything better, which is a click on one item opening another (David, 2026-09-14: "each
+     * click should be the entire space of the item"). The description and the mechanic are the
+     * dignity index's own text, so this page and the index say the same thing about bounds.
+     */
+    public void showBoundInterpretation(double longitude) {
+        int sign = Zodiac.signIndex(longitude);
+        String signName = Zodiac.SIGNS[sign].substring(0, 1).toUpperCase()
+            + Zodiac.SIGNS[sign].substring(1);
+        double inSign = Zodiac.degreeInSign(longitude);
+        double[] edges = com.zodiacomputing.ourania.astro.Dignity.boundEdges(sign);
+        double from = 0.0;
+        double to = 30.0;
+        for (int i = 0; i < edges.length - 1; i++) {
+            if (inSign >= edges[i] && inSign < edges[i + 1]) {
+                from = edges[i];
+                to = edges[i + 1];
+            }
+        }
+        String ruler = com.zodiacomputing.ourania.astro.Dignity.boundRulerOf(sign * 30.0 + from);
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
+        html.append("<h2 style='color:#00BFFF;'>The bound of ").append(ruler).append("</h2>");
+        html.append("<p>").append(signName).append(" ").append((int) from).append("&deg; to ")
+            .append((int) to).append("&deg;, in the Egyptian bounds.</p>");
+        html.append("<p>").append(dignityDefinition("bound")).append("</p>");
+        html.append("<p style='color:#9AA5B1;'>").append(dignityMechanic("bound")).append("</p>");
+        html.append(occupantsHtml(signName, from, to - from, "bound"));
+        html.append("</body></html>");
+        setHtml(html.toString(), false);
+    }
+
     public void showDecanInterpretation(String signName, int decanNum) {
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");

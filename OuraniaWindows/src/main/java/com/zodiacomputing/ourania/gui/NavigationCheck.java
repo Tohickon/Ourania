@@ -1773,7 +1773,9 @@ public final class NavigationCheck {
                 SkymapPanel.bandAt((signInner + signOuter) / 2.0, rings, bodyBase));
             eq("the inner degree scale reads a degree", SkymapPanel.BAND_DEGREE,
                 SkymapPanel.bandAt((degreeInner + termInner) / 2.0, rings, bodyBase));
-            eq("the bounds ring names its sign", SkymapPanel.BAND_OPEN,
+            // The bounds ring has its own reading since 2026-09-14; naming the sign was a click on
+            // one item opening another.
+            eq("the bounds ring reads a bound", SkymapPanel.BAND_BOUND,
                 SkymapPanel.bandAt((termInner + signInner) / 2.0, rings, bodyBase));
             eq("the open middle names its sign", SkymapPanel.BAND_OPEN,
                 SkymapPanel.bandAt((bodyBase + degreeInner) / 2.0, rings, bodyBase));
@@ -1795,9 +1797,12 @@ public final class NavigationCheck {
                 width.getOrDefault(SkymapPanel.BAND_SIGN, 0) == signOuter - signInner);
             ok("the degree scale is as deep as it is drawn",
                 width.getOrDefault(SkymapPanel.BAND_DEGREE, 0) == termInner - degreeInner);
+            ok("the bounds ring is as deep as it is drawn",
+                width.getOrDefault(SkymapPanel.BAND_BOUND, 0) == signInner - termInner);
+            // Less the bounds ring as well as the degree scale, now that it is a band of its own.
             ok("the open middle is what is left",
                 width.getOrDefault(SkymapPanel.BAND_OPEN, 0)
-                    == (signInner - bodyBase) - (termInner - degreeInner));
+                    == (signInner - bodyBase) - (termInner - degreeInner) - (signInner - termInner));
 
             // ---- half two: the chords, on a real tri-wheel ----
             boolean[] every = new boolean[com.zodiacomputing.ourania.astro.Bodies.ALL.length];

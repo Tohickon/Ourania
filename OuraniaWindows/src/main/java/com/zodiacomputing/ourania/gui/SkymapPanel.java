@@ -1997,6 +1997,315 @@ extends JPanel {
         return changed || !this.focusPinned;
     }
 
+    // ---------------------------------------------------------------- hover swell
+
+    /**
+     * What a hover swells: a ring target, packed as kind * 1000 + index.
+     *
+     * <b>David, 2026-09-14: "make everything clickable bulge a little when hovered, to know it's
+     * clickable".</b> The wheel answered clicks on bodies, signs, decans, the degree scale,
+     * houses and mansions, and gave no sign which of them it would answer before the click - so
+     * a ring that did nothing and a ring whose reading went to a hidden tab looked the same. The
+     * hovered body now swells by {@link #HOVER_SCALE}; a hovered ring target gets a soft wash and
+     * its label drawn larger; and the cursor turns to a hand over anything that opens something.
+     *
+     * The target is found by {@link #ringTargetAt}, which walks the same bands in the same order
+     * as handleChartClick, so what swells is what the click opens.
+     */
+    static final int HOVER_SIGN = 1;
+    static final int HOVER_DECAN = 2;
+    static final int HOVER_DEGREE = 3;
+    static final int HOVER_HOUSE = 4;
+    static final int HOVER_MANSION = 5;
+    /** A bound, indexed by the whole degree of longitude under the cursor. */
+    static final int HOVER_BOUND = 6;
+    /** A degree on the rim when the mansions are folded away. */
+    static final int HOVER_RIM_DEGREE = 7;
+    static final double HOVER_SCALE = 1.3;
+
+    /** The ring target under the cursor, packed, or -1. */
+    int hoverRing = -1;
+    /** The body under the cursor, packed as bodyAt packs it, or -1 - independent of the pin. */
+    int hoverBody = -1;
+
+    /** Sets the drawing transform to base, swollen about (x, y) when on. */
+    static void bulge(Graphics2D g2, java.awt.geom.AffineTransform base, int x, int y, boolean on) {
+        g2.setTransform(base);
+        if (on) {
+            g2.translate(x, y);
+            g2.scale(HOVER_SCALE, HOVER_SCALE);
+            g2.translate(-x, -y);
+        }
+    }
+
+    static final int GLOBE_NONE = 0;
+    static final int GLOBE_HOUSE = 2;
+    static final int GLOBE_DECAN = 3;
+    static final int GLOBE_DEGREE = 4;
+    static final int GLOBE_MANSION = 5;
+    static final int GLOBE_SIGN = 6;
+    static final int GLOBE_BOUND = 7;
+
+    /**
+     * What a point on the globe opens, other than a body: {kind, value}, kind GLOBE_NONE when
+     * nothing. The one order for the globe's click and its hover, so what lights is what opens.
+     *
+     * House numbers first (a label the reader aimed at), then the decan band before the degree
+     * ticks that crowd it, the mansions, the signs, the bounds, and last the house wedges of the
+     * plane, which lie under everything else.
+     */
+    int[] globeTargetAt(int x, int y) {
+        int w = this.chartPanel.getWidth();
+        int h = this.chartPanel.getHeight();
+        int v = GlobeRenderer.houseNumberAt(this.globe, w, h, this, x, y);
+        if (v >= 1) {
+            return new int[]{GLOBE_HOUSE, v};
+        }
+        v = GlobeRenderer.decanAt(this.globe, w, h, this, x, y);
+        if (v >= 0) {
+            return new int[]{GLOBE_DECAN, v};
+        }
+        v = GlobeRenderer.degreeAt(this.globe, w, h, this, x, y);
+        if (v >= 0) {
+            return new int[]{GLOBE_DEGREE, v};
+        }
+        v = GlobeRenderer.mansionAt(this.globe, w, h, this, x, y);
+        if (v >= 1) {
+            return new int[]{GLOBE_MANSION, v};
+        }
+        v = GlobeRenderer.signAt(this.globe, w, h, this, x, y);
+        if (v >= 0) {
+            return new int[]{GLOBE_SIGN, v};
+        }
+        v = GlobeRenderer.boundAt(this.globe, w, h, this, x, y);
+        if (v >= 0) {
+            return new int[]{GLOBE_BOUND, v};
+        }
+        v = GlobeRenderer.houseAreaAt(this.globe, w, h, this, x, y);
+        if (v >= 1) {
+            return new int[]{GLOBE_HOUSE, v};
+        }
+        return new int[]{GLOBE_NONE, -1};
+    }
+
+    /** Records what is under the cursor; true when that changed and the wheel should repaint. */
+    boolean setHover(int body, int ring) {
+        if (body == this.hoverBody && ring == this.hoverRing) {
+            return false;
+        }
+        this.hoverBody = body;
+        this.hoverRing = ring;
+        return true;
+    }
+
+    /**
+     * The ring target under a point on the flat wheel, packed, or -1 - for a point that is not
+     * on a body or an aspect line, which the caller has already asked about.
+     *
+     * The bands in handleChartClick's order: the house field inside the bodies, then the decan,
+     * sign and degree bands by bandAt, then the mansion strip, then the Sabian strip.
+     */
+    int ringTargetAt(int x, int y) {
+        if (this.sw == null || this.baseSd == null) {
+            return -1;
+        }
+        Geometry g = this.geometry();
+        if (g == null) {
+            return -1;
+        }
+        double dx = x - g.cx;
+        double dy = y - g.cy;
+        double r = Math.hypot(dx, dy);
+        double screen = Math.toDegrees(Math.atan2(dy, dx));
+        if (screen < 0.0) {
+            screen += 360.0;
+        }
+        double lon = (180.0 + g.pin - screen) % 360.0;
+        if (lon < 0.0) {
+            lon += 360.0;
+        }
+        if (r < g.bodyBase) {
+            double[] cusps = this.activeCusps;
+            for (int h = 1; h <= 12; h++) {
+                double from = cusps[h];
+                double to = h == 12 ? cusps[1] : cusps[h + 1];
+                double at = lon;
+                if (to < from) {
+                    to += 360.0;
+                }
+                if (at < from && to > 360.0) {
+                    at += 360.0;
+                }
+                if (at >= from && at < to) {
+                    return HOVER_HOUSE * 1000 + h;
+                }
+            }
+            return -1;
+        }
+        switch (SkymapPanel.bandAt(r, g.rings, g.bodyBase)) {
+            case BAND_DECAN:
+                return HOVER_DECAN * 1000 + (int) (lon / 10.0);
+            case BAND_SIGN:
+            case BAND_OPEN:
+                return HOVER_SIGN * 1000 + (int) (lon / 30.0);
+            case BAND_DEGREE:
+                return HOVER_DEGREE * 1000 + ((int) Math.round(lon) % 360);
+            case BAND_BOUND:
+                return HOVER_BOUND * 1000 + (int) Math.floor(lon);
+            default:
+                break;
+        }
+        int outer = g.rings[RING_OUTER];
+        if (SkymapPanel.inMansionBand(r, outer)) {
+            return this.layerShown(Layer.MANSIONS)
+                ? HOVER_MANSION * 1000 + com.zodiacomputing.ourania.astro.LunarMansions.at(lon).number
+                : HOVER_RIM_DEGREE * 1000 + ((int) Math.round(lon) % 360);
+        }
+        return -1;
+    }
+
+    /** An annular wedge between two radii and two longitudes, in screen coordinates. */
+    private static java.awt.Shape wedge(Geometry g, double r0, double r1, double lonFrom,
+                                        double lonTo) {
+        java.awt.geom.Path2D.Double p = new java.awt.geom.Path2D.Double();
+        int steps = Math.max(2, (int) Math.ceil(Math.abs(lonTo - lonFrom) / 2.0));
+        for (int i = 0; i <= steps; i++) {
+            double a = Math.toRadians(180.0 + g.pin - (lonFrom + (lonTo - lonFrom) * i / steps));
+            double px = g.cx + r1 * Math.cos(a);
+            double py = g.cy + r1 * Math.sin(a);
+            if (i == 0) {
+                p.moveTo(px, py);
+            } else {
+                p.lineTo(px, py);
+            }
+        }
+        for (int i = steps; i >= 0; i--) {
+            double a = Math.toRadians(180.0 + g.pin - (lonFrom + (lonTo - lonFrom) * i / steps));
+            p.lineTo(g.cx + r0 * Math.cos(a), g.cy + r0 * Math.sin(a));
+        }
+        p.closePath();
+        return p;
+    }
+
+    /** Draws text centred on a point at a longitude and radius. */
+    private static void centred(Graphics2D g2, Geometry g, String text, double lon, double r) {
+        double a = Math.toRadians(180.0 + g.pin - lon);
+        int x = g.cx + (int) Math.round(r * Math.cos(a));
+        int y = g.cy + (int) Math.round(r * Math.sin(a));
+        java.awt.FontMetrics fm = g2.getFontMetrics();
+        g2.drawString(text, x - fm.stringWidth(text) / 2, y + fm.getAscent() / 2 - 2);
+    }
+
+    /** The swell for a hovered ring target, painted over the finished wheel. */
+    void paintHover(Graphics2D g2, Geometry g) {
+        if (this.hoverRing < 0 || g == null) {
+            return;
+        }
+        int kind = this.hoverRing / 1000;
+        int idx = this.hoverRing % 1000;
+        int[] rings = g.rings;
+        java.awt.Composite was = g2.getComposite();
+        Color wash = new Color(255, 255, 255, 38);
+        switch (kind) {
+            case HOVER_SIGN: {
+                g2.setColor(wash);
+                g2.fill(wedge(g, rings[RING_SIGN_INNER], rings[RING_SIGN_OUTER], idx * 30.0,
+                    idx * 30.0 + 30.0));
+                g2.setFont(new Font("SansSerif", Font.PLAIN, (int) Math.round(22 * HOVER_SCALE)));
+                g2.setColor(this.getElementColor(Zodiac.elementIndex(idx)));
+                centred(g2, g, ZODIAC_SYMBOLS[idx], idx * 30.0 + 15.0, rings[RING_SIGN_OUTER] - 18);
+                break;
+            }
+            case HOVER_DECAN: {
+                g2.setColor(wash);
+                g2.fill(wedge(g, rings[RING_SIGN_OUTER], rings[RING_DECAN_OUTER], idx * 10.0,
+                    idx * 10.0 + 10.0));
+                g2.setFont(new Font("SansSerif", Font.PLAIN, (int) Math.round(12 * HOVER_SCALE * 1.2)));
+                int sign = idx / 3;
+                String glyph = null;
+                if (Settings.DECAN_RING_CHALDEAN.equals(Settings.decanRing())) {
+                    int fi = Bodies.indexOfName(Zodiac.chaldeanDecanRuler(Zodiac.SIGNS[sign], idx % 3 + 1));
+                    if (fi >= 0 && fi < BODY_GLYPHS.length) {
+                        g2.setColor(this.bodyColor(fi));
+                        glyph = BODY_GLYPHS[fi];
+                    }
+                }
+                if (glyph == null) {
+                    int face = Zodiac.triplicityDecanSignIndex(sign, idx % 3 + 1);
+                    g2.setColor(this.getElementColor(Zodiac.elementIndex(face)));
+                    glyph = ZODIAC_SYMBOLS[face];
+                }
+                centred(g2, g, glyph, idx * 10.0 + 5.0, rings[RING_DECAN_OUTER] - 10);
+                break;
+            }
+            case HOVER_DEGREE: {
+                g2.setColor(wash);
+                g2.fill(wedge(g, rings[RING_DEGREE_INNER], rings[RING_TERM_INNER] + 2, idx - 0.5,
+                    idx + 0.5));
+                double a = Math.toRadians(180.0 + g.pin - idx);
+                g2.setColor(new Color(255, 255, 255, 220));
+                g2.setStroke(new BasicStroke(2.5f));
+                g2.drawLine(g.cx + (int) (rings[RING_DEGREE_INNER] * Math.cos(a)),
+                    g.cy + (int) (rings[RING_DEGREE_INNER] * Math.sin(a)),
+                    g.cx + (int) ((rings[RING_TERM_INNER] + 4) * Math.cos(a)),
+                    g.cy + (int) ((rings[RING_TERM_INNER] + 4) * Math.sin(a)));
+                break;
+            }
+            case HOVER_HOUSE: {
+                double from = this.activeCusps[idx];
+                double to = idx == 12 ? this.activeCusps[1] : this.activeCusps[idx + 1];
+                if (to < from) {
+                    to += 360.0;
+                }
+                g2.setColor(new Color(255, 255, 255, 14));
+                g2.fill(wedge(g, 0, g.natalFloor, from, to));
+                g2.setFont(new Font("Arial", Font.BOLD, (int) Math.round(15 * HOVER_SCALE)));
+                g2.setColor(this.getElementColor(Zodiac.elementIndex(idx - 1)));
+                centred(g2, g, String.valueOf(idx), from + (to - from) / 2.0, g.natalFloor - 16);
+                break;
+            }
+            case HOVER_MANSION: {
+                double start = (idx - 1) * com.zodiacomputing.ourania.astro.LunarMansions.WIDTH;
+                g2.setColor(new Color(255, 255, 255, 50));
+                g2.fill(wedge(g, rings[RING_OUTER] - RIM_BAND_DEPTH, rings[RING_OUTER] + 4,
+                    start, start + com.zodiacomputing.ourania.astro.LunarMansions.WIDTH));
+                break;
+            }
+            case HOVER_RIM_DEGREE: {
+                g2.setColor(new Color(255, 255, 255, 60));
+                g2.fill(wedge(g, rings[RING_OUTER] - RIM_BAND_DEPTH, rings[RING_OUTER] + 4,
+                    idx - 0.5, idx + 0.5));
+                break;
+            }
+            case HOVER_BOUND: {
+                int sign = idx / 30;
+                double[] edges = com.zodiacomputing.ourania.astro.Dignity.boundEdges(sign);
+                double inSign = idx % 30 + 0.5;
+                for (int e = 0; e < edges.length - 1; e++) {
+                    if (inSign >= edges[e] && inSign < edges[e + 1]) {
+                        double from = sign * 30.0 + edges[e];
+                        double to = sign * 30.0 + edges[e + 1];
+                        g2.setColor(wash);
+                        g2.fill(wedge(g, rings[RING_TERM_INNER], rings[RING_SIGN_INNER], from, to));
+                        int bi = Bodies.indexOfName(
+                            com.zodiacomputing.ourania.astro.Dignity.boundRulerOf((from + to) / 2.0));
+                        if (bi >= 0 && bi < BODY_GLYPHS.length) {
+                            g2.setFont(new Font("SansSerif", Font.PLAIN,
+                                (int) Math.round(11 * HOVER_SCALE * 1.2)));
+                            g2.setColor(this.bodyColor(bi));
+                            centred(g2, g, BODY_GLYPHS[bi], (from + to) / 2.0,
+                                (rings[RING_TERM_INNER] + rings[RING_SIGN_INNER]) / 2.0);
+                        }
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+        g2.setComposite(was);
+    }
+
     /** Sets the focused body and reports whether anything changed, so hover repaints once. */
     private boolean setFocus(int packed) {
         if (this.focusPinned) {
@@ -2959,7 +3268,9 @@ extends JPanel {
             public void mouseExited(MouseEvent mouseEvent) {
                 // Without this the chart stays dimmed around whatever the cursor left on,
                 // which reads as a rendering fault rather than as a selection.
-                if (SkymapPanel.this.setFocus(-1)) {
+                boolean cleared = SkymapPanel.this.setFocus(-1);
+                cleared |= SkymapPanel.this.setHover(-1, -1);
+                if (cleared) {
                     SkymapPanel.this.chartPanel.repaint();
                 }
             }
@@ -2996,22 +3307,21 @@ extends JPanel {
                     int w2 = SkymapPanel.this.chartPanel.getWidth();
                     int h2 = SkymapPanel.this.chartPanel.getHeight();
                     int over = SkymapPanel.this.bodyAt(x, y);
-                    int house = over >= 0 ? -1
-                        : GlobeRenderer.houseNumberAt(SkymapPanel.this.globe, w2, h2,
-                            SkymapPanel.this, x, y);
-                    int deg = over >= 0 || house >= 0 ? -1
-                        : GlobeRenderer.degreeAt(SkymapPanel.this.globe, w2, h2,
-                            SkymapPanel.this, x, y);
-                    // The mansion band is outside the degree scale, so the two never contend
-                    // for a pixel - but it is asked last for the same reason the others are
-                    // ordered: whatever lights under the cursor is what opens when it is
-                    // clicked, and the click asks in this order too.
-                    int station = over >= 0 || house >= 0 || deg >= 0 ? -1
-                        : GlobeRenderer.mansionAt(SkymapPanel.this.globe, w2, h2,
-                            SkymapPanel.this, x, y);
+                    // The click's own resolver, so whatever lights under the cursor is what
+                    // opens when it is clicked.
+                    int[] t = over >= 0 ? new int[]{GLOBE_NONE, -1}
+                        : SkymapPanel.this.globeTargetAt(x, y);
+                    int house = t[0] == GLOBE_HOUSE ? t[1] : -1;
+                    int deg = t[0] == GLOBE_DEGREE ? t[1] : -1;
+                    int station = t[0] == GLOBE_MANSION ? t[1] : -1;
                     boolean moved = SkymapPanel.this.setFocusDegree(deg);
                     moved |= SkymapPanel.this.setFocusHouse(house);
                     moved |= SkymapPanel.this.setFocusMansion(station);
+                    // The hand over anything the globe answers.
+                    boolean clickable = over >= 0 || t[0] != GLOBE_NONE;
+                    SkymapPanel.this.chartPanel.setCursor(java.awt.Cursor.getPredefinedCursor(
+                        clickable ? java.awt.Cursor.HAND_CURSOR : java.awt.Cursor.DEFAULT_CURSOR));
+                    moved |= SkymapPanel.this.setHover(over, -1);
                     if (SkymapPanel.this.setFocus(over) || moved) {
                         SkymapPanel.this.chartPanel.repaint();
                     }
@@ -3032,8 +3342,14 @@ extends JPanel {
                 // what a reader is actually looking at, lit nothing on any ring. A glyph wins
                 // the cursor when there is one under it, because a body is what someone
                 // resting on a body means.
-                moved |= SkymapPanel.this.setHighlightedChord(
-                    over >= 0 ? null : SkymapPanel.this.chordAt(px, py));
+                int[] chord = over >= 0 ? null : SkymapPanel.this.chordAt(px, py);
+                moved |= SkymapPanel.this.setHighlightedChord(chord);
+                // The swell: whatever this point would open, shown before the click.
+                int ring = over >= 0 || chord != null ? -1 : SkymapPanel.this.ringTargetAt(px, py);
+                moved |= SkymapPanel.this.setHover(over, ring);
+                SkymapPanel.this.chartPanel.setCursor(java.awt.Cursor.getPredefinedCursor(
+                    over >= 0 || chord != null || ring >= 0
+                        ? java.awt.Cursor.HAND_CURSOR : java.awt.Cursor.DEFAULT_CURSOR));
                 if (moved) {
                     SkymapPanel.this.chartPanel.repaint();
                 }
@@ -4340,23 +4656,33 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // Nothing under the cursor but the scaffolding: a house number opens its
                 // house, a tick opens its degree. Same order the hover uses, so what lights
                 // under the cursor is what opens when it is clicked.
-                int house = GlobeRenderer.houseNumberAt(this.globe,
-                    this.chartPanel.getWidth(), this.chartPanel.getHeight(), this, n, n2);
-                if (house >= 1 && this.window != null) {
-                    this.window.showInterpretationForHouse(house);
+                int[] target = this.globeTargetAt(n, n2);
+                if (this.window == null) {
                     return;
                 }
-                int deg = GlobeRenderer.degreeAt(this.globe, this.chartPanel.getWidth(),
-                    this.chartPanel.getHeight(), this, n, n2);
-                if (deg >= 0 && this.window != null) {
-                    this.window.showInterpretationForSabianSymbol(
-                        SIGN_NAMES[(deg / 30) % 12], deg % 30 + 1);
-                    return;
-                }
-                int station = GlobeRenderer.mansionAt(this.globe, this.chartPanel.getWidth(),
-                    this.chartPanel.getHeight(), this, n, n2);
-                if (station >= 1 && this.window != null) {
-                    this.window.showInterpretationForMansion(station);
+                switch (target[0]) {
+                    case GLOBE_HOUSE:
+                        this.window.showInterpretationForHouse(target[1]);
+                        break;
+                    case GLOBE_DECAN:
+                        this.window.showInterpretationForDecan(SIGN_NAMES[target[1] / 3],
+                            target[1] % 3 + 1);
+                        break;
+                    case GLOBE_DEGREE:
+                        this.window.showInterpretationForSabianSymbol(
+                            SIGN_NAMES[(target[1] / 30) % 12], target[1] % 30 + 1);
+                        break;
+                    case GLOBE_MANSION:
+                        this.window.showInterpretationForMansion(target[1]);
+                        break;
+                    case GLOBE_SIGN:
+                        this.window.showInterpretationForSign(SIGN_NAMES[target[1]]);
+                        break;
+                    case GLOBE_BOUND:
+                        this.window.showInterpretationForBound(target[1] + 0.5);
+                        break;
+                    default:
+                        break;
                 }
                 return;
             }
@@ -4743,6 +5069,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.window.showInterpretationForSign(SIGN_NAMES[n3]);
                 return;
             }
+            case BAND_BOUND: {
+                this.window.showInterpretationForBound(d9);
+                return;
+            }
             case BAND_DEGREE: {
                 n3 = (int)Math.round(d9) % 360;
                 if (n3 < 0) {
@@ -4755,31 +5085,20 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             default:
                 break;
         }
-        // The lunar mansion ring, tested BEFORE the Sabian degree because the two share this
-        // band and the ring is the half you can see.
-        //
-        // The mansions are drawn from n9-9 outward; the degree ticks reach n9-6. Anything on
-        // that visible band is a mansion click. The Sabian symbol keeps the strip just inside
-        // it, n9-15 to n9-9, where nothing is drawn - it is a per-degree reading with no ring
-        // of its own, so it loses the contested pixels rather than the feature that has a
-        // ring drawn on them.
-        // Gated on the layer, so a folded ring is not a ring you can still click. A hit test
-        // that outlives what it tests is the flat wheel's version of a glyph you can see and
-        // cannot click - the same defect from the other end.
-        if (this.layerShown(Layer.MANSIONS) && SkymapPanel.inMansionBand(d6, n9)) {
-            this.window.showInterpretationForMansion(
-                com.zodiacomputing.ourania.astro.LunarMansions.at(d9).number);
-            return;
-        }
-        if (SkymapPanel.inSabianBand(d6, n9)) {
+        // The rim, from the decan ring out: the mansion under the point, or - with the mansions
+        // folded away - the degree's Sabian symbol, since the outer tick scale is what is left
+        // there. One target for the whole visible band; see RIM_BAND_DEPTH.
+        if (SkymapPanel.inMansionBand(d6, n9)) {
+            if (this.layerShown(Layer.MANSIONS)) {
+                this.window.showInterpretationForMansion(
+                    com.zodiacomputing.ourania.astro.LunarMansions.at(d9).number);
+                return;
+            }
             n3 = (int)Math.round(d9) % 360;
             if (n3 < 0) {
                 n3 += 360;
             }
-            int n24 = n3 / 30;
-            int n25 = n3 % 30 + 1;
-            this.window.showInterpretationForSabianSymbol(SIGN_NAMES[n24], n25);
-            return;
+            this.window.showInterpretationForSabianSymbol(SIGN_NAMES[n3 / 30], n3 % 30 + 1);
         }
     }
 
@@ -5320,8 +5639,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     /** How far in from the outer ring the mansion band starts. The ring is drawn there. */
     static final int MANSION_BAND_DEPTH = 9;
 
-    /** How far in the Sabian degree target reaches. Nothing is drawn on this strip. */
-    static final int SABIAN_BAND_DEPTH = 15;
+    /**
+     * How far in from the outer ring the rim's click target reaches: all the way to the decan
+     * ring, 20 px.
+     *
+     * <b>The whole rim is one target now.</b> It was split three ways - the mansion band from 9 px
+     * in, an undrawn "Sabian strip" from 15 to 9, and a dead strip from 20 to 15 - so a click on
+     * the inner half of the visible rim opened a Sabian symbol nothing on screen pointed to, or
+     * nothing at all. Measured by colouring every pixel of the wheel by what the real click
+     * handler opens (2026-09-14). David: "each click should be the entire space of the item". The
+     * Sabian symbols have their own drawn ring, the inner degree scale, where every degree cell
+     * opens its symbol.
+     */
+    static final int RIM_BAND_DEPTH = 20;
 
     /**
      * True when a click radius lands on the lunar mansion ring.
@@ -5334,12 +5664,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * asserted disjoint - a hit test that overlaps another silently gives one of them away.
      */
     static boolean inMansionBand(double radius, int outer) {
-        return radius >= outer - MANSION_BAND_DEPTH && radius <= outer + 15;
-    }
-
-    /** True when a click radius lands on the Sabian degree strip inside the mansion ring. */
-    static boolean inSabianBand(double radius, int outer) {
-        return radius >= outer - SABIAN_BAND_DEPTH && radius < outer - MANSION_BAND_DEPTH;
+        return radius >= outer - RIM_BAND_DEPTH && radius <= outer + 15;
     }
 
     /** Indices into {@link #ringRadii}. */
@@ -6231,6 +6556,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     static final int BAND_DEGREE = 3;
     /** The bounds ring and the open middle, which name the sign the wedge belongs to. */
     static final int BAND_OPEN = 4;
+    /** The Egyptian bounds ring, between the degree scale and the signs. */
+    static final int BAND_BOUND = 5;
 
     /**
      * Which readable ring a radius falls in.
@@ -6262,6 +6589,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // and the middle is the space around it.
         if (r >= rings[RING_DEGREE_INNER] && r < rings[RING_TERM_INNER]) {
             return BAND_DEGREE;
+        }
+        // The bounds ring answers for its own bound. It named the sign until 2026-09-14, for
+        // want of a reading - which made a click on a bound open something else.
+        if (r >= rings[RING_TERM_INNER] && r < rings[RING_SIGN_INNER]) {
+            return BAND_BOUND;
         }
         if (r >= bodyBase && r < rings[RING_SIGN_INNER]) {
             return BAND_OPEN;
@@ -7521,11 +7853,21 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 }
                 double d7 = d3 + (d - d3) / 2.0;
                 double d8 = Math.toRadians(180.0 + d4 - d7);
-                int n22 = n12 + (int)((double)(n18 - 15) * Math.cos(d8));
-                int n23 = n13 + (int)((double)(n18 - 15) * Math.sin(d8));
+                // <b>Just inside the aspect field's rim, not under the sign ring.</b> The number
+                // sat 15 px inside the sign ring's inner edge, which was open space when it was
+                // placed; the bounds ring and the degree scale have since grown into exactly that
+                // band, and an 11 px digit among the bound glyphs and the 0/10/20 labels read as
+                // no house numbers at all (reported 2026-09-14). The rim of the aspect disc is
+                // the one ring on the wheel nothing else is drawn on.
+                int houseR = g.natalFloor - 16;
+                int n22 = n12 + (int)((double)houseR * Math.cos(d8));
+                int n23 = n13 + (int)((double)houseR * Math.sin(d8));
                 graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n8 - 1)));
-                graphics2D.setFont(new Font("Arial", 1, 11));
-                graphics2D.drawString(String.valueOf(n8), n22 - 3, n23 + 3);
+                graphics2D.setFont(new Font("Arial", 1, 15));
+                java.awt.FontMetrics houseFm = graphics2D.getFontMetrics();
+                String houseText = String.valueOf(n8);
+                graphics2D.drawString(houseText, n22 - houseFm.stringWidth(houseText) / 2,
+                    n23 + houseFm.getAscent() / 2 - 1);
             }
             if (SkymapPanel.this.showTransitChart && "Both".equals(SkymapPanel.this.houseAlignment)) {
                 Stroke stroke = graphics2D.getStroke();
@@ -7665,11 +8007,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         d4, n12, n13, hlDisc, hlDisc, hlWheel, hlA, hlB);
                 }
             }
+            // The transform the bodies are drawn in, so a hovered glyph's swell is undone
+            // before anything else is painted - every loop below resets to it.
+            final java.awt.geom.AffineTransform bodyTx = graphics2D.getTransform();
             for (n7 = 0; SkymapPanel.this.layerShown(Layer.NATAL) && n7 < BODY_COUNT; ++n7) {
                 if (!SkymapPanel.this.bValid[n7]) continue;
                 double d10 = Math.toRadians(180.0 + d4 - SkymapPanel.this.bLon[n7]);
                 n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));
                 int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
+                SkymapPanel.bulge(graphics2D, bodyTx, n4, n26, SkymapPanel.this.hoverBody == n7);
                 if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_NATAL)) {
                     SkymapPanel.drawHighlightHalo(graphics2D, n4, n26,
                         Bodies.at(n7).isAngle() ? 13 : SkymapPanel.natalSize(n7).radius);
@@ -7713,6 +8059,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     object = SkymapPanel.glyphFor(n7, glyphSize.font);
                     graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n26 + glyphSize.baseline);
                 }
+                graphics2D.setTransform(bodyTx);
                 // The leader from the glyph to the degree it actually occupies. Bodies are
                 // spread outward when they crowd, so without this a reader cannot tell which
                 // degree a glyph belongs to. Colour and visibility are both settings; the
@@ -7743,6 +8090,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     graphics2D.setStroke(priorLeader);
                 }
             }
+            graphics2D.setTransform(bodyTx);
             if (SkymapPanel.this.outerRingDrawn()) {
                 Composite outerWas = graphics2D.getComposite();
                 float outerA = SkymapPanel.ringAlpha(SkymapPanel.this.outerOpenFraction());
@@ -7758,6 +8106,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.tLon[n7]);
                     n4 = n12 + (int)((double)nArray2[n7] * Math.cos(d12));
                     int n27 = n13 + (int)((double)nArray2[n7] * Math.sin(d12));
+                    SkymapPanel.bulge(graphics2D, bodyTx, n4, n27,
+                        SkymapPanel.this.hoverBody == (n7 | TRANSIT_BIT));
                     if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_OUTER)) {
                         SkymapPanel.drawHighlightHalo(graphics2D, n4, n27,
                             Bodies.at(n7).isAngle() ? 13
@@ -7796,6 +8146,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // Tri-wheel: sky positions in the outermost ring. Blue-tinted, and by default a
             // different shape from the synastry ring inside it - see Settings.MARKER_SHAPES
             // for why the tint alone was not enough.
+            graphics2D.setTransform(bodyTx);
             if (SkymapPanel.this.triRingDrawn()) {
                 Composite triWas = graphics2D.getComposite();
                 float triA = SkymapPanel.ringAlpha(SkymapPanel.this.triOpenFraction());
@@ -7842,6 +8193,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 }
                 graphics2D.setComposite(triWas);
             }
+            graphics2D.setTransform(bodyTx);
+            SkymapPanel.this.paintHover(graphics2D, g);
         }
 
         /**

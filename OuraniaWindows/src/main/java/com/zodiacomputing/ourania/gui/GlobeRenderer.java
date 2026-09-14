@@ -891,6 +891,135 @@ final class GlobeRenderer {
      * answers, and it needs no inverse projection - which is what keeps this honest under a
      * camera the reader can turn to any angle.
      */
+    /**
+     * The decan under a point, 0 to 35, or -1: the nearest decan glyph within a few pixels.
+     *
+     * <b>The globe drew the decans and signs and answered a click on neither.</b> Only bodies,
+     * house numbers, degree ticks and mansions were hit-tested, so a sign or decan click on the
+     * globe did nothing while the same click on the flat wheel opened its reading (reported
+     * 2026-09-14). Asked before the degree ticks by the caller: the 360 ticks run just outside
+     * the decan glyphs, and a tick is always within reach, so a decan tested after them could
+     * never be clicked. The radius is tight for the same reason.
+     */
+    static int decanAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+        if (!panel.layerShown(SkymapPanel.Layer.DECANS)) {
+            return -1;
+        }
+        // <b>The whole decan band, not the glyph.</b> David: "each click should be the entire
+        // space of the item". Sampled across the band's width and along every two degrees; the
+        // margin is small because the degree scale starts just outside, and a wider one would
+        // take its ticks.
+        int lonAt = bandAt(cam, w, h, panel, px, py, Globe.SHELL_SIGN_OUTER + 0.02,
+            Globe.SHELL_DECAN + 0.02, 5.0);
+        return lonAt < 0 ? -1 : lonAt / 10;
+    }
+
+    /**
+     * The whole degree of longitude under a point on a band of the ecliptic plane, or -1: the
+     * nearest of samples every two degrees along three radii across the band, within a margin.
+     * One sampler for every band, so they are hit the same way.
+     */
+    static int bandAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py,
+                      double inner, double outer, double margin) {
+        double origin = panel.pinLongitude();
+        double[] radii = {inner, (inner + outer) / 2.0, outer};
+        int best = -1;
+        double bestDist = margin;
+        for (double lon = 1.0; lon < 360.0; lon += 2.0) {
+            for (double r : radii) {
+                double[] pt = Globe.onShell(lon, origin, r, 0.0);
+                Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                if (!q.visible) {
+                    continue;
+                }
+                double dist = Math.hypot(q.x - px, q.y - py);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = (int) lon;
+                }
+            }
+        }
+        return best;
+    }
+
+    /** The bound under a point: its longitude in whole degrees, or -1. The bounds band's width. */
+    static int boundAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+        if (!panel.layerShown(SkymapPanel.Layer.BOUNDS)) {
+            return -1;
+        }
+        return bandAt(cam, w, h, panel, px, py, Globe.SHELL_HOUSE + 0.03,
+            Globe.SHELL_SIGN_INNER - 0.02, 6.0);
+    }
+
+    /**
+     * The house whose wedge of the ecliptic plane is under a point, 1 to 12, or -1.
+     *
+     * <b>The whole wedge, not only the number.</b> The number was the one way to ask for a house,
+     * kept deliberately narrow; David asked on 2026-09-14 for every item to answer across its
+     * whole space. Bodies are tested before this by the caller, so a glyph standing in a house
+     * still opens the body.
+     */
+    static int houseAreaAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+        double[] cusps = panel.activeCusps;
+        if (cusps == null || cusps.length < 13 || !panel.layerShown(SkymapPanel.Layer.HOUSES)) {
+            return -1;
+        }
+        double origin = panel.pinLongitude();
+        int best = -1;
+        // Denser than the bands: seen edge-on the plane is foreshortened, and a click map at a
+        // low camera showed dead flecks between samples 3 degrees and 0.18 apart.
+        double bestDist = 10.0;
+        for (int i = 1; i <= 12; i++) {
+            double span = arc(cusps[i], cusps[i == 12 ? 1 : i + 1]);
+            for (double t = 1.0; t < span; t += 2.0) {
+                for (double r = 0.2; r <= Globe.SHELL_HOUSE + 0.02; r += 0.11) {
+                    double[] pt = Globe.onShell(cusps[i] + t, origin, r, 0.0);
+                    Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                    if (!q.visible) {
+                        continue;
+                    }
+                    double dist = Math.hypot(q.x - px, q.y - py);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        best = i;
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
+    /**
+     * The sign under a point, 0 to 11, or -1: anywhere on the sign band, sampled across its
+     * width and along every two degrees, the way {@link #mansionAt} samples its band.
+     */
+    static int signAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+        if (!panel.layerShown(SkymapPanel.Layer.SIGNS)) {
+            return -1;
+        }
+        double origin = panel.pinLongitude();
+        double span = Globe.SHELL_SIGN_OUTER - Globe.SHELL_SIGN_INNER;
+        double[] radii = {Globe.SHELL_SIGN_INNER + span * 0.2, Globe.SHELL_SIGN_INNER + span * 0.5,
+            Globe.SHELL_SIGN_INNER + span * 0.8};
+        int best = -1;
+        double bestDist = 11.0;
+        for (double lon = 1.0; lon < 360.0; lon += 2.0) {
+            for (double r : radii) {
+                double[] pt = Globe.onShell(lon, origin, r, 0.0);
+                Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                if (!q.visible) {
+                    continue;
+                }
+                double dist = Math.hypot(q.x - px, q.y - py);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = (int) (lon / 30.0);
+                }
+            }
+        }
+        return best;
+    }
+
     static int mansionAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.MANSIONS)) {
             return -1;

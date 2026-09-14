@@ -2201,34 +2201,22 @@ public final class AspectGridCheck {
         ok("28 mansions tile the circle exactly",
             Math.abs(com.zodiacomputing.ourania.astro.LunarMansions.WIDTH * 28 - 360.0) < 1e-9);
 
-        // The mansion ring and the Sabian degree share the outer band, and a hit test that
-        // overlaps another silently gives one of them away. The mansion ring was drawn with
-        // no click route at all until David reported that selecting one did nothing, so this
-        // asserts both that the route exists and that it does not swallow its neighbour.
+        // <b>The whole rim is the mansion target, from the decan ring out.</b> It used to split
+        // into a mansion band, an undrawn Sabian strip and a dead strip; a click map of the
+        // wheel (2026-09-14) showed the inner half of the visible rim opening a Sabian nothing
+        // pointed at, or nothing. The Sabian symbols are read from the inner degree scale.
         int[] r = SkymapPanel.ringRadii(900, 900, false);
         int outer = r[SkymapPanel.RING_OUTER];
-        int both = 0;
-        int neither = 0;
-        for (int d = -20; d <= 20; d++) {
-            double radius = outer + d;
-            boolean mansion = SkymapPanel.inMansionBand(radius, outer);
-            boolean sabian = SkymapPanel.inSabianBand(radius, outer);
-            ok("the mansion and Sabian bands never overlap (offset " + d + ")",
-                !(mansion && sabian));
-            if (mansion && sabian) both++;
-            if (!mansion && !sabian) neither++;
+        int decanOuter = r[SkymapPanel.RING_DECAN_OUTER];
+        boolean wholeRim = true;
+        for (int radius = decanOuter; radius <= outer; radius++) {
+            wholeRim &= SkymapPanel.inMansionBand(radius, outer);
         }
-        ok("no radius belongs to both bands", both == 0);
-        ok("the visible ring is a mansion target",
-            SkymapPanel.inMansionBand(outer, outer)
-                && SkymapPanel.inMansionBand(outer - 3, outer)
-                && SkymapPanel.inMansionBand(outer - 9, outer));
-        ok("the strip inside it is still a Sabian target",
-            SkymapPanel.inSabianBand(outer - 10, outer)
-                && SkymapPanel.inSabianBand(outer - 15, outer));
-        ok("neither band reaches the decan ring",
-            !SkymapPanel.inMansionBand(r[SkymapPanel.RING_DECAN_OUTER], outer)
-                && !SkymapPanel.inSabianBand(r[SkymapPanel.RING_DECAN_OUTER], outer));
+        ok("every radius from the decan ring to the rim is a mansion target", wholeRim);
+        ok("and the decan ring itself is not",
+            !SkymapPanel.inMansionBand(decanOuter - 1, outer));
+        eq("the decan ring's last pixel still reads a decan", SkymapPanel.BAND_DECAN,
+            SkymapPanel.bandAt(decanOuter - 1, r, 200));
         ok("every longitude on the ring resolves to a mansion", mansionAtEveryDegree());
     }
 
