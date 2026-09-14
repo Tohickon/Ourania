@@ -3810,6 +3810,9 @@ extends JPanel {
                 if ("DECLINATIONS".equals(kind)) {
                     return ChartTables.declinations(f);
                 }
+                if ("ANTISCIA".equals(kind)) {
+                    return ChartTables.antiscia(f);
+                }
                 // These two are read against a moment, not just a chart, so they take the
                 // birth instant and today. The transit clock drives them when it is set, so
                 // stepping time moves the progressed chart with it.

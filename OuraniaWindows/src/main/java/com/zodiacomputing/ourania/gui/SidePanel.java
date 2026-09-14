@@ -111,6 +111,8 @@ public final class SidePanel extends JPanel {
             "The tightest harmonic contacts the classical aspects do not show"));
         tables.add(tableButton("Declinations", "DECLINATIONS",
             "North and south of the equator: planets out of bounds, parallels and contraparallels"));
+        tables.add(tableButton("Antiscia", "ANTISCIA",
+            "Each point mirrored across the solstice and equinox axes, and who stands on the mirrors"));
         tables.add(tableButton("Progressed", "PROGRESSED",
             "The secondary progressed chart: a day of ephemeris for a year of life"));
         tables.add(tableButton("Solar Arc", "SOLARARC",

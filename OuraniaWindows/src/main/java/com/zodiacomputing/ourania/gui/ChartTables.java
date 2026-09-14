@@ -569,6 +569,48 @@ public final class ChartTables {
         return h.toString();
     }
 
+    /**
+     * Antiscia and contra-antiscia: each point's two mirror degrees, and who stands on them.
+     * Master list D8. Facts only, for the reason {@link #declinations} gives.
+     */
+    public static String antiscia(ChartFrame natal) {
+        com.zodiacomputing.ourania.astro.Antiscia.Result r =
+            com.zodiacomputing.ourania.astro.Antiscia.of(natal);
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Antiscia</h1>");
+        h.append("<p>Each degree mirrored across the solstice axis, 0&deg; Cancer to ")
+         .append("0&deg; Capricorn, where two points share the same length of day - its ")
+         .append("antiscion - and across the equinox axis, 0&deg; Aries to 0&deg; Libra - its ")
+         .append("contra-antiscion.</p>");
+
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Point", "Position", "Antiscion", "Contra-antiscion"));
+        for (com.zodiacomputing.ourania.astro.Antiscia.Point p : r.points) {
+            h.append(row4("td", p.name, position(p.longitude), position(p.antiscion),
+                position(p.contraAntiscion)));
+        }
+        h.append("</table>");
+
+        h.append("<h2>Points on another's mirror</h2>");
+        h.append("<p>A point on another's antiscion is read like a conjunction; on its ")
+         .append("contra-antiscion, like an opposition. Within ")
+         .append(trim(com.zodiacomputing.ourania.astro.Antiscia.orb)).append("&deg;.</p>");
+        if (r.contacts.isEmpty()) {
+            h.append("<p><i>No point stands on another's antiscion or contra-antiscion ")
+             .append("within orb.</i></p>");
+            return h.toString();
+        }
+        h.append("<table cellpadding=\"4\">");
+        h.append(row3("th", "Pair", "Contact", "Orb"));
+        for (com.zodiacomputing.ourania.astro.Antiscia.Contact c : r.contacts) {
+            h.append(row3("td", c.a + " &ndash; " + c.b,
+                c.contra ? "contra-antiscion" : "antiscion",
+                String.format("%.2f&deg;", c.off)));
+        }
+        h.append("</table>");
+        return h.toString();
+    }
+
     /** A declination the way almanacs print it: degrees and minutes, N or S. */
     static String declination(double dec) {
         double a = Math.abs(dec);
