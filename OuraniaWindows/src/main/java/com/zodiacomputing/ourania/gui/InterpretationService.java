@@ -51,9 +51,11 @@ public class InterpretationService {
      * <b>Its own file, not spliced into Sabian_interpretations.json</b>, which the other agent
      * writes to - the two-agents rule.
      *
-     * <b>The classic symbol it carries is not the app's.</b> In 178 of 360 degrees it differs
-     * substantially from {@link #getSabianSymbol}, sometimes as rewording and sometimes as a
-     * different image, and the modern tiers follow whichever image the file used. Those degrees
+     * <b>The classic symbol it carries is not the app's.</b> In the second set, swapped in the same
+     * day, 147 of 360 degrees differ substantially from {@link #getSabianSymbol} (the first set:
+     * 178). Many are edition differences - the app's set is partly Rudhyar's rewording, the file
+     * often the 1925 original - and some are a different image, and the modern tiers follow
+     * whichever image the file used. Those degrees
      * carry classicDiffers, and the reading shows the file's symbol beside the tiers so a reader
      * can see what they describe. The app's own symbol is left alone.
      */

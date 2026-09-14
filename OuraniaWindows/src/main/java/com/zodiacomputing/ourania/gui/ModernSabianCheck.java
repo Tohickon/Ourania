@@ -39,8 +39,9 @@ public final class ModernSabianCheck {
         }
         ok("all 360 degrees carry a modern image, archetype and meaning: " + complete
             + ", first gaps " + gaps, complete == 360);
-        ok("178 degrees are flagged as written from a different symbol, got " + flagged,
-            flagged == 178);
+        // The second set David supplied: 147 differ from the app's symbol (the first had 178).
+        ok("147 degrees are flagged as written from a different symbol, got " + flagged,
+            flagged == 147);
         ok("a degree that does not exist has none", svc.getModernSabian("Aries", 31) == null);
         ok("the sign's case does not matter",
             svc.getModernSabian("aries", 1) != null && svc.getModernSabian("ARIES", 1) != null);
