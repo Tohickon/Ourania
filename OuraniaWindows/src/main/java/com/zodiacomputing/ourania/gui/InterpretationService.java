@@ -39,7 +39,70 @@ public class InterpretationService {
         loadDegreesData();
         loadAnglesData();
         loadSabianDetailData();
+        loadModernSabians();
         loadExtraBodiesData();
+    }
+
+    /**
+     * The four-tier Sabian set David supplied on 2026-09-14: for each degree a modern image, a
+     * core archetype and a contemporary meaning, plus the classic symbol the three were written
+     * from. Keyed like the classic symbols, "aries_1".
+     *
+     * <b>Its own file, not spliced into Sabian_interpretations.json</b>, which the other agent
+     * writes to - the two-agents rule.
+     *
+     * <b>The classic symbol it carries is not the app's.</b> In 178 of 360 degrees it differs
+     * substantially from {@link #getSabianSymbol}, sometimes as rewording and sometimes as a
+     * different image, and the modern tiers follow whichever image the file used. Those degrees
+     * carry classicDiffers, and the reading shows the file's symbol beside the tiers so a reader
+     * can see what they describe. The app's own symbol is left alone.
+     */
+    private final Map<String, String[]> modernSabians = new HashMap<>();
+
+    private static final String[] MODERN_SABIAN_FIELDS =
+        {"title", "classic", "modern", "archetype", "meaning", "classicDiffers"};
+
+    private void loadModernSabians() {
+        File file = new File("src/main/resources/data/modern_sabians.json");
+        if (!file.exists()) {
+            return;
+        }
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+            String line;
+            String key = null;
+            String[] fields = null;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("\"") && line.endsWith("{")) {
+                    key = line.substring(1, line.indexOf('"', 1)).toLowerCase();
+                    fields = new String[MODERN_SABIAN_FIELDS.length];
+                    modernSabians.put(key, fields);
+                    continue;
+                }
+                if (fields == null) {
+                    continue;
+                }
+                for (int i = 0; i < MODERN_SABIAN_FIELDS.length; i++) {
+                    String name = "\"" + MODERN_SABIAN_FIELDS[i] + "\":";
+                    if (line.startsWith(name)) {
+                        fields[i] = extractQuotedValue(line, name.length());
+                    }
+                }
+            }
+            System.out.println("Loaded modern Sabians: " + modernSabians.size() + " degrees.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * The modern Sabian tiers for a degree: {title, classic, modern, archetype, meaning,
+     * classicDiffers}, or null when the degree has none.
+     */
+    public String[] getModernSabian(String signName, int degree) {
+        String[] f = modernSabians.get(signName.toLowerCase() + "_" + degree);
+        return f == null ? null : f.clone();
     }
 
     /**

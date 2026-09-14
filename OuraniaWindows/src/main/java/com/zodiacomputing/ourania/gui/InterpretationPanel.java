@@ -507,6 +507,7 @@ public class InterpretationPanel extends JPanel {
             // Sabian Symbol
             html.append("<h3 style='color:#E0E0E0;'><b>Sabian Symbol (").append(signName).append(" ").append(degree).append("&deg;)</b></h3>");
             html.append("<p><i>\"").append(InterpretationService.getInstance().getSabianSymbol(signName, degree)).append("\"</i></p>");
+            html.append(modernSabianHtml(signName, degree));
 
             // Expanded Sabian detail: interpretation, shadow expression, keywords
             String sabianFullText = InterpretationService.getInstance().getSabianFullText(signName, degree);
@@ -1196,12 +1197,54 @@ public class InterpretationPanel extends JPanel {
         setHtml(html.toString(), false);
     }
     
+    /**
+     * The modern Sabian tiers under a degree's classic symbol, or nothing when there are none.
+     *
+     * Each label is its own line and each tier its own paragraph: Swing's HTML swallows a space
+     * at the edge of a styled run, so "Archetype:" in bold before plain text would run into it.
+     *
+     * Where the file's classic symbol differs from the one printed above, the file's is shown
+     * too, because the modern image and meaning were written from it and a reader should be
+     * able to see which picture they describe. See InterpretationService.loadModernSabians.
+     */
+    static String modernSabianHtml(String signName, int degree) {
+        String[] t = InterpretationService.getInstance().getModernSabian(signName, degree);
+        if (t == null || t[2] == null) {
+            return "";
+        }
+        StringBuilder h = new StringBuilder();
+        if (t[0] != null && !t[0].isEmpty()) {
+            h.append("<p style='color:#FFD166;'>").append(escapeText(t[0])).append("</p>");
+        }
+        if ("true".equals(t[5]) && t[1] != null) {
+            h.append("<p style='color:#9AA5B1; font-size:11px;'>The modern reading below was ")
+             .append("written from a differently worded symbol: \"")
+             .append(escapeText(t[1])).append("\"</p>");
+        }
+        h.append("<p style='color:#9AA5B1; font-size:11px;'>Modern image</p>")
+         .append("<p><i>").append(escapeText(t[2])).append("</i></p>");
+        if (t[3] != null) {
+            h.append("<p style='color:#9AA5B1; font-size:11px;'>Core archetype</p>")
+             .append("<p>").append(escapeText(t[3])).append("</p>");
+        }
+        if (t[4] != null) {
+            h.append("<p style='color:#9AA5B1; font-size:11px;'>What it means now</p>")
+             .append("<p>").append(escapeText(t[4])).append("</p>");
+        }
+        return h.toString();
+    }
+
+    private static String escapeText(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+
     public void showSabianInterpretation(String signName, int degree) {
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
         html.append("<h2 style='color:#00BFFF;'>Sabian Symbol (").append(signName).append(" ").append(degree).append("&deg;)</h2>");
         html.append("<p style='font-size:16px; font-style:italic;'>\"").append(InterpretationService.getInstance().getSabianSymbol(signName, degree)).append("\"</p>");
-        
+        html.append(modernSabianHtml(signName, degree));
+
         String degreeSummary = InterpretationService.getInstance().getDegreeSummary(signName, degree);
         String degreeFullText = InterpretationService.getInstance().getDegreeFullText(signName, degree);
         if (!degreeSummary.isEmpty() || !degreeFullText.isEmpty()) {
