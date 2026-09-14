@@ -112,6 +112,12 @@ public final class ChartSetupCheck {
         report("Transit search screen", beforeSearch);
 
         System.out.println();
+        System.out.println("=== the zodiac in force is named on screen ===");
+        int beforeZodiac = failures.size();
+        theZodiacIsNamed();
+        report("Zodiac label", beforeZodiac);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -797,6 +803,72 @@ public final class ChartSetupCheck {
             ok("the season is one row, not three",
                 html[0].split("<tr").length - 2 == engine.size());
         } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * A sidereal chart says so, on the readout and on the wheel; a tropical one says nothing.
+     *
+     * The gap the sidereal zodiac shipped with: switched in Settings and forgotten, the Sun
+     * shows a sign early and nothing on screen explains it. Driven through the setting and the
+     * door the Settings screen uses, not by setting the zodiac underneath the window.
+     */
+    private static void theZodiacIsNamed() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            java.lang.reflect.Field fc = OuraniaWindow.class.getDeclaredField("chartSetupPanel");
+            fc.setAccessible(true);
+            ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
+            java.lang.reflect.Field fd = SkymapPanel.class.getDeclaredField("timeDrawer");
+            fd.setAccessible(true);
+            Drawer drawer = (Drawer) fd.get(panel);
+            Thread.sleep(2000);
+            ok("a chart generates",
+                generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
+
+            final String[] label = {""};
+            final int[] gold = {0};
+            Runnable measure = () -> {
+                label[0] = drawer.label();
+                java.awt.image.BufferedImage img =
+                    new java.awt.image.BufferedImage(600, 400, java.awt.image.BufferedImage.TYPE_INT_RGB);
+                java.awt.Graphics2D g = img.createGraphics();
+                SkymapPanel.paintZodiacTag(g, 600, 400);
+                g.dispose();
+                int n = 0;
+                for (int y = 370; y < 400; y++) {
+                    for (int x = 0; x < 200; x++) {
+                        java.awt.Color c = new java.awt.Color(img.getRGB(x, y));
+                        n += c.getRed() > 180 && c.getGreen() > 130 && c.getBlue() < 120 ? 1 : 0;
+                    }
+                }
+                gold[0] = n;
+            };
+
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                Settings.setZodiac("Sidereal (Lahiri)");
+                hold[0].applyBodySelection();
+                measure.run();
+            });
+            ok("sidereal: the readout names the zodiac: " + label[0],
+                label[0].contains("Sidereal (Lahiri)"));
+            ok("and the wheel carries the tag, " + gold[0] + " gold pixels", gold[0] > 20);
+
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                Settings.setZodiac("Tropical");
+                hold[0].applyBodySelection();
+                measure.run();
+            });
+            ok("tropical: the readout says nothing about the zodiac: " + label[0],
+                !label[0].contains("Sidereal") && !label[0].contains("Tropical"));
+            ok("and there is no tag", gold[0] == 0);
+        } finally {
+            Settings.setZodiac("Tropical");
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
     }

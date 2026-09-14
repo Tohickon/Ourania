@@ -149,6 +149,11 @@ public final class Drawer extends JPanel {
         handle.repaint();
     }
 
+    /** The handle's text, for checks. */
+    String label() {
+        return label;
+    }
+
     public boolean isOpen() {
         return open;
     }

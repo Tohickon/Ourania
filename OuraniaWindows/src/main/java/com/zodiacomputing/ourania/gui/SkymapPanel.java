@@ -2028,6 +2028,23 @@ extends JPanel {
     /** The body under the cursor, packed as bodyAt packs it, or -1 - independent of the pin. */
     int hoverBody = -1;
 
+    /**
+     * "Sidereal (Lahiri)" in the wheel's lower-left corner when a sidereal zodiac is in force.
+     *
+     * On the wheel itself as well as on the time readout, because a saved or printed chart
+     * image carries the wheel and not the drawer handle - and a sidereal chart with no label is
+     * a chart that will be read as a tropical one with its planets in the wrong signs.
+     */
+    static void paintZodiacTag(Graphics2D g2, int w, int h) {
+        if (!com.zodiacomputing.ourania.astro.Ephemeris.sidereal()) {
+            return;
+        }
+        String tag = com.zodiacomputing.ourania.astro.Ephemeris.zodiacLabel();
+        g2.setFont(new Font("SansSerif", Font.BOLD, 13));
+        g2.setColor(new Color(226, 178, 88));
+        g2.drawString(tag, 12, h - 12);
+    }
+
     /** Sets the drawing transform to base, swollen about (x, y) when on. */
     static void bulge(Graphics2D g2, java.awt.geom.AffineTransform base, int x, int y, boolean on) {
         g2.setTransform(base);
@@ -4335,6 +4352,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         if (this.triRingDrawn() && this.skyChartTime != null) {
             out.append("      Sky: ").append(this.skyChartTime.format(fmt));
+        }
+        // <b>The zodiac, when it is not the one a reader assumes.</b> Switched to sidereal in
+        // Settings and forgotten, a chart shows the Sun a sign early with nothing on screen to
+        // say why - the gap left open when the sidereal zodiac shipped. Tropical says nothing,
+        // because it is what every other chart the reader has seen was drawn in.
+        if (com.zodiacomputing.ourania.astro.Ephemeris.sidereal()) {
+            out.append("      ").append(com.zodiacomputing.ourania.astro.Ephemeris.zodiacLabel());
         }
         this.timeDrawer.setLabel(out.toString());
     }
@@ -7675,6 +7699,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 GlobeRenderer.paint(graphics2D, SkymapPanel.this.globe,
                     this.getWidth(), this.getHeight(), SkymapPanel.this,
                     SkymapPanel.this.globeDragging);
+                SkymapPanel.paintZodiacTag(graphics2D, this.getWidth(), this.getHeight());
                 return;
             }
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -8195,6 +8220,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
             graphics2D.setTransform(bodyTx);
             SkymapPanel.this.paintHover(graphics2D, g);
+            SkymapPanel.paintZodiacTag(graphics2D, n10, n11);
         }
 
         /**
