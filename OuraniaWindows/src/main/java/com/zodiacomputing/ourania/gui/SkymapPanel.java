@@ -3628,6 +3628,7 @@ extends JPanel {
         // chartPanel goes in via the OverlayDock below, so the transport drawer can lie
         // over the bottom of the wheel's area rather than taking height from it.
         controlPanel = this.createControlPanel();
+        this.refreshScrubBars();
         // <b>The transport row goes in a drawer, and its handle is the clock.</b> The strip
         // was two wrapped rows of controls permanently across the bottom of the window, most
         // of them set once and left alone. Put away, the one thing that must stay readable is
@@ -3677,6 +3678,8 @@ extends JPanel {
     /** As above, with Chart B's own zone override - every subject has one now. */
     public void applyChartSettings(final String string, final String string2, final String string3, ChartMode chartMode, final String string4, final String string5, final String string6, final boolean transits, final boolean baseUnknown, final String zoneOverride, final String relocate, final String tZoneOverride) {
         this.baseTimeUnknown = baseUnknown;
+        // A chart cast from the form is a new birth time, not a scrubbed one: nothing to reset to.
+        this.scrubOrigins.clear();
         this.baseZoneOverride = zoneOverride == null ? "" : zoneOverride.trim();
         this.transitZoneOverride = tZoneOverride == null ? "" : tZoneOverride.trim();
         this.relocateTo = relocate == null ? "" : relocate.trim();
@@ -4716,12 +4719,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             Widgets.styleButton(jButtonArray[bi], buttonRoles[bi]);
             jPanel2.add(jButtonArray[bi]);
         }
-        JLabel scrubLabel = new JLabel("Scrub");
-        scrubLabel.setForeground(Theme.TEXT_DIM);
-        scrubLabel.setFont(Theme.SMALL);
-        this.scrubSlider = SkymapPanel.scrubSlider(this);
-        jPanel2.add(scrubLabel);
-        jPanel2.add(this.scrubSlider);
+        // <b>A bar per chart, on a row of its own.</b> One Scrub slider moved whatever the
+        // transport moves; David asked for "different scrub bars that control different charts".
+        // Each is shown only while its chart is on the wheel - see refreshScrubBars.
+        scrubRow = new JPanel(new Widgets.WrapLayout(1, 14, 2));
+        scrubRow.setBackground(Color.BLACK);
+        scrubRow.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        JLabel scrubLabel = new JLabel("Scrub:");
+        scrubLabel.setForeground(Color.WHITE);
+        scrubRow.add(scrubLabel);
+        for (ScrubTarget t : new ScrubTarget[] {ScrubTarget.CHART_A, ScrubTarget.CHART_B, ScrubTarget.SKY}) {
+            scrubRow.add(this.scrubBar(t));
+        }
+        this.scrubSlider = this.scrubSliders.get(ScrubTarget.SKY);
 
         // <b>Readings, Tables and Tools have moved to the sidebar.</b> They were popup
         // menus here, which grouped the controls but stayed menus: they floated over the
@@ -4895,6 +4905,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         ringRow.add(this.ringBar);
         jPanel.add(ringRow);
         jPanel.add(jPanel2);
+        jPanel.add(scrubRow);
         jPanel.add(jPanel3);
 
         // <b>The rows have to be re-measured when the width changes, and nothing does that on
@@ -4908,6 +4919,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 jPanel2.invalidate();
+                scrubRow.invalidate();
                 jPanel3.invalidate();
                 jPanel.revalidate();
             }
@@ -7134,13 +7146,55 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return "Real Time".equals(this.stepAmount) ? "1 Hour" : this.stepAmount;
     }
 
+    /**
+     * What a scrub moves.
+     *
+     * <b>TRANSPORT</b> is the transport's own rule - the sky, and never a birth time on a
+     * synastry or composite - and is what Shift+drag on the wheel uses. The other three are the
+     * per-chart bars David asked for: "different scrub bars that control different charts in the
+     * wheel and globe". Each moves one moment only, whichever ring it drives, so a birth time
+     * can be walked for rectification while the sky holds still, or the sky walked across a
+     * relationship without touching either person.
+     */
+    enum ScrubTarget {
+        TRANSPORT("the chart"), CHART_A("Chart A"), CHART_B("Chart B"), SKY("Sky");
+
+        final String label;
+
+        ScrubTarget(String label) {
+            this.label = label;
+        }
+    }
+
+    ScrubTarget scrubTarget = ScrubTarget.TRANSPORT;
+    private ZonedDateTime scrubTransit;
+    /**
+     * A birth time as it was before any bar moved it, so its ↺ can put it back. Kept for Chart A
+     * and Chart B only - the sky has no "true" moment to return to - and cleared whenever a chart
+     * is cast from Chart Setup, because that is a new birth time rather than a scrubbed one.
+     */
+    final java.util.EnumMap<ScrubTarget, ZonedDateTime> scrubOrigins =
+        new java.util.EnumMap<>(ScrubTarget.class);
+
     void beginScrub() {
+        this.beginScrub(ScrubTarget.TRANSPORT);
+    }
+
+    void beginScrub(ScrubTarget target) {
         if (this.scrubbing) {
             return;
         }
         this.isPlaying = false;
+        this.scrubTarget = target;
         this.scrubBase = this.baseChartTime;
         this.scrubSky = this.skyChartTime;
+        this.scrubTransit = this.transitChartTime;
+        if (target == ScrubTarget.CHART_A && this.baseChartTime != null) {
+            this.scrubOrigins.putIfAbsent(target, this.baseChartTime);
+        }
+        if (target == ScrubTarget.CHART_B && this.transitChartTime != null) {
+            this.scrubOrigins.putIfAbsent(target, this.transitChartTime);
+        }
         this.scrubSteps = 0;
         this.scrubbing = true;
     }
@@ -7155,13 +7209,26 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         this.baseChartTime = this.scrubBase;
         this.skyChartTime = this.scrubSky;
+        this.transitChartTime = this.scrubTransit;
         String unit = this.stepAmount;
         int direction = this.animationDirection;
         try {
             this.stepAmount = this.scrubUnit();
             this.animationDirection = steps;
-            if (steps != 0) {
-                this.stepTime();
+            switch (this.scrubTarget) {
+                case CHART_A:
+                    this.baseChartTime = this.stepped(this.scrubBase, steps);
+                    break;
+                case CHART_B:
+                    this.transitChartTime = this.stepped(this.scrubTransit, steps);
+                    break;
+                case SKY:
+                    this.skyChartTime = this.stepped(this.scrubSky, steps);
+                    break;
+                default:
+                    if (steps != 0) {
+                        this.stepTime();
+                    }
             }
         } finally {
             this.stepAmount = unit;
@@ -7169,6 +7236,89 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         this.scrubSteps = steps;
         this.requestScrubRefresh();
+    }
+
+    /** Puts a scrubbed birth time back where it was before any bar moved it. */
+    void resetScrub(ScrubTarget target) {
+        ZonedDateTime origin = this.scrubOrigins.remove(target);
+        if (origin == null) {
+            return;
+        }
+        if (target == ScrubTarget.CHART_A) {
+            this.baseChartTime = origin;
+        } else if (target == ScrubTarget.CHART_B) {
+            this.transitChartTime = origin;
+        }
+        this.updateChartData();
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+    }
+
+    /** The per-chart bars, by what they move. */
+    final java.util.EnumMap<ScrubTarget, javax.swing.JSlider> scrubSliders =
+        new java.util.EnumMap<>(ScrubTarget.class);
+    /** Each bar's label, slider and reset, shown and hidden together. */
+    final java.util.EnumMap<ScrubTarget, JPanel> scrubBars = new java.util.EnumMap<>(ScrubTarget.class);
+    final java.util.EnumMap<ScrubTarget, JButton> scrubResets = new java.util.EnumMap<>(ScrubTarget.class);
+
+    /**
+     * Shows the bars for the charts that are on the wheel.
+     *
+     * Chart A's bar only when Chart A is a birth chart - with no Chart A the inner wheel IS the
+     * sky, and a second bar moving the same moment would be two controls for one thing. Chart
+     * B's on a synastry or a composite, where there is a second person. The sky's always.
+     */
+    void refreshScrubBars() {
+        boolean relationship = this.isRelationshipChart();
+        this.showBar(ScrubTarget.CHART_A, this.innerIsBirthChart || relationship);
+        this.showBar(ScrubTarget.CHART_B, this.isSynastryChart() || relationship);
+        this.showBar(ScrubTarget.SKY, true);
+        for (java.util.Map.Entry<ScrubTarget, JButton> e : this.scrubResets.entrySet()) {
+            e.getValue().setEnabled(this.scrubOrigins.containsKey(e.getKey()));
+        }
+    }
+
+    private void showBar(ScrubTarget target, boolean on) {
+        JPanel bar = this.scrubBars.get(target);
+        if (bar != null && bar.isVisible() != on) {
+            bar.setVisible(on);
+            if (bar.getParent() != null) {
+                bar.getParent().revalidate();
+            }
+        }
+    }
+
+    /** One labelled bar: the chart's name, its slider, and for a birth chart a reset. */
+    private JPanel scrubBar(ScrubTarget target) {
+        JPanel bar = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 6, 0));
+        bar.setOpaque(false);
+        JLabel label = new JLabel(target.label);
+        label.setForeground(Theme.TEXT_DIM);
+        label.setFont(Theme.SMALL);
+        // Room after the name: the slider's track starts at its bounds and clipped the last
+        // letter, so "Chart B" read "Chart E".
+        label.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 4));
+        javax.swing.JSlider slider = SkymapPanel.scrubSlider(this, target);
+        slider.setPreferredSize(new java.awt.Dimension(170, 24));
+        bar.add(label);
+        bar.add(slider);
+        if (target == ScrubTarget.CHART_A || target == ScrubTarget.CHART_B) {
+            JButton reset = new JButton("↺");
+            Widgets.styleButton(reset, Widgets.Role.TRANSPORT);
+            reset.setFont(Theme.font("Segoe UI", Font.PLAIN, 13));
+            reset.setToolTipText("Put " + target.label + "'s birth time back where it was");
+            reset.setEnabled(false);
+            reset.addActionListener(e -> {
+                this.resetScrub(target);
+                this.refreshScrubBars();
+            });
+            bar.add(reset);
+            this.scrubResets.put(target, reset);
+        }
+        this.scrubSliders.put(target, slider);
+        this.scrubBars.put(target, bar);
+        return bar;
     }
 
     /** Ends the scrub where it stands, and draws that moment at once. */
@@ -7209,8 +7359,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         });
     }
 
-    /** The transport strip's Scrub slider, kept for the check. */
+    /** The sky's scrub bar, kept for the check. */
     javax.swing.JSlider scrubSlider;
+    /** The row the per-chart scrub bars sit on. */
+    private JPanel scrubRow;
 
     /** How many steps the slider reaches each way from where the scrub began. */
     static final int SCRUB_SLIDER_REACH = 60;
@@ -7225,24 +7377,27 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * wherever the chart is, as many times as the reader likes. An arrow key on the focused
      * slider is a single step.
      */
-    static javax.swing.JSlider scrubSlider(SkymapPanel panel) {
+    static javax.swing.JSlider scrubSlider(SkymapPanel panel, ScrubTarget target) {
         javax.swing.JSlider slider = new javax.swing.JSlider(-SCRUB_SLIDER_REACH, SCRUB_SLIDER_REACH, 0);
         slider.setOpaque(false);
         slider.setPreferredSize(new java.awt.Dimension(220, 26));
-        slider.setToolTipText("Drag to move through time by the Step setting; the chart stays where "
-            + "you let go. Shift+drag on the wheel does the same.");
+        slider.setToolTipText(target == ScrubTarget.SKY
+            ? "Drag to move the sky through time by the Step setting; it stays where you let go."
+            : "Drag to move " + target.label + "'s birth time by the Step setting - for trying a "
+                + "time, not saving one. The ↺ beside it puts the birth time back.");
         final boolean[] resetting = {false};
         slider.addChangeListener(e -> {
             if (resetting[0]) {
                 return;
             }
-            panel.beginScrub();
+            panel.beginScrub(target);
             panel.scrubTo(slider.getValue());
             if (panel.chartPanel != null) {
                 panel.chartPanel.repaint();
             }
             if (!slider.getValueIsAdjusting()) {
                 panel.endScrub();
+                panel.refreshScrubBars();
                 resetting[0] = true;
                 try {
                     slider.setValue(0);
@@ -7267,7 +7422,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (!this.scrubbing) {
             return;
         }
-        String text = "Scrubbing " + scrubLabel(this.scrubSteps, this.scrubUnit());
+        String text = "Scrubbing " + (this.scrubTarget == ScrubTarget.TRANSPORT ? "" : this.scrubTarget.label + " ")
+            + scrubLabel(this.scrubSteps, this.scrubUnit());
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setFont(Theme.font("Segoe UI", Font.BOLD, 13));
         java.awt.FontMetrics fm = g2.getFontMetrics();
@@ -7461,6 +7617,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         this.refreshTimeReadout();
         this.refreshReadingIfShown();
+        // Which charts are on the wheel decides which scrub bars there are.
+        this.refreshScrubBars();
     }
 
     /**

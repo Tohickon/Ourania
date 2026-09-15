@@ -40,6 +40,7 @@ public final class ScrubCheck {
             part("E: the slider springs back and the chart stays", () -> slider(sky));
             part("F: the wheel is redrawn at the scrubbed moment", () -> redraw(sky, chart));
             part("G: Play moves the chart the app opens onto", () -> play(sky));
+            part("H: a bar per chart, each moving only its own", () -> bars(sky));
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
@@ -332,6 +333,104 @@ public final class ScrubCheck {
         double moved = com.zodiacomputing.ourania.astro.Aspects.separation(before[moon],
             ((double[]) field(sky, "bLon"))[moon]);
         ok("and the wheel's Moon went with it, " + Math.round(moved) + " degrees", moved > 20 && moved < 32);
+    }
+
+    /**
+     * David: "could we have different scrub bars that control different charts in the wheel and
+     * globe". One bar per chart, shown while that chart is on the wheel, each moving only its own
+     * moment; a birth time moved by its bar can be put back.
+     */
+    private static void bars(SkymapPanel sky) throws Exception {
+        final ZonedDateTime personB = ZonedDateTime.of(1985, 3, 2, 14, 30, 0, 0, ZoneId.of("UTC"));
+        ok("there is a bar for Chart A, Chart B and the sky",
+            sky.scrubSliders.containsKey(SkymapPanel.ScrubTarget.CHART_A)
+                && sky.scrubSliders.containsKey(SkymapPanel.ScrubTarget.CHART_B)
+                && sky.scrubSliders.containsKey(SkymapPanel.ScrubTarget.SKY));
+
+        mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
+        ok("the cold open shows the sky's bar alone", shown(sky) .equals("SKY"));
+
+        mode(sky, ChartMode.SINGLE, true, false, personB, "1 Hour");
+        ok("a natal chart shows Chart A's bar and the sky's, " + shown(sky), shown(sky).equals("CHART_A SKY"));
+        slide(sky, SkymapPanel.ScrubTarget.CHART_A, 3);
+        eq("Chart A's bar moves Chart A's birth three hours", ANCHOR.plusHours(3), time(sky, "baseChartTime"));
+        eq("and leaves the sky where it was", ANCHOR, time(sky, "skyChartTime"));
+        ok("and offers the birth time back", sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).isEnabled());
+        slide(sky, SkymapPanel.ScrubTarget.CHART_A, 2);
+        eq("a second slide goes on from there", ANCHOR.plusHours(5), time(sky, "baseChartTime"));
+        SwingUtilities.invokeAndWait(() -> sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).doClick());
+        eq("the reset puts the birth time back where it was before either slide", ANCHOR, time(sky, "baseChartTime"));
+        ok("and has nothing more to reset", !sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).isEnabled());
+
+        mode(sky, ChartMode.SYNASTRY, true, true, personB, "1 Day");
+        ok("a synastry shows all three bars, " + shown(sky), shown(sky).equals("CHART_A CHART_B SKY"));
+        slide(sky, SkymapPanel.ScrubTarget.CHART_B, -2);
+        eq("Chart B's bar moves Chart B's birth back two days", personB.minusDays(2), time(sky, "transitChartTime"));
+        eq("and not Chart A's", ANCHOR, time(sky, "baseChartTime"));
+        eq("nor the sky", ANCHOR, time(sky, "skyChartTime"));
+        slide(sky, SkymapPanel.ScrubTarget.SKY, 4);
+        eq("the sky's bar moves the sky four days", ANCHOR.plusDays(4), time(sky, "skyChartTime"));
+        eq("and neither birth", personB.minusDays(2), time(sky, "transitChartTime"));
+        SwingUtilities.invokeAndWait(() -> sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_B).doClick());
+        eq("Chart B's reset puts that birth back", personB, time(sky, "transitChartTime"));
+
+        mode(sky, ChartMode.COMPOSITE_MIDPOINT, true, true, personB, "1 Day");
+        ok("a composite shows both people's bars, " + shown(sky), shown(sky).equals("CHART_A CHART_B SKY"));
+
+        // The globe reads the same moments.
+        mode(sky, ChartMode.SINGLE, true, false, personB, "1 Day");
+        SwingUtilities.invokeAndWait(() -> sky.setGlobeMode(true));
+        double[] before = ((double[]) field(sky, "bLon")).clone();
+        slide(sky, SkymapPanel.ScrubTarget.CHART_A, 5);
+        int moon = com.zodiacomputing.ourania.astro.Bodies.indexOf("moon");
+        double moved = com.zodiacomputing.ourania.astro.Aspects.separation(before[moon], ((double[]) field(sky, "bLon"))[moon]);
+        ok("on the globe, Chart A's bar moves Chart A's Moon five days, " + Math.round(moved) + " degrees",
+            moved > 50 && moved < 80);
+        SwingUtilities.invokeAndWait(() -> {
+            sky.setGlobeMode(false);
+            sky.scrubOrigins.clear();
+            sky.refreshScrubBars();
+        });
+        mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
+    }
+
+    private static void mode(SkymapPanel sky, ChartMode m, boolean natal, boolean transits,
+                             ZonedDateTime personB, String step) throws Exception {
+        reset(sky, step);
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                set(sky, "chartMode", m);
+                set(sky, "innerIsBirthChart", natal);
+                set(sky, "showTransitChart", transits);
+                set(sky, "transitChartTime", personB);
+                sky.scrubOrigins.clear();
+                sky.updateChartData();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /** Which bars are showing, in order. */
+    private static String shown(SkymapPanel sky) {
+        StringBuilder sb = new StringBuilder();
+        for (SkymapPanel.ScrubTarget t : sky.scrubBars.keySet()) {
+            if (sky.scrubBars.get(t).isVisible()) {
+                sb.append(sb.length() == 0 ? "" : " ").append(t.name());
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Drags one bar's knob to a value and lets go, as a reader does. */
+    private static void slide(SkymapPanel sky, SkymapPanel.ScrubTarget t, int value) throws Exception {
+        javax.swing.JSlider slider = sky.scrubSliders.get(t);
+        SwingUtilities.invokeAndWait(() -> {
+            slider.setValueIsAdjusting(true);
+            slider.setValue(value);
+            slider.setValueIsAdjusting(false);
+        });
+        SwingUtilities.invokeAndWait(() -> { });
     }
 
     private static void press(Component c, int id, int x, int y, boolean shift) {
