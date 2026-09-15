@@ -105,7 +105,10 @@ public class OuraniaWindow extends JFrame {
         // Before anything casts a chart: the zodiac is read by every ephemeris call.
         com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(Settings.zodiac());
         setTitle("Ourania+ (Windows Edition)");
+        // A size for a window nobody restores - a check suite's. The application's window is put
+        // where the last session left it by main, through WindowPlacement.restore.
         setSize(1024, 768);
+        WindowPlacement.installKeys(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the window
         setLayout(new BorderLayout());
@@ -1121,6 +1124,11 @@ public class OuraniaWindow extends JFrame {
             }
             
             OuraniaWindow window = new OuraniaWindow();
+            // Where the last session closed, or 85% of the screen the first time; and remembered
+            // again on the way out. See WindowPlacement for why this is main's and not the
+            // constructor's.
+            WindowPlacement.restore(window);
+            WindowPlacement.remember(window);
             window.setVisible(true);
 
             // <b>Draw the chart the reader already has.</b> The saved Chart A was restored
