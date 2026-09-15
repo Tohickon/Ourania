@@ -36,8 +36,26 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public final class ChartExporter {
 
-    /** Multipliers offered for a saved image. Screen, then two for print and for a page. */
-    static final int[] SCALES = {1, 2, 4};
+    /**
+     * Multipliers offered for a saved image: the screen's own, then 2x and 4x for print, once
+     * each and in order.
+     *
+     * <b>"Screen" is the screen's scale, not 1.</b> The first option read "1x (screen)", which was
+     * true only at 100% Windows scaling; at David's 300% it saved a picture a third the size of
+     * the wheel on screen. See HiDpi.
+     */
+    static double[] scales(double screen) {
+        java.util.TreeSet<Double> set = new java.util.TreeSet<>();
+        set.add(HiDpi.round(screen));
+        set.add(2.0);
+        set.add(4.0);
+        double[] out = new double[set.size()];
+        int i = 0;
+        for (double d : set) {
+            out[i++] = d;
+        }
+        return out;
+    }
 
     private ChartExporter() { }
 
@@ -51,8 +69,12 @@ public final class ChartExporter {
      * the wheel redraw at the larger size, so the text and the strokes are sharp at 4x.
      */
     static BufferedImage render(Component chart, int scale) {
-        int w = Math.max(1, chart.getWidth()) * scale;
-        int h = Math.max(1, chart.getHeight()) * scale;
+        return render(chart, (double) scale);
+    }
+
+    static BufferedImage render(Component chart, double scale) {
+        int w = (int) Math.round(Math.max(1, chart.getWidth()) * scale);
+        int h = (int) Math.round(Math.max(1, chart.getHeight()) * scale);
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -96,10 +118,20 @@ public final class ChartExporter {
             warn(parent, "The chart has not been drawn yet.");
             return;
         }
-        Object[] options = {"1x (screen)", "2x", "4x (print)"};
+        double screen = HiDpi.scale(chart);
+        double[] scales = scales(screen);
+        Object[] options = new Object[scales.length];
+        int preferred = 0;
+        for (int i = 0; i < scales.length; i++) {
+            String tag = scales[i] == HiDpi.round(screen) ? " (as on screen)" : scales[i] == 4.0 ? " (print)" : "";
+            options[i] = HiDpi.label(scales[i]) + tag;
+            if (scales[i] == HiDpi.round(screen)) {
+                preferred = i;
+            }
+        }
         int pick = JOptionPane.showOptionDialog(parent, "Resolution for the saved image:",
             "Save chart image", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-            null, options, options[1]);
+            null, options, options[preferred]);
         if (pick < 0) {
             return;
         }
@@ -108,20 +140,20 @@ public final class ChartExporter {
             return;
         }
         try {
-            ImageIO.write(render(chart, SCALES[pick]), "png", file);
+            ImageIO.write(render(chart, scales[pick]), "png", file);
         } catch (IOException e) {
             warn(parent, "Could not write the image: " + e.getMessage());
         }
     }
 
-    /** B4b. The wheel to the clipboard, at screen size. */
+    /** B4b. The wheel to the clipboard, at the size it is on screen - in real pixels. */
     static void copyChartImage(Component parent, Component chart) {
         if (chart == null || chart.getWidth() <= 0) {
             warn(parent, "The chart has not been drawn yet.");
             return;
         }
         Toolkit.getDefaultToolkit().getSystemClipboard()
-            .setContents(new ImageSelection(render(chart, 1)), null);
+            .setContents(new ImageSelection(render(chart, HiDpi.scale(chart))), null);
     }
 
     /** An image on the clipboard. Swing ships no Transferable for one. */

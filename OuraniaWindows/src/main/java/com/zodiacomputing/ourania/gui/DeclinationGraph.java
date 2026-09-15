@@ -104,10 +104,32 @@ final class DeclinationGraph {
         return render(r, WIDTH, HEIGHT);
     }
 
-    static BufferedImage render(Declinations.Result r, int w, int h) {
-        Layout l = layout(r, w, h);
+    /**
+     * The graph at a pixel scale: laid out at its own size and drawn that many times over, so on
+     * a 3x screen it has three real pixels for each of Swing's and is as sharp as the text beside
+     * it. See HiDpi - drawn at 1x, the reading pane stretched it and it came out soft.
+     */
+    static BufferedImage render(Declinations.Result r, double scale) {
+        int w = (int) Math.round(WIDTH * scale);
+        int h = (int) Math.round(HEIGHT * scale);
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
+        g.scale(scale, scale);
+        draw(g, r, WIDTH, HEIGHT);
+        g.dispose();
+        return img;
+    }
+
+    static BufferedImage render(Declinations.Result r, int w, int h) {
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        draw(g, r, w, h);
+        g.dispose();
+        return img;
+    }
+
+    private static void draw(Graphics2D g, Declinations.Result r, int w, int h) {
+        Layout l = layout(r, w, h);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g.setColor(GROUND);
@@ -211,8 +233,6 @@ final class DeclinationGraph {
         g.fillRect(lx, ly - 9, 14, 10);
         g.setColor(new Color(200, 205, 215));
         g.drawString("out of bounds", lx + 18, ly);
-        g.dispose();
-        return img;
     }
 
     private static void label(Graphics2D g, FontMetrics fm, String text, int y, Color ink) {
@@ -246,6 +266,11 @@ final class DeclinationGraph {
      * keeps the last few and deletes the rest, so it does not grow for the life of the machine.
      */
     static String imgTag(Declinations.Result r) {
+        return imgTag(r, HiDpi.scale(null));
+    }
+
+    /** At a given pixel scale; the tag keeps the graph's own size, so the pane lays it out alike. */
+    static String imgTag(Declinations.Result r, double scale) {
         try {
             File dir = folder();
             File[] old = dir.listFiles((d, n) -> n.startsWith("declinations-") && n.endsWith(".png"));
@@ -256,7 +281,7 @@ final class DeclinationGraph {
                 }
             }
             File out = new File(dir, "declinations-" + System.currentTimeMillis() + "-" + (written++) + ".png");
-            javax.imageio.ImageIO.write(render(r), "png", out);
+            javax.imageio.ImageIO.write(render(r, scale), "png", out);
             out.deleteOnExit();
             return "<img src='" + out.toURI() + "' width='" + WIDTH + "' height='" + HEIGHT
                 + "' alt='Declination graph'>";

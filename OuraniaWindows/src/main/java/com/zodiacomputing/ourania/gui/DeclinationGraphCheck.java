@@ -258,8 +258,13 @@ public final class DeclinationGraphCheck {
         java.io.File file = new java.io.File(new java.net.URI(m.group(1)));
         ok("its image file exists", file.isFile());
         BufferedImage read = javax.imageio.ImageIO.read(file);
-        ok("and is the graph's size", read != null && read.getWidth() == DeclinationGraph.WIDTH
-            && read.getHeight() == DeclinationGraph.HEIGHT);
+        // At the screen's pixel scale since the HiDPI pass; the tag keeps the graph's own size.
+        double s = HiDpi.scale(null);
+        ok("and is the graph's size at the screen's scale, " + s + "x", read != null
+            && read.getWidth() == (int) Math.round(DeclinationGraph.WIDTH * s)
+            && read.getHeight() == (int) Math.round(DeclinationGraph.HEIGHT * s));
+        ok("while the tag lays it out at the graph's own size",
+            html.contains("width='" + DeclinationGraph.WIDTH + "'") && html.contains("height='" + DeclinationGraph.HEIGHT + "'"));
         ok("the graph comes before the table it draws", html.indexOf("<img") < html.indexOf("<table"));
 
         String second = ChartTables.declinations(f);
