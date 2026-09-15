@@ -59,9 +59,35 @@ public final class ChartExporter {
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         g.scale(scale, scale);
-        chart.paint(g);
+        paintWhole(chart, g);
         g.dispose();
         return img;
+    }
+
+    /** Client property a chart reads to draw the whole wheel whatever the screen is zoomed to. */
+    static final String EXPORTING = "ourania.exporting";
+
+    /**
+     * Paints the chart as a saved image or a print: all of it.
+     *
+     * <b>The screen's zoom is the reader's view, not the chart.</b> A PNG saved while zoomed in
+     * on one sign would be a picture of one sign. Marked on the component for the length of the
+     * paint rather than detected from the Graphics, because Swing's own screen painting goes
+     * through offscreen buffers too and a device test cannot reliably tell the two apart.
+     */
+    static void paintWhole(Component chart, Graphics2D g) {
+        javax.swing.JComponent jc = chart instanceof javax.swing.JComponent
+            ? (javax.swing.JComponent) chart : null;
+        if (jc != null) {
+            jc.putClientProperty(EXPORTING, Boolean.TRUE);
+        }
+        try {
+            chart.paint(g);
+        } finally {
+            if (jc != null) {
+                jc.putClientProperty(EXPORTING, null);
+            }
+        }
     }
 
     /** B1. Saves the wheel as a PNG, at a scale the reader picks. */
@@ -154,7 +180,7 @@ public final class ChartExporter {
                 g2.scale(s, s);
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-                chart.paint(g2);
+                paintWhole(chart, g2);
                 return Printable.PAGE_EXISTS;
             }
         });
