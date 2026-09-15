@@ -3411,6 +3411,13 @@ extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
+                // A scrub moved the time; the click that ends it chose nothing.
+                if (SkymapPanel.this.scrubDragged) {
+                    SkymapPanel.this.scrubDragged = false;
+                    SkymapPanel.this.globeTurned = false;
+                    SkymapPanel.this.viewPanned = false;
+                    return;
+                }
                 // A drag on the globe turns it; a click still selects. The threshold is what
                 // separates the two, because every drag ends in a click event as well.
                 if (SkymapPanel.this.globeMode && SkymapPanel.this.globeTurned) {
@@ -3447,11 +3454,16 @@ extends JPanel {
                 SkymapPanel.this.dragFrom = mouseEvent.getPoint();
                 SkymapPanel.this.globeTurned = false;
                 SkymapPanel.this.viewPanned = false;
+                SkymapPanel.this.scrubDragged = false;
             }
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 SkymapPanel.this.dragFrom = null;
+                if (SkymapPanel.this.scrubbing && SkymapPanel.this.scrubDragged) {
+                    SkymapPanel.this.endScrub();
+                    SkymapPanel.this.chartPanel.setCursor(java.awt.Cursor.getDefaultCursor());
+                }
                 if (SkymapPanel.this.globeDragging) {
                     SkymapPanel.this.globeDragging = false;
                     SkymapPanel.this.chartPanel.repaint();
@@ -3474,6 +3486,22 @@ extends JPanel {
             @Override
             public void mouseDragged(MouseEvent mouseEvent) {
                 if (SkymapPanel.this.dragFrom == null) {
+                    return;
+                }
+                // <b>Shift+drag scrubs time</b>, on the wheel and on the globe: right is later,
+                // one step of the Step setting per SCRUB_PX. Measured from where the press was,
+                // so dragging back to it returns to the moment the scrub began. E8.
+                if (mouseEvent.isShiftDown() || SkymapPanel.this.scrubDragged) {
+                    int sdx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
+                    if (!SkymapPanel.this.scrubDragged && Math.abs(sdx) < SCRUB_PX) {
+                        return;
+                    }
+                    SkymapPanel.this.scrubDragged = true;
+                    SkymapPanel.this.beginScrub();
+                    SkymapPanel.this.scrubTo(sdx / SCRUB_PX);
+                    SkymapPanel.this.chartPanel.setCursor(
+                        java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.E_RESIZE_CURSOR));
+                    SkymapPanel.this.chartPanel.repaint();
                     return;
                 }
                 // <b>The flat wheel pans when it is zoomed in.</b> At fit there is nowhere to go,
@@ -4688,6 +4716,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             Widgets.styleButton(jButtonArray[bi], buttonRoles[bi]);
             jPanel2.add(jButtonArray[bi]);
         }
+        JLabel scrubLabel = new JLabel("Scrub");
+        scrubLabel.setForeground(Theme.TEXT_DIM);
+        scrubLabel.setFont(Theme.SMALL);
+        this.scrubSlider = SkymapPanel.scrubSlider(this);
+        jPanel2.add(scrubLabel);
+        jPanel2.add(this.scrubSlider);
 
         // <b>Readings, Tables and Tools have moved to the sidebar.</b> They were popup
         // menus here, which grouped the controls but stayed menus: they floated over the
@@ -6991,6 +7025,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
             return;
         }
+        // <b>With no Chart A the inner wheel is the sky, so the sky is what moves.</b>
+        // updateChartData copies skyChartTime over baseChartTime whenever the inner wheel is the
+        // sky, so the branch below - which moved baseChartTime - was undone by the very next
+        // recompute, and Play, Fast and Slow did nothing at all on the chart the app opens
+        // onto. Found by ScrubCheck on 2026-09-15, since a scrub steps through here too.
+        if (!this.innerIsBirthChart) {
+            if (bl2 || bl) {
+                this.skyChartTime = "Real Time".equals(this.stepAmount)
+                    ? ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId))
+                    : this.stepped(this.skyChartTime, n);
+            }
+            return;
+        }
         if ("Real Time".equals(this.stepAmount)) {
             if (bl2) {
                 this.baseChartTime = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
@@ -7049,6 +7096,188 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.skyChartTime = this.skyChartTime.plusYears(n);
             }
         }
+    }
+
+    // ------------------------------------------------------------------ scrubbing
+
+    /**
+     * Master list E8: "Drag-to-time scrubbing - transport buttons step time; no timeline slider
+     * or drag gesture."
+     *
+     * <b>A scrub is an offset from where it began, not a run of steps.</b> Every change puts the
+     * times back where the scrub started and moves them once by the whole offset, so dragging
+     * out and back lands exactly where it began - a run of one-month steps from the 31st would
+     * not (31 January, 28 February, 28 March). And it goes through {@link #stepTime} with the
+     * offset as its step count, so which chart moves is the transport's own rule: the sky, and
+     * never a birth time on a synastry or a composite.
+     *
+     * Shift+drag on the wheel, or the Scrub slider beside the transport buttons. A plain drag
+     * is left to the pan.
+     */
+    private boolean scrubbing;
+    private ZonedDateTime scrubBase;
+    private ZonedDateTime scrubSky;
+    /** Steps from where the scrub began. */
+    int scrubSteps;
+    /** Set while a Shift+drag has scrubbed, so its closing click does not also select. */
+    private boolean scrubDragged;
+    private boolean scrubRefreshQueued;
+    /** Screen pixels of drag per step. */
+    static final int SCRUB_PX = 10;
+
+    boolean isScrubbing() {
+        return this.scrubbing;
+    }
+
+    /** The unit a scrub moves in: the Step setting, or an hour when Step follows the clock. */
+    String scrubUnit() {
+        return "Real Time".equals(this.stepAmount) ? "1 Hour" : this.stepAmount;
+    }
+
+    void beginScrub() {
+        if (this.scrubbing) {
+            return;
+        }
+        this.isPlaying = false;
+        this.scrubBase = this.baseChartTime;
+        this.scrubSky = this.skyChartTime;
+        this.scrubSteps = 0;
+        this.scrubbing = true;
+    }
+
+    /** Moves the chart to this many steps from where the scrub began. */
+    void scrubTo(int steps) {
+        if (!this.scrubbing) {
+            this.beginScrub();
+        }
+        if (steps == this.scrubSteps) {
+            return;
+        }
+        this.baseChartTime = this.scrubBase;
+        this.skyChartTime = this.scrubSky;
+        String unit = this.stepAmount;
+        int direction = this.animationDirection;
+        try {
+            this.stepAmount = this.scrubUnit();
+            this.animationDirection = steps;
+            if (steps != 0) {
+                this.stepTime();
+            }
+        } finally {
+            this.stepAmount = unit;
+            this.animationDirection = direction;
+        }
+        this.scrubSteps = steps;
+        this.requestScrubRefresh();
+    }
+
+    /** Ends the scrub where it stands, and draws that moment at once. */
+    void endScrub() {
+        if (!this.scrubbing) {
+            return;
+        }
+        this.scrubbing = false;
+        this.scrubBase = null;
+        this.scrubSky = null;
+        this.scrubRefreshQueued = false;
+        this.updateChartData();
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+    }
+
+    /**
+     * One recompute for however many drag events arrived before it could run.
+     *
+     * A drag delivers an event per pixel; recomputing the chart for each would queue work
+     * faster than it is done and the wheel would trail the mouse by seconds.
+     */
+    private void requestScrubRefresh() {
+        if (this.scrubRefreshQueued) {
+            return;
+        }
+        this.scrubRefreshQueued = true;
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            if (!this.scrubRefreshQueued) {
+                return;
+            }
+            this.scrubRefreshQueued = false;
+            this.updateChartData();
+            if (this.chartPanel != null) {
+                this.chartPanel.repaint();
+            }
+        });
+    }
+
+    /** The transport strip's Scrub slider, kept for the check. */
+    javax.swing.JSlider scrubSlider;
+
+    /** How many steps the slider reaches each way from where the scrub began. */
+    static final int SCRUB_SLIDER_REACH = 60;
+
+    /**
+     * A slider that springs back: drag the knob and the chart follows it, let go and the chart
+     * stays where it was put while the knob returns to the middle, ready to go again.
+     *
+     * <b>Why it springs back.</b> A slider with a fixed range pinned to a date would need a
+     * range, and any range is wrong - a day's worth for a transit, a century for a progression.
+     * Springing back makes the range relative: sixty steps of the Step setting each way, from
+     * wherever the chart is, as many times as the reader likes. An arrow key on the focused
+     * slider is a single step.
+     */
+    static javax.swing.JSlider scrubSlider(SkymapPanel panel) {
+        javax.swing.JSlider slider = new javax.swing.JSlider(-SCRUB_SLIDER_REACH, SCRUB_SLIDER_REACH, 0);
+        slider.setOpaque(false);
+        slider.setPreferredSize(new java.awt.Dimension(220, 26));
+        slider.setToolTipText("Drag to move through time by the Step setting; the chart stays where "
+            + "you let go. Shift+drag on the wheel does the same.");
+        final boolean[] resetting = {false};
+        slider.addChangeListener(e -> {
+            if (resetting[0]) {
+                return;
+            }
+            panel.beginScrub();
+            panel.scrubTo(slider.getValue());
+            if (panel.chartPanel != null) {
+                panel.chartPanel.repaint();
+            }
+            if (!slider.getValueIsAdjusting()) {
+                panel.endScrub();
+                resetting[0] = true;
+                try {
+                    slider.setValue(0);
+                } finally {
+                    resetting[0] = false;
+                }
+            }
+        });
+        return slider;
+    }
+
+    /** "+3 days", "-1 month": the offset a scrub stands at, in words. */
+    static String scrubLabel(int steps, String unit) {
+        String word = unit.replaceFirst("^1 ", "").toLowerCase();
+        String sign = steps > 0 ? "+" : steps < 0 ? "−" : "±";
+        int n = Math.abs(steps);
+        return sign + n + " " + word + (n == 1 ? "" : "s");
+    }
+
+    /** The offset, over the top of the wheel while a scrub is running. */
+    void paintScrubTag(Graphics2D g2, int w) {
+        if (!this.scrubbing) {
+            return;
+        }
+        String text = "Scrubbing " + scrubLabel(this.scrubSteps, this.scrubUnit());
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setFont(Theme.font("Segoe UI", Font.BOLD, 13));
+        java.awt.FontMetrics fm = g2.getFontMetrics();
+        int tw = fm.stringWidth(text) + 24;
+        int x = (w - tw) / 2;
+        g2.setColor(new Color(22, 28, 43, 230));
+        g2.fillRoundRect(x, 10, tw, 26, 12, 12);
+        g2.setColor(new Color(226, 178, 88));
+        g2.drawRoundRect(x, 10, tw, 26, 12, 12);
+        g2.drawString(text, x + 12, 10 + (26 + fm.getAscent() - fm.getDescent()) / 2);
     }
 
     /**
@@ -7965,6 +8194,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     this.getWidth(), this.getHeight(), SkymapPanel.this,
                     SkymapPanel.this.globeDragging);
                 SkymapPanel.paintZodiacTag(graphics2D, this.getWidth(), this.getHeight());
+                SkymapPanel.this.paintScrubTag(graphics2D, this.getWidth());
                 return;
             }
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -8499,6 +8729,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             SkymapPanel.paintZodiacTag(graphics2D, n10, n11);
             if (onScreen) {
                 SkymapPanel.this.paintFitChip(graphics2D);
+                SkymapPanel.this.paintScrubTag(graphics2D, n10);
             }
         }
 
