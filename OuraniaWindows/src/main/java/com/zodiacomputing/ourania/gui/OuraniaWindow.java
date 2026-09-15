@@ -12,6 +12,7 @@ public class OuraniaWindow extends JFrame {
     private NameListPanel nameListPanel;
     private ReleasingPanel releasingPanel;
     private TransitSearchPanel transitSearchPanel;
+    private DialPanel dialPanel;
 
     private ChartSetupPanel chartSetupPanel;
     private SidePanel sidePanel;
@@ -235,6 +236,8 @@ public class OuraniaWindow extends JFrame {
 
         transitSearchPanel = new TransitSearchPanel(this);
         contentPanel.add(transitSearchPanel, "TRANSIT_SEARCH");
+        dialPanel = new DialPanel(this);
+        contentPanel.add(dialPanel, "DIAL");
         
         // <b>Share, Sync, Connect and Help are gone.</b> All four were placeholder cards
         // reading "(Under Construction)" behind live menu entries. A menu that offers ten
@@ -358,6 +361,11 @@ public class OuraniaWindow extends JFrame {
         }
         if ("TRANSIT_SEARCH".equals(screenName) && transitSearchPanel != null) {
             transitSearchPanel.refreshChart();
+        }
+        // The dial reads the chart on the wheel each time it is opened, so changing the chart
+        // and coming back cannot show the old one.
+        if ("DIAL".equals(screenName) && dialPanel != null) {
+            dialPanel.refreshChart();
         }
 
         cardLayout.show(contentPanel, screenName);
