@@ -35,7 +35,7 @@ public final class NavigationCheck {
      * the place that has to change, and the failure says so.
      */
     private static final String[] SCREENS = {
-        "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH",
+        "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH", "TRANSIT_CALENDAR",
         "DIAL", "SKY_VIEW", "SETTINGS",
     };
 
@@ -329,11 +329,15 @@ public final class NavigationCheck {
         // titled "Chart Setup". The label had been stale since the two-step chooser replaced
         // the mode combo; this pins that it does not come back. Since 2026-09-13 there is a
         // real transit search, so the rule is narrower than it was: a row may say "transit"
-        // only if it opens that screen.
+        // only if it opens that screen. Since 2026-09-15 there are two transit screens - the search
+        // and the Transit Calendar - so a row saying "transit" must open one of them, and still
+        // never Chart Setup.
         for (JButton row : rows(side)) {
             if (row.getText().toLowerCase().contains("transit")) {
-                ok("a row that says transit opens the transit search, not setup: "
-                    + row.getText(), "TRANSIT_SEARCH".equals(screenOf(row.getText())));
+                String opens = screenOf(row.getText());
+                ok("a row that says transit opens a transit screen, not setup: "
+                    + row.getText() + " -> " + opens,
+                    "TRANSIT_SEARCH".equals(opens) || "TRANSIT_CALENDAR".equals(opens));
             }
         }
     }

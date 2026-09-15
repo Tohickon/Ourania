@@ -66,6 +66,8 @@ public final class SidePanel extends JPanel {
         {"Zodiacal Releasing", "RELEASING", "Periods of Fortune and Spirit for this chart"},
         {"Transit Search", "TRANSIT_SEARCH",
             "When a transiting planet aspects a point in Chart A, over a span of years"},
+        {"Transit Calendar", "TRANSIT_CALENDAR",
+            "Chart A's month, each day shaded by the transits in orb and those going exact"},
         {"Dial", "DIAL",
             "The 90, 45 and 22.5 degree dials: hard aspects and midpoint pictures under one pointer"},
         {"Settings", "SETTINGS",

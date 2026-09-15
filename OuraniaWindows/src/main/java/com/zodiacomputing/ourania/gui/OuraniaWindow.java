@@ -14,6 +14,7 @@ public class OuraniaWindow extends JFrame {
     private TransitSearchPanel transitSearchPanel;
     private DialPanel dialPanel;
     private SkyViewPanel skyViewPanel;
+    private TransitCalendarPanel transitCalendarPanel;
 
     private ChartSetupPanel chartSetupPanel;
     private SidePanel sidePanel;
@@ -244,6 +245,8 @@ public class OuraniaWindow extends JFrame {
         contentPanel.add(dialPanel, "DIAL");
         skyViewPanel = new SkyViewPanel(this);
         contentPanel.add(skyViewPanel, "SKY_VIEW");
+        transitCalendarPanel = new TransitCalendarPanel(this);
+        contentPanel.add(transitCalendarPanel, "TRANSIT_CALENDAR");
         
         // <b>Share, Sync, Connect and Help are gone.</b> All four were placeholder cards
         // reading "(Under Construction)" behind live menu entries. A menu that offers ten
@@ -375,6 +378,9 @@ public class OuraniaWindow extends JFrame {
         }
         if ("SKY_VIEW".equals(screenName) && skyViewPanel != null) {
             skyViewPanel.refreshChart();
+        }
+        if ("TRANSIT_CALENDAR".equals(screenName) && transitCalendarPanel != null) {
+            transitCalendarPanel.refreshChart();
         }
 
         cardLayout.show(contentPanel, screenName);
