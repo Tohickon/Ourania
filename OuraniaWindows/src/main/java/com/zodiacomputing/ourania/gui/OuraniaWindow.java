@@ -13,6 +13,7 @@ public class OuraniaWindow extends JFrame {
     private ReleasingPanel releasingPanel;
     private TransitSearchPanel transitSearchPanel;
     private DialPanel dialPanel;
+    private SkyViewPanel skyViewPanel;
 
     private ChartSetupPanel chartSetupPanel;
     private SidePanel sidePanel;
@@ -241,6 +242,8 @@ public class OuraniaWindow extends JFrame {
         contentPanel.add(transitSearchPanel, "TRANSIT_SEARCH");
         dialPanel = new DialPanel(this);
         contentPanel.add(dialPanel, "DIAL");
+        skyViewPanel = new SkyViewPanel(this);
+        contentPanel.add(skyViewPanel, "SKY_VIEW");
         
         // <b>Share, Sync, Connect and Help are gone.</b> All four were placeholder cards
         // reading "(Under Construction)" behind live menu entries. A menu that offers ten
@@ -369,6 +372,9 @@ public class OuraniaWindow extends JFrame {
         // and coming back cannot show the old one.
         if ("DIAL".equals(screenName) && dialPanel != null) {
             dialPanel.refreshChart();
+        }
+        if ("SKY_VIEW".equals(screenName) && skyViewPanel != null) {
+            skyViewPanel.refreshChart();
         }
 
         cardLayout.show(contentPanel, screenName);
@@ -1041,6 +1047,11 @@ public class OuraniaWindow extends JFrame {
      * The radix and not the current chart - the current chart carries the harmonic, and a
      * transit to an H5 position is a transit to a degree nothing occupies.
      */
+    /** The wheel, for a view that reads its moment and place - the Sky View. */
+    SkymapPanel skymapForViews() {
+        return skymapPanel;
+    }
+
     com.zodiacomputing.ourania.astro.ChartFrame radixChartForSearch() {
         return skymapPanel == null ? null : skymapPanel.radixChart();
     }

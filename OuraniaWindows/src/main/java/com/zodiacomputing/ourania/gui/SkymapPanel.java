@@ -4228,6 +4228,18 @@ extends JPanel {
      * mode added later inherits it without anyone remembering to. At H1 this returns the
      * radix frame itself, unchanged and uncopied.
      */
+    /**
+     * The moment and place the Sky View draws: the sky's, or Chart A's birth sky.
+     * {jdUt, latitude, longitude}; the sky's when there is no Chart A.
+     */
+    double[] skyMoment(boolean chartA) {
+        if (chartA && this.innerIsBirthChart && this.baseSd != null) {
+            return new double[] {this.baseSd.getJulDay(), this.baseLatitude, this.baseLongitude};
+        }
+        double jd = this.skySd != null ? this.skySd.getJulDay() : new SweDate().getJulDay();
+        return new double[] {jd, this.skyLatitude, this.skyLongitude};
+    }
+
     public ChartFrame getCurrentChart() {
         return com.zodiacomputing.ourania.astro.Harmonics.of(radixChart(), this.harmonic);
     }

@@ -55,7 +55,11 @@ public final class SidePanel extends JPanel {
     static final String[][] SCREENS = {
         {"Chart Setup", "SEARCH",
             "Enter birth data and choose what to draw - natal, transits, synastry or a composite"},
-        {"Grid Skymap", "SKYMAP", "The chart wheel"},
+        // <b>Called what it is.</b> "Grid Skymap" opened the chart wheel, which is neither a grid nor
+        // a map of the sky; the sky itself is the Sky View below (master list E).
+        {"Chart Wheel", "SKYMAP", "The chart wheel"},
+        {"Sky View", "SKY_VIEW",
+            "The real sky over the chart's place: planets above and below the horizon, the ecliptic and the angles"},
         {"Chart Data", "NAME_LIST",
             "The active chart as tables: longitudes, house cusps and the aspect list"},
         {"Interpretation", "INTERPRETATION", "Show or hide the reading panel"},
