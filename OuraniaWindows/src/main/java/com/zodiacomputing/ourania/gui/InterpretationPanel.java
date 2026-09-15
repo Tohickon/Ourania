@@ -43,7 +43,34 @@ public class InterpretationPanel extends JPanel {
         return editorPane == null ? "" : editorPane.getText();
     }
 
+    /**
+     * Runs a show* method and returns the page it built, leaving this panel's own pane alone.
+     *
+     * <b>So a clicked reading can open on the Selection page without a second generator.</b>
+     * Every detail view ends at setHtml; while a capture is open, setHtml keeps the styled page
+     * for the caller instead of rendering it. Null when the method built no page. Nested
+     * captures each keep their own.
+     */
+    String capture(Runnable show) {
+        String[] slot = {null};
+        String[] outer = capturing;
+        capturing = slot;
+        try {
+            show.run();
+        } finally {
+            capturing = outer;
+        }
+        return slot[0];
+    }
+
+    /** The open capture's slot, or null when pages render here as usual. */
+    private String[] capturing;
+
     private void setHtml(String html, boolean pre) {
+        if (capturing != null) {
+            capturing[0] = pre ? html : style(Prose.decorate(html));
+            return;
+        }
         preformatted = pre;
         setPreferredSize(new Dimension(pre ? REPORT_WIDTH : FLOW_WIDTH, 0));
         editorPane.setText(pre ? html : style(Prose.decorate(html)));

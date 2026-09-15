@@ -1122,16 +1122,18 @@ public final class AspectGridCheck {
             try {
                 OuraniaWindow w = new OuraniaWindow();
                 out[0] = skyOf(w);
-                java.lang.reflect.Field fi =
-                    OuraniaWindow.class.getDeclaredField("interpretationPanel");
-                fi.setAccessible(true);
-                out[1] = fi.get(w);
+                // <b>The Selection page, not the reading panel.</b> A clicked body's reading
+                // opens on Selection since 2026-09-15 - "selection was meant to define and show
+                // what was selected" - so that is where its contacts are listed.
+                java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("selectionPane");
+                fs.setAccessible(true);
+                out[1] = fs.get(w);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
         SkymapPanel sky = (SkymapPanel) out[0];
-        final InterpretationPanel ip = (InterpretationPanel) out[1];
+        final javax.swing.JEditorPane ip = (javax.swing.JEditorPane) out[1];
 
         // 1. In SYNASTRY with transits on: showTriWheel is true.
         //
@@ -1197,7 +1199,7 @@ public final class AspectGridCheck {
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             try {
                 sky.triggerPlanetInterpretation("base_0");
-                baseText[0] = paneText(ip);
+                baseText[0] = ip.getText();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -1228,7 +1230,7 @@ public final class AspectGridCheck {
      * @param angles true to sweep the angles (which route through {@code showAngleAt}),
      *               false to sweep the ordinary bodies (which build their list inline)
      */
-    private static int[] skyClickTally(SkymapPanel sky, InterpretationPanel ip, boolean angles)
+    private static int[] skyClickTally(SkymapPanel sky, javax.swing.JEditorPane ip, boolean angles)
             throws Exception {
         boolean[] cValid = (boolean[]) getField(sky, "cValid");
         final int[] tally = new int[2];
@@ -1238,8 +1240,9 @@ public final class AspectGridCheck {
             final String[] text = new String[1];
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 try {
+                    ip.setText("<html><body>reset</body></html>");
                     sky.triggerPlanetInterpretation(link);
-                    text[0] = paneText(ip);
+                    text[0] = ip.getText();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -1267,7 +1270,7 @@ public final class AspectGridCheck {
      * <b>The panel is reset between clicks.</b> Reading it after a click that hit nothing
      * would return the PREVIOUS body's reading and count it again.
      */
-    private static int[] skyWheelClickTally(SkymapPanel sky, final InterpretationPanel ip)
+    private static int[] skyWheelClickTally(SkymapPanel sky, final javax.swing.JEditorPane ip)
             throws Exception {
         // Typed as Component: ChartPanel is a private inner class of SkymapPanel and cannot be
         // named from here. Everything this needs - setSize, getWidth, getHeight - is Component.
@@ -1302,9 +1305,9 @@ public final class AspectGridCheck {
             final String[] text = new String[1];
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 try {
-                    ip.showIndex("houses");          // a known page naming no chart
+                    ip.setText("<html><body>reset</body></html>");   // a page naming no chart
                     click.invoke(sky, px, py);
-                    text[0] = paneText(ip);
+                    text[0] = ip.getText();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

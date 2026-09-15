@@ -2332,6 +2332,12 @@ public final class NavigationCheck {
             final Container cards = (Container) fieldOf(rail, "pages");
             final java.util.List<String> pages = rail.pageNames();
             final java.util.List<String[]> none = new java.util.ArrayList<>();
+            final javax.swing.JEditorPane selection =
+                (javax.swing.JEditorPane) fieldOf(w[0], "selectionPane");
+            final javax.swing.JEditorPane reading = (javax.swing.JEditorPane)
+                fieldOf(fieldOf(w[0], "interpretationPanel"), "editorPane");
+            final String[] readingBefore = {reading.getText()};
+            final String[] lastSelection = {""};
             final String[] routes = {"planet", "angle", "sign", "mansion", "decan", "bound", "sabian",
                 "house", "aspect", "synastry aspect", "transit aspect", "index", "pattern", "close"};
             for (String route : routes) {
@@ -2359,11 +2365,23 @@ public final class NavigationCheck {
                 java.util.List<String> visible = visibleCards(cards, pages);
                 ok("after the " + route + " route one page is visible, the selected " + rail.selected()
                     + ", not " + visible, visible.size() == 1 && visible.get(0).equals(rail.selected()));
-                if (!route.equals("close") && !route.equals("pattern") && !route.equals("planet")
-                        && !route.equals("angle")) {
-                    ok("the " + route + " route reveals the reading it wrote, showing " + rail.selected(),
+                if (route.equals("index")) {
+                    ok("the index route opens on Interpretation, showing " + rail.selected(),
                         OuraniaWindow.READING_PAGE.equals(rail.selected()) && rail.isOpen());
+                } else if (!route.equals("close")) {
+                    // <b>A clicked thing is a selection.</b> David: "interpretation was meant to
+                    // be a tab to interpret the entire chart, selection was meant to define and
+                    // show what was selected". Every one of these wrote over Interpretation.
+                    ok("the " + route + " route opens on Selection, showing " + rail.selected(),
+                        OuraniaWindow.SELECTION_PAGE.equals(rail.selected()) && rail.isOpen());
+                    String sel = selection.getText();
+                    ok("the " + route + " route put its reading there, " + sel.length() + " chars",
+                        sel.length() > 400 && !sel.equals(lastSelection[0]));
+                    lastSelection[0] = sel;
+                    ok("the " + route + " route left the Interpretation page's text alone",
+                        reading.getText().equals(readingBefore[0]));
                 }
+                readingBefore[0] = reading.getText();
                 for (String page : pages) {
                     SwingUtilities.invokeAndWait(() -> rail.reveal(page));
                     java.util.List<String> shown = visibleCards(cards, pages);
@@ -2371,6 +2389,20 @@ public final class NavigationCheck {
                         shown.size() == 1 && shown.get(0).equals(page));
                 }
             }
+            // A link inside a reading on the Selection page - a sign named in the prose - defines
+            // something too, so it stays on Selection; "back" asks for the whole chart.
+            SwingUtilities.invokeAndWait(() -> {
+                w[0].showInterpretationForHouse(5);
+                w[0].handlePlacementClick("sign|Aquarius");
+            });
+            SwingUtilities.invokeAndWait(() -> { });
+            ok("a sign linked inside a Selection reading opens on Selection, showing " + rail.selected(),
+                OuraniaWindow.SELECTION_PAGE.equals(rail.selected())
+                    && selection.getText().contains("Aquarius"));
+            SwingUtilities.invokeAndWait(() -> w[0].handlePlacementClick("back"));
+            SwingUtilities.invokeAndWait(() -> { });
+            ok("\"back\" goes to the whole chart on Interpretation, showing " + rail.selected(),
+                OuraniaWindow.READING_PAGE.equals(rail.selected()));
             // The Close button puts the rail away rather than hiding its own card, which left the
             // Interpretation tab opening onto a blank page afterwards.
             SwingUtilities.invokeAndWait(() -> {

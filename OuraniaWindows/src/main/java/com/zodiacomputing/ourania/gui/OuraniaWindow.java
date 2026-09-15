@@ -429,10 +429,7 @@ public class OuraniaWindow extends JFrame {
 
     public void showInterpretationForPlanet(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects, double lon) {
         if (interpretationPanel != null) {
-            interpretationPanel.showPlanetInterpretation(planetName, signName, degree, decanNum, houseNum, activeAspects, lon);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showPlanetInterpretation(planetName, signName, degree, decanNum, houseNum, activeAspects, lon));
         }
     }
 
@@ -445,11 +442,7 @@ public class OuraniaWindow extends JFrame {
                                            java.util.List<String[]> activeAspects,
                                            String role, int hostHouse) {
         if (interpretationPanel != null) {
-            interpretationPanel.showAngleInterpretation(angleName, signName, degree,
-                activeAspects, role, hostHouse);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showAngleInterpretation(angleName, signName, degree, activeAspects, role, hostHouse));
         }
     }
 
@@ -561,6 +554,25 @@ public class OuraniaWindow extends JFrame {
     private void revealReading() {
         if (chartRail != null) {
             chartRail.reveal(READING_PAGE);
+        }
+    }
+
+    /**
+     * A clicked thing's reading, onto the Selection page, whole and from the top.
+     *
+     * <b>Interpretation reads the chart; Selection says what was clicked.</b> David, 2026-09-14:
+     * "interpretation was meant to be a tab to interpret the entire chart, selection was meant
+     * to define and show what was selected". Every wheel, grid and placement click - a sign, a
+     * decan, a house, a Sabian degree, a mansion, a bound, an aspect, a body from another ring -
+     * wrote its reading over the Interpretation page instead, so the whole-chart reading was
+     * replaced by whatever was last clicked. The panel still builds the page, once, through
+     * the same generator; {@link InterpretationPanel#capture} hands it here instead of to the
+     * panel's own pane.
+     */
+    private void selectReading(Runnable show) {
+        String html = interpretationPanel.capture(show);
+        if (html != null) {
+            showSelection(html, true);
         }
     }
 
@@ -777,12 +789,26 @@ public class OuraniaWindow extends JFrame {
             }
             return;
         }
-        // One of the reading's own links - a glossary term, a forecast, "Turn it off" - clicked
-        // where a reading is shown on the Selection page. Asked of the panel, which owns that
-        // scheme, before the command is read as a body label.
-        if (interpretationPanel != null && interpretationPanel.followLink(command)) {
-            revealReading();
-            return;
+        // One of the reading's own links - a glossary term, a sign, a forecast, "Turn it off" -
+        // clicked where a reading is shown on the Selection page. Asked of the panel, which owns
+        // that scheme, before the command is read as a body label. What it opens is itself a
+        // selection and stays on that page; "back" asks for the whole chart, which is the
+        // Interpretation page's.
+        if (interpretationPanel != null) {
+            if ("back".equals(command)) {
+                interpretationPanel.followLink(command);
+                revealReading();
+                return;
+            }
+            final boolean[] known = {false};
+            String html = interpretationPanel.capture(
+                () -> known[0] = interpretationPanel.followLink(command));
+            if (known[0]) {
+                if (html != null) {
+                    showSelection(html, true);
+                }
+                return;
+            }
         }
         if (skymapPanel != null) {
             skymapPanel.triggerPlanetInterpretation(command);
@@ -791,48 +817,33 @@ public class OuraniaWindow extends JFrame {
 
     public void showInterpretationForSign(String signName) {
         if (interpretationPanel != null) {
-            interpretationPanel.showSignInterpretation(signName);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showSignInterpretation(signName));
         }
     }
     
     /** Clicking the mansion ring on the wheel. */
     public void showInterpretationForMansion(int number) {
         if (interpretationPanel != null) {
-            interpretationPanel.showMansionDetail(number);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showMansionDetail(number));
         }
     }
 
     public void showInterpretationForDecan(String signName, int decanNum) {
         if (interpretationPanel != null) {
-            interpretationPanel.showDecanInterpretation(signName, decanNum);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showDecanInterpretation(signName, decanNum));
         }
     }
 
     /** Clicking the bounds ring: the Egyptian bound at this longitude. */
     public void showInterpretationForBound(double longitude) {
         if (interpretationPanel != null) {
-            interpretationPanel.showBoundInterpretation(longitude);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showBoundInterpretation(longitude));
         }
     }
 
     public void showInterpretationForSabianSymbol(String signName, int degree) {
         if (interpretationPanel != null) {
-            interpretationPanel.showSabianInterpretation(signName, degree);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showSabianInterpretation(signName, degree));
         }
     }
     
@@ -966,23 +977,17 @@ public class OuraniaWindow extends JFrame {
     // EAST region, not in contentPanel. CardLayout.show is a silent no-op for an unknown
     // name, so the text was generated and then never shown: clicking an aspect in the
     // grid, or a house on the wheel, did nothing at all unless the panel already happened
-    // to be open. They reveal the rail's Interpretation page now, like every handler here.
+    // to be open. They open on the Selection page now, like every clicked reading.
 
     public void showInterpretationForHouse(int houseNum) {
         if (interpretationPanel != null) {
-            interpretationPanel.showHouseInterpretation(houseNum);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showHouseInterpretation(houseNum));
         }
     }
 
     public void showInterpretationForAspect(String planet1, String planet2, String aspectType) {
         if (interpretationPanel != null) {
-            interpretationPanel.showAspectInterpretation(planet1, planet2, aspectType);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showAspectInterpretation(planet1, planet2, aspectType));
         }
     }
 
@@ -996,19 +1001,13 @@ public class OuraniaWindow extends JFrame {
      */
     public void showInterpretationForSynastryAspect(String chartA, String chartB, String aspectType) {
         if (interpretationPanel != null) {
-            interpretationPanel.showSynastryAspectInterpretation(chartA, chartB, aspectType);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showSynastryAspectInterpretation(chartA, chartB, aspectType));
         }
     }
 
     public void showInterpretationForTransitAspect(String transiting, String natal, String aspectType) {
         if (interpretationPanel != null) {
-            interpretationPanel.showTransitAspectInterpretation(transiting, natal, aspectType);
-            revealReading();
-            revalidate();
-            repaint();
+            selectReading(() -> interpretationPanel.showTransitAspectInterpretation(transiting, natal, aspectType));
         }
     }
 
