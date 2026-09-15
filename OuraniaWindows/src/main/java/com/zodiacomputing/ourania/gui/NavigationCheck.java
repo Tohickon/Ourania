@@ -188,6 +188,16 @@ public final class NavigationCheck {
         opensOntoTheChart();
         report("Part H", before);
 
+        System.out.println("=== Part Q: a link on the Chart page shows what it opened ===");
+        before = failures.size();
+        chartPageLinksShowTheirPage();
+        report("Part Q", before);
+
+        System.out.println("=== Part R: the left rail shows one page at a time ===");
+        before = failures.size();
+        oneCardAtATime();
+        report("Part R", before);
+
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
@@ -2080,6 +2090,321 @@ public final class NavigationCheck {
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
+    }
+
+    /**
+     * A link clicked on the Chart page leaves the rail on the page it wrote to.
+     *
+     * <b>The pattern banner and the Index link wrote their reading into the Interpretation page
+     * and left the Chart page showing</b>, so the click changed nothing a reader could see.
+     * David, 2026-09-14: "its not letting me select the aspect patterns for more information on
+     * the left". The wheel's own clicks had the same fault the same day, fixed with
+     * revealReading; these two routes were missed because they come from the HTML pane, not
+     * the wheel.
+     *
+     * <p>Clicked through the pane itself - a real mouse click on the link's text, resolved by
+     * Swing's own link controller - not by calling handlePlacementClick, so a link the pane
+     * cannot hit fails here too. A chart has a pattern about four times in ten, so a banner in
+     * the generator's own markup is added when the scratch chart has none - and then every
+     * character of three entries is clicked, because only the name used to be a link.
+     */
+    private static void chartPageLinksShowTheirPage() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            final DrawerRail rail = (DrawerRail) fieldOf(w[0], "chartRail");
+            final javax.swing.JEditorPane natal = (javax.swing.JEditorPane) fieldOf(w[0], "natalPane");
+            final Object reading = fieldOf(w[0], "interpretationPanel");
+            final javax.swing.JEditorPane readingPane =
+                (javax.swing.JEditorPane) fieldOf(reading, "editorPane");
+            final javax.swing.JEditorPane selectionPane =
+                (javax.swing.JEditorPane) fieldOf(w[0], "selectionPane");
+
+            final String[] html = new String[1];
+            SwingUtilities.invokeAndWait(() -> html[0] = natal.getText());
+            if (!html[0].contains("pattern|")) {
+                String banner = SkymapPanel.patternEntryHtml(figure("Grand trine",
+                    java.util.List.of("Moon", "Sun", "Venus"), null, "air", null));
+                SwingUtilities.invokeAndWait(() -> natal.setText(
+                    html[0].replaceFirst("(?i)<body[^>]*>", "$0" + banner)));
+            }
+
+            final java.util.Map<String, java.awt.Point> links = new java.util.LinkedHashMap<>();
+            SwingUtilities.invokeAndWait(() -> {
+                natal.setSize(340, 6000);
+                natal.doLayout();
+                javax.swing.text.html.HTMLDocument doc =
+                    (javax.swing.text.html.HTMLDocument) natal.getDocument();
+                int bodies = 0;
+                for (int p = 0; p < doc.getLength(); p++) {
+                    Object a = doc.getCharacterElement(p).getAttributes()
+                        .getAttribute(javax.swing.text.html.HTML.Tag.A);
+                    if (!(a instanceof javax.swing.text.AttributeSet)) {
+                        continue;
+                    }
+                    Object href = ((javax.swing.text.AttributeSet) a)
+                        .getAttribute(javax.swing.text.html.HTML.Attribute.HREF);
+                    if (href == null || links.containsKey(href.toString())) {
+                        continue;
+                    }
+                    String h = href.toString();
+                    boolean body = !h.equals("index") && !h.startsWith("pattern|");
+                    if (body && bodies >= 3) {
+                        continue;
+                    }
+                    try {
+                        java.awt.geom.Rectangle2D r = natal.modelToView2D(p + 1);
+                        if (r == null) {
+                            continue;
+                        }
+                        links.put(h, new java.awt.Point((int) r.getX() + 1,
+                            (int) (r.getY() + r.getHeight() / 2)));
+                        if (body) {
+                            bodies++;
+                        }
+                    } catch (Exception e) {
+                        // Not laid out; the count below says so.
+                    }
+                }
+            });
+            ok("the Chart page carries the Index link", links.containsKey("index"));
+            ok("and a pattern link", links.keySet().stream().anyMatch(h -> h.startsWith("pattern|")));
+            ok("and body links, " + links.size() + " links in all", links.size() >= 3);
+
+            for (java.util.Map.Entry<String, java.awt.Point> link : links.entrySet()) {
+                final boolean isPattern = link.getKey().startsWith("pattern|");
+                SwingUtilities.invokeAndWait(() -> {
+                    rail.reveal(OuraniaWindow.CHART_PAGE);
+                    if (isPattern) {
+                        // Filler, scrolled well down a real-sized viewport, so a page that
+                        // neither changes nor returns to its heading is seen doing neither.
+                        javax.swing.JScrollPane scroll = (javax.swing.JScrollPane)
+                            selectionPane.getParent().getParent();
+                        scroll.setSize(320, 600);
+                        selectionPane.setText("<html><body>"
+                            + "<p>filler</p>".repeat(400) + "</body></html>");
+                        scroll.validate();
+                        scroll.getViewport().setViewPosition(new java.awt.Point(0, 3000));
+                    }
+                    java.awt.Point pt = link.getValue();
+                    long t = System.currentTimeMillis();
+                    for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
+                            java.awt.event.MouseEvent.MOUSE_RELEASED,
+                            java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+                        natal.dispatchEvent(new java.awt.event.MouseEvent(natal, id, t, 0,
+                            pt.x, pt.y, 1, false, java.awt.event.MouseEvent.BUTTON1));
+                    }
+                });
+                SwingUtilities.invokeAndWait(() -> { });
+                String h = link.getKey();
+                String kind = h.equals("index") ? "the Index link"
+                    : h.startsWith("pattern|") ? "a pattern link" : "the body link " + h;
+                ok(kind + " leaves the Chart page for the page it wrote to, showing "
+                    + rail.selected(), !OuraniaWindow.CHART_PAGE.equals(rail.selected()) && rail.isOpen());
+                if (!h.equals("index") && !h.startsWith("pattern|")) {
+                    continue;
+                }
+                if (!isPattern) {
+                    ok(kind + " shows the Interpretation page, not " + rail.selected(),
+                        OuraniaWindow.READING_PAGE.equals(rail.selected()));
+                    continue;
+                }
+                // <b>A figure is a selection.</b> David: "interpretation was meant to be a tab
+                // to interpret the entire chart, selection was meant to define and show what
+                // was selected" - and it should bloom out whole, not stop short.
+                ok(kind + " opens on the Selection page, not " + rail.selected(),
+                    OuraniaWindow.SELECTION_PAGE.equals(rail.selected()));
+                // Two turns of the queue: setHtml restores the old position later, and the
+                // return to the top is queued behind that.
+                SwingUtilities.invokeAndWait(() -> { });
+                SwingUtilities.invokeAndWait(() -> { });
+                SwingUtilities.invokeAndWait(() -> { });
+                String name = InterpretationPanel.parsePatternHref(h)[0];
+                String shown = selectionPane.getText();
+                ok(kind + " put that figure's reading on it",
+                    !shown.contains("filler") && shown.toLowerCase().contains(name.toLowerCase()));
+                ok(kind + " shows the whole reading, down to its last link",
+                    shown.contains("coming for this figure") && shown.contains("unlight"));
+                ok(kind + " has no back link to an interpretation it did not come from",
+                    !shown.contains("back to the full interpretation"));
+                int y = ((javax.swing.JViewport) selectionPane.getParent()).getViewPosition().y;
+                ok(kind + " starts at the top of the page, not " + y + "px down", y == 0);
+                ok(kind + " leaves the Interpretation page to the whole chart",
+                    !readingPane.getText().toLowerCase().contains("widest leg"));
+            }
+
+            // <b>Every character of an entry, not only its name.</b> Only the bold name was a
+            // link, so "(air)" and the line of planets under it did nothing when clicked -
+            // which is what David was clicking. Three figures in the generator's own markup,
+            // the same three his chart showed, and a click on each visible character.
+            final String[] names = {"Grand trine", "Kite", "T-square"};
+            final String entries = SkymapPanel.patternEntryHtml(figure("Grand trine",
+                    java.util.List.of("Mercury", "Pluto", "Uranus"), null, "air", null))
+                + SkymapPanel.patternEntryHtml(figure("Kite",
+                    java.util.List.of("Mercury", "Neptune", "Pluto", "Uranus"), "Mercury", "air", null))
+                + SkymapPanel.patternEntryHtml(figure("T-square",
+                    java.util.List.of("Chiron", "Pluto", "Venus"), "Pluto", null, "fixed"));
+            final java.util.List<java.awt.Point> points = new java.util.ArrayList<>();
+            final java.util.List<String> owners = new java.util.ArrayList<>();
+            final java.util.List<Character> glyphs = new java.util.ArrayList<>();
+            SwingUtilities.invokeAndWait(() -> {
+                natal.setText("<html><body style='font-family:Arial; font-size:12px; color:white;'>"
+                    + entries + "</body></html>");
+                natal.setSize(340, 2000);
+                natal.doLayout();
+                try {
+                    javax.swing.text.Document doc = natal.getDocument();
+                    String text = doc.getText(0, doc.getLength());
+                    for (int p = 0; p < text.length(); p++) {
+                        char c = text.charAt(p);
+                        if (Character.isWhitespace(c) || c == '\u00A0') {
+                            continue;
+                        }
+                        String owner = null;
+                        for (String n : names) {
+                            int at = text.indexOf(n);
+                            if (at >= 0 && at <= p) {
+                                owner = n;
+                            }
+                        }
+                        java.awt.geom.Rectangle2D a = natal.modelToView2D(p);
+                        java.awt.geom.Rectangle2D b = natal.modelToView2D(p + 1);
+                        if (a == null || b == null || Math.abs(a.getY() - b.getY()) >= 1.0
+                                || b.getX() <= a.getX()) {
+                            continue;
+                        }
+                        points.add(new java.awt.Point((int) ((a.getX() + b.getX()) / 2),
+                            (int) (a.getY() + a.getHeight() / 2)));
+                        owners.add(owner);
+                        glyphs.add(c);
+                    }
+                } catch (javax.swing.text.BadLocationException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            ok("the three entries lay out into clickable characters, " + points.size(),
+                points.size() > 80);
+            java.util.Map<String, StringBuilder> dead = new java.util.LinkedHashMap<>();
+            for (int i = 0; i < points.size(); i++) {
+                final java.awt.Point pt = points.get(i);
+                SwingUtilities.invokeAndWait(() -> {
+                    rail.reveal(OuraniaWindow.CHART_PAGE);
+                    selectionPane.setText("<html><body></body></html>");
+                    long t = System.currentTimeMillis();
+                    for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
+                            java.awt.event.MouseEvent.MOUSE_RELEASED,
+                            java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+                        natal.dispatchEvent(new java.awt.event.MouseEvent(natal, id, t, 0,
+                            pt.x, pt.y, 1, false, java.awt.event.MouseEvent.BUTTON1));
+                    }
+                });
+                SwingUtilities.invokeAndWait(() -> { });
+                boolean opened = OuraniaWindow.SELECTION_PAGE.equals(rail.selected())
+                    && selectionPane.getText().toLowerCase().contains(owners.get(i).toLowerCase());
+                if (!opened) {
+                    dead.computeIfAbsent(owners.get(i), k -> new StringBuilder()).append(glyphs.get(i));
+                }
+            }
+            for (String n : names) {
+                ok("every character of the " + n + " entry opens its reading, dead: \""
+                    + (dead.containsKey(n) ? dead.get(n) : "") + "\"", !dead.containsKey(n));
+            }
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    /**
+     * Whatever route wrote a reading, the left rail shows exactly one page, the chosen one.
+     *
+     * <b>The Interpretation card stayed visible under every page.</b> The rail is a CardLayout,
+     * which shows a page by hiding the others, and fourteen setVisible(true) calls from the days
+     * when the panel was a frame region undid that on each reading. On the pages added after it
+     * - Snapshot through Calendar - it painted on top and took the scroll wheel. David: "make
+     * sure the information panel on the left is scrollable it was giving me quite a few
+     * glitches". Every reading route is run, then every page is opened, and the rail is counted.
+     */
+    private static void oneCardAtATime() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            final DrawerRail rail = (DrawerRail) fieldOf(w[0], "chartRail");
+            final Container cards = (Container) fieldOf(rail, "pages");
+            final java.util.List<String> pages = rail.pageNames();
+            final java.util.List<String[]> none = new java.util.ArrayList<>();
+            final String[] routes = {"planet", "angle", "sign", "mansion", "decan", "bound", "sabian",
+                "house", "aspect", "synastry aspect", "transit aspect", "index", "pattern", "close"};
+            for (String route : routes) {
+                SwingUtilities.invokeAndWait(() -> {
+                    OuraniaWindow win = w[0];
+                    switch (route) {
+                        case "planet": win.showInterpretationForPlanet("Sun", "Leo", 12, 2, 5, none, 132.0); break;
+                        case "angle": win.showInterpretationForAngle("Ascendant", "Leo", 12, none); break;
+                        case "sign": win.showInterpretationForSign("Leo"); break;
+                        case "mansion": win.showInterpretationForMansion(9); break;
+                        case "decan": win.showInterpretationForDecan("Leo", 2); break;
+                        case "bound": win.showInterpretationForBound(132.0); break;
+                        case "sabian": win.showInterpretationForSabianSymbol("Leo", 12); break;
+                        case "house": win.showInterpretationForHouse(5); break;
+                        case "aspect": win.showInterpretationForAspect("Sun", "Moon", "Trine"); break;
+                        case "synastry aspect": win.showInterpretationForSynastryAspect("Sun", "Moon", "Trine"); break;
+                        case "transit aspect": win.showInterpretationForTransitAspect("Mars", "Sun", "Square"); break;
+                        case "index": win.showIndexPanel(""); break;
+                        case "pattern": win.handlePlacementClick(InterpretationPanel.patternHref("Grand trine",
+                            java.util.List.of("Moon", "Sun", "Venus"))); break;
+                        default: win.closeInterpretationPanel(); break;
+                    }
+                });
+                SwingUtilities.invokeAndWait(() -> { });
+                java.util.List<String> visible = visibleCards(cards, pages);
+                ok("after the " + route + " route one page is visible, the selected " + rail.selected()
+                    + ", not " + visible, visible.size() == 1 && visible.get(0).equals(rail.selected()));
+                if (!route.equals("close") && !route.equals("pattern") && !route.equals("planet")
+                        && !route.equals("angle")) {
+                    ok("the " + route + " route reveals the reading it wrote, showing " + rail.selected(),
+                        OuraniaWindow.READING_PAGE.equals(rail.selected()) && rail.isOpen());
+                }
+                for (String page : pages) {
+                    SwingUtilities.invokeAndWait(() -> rail.reveal(page));
+                    java.util.List<String> shown = visibleCards(cards, pages);
+                    ok("after the " + route + " route, opening " + page + " shows it alone, not " + shown,
+                        shown.size() == 1 && shown.get(0).equals(page));
+                }
+            }
+            // The Close button puts the rail away rather than hiding its own card, which left the
+            // Interpretation tab opening onto a blank page afterwards.
+            SwingUtilities.invokeAndWait(() -> {
+                rail.reveal(OuraniaWindow.READING_PAGE);
+                w[0].closeInterpretationPanel();
+            });
+            ok("Close puts the rail away", !rail.isOpen());
+            SwingUtilities.invokeAndWait(() -> rail.reveal(OuraniaWindow.READING_PAGE));
+            ok("and the Interpretation page still opens onto its panel",
+                visibleCards(cards, pages).equals(java.util.List.of(OuraniaWindow.READING_PAGE)));
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    /** The rail pages whose card is visible, by name, in the order the rail holds them. */
+    private static java.util.List<String> visibleCards(Container cards, java.util.List<String> pages) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        Component[] kids = cards.getComponents();
+        for (int i = 0; i < kids.length && i < pages.size(); i++) {
+            if (kids[i].isVisible()) {
+                out.add(pages.get(i));
+            }
+        }
+        return out;
+    }
+
+    private static com.zodiacomputing.ourania.astro.AspectPatterns.Pattern figure(String name,
+            java.util.List<String> bodies, String apex, String element, String modality) {
+        com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p =
+            new com.zodiacomputing.ourania.astro.AspectPatterns.Pattern(name, bodies, apex);
+        p.element = element;
+        p.modality = modality;
+        return p;
     }
 
     private static void collectPanels(Container c, java.util.List<DrawerRail> rails,

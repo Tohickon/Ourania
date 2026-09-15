@@ -2294,7 +2294,7 @@ extends JPanel {
                 }
                 g2.setColor(new Color(255, 255, 255, 14));
                 g2.fill(wedge(g, 0, g.natalFloor, from, to));
-                g2.setFont(new Font("Arial", Font.BOLD, (int) Math.round(15 * HOVER_SCALE)));
+                g2.setFont(Theme.font("Arial", Font.BOLD, (int) Math.round(15 * HOVER_SCALE)));
                 g2.setColor(this.getElementColor(Zodiac.elementIndex(idx - 1)));
                 centred(g2, g, String.valueOf(idx), from + (to - from) / 2.0, g.natalFloor - 16);
                 break;
@@ -3632,7 +3632,7 @@ extends JPanel {
     private static JLabel compactLabel(String shortText, String fullName) {
         JLabel label = new JLabel(shortText);
         label.setForeground(Color.WHITE);
-        label.setFont(new Font("Arial", Font.PLAIN, 11));
+        label.setFont(Theme.font("Arial", Font.PLAIN, 11));
         label.setToolTipText(fullName);
         return label;
     }
@@ -7273,6 +7273,40 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return this.generatePlanetPlacementsHtml(PlacementPart.ALL);
     }
 
+    /**
+     * One figure in the pattern banner, every word of it a link to the figure's reading.
+     *
+     * <b>Only the bold name was a link.</b> The quality after it and the line of planets under
+     * it were plain text, so a reader clicking "Mercury, Pluto, Uranus" under a grand trine got
+     * nothing. David, 2026-09-14: "Grand trine (air) Mercury, Pluto, Uranus ... not letting me
+     * select them". Swing's HTML cannot wrap a block in one anchor, so each run carries the same
+     * href in its own colour. NavigationCheck Part Q clicks every character of this markup.
+     */
+    static String patternEntryHtml(com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p) {
+        String href = InterpretationPanel.patternHref(p.name, p.bodies);
+        StringBuilder sb = new StringBuilder("<div style='margin-bottom:3px;'>");
+        sb.append("<a href='").append(href)
+            .append("' style='color:#FFD166; text-decoration:none;'><b>").append(p.name).append("</b>");
+        String quality = p.modality != null
+            && (p.name.equals("T-square") || p.name.equals("Grand cross"))
+                ? p.modality
+                : p.element != null
+                    && (p.name.equals("Grand trine") || p.name.equals("Kite"))
+                        ? p.element : null;
+        if (quality != null) {
+            sb.append(" <span style='color:#dddddd;'>(").append(quality).append(")</span>");
+        }
+        sb.append("</a>");
+        sb.append("<div style='font-size:11px;'><a href='").append(href)
+            .append("' style='color:#dddddd; text-decoration:none;'>")
+            .append(String.join(", ", p.bodies));
+        if (p.apex != null) {
+            sb.append(" &nbsp;|&nbsp; apex ").append(p.apex);
+        }
+        sb.append("</a></div></div>");
+        return sb.toString();
+    }
+
     /** The width the aspect grid has to fit into: the drawer, less padding and scrollbar. */
     private static final int GRID_FIT_WIDTH = 276;
 
@@ -7355,27 +7389,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 .append(" &middot; lit on the wheel</h3>");
             for (com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p
                     : this.currentPatterns) {
-                stringBuilder.append("<div style='margin-bottom:3px;'>")
-                    .append("<a href='")
-                    .append(InterpretationPanel.patternHref(p.name, p.bodies))
-                    .append("' style='color:#FFD166; text-decoration:none;'><b>")
-                    .append(p.name).append("</b></a>");
-                String quality = p.modality != null
-                    && (p.name.equals("T-square") || p.name.equals("Grand cross"))
-                        ? p.modality
-                        : p.element != null
-                            && (p.name.equals("Grand trine") || p.name.equals("Kite"))
-                                ? p.element : null;
-                if (quality != null) {
-                    stringBuilder.append(" <span style='color:#dddddd;'>(").append(quality)
-                        .append(")</span>");
-                }
-                stringBuilder.append("<div style='color:#dddddd; font-size:11px;'>")
-                    .append(String.join(", ", p.bodies));
-                if (p.apex != null) {
-                    stringBuilder.append(" &nbsp;|&nbsp; apex ").append(p.apex);
-                }
-                stringBuilder.append("</div></div>");
+                stringBuilder.append(SkymapPanel.patternEntryHtml(p));
             }
             stringBuilder.append("<div style='color:#9AA5B1; font-size:10px;'>Click a figure "
                 + "for the full reading.</div>");
@@ -7941,7 +7955,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 int n22 = n12 + (int)((double)houseR * Math.cos(d8));
                 int n23 = n13 + (int)((double)houseR * Math.sin(d8));
                 graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n8 - 1)));
-                graphics2D.setFont(new Font("Arial", 1, 15));
+                graphics2D.setFont(Theme.font("Arial", 1, 15));
                 java.awt.FontMetrics houseFm = graphics2D.getFontMetrics();
                 String houseText = String.valueOf(n8);
                 graphics2D.drawString(houseText, n22 - houseFm.stringWidth(houseText) / 2,

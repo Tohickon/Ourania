@@ -229,79 +229,93 @@ public class InterpretationPanel extends JPanel {
     }
 
     private void handleLink(String href) {
+        followLink(href);
+    }
+
+    /**
+     * Follows one of this panel's links, wherever the link was clicked. True if it was one.
+     *
+     * <b>The panel's prose also renders on the Selection page now</b>, where a click goes to
+     * OuraniaWindow.handlePlacementClick rather than to this panel's listener. Its glossary
+     * terms, the forecast link and "Turn it off" would all have been dead there. The window
+     * asks here before reading a link as a body, so this scheme is still parsed in one place.
+     */
+    boolean followLink(String href) {
         if (href == null) {
-            return;
+            return false;
         }
         if (href.equals("back")) {
             // Clearing the wheel on the way back matters: a figure left lit under a different
             // view is the chart asserting something the panel is no longer saying.
             highlightOnWheel(null);
             updateInterpretations();
-            return;
+            return true;
         }
         if (href.equals("mansions")) {
             showAllMansions();
-            return;
+            return true;
         }
         if (href.equals("index") || href.startsWith("index|")) {
             showIndex(href.equals("index") ? "" : href.substring(6));
-            return;
+            return true;
         }
         if (href.startsWith("body|")) {
             openBody(parseInt(href.substring(5), -1));
-            return;
+            return true;
         }
         if (href.startsWith("house|")) {
             showHouseInterpretation(parseInt(href.substring(6), -1));
-            return;
+            return true;
         }
         if (href.startsWith("dignity|")) {
             showDignityDetail(href.substring(8));
-            return;
+            return true;
         }
         if (href.startsWith("aspecttype|")) {
             showAspectTypeDetail(href.substring(11));
-            return;
+            return true;
         }
         if (href.startsWith("sign|")) {
             showSignInterpretation(href.substring(5));
-            return;
+            return true;
         }
         if (href.startsWith("decan|")) {
             String[] bits = href.substring(6).split("\\|");
             if (bits.length == 2) {
                 showDecanInterpretation(bits[0], parseInt(bits[1], 1));
             }
-            return;
+            return true;
         }
         if (href.startsWith("sabian|")) {
             String[] bits = href.substring(7).split("\\|");
             if (bits.length == 2) {
                 showSabianInterpretation(bits[0], parseInt(bits[1], 1));
             }
-            return;
+            return true;
         }
         if (href.startsWith("forecast|")) {
             String[] bits = href.substring(9).split("\\|");
             if (bits.length == 2) {
                 showPatternForecast(bits[0], bits[1]);
             }
-            return;
+            return true;
         }
         String[] pattern = parsePatternHref(href);
         if (pattern != null) {
             showPatternDetail(pattern[0], pattern[1]);
-            return;
+            return true;
         }
         if (href.equals("unlight")) {
             highlightOnWheel(null);
-            return;
+            return true;
         }
         int mansion = parseMansionHref(href);
         if (mansion >= 1) {
             showMansionDetail(mansion);
+            return true;
         }
         // Anything else is a no-op rather than a stack trace in the UI.
+        return false;
     }
 
     /**
@@ -1352,6 +1366,22 @@ public class InterpretationPanel extends JPanel {
      * on screen after the chart time has moved.
      */
     public void showPatternDetail(String name, String bodiesCsv) {
+        setHtml(patternDetail(name, bodiesCsv, true), false);
+    }
+
+    /**
+     * One aspect pattern in full, styled, for the Selection page.
+     *
+     * <b>A clicked figure is a selection, not the chart's interpretation.</b> David, 2026-09-14:
+     * "interpretation was meant to be a tab to interpret the entire chart, selection was meant
+     * to define and show what was selected" - so the banner's click opens this there, whole.
+     * No back link: there is no full interpretation behind the Selection page to go back to.
+     */
+    String patternDetailHtml(String name, String bodiesCsv) {
+        return style(Prose.decorate(patternDetail(name, bodiesCsv, false)));
+    }
+
+    private String patternDetail(String name, String bodiesCsv, boolean withBack) {
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
 
@@ -1372,10 +1402,10 @@ public class InterpretationPanel extends JPanel {
             highlightOnWheel(null);
             html.append("<h2 style='color:#FFD166;'>").append(name).append("</h2>");
             html.append("<p>This figure is not in the chart as currently cast.</p>");
-            appendBack(html);
-            html.append("</body></html>");
-            setHtml(html.toString(), false);
-            return;
+            if (withBack) {
+                appendBack(html);
+            }
+            return html.append("</body></html>").toString();
         }
 
         // Light it on the wheel as the detail view opens. This is the answer to "where is it
@@ -1445,9 +1475,10 @@ public class InterpretationPanel extends JPanel {
             .append(" months &rarr;</a></p>");
         html.append("<p style='font-size:11px; color:#9AA5B1;'>This figure is lit on the wheel. "
             + "<a href='unlight' style='color:#7FB3FF;'>Turn it off</a>.</p>");
-        appendBack(html);
-        html.append("</body></html>");
-        setHtml(html.toString(), false);
+        if (withBack) {
+            appendBack(html);
+        }
+        return html.append("</body></html>").toString();
     }
 
     // ------------------------------------------------------------------ the indexes

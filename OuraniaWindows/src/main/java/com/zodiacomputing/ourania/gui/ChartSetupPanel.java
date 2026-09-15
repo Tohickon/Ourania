@@ -222,7 +222,7 @@ public class ChartSetupPanel extends JPanel {
         setNowBtn.addActionListener(e -> setBaseToNow());
         
         JPanel baseFiller = new JPanel();
-        baseFiller.setBackground(Color.BLACK);
+        baseFiller.setBackground(Theme.SURFACE);
         baseFiller.setPreferredSize(new Dimension(15, 10));
         baseHeader.add(baseFiller);
         baseHeader.add(setNowBtn);
@@ -326,7 +326,7 @@ public class ChartSetupPanel extends JPanel {
         loadBtn.addActionListener(e -> loadTransit());
 
         JPanel tFiller = new JPanel();
-        tFiller.setBackground(Color.BLACK);
+        tFiller.setBackground(Theme.SURFACE);
         tFiller.setPreferredSize(new Dimension(10, 10));
         transitHeader.add(tFiller);
         transitHeader.add(saveBtn);
@@ -458,7 +458,7 @@ public class ChartSetupPanel extends JPanel {
         skyHeader.add(skyTitle);
 
         JPanel skyFiller = new JPanel();
-        skyFiller.setBackground(Color.BLACK);
+        skyFiller.setBackground(Theme.SURFACE);
         skyFiller.setPreferredSize(new Dimension(15, 10));
         skyHeader.add(skyFiller);
 
@@ -521,8 +521,8 @@ public class ChartSetupPanel extends JPanel {
         buttonPanel.setBackground(Theme.BG);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 30, 0));
         
-        JButton swapBtn = new JButton("Swap A / B");
-        swapBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        JButton swapBtn = new JButton("\u21C4  Swap A / B");
+        swapBtn.setFont(Theme.font("Arial", Font.BOLD, 16));
         swapBtn.setBackground(new Color(90, 90, 100));
         swapBtn.setForeground(Color.WHITE);
         swapBtn.setContentAreaFilled(false);

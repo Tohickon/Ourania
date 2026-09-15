@@ -88,7 +88,7 @@ public class SettingsPanel extends JPanel {
 
         JLabel title = new JLabel("Settings", SwingConstants.CENTER);
         title.setForeground(TEXT);
-        title.setFont(new Font("Arial", Font.BOLD, 24));
+        title.setFont(Theme.font("Arial", Font.BOLD, 24));
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 6, 0));
         // <b>A way out, which this screen did not have.</b> Settings is a CardLayout card
         // with no back control of any kind - the only exit was the side drawer's Menu, so with
@@ -448,7 +448,7 @@ public class SettingsPanel extends JPanel {
             + "an angle on the wheel to see what it currently contacts."));
 
         status.setForeground(DIM);
-        status.setFont(new Font("Arial", Font.ITALIC, 12));
+        status.setFont(Theme.font("Arial", Font.ITALIC, 12));
         status.setAlignmentX(Component.LEFT_ALIGNMENT);
         body.add(Box.createRigidArea(new Dimension(0, 14)));
         body.add(status);
@@ -481,7 +481,7 @@ public class SettingsPanel extends JPanel {
 
         JLabel name = new JLabel(group.title);
         name.setForeground(new Color(173, 216, 230));
-        name.setFont(new Font("Arial", Font.BOLD, 14));
+        name.setFont(Theme.font("Arial", Font.BOLD, 14));
         name.setAlignmentX(Component.LEFT_ALIGNMENT);
         name.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 12));
         panel.add(name);
@@ -491,7 +491,7 @@ public class SettingsPanel extends JPanel {
         // why the intro note came out as one clipped line the first time this was drawn.
         JLabel blurb = new JLabel("<html><body style='width:260px'>" + group.blurb + "</body></html>");
         blurb.setForeground(DIM);
-        blurb.setFont(new Font("Arial", Font.PLAIN, 11));
+        blurb.setFont(Theme.font("Arial", Font.PLAIN, 11));
         blurb.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(blurb);
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
@@ -507,7 +507,7 @@ public class SettingsPanel extends JPanel {
             JCheckBox box = new JCheckBox(label, enabled[i]);
             box.setForeground(TEXT);
             box.setBackground(Color.BLACK);
-            box.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 14));
+            box.setFont(Theme.font("Segoe UI Symbol", Font.PLAIN, 14));
             box.setFocusPainted(false);
             box.setAlignmentX(Component.LEFT_ALIGNMENT);
             box.setToolTipText(d.meaning);
@@ -982,7 +982,7 @@ public class SettingsPanel extends JPanel {
 
     private JButton bulkButton(String text, Runnable action) {
         JButton b = new JButton(text);
-        b.setFont(new Font("Arial", Font.PLAIN, 12));
+        b.setFont(Theme.font("Arial", Font.PLAIN, 12));
         b.setBackground(ACCENT);
         b.setForeground(Color.WHITE);
         b.setContentAreaFilled(false);
@@ -1116,7 +1116,7 @@ public class SettingsPanel extends JPanel {
     private JLabel heading(String text) {
         JLabel l = new JLabel(text);
         l.setForeground(TEXT);
-        l.setFont(new Font("Arial", Font.BOLD, 17));
+        l.setFont(Theme.font("Arial", Font.BOLD, 17));
         l.setAlignmentX(Component.LEFT_ALIGNMENT);
         // Two pixels of slack on the right. A JLabel gets exactly its preferred width in a
         // BoxLayout, and a one-pixel disagreement between the metrics that computed it and
@@ -1129,7 +1129,7 @@ public class SettingsPanel extends JPanel {
     private JLabel note(String text) {
         JLabel l = new JLabel("<html><body style='width:600px'>" + text + "</body></html>");
         l.setForeground(DIM);
-        l.setFont(new Font("Arial", Font.PLAIN, 12));
+        l.setFont(Theme.font("Arial", Font.PLAIN, 12));
         l.setAlignmentX(Component.LEFT_ALIGNMENT);
         return l;
     }

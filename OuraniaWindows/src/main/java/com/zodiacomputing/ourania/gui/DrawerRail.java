@@ -343,8 +343,8 @@ public final class DrawerRail extends JPanel {
             g2.setFont(Theme.HEADING);
             g2.setColor(off ? TAB_DISABLED : (on ? Color.WHITE : Theme.TEXT));
             FontMetrics fm = g2.getFontMetrics();
-            // ASCII only: this font draws the triangle glyphs as empty boxes.
-            String arrow = side == Drawer.Side.LEFT ? (on ? "<" : ">") : (on ? ">" : "<");
+            // Triangles, as on Drawer's handle; see Theme.font for why they were once "<".
+            String arrow = side == Drawer.Side.LEFT ? (on ? "\u25C2" : "\u25B8") : (on ? "\u25B8" : "\u25C2");
             String text = arrow + "  " + label;
             g2.rotate(-Math.PI / 2.0);
             int textX = -(getHeight() + fm.stringWidth(text)) / 2;

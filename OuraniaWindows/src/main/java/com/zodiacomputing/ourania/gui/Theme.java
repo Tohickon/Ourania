@@ -91,9 +91,30 @@ final class Theme {
 
     private static Font font(int style, int size) {
         // Segoe UI is present on every supported Windows version and is what the rest of the
-        // desktop is set in; Arial was inherited from the decompiled source. Font falls back
-        // on its own if it is ever missing, so this needs no guard.
-        return new Font(FAMILY, style, size);
+        // desktop is set in; Arial was inherited from the decompiled source.
+        return font(FAMILY, style, size);
+    }
+
+    /**
+     * A named face that still draws the symbols it does not have. Every font a component is set
+     * in comes from here; GlyphCheck holds the gui package to that.
+     *
+     * <b>new Font("Segoe UI", ...) draws every symbol in the app as an empty box.</b> A physical
+     * font has no fallback: rendered, U+2648 leaves exactly the ink of a missing glyph, and so
+     * did the drawer triangles, the swap arrow, and the releasing panel's star and link. The
+     * glyphs had been swapped for "+", "&lt;" and "v" one at a time, each comment blaming "this
+     * font". HTML panes never showed it, because the HTML renderer falls back on its own; nor
+     * did SansSerif, which is a logical font and composites by contract.
+     *
+     * <p>StyleContext.getFont is Swing's public way to the same composite for a physical face:
+     * Latin text keeps that face's exact metrics (measured: "Aries W" is 68px either way) and
+     * anything missing is drawn from the platform's fallback fonts. deriveFont keeps the
+     * fallback and drops the UIResource marker, so a look-and-feel refresh cannot swap the font
+     * back out; new Font(font.getAttributes()) would lose the fallback, measured.
+     */
+    static Font font(String family, int style, int size) {
+        return javax.swing.text.StyleContext.getDefaultStyleContext()
+            .getFont(family, style, size).deriveFont(style, (float) size);
     }
 
     // ---- spacing ----------------------------------------------------------------------

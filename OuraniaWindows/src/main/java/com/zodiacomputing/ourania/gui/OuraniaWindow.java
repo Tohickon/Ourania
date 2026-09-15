@@ -172,9 +172,14 @@ public class OuraniaWindow extends JFrame {
         contentPanel.add(nameListPanel, "NAME_LIST");
         
         interpretationPanel = new InterpretationPanel(skymapPanel, this);
-        // Sized by the rail now, and always visible within it - the rail's own tab is what
-        // shows and hides it, so a second visibility flag would fight the tab for control.
-        interpretationPanel.setVisible(true);
+        // <b>The rail owns this panel's visibility, and nothing else may touch it.</b> The rail
+        // is a CardLayout, which shows a page by hiding every other card. Fourteen calls to
+        // interpretationPanel.setVisible(true), left from when the panel was a frame region of
+        // its own, kept this card visible under whichever page was chosen: on the pages added
+        // after it - Snapshot through Calendar - it painted over the page and took its scroll
+        // wheel, and on every page its own repaints could land on top. David, 2026-09-14:
+        // "make sure the information panel on the left is scrollable it was giving me quite a
+        // few glitches". NavigationCheck Part R holds the rail to one visible card.
         chartRail.addPage(READING_PAGE, interpretationPanel);
         for (String[] r : READINGS) {
             javax.swing.JEditorPane pane = HtmlPanes.chartPane(this);
@@ -324,7 +329,7 @@ public class OuraniaWindow extends JFrame {
         
         JLabel label = new JLabel(text + " (Under Construction)", SwingConstants.CENTER);
         label.setForeground(Color.LIGHT_GRAY);
-        label.setFont(new Font("Arial", Font.BOLD, 24));
+        label.setFont(Theme.font("Arial", Font.BOLD, 24));
         
         panel.add(label, BorderLayout.CENTER);
         return panel;
@@ -425,7 +430,6 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForPlanet(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects, double lon) {
         if (interpretationPanel != null) {
             interpretationPanel.showPlanetInterpretation(planetName, signName, degree, decanNum, houseNum, activeAspects, lon);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -443,7 +447,6 @@ public class OuraniaWindow extends JFrame {
         if (interpretationPanel != null) {
             interpretationPanel.showAngleInterpretation(angleName, signName, degree,
                 activeAspects, role, hostHouse);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -562,8 +565,26 @@ public class OuraniaWindow extends JFrame {
     }
 
     public void showSelection(String html) {
+        showSelection(html, false);
+    }
+
+    /**
+     * @param fromTop start the page at its top. A new selection is read from its heading; the
+     *                selection card's own expanders keep the reader's place instead.
+     */
+    void showSelection(String html, boolean fromTop) {
         if (selectionPane != null) {
             HtmlPanes.setHtml(selectionPane, html);
+            if (fromTop) {
+                // Queued behind setHtml's own deferred restore of the old position.
+                final javax.swing.JScrollPane scroll = (javax.swing.JScrollPane)
+                    javax.swing.SwingUtilities.getAncestorOfClass(javax.swing.JScrollPane.class,
+                        selectionPane);
+                if (scroll != null) {
+                    javax.swing.SwingUtilities.invokeLater(() -> javax.swing.SwingUtilities.invokeLater(
+                        () -> scroll.getVerticalScrollBar().setValue(0)));
+                }
+            }
         }
         if (chartRail != null) {
             // There is something selected now, so the tab stops being greyed out.
@@ -600,7 +621,7 @@ public class OuraniaWindow extends JFrame {
     public void showIndexPanel(String category) {
         if (interpretationPanel != null) {
             interpretationPanel.showIndex(category == null ? "" : category);
-            interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -737,10 +758,12 @@ public class OuraniaWindow extends JFrame {
         String[] pattern = InterpretationPanel.parsePatternHref(command);
         if (pattern != null) {
             if (interpretationPanel != null) {
-                interpretationPanel.showPatternDetail(pattern[0], pattern[1]);
-                interpretationPanel.setVisible(true);
-                revalidate();
-                repaint();
+                // <b>Onto Selection, whole and from the top.</b> The banner sits on the Chart
+                // page and wrote the figure behind it, onto Interpretation. David, 2026-09-14:
+                // "selection was meant to define and show what was selected", and a clicked
+                // figure should bloom out there in full. Interpretation stays the reading of the
+                // whole chart.
+                showSelection(interpretationPanel.patternDetailHtml(pattern[0], pattern[1]), true);
             }
             return;
         }
@@ -754,6 +777,13 @@ public class OuraniaWindow extends JFrame {
             }
             return;
         }
+        // One of the reading's own links - a glossary term, a forecast, "Turn it off" - clicked
+        // where a reading is shown on the Selection page. Asked of the panel, which owns that
+        // scheme, before the command is read as a body label.
+        if (interpretationPanel != null && interpretationPanel.followLink(command)) {
+            revealReading();
+            return;
+        }
         if (skymapPanel != null) {
             skymapPanel.triggerPlanetInterpretation(command);
         }
@@ -762,7 +792,6 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForSign(String signName) {
         if (interpretationPanel != null) {
             interpretationPanel.showSignInterpretation(signName);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -773,7 +802,6 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForMansion(int number) {
         if (interpretationPanel != null) {
             interpretationPanel.showMansionDetail(number);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -783,7 +811,6 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForDecan(String signName, int decanNum) {
         if (interpretationPanel != null) {
             interpretationPanel.showDecanInterpretation(signName, decanNum);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -794,7 +821,6 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForBound(double longitude) {
         if (interpretationPanel != null) {
             interpretationPanel.showBoundInterpretation(longitude);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -804,7 +830,6 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForSabianSymbol(String signName, int degree) {
         if (interpretationPanel != null) {
             interpretationPanel.showSabianInterpretation(signName, degree);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -815,7 +840,6 @@ public class OuraniaWindow extends JFrame {
     public void showSnapshot(String when, String where, String paragraph) {
         if (interpretationPanel != null) {
             interpretationPanel.showSnapshot(when, where, paragraph);
-            interpretationPanel.setVisible(true);
             revalidate();
             repaint();
         }
@@ -825,7 +849,6 @@ public class OuraniaWindow extends JFrame {
     public void showReport(String when, String where, String report) {
         if (interpretationPanel != null) {
             interpretationPanel.showReport(when, where, report);
-            interpretationPanel.setVisible(true);
             revalidate();
             repaint();
         }
@@ -926,11 +949,15 @@ public class OuraniaWindow extends JFrame {
         return true;
     }
 
+    /**
+     * The reading's Close button: puts the rail away.
+     *
+     * It hid the card itself, which inside the rail left the Interpretation tab opening onto a
+     * blank page for the rest of the session - the card stayed hidden when the tab showed it.
+     */
     public void closeInterpretationPanel() {
-        if (interpretationPanel != null) {
-            interpretationPanel.setVisible(false);
-            revalidate();
-            repaint();
+        if (chartRail != null && READING_PAGE.equals(chartRail.selected())) {
+            chartRail.setOpen(false);
         }
     }
 
@@ -939,12 +966,11 @@ public class OuraniaWindow extends JFrame {
     // EAST region, not in contentPanel. CardLayout.show is a silent no-op for an unknown
     // name, so the text was generated and then never shown: clicking an aspect in the
     // grid, or a house on the wheel, did nothing at all unless the panel already happened
-    // to be open. Every other handler here calls setVisible(true); these now match.
+    // to be open. They reveal the rail's Interpretation page now, like every handler here.
 
     public void showInterpretationForHouse(int houseNum) {
         if (interpretationPanel != null) {
             interpretationPanel.showHouseInterpretation(houseNum);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -954,7 +980,6 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForAspect(String planet1, String planet2, String aspectType) {
         if (interpretationPanel != null) {
             interpretationPanel.showAspectInterpretation(planet1, planet2, aspectType);
-            interpretationPanel.setVisible(true);
             revealReading();
             revalidate();
             repaint();
@@ -972,7 +997,7 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForSynastryAspect(String chartA, String chartB, String aspectType) {
         if (interpretationPanel != null) {
             interpretationPanel.showSynastryAspectInterpretation(chartA, chartB, aspectType);
-            interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }
@@ -981,7 +1006,7 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForTransitAspect(String transiting, String natal, String aspectType) {
         if (interpretationPanel != null) {
             interpretationPanel.showTransitAspectInterpretation(transiting, natal, aspectType);
-            interpretationPanel.setVisible(true);
+            revealReading();
             revalidate();
             repaint();
         }

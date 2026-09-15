@@ -58,7 +58,7 @@ public final class Widgets {
      */
     public static final Color COMBO_BG = Theme.SURFACE_3;
 
-    private static final Font COMBO_FONT = new Font("Arial", Font.BOLD, 12);
+    private static final Font COMBO_FONT = Theme.font("Arial", Font.BOLD, 12);
 
     private Widgets() { }
 
@@ -362,7 +362,7 @@ public final class Widgets {
     }
 
     /** Plain 11 rather than bold 12 - see {@link #styleCompactCombo}. */
-    private static final Font COMPACT_COMBO_FONT = new Font("Arial", Font.PLAIN, 11);
+    private static final Font COMPACT_COMBO_FONT = Theme.font("Arial", Font.PLAIN, 11);
 
     /**
      * A control-strip dropdown that has to share its row with six others.

@@ -94,6 +94,8 @@ public final class Accordion extends JPanel {
         private final String title;
         private final JPanel header;
         private final JLabel chevron;
+        static final String CLOSED = "\u25B8";
+        static final String OPEN = "\u25BE";
         private final JPanel holder;
         private final JScrollPane scroller;
         private JScrollPane scrollerRef;
@@ -110,10 +112,9 @@ public final class Accordion extends JPanel {
             setOpaque(false);
             setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            // ASCII rather than a triangle glyph: the app's font renders U+25B8 as an empty
-            // box, which is the same reason the wheel's drawer labels use "..." - and why the
-            // "Swap Natal / Transit" button still shows a box where its arrow should be.
-            chevron = new JLabel("+");
+            // The triangle it was always meant to be. It was "+" while Theme's fonts were
+            // physical and drew U+25B8 as an empty box; see Theme.font.
+            chevron = new JLabel(CLOSED);
             chevron.setForeground(TITLE);
             chevron.setFont(Theme.HEADING);
             chevron.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
@@ -205,7 +206,7 @@ public final class Accordion extends JPanel {
 
         public void setOpen(boolean shouldOpen) {
             this.open = shouldOpen;
-            chevron.setText(shouldOpen ? "-" : "+");
+            chevron.setText(shouldOpen ? OPEN : CLOSED);
             header.setBackground(shouldOpen ? HEADER_OPEN : HEADER_BG);
             targetHeight = shouldOpen ? openHeight() : 0;
             // <b>No animation when nothing can see it.</b> A section opened before the window

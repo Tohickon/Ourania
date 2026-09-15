@@ -269,15 +269,14 @@ public final class Drawer extends JPanel {
             g2.setFont(Theme.HEADING);
             g2.setColor(open ? Color.WHITE : TEXT);
             FontMetrics fm = g2.getFontMetrics();
-            // ASCII arrows: this font renders the triangle glyphs as empty boxes, which is
-            // why the wheel's drawer labels use "..." and why "Swap Natal / Transit" still
-            // shows a box where its arrow should be.
+            // Triangles, pointing the way the drawer will move. They were "<" and "v" while
+            // Theme's fonts were physical and drew the triangles as empty boxes; see Theme.font.
             String arrow;
             switch (side) {
-                case LEFT:   arrow = open ? "<" : ">"; break;
-                case RIGHT:  arrow = open ? ">" : "<"; break;
-                case TOP:    arrow = open ? "^" : "v"; break;
-                default:     arrow = open ? "v" : "^"; break;
+                case LEFT:   arrow = open ? "\u25C2" : "\u25B8"; break;
+                case RIGHT:  arrow = open ? "\u25B8" : "\u25C2"; break;
+                case TOP:    arrow = open ? "\u25B4" : "\u25BE"; break;
+                default:     arrow = open ? "\u25BE" : "\u25B4"; break;
             }
             String text = arrow + "  " + label;
             if (vertical()) {

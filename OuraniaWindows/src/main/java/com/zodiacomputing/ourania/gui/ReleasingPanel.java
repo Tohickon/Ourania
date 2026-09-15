@@ -30,7 +30,7 @@ public class ReleasingPanel extends JPanel {
         
         JLabel titleLabel = new JLabel("Zodiacal Releasing");
         titleLabel.setForeground(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setFont(Theme.font("Arial", Font.BOLD, 24));
         
         String[] lots = {"Lot of Spirit (Career/Action)", "Lot of Fortune (Body/Circumstance)"};
         lotSelector = new JComboBox<>(lots);
@@ -131,7 +131,7 @@ public class ReleasingPanel extends JPanel {
         public PeriodCellRenderer() {
             panel.setOpaque(false);
             textLabel.setForeground(Color.WHITE);
-            textLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+            textLabel.setFont(Theme.font("Arial", Font.PLAIN, 14));
             
             colorBar.setPreferredSize(new Dimension(15, 25));
             colorBar.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));

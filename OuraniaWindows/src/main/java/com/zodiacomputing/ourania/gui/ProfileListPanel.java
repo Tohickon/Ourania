@@ -246,7 +246,7 @@ public final class ProfileListPanel extends JPanel {
                                String tip) {
         JButton b = new JButton(label);
         b.setToolTipText(tip);
-        b.setFont(new Font("Arial", Font.BOLD, 11));
+        b.setFont(Theme.font("Arial", Font.BOLD, 11));
         b.setHorizontalAlignment(SwingConstants.CENTER);
         b.setMargin(new java.awt.Insets(2, 8, 2, 8));
         // <b>Both slots look the same, because neither is selected.</b> Chart A was PRIMARY
