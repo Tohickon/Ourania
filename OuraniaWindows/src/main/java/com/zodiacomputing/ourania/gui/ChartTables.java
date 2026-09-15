@@ -532,6 +532,10 @@ public final class ChartTables {
         // No bold or colour mid-sentence in these panes: Swing's HTML swallows the space at the
         // edge of a styled run, and "is <b>out of bounds</b>" rendered as "iout of bounds".
 
+        // The same facts drawn, before they are listed: a parallel is two planets level with
+        // each other, which is seen at a glance and not in a table of pairs. See DeclinationGraph.
+        h.append("<p>").append(DeclinationGraph.imgTag(r)).append("</p>");
+
         h.append("<table cellpadding=\"4\">");
         h.append(row3("th", "Body", "Declination", ""));
         for (com.zodiacomputing.ourania.astro.Declinations.Entry e : r.entries) {
