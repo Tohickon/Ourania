@@ -324,6 +324,26 @@ public final class Settings {
         set(SPHERES_KEY, on ? "true" : "false");
     }
 
+    /** Settings key for the translucent sign shell on the globe. */
+    public static final String GLOBE_SIGN_PLANE_KEY = "chart.globeSignPlane";
+
+    /**
+     * Whether the globe fills the signs as a translucent coloured shell.
+     *
+     * On by default, because it is what makes the globe a zodiac rather than a wireframe: a body
+     * seen through it is in a sign and in a house at once, which is the thing the flat wheel
+     * cannot draw. Off leaves the sign boundaries, the band at the equator and the degree scale,
+     * so nothing is lost except the wash of colour - which is worth having when the aspect
+     * network underneath is what the reader is actually looking at.
+     */
+    public static boolean globeSignPlane() {
+        return !"false".equals(get(GLOBE_SIGN_PLANE_KEY, "true"));
+    }
+
+    public static void setGlobeSignPlane(boolean on) {
+        set(GLOBE_SIGN_PLANE_KEY, on ? "true" : "false");
+    }
+
     /** Settings key for drawing the natal bodies as planets on the globe. */
     public static final String GLOBE_PLANETS_KEY = "chart.globePlanets";
 

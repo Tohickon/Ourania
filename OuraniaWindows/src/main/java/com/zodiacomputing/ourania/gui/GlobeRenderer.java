@@ -116,7 +116,7 @@ final class GlobeRenderer {
         // drag from forty frames a second to twenty. Twenty is not a slow globe, it is a
         // globe that fights the hand moving it. The shells come back the moment the drag ends,
         // which is when a reader is actually looking at them rather than at the motion.
-        if (!turning && r.shown(SkymapPanel.Layer.SIGNS)) {
+        if (!turning && r.shown(SkymapPanel.Layer.SIGNS) && Settings.globeSignPlane()) {
             r.signPlane();
         }
 
@@ -1422,6 +1422,33 @@ final class GlobeRenderer {
             Globe.Projected q = at(p);
             if (!q.visible) {
                 continue;
+            }
+            // <b>The leader from the body to the degree it occupies - on the globe too.</b> The
+            // flat wheel has drawn these since the bodies began being spread outward when they
+            // crowd; here they are stacked up the shell for the same reason, and until
+            // 2026-09-15 the globe drew no leader at all, so a stacked glyph pointed at nothing.
+            // David: "when turned on to have a line go from the object to the degree its in it
+            // doesnt do that for globe mode."
+            //
+            // It runs to the inner edge of the sign band at the body's own longitude, which is
+            // where that degree is on this drawing, and it is a Piece of its own so the depth
+            // sort puts it behind the glyph rather than over it.
+            if (Settings.showDegreeLines()) {
+                Globe.Projected mark = at(Globe.onShell(lon[i], this.origin,
+                    Globe.SHELL_SIGN_INNER, 0.0, inclinationOf(deck, this.stacked)));
+                if (mark.visible) {
+                    boolean leaderLit = panel.onGlobeFocus(i, outer);
+                    Color leaderInk = ChartPalette.colorOr(ChartPalette.leaderHex(null),
+                        Color.WHITE);
+                    double leaderFar = q.depth > this.cam.distance ? 0.55 : 1.0;
+                    int leaderAlpha = (int) Math.round((leaderLit ? 235 : 60) * leaderFar);
+                    this.pieces.add(new Piece(q.depth + 0.01, () -> {
+                        this.g.setStroke(stroke(leaderLit ? 1.8f : 1.0f));
+                        this.g.setColor(new Color(leaderInk.getRed(), leaderInk.getGreen(),
+                            leaderInk.getBlue(), leaderAlpha));
+                        this.g.drawLine((int) q.x, (int) q.y, (int) mark.x, (int) mark.y);
+                    }));
+                }
             }
             boolean lit = panel.onGlobeFocus(i, outer);
             Color ink = panel.ringInk(i, role);

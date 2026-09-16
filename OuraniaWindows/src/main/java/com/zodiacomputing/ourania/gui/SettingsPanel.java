@@ -237,6 +237,25 @@ public class SettingsPanel extends JPanel {
         });
         body.add(arcs);
 
+        JCheckBox signPlane = new JCheckBox("On the globe, fill the signs as a coloured shell",
+            Settings.globeSignPlane());
+        signPlane.setForeground(TEXT);
+        signPlane.setBackground(Color.BLACK);
+        signPlane.setFont(Theme.BODY);
+        signPlane.setFocusPainted(false);
+        signPlane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        signPlane.setToolTipText("<html><b>The translucent sign shell.</b><br>On: each sign is "
+            + "washed in its element's colour, so a body seen through it is in a sign and in a "
+            + "house at once - the one thing the flat wheel cannot show.<br>Off: the boundaries, "
+            + "the band at the equator and the degree scale stay; only the wash goes, which "
+            + "clears the aspect network underneath.<br><i>The globe only; the flat wheel is "
+            + "unaffected.</i></html>");
+        signPlane.addItemListener(e -> {
+            Settings.setGlobeSignPlane(signPlane.isSelected());
+            applyPalette();
+        });
+        body.add(signPlane);
+
         JCheckBox stacked = new JCheckBox("On the globe, stack the rings instead of crossing "
             + "them", Settings.globeStackedRings());
         stacked.setForeground(TEXT);

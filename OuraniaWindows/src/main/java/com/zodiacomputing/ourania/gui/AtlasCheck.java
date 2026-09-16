@@ -86,6 +86,13 @@ public final class AtlasCheck {
             }
             System.exit(1);
         }
+        // <b>And say so to the process, not only to the console.</b> Part H builds a form, which
+        // starts the AWT event thread, and that thread is not a daemon - so main returned, the
+        // result printed, and the JVM sat there holding the run open. Measured 2026-09-15: 27
+        // minutes elapsed against 32 seconds of CPU, twice, each time stopping a sequential
+        // regression dead until it was killed by hand. Every other suite in this package exits
+        // explicitly; this one relied on having no windows, which stopped being true.
+        System.exit(0);
     }
 
     /** The file is present, it parses, and it holds roughly what it should. */
