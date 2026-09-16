@@ -95,20 +95,57 @@ public final class Horizon {
         return rc < 0 ? null : new double[] {xx[0], xx[1]};
     }
 
-    /** The Sun, Moon and planets in the sky over a place. */
+    /**
+     * The chosen points in the sky over a place, using the reader's body selection.
+     *
+     * <b>Every selected point the ephemeris can place, not only the planets.</b> It drew the ten
+     * planets alone and ignored the selection, so a reader who had switched Ceres or Eros on saw
+     * them on the wheel and not in the sky - David, 2026-09-15: "it only shows the planets and not
+     * the asteroids when they are selected". The asteroids, the centaurs and the nodes are real
+     * bodies at real places in the sky; there is no reason the horizon should know less about them
+     * than the wheel does.
+     *
+     * The points that are <i>not</i> here are the ones with no place of their own: the lots, the
+     * Vertex and the East Point are derived from a chart's angles rather than from the sky, and the
+     * four angles come from {@link #angleplaces} because they are where the ecliptic meets the
+     * horizon and meridian. The South Node is included, as the degree opposite the North Node.
+     */
     public static List<Place> bodies(SwissEph sw, double jdUt, double lat, double lon) {
+        return bodies(sw, jdUt, lat, lon, com.zodiacomputing.ourania.gui.Settings.loadBodySelection());
+    }
+
+    /** As {@link #bodies}, with the selection given rather than read - for a check. */
+    public static List<Place> bodies(SwissEph sw, double jdUt, double lat, double lon,
+                                     boolean[] selected) {
         List<Place> out = new ArrayList<>();
         for (int i = 0; i < Bodies.count(); i++) {
-            Bodies.Def d = Bodies.at(i);
-            if (d.kind != Bodies.Kind.LUMINARY && d.kind != Bodies.Kind.PLANET) {
+            if (selected != null && i < selected.length && !selected[i]) {
                 continue;
             }
-            Place p = place(sw, jdUt, lat, lon, d.name, d.getIpl());
+            Bodies.Def d = Bodies.at(i);
+            Place p = null;
+            if (d.source == Bodies.Source.EPHEMERIS) {
+                p = place(sw, jdUt, lat, lon, d.name, d.getIpl());
+            } else if (d.source == Bodies.Source.SOUTH_NODE) {
+                p = onEcliptic(sw, jdUt, lat, lon, d.name,
+                    Almanac.bodyLongitude(sw, jdUt, "North Node") + 180.0);
+            }
             if (p != null) {
                 out.add(p);
             }
         }
         return out;
+    }
+
+    /** A point that sits on the ecliptic by definition, with whether it is climbing. */
+    static Place onEcliptic(SwissEph sw, double jdUt, double lat, double lon, String name,
+                            double tropicalLon) {
+        if (Double.isNaN(tropicalLon)) {
+            return null;
+        }
+        double[] now = fromEcliptic(sw, jdUt, lat, lon, Zodiac.normalise(tropicalLon));
+        double[] then = fromEcliptic(sw, jdUt + 10.0 / 1440.0, lat, lon, Zodiac.normalise(tropicalLon));
+        return new Place(name, now[0], now[1], now[2], then[1] > now[1]);
     }
 
     /** One body in the sky, with whether it is climbing ten minutes on. */

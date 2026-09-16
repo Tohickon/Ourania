@@ -34,6 +34,7 @@ public final class SkyViewCheck {
         part("B: the sky agrees with the chart and with the Sun", () -> facts(sw));
         part("C: the dome and the horizon draw where they should", SkyViewCheck::projection);
         part("D: the screen, its time and its door", SkyViewCheck::screen);
+        part("E: the sky shows what the reader has chosen", () -> selection(sw));
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -69,6 +70,11 @@ public final class SkyViewCheck {
             double lon = rnd.nextDouble() * 360.0 - 180.0;
             for (Horizon.Place p : Horizon.bodies(sw, jd, lat, lon)) {
                 int ipl = Bodies.byName(p.name).getIpl();
+                if (ipl < 0) {
+                    // The South Node has no ephemeris number: it is a degree on the ecliptic, and
+                    // Part E holds it to the North Node's opposite instead.
+                    continue;
+                }
                 double[] xx = new double[6];
                 sw.swe_calc_ut(jd, ipl, SweConst.SEFLG_SWIEPH | SweConst.SEFLG_EQUATORIAL, xx, new StringBuffer());
                 double[] mine = altAz(jd, lat, lon, xx[0], xx[1]);
@@ -228,6 +234,112 @@ public final class SkyViewCheck {
         ok("empty sky has no card", tip == null);
     }
 
+    /** How many registry points the sky can place out of a selection. */
+    private static int selectable(boolean[] on) {
+        int n = 0;
+        for (int i = 0; i < Bodies.count(); i++) {
+            if (i < on.length && on[i] && (Bodies.at(i).source == Bodies.Source.EPHEMERIS
+                    || Bodies.at(i).source == Bodies.Source.SOUTH_NODE)) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    /**
+     * David, 2026-09-15: "it only shows the planets and not the asteroids when they are selected".
+     *
+     * The sky view drew the ten planets and never read the body selection, so an asteroid switched
+     * on in Settings appeared on the wheel and nowhere in the sky.
+     */
+    private static void selection(SwissEph sw) throws Exception {
+        double jd = SweDate.getJulDay(2026, 9, 15, 3.0);
+        double lat = 39.95;
+        double lon = -75.16;
+
+        boolean[] planetsOnly = new boolean[Bodies.count()];
+        for (int i = 0; i < Bodies.count(); i++) {
+            planetsOnly[i] = Bodies.at(i).kind == Bodies.Kind.LUMINARY
+                || Bodies.at(i).kind == Bodies.Kind.PLANET;
+        }
+        java.util.Set<String> names = new java.util.TreeSet<>();
+        for (Horizon.Place b : Horizon.bodies(sw, jd, lat, lon, planetsOnly)) {
+            names.add(b.name);
+        }
+        eq("with the planets alone chosen, the sky holds the ten", 10, names.size());
+        ok("and no asteroid among them", !names.contains("Ceres") && !names.contains("Eros"));
+
+        boolean[] withRocks = planetsOnly.clone();
+        for (String id : new String[] {"ceres", "pallas", "juno", "vesta", "chiron", "eros", "eris",
+                                       "north_node", "south_node"}) {
+            withRocks[Bodies.indexOf(id)] = true;
+        }
+        java.util.Set<String> wider = new java.util.TreeSet<>();
+        for (Horizon.Place b : Horizon.bodies(sw, jd, lat, lon, withRocks)) {
+            wider.add(b.name);
+        }
+        eq("choosing the asteroids and the nodes puts all of them in the sky",
+            selectable(withRocks), wider.size());
+        for (String name : new String[] {"Ceres", "Pallas", "Juno", "Vesta", "Chiron", "Eros",
+                                         "Eris", "North Node", "South Node"}) {
+            ok("the sky holds " + name, wider.contains(name));
+        }
+
+        // A lot has no place in the sky of its own - it is built from a chart - so choosing one
+        // adds nothing, and must not throw either.
+        boolean[] withLots = withRocks.clone();
+        withLots[Bodies.indexOf("fortune")] = true;
+        withLots[Bodies.indexOf("vertex")] = true;
+        eq("a lot or the Vertex adds nothing to the sky", wider.size(),
+            Horizon.bodies(sw, jd, lat, lon, withLots).size());
+
+        // The South Node is the degree opposite the North Node, so it stands there in the sky too.
+        Horizon.Place north = null;
+        Horizon.Place south = null;
+        for (Horizon.Place b : Horizon.bodies(sw, jd, lat, lon, withRocks)) {
+            if ("North Node".equals(b.name)) {
+                north = b;
+            } else if ("South Node".equals(b.name)) {
+                south = b;
+            }
+        }
+        double[] opposite = Horizon.fromEcliptic(sw, jd, lat, lon,
+            com.zodiacomputing.ourania.astro.Zodiac.normalise(
+                com.zodiacomputing.ourania.astro.Almanac.bodyLongitude(sw, jd, "North Node") + 180.0));
+        ok("the South Node stands at the North Node's opposite degree",
+            south != null && Math.abs(south.altitude - opposite[1]) < 1.0e-9
+                && sep(south.azimuth, opposite[0]) < 1.0e-9);
+        ok("and the two nodes are on opposite sides of the sky, "
+                + (north == null || south == null ? "missing" : String.format("%.0f degrees apart",
+                    sep(north.azimuth, south.azimuth))),
+            north != null && south != null && Math.abs(north.altitude + south.altitude) < 40.0);
+
+        // And the screen reads the saved selection, not a list of its own.
+        String keep = Settings.get(Settings.BODIES_KEY, null);
+        try {
+            Settings.saveBodySelection(withRocks);
+            final SkyViewPanel[] v = new SkyViewPanel[1];
+            SwingUtilities.invokeAndWait(() -> {
+                v[0] = new SkyViewPanel(null);
+                v[0].setMoment(new double[] {jd, lat, lon});
+            });
+            java.util.Set<String> shown = new java.util.TreeSet<>();
+            for (Horizon.Place b : v[0].bodies) {
+                shown.add(b.name);
+            }
+            ok("the screen draws the chosen asteroids, " + shown.size() + " points",
+                shown.contains("Ceres") && shown.contains("Eros") && shown.equals(wider));
+            String html = v[0].table.getText();
+            ok("and names them in the table", html.contains("Ceres") && html.contains("Eros"));
+        } finally {
+            if (keep == null) {
+                Settings.update(props -> props.remove(Settings.BODIES_KEY));
+            } else {
+                Settings.set(Settings.BODIES_KEY, keep);
+            }
+        }
+    }
+
     private static void screen() throws Exception {
         final SkyViewPanel[] v = new SkyViewPanel[1];
         double jd = SweDate.getJulDay(2026, 9, 15, 3.0);
@@ -236,7 +348,8 @@ public final class SkyViewCheck {
             v[0].setMoment(new double[] {jd, 39.95, -75.16});
         });
         SkyViewPanel p = v[0];
-        eq("all ten bodies are in the sky list", 10, p.bodies.size());
+        eq("every selected point the sky can place is in the list", selectable(Settings.loadBodySelection()),
+            p.bodies.size());
         ok("and the four angles", p.angles.size() == 4);
         ok("the ecliptic is a ring of 180 points", p.ecliptic.size() == 180);
         String html = p.table.getText();

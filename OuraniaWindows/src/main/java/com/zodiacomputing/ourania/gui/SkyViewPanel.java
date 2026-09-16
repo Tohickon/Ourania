@@ -86,6 +86,11 @@ public final class SkyViewPanel extends JPanel {
         JLabel lede = new JLabel("The real sky over the chart's place: each planet's height and direction.");
         lede.setForeground(Theme.TEXT_DIM);
         lede.setFont(Theme.SMALL);
+        // A label's box is laid out at exactly the width its own FontMetrics measures, with no
+        // slack at all, so any context that renders the same string a hair wider - a screenshot
+        // painted into an image, a different machine's antialiasing - loses the last letters. A
+        // few pixels of room costs nothing and makes that impossible.
+        lede.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 12));
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
         controls.setOpaque(false);
@@ -407,7 +412,7 @@ public final class SkyViewPanel extends JPanel {
         }
 
         private void paintBodies(Graphics2D g) {
-            Font glyphFont = new Font("SansSerif", Font.PLAIN, 15);
+            Font glyphFont = Theme.font("SansSerif", Font.PLAIN, 15);
             for (Horizon.Place p : bodies) {
                 if (!drawn(p) || (!dome() && p.apparent < BOTTOM_ALT)) {
                     continue;

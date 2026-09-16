@@ -81,6 +81,11 @@ public final class TransitCalendarPanel extends JPanel {
         JLabel lede = new JLabel("Chart A's month: each day shaded by the transits in orb and those going exact.");
         lede.setForeground(Theme.TEXT_DIM);
         lede.setFont(Theme.SMALL);
+        // A label's box is laid out at exactly the width its own FontMetrics measures, with no
+        // slack at all, so any context that renders the same string a hair wider - a screenshot
+        // painted into an image, a different machine's antialiasing - loses the last letters. A
+        // few pixels of room costs nothing and makes that impossible.
+        lede.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 12));
 
         JPanel nav = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         nav.setOpaque(false);
