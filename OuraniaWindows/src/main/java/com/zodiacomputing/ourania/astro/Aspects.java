@@ -380,6 +380,35 @@ public final class Aspects {
             || d.kind == Bodies.Kind.POINT;
     }
 
+    /**
+     * The aspect within a single flat orb, for transits - or null.
+     *
+     * <b>Why transits do not go through {@link #typeOf}.</b> That judges a pair on the natal
+     * body table, ten degrees for the Sun, and a transit judged there stayed "in orb" for years:
+     * measured 2026-09-15, transiting Pluto to the natal Sun averaged 5,345 days in orb, and
+     * a chart carried 21.6 transits at any moment, a third of them over five degrees off. Transit
+     * orbs are one flat width, {@link Transits#orb}, capped by each aspect's own ceiling so a
+     * minor aspect never gets wider than it is natally.
+     *
+     * The calculated-point rule is kept - it is about what can cast an aspect, not about width -
+     * and the nearest exact angle wins, so a wide setting cannot name the wrong aspect.
+     */
+    public static Type typeWithin(double separation, String nameA, String nameB, double orb) {
+        if (bothCalculated(nameA, nameB)) {
+            return null;
+        }
+        Type best = null;
+        double bestOff = Double.MAX_VALUE;
+        for (Type t : Type.values()) {
+            double off = Math.abs(separation - t.exactAngle);
+            if (off <= Math.min(orb, t.maxOrb) && off < bestOff) {
+                best = t;
+                bestOff = off;
+            }
+        }
+        return best;
+    }
+
     public static Type typeOf(double separation, String nameA, String nameB) {
         return typeOf(separation, nameA, nameB, false);
     }

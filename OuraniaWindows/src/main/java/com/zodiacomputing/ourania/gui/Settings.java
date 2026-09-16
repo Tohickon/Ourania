@@ -635,6 +635,29 @@ public final class Settings {
         com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(label);
     }
 
+    /** The one transit orb in degrees; see Transits.orb for why it is one flat width. */
+    public static final String TRANSIT_ORB_KEY = "transit.orb";
+    public static final double TRANSIT_ORB_MIN = 0.25;
+    public static final double TRANSIT_ORB_MAX = 5.0;
+
+    /** The stored transit orb, or the default when it is missing, unreadable or out of range. */
+    public static double transitOrb() {
+        double fallback = com.zodiacomputing.ourania.astro.Transits.DEFAULT_ORB;
+        try {
+            double v = Double.parseDouble(get(TRANSIT_ORB_KEY, String.valueOf(fallback)).trim());
+            return v >= TRANSIT_ORB_MIN && v <= TRANSIT_ORB_MAX ? v : fallback;
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
+    }
+
+    /** Saves the transit orb and puts it in force for every transit surface from here on. */
+    public static void setTransitOrb(double degrees) {
+        double v = Math.max(TRANSIT_ORB_MIN, Math.min(TRANSIT_ORB_MAX, degrees));
+        set(TRANSIT_ORB_KEY, String.valueOf(v));
+        com.zodiacomputing.ourania.astro.Transits.orb = v;
+    }
+
     public static void setTrueNode(boolean useTrue) {
         set(NODE_VARIANT_KEY, useTrue ? "true" : "mean");
     }

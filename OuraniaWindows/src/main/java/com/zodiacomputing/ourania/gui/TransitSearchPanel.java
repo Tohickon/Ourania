@@ -54,6 +54,8 @@ public final class TransitSearchPanel extends JPanel {
     private final JSpinner fromYear;
     private final JSpinner toYear;
     private final JSpinner orb;
+    /** The Settings transit orb as of the last time the spinner was set from it. */
+    private double orbSetting;
     private final JButton searchButton = new JButton("Search");
     private final JLabel status = new JLabel(" ");
     private final JEditorPane results;
@@ -90,10 +92,12 @@ public final class TransitSearchPanel extends JPanel {
         toYear = new JSpinner(new SpinnerNumberModel(year + 4, 1800, 2399, 1));
         fromYear.setEditor(new JSpinner.NumberEditor(fromYear, "#"));
         toYear.setEditor(new JSpinner.NumberEditor(toYear, "#"));
-        orb = new JSpinner(new SpinnerNumberModel(1.0, 0.1, 5.0, 0.5));
+        orbSetting = com.zodiacomputing.ourania.astro.Transits.orb;
+        orb = new JSpinner(new SpinnerNumberModel(orbSetting, 0.1, 5.0, 0.5));
         orb.setToolTipText("<html>How close counts as in effect, in degrees either side of exact."
             + "<br>It sets where each passage starts and ends; the exact dates do not depend on it."
-            + "<br>No transit orb in this app has been calibrated, so it is yours to set.</html>");
+            + "<br>Opens at the transit orb in Settings, which the readings and the calendar use too;"
+            + "<br>a change here is for this search only.</html>");
 
         JPanel row1 = row();
         row1.add(label("Transiting"));
@@ -157,6 +161,12 @@ public final class TransitSearchPanel extends JPanel {
 
     /** Fills the natal point list from the chart on the wheel; called when the screen opens. */
     void refreshChart() {
+        // The Settings orb moved since this screen last looked: follow it. An orb typed here for
+        // one search is left alone otherwise.
+        if (com.zodiacomputing.ourania.astro.Transits.orb != orbSetting) {
+            orbSetting = com.zodiacomputing.ourania.astro.Transits.orb;
+            orb.setValue(orbSetting);
+        }
         ChartFrame natal = chart();
         Object keep = natalPoint.getSelectedItem();
         natalPoint.removeAllItems();

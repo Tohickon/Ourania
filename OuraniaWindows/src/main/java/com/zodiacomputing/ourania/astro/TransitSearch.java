@@ -17,11 +17,9 @@ import java.util.List;
  * school that reads stations - vanish. So the unit here is the stretch of time the transit
  * spends inside the orb, carrying every exact moment and every station that falls in it.
  *
- * <p><b>The orb is the caller's, and it says so.</b> {@link Transits#orbScale} records that no
- * transit orb in this project has been calibrated against anything, and the natal orb table
- * runs to ten degrees - far wider than transit practice uses. Rather than pick a number by
- * eye and bury it, the search takes the orb as a parameter the reader sets and sees. It only
- * decides where a passage begins and ends; the exact dates do not depend on it at all.
+ * <p><b>The orb is the caller's, and it says so.</b> The screens pass {@link Transits#orb}, the
+ * one transit orb the Report and Synthesis also use, and the reader can change it for a search.
+ * It only decides where a passage begins and ends; the exact dates do not depend on it at all.
  *
  * <p><b>The same moments the rest of the app finds, found more cheaply.</b> The exact dates are
  * roots of the same function {@link Transits#exactDates} solves and the stations come from

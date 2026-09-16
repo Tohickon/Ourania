@@ -28,24 +28,39 @@ import java.util.Set;
  * Every hit carries the reason it survived, so a reading can say why it is being told
  * about this and not the ninety others.
  *
- * Aspect geometry is not re-implemented here: orbs, type detection and applying all come
- * from Aspects, so a change to the orb table moves natal and transit readings together.
+ * Aspect geometry is not re-implemented here: type detection and applying come from Aspects.
+ * The width is not the natal table's: transits are judged on one flat orb, {@link #orb}, the
+ * same one the Transit Search and Transit Calendar use.
  */
 public final class Transits {
 
     /** The four angles, named as Aspects.toAngles names them. */
     private static final String[] ANGLE_NAMES = {"Ascendant", "MC", "Descendant", "IC"};
 
+    /** The transit orb a fresh install uses, in degrees either side of exact. */
+    public static final double DEFAULT_ORB = 1.0;
+
     /**
-     * Multiplier on the natal orb table for transit work.
+     * The one transit orb, in degrees: every transit surface - the Report and Synthesis lists,
+     * the Transit Search, the Transit Calendar - judges "in orb" by this width.
      *
-     * Deliberately 1.0. Transit practice usually wants tighter orbs than natal - often a
-     * degree or two for the outers - but no value here has been calibrated against
-     * anything, and picking one by eye is how weights got into the state the calibration
-     * note describes. The seam exists so a measured answer has somewhere to land; until
-     * then the orb table is the single source of truth and the filter does the selecting.
+     * <b>What it replaced.</b> This was {@code orbScale = 1.0}, a multiplier on the natal body
+     * table, so transits here were judged at ten degrees to the Sun and eight to the angles while
+     * the Search and Calendar screens used a flat degree: two rules for one question. Measured over
+     * 200 random charts (2026-09-15), the table gave 21.6 transits in orb at any moment, 1,483 of
+     * them more than five degrees off, and a Pluto conjunction to the natal Sun lasting 14.6 years
+     * on average - weather, not an event.
+     *
+     * <b>Why 1 and not a fitted value.</b> The dial is smooth: half the table gives 13.3 transits,
+     * a fifth 8.4, a tenth 6.3, with no break anywhere, which is the shape the angularityOrb sweep
+     * showed could not be calibrated from data. So the number is a convention, David's call
+     * (master list F3): one degree, the width the Search and Calendar already used. At it a Pluto
+     * conjunction to the Sun lasts about 2.3 years. It is a setting ({@code Settings.transitOrb}),
+     * because it is the reader's to widen.
+     *
+     * Almanac events keep their own seam below: an eclipse on a degree is a different question.
      */
-    public static double orbScale = 1.0;
+    public static double orb = DEFAULT_ORB;
 
     /** How many natally prominent bodies count as significant targets. */
     public static int defaultTopN = 5;
@@ -53,7 +68,7 @@ public final class Transits {
     /**
      * Multiplier on the natal orb table for almanac events landing on natal points.
      *
-     * Separate seam from orbScale, and 1.0 for the same reason: the L8 spec asks for eclipse
+     * Separate seam from the transit orb, and 1.0 because: the L8 spec asks for eclipse
      * contacts "within a few degrees", which is tighter than the orb table gives, but no
      * number here has been measured against anything and picking one by eye is the failure
      * the calibration note records. Until it is calibrated the orb table stays the single
@@ -197,9 +212,18 @@ public final class Transits {
         // group: it was orb, which let a septile from Eros outrank a square from Saturn
         // merely by being tighter. Ordering by weight first and orb second says that a
         // planet arriving matters more than a minor body arriving closer.
+        //
+        // <b>And a planet arriving comes before a minor body arriving, whatever the weights.</b>
+        // The weight could not hold that line on its own: a station multiplies it by five, so a
+        // stationing Chiron square the Ascendant (0.27 off) outweighed Saturn on the MC and Mars
+        // and Venus on the angles - under the old ten-degree orbs as well, where Pluto and Neptune
+        // three degrees off happened to sit above it. When the transit orb went to one degree
+        // (2026-09-15) they left and Chiron opened the list. David's call: the ten planets first,
+        // then weight within each tier. Ordering only - weight and intensity are unchanged.
         out.sort(Comparator
             .comparingInt((Hit h) -> "angle".equals(h.why) ? 0 : 1)
             .thenComparingInt(h -> h.natalRank < 0 ? Integer.MAX_VALUE : h.natalRank)
+            .thenComparingInt(h -> Bodies.hasPrimaryActor(h.transiting, h.natal, true) ? 0 : 1)
             .thenComparingDouble(h -> -h.weight)
             .thenComparingDouble(h -> h.offBy));
         return out;
@@ -419,10 +443,25 @@ public final class Transits {
         return c;
     }
 
+    /** The transit half: one flat orb, {@link #orb}, not the natal table. */
+    static Contact transitContact(String movingName, double movingLon,
+                                  String natalName, double natalLon) {
+        double sep = Aspects.separation(movingLon, natalLon);
+        Aspects.Type type = Aspects.typeWithin(sep, movingName, natalName, orb);
+        if (type == null) {
+            return null;
+        }
+        Contact c = new Contact();
+        c.type = type;
+        c.separation = sep;
+        c.offBy = Math.abs(sep - type.exactAngle);
+        c.orbUsed = Math.min(orb, type.maxOrb);
+        c.tightness = c.orbUsed <= 0 ? 0.0 : Math.max(0.0, 1.0 - c.offBy / c.orbUsed);
+        return c;
+    }
+
     private static Hit hit(ChartFrame.Body t, String natalName, double natalLon, String why) {
-        // No ceiling on the transit path: the orb table is the rule there, unchanged.
-        Contact c = contact(t.name, t.lon, natalName, natalLon,
-            orbScale, Double.POSITIVE_INFINITY);
+        Contact c = transitContact(t.name, t.lon, natalName, natalLon);
         if (c == null) {
             return null;
         }

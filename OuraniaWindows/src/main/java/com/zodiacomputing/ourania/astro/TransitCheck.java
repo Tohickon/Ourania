@@ -1575,9 +1575,13 @@ public final class TransitCheck {
         for (java.util.Map.Entry<String, List<Transits.Hit>> e : byTarget.entrySet()) {
             List<Transits.Hit> g2 = e.getValue();
             groups++;
+            // Planets first, then weight within each tier (David, 2026-09-15; see Transits).
             for (int i = 1; i < g2.size(); i++) {
-                yes("a target's contacts run in weight order (" + e.getKey() + ")",
-                    g2.get(i - 1).weight >= g2.get(i).weight - 1e-9);
+                boolean prevActor = Bodies.hasPrimaryActor(g2.get(i - 1).transiting, g2.get(i - 1).natal, true);
+                boolean thisActor = Bodies.hasPrimaryActor(g2.get(i).transiting, g2.get(i).natal, true);
+                yes("a target's contacts run planets first, then in weight order (" + e.getKey() + ")",
+                    (prevActor && !thisActor)
+                        || (prevActor == thisActor && g2.get(i - 1).weight >= g2.get(i).weight - 1e-9));
             }
             // The defect stated directly: a minor body leading a group that also holds a
             // planetary contact.
@@ -1603,22 +1607,32 @@ public final class TransitCheck {
 
         // Orb alone must not be able to reorder the list. A tight minor aspect from a minor
         // body has to stay below a wide major one from a planet on the same target.
-        Transits.Hit tightMinor = null;
-        Transits.Hit wideMajor = null;
-        for (Transits.Hit h : hits) {
-            boolean actor = Bodies.hasPrimaryActor(h.transiting, h.natal, true);
-            if (!actor && (tightMinor == null || h.offBy < tightMinor.offBy)) {
-                tightMinor = h;
+        //
+        // <b>Asserted on the order, not the weight, since 2026-09-15.</b> A station multiplies the
+        // weight by five, so a stationing minor body can outweigh a planet - it did here all along,
+        // hidden while Pluto and Neptune three degrees off led the list at the old wide orbs. David
+        // settled it as an ordering rule, planets first, so that is what is held.
+        // Pairs are taken within one group of the list (the angles, or one ranked natal target),
+        // because the groups themselves come in a fixed order that no body can change.
+        int pairs = 0;
+        for (Transits.Hit minor : hits) {
+            if (Bodies.hasPrimaryActor(minor.transiting, minor.natal, true)) {
+                continue;
             }
-            if (actor && h.type != null && !h.type.isMinor()
-                    && (wideMajor == null || h.offBy > wideMajor.offBy)) {
-                wideMajor = h;
+            for (Transits.Hit major : hits) {
+                boolean sameGroup = "angle".equals(minor.why)
+                    ? "angle".equals(major.why)
+                    : !"angle".equals(major.why) && major.natalRank == minor.natalRank;
+                if (sameGroup && Bodies.hasPrimaryActor(major.transiting, major.natal, true)
+                        && major.type != null && !major.type.isMinor() && minor.offBy < major.offBy) {
+                    pairs++;
+                    yes("a tight minor arrival still ranks below a wide planetary one: "
+                            + minor + " / " + major,
+                        hits.indexOf(minor) > hits.indexOf(major));
+                }
             }
         }
-        if (tightMinor != null && wideMajor != null && tightMinor.offBy < wideMajor.offBy) {
-            yes("a tight minor arrival still weighs less than a wide planetary one",
-                tightMinor.weight < wideMajor.weight);
-        }
+        yes("there is a tight minor arrival and a wide planetary one to compare, " + pairs, pairs > 0);
 
         // <b>intensity must stay clean.</b> Convergence multiplies its own body and aspect
         // weights over intensity, so folding the hierarchy into it would count the hierarchy

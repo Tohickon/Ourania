@@ -106,6 +106,8 @@ public class OuraniaWindow extends JFrame {
     public OuraniaWindow() {
         // Before anything casts a chart: the zodiac is read by every ephemeris call.
         com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(Settings.zodiac());
+        // And the transit orb, read by every transit list, search and calendar.
+        com.zodiacomputing.ourania.astro.Transits.orb = Settings.transitOrb();
         setTitle("Ourania+ (Windows Edition)");
         // A size for a window nobody restores - a check suite's. The application's window is put
         // where the last session left it by main, through WindowPlacement.restore.

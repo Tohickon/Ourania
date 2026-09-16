@@ -324,7 +324,7 @@ public final class TransitCalendarCheck {
         if (arrived != null && arrived.month.equals(last)) {
             // Through the panel's own lock: Swiss Ephemeris shares static state between instances,
             // so a fresh instance on this thread would race any stale worker still finishing.
-            TransitCalendar.Month fresh = p.compute(natal, last, p.zone, p.orb);
+            TransitCalendar.Month fresh = p.compute(natal, last, p.zone, p.orb());
             boolean same = fresh.days.size() == arrived.days.size();
             for (int i = 0; same && i < fresh.days.size(); i++) {
                 same = Math.abs(fresh.days.get(i).score - arrived.days.get(i).score) < 1e-9

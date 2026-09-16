@@ -58,7 +58,10 @@ public final class TransitCalendarPanel extends JPanel {
 
     YearMonth shown = YearMonth.now();
     ZoneId zone = ZoneId.systemDefault();
-    double orb = 1.0;
+    /** The one transit orb, from Settings: the calendar has no width of its own. */
+    double orb() {
+        return com.zodiacomputing.ourania.astro.Transits.orb;
+    }
     volatile TransitCalendar.Month month;
     LocalDate selected;
     private ChartFrame chart;
@@ -194,7 +197,7 @@ public final class TransitCalendarPanel extends JPanel {
         detail.setText("<html><body></body></html>");
         final ChartFrame natal = this.chart;
         final ZoneId z = this.zone;
-        final double o = this.orb;
+        final double o = orb();
         running = new SwingWorker<TransitCalendar.Month, Void>() {
             @Override
             protected TransitCalendar.Month doInBackground() {
@@ -228,7 +231,7 @@ public final class TransitCalendarPanel extends JPanel {
         this.shown = ym;
         this.selected = null;
         monthLabel.setText(ym.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()) + " " + ym.getYear());
-        this.month = this.chart == null ? null : compute(this.chart, ym, this.zone, this.orb);
+        this.month = this.chart == null ? null : compute(this.chart, ym, this.zone, orb());
         layoutCells();
     }
 

@@ -71,6 +71,8 @@ public class SettingsPanel extends JPanel {
     private final OuraniaWindow window;
     private final JCheckBox[] boxes = new JCheckBox[Bodies.count()];
     private final JLabel status = new JLabel(" ");
+    /** Settings > Calculation Variants: the one transit orb. */
+    javax.swing.JSpinner transitOrb;
 
     /**
      * Guards the listeners while the All/None/Defaults buttons move the boxes.
@@ -1097,6 +1099,24 @@ public class SettingsPanel extends JPanel {
         lZodiac.setForeground(TEXT);
         row.add(lZodiac);
         row.add(zodiacCombo);
+
+        // The one transit orb: the readings' transit lists, the Transit Search and the Transit
+        // Calendar all judge "in orb" by it. Saved and applied at once, like the zodiac.
+        transitOrb = new javax.swing.JSpinner(new javax.swing.SpinnerNumberModel(
+            Settings.transitOrb(), Settings.TRANSIT_ORB_MIN, Settings.TRANSIT_ORB_MAX, 0.25));
+        transitOrb.setToolTipText("<html>How close a transit must be to exact to count, in degrees "
+            + "either side.<br>One width for every transit: the Report and Synthesis lists, the "
+            + "Transit Search and the Transit Calendar.<br>Default 1&deg;. A convention, not a "
+            + "measured value: see the note on Transits.orb.</html>");
+        transitOrb.addChangeListener(e -> {
+            Settings.setTransitOrb(((Number) transitOrb.getValue()).doubleValue());
+            status.setText("Saved");
+            if (window != null) window.applyBodySelection();
+        });
+        JLabel lOrb = new JLabel("Transit orb (°): ");
+        lOrb.setForeground(TEXT);
+        row.add(lOrb);
+        row.add(transitOrb);
 
         p.add(row);
         return p;
