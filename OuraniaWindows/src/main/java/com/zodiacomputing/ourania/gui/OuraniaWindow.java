@@ -15,6 +15,7 @@ public class OuraniaWindow extends JFrame {
     private DialPanel dialPanel;
     private SkyViewPanel skyViewPanel;
     private TransitCalendarPanel transitCalendarPanel;
+    private ReturnsPanel returnsPanel;
 
     private ChartSetupPanel chartSetupPanel;
     private SidePanel sidePanel;
@@ -251,6 +252,9 @@ public class OuraniaWindow extends JFrame {
         contentPanel.add(skyViewPanel, "SKY_VIEW");
         transitCalendarPanel = new TransitCalendarPanel(this);
         contentPanel.add(transitCalendarPanel, "TRANSIT_CALENDAR");
+
+        returnsPanel = new ReturnsPanel(this);
+        contentPanel.add(returnsPanel, "RETURNS");
         
         // <b>Share, Sync, Connect and Help are gone.</b> All four were placeholder cards
         // reading "(Under Construction)" behind live menu entries. A menu that offers ten
@@ -382,6 +386,9 @@ public class OuraniaWindow extends JFrame {
         }
         if ("SKY_VIEW".equals(screenName) && skyViewPanel != null) {
             skyViewPanel.refreshChart();
+        }
+        if ("RETURNS".equals(screenName) && returnsPanel != null) {
+            returnsPanel.refreshChart();
         }
         if ("TRANSIT_CALENDAR".equals(screenName) && transitCalendarPanel != null) {
             transitCalendarPanel.refreshChart();
@@ -1071,6 +1078,33 @@ public class OuraniaWindow extends JFrame {
         if (chartSetupPanel != null) {
             chartSetupPanel.showPrecisionNotice(notes);
         }
+    }
+
+    /**
+     * Draws a return chart around Chart A, on the wheel's outer ring - master list F5.
+     *
+     * <b>The wheel needs no new mode for this.</b> A return is a chart for a moment at a place, and
+     * the sky ring is exactly that; handing it the return's moment and the place the return was cast
+     * for gives the bi-wheel the technique asks for - the return outside, the natal inside - through
+     * the same door the transport already uses. Teaching SkymapPanel a RETURN mode would mean
+     * editing the decompiled wheel and the setup form to reach a picture it can already draw.
+     *
+     * The subject is labelled so the readout says what is on the ring rather than "Sky".
+     */
+    void showReturnOnWheel(com.zodiacomputing.ourania.astro.Returns.Return r) {
+        if (skymapPanel == null || r == null) {
+            return;
+        }
+        java.time.ZonedDateTime when = java.time.Instant
+            .ofEpochMilli(Math.round((r.jd - 2440587.5) * 86400000.0))
+            .atZone(java.time.ZoneOffset.UTC);
+        String label = Character.toUpperCase(r.kind.charAt(0)) + r.kind.substring(1) + " return";
+        com.zodiacomputing.ourania.astro.ChartSubject sky =
+            com.zodiacomputing.ourania.astro.ChartSubject.of(label, when, label, r.lat, r.lon,
+                "UTC", false);
+        skymapPanel.installSubjects(skymapPanel.chartASubject(), skymapPanel.chartBSubject(), sky);
+        applyChartMode(ChartMode.TRANSIT, true, wheelHasChartA(), false);
+        switchScreen("SKYMAP");
     }
 
     /** Whether the wheel is actually holding a Chart A - the entered chart, not the typing. */

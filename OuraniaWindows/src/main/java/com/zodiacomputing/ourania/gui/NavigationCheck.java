@@ -35,7 +35,7 @@ public final class NavigationCheck {
      * the place that has to change, and the failure says so.
      */
     private static final String[] SCREENS = {
-        "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH", "TRANSIT_CALENDAR",
+        "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH", "RETURNS", "TRANSIT_CALENDAR",
         "DIAL", "SKY_VIEW", "SETTINGS",
     };
 

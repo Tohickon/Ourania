@@ -104,6 +104,20 @@ public final class Returns {
         public double lon = Double.NaN;
         /** Age in completed years for a solar return; the index within the window for lunar. */
         public int ordinal;
+        /**
+         * True when the return was taken to the body's <i>sidereal</i> natal degree - the
+         * precessed return - rather than to its tropical one. See {@link #precessionDegrees}.
+         */
+        public boolean precessed;
+        /**
+         * Degrees of precession carried into the target longitude; zero for a tropical return.
+         *
+         * Held rather than recomputed so a reading can say how much later this return is, and a
+         * check can hold it to {@link Precession#between} without redoing the search.
+         */
+        public double precessionDegrees;
+        /** True when the return was cast somewhere other than the birthplace. */
+        public boolean relocated;
 
         @Override
         public String toString() {
@@ -156,9 +170,41 @@ public final class Returns {
      */
     public static Return solar(SwissEph sw, double natalJd, double natalSunLon, int forAge,
                                double lat, double lon, int hsys) {
+        return solar(sw, natalJd, natalSunLon, forAge, lat, lon, hsys, false);
+    }
+
+    /**
+     * The solar return, tropical or precessed - master list F5.
+     *
+     * <b>What precessed means, and why it is solved twice.</b> A tropical return is the moment the
+     * Sun regains the longitude it held at birth. A precessed return is the moment it regains the
+     * same place <i>against the stars</i>, so the target moves by the precession accumulated since
+     * birth - about 50.3 arcseconds a year, which is roughly twenty minutes of clock per year of
+     * age. The amount depends on when the return falls and the return depends on the amount, so
+     * the tropical return is solved first and the target corrected from it; one further pass is
+     * enough, because the correction moves the answer by hours and the precession across those
+     * hours is measured in thousandths of an arcsecond.
+     *
+     * Both are in use and neither is the return, so the caller says which and the reading names it.
+     * David's call, 2026-09-15: tropical by default.
+     */
+    public static Return solar(SwissEph sw, double natalJd, double natalSunLon, int forAge,
+                               double lat, double lon, int hsys, boolean precessed) {
         double jd = Profection.solarReturnJd(sw, natalJd, natalSunLon, forAge);
         if (Double.isNaN(jd)) {
             return null;
+        }
+        double carried = 0.0;
+        if (precessed) {
+            for (int pass = 0; pass < 2; pass++) {
+                carried = Precession.between(natalJd, jd);
+                double target = Zodiac.normalise(natalSunLon + carried);
+                double next = Profection.solarReturnJd(sw, natalJd, target, forAge);
+                if (Double.isNaN(next)) {
+                    return null;
+                }
+                jd = next;
+            }
         }
         Return r = new Return();
         r.kind = "solar";
@@ -167,6 +213,8 @@ public final class Returns {
         r.body = "Sun";
         r.jd = jd;
         r.ordinal = forAge;
+        r.precessed = precessed;
+        r.precessionDegrees = carried;
         r.chart = ChartFrame.compute(sw, jd, lat, lon, hsys, false, 0.0);
         return r;
     }
@@ -182,9 +230,22 @@ public final class Returns {
     public static List<Return> lunar(SwissEph sw, double natalJd, double natalMoonLon,
                                      double jdFrom, double jdTo,
                                      double lat, double lon, int hsys) {
+        return lunar(sw, natalJd, natalMoonLon, jdFrom, jdTo, lat, lon, hsys, false);
+    }
+
+    /** As {@link #lunar}, tropical or precessed - the target degree moves with the equinox. */
+    public static List<Return> lunar(SwissEph sw, double natalJd, double natalMoonLon,
+                                     double jdFrom, double jdTo,
+                                     double lat, double lon, int hsys, boolean precessed) {
         List<Return> out = new ArrayList<>();
+        // The Moon covers thirteen degrees a day, so the correction cannot move a return past the
+        // next one and the target is taken from the middle of the window rather than solved per
+        // crossing: across a year the two differ by under a tenth of a second of clock.
+        final double carried = precessed
+            ? Precession.between(natalJd, (jdFrom + jdTo) / 2.0) : 0.0;
+        final double target = Zodiac.normalise(natalMoonLon + carried);
         Almanac.OfTime f = jd -> Almanac.signedDelta(
-            Almanac.bodyLongitude(sw, jd, "Moon"), natalMoonLon);
+            Almanac.bodyLongitude(sw, jd, "Moon"), target);
         int i = 0;
         for (double jd : Almanac.roots(f, jdFrom, jdTo, 1.0)) {
             Return r = new Return();
@@ -194,6 +255,8 @@ public final class Returns {
             r.body = "Moon";
             r.jd = jd;
             r.ordinal = i++;
+            r.precessed = precessed;
+            r.precessionDegrees = carried;
             r.chart = ChartFrame.compute(sw, jd, lat, lon, hsys, false, 0.0);
             out.add(r);
         }
@@ -309,13 +372,29 @@ public final class Returns {
     public static List<Return> planetary(SwissEph sw, String body, double natalLon,
                                          double jdFrom, double jdTo,
                                          double lat, double lon, int hsys) {
+        return planetary(sw, body, natalLon, jdFrom, jdTo, lat, lon, hsys, false, Double.NaN);
+    }
+
+    /**
+     * As {@link #planetary}, tropical or precessed.
+     *
+     * @param natalJd the birth moment, needed only to measure the precession from; pass NaN with
+     *                {@code precessed} false when there is nothing to measure.
+     */
+    public static List<Return> planetary(SwissEph sw, String body, double natalLon,
+                                         double jdFrom, double jdTo,
+                                         double lat, double lon, int hsys,
+                                         boolean precessed, double natalJd) {
         List<Return> out = new ArrayList<>();
         Double step = RETURN_SCAN_STEP.get(body);
         if (step == null) {
             return out;
         }
+        final double carried = precessed && !Double.isNaN(natalJd)
+            ? Precession.between(natalJd, (jdFrom + jdTo) / 2.0) : 0.0;
+        final double target = Zodiac.normalise(natalLon + carried);
         Almanac.OfTime f = jd -> Almanac.signedDelta(
-            Almanac.bodyLongitude(sw, jd, body), natalLon);
+            Almanac.bodyLongitude(sw, jd, body), target);
         int i = 0;
         for (double jd : Almanac.roots(f, jdFrom, jdTo, step)) {
             Return r = new Return();
@@ -325,6 +404,8 @@ public final class Returns {
             r.body = body;
             r.jd = jd;
             r.ordinal = i++;
+            r.precessed = precessed;
+            r.precessionDegrees = carried;
             r.chart = ChartFrame.compute(sw, jd, lat, lon, hsys, false, 0.0);
             out.add(r);
         }
