@@ -41,6 +41,7 @@ public final class ScrubCheck {
             part("F: the wheel is redrawn at the scrubbed moment", () -> redraw(sky, chart));
             part("G: Play moves the chart the app opens onto", () -> play(sky));
             part("H: a bar per chart, each moving only its own", () -> bars(sky));
+            part("I: a bar held pulled keeps time going until it is let go", () -> shuttle(sky));
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
@@ -388,6 +389,113 @@ public final class ScrubCheck {
             moved > 50 && moved < 80);
         SwingUtilities.invokeAndWait(() -> {
             sky.setGlobeMode(false);
+            sky.scrubOrigins.clear();
+            sky.refreshScrubBars();
+        });
+        mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
+    }
+
+    /**
+     * David: "for the scrubbers when you pull them forward or backward can you have the time keep
+     * going until released". Held for real time on the real Swing timer, not by calling the rate.
+     */
+    private static void shuttle(SkymapPanel sky) throws Exception {
+        eq("the middle does not run", 0.0, SkymapPanel.shuttleRate(0));
+        eq("nor the edge of the dead zone", 0.0, SkymapPanel.shuttleRate(SkymapPanel.SHUTTLE_DEAD_ZONE));
+        int runsInside = 0;
+        for (int v = -SkymapPanel.SHUTTLE_DEAD_ZONE; v <= SkymapPanel.SHUTTLE_DEAD_ZONE; v++) {
+            runsInside += SkymapPanel.shuttleRate(v) == 0.0 ? 0 : 1;
+        }
+        eq("no notch inside the dead zone runs on", 0, runsInside);
+        eq("a full pull forward is the top rate", SkymapPanel.SHUTTLE_MAX_RATE,
+            SkymapPanel.shuttleRate(SkymapPanel.SCRUB_SLIDER_REACH));
+        eq("and back, the same rate backwards", -SkymapPanel.SHUTTLE_MAX_RATE,
+            SkymapPanel.shuttleRate(-SkymapPanel.SCRUB_SLIDER_REACH));
+        boolean climbs = true;
+        for (int v = SkymapPanel.SHUTTLE_DEAD_ZONE + 1; v <= SkymapPanel.SCRUB_SLIDER_REACH; v++) {
+            climbs &= SkymapPanel.shuttleRate(v) > SkymapPanel.shuttleRate(v - 1);
+        }
+        ok("the further the pull, the faster it runs", climbs);
+
+        final ZonedDateTime personB = ZonedDateTime.of(1985, 3, 2, 14, 30, 0, 0, ZoneId.of("UTC"));
+        mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
+        javax.swing.JSlider bar = sky.scrubSliders.get(SkymapPanel.ScrubTarget.SKY);
+        final int reach = SkymapPanel.SCRUB_SLIDER_REACH;
+
+        SwingUtilities.invokeAndWait(() -> {
+            bar.setValueIsAdjusting(true);
+            bar.setValue(reach);
+        });
+        Thread.sleep(600);
+        ZonedDateTime early = time(sky, "skyChartTime");
+        // Then a busy event thread, as a slow redraw makes it: three quarter-second stalls, which
+        // Swing's timer answers by coalescing the ticks it could not deliver.
+        for (int i = 0; i < 3; i++) {
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+            Thread.sleep(50);
+        }
+        ZonedDateTime later = time(sky, "skyChartTime");
+        long earlyHours = java.time.Duration.between(ANCHOR, early).toHours();
+        long laterHours = java.time.Duration.between(ANCHOR, later).toHours();
+        ok("held all the way forward, the sky runs on past where the knob sits: +" + earlyHours + "h",
+            earlyHours > reach);
+        ok("and keeps going while it is held: +" + earlyHours + "h then +" + laterHours + "h",
+            laterHours > earlyHours + 5);
+        ok("at about the top rate, not faster: +" + laterHours + "h in 1.5 s",
+            laterHours <= reach + Math.ceil(SkymapPanel.SHUTTLE_MAX_RATE * 3.0));
+        // Not slower either: the run is by the clock, so a busy event thread that coalesces the
+        // timer's ticks cannot shorten it. Six tenths of the nominal distance, for scheduling slack.
+        ok("and not far under it, however busy the redraw: +" + laterHours + "h in 1.5 s",
+            laterHours >= reach + SkymapPanel.SHUTTLE_MAX_RATE * 1.5 * 0.6);
+
+        SwingUtilities.invokeAndWait(() -> bar.setValueIsAdjusting(false));
+        ZonedDateTime released = time(sky, "skyChartTime");
+        ok("letting go ends the scrub", !sky.isScrubbing());
+        eq("and the knob springs back", 0, bar.getValue());
+        ok("where it was let go, the sky stays: +" + java.time.Duration.between(ANCHOR, released).toHours() + "h",
+            java.time.Duration.between(ANCHOR, released).toHours() >= laterHours);
+        Thread.sleep(400);
+        eq("and does not run on after", released, time(sky, "skyChartTime"));
+
+        SwingUtilities.invokeAndWait(() -> {
+            bar.setValueIsAdjusting(true);
+            bar.setValue(-reach);
+        });
+        Thread.sleep(1000);
+        SwingUtilities.invokeAndWait(() -> bar.setValueIsAdjusting(false));
+        long back = java.time.Duration.between(released, time(sky, "skyChartTime")).toHours();
+        ok("held back, it runs backwards past the knob: " + back + "h", back < -reach);
+
+        // Inside the dead zone the knob is an offset and nothing more.
+        ZonedDateTime from = time(sky, "skyChartTime");
+        SwingUtilities.invokeAndWait(() -> {
+            bar.setValueIsAdjusting(true);
+            bar.setValue(SkymapPanel.SHUTTLE_DEAD_ZONE);
+        });
+        Thread.sleep(800);
+        SwingUtilities.invokeAndWait(() -> bar.setValueIsAdjusting(false));
+        eq("a small pull held still is just that many steps", from.plusHours(SkymapPanel.SHUTTLE_DEAD_ZONE),
+            time(sky, "skyChartTime"));
+
+        // Chart A's bar runs Chart A's birth, and the sky holds still.
+        mode(sky, ChartMode.SINGLE, true, false, personB, "1 Hour");
+        javax.swing.JSlider a = sky.scrubSliders.get(SkymapPanel.ScrubTarget.CHART_A);
+        SwingUtilities.invokeAndWait(() -> {
+            a.setValueIsAdjusting(true);
+            a.setValue(reach);
+        });
+        Thread.sleep(1000);
+        SwingUtilities.invokeAndWait(() -> a.setValueIsAdjusting(false));
+        long birth = java.time.Duration.between(ANCHOR, time(sky, "baseChartTime")).toHours();
+        ok("Chart A's bar held runs Chart A's birth on: +" + birth + "h", birth > reach);
+        eq("and leaves the sky where it was", ANCHOR, time(sky, "skyChartTime"));
+        SwingUtilities.invokeAndWait(() -> {
             sky.scrubOrigins.clear();
             sky.refreshScrubBars();
         });

@@ -7394,31 +7394,84 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         slider.setOpaque(false);
         slider.setPreferredSize(new java.awt.Dimension(220, 26));
         slider.setToolTipText(target == ScrubTarget.SKY
-            ? "Drag to move the sky through time by the Step setting; it stays where you let go."
+            ? "Drag to move the sky through time by the Step setting. Hold it pulled and time keeps "
+                + "going that way, faster the further you pull; it stays where you let go."
             : "Drag to move " + target.label + "'s birth time by the Step setting - for trying a "
-                + "time, not saving one. The ↺ beside it puts the birth time back.");
+                + "time, not saving one. Hold it pulled and time keeps going until you let go. "
+                + "The ↺ beside it puts the birth time back.");
         final boolean[] resetting = {false};
+        // Steps run up while the knob is held off the dead zone, on top of where the knob sits.
+        final double[] travel = {0.0};
+        // <b>By the clock, not by the tick.</b> Each tick recomputes the chart on the event thread,
+        // and Swing coalesces ticks that pile up behind it: counted per tick, a bar held at 48 for
+        // two seconds ran 6 steps where its rate said 23.
+        final long[] lastTick = {0L};
+        final javax.swing.Timer shuttle = new javax.swing.Timer(SHUTTLE_TICK_MS, null);
+        shuttle.addActionListener(ev -> {
+            if (!slider.getValueIsAdjusting() || !panel.isScrubbing()) {
+                shuttle.stop();
+                return;
+            }
+            long now = System.nanoTime();
+            travel[0] += shuttleRate(slider.getValue()) * (now - lastTick[0]) / 1.0e9;
+            lastTick[0] = now;
+            panel.scrubTo(slider.getValue() + (int) travel[0]);
+            if (panel.chartPanel != null) {
+                panel.chartPanel.repaint();
+            }
+        });
         slider.addChangeListener(e -> {
             if (resetting[0]) {
                 return;
             }
             panel.beginScrub(target);
-            panel.scrubTo(slider.getValue());
+            panel.scrubTo(slider.getValue() + (int) travel[0]);
             if (panel.chartPanel != null) {
                 panel.chartPanel.repaint();
             }
-            if (!slider.getValueIsAdjusting()) {
-                panel.endScrub();
-                panel.refreshScrubBars();
-                resetting[0] = true;
-                try {
-                    slider.setValue(0);
-                } finally {
-                    resetting[0] = false;
+            if (slider.getValueIsAdjusting()) {
+                if (!shuttle.isRunning()) {
+                    lastTick[0] = System.nanoTime();
+                    shuttle.start();
                 }
+                return;
+            }
+            shuttle.stop();
+            travel[0] = 0.0;
+            panel.endScrub();
+            panel.refreshScrubBars();
+            resetting[0] = true;
+            try {
+                slider.setValue(0);
+            } finally {
+                resetting[0] = false;
             }
         });
         return slider;
+    }
+
+    /** How often a held bar redraws while it runs on, in milliseconds; the distance is by the clock. */
+    static final int SHUTTLE_TICK_MS = 50;
+    /** Steps a second with the knob pulled all the way. */
+    static final double SHUTTLE_MAX_RATE = 20.0;
+    /** Knob positions either side of the middle that only offset, and do not run on. */
+    static final int SHUTTLE_DEAD_ZONE = 10;
+
+    /**
+     * Steps a second a bar runs at with its knob held here.
+     *
+     * David: "when you pull them forward or backward can you have the time keep going until
+     * released". The knob still offsets the chart by where it sits, so a short flick is still a
+     * few steps; held past the dead zone it also runs on, like a shuttle, and the rate climbs with
+     * the square of the pull - a gentle pull creeps, a full one covers twenty steps a second.
+     */
+    static double shuttleRate(int value) {
+        int pull = Math.abs(value) - SHUTTLE_DEAD_ZONE;
+        if (pull <= 0) {
+            return 0.0;
+        }
+        double share = (double) pull / (SCRUB_SLIDER_REACH - SHUTTLE_DEAD_ZONE);
+        return Math.signum(value) * SHUTTLE_MAX_RATE * share * share;
     }
 
     /** "+3 days", "-1 month": the offset a scrub stands at, in words. */
