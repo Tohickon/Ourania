@@ -234,7 +234,32 @@ public class InterpretationService {
         "aspect_frames_v2.json",
         "composite_transits_new_aspects.json",
         "composite_transits_new_aspects_b.json",
-        "tarot_bodies.json"
+        "tarot_bodies.json",
+        // Master list C9: the seven points D10 shipped had no prose at all - Vertex, East Point
+        // and the five Hermetic lots stood on the wheel with only their registry one-liners, and
+        // DataCheck's 168 standing failures were exactly their missing composite entries.
+        //
+        // 350 entries: sign and house, natal and composite, for all seven, plus a body core and
+        // a composite frame each. David 2026-09-15, as a 336-entry dictionary; the two frames
+        // per point are his registry definition in front of his own description of the point.
+        //
+        // <b>Its own file, and last in the list.</b> Six sections, every one of them already
+        // owned by a file loaded earlier, so putIfAbsent means this fills its seven points'
+        // gaps and can shadow nothing that exists. A splice into body_placements.json or
+        // composite_signs.json would have put 350 new lines through the four files whose
+        // rewrite deleted 192 entries in August.
+        "d10_point_prose.json",
+        // The five outer planets conjunct those same seven points, within a degree - 35
+        // readings, David 2026-09-16. The orb the set is written for is the one F3 settled on,
+        // so the prose and the engine agree about what counts as exact.
+        //
+        // <b>Its keys are not the ones it arrived with.</b> Every supplied rule id read
+        // "transit_jupiter_conjunction_vertex" and getTransitAspect asks for
+        // "transit_jupiter_conjunction_natal_vertex" - the segment that says the target is a
+        // birth placement rather than a second transiting body. All 35 were rewritten from the
+        // planet and target fields, because as supplied all 35 would have loaded and answered
+        // nothing. D10ProseCheck Part F fails if the original shape is ever spliced back in.
+        "d10_point_transits.json"
     };
 
 
