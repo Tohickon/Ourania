@@ -98,6 +98,9 @@ public final class Settings {
                     java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             }
             System.setProperty(FILE_PROPERTY, scratch.getAbsolutePath());
+            // The file underneath has changed identity, so anything parsed from the old one is
+            // now the wrong answer.
+            forget();
         } catch (Exception ex) {
             // A suite that cannot get a scratch file must not silently write the real one.
             throw new IllegalStateException(
@@ -105,9 +108,62 @@ public final class Settings {
         }
     }
 
-    public static Properties load() {
-        Properties p = new Properties();
+    /** The last file parsed, and what it was stamped with when it was parsed. */
+    private static Properties cached;
+    private static String cachedPath;
+    private static long cachedStamp;
+    private static long cachedLength;
+    /** When the file was last asked whether it had changed. */
+    private static long lastStatNanos;
+
+    /**
+     * How long a settings file edited outside the app can go unnoticed, in milliseconds.
+     *
+     * Half a second: shorter than anyone can retype a value and switch windows, and long enough
+     * that a frame drawing hundreds of coloured things asks the filesystem once rather than 694
+     * times.
+     */
+    public static final long STAT_INTERVAL_MS = 500;
+
+    /**
+     * The stored settings, parsed at most once per change of the file.
+     *
+     * <b>This used to read and parse the file on every call, and the cost was the whole frame.</b>
+     * Measured 2026-09-15: one repaint of the wheel asked for settings <b>694 times</b> - the
+     * palette is consulted per body, per aspect, per ring - at about 139 microseconds a call,
+     * which is 96 of the 109 milliseconds that repaint took. Building the window asked 1,244
+     * times. The file is about a kilobyte; the work was all in opening and parsing it again.
+     *
+     * <b>Still one read per change, not one read per session.</b> The cache is keyed on the file's
+     * own timestamp and length, so an edit made outside the app - by hand, or by the other agent
+     * working this tree - is picked up on the next call rather than ignored until restart. Our own
+     * writes clear it outright in {@link #update}, so a save is never served stale, and
+     * {@link #useScratchFile} clears it because the file underneath has changed identity.
+     *
+     * Synchronized because the ephemeris workers read settings off the event thread, and two
+     * threads parsing the same file into two Properties is work done twice to get one answer.
+     */
+    public static synchronized Properties load() {
+        // <b>And the check itself is rationed.</b> Asking the filesystem for a timestamp and a
+        // length is two system calls, which measured 53 microseconds a time on this machine - so a
+        // frame that consults the settings 694 times was still spending 37 milliseconds proving
+        // the file had not changed. The stamp is re-read at most every STAT_INTERVAL_MS, which
+        // bounds how long an edit made outside the app can go unnoticed rather than removing the
+        // check. Our own writes clear the cache outright and do not wait for it.
+        long now = System.nanoTime();
+        if (cached != null && now - lastStatNanos < STAT_INTERVAL_MS * 1000000L) {
+            return cached;
+        }
         File f = new File(file());
+        String path = f.getPath();
+        long stamp = f.lastModified();
+        long length = f.length();
+        lastStatNanos = now;
+        if (cached != null && path.equals(cachedPath) && stamp == cachedStamp
+                && length == cachedLength) {
+            return cached;
+        }
+        Properties p = new Properties();
         lastLoadFailed = false;
         if (f.exists()) {
             try (FileInputStream fis = new FileInputStream(f)) {
@@ -117,7 +173,26 @@ public final class Settings {
                 ex.printStackTrace();
             }
         }
+        // A file that would not parse is not cached: the next call should try again rather than
+        // serve an empty set for the rest of the session.
+        if (!lastLoadFailed) {
+            cached = p;
+            cachedPath = path;
+            cachedStamp = stamp;
+            cachedLength = length;
+        } else {
+            forget();
+        }
         return p;
+    }
+
+    /** Drops the parsed copy, so the next read goes back to the file. */
+    public static synchronized void forget() {
+        cached = null;
+        cachedPath = null;
+        cachedStamp = 0L;
+        cachedLength = 0L;
+        lastStatNanos = 0L;
     }
 
     /** True when the file on disk exists but could not be read. */
@@ -159,11 +234,18 @@ public final class Settings {
             if (lastLoadFailed) {
                 preserveCorrupt();
             }
-            mutation.accept(p);
-            p.setProperty(SCHEMA_KEY, String.valueOf(SCHEMA));
+            // A write must not be served from the copy that was read a moment ago: mutate a copy
+            // of what is on disk, and drop the cache either side so nothing can observe the file
+            // and the cache disagreeing.
+            Properties write = new Properties();
+            write.putAll(p);
+            mutation.accept(write);
+            write.setProperty(SCHEMA_KEY, String.valueOf(SCHEMA));
+            forget();
             try (FileOutputStream fos = new FileOutputStream(file())) {
-                p.store(fos, "Ourania Settings");
+                write.store(fos, "Ourania Settings");
             }
+            forget();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
