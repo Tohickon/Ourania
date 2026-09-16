@@ -1022,25 +1022,57 @@ public final class TransitCheck {
             yes("progressed contact inside the window", c.jd >= from - 1e-6 && c.jd <= to + 1e-6);
             yes("progressed contacts are chronological", c.jd >= lastJd);
             lastJd = c.jd;
-            yes("progressed body is one of the fast enough ones",
-                java.util.Arrays.asList(Progressions.progressedBodies).contains(c.progressed));
+            yes("progressed body is one of the fast enough ones, or an angle",
+                java.util.Arrays.asList(Progressions.progressedBodies).contains(c.progressed)
+                    || java.util.Arrays.asList(Progressions.PROGRESSED_ANGLES).contains(c.progressed));
             yes("progressed contact why is in the filter vocabulary",
                 "angle".equals(c.why) || "light".equals(c.why)
                     || "prominence".equals(c.why) || "lord of the year".equals(c.why));
 
-            // Re-derive: ask the ephemeris for the progressed body at the reported moment.
-            double lon = Almanac.bodyLongitude(sw,
-                Progressions.progressedJd(natalJd, c.jd), c.progressed);
+            // Re-derive: ask the ephemeris for the progressed body at the reported moment, or
+            // the angle rule for the progressed angle.
+            double lon = java.util.Arrays.asList(Progressions.PROGRESSED_ANGLES).contains(c.progressed)
+                ? ProgressedAngles.longitudeOf(sw, natal, natalJd, c.jd, c.progressed,
+                    ProgressedAngles.method)
+                : Almanac.bodyLongitude(sw, Progressions.progressedJd(natalJd, c.jd), c.progressed);
             double sep = Math.abs(delta(lon, natalLonOf(natal, c.natal)));
             near("progressed contact really is exact", c.type.exactAngle, sep, 1e-3);
         }
 
-        // Progressed angles must not appear: the spec says they need an exact birth time.
+        // <b>Progressed angles are in, as of 2026-09-15 (master list F4).</b> This asserted that
+        // they never appeared, on the grounds that they need an exact birth time and nothing here
+        // could tell a real one from a placeholder. A chart now carries a Rodden rating and a
+        // time-unknown chart withholds its angles, so the condition is met - and what is held now
+        // is the condition itself: an angle may be progressed only from a chart with a time, and
+        // only under a rule slow enough for the date to mean something. ProgressedAngleCheck holds
+        // the arithmetic; this holds the gate, on the surface that feeds the readings.
+        boolean allowed = !natal.timeUnknown && ProgressedAngles.method.datable();
+        int angleContacts = 0;
         for (Progressions.Contact c : contacts) {
-            yes("no progressed angles",
-                !"Ascendant".equals(c.progressed) && !"MC".equals(c.progressed)
-                    && !"Descendant".equals(c.progressed) && !"IC".equals(c.progressed));
+            boolean isAngle = "Ascendant".equals(c.progressed) || "MC".equals(c.progressed)
+                || "Descendant".equals(c.progressed) || "IC".equals(c.progressed);
+            angleContacts += isAngle ? 1 : 0;
+            yes("a progressed angle appears only when the chart has a time and the rule dates",
+                !isAngle || allowed);
+            // The two ends of an axis are one contact, not two.
+            yes("only the Ascendant and the MC are progressed, not their opposites",
+                !"Descendant".equals(c.progressed) && !"IC".equals(c.progressed));
         }
+        System.out.printf("progressed angle contacts: %d (rule %s)%n",
+            angleContacts, ProgressedAngles.method.label);
+
+        // And with no birth time there are none at all, whatever the rule.
+        ChartFrame noTime = ChartFrame.computeTimeUnknown(sw,
+            new SweDate(NATAL_Y, NATAL_M, NATAL_D, 12.0).getJulDay(), NATAL_LAT, NATAL_LON,
+            'P', false, 0.0);
+        int fromNoTime = 0;
+        for (Progressions.Contact c : Progressions.contacts(sw, noTime, natalJd, ranked,
+                prof.lord, from, to)) {
+            if ("Ascendant".equals(c.progressed) || "MC".equals(c.progressed)) {
+                fromNoTime++;
+            }
+        }
+        eq("a chart with no birth time progresses no angles", 0, fromNoTime);
 
         // Lunation phase is one of the eight, and it advances over a lifetime.
         String phaseNow = Progressions.lunationPhase(sw, natalJd, transitJd);

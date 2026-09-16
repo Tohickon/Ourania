@@ -296,10 +296,52 @@ public final class ChartTables {
                     trim(moved > 180.0 ? moved - 360.0 : moved) + "&deg;"));
         }
         h.append("</table>");
-        h.append("<p><i>Houses are not shown: progressed angles need the birth time to be a ")
-         .append("real time rather than a placeholder, which the chart record does not yet ")
-         .append("distinguish. The bodies are unaffected by that.</i></p>");
+        h.append(progressedAngleRows(natal, sw, natalJd, nowJd));
         h.append(contactSection(natal, sw, natalJd, nowJd, false));
+        return h.toString();
+    }
+
+    /**
+     * The progressed angles, and the rule that moved them - master list F4.
+     *
+     * <b>Named, not just given.</b> The three rules put the progressed Ascendant in different
+     * signs, so a table that printed a degree without saying how it got there would be asserting
+     * a convention it had picked silently. A chart with no birth time gets the reason instead of
+     * a number: the angles of a noon chart are not withheld out of caution, they are unknown.
+     */
+    private static String progressedAngleRows(ChartFrame natal, SwissEph sw, double natalJd,
+                                              double nowJd) {
+        com.zodiacomputing.ourania.astro.ProgressedAngles.Method m =
+            com.zodiacomputing.ourania.astro.ProgressedAngles.method;
+        if (natal == null || natal.timeUnknown) {
+            return "<p><i>The angles are not progressed: this chart has no birth time, so its "
+                 + "Ascendant and Midheaven are unknown rather than merely approximate. The "
+                 + "bodies above are unaffected - they barely move in a day.</i></p>";
+        }
+        double[] a = com.zodiacomputing.ourania.astro.ProgressedAngles.at(sw, natal, natalJd, nowJd, m);
+        if (a == null) {
+            return "<p><i>The progressed angles could not be derived for this chart.</i></p>";
+        }
+        StringBuilder h = new StringBuilder();
+        h.append("<h2>Progressed angles</h2>");
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Angle", "Progressed", "Natal", "Moved"));
+        String[] names = {"Ascendant", "MC", "Descendant", "IC"};
+        double[] natalLons = {natal.asc, natal.mc, natal.dsc, natal.ic};
+        for (int i = 0; i < names.length; i++) {
+            double moved = com.zodiacomputing.ourania.astro.Zodiac.normalise(a[i] - natalLons[i]);
+            h.append(row4("td", names[i], position(a[i]), position(natalLons[i]),
+                trim(moved > 180.0 ? moved - 360.0 : moved) + "&deg;"));
+        }
+        h.append("</table>");
+        h.append("<p><i>").append(m.label).append(": ").append(m.meaning)
+         .append(" The Ascendant is derived from the progressed MC at the birth latitude, not "
+             + "advanced on its own, because a pair moved separately belongs to no real horizon.");
+        if (!m.datable()) {
+            h.append(" Quotidian angles cross the whole zodiac each year, so they are shown as "
+                + "positions and are not listed among the dated contacts below.");
+        }
+        h.append(" The rule is a setting.</i></p>");
         return h.toString();
     }
 

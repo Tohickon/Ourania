@@ -379,6 +379,44 @@ public final class ChartFrame {
     }
 
     /**
+     * The house frame an ecliptic MC implies at a latitude: {@code [armc, asc, mc, vertex,
+     * equatorial asc]}, with {@code cusps} filled in, or the four after the ARMC as NaN when no
+     * frame could be derived.
+     *
+     * <b>One derivation, two callers.</b> The midpoint composite derives its houses from the
+     * composite MC, and a progressed chart derives its houses from the progressed MC; those are
+     * the same operation, and written twice they would drift - which is the defect this project
+     * logs more than any other. The library wants the MC as right ascension, so the ecliptic
+     * point on the meridian is reduced with {@code RAMC = atan2(sin lambda cos eps, cos lambda)},
+     * quadrant-safe.
+     *
+     * <b>The reduction is tropical geometry.</b> In a sidereal chart the MC is taken back to the
+     * tropical frame first and the library's tropical cusps brought forward again after,
+     * otherwise the whole house frame turns by the ayanamsa.
+     */
+    public static double[] frameFromMc(SwissEph sw, double mcLon, double geoLat, double obliquity,
+                                       double ayanamsa, int hsys, double[] cusps) {
+        double eps = Math.toRadians(obliquity);
+        double lam = Math.toRadians(mcLon + ayanamsa);
+        double armc = Zodiac.normalise(
+            Math.toDegrees(Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam))));
+        double[] ascmc = new double[10];
+        double[] house = cusps == null ? new double[13] : cusps;
+        int hret = sw == null ? -1 : sw.swe_houses_armc(armc, geoLat, obliquity, hsys, house, ascmc);
+        if (hret < 0) {
+            return new double[] {armc, Double.NaN, Double.NaN, Double.NaN, Double.NaN};
+        }
+        for (int i = 1; i <= 12; i++) {
+            house[i] = Zodiac.normalise(house[i] - ayanamsa);
+        }
+        return new double[] {armc,
+            Zodiac.normalise(ascmc[0] - ayanamsa),
+            Zodiac.normalise(ascmc[1] - ayanamsa),
+            Zodiac.normalise(ascmc[3] - ayanamsa),
+            Zodiac.normalise(ascmc[4] - ayanamsa)};
+    }
+
+    /**
      * The composite at the couple's own midpoint place.
      *
      * <b>The default, not the only answer.</b> The reference place method wants the latitude
@@ -480,22 +518,14 @@ public final class ChartFrame {
         // taken back to the tropical frame first, and the library's tropical cusps brought
         // forward again after - otherwise the whole house frame is turned by the ayanamsa.
         f.ayanamsa = (c1.ayanamsa + c2.ayanamsa) / 2.0;
-        double eps = Math.toRadians(f.trueObliquity);
-        double lam = Math.toRadians(compMc + f.ayanamsa);
-        double ramc = Math.toDegrees(Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam)));
-        f.armc = Zodiac.normalise(ramc);
-
-        double[] ascmc = new double[10];
-        int hret = sw == null ? -1
-            : sw.swe_houses_armc(f.armc, f.geoLat, f.trueObliquity, f.hsys, f.cusps, ascmc);
-        if (hret >= 0) {
-            for (int i = 1; i <= 12; i++) {
-                f.cusps[i] = Zodiac.normalise(f.cusps[i] - f.ayanamsa);
-            }
-            f.asc = Zodiac.normalise(ascmc[0] - f.ayanamsa);
-            f.mc = Zodiac.normalise(ascmc[1] - f.ayanamsa);
-            f.vertex = Zodiac.normalise(ascmc[3] - f.ayanamsa);
-            f.equatorialAsc = Zodiac.normalise(ascmc[4] - f.ayanamsa);
+        double[] frame = frameFromMc(sw, compMc, f.geoLat, f.trueObliquity, f.ayanamsa, f.hsys,
+            f.cusps);
+        f.armc = frame[0];
+        if (!Double.isNaN(frame[1])) {
+            f.asc = frame[1];
+            f.mc = frame[2];
+            f.vertex = frame[3];
+            f.equatorialAsc = frame[4];
         } else {
             // No ephemeris, or a house system with no solution at this latitude. Fall back to
             // whole-sign-ish equal houses off the midpoint MC so the frame is still usable, and

@@ -22,7 +22,15 @@ import java.util.List;
  *   <li><b>The progressed lunation phase</b> - a 29.5-year cycle through eight phases.</li>
  * </ul>
  *
- * <h3>Progressed angles are deliberately absent</h3>
+ * <h3>Progressed angles: built 2026-09-15, master list F4</h3>
+ *
+ * They live in {@link ProgressedAngles}, which carries the reason they need a rule of their own and
+ * the three the technique uses. {@link #contacts} scans them alongside the bodies whenever the
+ * chart has a birth time and the rule in force moves them slowly enough for a perfection to be an
+ * event. The paragraphs below are what stood here before, kept because they record how the
+ * exclusion came to be defended for a reason that was not true.
+ *
+ * <h3>What the exclusion used to say</h3>
  *
  * The spec: progressed angles "need an exact birth time and degrade fast without one".
  *
@@ -124,7 +132,7 @@ public final class Progressions {
      * Keyed on the real instant rounded to a microsecond of a day, so the coarse scan hits
      * the cache and only bisection falls through to the ephemeris.
      */
-    private static final class ProgressedLon {
+    private static class ProgressedLon {
         private final SwissEph sw;
         private final String body;
         private final double natalJd;
@@ -136,11 +144,61 @@ public final class Progressions {
             this.natalJd = natalJd;
         }
 
+        SwissEph sw() {
+            return this.sw;
+        }
+
+        double natalJd() {
+            return this.natalJd;
+        }
+
         double at(double jd) {
             long key = Math.round(jd * 1.0e6);
             Double v = memo.get(key);
             if (v == null) {
                 v = Almanac.bodyLongitude(sw, progressedJd(natalJd, jd), body);
+                memo.put(key, v);
+            }
+            return v;
+        }
+    }
+
+    /** The two angles that are progressed: the other two are their opposites, to the degree. */
+    public static final String[] PROGRESSED_ANGLES = {"Ascendant", "MC"};
+
+    /** The end of the axis an angle belongs to, or null - two ends, one contact. */
+    private static String axisPartner(String angle) {
+        switch (angle) {
+            case "Ascendant":  return "Descendant";
+            case "Descendant": return "Ascendant";
+            case "MC":         return "IC";
+            case "IC":         return "MC";
+            default:           return null;
+        }
+    }
+
+    /**
+     * Memoised progressed longitude of one angle, so the root finder can treat it exactly like a
+     * body. Same keying as {@link ProgressedLon}, for the same reason.
+     */
+    private static final class ProgressedAngleLon extends ProgressedLon {
+        private final ChartFrame natal;
+        private final String angle;
+        private final java.util.HashMap<Long, Double> memo = new java.util.HashMap<>();
+
+        ProgressedAngleLon(SwissEph sw, ChartFrame natal, double natalJd, String angle) {
+            super(sw, angle, natalJd);
+            this.natal = natal;
+            this.angle = angle;
+        }
+
+        @Override
+        double at(double jd) {
+            long key = Math.round(jd * 1.0e6);
+            Double v = memo.get(key);
+            if (v == null) {
+                v = ProgressedAngles.longitudeOf(sw(), natal, natalJd(), jd, angle,
+                    ProgressedAngles.method);
                 memo.put(key, v);
             }
             return v;
@@ -188,6 +246,44 @@ public final class Progressions {
                         c.why = target.why;
                         c.natalRank = target.rank;
                         c.retrograde = progressedSpeed(sw, natalJd, jd, body) < 0.0;
+                        out.add(c);
+                    }
+                }
+            }
+        }
+
+        // The progressed angles, on the same footing as the bodies and with two conditions on
+        // them: the chart must have a birth time to progress, and the rule in force must move
+        // them slowly enough for the date of a perfection to mean something. A quotidian angle
+        // crosses the whole zodiac every year and would bury everything else here.
+        if (natal.timeUnknown || !ProgressedAngles.method.datable()) {
+            out.sort(Comparator.comparingDouble((Contact c) -> c.jd).thenComparing(c -> c.natal));
+            return out;
+        }
+        for (String angle : PROGRESSED_ANGLES) {
+            ProgressedAngleLon cache = new ProgressedAngleLon(sw, natal, natalJd, angle);
+            if (Double.isNaN(cache.at(jdFrom))) {
+                continue;
+            }
+            for (Transits.NatalTarget target : targets) {
+                // <b>The far end of the same axis is the same moment, not a second one.</b> The
+                // Ascendant and the Descendant are 180 degrees apart by construction, so a
+                // progressed angle squares both at the same instant and reporting both is one
+                // event written twice. Its own natal degree is kept: the progressed Ascendant
+                // square its own natal place is a real contact and a much-used one.
+                if (angle.equals(axisPartner(target.name))) {
+                    continue;
+                }
+                for (Aspects.Type type : Aspects.Type.values()) {
+                    for (double jd : perfections(cache, target.lon, type, jdFrom, jdTo)) {
+                        Contact c = new Contact();
+                        c.progressed = angle;
+                        c.natal = target.name;
+                        c.type = type;
+                        c.jd = jd;
+                        c.why = target.why;
+                        c.natalRank = target.rank;
+                        c.retrograde = false;
                         out.add(c);
                     }
                 }

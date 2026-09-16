@@ -73,6 +73,8 @@ public class SettingsPanel extends JPanel {
     private final JLabel status = new JLabel(" ");
     /** Settings > Calculation Variants: the one transit orb. */
     javax.swing.JSpinner transitOrb;
+    /** Settings > Calculation Variants: which rule progresses the angles. */
+    JComboBox<com.zodiacomputing.ourania.astro.ProgressedAngles.Method> progressedAngles;
 
     /**
      * Guards the listeners while the All/None/Defaults buttons move the boxes.
@@ -1117,6 +1119,28 @@ public class SettingsPanel extends JPanel {
         lOrb.setForeground(TEXT);
         row.add(lOrb);
         row.add(transitOrb);
+
+        // Which rule progresses the Ascendant and MC. Named in the reading that uses it, so the
+        // three answers are the reader's choice rather than a hidden convention.
+        progressedAngles = new JComboBox<>(
+            com.zodiacomputing.ourania.astro.ProgressedAngles.Method.values());
+        progressedAngles.setSelectedItem(Settings.progressedAngleMethod());
+        progressedAngles.setToolTipText("<html><b>How the progressed Ascendant and MC move.</b><br>"
+            + "Solar arc: by the arc the progressed Sun has travelled, about a degree a year.<br>"
+            + "Naibod: by the Sun's mean motion, 59'08\" a year, an even rate.<br>"
+            + "Quotidian: the real angles of the progressed moment, a degree a day of life - shown "
+            + "as positions only, because they aspect everything several times a year.</html>");
+        progressedAngles.addActionListener(e -> {
+            Settings.setProgressedAngleMethod(
+                (com.zodiacomputing.ourania.astro.ProgressedAngles.Method)
+                    progressedAngles.getSelectedItem());
+            status.setText("Saved");
+            if (window != null) window.applyBodySelection();
+        });
+        JLabel lProg = new JLabel("Progressed angles: ");
+        lProg.setForeground(TEXT);
+        row.add(lProg);
+        row.add(progressedAngles);
 
         p.add(row);
         return p;

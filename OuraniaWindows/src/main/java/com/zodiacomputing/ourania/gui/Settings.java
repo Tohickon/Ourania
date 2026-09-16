@@ -658,6 +658,23 @@ public final class Settings {
         com.zodiacomputing.ourania.astro.Transits.orb = v;
     }
 
+    /** Which rule progresses the angles; see astro.ProgressedAngles for the three. */
+    public static final String PROGRESSED_ANGLES_KEY = "progressions.angleMethod";
+
+    public static com.zodiacomputing.ourania.astro.ProgressedAngles.Method progressedAngleMethod() {
+        return com.zodiacomputing.ourania.astro.ProgressedAngles.Method.of(
+            get(PROGRESSED_ANGLES_KEY, null));
+    }
+
+    /** Saves the rule and puts it in force for every progressed reading from here on. */
+    public static void setProgressedAngleMethod(
+            com.zodiacomputing.ourania.astro.ProgressedAngles.Method m) {
+        com.zodiacomputing.ourania.astro.ProgressedAngles.Method use =
+            m == null ? com.zodiacomputing.ourania.astro.ProgressedAngles.Method.SOLAR_ARC : m;
+        set(PROGRESSED_ANGLES_KEY, use.label);
+        com.zodiacomputing.ourania.astro.ProgressedAngles.method = use;
+    }
+
     public static void setTrueNode(boolean useTrue) {
         set(NODE_VARIANT_KEY, useTrue ? "true" : "mean");
     }
