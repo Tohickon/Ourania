@@ -99,6 +99,7 @@ public final class ThemeConvergence {
      */
     public static List<Result> themes(ChartFrame f, Profection prof, List<Convergence.Target> targets) {
         List<Result> out = new ArrayList<>();
+        Set<String> active = activePoints(f, prof, targets);
         for (Theme theme : Theme.values()) {
             Result r = new Result();
             r.theme = theme;
@@ -115,6 +116,14 @@ public final class ThemeConvergence {
                 r.score += t.score;
                 for (Convergence.Witness w : t.witnesses) {
                     if (!w.independent) {
+                        continue;
+                    }
+                    // K12 stages 1 and 3: an external catalyst only testifies where the year
+                    // has already loaded the gun. To a point nothing else has woken it is
+                    // listed, as background, and not counted.
+                    if (isCatalyst(w.family) && !active.contains(t.natal)) {
+                        r.testimonies.add(w.family.name() + ": " + t.natal + " - " + w.detail
+                            + " (to a point not active this year: background, not counted)");
                         continue;
                     }
                     boolean fresh = r.families.add(w.family);
@@ -136,6 +145,42 @@ public final class ThemeConvergence {
             return Double.compare(b.score, a.score);
         });
         return out;
+    }
+
+    /** Transits, stations and eclipses: the world arriving, as against the chart's own clocks. */
+    static boolean isCatalyst(Convergence.Family f) {
+        return f == Convergence.Family.TRANSIT || f == Convergence.Family.STATION
+            || f == Convergence.Family.ECLIPSE;
+    }
+
+    /**
+     * K12 stages 1 and 2: the natal points the year has activated - the lord of the year, the
+     * bodies in the profected sign, and every point a progression or solar arc reaches in the
+     * window (the "loaded gun"). Only these can be triggered by a transit, station or eclipse.
+     */
+    static Set<String> activePoints(ChartFrame f, Profection prof, List<Convergence.Target> targets) {
+        Set<String> a = new LinkedHashSet<>();
+        if (prof != null) {
+            if (prof.lord != null) {
+                a.add(prof.lord);
+            }
+            for (int i = 0; i < Bodies.count(); i++) {
+                String name = Bodies.at(i).name;
+                ChartFrame.Body b = f.body(name);
+                if (b != null && b.ok && Zodiac.signIndex(b.lon) == prof.sign) {
+                    a.add(name);
+                }
+            }
+        }
+        for (Convergence.Target t : targets) {
+            for (Convergence.Witness w : t.witnesses) {
+                if (w.independent && (w.family == Convergence.Family.PROGRESSION
+                        || w.family == Convergence.Family.SOLAR_ARC)) {
+                    a.add(t.natal);
+                }
+            }
+        }
+        return a;
     }
 
     /** The theme's named points, the domicile rulers of its ruler houses, and its houses' occupants. */

@@ -69,13 +69,30 @@ public final class ThemeConvergenceCheck {
             target("Saturn", w(Convergence.Family.STATION, false)));
         ok("an echo does not count", !career(f, null, echo).headline());
 
+        // Both points activated (a solar arc on the MC, a progression on Saturn), so both
+        // transits reach active points - and are still one technique.
         List<Convergence.Target> same = List.of(
-            target("MC", w(Convergence.Family.TRANSIT, true)),
-            target("Saturn", w(Convergence.Family.TRANSIT, true)),
-            target("Sun", w(Convergence.Family.TRANSIT, true)));
+            target("MC", w(Convergence.Family.SOLAR_ARC, true), w(Convergence.Family.TRANSIT, true)),
+            target("Saturn", w(Convergence.Family.PROGRESSION, true), w(Convergence.Family.TRANSIT, true)));
         ThemeConvergence.Result rs = career(f, null, same);
-        ok("one technique on three points is one testimony", rs.families.size() == 1 && !rs.headline());
-        ok("but all three are still shown", rs.testimonies.size() == 3);
+        ok("one technique on two points is one testimony (" + rs.families + ")",
+            rs.families.size() == 3);
+        ok("but both are still shown, the second marked", rs.testimonies.size() == 4
+            && rs.testimonies.stream().filter(s -> s.contains("counted once")).count() == 1);
+
+        // ---- the activation filter (K12 stages 1-3)
+        List<Convergence.Target> cold = List.of(target("Sun", w(Convergence.Family.TRANSIT, true)));
+        ThemeConvergence.Result rc = career(f, null, cold);
+        ok("a transit to a point nothing has activated is not counted", rc.families.isEmpty());
+        ok("but it is listed, as background", rc.testimonies.size() == 1
+            && rc.testimonies.get(0).contains("not active this year"));
+        List<Convergence.Target> warm = List.of(target("Sun",
+            w(Convergence.Family.PROGRESSION, true), w(Convergence.Family.TRANSIT, true)));
+        ok("a progression activates the point, and the transit to it counts",
+            career(f, null, warm).families.size() == 2);
+        List<Convergence.Target> stationCold = List.of(target("Sun", w(Convergence.Family.STATION, true),
+            w(Convergence.Family.ECLIPSE, true)));
+        ok("stations and eclipses are catalysts too", career(f, null, stationCold).families.isEmpty());
 
         List<Convergence.Target> elsewhere = List.of(
             target("Neptune-not-a-point", w(Convergence.Family.TRANSIT, true),
@@ -91,6 +108,16 @@ public final class ThemeConvergenceCheck {
         ThemeConvergence.Result rp = career(f, tenth, two);
         ok("a profection on the 10th is Career's third testimony", rp.headline()
             && rp.families.contains(Convergence.Family.PROFECTION));
+        java.util.Set<String> act = ThemeConvergence.activePoints(f, tenth, List.of());
+        ok("the lord of the year is active (" + tenth.lord + ")", act.contains(tenth.lord));
+        boolean signOk = true;
+        for (String n : act) {
+            ChartFrame.Body b = f.body(n);
+            if (!n.equals(tenth.lord) && (b == null || Zodiac.signIndex(b.lon) != tenth.sign)) {
+                signOk = false;
+            }
+        }
+        ok("and otherwise only bodies in the profected sign", signOk);
         Profection second = Profection.at(jd, jd + 365.25 * 1.5, f.asc);
         ok("age 1 profects to the 2nd (" + second.house + ")", second.house == 2);
         ok("a profection elsewhere is not", !career(f, second, two).headline());
