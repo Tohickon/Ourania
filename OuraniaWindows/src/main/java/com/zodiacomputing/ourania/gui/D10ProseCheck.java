@@ -395,6 +395,19 @@ public final class D10ProseCheck {
         // prose is unreachable until the reader asks for the point, and the second is what
         // happens once they do. The sampling below would otherwise measure nothing at all,
         // which is exactly what it did on the first run.
+        //
+        // <b>Asked of the registry's defaults, never of the reader's saved selection.</b> This
+        // first read the selection out of the scratch settings file, which is a copy of the
+        // reader's own - and on 2026-09-16 David switched these seven on to look at their new
+        // prose, so seven assertions about a fresh install failed on his machine. That is item
+        // J14, the defect this session had just diagnosed in ChartSetupCheck, written into a
+        // new suite the same day. The claim is about what ships, so it is asked of what ships.
+        boolean[] shipped = Bodies.defaults();
+        for (String id : POINTS) {
+            int i = Bodies.indexOf(id);
+            ok(id + " ships switched off", i >= 0 && !shipped[i]);
+        }
+        Settings.saveBodySelection(shipped);
         double fresh = new SweDate(1984, 9, 8, 7.55).getJulDay();
         ChartFrame offByDefault;
         synchronized (sw) {
@@ -406,7 +419,7 @@ public final class D10ProseCheck {
                 continue;
             }
             ChartFrame.Body b = offByDefault.body(d.name);
-            ok(id + " is off until the reader selects it", b == null || !b.ok);
+            ok(id + " is not placed on a fresh install's chart", b == null || !b.ok);
         }
 
         boolean[] all = new boolean[Bodies.count()];

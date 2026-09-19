@@ -256,6 +256,34 @@ public class SettingsPanel extends JPanel {
         });
         body.add(signPlane);
 
+        // The same switch for the other bands that have a fill to switch.
+        //
+        // <b>There is no decan box, deliberately.</b> The decan band on the globe is glyph
+        // billboards and nothing else - no shell, no wash, no hover fill - so a control for it
+        // would sit here governing nothing, which is the placeholder defect this screen has
+        // already had removed from it twice.
+        body.add(globeFillBox("On the globe, fill the current house",
+            Settings.globeHouseFill(), Settings::setGlobeHouseFill,
+            "<html><b>The house wash.</b><br>On: the house a body stands in is washed in "
+            + "parchment across the plane, and the house asked for by its number is cut through "
+            + "the sphere as well.<br>Off: the cusp spokes, the numbers and the glyphs all stay "
+            + "where they are; only the wash goes.<br><i>The globe only.</i></html>"));
+        body.add(globeFillBox("On the globe, fill the degree under the cursor",
+            Settings.globeDegreeFill(), Settings::setGlobeDegreeFill,
+            "<html><b>The Sabian scale's own fill.</b><br>On: pointing at a tick lights the "
+            + "one degree behind it, across the plane and through the sphere, so the tick names "
+            + "a place rather than a mark.<br>Off: the 360 ticks, the scale line they hang from "
+            + "and the sign marks stay; the slice behind them does not.<br><i>The globe "
+            + "only.</i></html>"));
+        body.add(globeFillBox("On the globe, fill the lunar mansion stations",
+            Settings.globeMansionFill(), Settings::setGlobeMansionFill,
+            "<html><b>The mansion band's tint.</b><br>On: the Moon's own station is washed in "
+            + "lavender and the station under the cursor more brightly.<br>Off: the band's two "
+            + "edges, its 28 divisions and its numbers stay, and the Moon's station is still "
+            + "picked out by a brighter boundary and number - the stations stay countable, they "
+            + "stop being tinted.<br><i>The globe only; the flat wheel's mansion ring is "
+            + "unaffected.</i></html>"));
+
         JCheckBox stacked = new JCheckBox("On the globe, stack the rings instead of crossing "
             + "them", Settings.globeStackedRings());
         stacked.setForeground(TEXT);
@@ -517,6 +545,21 @@ public class SettingsPanel extends JPanel {
         blurb.setFont(Theme.font("Arial", Font.PLAIN, 11));
         blurb.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(blurb);
+
+        // <b>Per section, because the whole-screen pair is not the same offer.</b> David,
+        // 2026-09-16: a select-all for each section, "like for asteroids etc." The buttons at
+        // the foot of the screen move all 32 points at once, which is no use to a reader who
+        // wants every asteroid and none of the lots - they would have to click through a
+        // section one point at a time to get there. Scoped to this group's own boxes, and
+        // through the same bulkUpdate guard the screen-wide pair uses, so 12 toggles are one
+        // write of the settings file rather than 12.
+        JPanel bulk = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        bulk.setBackground(Color.BLACK);
+        bulk.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bulk.add(groupButton("All", group, true));
+        bulk.add(groupButton("None", group, false));
+        panel.add(bulk);
+
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
 
         for (int i = 0; i < Bodies.count(); i++) {
@@ -1014,6 +1057,55 @@ public class SettingsPanel extends JPanel {
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
         b.addActionListener(e -> action.run());
         return b;
+    }
+
+    /**
+     * One of the globe's fill switches, built the way the sign-shell box beside it is built.
+     *
+     * Written once rather than three times because the three differ only in their words and the
+     * setting they write, and a fourth band with a fill would otherwise be a fourth copy.
+     */
+    private JCheckBox globeFillBox(String label, boolean on,
+                                   java.util.function.Consumer<Boolean> setter, String tip) {
+        final JCheckBox box = new JCheckBox(label, on);
+        box.setForeground(TEXT);
+        box.setBackground(Color.BLACK);
+        box.setFont(Theme.BODY);
+        box.setFocusPainted(false);
+        box.setAlignmentX(Component.LEFT_ALIGNMENT);
+        box.setToolTipText(tip);
+        box.addItemListener(e -> {
+            setter.accept(box.isSelected());
+            applyPalette();
+        });
+        return box;
+    }
+
+    /** A section's own All or None, moving only that section's boxes. */
+    private JButton groupButton(String text, final Bodies.Group group, final boolean on) {
+        JButton b = bulkButton(text, () -> setGroup(group, on));
+        b.setFont(Theme.font("Arial", Font.PLAIN, 11));
+        b.setToolTipText((on ? "Select every point in " : "Clear every point in ")
+            + group.title);
+        return b;
+    }
+
+    /**
+     * Sets every box in one section, then applies once.
+     *
+     * Matched on the registry's group rather than on which panel a box happens to sit in, so
+     * the section and the button cannot disagree about membership: the panel is built from the
+     * same test.
+     */
+    void setGroup(Bodies.Group group, boolean on) {
+        bulkUpdate = true;
+        for (int i = 0; i < boxes.length; i++) {
+            if (boxes[i] != null && Bodies.at(i).group == group) {
+                boxes[i].setSelected(on);
+            }
+        }
+        bulkUpdate = false;
+        save();
     }
 
     /** Sets every box, then applies once. See the bulkUpdate field. */

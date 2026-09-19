@@ -1735,7 +1735,8 @@ extends JPanel {
                 SkymapPanel.this.layerOpen(Layer.DECANS),
                 SkymapPanel.this.layerOpen(Layer.SIGNS),
                 SkymapPanel.this.layerOpen(Layer.BOUNDS),
-                SkymapPanel.this.layerOpen(Layer.DEGREES));
+                SkymapPanel.this.layerOpen(Layer.DEGREES),
+                SkymapPanel.this.layerOpen(Layer.MANSIONS));
             this.bodyBase = SkymapPanel.this.bodyBaseRadius(this.rings);
             this.natalFloor = this.bodyBase
                 - SkymapPanel.natalBandDepth(Math.max(1, this.bodyBase));
@@ -2326,10 +2327,18 @@ extends JPanel {
             default:
                 break;
         }
-        int outer = g.rings[RING_OUTER];
-        if (SkymapPanel.inMansionBand(r, outer)) {
+        if (this.layerShown(Layer.MANSIONS) && SkymapPanel.inMansionRing(r, g.rings)) {
+            return HOVER_MANSION * 1000
+                + com.zodiacomputing.ourania.astro.LunarMansions.at(lon).number;
+        }
+        if (this.layerShown(Layer.DEGREES) && SkymapPanel.inRimDegreeBand(r, g.rings)) {
+            return HOVER_RIM_DEGREE * 1000 + ((int) Math.round(lon) % 360);
+        }
+        // The rim with both folded away: nothing is drawn there, so nothing answers.
+        if (SkymapPanel.inMansionBand(r, g.rings[RING_OUTER])) {
             return this.layerShown(Layer.MANSIONS)
-                ? HOVER_MANSION * 1000 + com.zodiacomputing.ourania.astro.LunarMansions.at(lon).number
+                ? HOVER_MANSION * 1000
+                    + com.zodiacomputing.ourania.astro.LunarMansions.at(lon).number
                 : HOVER_RIM_DEGREE * 1000 + ((int) Math.round(lon) % 360);
         }
         return -1;
@@ -2435,16 +2444,24 @@ extends JPanel {
                 centred(g2, g, String.valueOf(idx), from + (to - from) / 2.0, g.natalFloor - 16);
                 break;
             }
+            // <b>Each swell covers its own band, not the whole rim.</b> Both used to wash the
+            // full 20 pixels, which was right while the rim was one target and is wrong now
+            // that the mansions and the scale are drawn apart: a swell that reaches over the
+            // ring next door says the reader is pointing at both.
             case HOVER_MANSION: {
                 double start = (idx - 1) * com.zodiacomputing.ourania.astro.LunarMansions.WIDTH;
+                int floor = rings[RING_MANSION_INNER] < rings[RING_OUTER]
+                    ? rings[RING_MANSION_INNER] : rings[RING_OUTER] - RIM_BAND_DEPTH;
                 g2.setColor(new Color(255, 255, 255, 50));
-                g2.fill(wedge(g, rings[RING_OUTER] - RIM_BAND_DEPTH, rings[RING_OUTER] + 4,
+                g2.fill(wedge(g, floor, rings[RING_OUTER] + 4,
                     start, start + com.zodiacomputing.ourania.astro.LunarMansions.WIDTH));
                 break;
             }
             case HOVER_RIM_DEGREE: {
+                int ceiling = rings[RING_MANSION_INNER] < rings[RING_OUTER]
+                    ? rings[RING_MANSION_INNER] : rings[RING_OUTER] + 4;
                 g2.setColor(new Color(255, 255, 255, 60));
-                g2.fill(wedge(g, rings[RING_OUTER] - RIM_BAND_DEPTH, rings[RING_OUTER] + 4,
+                g2.fill(wedge(g, rings[RING_OUTER] - RIM_BAND_DEPTH, ceiling,
                     idx - 0.5, idx + 0.5));
                 break;
             }
@@ -5379,11 +5396,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             default:
                 break;
         }
-        // The rim, from the decan ring out: the mansion under the point, or - with the mansions
-        // folded away - the degree's Sabian symbol, since the outer tick scale is what is left
-        // there. One target for the whole visible band; see RIM_BAND_DEPTH.
+        // The rim, from the decan ring out, and it is two targets now: the mansion band above
+        // RING_MANSION_INNER, the degree scale below it. With the mansions folded the scale has
+        // the whole rim and answers everywhere in it, which is what it did before the band was
+        // carved out.
+        if (this.layerShown(Layer.MANSIONS) && SkymapPanel.inMansionRing(d6, rings)) {
+            this.window.showInterpretationForMansion(
+                com.zodiacomputing.ourania.astro.LunarMansions.at(d9).number);
+            return;
+        }
         if (SkymapPanel.inMansionBand(d6, n9)) {
-            if (this.layerShown(Layer.MANSIONS)) {
+            if (this.layerShown(Layer.MANSIONS) && !SkymapPanel.inRimDegreeBand(d6, rings)) {
                 this.window.showInterpretationForMansion(
                     com.zodiacomputing.ourania.astro.LunarMansions.at(d9).number);
                 return;
@@ -5961,6 +5984,28 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return radius >= outer - RIM_BAND_DEPTH && radius <= outer + 15;
     }
 
+    /**
+     * True when a click radius lands on the lunar mansion ring, given the whole chain.
+     *
+     * <b>The rim is two targets now, because it draws two things.</b> While the mansions were
+     * drawn over the degree scale one target for the whole rim was the honest answer - there was
+     * no way to point at the scale. Now the band has an edge, the mansions answer above it and
+     * the scale answers below it, which is David's rule from 2026-09-14: each click is the
+     * entire space of the item. With the mansions folded the band is empty and the scale takes
+     * the rim back, so nothing is pointing at an invisible ring.
+     */
+    static boolean inMansionRing(double radius, int[] rings) {
+        return rings[RING_MANSION_INNER] < rings[RING_OUTER]
+            && radius >= rings[RING_MANSION_INNER] && radius <= rings[RING_OUTER] + 15;
+    }
+
+    /** True when a click radius lands on the rim degree scale, below any mansion band. */
+    static boolean inRimDegreeBand(double radius, int[] rings) {
+        double ceiling = rings[RING_MANSION_INNER] < rings[RING_OUTER]
+            ? rings[RING_MANSION_INNER] : rings[RING_OUTER] + 15;
+        return radius >= rings[RING_OUTER] - RIM_BAND_DEPTH && radius < ceiling;
+    }
+
     /** Indices into {@link #ringRadii}. */
     static final int RING_OUTER = 0;
     static final int RING_TRI = 1;
@@ -5995,6 +6040,23 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * two scales - decans, signs, bounds - is sandwiched by them.
      */
     static final int RING_DEGREE_INNER = 8;
+
+    /**
+     * Inner edge of the lunar mansion band, and so the outer edge of the rim degree scale.
+     *
+     * <b>The mansions used to share the rim with the degree ticks, and covered them.</b> They
+     * were drawn from {@code outer - 9} outward while the ticks reached {@code outer - 6}, so
+     * with the mansions open the outer scale was underneath a lavender wash and its numbers -
+     * David, 2026-09-16: "when lunar mansions are selected they cover over the second outer
+     * sabian ring". The band now has an edge of its own and the ticks hang below it.
+     *
+     * <b>Appended rather than inserted, and zero when the mansions are folded.</b> Every index
+     * before this one is load-bearing in four places, so an insert would move the bodies; and a
+     * caller that knows nothing about mansions gets {@code outer} back, which is where the rim
+     * scale has always sat. With the layer folded the two are equal, so the wheel lays out
+     * exactly as it did - which is what lets AspectGridCheck go on asserting its formula.
+     */
+    static final int RING_MANSION_INNER = 9;
 
     /** How deep the bound band is. Two pixels shallower than the decans, being finer. */
     static final int TERM_BAND_DEPTH = 18;
@@ -6072,6 +6134,24 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
                            double decanOpen, double signOpen, double boundOpen,
                            double degreeOpen) {
+        // Mansions folded: the rim degree scale keeps the whole rim, which is the layout every
+        // caller of this arity was written against.
+        return ringRadii(width, height, outerOpen, triOpen, decanOpen, signOpen, boundOpen,
+            degreeOpen, 0.0);
+    }
+
+    /**
+     * The same chain, with the lunar mansion band able to open at the rim.
+     *
+     * <b>The band has to carve its own space, not borrow the scale's.</b> The rim is 20 pixels
+     * between {@code RING_OUTER} and {@code RING_DECAN_OUTER}; the mansions take the outermost
+     * {@link #MANSION_BAND_DEPTH} of it as they open, and the degree ticks hang from whatever
+     * is left. At {@code mansionOpen == 0} the two edges coincide and this is the old layout
+     * to the pixel.
+     */
+    static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
+                           double decanOpen, double signOpen, double boundOpen,
+                           double degreeOpen, double mansionOpen) {
         double o = Math.max(0.0, Math.min(1.0, outerOpen));
         double t = Math.max(0.0, Math.min(1.0, triOpen));
         double dc = Math.max(0.0, Math.min(1.0, decanOpen));
@@ -6092,9 +6172,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int tri     = degreeInner;
         int transit = (int) Math.round((double) tri - (double) depth * t);
         int bodyTop = (int) Math.round((double) transit - (double) depth * o);
+        double mn = Math.max(0.0, Math.min(1.0, mansionOpen));
+        int mansionInner = (int) Math.round(outer - MANSION_BAND_DEPTH * mn);
         return new int[] {
             outer, tri, transit, decanOuter, signOuter, signInner, bodyTop,
-            termInner, degreeInner };
+            termInner, degreeInner, mansionInner };
     }
 
     /** Overload for callers that pre-date the tri-wheel; preserves the old contract. */
@@ -6562,7 +6644,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         g.setFont(was);
     }
 
-    private void drawMansionRing(Graphics2D g, int cx, int cy, int outer, double pin) {
+    private void drawMansionRing(Graphics2D g, int cx, int cy, int outer, int inner,
+                                 double pin) {
         try {
             java.util.List<com.zodiacomputing.ourania.astro.LunarMansions.Mansion> all =
                 com.zodiacomputing.ourania.astro.LunarMansions.all();
@@ -6570,7 +6653,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.moonMansion();
 
             int bandOuter = outer;
-            int bandInner = outer - 9;
+            // <b>From the chain, not from outer - 9 written here.</b> The band's inner edge is
+            // also the degree scale's outer edge, so the two have to be one number: while this
+            // method computed its own, the scale had no way to know where the band ended and
+            // was drawn underneath it.
+            int bandInner = Math.min(inner, outer - 1);
             Stroke saved = g.getStroke();
             Font savedFont = g.getFont();
 
@@ -8453,6 +8540,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int nBodyTop = rings[RING_BODY_TOP];
             int nTermInner = rings[RING_TERM_INNER];
             int nDegreeInner = rings[RING_DEGREE_INNER];
+            // The rim scale's outer edge: the rim itself with the mansions folded, and the
+            // underside of the mansion band once they open.
+            int nMansionInner = rings[RING_MANSION_INNER];
             // <b>The disc, filled separately from the page.</b> One colour used to do both -
             // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
             // Filled before any ring is drawn, so every stroke below lands on top of it.
@@ -8546,14 +8636,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     nDegreeInner, d4);
             }
 
-            // The 28 lunar mansions, in the outermost band alongside the degree ticks.
+            // The 28 lunar mansions, in a band of their own at the rim.
             //
-            // Placed here rather than as a band of its own because every other ring's radius
-            // is load-bearing: the glyph rings, the hit test and natalRadii all derive from
-            // the same chain, so carving out a new band would move the bodies. This band holds
-            // only tick marks, so the mansions can share it without anything else shifting.
+            // <b>It used to share the rim with the degree ticks and cover them.</b> The band is
+            // now carved out of the rim by the chain - RING_MANSION_INNER - and the ticks below
+            // read from the same number, so the two cannot overlap. Carving it here rather than
+            // inside the zodiac is what keeps the bodies where they are: every radius from
+            // RING_DECAN_OUTER inward is untouched.
             if (SkymapPanel.this.layerShown(Layer.MANSIONS)) {
-                SkymapPanel.this.drawMansionRing(graphics2D, n12, n13, n14, d4);
+                SkymapPanel.this.drawMansionRing(graphics2D, n12, n13, n14, nMansionInner, d4);
             }
 
             graphics2D.setFont(new Font("SansSerif", 0, 22));
@@ -8576,7 +8667,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics2D.setColor(new Color(150, 150, 150));
             for (n8 = 0; SkymapPanel.this.layerShown(Layer.DEGREES) && n8 < 360; ++n8) {
                 d3 = Math.toRadians(180.0 + d4 - (double)n8);
-                int n21 = n14;
+                // Hanging from the mansion band's underside rather than from the rim, so the
+                // two scales and the mansions are three separate bands the reader can tell
+                // apart. With the mansions folded this is the rim, exactly as before.
+                int n21 = nMansionInner;
                 n = n8 % 10 == 0 ? n21 - 6 : (n8 % 5 == 0 ? n21 - 4 : n21 - 2);
                 n7 = n12 + (int)((double)n * Math.cos(d3));
                 n6 = n13 + (int)((double)n * Math.sin(d3));
@@ -8819,11 +8913,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // alpha stays here because a solid leader would compete with the aspect lines.
                 graphics2D.setComposite(priorComposite);
                 if (Settings.showDegreeLines()) {
-                    // <b>To the near scale, not the far one.</b> These used to run to the sign
-                    // ring, which since the reorder is three bands away from the bodies; they
-                    // now stop at the inner degree scale, which is the thing they are pointing
-                    // at. A leader that crosses the decans and the bounds to reach a tick is a
-                    // line the reader has to trace rather than read.
+                    // <b>To the far scale, at the reader's asking.</b> These ran to the inner
+                    // degree scale on the argument that a leader crossing the decans and the
+                    // bounds is a line the reader has to trace rather than read. David,
+                    // 2026-09-16: "can we extend the line all the way to the second sabian ring
+                    // degree" - so they now reach the rim scale, which is the outer of the two.
+                    // The inner scale is still drawn and still readable; what changed is where
+                    // the line ends, and that is his call to make while looking at it.
                     //
                     // <b>The hovered body's leader is drawn to be seen.</b> At alpha 60 every
                     // leader is a hint and none of them is an answer; the one the cursor is on
@@ -8838,8 +8934,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         leader.getBlue(), lit ? 235 : 60));
                     graphics2D.setStroke(new BasicStroke(lit ? 1.8f : 1.0f));
                     graphics2D.drawLine(n4, n26,
-                        n12 + (int)((double)nDegreeInner * Math.cos(d10)),
-                        n13 + (int)((double)nDegreeInner * Math.sin(d10)));
+                        n12 + (int)((double)nMansionInner * Math.cos(d10)),
+                        n13 + (int)((double)nMansionInner * Math.sin(d10)));
                     graphics2D.setStroke(priorLeader);
                 }
             }

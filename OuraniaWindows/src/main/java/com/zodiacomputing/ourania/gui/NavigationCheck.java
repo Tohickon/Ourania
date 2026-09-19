@@ -1560,6 +1560,16 @@ public final class NavigationCheck {
                     sky.layerWanted(SkymapPanel.Layer.MANSIONS)
                         && sky.layerShown(SkymapPanel.Layer.MANSIONS));
 
+                // <b>Leaders off for this measurement, and that is not hiding anything.</b> Since
+                // 2026-09-16 a leader line ends at the outer degree scale, and the outer scale
+                // hangs from the underside of the mansion band - so folding the mansions lifts
+                // the scale nine pixels to the rim and every leader lengthens to follow it. A line
+                // with a moved endpoint re-rasterises along its whole length, which the first run
+                // reported as 13,335 strays from radius 301 inward of the band. That is David's
+                // requested behaviour, not a leak; what this part measures is the mansion ring's
+                // own footprint, so the leaders are taken out of the frame it measures.
+                final boolean leadersWere = Settings.showDegreeLines();
+                Settings.setShowDegreeLines(false);
                 java.awt.image.BufferedImage open = flatFrame(wheel, size);
                 SwingUtilities.invokeAndWait(
                     () -> sky.setLayer(SkymapPanel.Layer.MANSIONS, false));
@@ -1590,7 +1600,16 @@ public final class NavigationCheck {
                         changed++;
                         // A pixel of the band, allowing a pixel of antialiasing either side.
                         double r = Math.hypot(x - half, y - half);
-                        if (r < outer - 15 || r > outer + 2) {
+                        // The inner edge now reaches the outer scale as well: open, the mansions
+                        // push it down to outer - MANSION_BAND_DEPTH - 6, and folding them lifts it
+                        // back to the rim, so the scale's old position is part of what folding the
+                        // mansions legitimately redraws. Two pixels of antialiasing below it.
+                        // Three pixels, measured: the tick ends are truncated to whole pixels on
+                        // both axes, which can pull a point up to 1.4 px inward, plus half of
+                        // the 1.5 px stroke and a pixel of antialiasing. Two pixels left twelve
+                        // strays at radius 522.5, which is exactly the ends of the tens ticks.
+                        int scaleFloor = outer - SkymapPanel.MANSION_BAND_DEPTH - 6 - 3;
+                        if (r < Math.min(outer - 15, scaleFloor) || r > outer + 2) {
                             strayed++;
                             strayLo = Math.min(strayLo, r);
                             strayHi = Math.max(strayHi, r);
@@ -1639,6 +1658,9 @@ public final class NavigationCheck {
                     }
                 }
                 ok("unfolding puts the wheel back exactly as it was", stillDifferent == 0);
+                // Restored only now: the unfolded frame is compared against the open one, and
+                // both have to be painted with the leaders in the same state.
+                Settings.setShowDegreeLines(leadersWere);
             } finally {
                 Settings.setAnimateRings(true);
             }

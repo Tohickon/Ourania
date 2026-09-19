@@ -344,6 +344,68 @@ public final class Settings {
         set(GLOBE_SIGN_PLANE_KEY, on ? "true" : "false");
     }
 
+    /** Settings key for filling the current house on the globe. */
+    public static final String GLOBE_HOUSE_FILL_KEY = "chart.globeHouseFill";
+
+    /** Settings key for filling the pointed-at degree on the globe. */
+    public static final String GLOBE_DEGREE_FILL_KEY = "chart.globeDegreeFill";
+
+    /** Settings key for filling the lunar mansion stations on the globe. */
+    public static final String GLOBE_MANSION_FILL_KEY = "chart.globeMansionFill";
+
+    /**
+     * Whether the globe washes the house the reader is on with colour.
+     *
+     * <b>The same bargain the sign shell strikes, band by band.</b> David asked for the sign
+     * shell's switch on the other bands too, 2026-09-16. Off leaves the cusp spokes, the glyphs
+     * and the numbers exactly where they are and takes only the wash, so a reader who is
+     * looking at the aspect network underneath can clear the colour without losing the frame
+     * they are reading positions against. On by default, because the wash is what answers
+     * "which house is this" without a click.
+     *
+     * <b>There is no decan control, and that is not an oversight.</b> The decan band on the
+     * globe is glyph billboards and nothing else - no shell, no wash, not even a hover fill -
+     * so a switch for it would govern nothing. A control that does nothing is worse than an
+     * absent one; the two empty screens removed in September are the same lesson.
+     */
+    public static boolean globeHouseFill() {
+        return !"false".equals(get(GLOBE_HOUSE_FILL_KEY, "true"));
+    }
+
+    public static void setGlobeHouseFill(boolean on) {
+        set(GLOBE_HOUSE_FILL_KEY, on ? "true" : "false");
+    }
+
+    /**
+     * Whether the globe washes the degree under the cursor - the Sabian scale's own fill.
+     *
+     * The ticks, the scale line they hang from and the sign marks all stay when this is off;
+     * what goes is the one-degree slice that lights behind the tick being pointed at.
+     */
+    public static boolean globeDegreeFill() {
+        return !"false".equals(get(GLOBE_DEGREE_FILL_KEY, "true"));
+    }
+
+    public static void setGlobeDegreeFill(boolean on) {
+        set(GLOBE_DEGREE_FILL_KEY, on ? "true" : "false");
+    }
+
+    /**
+     * Whether the globe fills the lunar mansion stations with colour.
+     *
+     * <b>The most visible of the three.</b> The mansion band carries a standing wash on the
+     * Moon's own station and a brighter one on the station under the cursor, over a band that
+     * sits outside the whole zodiac. Off keeps the band's two edges, its 28 divisions and its
+     * numbers - the stations stay countable, they simply stop being tinted.
+     */
+    public static boolean globeMansionFill() {
+        return !"false".equals(get(GLOBE_MANSION_FILL_KEY, "true"));
+    }
+
+    public static void setGlobeMansionFill(boolean on) {
+        set(GLOBE_MANSION_FILL_KEY, on ? "true" : "false");
+    }
+
     /** Settings key for drawing the natal bodies as planets on the globe. */
     public static final String GLOBE_PLANETS_KEY = "chart.globePlanets";
 

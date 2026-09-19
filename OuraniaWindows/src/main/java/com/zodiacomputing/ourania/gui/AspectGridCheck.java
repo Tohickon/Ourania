@@ -2067,7 +2067,14 @@ public final class AspectGridCheck {
                         String tag = at + " partner=" + partner + " sky=" + sky;
 
                         int[] got = SkymapPanel.ringRadii(w, h, partner, sky);
-                        ok("ring chain returns nine radii" + tag, got.length == 9);
+                        // Ten since 2026-09-16, when the lunar mansions were given a band of
+                        // their own at the rim. The new radius is appended, and equals RING_OUTER
+                        // for every caller of this arity - the mansions are folded as far as
+                        // this overload is concerned - so every figure asserted below is the
+                        // formula this suite has always asserted.
+                        ok("ring chain returns ten radii" + tag, got.length == 10);
+                        ok("the mansion band is closed for a caller that does not open it" + tag,
+                            got[SkymapPanel.RING_MANSION_INNER] == outer);
                         ok("outer matches" + tag, got[SkymapPanel.RING_OUTER] == outer);
                         ok("decan outer matches" + tag,
                             got[SkymapPanel.RING_DECAN_OUTER] == decanOuter);

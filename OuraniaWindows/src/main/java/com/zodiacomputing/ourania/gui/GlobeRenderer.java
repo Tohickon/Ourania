@@ -527,7 +527,8 @@ final class GlobeRenderer {
             return;
         }
         int house = Zodiac.houseOf(lon, cusps);
-        if (house >= 1 && house <= 12 && this.shown(SkymapPanel.Layer.HOUSES)) {
+        if (house >= 1 && house <= 12 && this.shown(SkymapPanel.Layer.HOUSES)
+                && Settings.globeHouseFill()) {
             double from = cusps[house];
             double span = arc(from, cusps[house == 12 ? 1 : house + 1]);
             // The house stays flat because the houses are: they are spokes in the plane, and
@@ -825,7 +826,7 @@ final class GlobeRenderer {
         // would put a second solid wedge over the sign wedge that body is standing in. Asking
         // for it by pointing at the number is a deliberate act, and the only time the reader
         // wants the house rather than the placement.
-        if (lit >= 1 && lit <= 12) {
+        if (lit >= 1 && lit <= 12 && Settings.globeHouseFill()) {
             double span = arc(cusps[lit], cusps[lit == 12 ? 1 : lit + 1]);
             wedgeOnSphere(cusps[lit], cusps[lit] + span, Globe.SHELL_SIGN_INNER + 0.11,
                 faded(new Color(236, 224, 188, 66), SkymapPanel.Layer.HOUSES));
@@ -1080,13 +1081,19 @@ final class GlobeRenderer {
         int lit = this.panel.focusedMansion();
 
         // The Moon's own station, washed in first so the boundaries sit on top of it.
-        if (moon != null) {
+        //
+        // <b>Both washes answer to Settings, the divisions and numbers below do not.</b> Off,
+        // the band keeps its two edges, its 28 boundaries and its numbers - the reader can
+        // still count the stations and see which one the Moon is in from the brighter boundary
+        // and number. What goes is the tint over the sky behind them.
+        boolean fill = Settings.globeMansionFill();
+        if (moon != null && fill) {
             quadRing(moon.start, moon.end(), inner, outer, wash(base, 70));
         }
         // And the station under the cursor, brighter, plus its slice of the sphere - the same
         // answer a hovered degree tick gives, for the same reason: a band that lights only its
         // own thickness is pointing at itself rather than at the sky it names.
-        if (lit >= 1) {
+        if (lit >= 1 && fill) {
             LunarMansions.Mansion m = LunarMansions.byNumber(lit);
             quadRing(m.start, m.end(), inner, outer, wash(base, 130));
             wedgeOnSphere(m.start, m.end(), Globe.SHELL_SIGN_INNER + 0.09, wash(base, 60));
@@ -1151,7 +1158,7 @@ final class GlobeRenderer {
         // <b>Through the sphere as well as across the plane.</b> Lighting only the flat sector
         // made the same mistake the sign highlight made - the sphere is where the bodies are,
         // so a degree that lights only the disc is pointing at half of itself.
-        if (lit >= 0) {
+        if (lit >= 0 && Settings.globeDegreeFill()) {
             wedgeOnSphere(lit, lit + 1.0, Globe.SHELL_SIGN_INNER + 0.09,
                 faded(new Color(255, 238, 170, 96), SkymapPanel.Layer.DEGREES));
             quadRing(lit, lit + 1.0, 0.10, inner + Globe.TICK_HOVER_REACH,
