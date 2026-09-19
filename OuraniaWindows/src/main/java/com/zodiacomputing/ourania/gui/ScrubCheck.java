@@ -73,8 +73,8 @@ public final class ScrubCheck {
                     sky.endScrub();
                 }
                 set(sky, "chartMode", ChartMode.SINGLE);
-                set(sky, "baseChartTime", ANCHOR);
-                set(sky, "skyChartTime", ANCHOR);
+                set(sky, "natalRing.time", ANCHOR);
+                set(sky, "skyRing.time", ANCHOR);
                 set(sky, "stepAmount", step);
                 set(sky, "isPlaying", false);
                 sky.fitView();
@@ -112,8 +112,8 @@ public final class ScrubCheck {
         ok("a Shift+drag scrubs", sky.isScrubbing());
         ok("and pauses the animation", !(Boolean) field(sky, "isPlaying"));
         eq("35 px right is three steps", 3, sky.scrubSteps);
-        ZonedDateTime base = time(sky, "baseChartTime");
-        ZonedDateTime skyT = time(sky, "skyChartTime");
+        ZonedDateTime base = time(sky, "natalRing.time");
+        ZonedDateTime skyT = time(sky, "skyRing.time");
         boolean moved = base.equals(ANCHOR.plusDays(3)) || skyT.equals(ANCHOR.plusDays(3));
         ok("the transport's chart moved exactly three days: base " + base + ", sky " + skyT, moved);
         ok("nothing moved by any other amount",
@@ -124,7 +124,7 @@ public final class ScrubCheck {
         eq("60 px left of the press is six steps back", -6, sky.scrubSteps);
         SwingUtilities.invokeAndWait(() -> press(chart, MouseEvent.MOUSE_DRAGGED, 404, 402, true));
         ok("back at the press, both times are exactly where the scrub began",
-            time(sky, "baseChartTime").equals(ANCHOR) && time(sky, "skyChartTime").equals(ANCHOR));
+            time(sky, "natalRing.time").equals(ANCHOR) && time(sky, "skyRing.time").equals(ANCHOR));
 
         SwingUtilities.invokeAndWait(() -> {
             press(chart, MouseEvent.MOUSE_DRAGGED, 452, 402, true);
@@ -133,8 +133,8 @@ public final class ScrubCheck {
         });
         ok("letting go ends the scrub", !sky.isScrubbing());
         ok("and the chart stays where it was let go, +5 days",
-            time(sky, "baseChartTime").equals(ANCHOR.plusDays(5))
-                || time(sky, "skyChartTime").equals(ANCHOR.plusDays(5)));
+            time(sky, "natalRing.time").equals(ANCHOR.plusDays(5))
+                || time(sky, "skyRing.time").equals(ANCHOR.plusDays(5)));
         ok("the click that ends a scrub opens nothing", selection.getText().contains("scrub-nothing-opened"));
 
         // Without Shift, at fit, a drag is still nothing; zoomed, it pans and does not scrub.
@@ -145,7 +145,7 @@ public final class ScrubCheck {
             press(chart, MouseEvent.MOUSE_RELEASED, 480, 400, false);
         });
         ok("a plain drag at fit moves no time",
-            time(sky, "baseChartTime").equals(ANCHOR) && time(sky, "skyChartTime").equals(ANCHOR));
+            time(sky, "natalRing.time").equals(ANCHOR) && time(sky, "skyRing.time").equals(ANCHOR));
         sky.zoomAt(450, 410, -5);
         SwingUtilities.invokeAndWait(() -> {
             press(chart, MouseEvent.MOUSE_PRESSED, 400, 400, false);
@@ -153,7 +153,7 @@ public final class ScrubCheck {
             press(chart, MouseEvent.MOUSE_RELEASED, 480, 400, false);
         });
         ok("a plain drag while zoomed pans and moves no time",
-            !sky.viewIsFit() && time(sky, "baseChartTime").equals(ANCHOR) && time(sky, "skyChartTime").equals(ANCHOR));
+            !sky.viewIsFit() && time(sky, "natalRing.time").equals(ANCHOR) && time(sky, "skyRing.time").equals(ANCHOR));
 
         // The globe scrubs the same way.
         reset(sky, "1 Hour");
@@ -164,7 +164,7 @@ public final class ScrubCheck {
             press(chart, MouseEvent.MOUSE_RELEASED, 425, 400, true);
         });
         ok("on the globe, Shift+drag scrubs too: two hours",
-            time(sky, "baseChartTime").equals(ANCHOR.plusHours(2)) || time(sky, "skyChartTime").equals(ANCHOR.plusHours(2)));
+            time(sky, "natalRing.time").equals(ANCHOR.plusHours(2)) || time(sky, "skyRing.time").equals(ANCHOR.plusHours(2)));
         SwingUtilities.invokeAndWait(() -> sky.setGlobeMode(false));
 
         // Real Time has no step of its own; a scrub moves by the hour.
@@ -176,7 +176,7 @@ public final class ScrubCheck {
             sky.endScrub();
         });
         ok("four steps on Real Time is four hours, not the clock",
-            time(sky, "baseChartTime").equals(ANCHOR.plusHours(4)) || time(sky, "skyChartTime").equals(ANCHOR.plusHours(4)));
+            time(sky, "natalRing.time").equals(ANCHOR.plusHours(4)) || time(sky, "skyRing.time").equals(ANCHOR.plusHours(4)));
         try {
             eq("and the Step setting is left as it was", "Real Time", field(sky, "stepAmount"));
         } catch (Exception e) {
@@ -193,8 +193,8 @@ public final class ScrubCheck {
                 sky.beginScrub();
                 for (int k : new int[] {1, 2, 3}) {
                     sky.scrubTo(k);
-                    ZonedDateTime b = (ZonedDateTime) field(sky, "baseChartTime");
-                    ZonedDateTime s = (ZonedDateTime) field(sky, "skyChartTime");
+                    ZonedDateTime b = (ZonedDateTime) field(sky, "natalRing.time");
+                    ZonedDateTime s = (ZonedDateTime) field(sky, "skyRing.time");
                     seen.add(b.equals(ANCHOR) ? s : b);
                 }
                 sky.endScrub();
@@ -216,7 +216,7 @@ public final class ScrubCheck {
                 // Both people have a birth chart here; with no Chart A the inner time is the sky.
                 set(sky, "innerIsBirthChart", true);
                 set(sky, "showTransitChart", true);
-                set(sky, "transitChartTime", personB);
+                set(sky, "outerRing.time", personB);
                 set(sky, "animateTarget", "Both");
                 sky.beginScrub();
                 sky.scrubTo(2);
@@ -226,9 +226,9 @@ public final class ScrubCheck {
             }
         });
         ok("on a synastry this is a synastry", sky.isSynastryChart());
-        eq("the sky moved two weeks", ANCHOR.plusWeeks(2), time(sky, "skyChartTime"));
-        eq("person A's birth did not move", ANCHOR, time(sky, "baseChartTime"));
-        eq("person B's birth did not move", personB, time(sky, "transitChartTime"));
+        eq("the sky moved two weeks", ANCHOR.plusWeeks(2), time(sky, "skyRing.time"));
+        eq("person A's birth did not move", ANCHOR, time(sky, "natalRing.time"));
+        eq("person B's birth did not move", personB, time(sky, "outerRing.time"));
         SwingUtilities.invokeAndWait(() -> {
             try {
                 set(sky, "animateTarget", "Transit");
@@ -260,11 +260,11 @@ public final class ScrubCheck {
         SwingUtilities.invokeAndWait(() -> slider.setValueIsAdjusting(false));
         ok("letting go ends the scrub", !sky.isScrubbing());
         eq("the knob springs back to the middle", 0, slider.getValue());
-        ZonedDateTime after = time(sky, "baseChartTime").equals(ANCHOR) ? time(sky, "skyChartTime") : time(sky, "baseChartTime");
+        ZonedDateTime after = time(sky, "natalRing.time").equals(ANCHOR) ? time(sky, "skyRing.time") : time(sky, "natalRing.time");
         eq("and the chart stays seven days on", ANCHOR.plusDays(7), after);
         // An arrow key moves a focused slider one notch without adjusting.
         SwingUtilities.invokeAndWait(() -> slider.setValue(-1));
-        ZonedDateTime nudged = time(sky, "baseChartTime").equals(ANCHOR) ? time(sky, "skyChartTime") : time(sky, "baseChartTime");
+        ZonedDateTime nudged = time(sky, "natalRing.time").equals(ANCHOR) ? time(sky, "skyRing.time") : time(sky, "natalRing.time");
         eq("a single notch is a single step, from where the chart now is", ANCHOR.plusDays(6), nudged);
         eq("and the knob is back in the middle", 0, slider.getValue());
         ok("with no scrub left running", !sky.isScrubbing());
@@ -272,7 +272,7 @@ public final class ScrubCheck {
 
     private static void redraw(SkymapPanel sky, Component chart) throws Exception {
         reset(sky, "1 Day");
-        double[] b0 = ((double[]) field(sky, "bLon")).clone();
+        double[] b0 = ((double[]) field(sky, "natalRing.lon")).clone();
         SwingUtilities.invokeAndWait(() -> {
             press(chart, MouseEvent.MOUSE_PRESSED, 300, 400, true);
             for (int x = 305; x <= 350; x += 1) {
@@ -282,13 +282,13 @@ public final class ScrubCheck {
         // The one coalesced recompute runs on the next turn of the queue.
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> { });
-        double[] b1 = ((double[]) field(sky, "bLon")).clone();
+        double[] b1 = ((double[]) field(sky, "natalRing.lon")).clone();
         ok("mid-scrub the wheel has already moved", !Arrays.equals(b0, b1));
         final double[][] fresh = new double[1][];
         SwingUtilities.invokeAndWait(() -> {
             try {
                 sky.updateChartData();
-                fresh[0] = ((double[]) field(sky, "bLon")).clone();
+                fresh[0] = ((double[]) field(sky, "natalRing.lon")).clone();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -316,7 +316,7 @@ public final class ScrubCheck {
             !(Boolean) field(sky, "innerIsBirthChart") && !(Boolean) field(sky, "showTransitChart"));
         final java.lang.reflect.Method step = SkymapPanel.class.getDeclaredMethod("stepTime");
         step.setAccessible(true);
-        double[] before = ((double[]) field(sky, "bLon")).clone();
+        double[] before = ((double[]) field(sky, "natalRing.lon")).clone();
         SwingUtilities.invokeAndWait(() -> {
             try {
                 set(sky, "animationDirection", 1);
@@ -329,10 +329,10 @@ public final class ScrubCheck {
                 throw new RuntimeException(e);
             }
         });
-        eq("two ticks of Play at one day a step move the sky two days", ANCHOR.plusDays(2), time(sky, "skyChartTime"));
+        eq("two ticks of Play at one day a step move the sky two days", ANCHOR.plusDays(2), time(sky, "skyRing.time"));
         int moon = com.zodiacomputing.ourania.astro.Bodies.indexOf("moon");
         double moved = com.zodiacomputing.ourania.astro.Aspects.separation(before[moon],
-            ((double[]) field(sky, "bLon"))[moon]);
+            ((double[]) field(sky, "natalRing.lon"))[moon]);
         ok("and the wheel's Moon went with it, " + Math.round(moved) + " degrees", moved > 20 && moved < 32);
     }
 
@@ -354,26 +354,26 @@ public final class ScrubCheck {
         mode(sky, ChartMode.SINGLE, true, false, personB, "1 Hour");
         ok("a natal chart shows Chart A's bar and the sky's, " + shown(sky), shown(sky).equals("CHART_A SKY"));
         slide(sky, SkymapPanel.ScrubTarget.CHART_A, 3);
-        eq("Chart A's bar moves Chart A's birth three hours", ANCHOR.plusHours(3), time(sky, "baseChartTime"));
-        eq("and leaves the sky where it was", ANCHOR, time(sky, "skyChartTime"));
+        eq("Chart A's bar moves Chart A's birth three hours", ANCHOR.plusHours(3), time(sky, "natalRing.time"));
+        eq("and leaves the sky where it was", ANCHOR, time(sky, "skyRing.time"));
         ok("and offers the birth time back", sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).isEnabled());
         slide(sky, SkymapPanel.ScrubTarget.CHART_A, 2);
-        eq("a second slide goes on from there", ANCHOR.plusHours(5), time(sky, "baseChartTime"));
+        eq("a second slide goes on from there", ANCHOR.plusHours(5), time(sky, "natalRing.time"));
         SwingUtilities.invokeAndWait(() -> sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).doClick());
-        eq("the reset puts the birth time back where it was before either slide", ANCHOR, time(sky, "baseChartTime"));
+        eq("the reset puts the birth time back where it was before either slide", ANCHOR, time(sky, "natalRing.time"));
         ok("and has nothing more to reset", !sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).isEnabled());
 
         mode(sky, ChartMode.SYNASTRY, true, true, personB, "1 Day");
         ok("a synastry shows all three bars, " + shown(sky), shown(sky).equals("CHART_A CHART_B SKY"));
         slide(sky, SkymapPanel.ScrubTarget.CHART_B, -2);
-        eq("Chart B's bar moves Chart B's birth back two days", personB.minusDays(2), time(sky, "transitChartTime"));
-        eq("and not Chart A's", ANCHOR, time(sky, "baseChartTime"));
-        eq("nor the sky", ANCHOR, time(sky, "skyChartTime"));
+        eq("Chart B's bar moves Chart B's birth back two days", personB.minusDays(2), time(sky, "outerRing.time"));
+        eq("and not Chart A's", ANCHOR, time(sky, "natalRing.time"));
+        eq("nor the sky", ANCHOR, time(sky, "skyRing.time"));
         slide(sky, SkymapPanel.ScrubTarget.SKY, 4);
-        eq("the sky's bar moves the sky four days", ANCHOR.plusDays(4), time(sky, "skyChartTime"));
-        eq("and neither birth", personB.minusDays(2), time(sky, "transitChartTime"));
+        eq("the sky's bar moves the sky four days", ANCHOR.plusDays(4), time(sky, "skyRing.time"));
+        eq("and neither birth", personB.minusDays(2), time(sky, "outerRing.time"));
         SwingUtilities.invokeAndWait(() -> sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_B).doClick());
-        eq("Chart B's reset puts that birth back", personB, time(sky, "transitChartTime"));
+        eq("Chart B's reset puts that birth back", personB, time(sky, "outerRing.time"));
 
         mode(sky, ChartMode.COMPOSITE_MIDPOINT, true, true, personB, "1 Day");
         ok("a composite shows both people's bars, " + shown(sky), shown(sky).equals("CHART_A CHART_B SKY"));
@@ -381,10 +381,10 @@ public final class ScrubCheck {
         // The globe reads the same moments.
         mode(sky, ChartMode.SINGLE, true, false, personB, "1 Day");
         SwingUtilities.invokeAndWait(() -> sky.setGlobeMode(true));
-        double[] before = ((double[]) field(sky, "bLon")).clone();
+        double[] before = ((double[]) field(sky, "natalRing.lon")).clone();
         slide(sky, SkymapPanel.ScrubTarget.CHART_A, 5);
         int moon = com.zodiacomputing.ourania.astro.Bodies.indexOf("moon");
-        double moved = com.zodiacomputing.ourania.astro.Aspects.separation(before[moon], ((double[]) field(sky, "bLon"))[moon]);
+        double moved = com.zodiacomputing.ourania.astro.Aspects.separation(before[moon], ((double[]) field(sky, "natalRing.lon"))[moon]);
         ok("on the globe, Chart A's bar moves Chart A's Moon five days, " + Math.round(moved) + " degrees",
             moved > 50 && moved < 80);
         SwingUtilities.invokeAndWait(() -> {
@@ -427,7 +427,7 @@ public final class ScrubCheck {
             bar.setValue(reach);
         });
         Thread.sleep(600);
-        ZonedDateTime early = time(sky, "skyChartTime");
+        ZonedDateTime early = time(sky, "skyRing.time");
         // Then a busy event thread, as a slow redraw makes it: three quarter-second stalls, which
         // Swing's timer answers by coalescing the ticks it could not deliver.
         for (int i = 0; i < 3; i++) {
@@ -440,7 +440,7 @@ public final class ScrubCheck {
             });
             Thread.sleep(50);
         }
-        ZonedDateTime later = time(sky, "skyChartTime");
+        ZonedDateTime later = time(sky, "skyRing.time");
         long earlyHours = java.time.Duration.between(ANCHOR, early).toHours();
         long laterHours = java.time.Duration.between(ANCHOR, later).toHours();
         ok("held all the way forward, the sky runs on past where the knob sits: +" + earlyHours + "h",
@@ -455,13 +455,13 @@ public final class ScrubCheck {
             laterHours >= reach + SkymapPanel.SHUTTLE_MAX_RATE * 1.5 * 0.6);
 
         SwingUtilities.invokeAndWait(() -> bar.setValueIsAdjusting(false));
-        ZonedDateTime released = time(sky, "skyChartTime");
+        ZonedDateTime released = time(sky, "skyRing.time");
         ok("letting go ends the scrub", !sky.isScrubbing());
         eq("and the knob springs back", 0, bar.getValue());
         ok("where it was let go, the sky stays: +" + java.time.Duration.between(ANCHOR, released).toHours() + "h",
             java.time.Duration.between(ANCHOR, released).toHours() >= laterHours);
         Thread.sleep(400);
-        eq("and does not run on after", released, time(sky, "skyChartTime"));
+        eq("and does not run on after", released, time(sky, "skyRing.time"));
 
         SwingUtilities.invokeAndWait(() -> {
             bar.setValueIsAdjusting(true);
@@ -469,11 +469,11 @@ public final class ScrubCheck {
         });
         Thread.sleep(1000);
         SwingUtilities.invokeAndWait(() -> bar.setValueIsAdjusting(false));
-        long back = java.time.Duration.between(released, time(sky, "skyChartTime")).toHours();
+        long back = java.time.Duration.between(released, time(sky, "skyRing.time")).toHours();
         ok("held back, it runs backwards past the knob: " + back + "h", back < -reach);
 
         // Inside the dead zone the knob is an offset and nothing more.
-        ZonedDateTime from = time(sky, "skyChartTime");
+        ZonedDateTime from = time(sky, "skyRing.time");
         SwingUtilities.invokeAndWait(() -> {
             bar.setValueIsAdjusting(true);
             bar.setValue(SkymapPanel.SHUTTLE_DEAD_ZONE);
@@ -481,7 +481,7 @@ public final class ScrubCheck {
         Thread.sleep(800);
         SwingUtilities.invokeAndWait(() -> bar.setValueIsAdjusting(false));
         eq("a small pull held still is just that many steps", from.plusHours(SkymapPanel.SHUTTLE_DEAD_ZONE),
-            time(sky, "skyChartTime"));
+            time(sky, "skyRing.time"));
 
         // Chart A's bar runs Chart A's birth, and the sky holds still.
         mode(sky, ChartMode.SINGLE, true, false, personB, "1 Hour");
@@ -492,9 +492,9 @@ public final class ScrubCheck {
         });
         Thread.sleep(1000);
         SwingUtilities.invokeAndWait(() -> a.setValueIsAdjusting(false));
-        long birth = java.time.Duration.between(ANCHOR, time(sky, "baseChartTime")).toHours();
+        long birth = java.time.Duration.between(ANCHOR, time(sky, "natalRing.time")).toHours();
         ok("Chart A's bar held runs Chart A's birth on: +" + birth + "h", birth > reach);
-        eq("and leaves the sky where it was", ANCHOR, time(sky, "skyChartTime"));
+        eq("and leaves the sky where it was", ANCHOR, time(sky, "skyRing.time"));
         SwingUtilities.invokeAndWait(() -> {
             sky.scrubOrigins.clear();
             sky.refreshScrubBars();
@@ -510,7 +510,7 @@ public final class ScrubCheck {
                 set(sky, "chartMode", m);
                 set(sky, "innerIsBirthChart", natal);
                 set(sky, "showTransitChart", transits);
-                set(sky, "transitChartTime", personB);
+                set(sky, "outerRing.time", personB);
                 sky.scrubOrigins.clear();
                 sky.updateChartData();
             } catch (Exception e) {
@@ -548,15 +548,11 @@ public final class ScrubCheck {
     }
 
     private static Object field(Object o, String name) throws Exception {
-        Field f = o.getClass().getDeclaredField(name);
-        f.setAccessible(true);
-        return f.get(o);
+        return CheckReflect.get(o, name);
     }
 
     private static void set(Object o, String name, Object value) throws Exception {
-        Field f = o.getClass().getDeclaredField(name);
-        f.setAccessible(true);
-        f.set(o, value);
+        CheckReflect.set(o, name, value);
     }
 
     private interface Body {

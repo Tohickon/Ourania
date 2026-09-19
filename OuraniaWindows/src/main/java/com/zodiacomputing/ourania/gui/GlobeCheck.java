@@ -536,17 +536,13 @@ public final class GlobeCheck {
 
             // A chart with something on every ring, set directly so this part does not depend
             // on an ephemeris read or on which sample chart happens to be loaded.
-            java.lang.reflect.Field fb = SkymapPanel.class.getDeclaredField("bLon");
-            java.lang.reflect.Field fv = SkymapPanel.class.getDeclaredField("bValid");
-            fb.setAccessible(true);
-            fv.setAccessible(true);
             // <b>Let the chart settle first.</b> A new window casts its chart on a worker,
             // and a validity array written before that lands is quietly overwritten - which
             // showed up as the check returning a different total on consecutive runs, the one
             // symptom that makes every other number in a suite untrustworthy.
             Thread.sleep(2500);
-            double[] lon = (double[]) fb.get(panel);
-            boolean[] valid = (boolean[]) fv.get(panel);
+            double[] lon = panel.natalRing.lon;
+            boolean[] valid = panel.natalRing.valid;
             // <b>Half spread, half crowded.</b> An evenly spread chart never stacks, so the
             // first version of this part passed with the stack removed from the hit test
             // entirely - the mutation survived because the case was never exercised. The
@@ -575,12 +571,8 @@ public final class GlobeCheck {
             // tested ring zero - whose inclination is zero, so the entire tilt was untested.
             // A hit test that knew the radius and not the plane is the same
             // see-it-cannot-click-it defect, in the half that is harder to notice.
-            java.lang.reflect.Field ft = SkymapPanel.class.getDeclaredField("tLon");
-            java.lang.reflect.Field ftv = SkymapPanel.class.getDeclaredField("tValid");
-            ft.setAccessible(true);
-            ftv.setAccessible(true);
-            double[] tlon = (double[]) ft.get(panel);
-            boolean[] tvalid = (boolean[]) ftv.get(panel);
+            double[] tlon = panel.outerRing.lon;
+            boolean[] tvalid = panel.outerRing.valid;
             System.arraycopy(lon, 0, tlon, 0, lon.length);
             java.util.Arrays.fill(tvalid, true);
             java.lang.reflect.Field fst =
@@ -1047,17 +1039,17 @@ public final class GlobeCheck {
             int atSynastry = 0;
             int built = 0;
             for (int a = 0; a < SkymapPanel.BODY_COUNT; a++) {
-                if (!SkymapPanel.aspecting(a, panel.cValid)) {
+                if (!SkymapPanel.aspecting(a, panel.skyRing.valid)) {
                     continue;
                 }
                 for (int b = 0; b < SkymapPanel.BODY_COUNT; b++) {
-                    if (!SkymapPanel.aspecting(b, panel.bValid)) {
+                    if (!SkymapPanel.aspecting(b, panel.natalRing.valid)) {
                         continue;
                     }
-                    if (panel.aspectInkFor(panel.cLon[a], panel.bLon[b], a, b, false) != null) {
+                    if (panel.aspectInkFor(panel.skyRing.lon[a], panel.natalRing.lon[b], a, b, false) != null) {
                         atNatal++;
                     }
-                    if (panel.aspectInkFor(panel.cLon[a], panel.bLon[b], a, b, true) != null) {
+                    if (panel.aspectInkFor(panel.skyRing.lon[a], panel.natalRing.lon[b], a, b, true) != null) {
                         atSynastry++;
                     }
                 }
@@ -1148,7 +1140,7 @@ public final class GlobeCheck {
                 }
             }
             Thread.sleep(900);
-            for (String field : new String[] {"bValid", "tValid", "cValid"}) {
+            for (String field : new String[] {"natalRing.valid", "outerRing.valid", "skyRing.valid"}) {
                 set(panel, field, new boolean[SkymapPanel.BODY_COUNT]);
             }
 
@@ -1749,11 +1741,11 @@ public final class GlobeCheck {
             int[][] chords = (int[][]) build.invoke(null, panel);
             double[] shells = (double[]) radii.invoke(null, panel);
             double origin = panel.pinLongitude();
-            double[][] lons = {panel.bLon, panel.tLon, panel.cLon};
+            double[][] lons = {panel.natalRing.lon, panel.outerRing.lon, panel.skyRing.lon};
             int[][] levels = {
-                Globe.stackLevels(panel.bLon, panel.bValid, 7.0),
-                Globe.stackLevels(panel.tLon, panel.tValid, 7.0),
-                Globe.stackLevels(panel.cLon, panel.cValid, 7.0),
+                Globe.stackLevels(panel.natalRing.lon, panel.natalRing.valid, 7.0),
+                Globe.stackLevels(panel.outerRing.lon, panel.outerRing.valid, 7.0),
+                Globe.stackLevels(panel.skyRing.lon, panel.skyRing.valid, 7.0),
             };
 
             // <b>One chord on the screen at a time.</b> Two earlier versions of this sampled a
@@ -1763,9 +1755,9 @@ public final class GlobeCheck {
             // median came back 0.823 against 0.814 with it - the same number, which is a check
             // that cannot fail. So each chord is measured alone, with every other body's
             // validity switched off, and nothing can cross it.
-            boolean[] b0 = panel.bValid.clone();
-            boolean[] t0 = panel.tValid.clone();
-            boolean[] c0 = panel.cValid.clone();
+            boolean[] b0 = panel.natalRing.valid.clone();
+            boolean[] t0 = panel.outerRing.valid.clone();
+            boolean[] c0 = panel.skyRing.valid.clone();
             java.util.List<double[]> sample = new java.util.ArrayList<>();
             int tried = 0;
             for (int[] c : chords) {
@@ -1797,7 +1789,7 @@ public final class GlobeCheck {
                     GlobeRenderer.liftOf(deck, stacked)
                         + levels[ring][c[1]] * Globe.STACK_STEP,
                     GlobeRenderer.inclinationOf(deck, stacked));
-                double[] to = Globe.onShell(panel.bLon[c[2]], origin, shells[0],
+                double[] to = Globe.onShell(panel.natalRing.lon[c[2]], origin, shells[0],
                     GlobeRenderer.liftOf(innerDeck, stacked)
                         + levels[0][c[2]] * Globe.STACK_STEP,
                     GlobeRenderer.inclinationOf(innerDeck, stacked));
@@ -1843,9 +1835,9 @@ public final class GlobeCheck {
                 } else {
                     onlyC[c[1]] = true;
                 }
-                set(panel, "bValid", onlyB);
-                set(panel, "tValid", onlyT);
-                set(panel, "cValid", onlyC);
+                set(panel, "natalRing.valid", onlyB);
+                set(panel, "outerRing.valid", onlyT);
+                set(panel, "skyRing.valid", onlyC);
                 panel.invalidateGlobeChords();
 
                 java.awt.image.BufferedImage frame = new java.awt.image.BufferedImage(
@@ -1872,9 +1864,9 @@ public final class GlobeCheck {
                 }
                 sample.add(new double[] {nearInk, farInk});
             }
-            set(panel, "bValid", b0);
-            set(panel, "tValid", t0);
-            set(panel, "cValid", c0);
+            set(panel, "natalRing.valid", b0);
+            set(panel, "outerRing.valid", t0);
+            set(panel, "skyRing.valid", c0);
             panel.invalidateGlobeChords();
 
             System.out.println("  " + sample.size() + " chords measured alone, of "
@@ -1995,9 +1987,7 @@ public final class GlobeCheck {
     }
 
     private static void set(SkymapPanel panel, String name, Object value) throws Exception {
-        java.lang.reflect.Field f = SkymapPanel.class.getDeclaredField(name);
-        f.setAccessible(true);
-        f.set(panel, value);
+        CheckReflect.set(panel, name, value);
     }
 
     /**

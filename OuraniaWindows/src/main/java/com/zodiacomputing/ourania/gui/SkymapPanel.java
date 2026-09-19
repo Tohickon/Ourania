@@ -76,10 +76,13 @@ import javax.swing.Timer;
 public class SkymapPanel
 extends JPanel {
     private SwissEph sw;
-    private SweDate baseSd;
-    private ZonedDateTime baseChartTime;
-    private double baseLatitude = 51.4779;
-    private double baseLongitude = 0.0;
+    /**
+     * The wheel's three rings - the chart, the outer ring (transits, progressions or Chart B),
+     * and the sky. See {@link WheelRing}: these were thirty loose fields until J13.
+     */
+    public final WheelRing natalRing = new WheelRing();
+    public final WheelRing outerRing = new WheelRing();
+    public final WheelRing skyRing = new WheelRing();
     private String baseLocationName = "Los Angeles, CA";
     private String baseTimeZoneId = ZoneId.systemDefault().getId();
     public boolean showTransitChart = false;
@@ -157,7 +160,7 @@ extends JPanel {
      *
      * <b>Separate from {@link #showTransitChart}.</b> In SYNASTRY mode that flag means
      * "chart B exists" and is always true; this flag means "the sky is wrapped around
-     * both people". The sky data lives in {@link #skyChartTime}, which already
+     * both people". The sky data lives in {@link #skyRing.time}, which already
      * exists for exactly this purpose and whose javadoc says the same thing.
      */
     public boolean showTriWheel = false;
@@ -484,7 +487,7 @@ extends JPanel {
      *
      * <b>One bloom per ring that is DRAWN, not per idea it carries.</b> The outer ring holds a
      * partner in a synastry and the sky in a transit chart, and the painter does not care
-     * which - it draws a ring of glyphs from tLon either way. Keying the blooms to the arrays
+     * which - it draws a ring of glyphs from outerRing.lon either way. Keying the blooms to the arrays
      * rather than to the meaning is what stops this needing a branch per mode.
      *
      * The ring keeps drawing while a bloom is folding even though the flag that gated it has
@@ -609,8 +612,8 @@ extends JPanel {
         }
         try {
             this.installSubjects(this.subjectA, this.subjectB,
-                this.subjectSky.movedTo(this.subjectSky.placeName, this.skyLatitude,
-                    this.skyLongitude, ZoneId.of(zoneOverride).getId()));
+                this.subjectSky.movedTo(this.subjectSky.placeName, this.skyRing.latitude,
+                    this.skyRing.longitude, ZoneId.of(zoneOverride).getId()));
         } catch (Exception bad) {
             System.out.println("Ignoring unknown sky time zone \"" + zoneOverride + "\"");
         }
@@ -618,7 +621,7 @@ extends JPanel {
 
     /** The sky's moment, or now in the sky's own zone when the fields are blank. */
     private void setSkyMoment(String date, String time) {
-        // <b>Through the subject, not past it.</b> This wrote skyChartTime directly and left
+        // <b>Through the subject, not past it.</b> This wrote skyRing.time directly and left
         // subjectSky empty, so the two disagreed about what the sky was - the field said this
         // evening and the record said "not entered", and the chip that reads the record could
         // not name the chart it draws. A loose field written beside its own record is the
@@ -636,8 +639,8 @@ extends JPanel {
             when = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
         }
         this.installSubjects(this.subjectA, this.subjectB,
-            this.subjectSky.movedTo(this.subjectSky.placeName, this.skyLatitude,
-                this.skyLongitude, this.skyTimeZoneId).at(when));
+            this.subjectSky.movedTo(this.subjectSky.placeName, this.skyRing.latitude,
+                this.skyRing.longitude, this.skyTimeZoneId).at(when));
     }
 
     // ---------------------------------------------------------------- the three subjects
@@ -834,22 +837,22 @@ extends JPanel {
             anchor == null ? com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A")
                 : anchor;
 
-        this.baseChartTime = inner.moment;
-        this.baseLatitude = inner.latitude;
-        this.baseLongitude = inner.longitude;
+        this.natalRing.time = inner.moment;
+        this.natalRing.latitude = inner.latitude;
+        this.natalRing.longitude = inner.longitude;
         this.baseLocationName = inner.placeName;
         this.baseTimeZoneId = inner.zoneId;
         this.baseTimeUnknown = inner.timeUnknown;
 
-        this.transitChartTime = outer.moment;
-        this.transitLatitude = outer.latitude;
-        this.transitLongitude = outer.longitude;
+        this.outerRing.time = outer.moment;
+        this.outerRing.latitude = outer.latitude;
+        this.outerRing.longitude = outer.longitude;
         this.transitLocationName = outer.placeName;
         this.transitTimeZoneId = outer.zoneId;
 
-        this.skyChartTime = sky.moment;
-        this.skyLatitude = sky.latitude;
-        this.skyLongitude = sky.longitude;
+        this.skyRing.time = sky.moment;
+        this.skyRing.latitude = sky.latitude;
+        this.skyRing.longitude = sky.longitude;
         this.skyTimeZoneId = sky.zoneId;
     }
 
@@ -996,12 +999,8 @@ extends JPanel {
      * chart of a different moment.
      */
     private String relocateTo = "";
-    private SweDate transitSd;
-    private ZonedDateTime transitChartTime;
     /** The bottom drawer: transport controls, with the live moment on its handle. */
     private Drawer timeDrawer;
-    private double transitLatitude = 51.4779;
-    private double transitLongitude = 0.0;
 
     /**
      * Where the midpoint composite's house frame is derived, or NaN for the couple's own
@@ -1026,7 +1025,7 @@ extends JPanel {
      * Where the sky is read from, and when.
      *
      * <b>The sky borrowed Chart B's place, and that is the same crossing as borrowing its
-     * moment.</b> transitLatitude and transitLongitude are the second person's birthplace in a
+     * moment.</b> outerRing.latitude and outerRing.longitude are the second person's birthplace in a
      * synastry, so the third ring - the sky over both of them - was being cast for wherever
      * Chart B was born rather than for where the reader is. It looked right whenever the two
      * happened to be the same city and was wrong the rest of the time, which is the worst way
@@ -1038,7 +1037,7 @@ extends JPanel {
     /**
      * Whether a Chart A has actually been entered.
      *
-     * <b>A cold open drew the current sky and called it the natal wheel.</b> baseChartTime is
+     * <b>A cold open drew the current sky and called it the natal wheel.</b> natalRing.time is
      * initialised to now, so before anything is generated the inner wheel holds this moment -
      * and the setup form disagreed with it from the first frame, since the form's own base
      * date read 1990-01-01. Two surfaces, one chart, and neither of them right.
@@ -1069,8 +1068,6 @@ extends JPanel {
         return this.innerIsBirthChart;
     }
 
-    private double skyLatitude = 51.4779;
-    private double skyLongitude = 0.0;
     private String skyTimeZoneId = ZoneId.systemDefault().getId();
     private String animateTarget = "Transit";
     private String aspectFilter = "Natal-Natal";
@@ -1083,14 +1080,6 @@ extends JPanel {
     private String houseAlignment = "Natal";
     private String wheelPin = "Natal Asc";
     private JComboBox<String> pinCombo;
-    public double[] bLon = new double[BODY_COUNT];
-    public double[] bSpeed = new double[BODY_COUNT];
-    public boolean[] bValid = new boolean[BODY_COUNT];
-    private final boolean[] bOk = new boolean[BODY_COUNT];
-    public double[] tLon = new double[BODY_COUNT];
-    public double[] tSpeed = new double[BODY_COUNT];
-    public boolean[] tValid = new boolean[BODY_COUNT];
-    private final boolean[] tOk = new boolean[BODY_COUNT];
     /**
      * Which rings are drawn, from the mode, the transits flag and what the middle ring carries.
      *
@@ -1137,19 +1126,9 @@ extends JPanel {
     }
 
     /** Tri-wheel sky positions. Only populated when {@link #showTriWheel} is true. */
-    public double[] cLon = new double[BODY_COUNT];
-    public double[] cSpeed = new double[BODY_COUNT];
-    public boolean[] cValid = new boolean[BODY_COUNT];
-    private final boolean[] cOk = new boolean[BODY_COUNT];
-    public double[] triCusps = new double[13];
-    public double triAscendant;
     private boolean[] shown = Settings.loadBodySelection();
     public double[] activeCusps = new double[13];
     public double activeAscendant;
-    public double[] baseCusps = new double[13];
-    public double baseAscendant;
-    public double[] transitCusps = new double[13];
-    public double transitAscendant;
     private Timer animationTimer;
     private boolean isPlaying = false;
     private int animationDirection = 1;
@@ -1245,7 +1224,7 @@ extends JPanel {
      * The moment the outer wheel shows when the inner wheel is a composite.
      *
      * <b>A third time, because the other two are spoken for.</b> In a composite mode
-     * baseChartTime and transitChartTime are the two PEOPLE - they are what the composite is
+     * natalRing.time and outerRing.time are the two PEOPLE - they are what the composite is
      * built from - so there is nowhere to put "now" without a slot of its own. This is that
      * slot, and it is the only reason transits to a composite were not already possible: the
      * astro layer needed no change at all. {@code Transits.toNatal} takes two ChartFrames and
@@ -1254,14 +1233,12 @@ extends JPanel {
      * Defaults to now, and the existing Now / Play / step controls drive it while a composite
      * is on screen, which is how someone actually reads composite transits - by sweeping.
      */
-    private ZonedDateTime skyChartTime;
-    private SweDate skySd;
     private Timer refreshDebounce;
     public static final String[] SIGN_NAMES;
     private static final double ANGLE_SPEED = 361.0;
 
     public ZonedDateTime getChartTime() {
-        return this.baseChartTime;
+        return this.natalRing.time;
     }
 
     private static String[] buildElementTextHex() {
@@ -1523,7 +1500,7 @@ extends JPanel {
      * The focused body's longitude, or NaN when nothing is focused.
      *
      * <b>From the array the focus is actually on.</b> focusTransit says which ring the cursor
-     * found the body on, and reading bLon regardless would light the sign a natal body of the
+     * found the body on, and reading natalRing.lon regardless would light the sign a natal body of the
      * same index happens to occupy - a wedge confidently highlighting the wrong sign, which
      * is worse than not highlighting at all.
      */
@@ -1531,7 +1508,7 @@ extends JPanel {
         if (this.focusBody < 0) {
             return Double.NaN;
         }
-        double[] lon = this.focusTransit ? this.tLon : this.bLon;
+        double[] lon = this.focusTransit ? this.outerRing.lon : this.natalRing.lon;
         return this.focusBody < lon.length ? lon[this.focusBody] : Double.NaN;
     }
 
@@ -1639,7 +1616,7 @@ extends JPanel {
      * matches what the eye sees where rings overlap.
      */
     private String hoverTextAt(int x, int y) {
-        if (this.sw == null || this.baseSd == null || this.chartPanel == null) {
+        if (this.sw == null || this.natalRing.sd == null || this.chartPanel == null) {
             return null;
         }
         // The same three hit tests, in the same order, as bodyAt - and on the globe, the same
@@ -1655,10 +1632,10 @@ extends JPanel {
             // <b>Its own ring's numbers.</b> This chose between two arrays on a boolean, so a
             // body found on the sky ring was described with Chart B's longitude and speed -
             // the same card, twice, for two different charts.
-            double[] lon = ring == WHEEL_SKY ? this.cLon
-                : (ring == WHEEL_OUTER ? this.tLon : this.bLon);
-            double[] spd = ring == WHEEL_SKY ? this.cSpeed
-                : (ring == WHEEL_OUTER ? this.tSpeed : this.bSpeed);
+            double[] lon = ring == WHEEL_SKY ? this.skyRing.lon
+                : (ring == WHEEL_OUTER ? this.outerRing.lon : this.natalRing.lon);
+            double[] spd = ring == WHEEL_SKY ? this.skyRing.speed
+                : (ring == WHEEL_OUTER ? this.outerRing.speed : this.natalRing.speed);
             return i < lon.length ? this.hoverHtml(i, lon[i], spd[i], ring) : null;
         }
         Geometry g = this.geometry();
@@ -1666,22 +1643,22 @@ extends JPanel {
             return null;
         }
         if (this.triRingDrawn()) {
-            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.cLon, this.cValid,
+            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.skyRing.lon, this.skyRing.valid,
                 g.triRadii(), true);
             if (i >= 0) {
-                return this.hoverHtml(i, this.cLon[i], this.cSpeed[i], WHEEL_SKY);
+                return this.hoverHtml(i, this.skyRing.lon[i], this.skyRing.speed[i], WHEEL_SKY);
             }
         }
         if (this.outerRingDrawn()) {
-            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.tLon, this.tValid,
+            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.outerRing.lon, this.outerRing.valid,
                 g.transitRadii(), true);
             if (i >= 0) {
-                return this.hoverHtml(i, this.tLon[i], this.tSpeed[i], WHEEL_OUTER);
+                return this.hoverHtml(i, this.outerRing.lon[i], this.outerRing.speed[i], WHEEL_OUTER);
             }
         }
-        int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.bLon, this.bValid,
+        int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.natalRing.lon, this.natalRing.valid,
             g.natalRadii(), false);
-        return i >= 0 ? this.hoverHtml(i, this.bLon[i], this.bSpeed[i], WHEEL_NATAL) : null;
+        return i >= 0 ? this.hoverHtml(i, this.natalRing.lon[i], this.natalRing.speed[i], WHEEL_NATAL) : null;
     }
 
     /**
@@ -1749,8 +1726,8 @@ extends JPanel {
 
         int[] natalRadii() {
             if (this.natal == null) {
-                this.natal = SkymapPanel.bandRadii(SkymapPanel.this.bLon,
-                    SkymapPanel.this.bValid, this.bodyBase, this.natalFloor,
+                this.natal = SkymapPanel.bandRadii(SkymapPanel.this.natalRing.lon,
+                    SkymapPanel.this.natalRing.valid, this.bodyBase, this.natalFloor,
                     SkymapPanel.NATAL_EDGE, SkymapPanel.NATAL_SPACING);
             }
             return this.natal;
@@ -1759,7 +1736,7 @@ extends JPanel {
         int[] transitRadii() {
             if (this.transit == null) {
                 this.transit = SkymapPanel.bloomed(
-                    SkymapPanel.bandRadii(SkymapPanel.this.tLon, SkymapPanel.this.tValid,
+                    SkymapPanel.bandRadii(SkymapPanel.this.outerRing.lon, SkymapPanel.this.outerRing.valid,
                         this.rings[RING_TRANSIT], this.rings[RING_BODY_TOP]),
                     this.rings[RING_BODY_TOP], SkymapPanel.this.outerOpenFraction());
             }
@@ -1804,7 +1781,7 @@ extends JPanel {
         int[] triRadii() {
             if (this.tri == null) {
                 this.tri = SkymapPanel.bloomed(
-                    SkymapPanel.bandRadii(SkymapPanel.this.cLon, SkymapPanel.this.cValid,
+                    SkymapPanel.bandRadii(SkymapPanel.this.skyRing.lon, SkymapPanel.this.skyRing.valid,
                         this.rings[RING_TRI], this.rings[RING_TRANSIT]),
                     this.rings[RING_TRANSIT], SkymapPanel.this.triOpenFraction());
             }
@@ -1864,7 +1841,7 @@ extends JPanel {
     }
 
     private int bodyAt(int x, int y) {
-        if (this.sw == null || this.baseSd == null || this.chartPanel == null) {
+        if (this.sw == null || this.natalRing.sd == null || this.chartPanel == null) {
             return -1;
         }
         // <b>Whichever view is on screen answers.</b> The flat geometry below describes bands
@@ -1880,20 +1857,20 @@ extends JPanel {
             return -1;
         }
         if (this.triRingDrawn()) {
-            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.cLon, this.cValid,
+            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.skyRing.lon, this.skyRing.valid,
                 g.triRadii(), true);
             if (i >= 0) {
                 return i | TRANSIT_BIT;
             }
         }
         if (this.outerRingDrawn()) {
-            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.tLon, this.tValid,
+            int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.outerRing.lon, this.outerRing.valid,
                 g.transitRadii(), true);
             if (i >= 0) {
                 return i | TRANSIT_BIT;
             }
         }
-        return this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.bLon, this.bValid,
+        return this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.natalRing.lon, this.natalRing.valid,
             g.natalRadii(), false);
     }
 
@@ -1990,8 +1967,8 @@ extends JPanel {
         if (i == this.focusBody && transit == this.focusTransit) {
             return 1.0;
         }
-        double[] mine = transit ? this.tLon : this.bLon;
-        double[] theirs = this.focusTransit ? this.tLon : this.bLon;
+        double[] mine = transit ? this.outerRing.lon : this.natalRing.lon;
+        double[] theirs = this.focusTransit ? this.outerRing.lon : this.natalRing.lon;
         if (this.focusBody >= mine.length || this.focusBody >= theirs.length
                 || i >= mine.length) {
             return FOCUS_DIM;
@@ -2278,7 +2255,7 @@ extends JPanel {
      * sign and degree bands by bandAt, then the mansion strip, then the Sabian strip.
      */
     int ringTargetAt(int x, int y) {
-        if (this.sw == null || this.baseSd == null) {
+        if (this.sw == null || this.natalRing.sd == null) {
             return -1;
         }
         Geometry g = this.geometry();
@@ -2567,7 +2544,7 @@ extends JPanel {
         int signIdx = Zodiac.signIndex(lon);
         int degree = (int) (lon % 30.0) + 1;
         int decan = Zodiac.decan(lon);
-        int house = Zodiac.houseOf(lon, transit ? this.transitCusps : this.activeCusps);
+        int house = Zodiac.houseOf(lon, transit ? this.outerRing.cusps : this.activeCusps);
         String reading = this.window == null ? "" : this.window.planetReadingHtml(
             BODY_NAMES[n], SIGN_NAMES[signIdx], degree, decan, house,
             this.getActiveAspectsFor(n, transit), lon);
@@ -2847,7 +2824,7 @@ extends JPanel {
         sb.append("<div><b>").append(degInSign).append("&deg;")
           .append(minInSign < 10 ? "0" : "").append(minInSign).append("'</b> ")
           .append(SkymapPanel.capitalise(sign));
-        int house = Zodiac.houseOf(lon, transit ? this.transitCusps : this.activeCusps);
+        int house = Zodiac.houseOf(lon, transit ? this.outerRing.cusps : this.activeCusps);
         if (house > 0) {
             sb.append(" &nbsp;&middot;&nbsp; House ").append(house);
         }
@@ -3404,8 +3381,8 @@ extends JPanel {
             try {
                 Object object = this.syncGeocode(this.baseLocationName);
                 if (object != null) {
-                    this.baseLatitude = ((Geocoder.Result)object).lat;
-                    this.baseLongitude = ((Geocoder.Result)object).lon;
+                    this.natalRing.latitude = ((Geocoder.Result)object).lat;
+                    this.natalRing.longitude = ((Geocoder.Result)object).lon;
                     this.baseLocationName = ((Geocoder.Result)object).name;
                     this.baseTimeZoneId = ((Geocoder.Result)object).tzId;
                 }
@@ -3420,8 +3397,8 @@ extends JPanel {
             } catch (Exception ex) {}
             exception.printStackTrace();
         }
-        this.baseChartTime = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
-        this.transitChartTime = ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId));
+        this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
+        this.outerRing.time = ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId));
         this.updateChartData();
         this.chartPanel = new ChartPanel();
         this.chartPanel.addMouseListener(new MouseAdapter(){
@@ -3777,40 +3754,40 @@ extends JPanel {
         }
         boolean relationship = this.isRelationshipChart();
         double bodiesAt = Double.NaN;
-        if (this.baseSd != null && !relationship) {
+        if (this.natalRing.sd != null && !relationship) {
             String label = this.innerIsBirthChart ? "Chart A" : "Sky";
-            double lat = this.innerIsBirthChart ? this.baseLatitude : this.skyLatitude;
-            double lon = this.innerIsBirthChart ? this.baseLongitude : this.skyLongitude;
-            bodiesAt = this.baseSd.getJulDay();
+            double lat = this.innerIsBirthChart ? this.natalRing.latitude : this.skyRing.latitude;
+            double lon = this.innerIsBirthChart ? this.natalRing.longitude : this.skyRing.longitude;
+            bodiesAt = this.natalRing.sd.getJulDay();
             if (com.zodiacomputing.ourania.astro.Precision.housesFellBack(
                     this.sw, bodiesAt, lat, lon, this.houseSystem)) {
                 notes.add(com.zodiacomputing.ourania.astro.Precision.housesNote(
                     label, lat, this.houseSystem));
             }
         }
-        SweDate outerSd = this.isSynastryChart() ? this.transitSd : this.skySd;
+        SweDate outerSd = this.isSynastryChart() ? this.outerRing.sd : this.skyRing.sd;
         if (this.showTransitChart && outerSd != null && !this.showProgressed()) {
             boolean synastry = this.isSynastryChart();
-            double lat = synastry ? this.transitLatitude : this.skyLatitude;
-            double lon = synastry ? this.transitLongitude : this.skyLongitude;
+            double lat = synastry ? this.outerRing.latitude : this.skyRing.latitude;
+            double lon = synastry ? this.outerRing.longitude : this.skyRing.longitude;
             if (com.zodiacomputing.ourania.astro.Precision.housesFellBack(
                     this.sw, outerSd.getJulDay(), lat, lon, this.houseSystem)) {
                 notes.add(com.zodiacomputing.ourania.astro.Precision.housesNote(
                     synastry ? "Chart B" : "Sky", lat, this.houseSystem));
             }
         }
-        if (this.showTriWheel && this.skySd != null
+        if (this.showTriWheel && this.skyRing.sd != null
                 && com.zodiacomputing.ourania.astro.Precision.housesFellBack(this.sw,
-                    this.skySd.getJulDay(), this.skyLatitude, this.skyLongitude,
+                    this.skyRing.sd.getJulDay(), this.skyRing.latitude, this.skyRing.longitude,
                     this.houseSystem)) {
             notes.add(com.zodiacomputing.ourania.astro.Precision.housesNote(
-                "Sky", this.skyLatitude, this.houseSystem));
+                "Sky", this.skyRing.latitude, this.houseSystem));
         }
         // A missing data file loses the same bodies from every ring, so one moment is enough to
         // find them. Chiron's date limits are the exception, and the inner ring is the one a
         // reader is most likely to have cast at an unusual date.
-        if (Double.isNaN(bodiesAt) && this.skySd != null) {
-            bodiesAt = this.skySd.getJulDay();
+        if (Double.isNaN(bodiesAt) && this.skyRing.sd != null) {
+            bodiesAt = this.skyRing.sd.getJulDay();
         }
         if (!Double.isNaN(bodiesAt)) {
             String bodies = com.zodiacomputing.ourania.astro.Precision.bodiesNote(
@@ -3880,10 +3857,10 @@ extends JPanel {
     }
 
     private void showAnnualCalendar() {
-        if (this.sw == null || this.baseChartTime == null || this.window == null) {
+        if (this.sw == null || this.natalRing.time == null || this.window == null) {
             return;
         }
-        final int n = this.baseChartTime.getYear();
+        final int n = this.natalRing.time.getYear();
         this.readingTier = ReadingTier.NONE;
         this.window.showCalendar(n, "Scanning the ephemeris for " + n + "...");
         new SwingWorker<String, Void>(){
@@ -3958,24 +3935,24 @@ extends JPanel {
     /**
      * Chart B's frame in synastry mode, or null when there is no second chart.
      *
-     * Computed rather than read off tLon/tValid on purpose. Those arrays carry longitudes
+     * Computed rather than read off outerRing.lon/outerRing.valid on purpose. Those arrays carry longitudes
      * and nothing else; the cross-chart questions need chart B's HOUSE CUSPS and its four
      * angles, which only a ChartFrame has. The two agree by construction - same julian day,
      * same place, same house system, same ephemeris - so this is a second view of chart B,
      * not a second opinion about it.
      */
     private ChartFrame synastryChartB() {
-        if (this.sw == null || this.transitSd == null) {
+        if (this.sw == null || this.outerRing.sd == null) {
             return null;
         }
-        String string = SkymapPanel.frameKey(this.transitSd.getJulDay(), this.transitLatitude,
-            this.transitLongitude, this.houseSystem);
+        String string = SkymapPanel.frameKey(this.outerRing.sd.getJulDay(), this.outerRing.latitude,
+            this.outerRing.longitude, this.houseSystem);
         ChartFrame chartFrame = this.synastryBFrame;
         if (chartFrame != null && string.equals(this.synastryBKey)) {
             return chartFrame;
         }
-        this.synastryBFrame = chartFrame = ChartFrame.compute(this.sw, this.transitSd.getJulDay(),
-            this.transitLatitude, this.transitLongitude, this.houseSystem, false, 0.0);
+        this.synastryBFrame = chartFrame = ChartFrame.compute(this.sw, this.outerRing.sd.getJulDay(),
+            this.outerRing.latitude, this.outerRing.longitude, this.houseSystem, false, 0.0);
         this.synastryBKey = string;
         return chartFrame;
     }
@@ -4009,11 +3986,11 @@ extends JPanel {
      */
     public String synastryAngleContact(String bodyName) {
         if (bodyName == null || !this.isSynastryChart()
-                || this.sw == null || this.baseSd == null || this.transitSd == null) {
+                || this.sw == null || this.natalRing.sd == null || this.outerRing.sd == null) {
             return null;
         }
-        ChartFrame host = this.frameForCurrentChart(this.baseSd.getJulDay(),
-            this.baseLatitude, this.baseLongitude, this.houseSystem);
+        ChartFrame host = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
+            this.natalRing.latitude, this.natalRing.longitude, this.houseSystem);
         ChartFrame visitor = this.synastryChartB();
         if (host == null || visitor == null) {
             return null;
@@ -4028,11 +4005,11 @@ extends JPanel {
     }
 
     private String generateSynastryCrossHtml() {
-        if (this.sw == null || this.baseSd == null || this.transitSd == null) {
+        if (this.sw == null || this.natalRing.sd == null || this.outerRing.sd == null) {
             return "";
         }
-        ChartFrame chartFrame = this.frameForCurrentChart(this.baseSd.getJulDay(),
-            this.baseLatitude, this.baseLongitude, this.houseSystem);
+        ChartFrame chartFrame = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
+            this.natalRing.latitude, this.natalRing.longitude, this.houseSystem);
         ChartFrame chartFrame2 = this.synastryChartB();
         if (chartFrame == null || chartFrame2 == null) {
             return "";
@@ -4225,7 +4202,7 @@ extends JPanel {
     /**
      * What stands in a span of the zodiac on the TRANSIT wheel; empty when none is shown.
      *
-     * One method rather than three accessors on purpose. tLon/tSpeed/tValid are public and
+     * One method rather than three accessors on purpose. outerRing.lon/outerRing.speed/outerRing.valid are public and
      * a caller could read them directly, but three parallel arrays are three chances to
      * index one of them differently, and the interpretation panel has no business knowing
      * how the transit wheel stores itself.
@@ -4234,7 +4211,7 @@ extends JPanel {
         if (!this.showTransitChart) {
             return java.util.Collections.emptyList();
         }
-        return Occupants.inSpan(this.tLon, this.tValid, this.tSpeed, start, span);
+        return Occupants.inSpan(this.outerRing.lon, this.outerRing.valid, this.outerRing.speed, start, span);
     }
 
     /**
@@ -4250,11 +4227,11 @@ extends JPanel {
      * {jdUt, latitude, longitude}; the sky's when there is no Chart A.
      */
     double[] skyMoment(boolean chartA) {
-        if (chartA && this.innerIsBirthChart && this.baseSd != null) {
-            return new double[] {this.baseSd.getJulDay(), this.baseLatitude, this.baseLongitude};
+        if (chartA && this.innerIsBirthChart && this.natalRing.sd != null) {
+            return new double[] {this.natalRing.sd.getJulDay(), this.natalRing.latitude, this.natalRing.longitude};
         }
-        double jd = this.skySd != null ? this.skySd.getJulDay() : new SweDate().getJulDay();
-        return new double[] {jd, this.skyLatitude, this.skyLongitude};
+        double jd = this.skyRing.sd != null ? this.skyRing.sd.getJulDay() : new SweDate().getJulDay();
+        return new double[] {jd, this.skyRing.latitude, this.skyRing.longitude};
     }
 
     public ChartFrame getCurrentChart() {
@@ -4282,17 +4259,17 @@ extends JPanel {
     public String positionsText() {
         StringBuilder sb = new StringBuilder("Body\tLongitude\tSign\tDegree\tHouse\tRetrograde\n");
         for (int i = 0; i < BODY_COUNT; i++) {
-            if (!this.bValid[i]) {
+            if (!this.natalRing.valid[i]) {
                 continue;
             }
-            double lon = this.bLon[i];
+            double lon = this.natalRing.lon[i];
             int house = Zodiac.houseOf(lon, this.activeCusps);
             sb.append(BODY_NAMES[i]).append('\t')
               .append(String.format("%.4f", lon)).append('\t')
               .append(SkymapPanel.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)])).append('\t')
               .append(String.format("%.2f", Zodiac.degreeInSign(lon))).append('\t')
               .append(house > 0 ? String.valueOf(house) : "").append('\t')
-              .append(SkymapPanel.showsDirection(i) && this.bSpeed[i] < 0.0 ? "R" : "")
+              .append(SkymapPanel.showsDirection(i) && this.natalRing.speed[i] < 0.0 ? "R" : "")
               .append('\n');
         }
         return sb.toString();
@@ -4320,24 +4297,24 @@ extends JPanel {
     public ChartFrame radixChart() {
         boolean composite = this.chartMode == ChartMode.COMPOSITE_MIDPOINT
             || this.chartMode == ChartMode.COMPOSITE_DAVISON;
-        if (composite && this.baseSd != null && this.transitSd != null) {
+        if (composite && this.natalRing.sd != null && this.outerRing.sd != null) {
             // Its own field and its own key. Sharing cachedFrame with frameForCurrentChart is
             // what made a composite silently become person A's natal chart - see the field.
             // The reference place is part of the key. It changes the cusps, so leaving it out
             // would serve the previous location's house frame from cache after the user
             // changed it - visible only as houses that quietly disagree with the setting.
-            String key = this.chartMode + "|" + SkymapPanel.frameKey(this.baseSd.getJulDay(),
-                    this.baseLatitude, this.baseLongitude, this.houseSystem)
-                + "|" + SkymapPanel.frameKey(this.transitSd.getJulDay(),
-                    this.transitLatitude, this.transitLongitude, this.houseSystem)
+            String key = this.chartMode + "|" + SkymapPanel.frameKey(this.natalRing.sd.getJulDay(),
+                    this.natalRing.latitude, this.natalRing.longitude, this.houseSystem)
+                + "|" + SkymapPanel.frameKey(this.outerRing.sd.getJulDay(),
+                    this.outerRing.latitude, this.outerRing.longitude, this.houseSystem)
                 + "|ref:" + this.compositeRefLat + "," + this.compositeRefLon;
             if (this.relationshipFrame != null && key.equals(this.relationshipCacheKey)) {
                 return this.relationshipFrame;
             }
-            ChartFrame a = ChartFrame.compute(this.sw, this.baseSd.getJulDay(),
-                this.baseLatitude, this.baseLongitude, this.houseSystem, false, 0.0);
-            ChartFrame b = ChartFrame.compute(this.sw, this.transitSd.getJulDay(),
-                this.transitLatitude, this.transitLongitude, this.houseSystem, false, 0.0);
+            ChartFrame a = ChartFrame.compute(this.sw, this.natalRing.sd.getJulDay(),
+                this.natalRing.latitude, this.natalRing.longitude, this.houseSystem, false, 0.0);
+            ChartFrame b = ChartFrame.compute(this.sw, this.outerRing.sd.getJulDay(),
+                this.outerRing.latitude, this.outerRing.longitude, this.houseSystem, false, 0.0);
             this.relationshipFrame = this.chartMode == ChartMode.COMPOSITE_MIDPOINT
                 ? (Double.isNaN(this.compositeRefLat)
                     ? ChartFrame.computeMidpointComposite(this.sw, a, b)
@@ -4351,9 +4328,9 @@ extends JPanel {
         // form returned this.cachedFrame whenever it was non-null, so after the date or place
         // changed it served the old chart - harmless while only the wheel called this, and not
         // harmless now that readings do.
-        if (this.baseSd != null) {
-            return this.frameForCurrentChart(this.baseSd.getJulDay(), this.baseLatitude,
-                this.baseLongitude, this.houseSystem);
+        if (this.natalRing.sd != null) {
+            return this.frameForCurrentChart(this.natalRing.sd.getJulDay(), this.natalRing.latitude,
+                this.natalRing.longitude, this.houseSystem);
         }
         return this.cachedFrame;
     }
@@ -4392,12 +4369,12 @@ extends JPanel {
      * does, and only the finished HTML crosses back to the event thread.
      */
     public void showTable(final String kind) {
-        if (this.sw == null || this.baseSd == null || this.window == null) {
+        if (this.sw == null || this.natalRing.sd == null || this.window == null) {
             return;
         }
-        final double jd = this.baseSd.getJulDay();
-        final double lat = this.baseLatitude;
-        final double lon = this.baseLongitude;
+        final double jd = this.natalRing.sd.getJulDay();
+        final double lat = this.natalRing.latitude;
+        final double lon = this.natalRing.longitude;
         final char hsys = this.houseSystem;
         new javax.swing.SwingWorker<String, Void>() {
             @Override
@@ -4427,8 +4404,8 @@ extends JPanel {
                 // These two are read against a moment, not just a chart, so they take the
                 // birth instant and today. The transit clock drives them when it is set, so
                 // stepping time moves the progressed chart with it.
-                double now = SkymapPanel.this.showTransitChart && SkymapPanel.this.transitSd != null
-                        ? SkymapPanel.this.transitSd.getJulDay()
+                double now = SkymapPanel.this.showTransitChart && SkymapPanel.this.outerRing.sd != null
+                        ? SkymapPanel.this.outerRing.sd.getJulDay()
                         : new SweDate().getJulDay();
                 if ("PROGRESSED".equals(kind)) {
                     return ChartTables.progressed(f, SkymapPanel.this.sw, jd, now);
@@ -4462,20 +4439,20 @@ extends JPanel {
     }
 
     private void showReading(final ReadingTier readingTier) {
-        if (this.sw == null || this.baseSd == null || this.window == null || readingTier == ReadingTier.NONE) {
+        if (this.sw == null || this.natalRing.sd == null || this.window == null || readingTier == ReadingTier.NONE) {
             return;
         }
         this.readingTier = readingTier;
-        final double d = this.baseSd.getJulDay();
-        final double d2 = this.baseLatitude;
-        final double d3 = this.baseLongitude;
+        final double d = this.natalRing.sd.getJulDay();
+        final double d2 = this.natalRing.latitude;
+        final double d3 = this.natalRing.longitude;
         final char c = this.houseSystem;
         final String string = this.baseLocationName;
-        final String string2 = this.baseChartTime == null ? "" : this.baseChartTime.format(DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm z"));
-        final boolean bl = this.showTransitChart && this.transitSd != null;
-        final double d4 = bl ? this.transitSd.getJulDay() : Double.NaN;
-        final double d5 = this.transitLatitude;
-        final double d6 = this.transitLongitude;
+        final String string2 = this.natalRing.time == null ? "" : this.natalRing.time.format(DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm z"));
+        final boolean bl = this.showTransitChart && this.outerRing.sd != null;
+        final double d4 = bl ? this.outerRing.sd.getJulDay() : Double.NaN;
+        final double d5 = this.outerRing.latitude;
+        final double d6 = this.outerRing.longitude;
         new SwingWorker<String, Void>(){
 
             @Override
@@ -4518,7 +4495,7 @@ extends JPanel {
                         // computed to four levels and appeared in no reading until 2026-09-02.
                         object = (String)object + Snapshot.timeLayer(profection, list, list2,
                             yearScan.events, list3, chartFrame, d4);   // d4 is the moment;
-                        // d2 is baseLatitude in this decompiled scope, and passing it here
+                        // d2 is natalRing.latitude in this decompiled scope, and passing it here
                         // would have produced an empty section rather than an error.
                     }
                     return (String)object;
@@ -4592,7 +4569,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // <b>The inner wheel is named too.</b> It printed a bare timestamp, so a reader had
         // no way to tell a birth chart from the sky standing in for one - which is exactly
         // the confusion a cold open produced.
-        ZonedDateTime inner = this.innerIsBirthChart ? this.baseChartTime : this.skyChartTime;
+        ZonedDateTime inner = this.innerIsBirthChart ? this.natalRing.time : this.skyRing.time;
         if (inner != null) {
             // Whoever is actually on the inner wheel. This said "Chart A" for anything that
             // was not the sky, which was true while Chart A was the only chart that could be
@@ -4601,14 +4578,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 .append(inner.format(fmt));
         }
         out.append(String.format("   %.2f, %.2f",
-            this.innerIsBirthChart ? this.baseLatitude : this.skyLatitude,
-            this.innerIsBirthChart ? this.baseLongitude : this.skyLongitude));
+            this.innerIsBirthChart ? this.natalRing.latitude : this.skyRing.latitude,
+            this.innerIsBirthChart ? this.natalRing.longitude : this.skyRing.longitude));
         // The outer wheel is a second moment, and it is the one the transport usually moves,
         // so it is named rather than left for the reader to infer from a changing number.
         // Named for what it is rather than for where it sits: the outer wheel is Chart B in
         // a synastry and the sky everywhere else, and calling both of them "sky" is how a
         // reader comes to believe a birth chart is this moment.
-        ZonedDateTime outer = this.isSynastryChart() ? this.transitChartTime : this.skyChartTime;
+        ZonedDateTime outer = this.isSynastryChart() ? this.outerRing.time : this.skyRing.time;
         // <b>Each ring named by what is on it, and the moment it was cast at.</b> This chose
         // between two labels on isSynastryChart and printed the entered field beside them -
         // which said "Sky" over the progressed ring, printed Chart B's birth moment for a ring
@@ -4622,8 +4599,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             out.append("      ").append(capitalise(this.ringWord(WHEEL_OUTER)))
                .append(": ").append(when);
         }
-        if (this.triRingDrawn() && this.skyChartTime != null) {
-            out.append("      Sky: ").append(this.skyChartTime.format(fmt));
+        if (this.triRingDrawn() && this.skyRing.time != null) {
+            out.append("      Sky: ").append(this.skyRing.time.format(fmt));
         }
         // <b>The zodiac, when it is not the one a reader assumes.</b> Switched to sidereal in
         // Settings and forgotten, a chart shows the Sun a sign early with nothing on screen to
@@ -4703,10 +4680,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             boolean bl2 = this.animateTarget.equals("Natal") || this.animateTarget.equals("Both") || !this.showTransitChart;
             boolean bl3 = bl = (this.animateTarget.equals("Transit") || this.animateTarget.equals("Both")) && this.showTransitChart;
             if (bl2) {
-                this.baseChartTime = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
+                this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
             }
             if (bl) {
-                this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+                this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
             }
             this.updateChartData();
             this.chartPanel.repaint();
@@ -4999,8 +4976,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
             boolean outer = (hit & TRANSIT_BIT) != 0;
             int i = hit & ~TRANSIT_BIT;
-            double[] lon = outer ? this.tLon : this.bLon;
-            double[] spd = outer ? this.tSpeed : this.bSpeed;
+            double[] lon = outer ? this.outerRing.lon : this.natalRing.lon;
+            double[] spd = outer ? this.outerRing.speed : this.natalRing.speed;
             if (i >= lon.length) {
                 return;
             }
@@ -5032,8 +5009,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.chartPanel.repaint();
         }
         if (this.window != null && this.focusBody >= 0) {
-            double[] lon = this.focusTransit ? this.tLon : this.bLon;
-            double[] spd = this.focusTransit ? this.tSpeed : this.bSpeed;
+            double[] lon = this.focusTransit ? this.outerRing.lon : this.natalRing.lon;
+            double[] spd = this.focusTransit ? this.outerRing.speed : this.natalRing.speed;
             if (this.focusBody < lon.length) {
                 // The same card the tooltip builds - one description of a body, shown in two
                 // places rather than written twice.
@@ -5074,7 +5051,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         double d3;
         int n3;
         int n4;
-        if (this.sw == null || this.baseSd == null || this.window == null) {
+        if (this.sw == null || this.natalRing.sd == null || this.window == null) {
             return;
         }
         // One geometry, shared with the painter and both hit tests. The machine-named locals
@@ -5113,28 +5090,28 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int[] nArray2 = g.transitRadii();
         int[] nArrayC = g.triRadii();
         for (n3 = 0; n3 < BODY_COUNT; ++n3) {
-            if (!this.bValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.bLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, false))) continue;
-            this.showAngleAt(n3, this.bLon[n3], AngleRole.ANCHOR);
+            if (!this.natalRing.valid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.natalRing.lon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, false))) continue;
+            this.showAngleAt(n3, this.natalRing.lon[n3], AngleRole.ANCHOR);
             return;
         }
         // Tri-wheel angle hit test before the synastry ring, because the tri ring is outermost.
         if (this.triRingDrawn()) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
-                if (!this.cValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArrayC[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.cLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArrayC[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
-                this.showAngleAt(n3, this.cLon[n3], true, AngleRole.SKY);
+                if (!this.skyRing.valid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArrayC[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.skyRing.lon[n3]))), (double)n2 - (d = (double)n8 + (double)nArrayC[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
+                this.showAngleAt(n3, this.skyRing.lon[n3], true, AngleRole.SKY);
                 return;
             }
         }
         if (this.outerRingDrawn()) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
-                if (!this.tValid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray2[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.tLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray2[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
-                this.showAngleAt(n3, this.tLon[n3], this.angleRoleFor(false, true));
+                if (!this.outerRing.valid[n3] || !Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray2[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.outerRing.lon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray2[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
+                this.showAngleAt(n3, this.outerRing.lon[n3], this.angleRoleFor(false, true));
                 return;
             }
         }
         if (this.showTransitChart && "Both".equals(this.houseAlignment) && d6 >= (double)(n11 - 6) && d6 <= (double)(n10 + 6)) {
             for (n3 = 1; n3 <= 12; ++n3) {
-                d2 = (180.0 + d8 - this.transitCusps[n3]) % 360.0;
+                d2 = (180.0 + d8 - this.outerRing.cusps[n3]) % 360.0;
                 if (d2 < 0.0) {
                     d2 += 360.0;
                 }
@@ -5150,21 +5127,21 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.triRingDrawn() && d6 >= (double)n10 && d6 <= (double)(nTri + 10)) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 int n14c;
-                if (!this.cValid[n3] || Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArrayC[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.cLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArrayC[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
-                int n15c = (int)(this.cLon[n3] / 30.0);
-                int n16c = (int)(this.cLon[n3] % 30.0 / 10.0) + 1;
+                if (!this.skyRing.valid[n3] || Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArrayC[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.skyRing.lon[n3]))), (double)n2 - (d = (double)n8 + (double)nArrayC[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
+                int n15c = (int)(this.skyRing.lon[n3] / 30.0);
+                int n16c = (int)(this.skyRing.lon[n3] % 30.0 / 10.0) + 1;
                 int n17c = 1;
                 for (int i = 1; i <= 12; ++i) {
                     double d10; double d11;
                     double d12 = dArray[i];
                     double d13 = d11 = i == 12 ? dArray[1] : dArray[i + 1];
                     if (d11 < d12) d11 += 360.0;
-                    if ((d10 = this.cLon[n3]) < d12 && d11 > 360.0) d10 += 360.0;
+                    if ((d10 = this.skyRing.lon[n3]) < d12 && d11 > 360.0) d10 += 360.0;
                     if (!(d10 >= d12) || !(d10 < d11)) continue;
                     n17c = i; break;
                 }
-                // The sky ring aspects BOTH people, so this walks bLon (chart A) and then
-                // tLon (chart B). Listing only chart A was the tri-wheel's first shipped
+                // The sky ring aspects BOTH people, so this walks natalRing.lon (chart A) and then
+                // outerRing.lon (chart B). Listing only chart A was the tri-wheel's first shipped
                 // behaviour and it was silent: half the contacts simply were not there, and
                 // nothing in the panel said a chart had been skipped.
                 //
@@ -5176,25 +5153,25 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 ArrayList<String[]> arrayListC = new ArrayList<String[]>();
                 for (n14c = 0; n14c < BODY_COUNT; ++n14c) {
                     String string;
-                    if (!this.bValid[n14c]) continue;
-                    double d14 = Math.abs(this.cLon[n3] - this.bLon[n14c]);
+                    if (!this.natalRing.valid[n14c]) continue;
+                    double d14 = Math.abs(this.skyRing.lon[n3] - this.natalRing.lon[n14c]);
                     if (d14 > 180.0) d14 = 360.0 - d14;
                     if ((string = this.getAspectType(d14, n3, n14c, this.isSynastryPair(false))) == null) continue;
-                    boolean blA = this.isAspectApplying(this.cLon[n3], this.cSpeed[n3], this.bLon[n14c], this.bSpeed[n14c], string);
-                    String string2 = this.describeAspect(d14, string, n3, n14c, this.cLon[n3], this.bLon[n14c], blA);
+                    boolean blA = this.isAspectApplying(this.skyRing.lon[n3], this.skyRing.speed[n3], this.natalRing.lon[n14c], this.natalRing.speed[n14c], string);
+                    String string2 = this.describeAspect(d14, string, n3, n14c, this.skyRing.lon[n3], this.natalRing.lon[n14c], blA);
                     arrayListC.add(new String[]{BODY_NAMES[n14c], string, string2, "Chart A"});
                 }
                 for (n14c = 0; n14c < BODY_COUNT; ++n14c) {
                     String string;
-                    if (!this.tValid[n14c]) continue;
-                    double d14 = Math.abs(this.cLon[n3] - this.tLon[n14c]);
+                    if (!this.outerRing.valid[n14c]) continue;
+                    double d14 = Math.abs(this.skyRing.lon[n3] - this.outerRing.lon[n14c]);
                     if (d14 > 180.0) d14 = 360.0 - d14;
                     if ((string = this.getAspectType(d14, n3, n14c, this.isSynastryPair(false))) == null) continue;
-                    boolean blB = this.isAspectApplying(this.cLon[n3], this.cSpeed[n3], this.tLon[n14c], this.tSpeed[n14c], string);
-                    String string2 = this.describeAspect(d14, string, n3, n14c, this.cLon[n3], this.tLon[n14c], blB);
+                    boolean blB = this.isAspectApplying(this.skyRing.lon[n3], this.skyRing.speed[n3], this.outerRing.lon[n14c], this.outerRing.speed[n14c], string);
+                    String string2 = this.describeAspect(d14, string, n3, n14c, this.skyRing.lon[n3], this.outerRing.lon[n14c], blB);
                     arrayListC.add(new String[]{BODY_NAMES[n14c], string, string2, "Chart B"});
                 }
-                n14c = (int)(this.cLon[n3] % 30.0) + 1;
+                n14c = (int)(this.skyRing.lon[n3] % 30.0) + 1;
                 // A progressed body is a placement, not a transit. The transit route would head
                 // the page "Transiting Venus" and describe a passing event; what a progressed
                 // chart says is where the body has moved to. Same defect shape as the synastry
@@ -5210,9 +5187,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.outerRingDrawn() && d6 >= (double)n11 && d6 <= (double)(n10 + 10)) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 int n14;
-                if (!this.tValid[n3] || Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray2[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.tLon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray2[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
-                int n15 = (int)(this.tLon[n3] / 30.0);
-                int n16 = (int)(this.tLon[n3] % 30.0 / 10.0) + 1;
+                if (!this.outerRing.valid[n3] || Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d3 = (double)n7 + (double)nArray2[n3] * Math.cos(d2 = Math.toRadians(180.0 + d8 - this.outerRing.lon[n3]))), (double)n2 - (d = (double)n8 + (double)nArray2[n3] * Math.sin(d2))) < (double)SkymapPanel.hitRadius(n3, true))) continue;
+                int n15 = (int)(this.outerRing.lon[n3] / 30.0);
+                int n16 = (int)(this.outerRing.lon[n3] % 30.0 / 10.0) + 1;
                 int n17 = 1;
                 for (int i = 1; i <= 12; ++i) {
                     double d10;
@@ -5222,7 +5199,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (d11 < d12) {
                         d11 += 360.0;
                     }
-                    if ((d10 = this.tLon[n3]) < d12 && d11 > 360.0) {
+                    if ((d10 = this.outerRing.lon[n3]) < d12 && d11 > 360.0) {
                         d10 += 360.0;
                     }
                     if (!(d10 >= d12) || !(d10 < d11)) continue;
@@ -5232,17 +5209,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 ArrayList<String[]> arrayList = new ArrayList<String[]>();
                 for (n14 = 0; n14 < BODY_COUNT; ++n14) {
                     String string;
-                    if (!this.bValid[n14]) continue;
-                    double d14 = Math.abs(this.tLon[n3] - this.bLon[n14]);
+                    if (!this.natalRing.valid[n14]) continue;
+                    double d14 = Math.abs(this.outerRing.lon[n3] - this.natalRing.lon[n14]);
                     if (d14 > 180.0) {
                         d14 = 360.0 - d14;
                     }
                     if ((string = this.getAspectType(d14, n3, n14, this.isSynastryPair(true))) == null) continue;
-                    boolean bl = this.isAspectApplying(this.tLon[n3], this.tSpeed[n3], this.bLon[n14], this.bSpeed[n14], string);
-                    String string2 = this.describeAspect(d14, string, n3, n14, this.tLon[n3], this.bLon[n14], bl);
+                    boolean bl = this.isAspectApplying(this.outerRing.lon[n3], this.outerRing.speed[n3], this.natalRing.lon[n14], this.natalRing.speed[n14], string);
+                    String string2 = this.describeAspect(d14, string, n3, n14, this.outerRing.lon[n3], this.natalRing.lon[n14], bl);
                     arrayList.add(new String[]{BODY_NAMES[n14], string, string2});
                 }
-                n14 = (int)(this.tLon[n3] % 30.0) + 1;
+                n14 = (int)(this.outerRing.lon[n3] % 30.0) + 1;
                 this.window.showInterpretationForPlanet(
                     this.showProgressed() ? BODY_NAMES[n3]
                         : "transit_" + BODY_NAMES[n3].toLowerCase(),
@@ -5256,7 +5233,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             for (n3 = 0; n3 < BODY_COUNT; ++n3) {
                 int n19;
                 double d15;
-                if (!this.bValid[n3] || Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d = (double)n7 + (double)nArray[n3] * Math.cos(d3 = Math.toRadians(180.0 + d8 - (d2 = this.bLon[n3])))), (double)n2 - (d15 = (double)n8 + (double)nArray[n3] * Math.sin(d3))) < (double)SkymapPanel.hitRadius(n3, false))) continue;
+                if (!this.natalRing.valid[n3] || Bodies.at(n3).isAngle() || !(Math.hypot((double)n - (d = (double)n7 + (double)nArray[n3] * Math.cos(d3 = Math.toRadians(180.0 + d8 - (d2 = this.natalRing.lon[n3])))), (double)n2 - (d15 = (double)n8 + (double)nArray[n3] * Math.sin(d3))) < (double)SkymapPanel.hitRadius(n3, false))) continue;
                 int n20 = (int)(d2 / 30.0);
                 int n21 = (int)(d2 % 30.0 / 10.0) + 1;
                 int n22 = 1;
@@ -5278,14 +5255,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 ArrayList<String[]> arrayList = new ArrayList<String[]>();
                 for (n19 = 0; n19 < BODY_COUNT; ++n19) {
                     String string;
-                    if (n3 == n19 || !this.bValid[n19]) continue;
-                    double d20 = Math.abs(d2 - this.bLon[n19]);
+                    if (n3 == n19 || !this.natalRing.valid[n19]) continue;
+                    double d20 = Math.abs(d2 - this.natalRing.lon[n19]);
                     if (d20 > 180.0) {
                         d20 = 360.0 - d20;
                     }
                     if ((string = this.getAspectType(d20, n3, n19, false)) == null) continue;
-                    boolean bl2 = this.isAspectApplying(d2, this.bSpeed[n3], this.bLon[n19], this.bSpeed[n19], string);
-                    String string3 = this.describeAspect(d20, string, n3, n19, d2, this.bLon[n19], bl2);
+                    boolean bl2 = this.isAspectApplying(d2, this.natalRing.speed[n3], this.natalRing.lon[n19], this.natalRing.speed[n19], string);
+                    String string3 = this.describeAspect(d20, string, n3, n19, d2, this.natalRing.lon[n19], bl2);
                     arrayList.add(new String[]{BODY_NAMES[n19], string, string3});
                 }
                 n19 = (int)(d2 % 30.0) + 1;
@@ -5297,18 +5274,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             boolean bl3 = bl = (this.aspectFilter.equals("Transit-Natal") || this.aspectFilter.equals("Both")) && this.showTransitChart;
             if (n3 != 0) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
-                    if (!SkymapPanel.aspecting(n18, this.bValid)) continue;
+                    if (!SkymapPanel.aspecting(n18, this.natalRing.valid)) continue;
                     for (int i = n18 + 1; i < BODY_COUNT; ++i) {
-                        if (!SkymapPanel.aspecting(i, this.bValid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(0), g.aspectDisc(0), this.bLon[n18], this.bLon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
+                        if (!SkymapPanel.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(0), g.aspectDisc(0), this.natalRing.lon[n18], this.natalRing.lon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
                         return;
                     }
                 }
             }
             if (bl) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
-                    if (!SkymapPanel.aspecting(n18, this.tValid)) continue;
+                    if (!SkymapPanel.aspecting(n18, this.outerRing.valid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
-                        if (!SkymapPanel.aspecting(i, this.bValid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(1), g.aspectDisc(1), this.tLon[n18], this.bLon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
+                        if (!SkymapPanel.aspecting(i, this.natalRing.valid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(1), g.aspectDisc(1), this.outerRing.lon[n18], this.natalRing.lon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
                         return;
                     }
                 }
@@ -5318,11 +5295,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // sky aspect and get whatever happened to be behind it.
             if (bl && this.triRingDrawn()) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
-                    if (!SkymapPanel.aspecting(n18, this.cValid)) continue;
+                    if (!SkymapPanel.aspecting(n18, this.skyRing.valid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
-                        if (!SkymapPanel.aspecting(i, this.bValid)
+                        if (!SkymapPanel.aspecting(i, this.natalRing.valid)
                             || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(2),
-                                g.aspectDisc(2), this.cLon[n18], this.bLon[i],
+                                g.aspectDisc(2), this.skyRing.lon[n18], this.natalRing.lon[i],
                                 "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) {
                             continue;
                         }
@@ -5586,10 +5563,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * bodies; a composite angle reads against the composite's, because a composite mode loads
      * the composite INTO the base arrays (see updateChartData) rather than special-casing it
      * downstream; a transit angle reads against the natal; and chart B's angle reads against
-     * chart A. In each of those there is exactly one other chart and {@code bLon} is it.
+     * chart A. In each of those there is exactly one other chart and {@code natalRing.lon} is it.
      *
      * <b>The tri-wheel is the exception, and the reason for {@code fromSky}.</b> A sky angle
-     * has TWO other charts under it, and walking only {@code bLon} silently dropped every
+     * has TWO other charts under it, and walking only {@code natalRing.lon} silently dropped every
      * contact to chart B - the same defect the sky BODY click had. When {@code fromSky} is
      * true and a tri-wheel is up, both passes run and each row is tagged with the chart it
      * came from, because "Ascendant square Sun" is a different statement about each person.
@@ -5604,14 +5581,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         ArrayList<String[]> arrayList = new ArrayList<String[]>();
         for (int i = 0; i < BODY_COUNT; ++i) {
             String string;
-            if (!SkymapPanel.aspecting(i, this.bValid) || Bodies.isOppositePair(n, i)) continue;
-            double d2 = Math.abs(d - this.bLon[i]);
+            if (!SkymapPanel.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
+            double d2 = Math.abs(d - this.natalRing.lon[i]);
             if (d2 > 180.0) {
                 d2 = 360.0 - d2;
             }
             if ((string = this.getAspectType(d2, n, i, false)) == null) continue;
-            boolean bl = this.isAspectApplying(d, 361.0, this.bLon[i], this.bSpeed[i], string);
-            String string2 = this.describeAspect(d2, string, n, i, d, this.bLon[i], bl);
+            boolean bl = this.isAspectApplying(d, 361.0, this.natalRing.lon[i], this.natalRing.speed[i], string);
+            String string2 = this.describeAspect(d2, string, n, i, d, this.natalRing.lon[i], bl);
             arrayList.add(bothCharts
                 ? new String[]{BODY_NAMES[i], string, string2, "Chart A"}
                 : new String[]{BODY_NAMES[i], string, string2});
@@ -5622,14 +5599,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (bothCharts) {
             for (int i = 0; i < BODY_COUNT; ++i) {
                 String string;
-                if (!SkymapPanel.aspecting(i, this.tValid) || Bodies.isOppositePair(n, i)) continue;
-                double d2 = Math.abs(d - this.tLon[i]);
+                if (!SkymapPanel.aspecting(i, this.outerRing.valid) || Bodies.isOppositePair(n, i)) continue;
+                double d2 = Math.abs(d - this.outerRing.lon[i]);
                 if (d2 > 180.0) {
                     d2 = 360.0 - d2;
                 }
                 if ((string = this.getAspectType(d2, n, i, this.isSynastryPair(false))) == null) continue;
-                boolean bl = this.isAspectApplying(d, 361.0, this.tLon[i], this.tSpeed[i], string);
-                String string2 = this.describeAspect(d2, string, n, i, d, this.tLon[i], bl);
+                boolean bl = this.isAspectApplying(d, 361.0, this.outerRing.lon[i], this.outerRing.speed[i], string);
+                String string2 = this.describeAspect(d2, string, n, i, d, this.outerRing.lon[i], bl);
                 arrayList.add(new String[]{BODY_NAMES[i], string, string2, "Chart B"});
             }
         }
@@ -6257,19 +6234,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
 
     /** The longitudes of one wheel. */
     private double[] wheelLon(int wheel) {
-        return wheel == WHEEL_SKY ? this.cLon : (wheel == WHEEL_OUTER ? this.tLon : this.bLon);
+        return wheel == WHEEL_SKY ? this.skyRing.lon : (wheel == WHEEL_OUTER ? this.outerRing.lon : this.natalRing.lon);
     }
 
     /** The speeds of one wheel. */
     private double[] wheelSpeed(int wheel) {
-        return wheel == WHEEL_SKY ? this.cSpeed
-            : (wheel == WHEEL_OUTER ? this.tSpeed : this.bSpeed);
+        return wheel == WHEEL_SKY ? this.skyRing.speed
+            : (wheel == WHEEL_OUTER ? this.outerRing.speed : this.natalRing.speed);
     }
 
     /** Which points of one wheel are computed. */
     private boolean[] wheelValid(int wheel) {
-        return wheel == WHEEL_SKY ? this.cValid
-            : (wheel == WHEEL_OUTER ? this.tValid : this.bValid);
+        return wheel == WHEEL_SKY ? this.skyRing.valid
+            : (wheel == WHEEL_OUTER ? this.outerRing.valid : this.natalRing.valid);
     }
 
     /** The registry index for a grid label, which may carry the transit prefix. -1 if unknown. */
@@ -6306,9 +6283,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             return null;
         }
         double lonA = this.wheelLon(wheel)[a];
-        double lonB = this.bLon[b];
+        double lonB = this.natalRing.lon[b];
         double speedA = this.wheelSpeed(wheel)[a];
-        double speedB = this.bSpeed[b];
+        double speedB = this.natalRing.speed[b];
 
         double sep = Math.abs(lonA - lonB);
         if (sep > 180.0) {
@@ -6788,9 +6765,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             boolean isTransit = stringArray[0].equals("transit");
             boolean isSky = stringArray[0].equals("sky") || stringArray[0].equals("tri");
             int n = Integer.parseInt(stringArray[1]);
-            double[] dArray = isSky ? this.cLon : (isTransit ? this.tLon : this.bLon);
-            blArray = isSky ? this.cValid : (isTransit ? this.tValid : this.bValid);
-            double[] speedArray = isSky ? this.cSpeed : (isTransit ? this.tSpeed : this.bSpeed);
+            double[] dArray = isSky ? this.skyRing.lon : (isTransit ? this.outerRing.lon : this.natalRing.lon);
+            blArray = isSky ? this.skyRing.valid : (isTransit ? this.outerRing.valid : this.natalRing.valid);
+            double[] speedArray = isSky ? this.skyRing.speed : (isTransit ? this.outerRing.speed : this.natalRing.speed);
             if (n < 0 || n >= BODY_COUNT || !blArray[n]) {
                 return;
             }
@@ -6823,37 +6800,37 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             ArrayList<String[]> arrayList = new ArrayList<String[]>();
             if (isSky) {
                 for (int i = 0; i < BODY_COUNT; ++i) {
-                    if (!this.bValid[i]) continue;
-                    double d6 = Math.abs(d2 - this.bLon[i]);
+                    if (!this.natalRing.valid[i]) continue;
+                    double d6 = Math.abs(d2 - this.natalRing.lon[i]);
                     if (d6 > 180.0) d6 = 360.0 - d6;
                     String string2 = this.getAspectType(d6, n, i, this.isSynastryPair(false));
                     if (string2 == null) continue;
-                    boolean blA = this.isAspectApplying(d2, speedArray[n], this.bLon[i], this.bSpeed[i], string2);
-                    String string3 = this.describeAspect(d6, string2, n, i, d2, this.bLon[i], blA);
+                    boolean blA = this.isAspectApplying(d2, speedArray[n], this.natalRing.lon[i], this.natalRing.speed[i], string2);
+                    String string3 = this.describeAspect(d6, string2, n, i, d2, this.natalRing.lon[i], blA);
                     arrayList.add(new String[]{BODY_NAMES[i], string2, string3, "Chart A"});
                 }
                 for (int i = 0; i < BODY_COUNT; ++i) {
-                    if (!this.tValid[i]) continue;
-                    double d6 = Math.abs(d2 - this.tLon[i]);
+                    if (!this.outerRing.valid[i]) continue;
+                    double d6 = Math.abs(d2 - this.outerRing.lon[i]);
                     if (d6 > 180.0) d6 = 360.0 - d6;
                     String string2 = this.getAspectType(d6, n, i, this.isSynastryPair(false));
                     if (string2 == null) continue;
-                    boolean blB = this.isAspectApplying(d2, speedArray[n], this.tLon[i], this.tSpeed[i], string2);
-                    String string3 = this.describeAspect(d6, string2, n, i, d2, this.tLon[i], blB);
+                    boolean blB = this.isAspectApplying(d2, speedArray[n], this.outerRing.lon[i], this.outerRing.speed[i], string2);
+                    String string3 = this.describeAspect(d6, string2, n, i, d2, this.outerRing.lon[i], blB);
                     arrayList.add(new String[]{BODY_NAMES[i], string2, string3, "Chart B"});
                 }
             } else {
                 for (int i = 0; i < BODY_COUNT; ++i) {
                     String string2;
-                    if (n == i || !SkymapPanel.aspecting(i, this.bValid) || Bodies.isOppositePair(n, i)) continue;
-                    double d6 = Math.abs(d2 - this.bLon[i]);
+                    if (n == i || !SkymapPanel.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
+                    double d6 = Math.abs(d2 - this.natalRing.lon[i]);
                     if (d6 > 180.0) {
                         d6 = 360.0 - d6;
                     }
                     if ((string2 = this.getAspectType(d6, n, i, this.isSynastryPair(isTransit))) == null) continue;
                     d = speedArray[n];
-                    boolean bl2 = this.isAspectApplying(d2, d, this.bLon[i], this.bSpeed[i], string2);
-                    String string3 = this.describeAspect(d6, string2, n, i, d2, this.bLon[i], bl2);
+                    boolean bl2 = this.isAspectApplying(d2, d, this.natalRing.lon[i], this.natalRing.speed[i], string2);
+                    String string3 = this.describeAspect(d6, string2, n, i, d2, this.natalRing.lon[i], bl2);
                     arrayList.add(new String[]{BODY_NAMES[i], string2, string3});
                 }
             }
@@ -6874,26 +6851,26 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         double d;
         boolean[] blArray;
         ArrayList<String[]> arrayList = new ArrayList<String[]>();
-        double[] dArray = bl ? this.tLon : this.bLon;
-        boolean[] blArray2 = blArray = bl ? this.tValid : this.bValid;
+        double[] dArray = bl ? this.outerRing.lon : this.natalRing.lon;
+        boolean[] blArray2 = blArray = bl ? this.outerRing.valid : this.natalRing.valid;
         if (n < 0 || n >= BODY_COUNT || !blArray[n]) {
             return arrayList;
         }
         double d2 = dArray[n];
-        double d3 = d = bl ? this.tSpeed[n] : this.bSpeed[n];
+        double d3 = d = bl ? this.outerRing.speed[n] : this.natalRing.speed[n];
         if (Bodies.at(n).isAngle()) {
             d = 361.0;
         }
         for (int i = 0; i < BODY_COUNT; ++i) {
             String string;
-            if (n == i || !SkymapPanel.aspecting(i, this.bValid) || Bodies.isOppositePair(n, i)) continue;
-            double d4 = Math.abs(d2 - this.bLon[i]);
+            if (n == i || !SkymapPanel.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
+            double d4 = Math.abs(d2 - this.natalRing.lon[i]);
             if (d4 > 180.0) {
                 d4 = 360.0 - d4;
             }
             if ((string = this.getAspectType(d4, n, i, this.isSynastryPair(bl))) == null) continue;
-            boolean bl2 = this.isAspectApplying(d2, d, this.bLon[i], this.bSpeed[i], string);
-            String string2 = this.describeAspect(d4, string, n, i, d2, this.bLon[i], bl2);
+            boolean bl2 = this.isAspectApplying(d2, d, this.natalRing.lon[i], this.natalRing.speed[i], string);
+            String string2 = this.describeAspect(d4, string, n, i, d2, this.natalRing.lon[i], bl2);
             arrayList.add(new String[]{BODY_NAMES[i], string, string2});
         }
         return arrayList;
@@ -7013,17 +6990,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.drawsNatalAspects()) {
             int disc = g.aspectDisc(0);
             for (int a = 0; a < BODY_COUNT; a++) {
-                if (!SkymapPanel.aspecting(a, this.bValid)) {
+                if (!SkymapPanel.aspecting(a, this.natalRing.valid)) {
                     continue;
                 }
                 for (int b = a + 1; b < BODY_COUNT; b++) {
-                    if (!SkymapPanel.aspecting(b, this.bValid)
+                    if (!SkymapPanel.aspecting(b, this.natalRing.valid)
                         || Bodies.isOppositePair(a, b)
-                        || this.aspectInkFor(this.bLon[a], this.bLon[b], a, b, false) == null) {
+                        || this.aspectInkFor(this.natalRing.lon[a], this.natalRing.lon[b], a, b, false) == null) {
                         continue;
                     }
                     double d = chordDistance(x, y, g.cx, g.cy, pin, disc, disc,
-                        this.bLon[a], this.bLon[b]);
+                        this.natalRing.lon[a], this.natalRing.lon[b]);
                     if (d < near) {
                         near = d;
                         found = new int[] {WHEEL_NATAL, a, b};
@@ -7044,13 +7021,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         continue;
                     }
                     for (int b = 0; b < BODY_COUNT; b++) {
-                        if (!SkymapPanel.aspecting(b, this.bValid)
-                            || this.aspectInkFor(lon[a], this.bLon[b], a, b,
+                        if (!SkymapPanel.aspecting(b, this.natalRing.valid)
+                            || this.aspectInkFor(lon[a], this.natalRing.lon[b], a, b,
                                 wheel == WHEEL_OUTER) == null) {
                             continue;
                         }
                         double d = chordDistance(x, y, g.cx, g.cy, pin, disc, disc,
-                            lon[a], this.bLon[b]);
+                            lon[a], this.natalRing.lon[b]);
                         if (d < near) {
                             near = d;
                             found = new int[] {wheel, a, b};
@@ -7130,81 +7107,81 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // under the reader. Every mode but the synastry's own Chart B now steps the sky.
         if (this.isRelationshipChart() || this.isSynastryChart()) {
             if (bl) {
-                this.skyChartTime = "Real Time".equals(this.stepAmount)
+                this.skyRing.time = "Real Time".equals(this.stepAmount)
                     ? ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId))
-                    : this.stepped(this.skyChartTime, n);
+                    : this.stepped(this.skyRing.time, n);
             }
             return;
         }
         // <b>With no Chart A the inner wheel is the sky, so the sky is what moves.</b>
-        // updateChartData copies skyChartTime over baseChartTime whenever the inner wheel is the
-        // sky, so the branch below - which moved baseChartTime - was undone by the very next
+        // updateChartData copies skyRing.time over natalRing.time whenever the inner wheel is the
+        // sky, so the branch below - which moved natalRing.time - was undone by the very next
         // recompute, and Play, Fast and Slow did nothing at all on the chart the app opens
         // onto. Found by ScrubCheck on 2026-09-15, since a scrub steps through here too.
         if (!this.innerIsBirthChart) {
             if (bl2 || bl) {
-                this.skyChartTime = "Real Time".equals(this.stepAmount)
+                this.skyRing.time = "Real Time".equals(this.stepAmount)
                     ? ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId))
-                    : this.stepped(this.skyChartTime, n);
+                    : this.stepped(this.skyRing.time, n);
             }
             return;
         }
         if ("Real Time".equals(this.stepAmount)) {
             if (bl2) {
-                this.baseChartTime = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
+                this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
             }
             if (bl) {
-                this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+                this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
             }
             return;
         }
         switch (this.stepAmount) {
             case "1 Minute": {
                 if (bl2) {
-                    this.baseChartTime = this.baseChartTime.plusMinutes(n);
+                    this.natalRing.time = this.natalRing.time.plusMinutes(n);
                 }
                 if (!bl) break;
-                this.skyChartTime = this.skyChartTime.plusMinutes(n);
+                this.skyRing.time = this.skyRing.time.plusMinutes(n);
                 break;
             }
             case "1 Hour": {
                 if (bl2) {
-                    this.baseChartTime = this.baseChartTime.plusHours(n);
+                    this.natalRing.time = this.natalRing.time.plusHours(n);
                 }
                 if (!bl) break;
-                this.skyChartTime = this.skyChartTime.plusHours(n);
+                this.skyRing.time = this.skyRing.time.plusHours(n);
                 break;
             }
             case "1 Day": {
                 if (bl2) {
-                    this.baseChartTime = this.baseChartTime.plusDays(n);
+                    this.natalRing.time = this.natalRing.time.plusDays(n);
                 }
                 if (!bl) break;
-                this.skyChartTime = this.skyChartTime.plusDays(n);
+                this.skyRing.time = this.skyRing.time.plusDays(n);
                 break;
             }
             case "1 Week": {
                 if (bl2) {
-                    this.baseChartTime = this.baseChartTime.plusWeeks(n);
+                    this.natalRing.time = this.natalRing.time.plusWeeks(n);
                 }
                 if (!bl) break;
-                this.skyChartTime = this.skyChartTime.plusWeeks(n);
+                this.skyRing.time = this.skyRing.time.plusWeeks(n);
                 break;
             }
             case "1 Month": {
                 if (bl2) {
-                    this.baseChartTime = this.baseChartTime.plusMonths(n);
+                    this.natalRing.time = this.natalRing.time.plusMonths(n);
                 }
                 if (!bl) break;
-                this.skyChartTime = this.skyChartTime.plusMonths(n);
+                this.skyRing.time = this.skyRing.time.plusMonths(n);
                 break;
             }
             case "1 Year": {
                 if (bl2) {
-                    this.baseChartTime = this.baseChartTime.plusYears(n);
+                    this.natalRing.time = this.natalRing.time.plusYears(n);
                 }
                 if (!bl) break;
-                this.skyChartTime = this.skyChartTime.plusYears(n);
+                this.skyRing.time = this.skyRing.time.plusYears(n);
             }
         }
     }
@@ -7285,14 +7262,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         this.isPlaying = false;
         this.scrubTarget = target;
-        this.scrubBase = this.baseChartTime;
-        this.scrubSky = this.skyChartTime;
-        this.scrubTransit = this.transitChartTime;
-        if (target == ScrubTarget.CHART_A && this.baseChartTime != null) {
-            this.scrubOrigins.putIfAbsent(target, this.baseChartTime);
+        this.scrubBase = this.natalRing.time;
+        this.scrubSky = this.skyRing.time;
+        this.scrubTransit = this.outerRing.time;
+        if (target == ScrubTarget.CHART_A && this.natalRing.time != null) {
+            this.scrubOrigins.putIfAbsent(target, this.natalRing.time);
         }
-        if (target == ScrubTarget.CHART_B && this.transitChartTime != null) {
-            this.scrubOrigins.putIfAbsent(target, this.transitChartTime);
+        if (target == ScrubTarget.CHART_B && this.outerRing.time != null) {
+            this.scrubOrigins.putIfAbsent(target, this.outerRing.time);
         }
         this.scrubSteps = 0;
         this.scrubbing = true;
@@ -7306,9 +7283,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (steps == this.scrubSteps) {
             return;
         }
-        this.baseChartTime = this.scrubBase;
-        this.skyChartTime = this.scrubSky;
-        this.transitChartTime = this.scrubTransit;
+        this.natalRing.time = this.scrubBase;
+        this.skyRing.time = this.scrubSky;
+        this.outerRing.time = this.scrubTransit;
         String unit = this.stepAmount;
         int direction = this.animationDirection;
         try {
@@ -7316,13 +7293,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.animationDirection = steps;
             switch (this.scrubTarget) {
                 case CHART_A:
-                    this.baseChartTime = this.stepped(this.scrubBase, steps);
+                    this.natalRing.time = this.stepped(this.scrubBase, steps);
                     break;
                 case CHART_B:
-                    this.transitChartTime = this.stepped(this.scrubTransit, steps);
+                    this.outerRing.time = this.stepped(this.scrubTransit, steps);
                     break;
                 case SKY:
-                    this.skyChartTime = this.stepped(this.scrubSky, steps);
+                    this.skyRing.time = this.stepped(this.scrubSky, steps);
                     break;
                 default:
                     if (steps != 0) {
@@ -7344,9 +7321,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             return;
         }
         if (target == ScrubTarget.CHART_A) {
-            this.baseChartTime = origin;
+            this.natalRing.time = origin;
         } else if (target == ScrubTarget.CHART_B) {
-            this.transitChartTime = origin;
+            this.outerRing.time = origin;
         }
         this.updateChartData();
         if (this.chartPanel != null) {
@@ -7617,19 +7594,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
 
     public void updateChartData() {
         this.invalidateGlobeChords();
-        if (this.baseChartTime != null) {
-            this.baseSd = this.createSweDate(this.baseChartTime);
+        if (this.natalRing.time != null) {
+            this.natalRing.sd = this.createSweDate(this.natalRing.time);
         }
-        if (this.transitChartTime != null) {
-            this.transitSd = this.createSweDate(this.transitChartTime);
+        if (this.outerRing.time != null) {
+            this.outerRing.sd = this.createSweDate(this.outerRing.time);
         }
         if (this.sw == null) {
             return;
         }
-        if (this.skyChartTime == null) {
-            this.skyChartTime = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+        if (this.skyRing.time == null) {
+            this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
         }
-        this.skySd = this.createSweDate(this.skyChartTime);
+        this.skyRing.sd = this.createSweDate(this.skyRing.time);
 
         // <b>In a composite mode the INNER wheel is the composite itself.</b> Everything below
         // reads the base arrays, so the composite is loaded into them rather than special-cased
@@ -7648,16 +7625,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // <b>With no Chart A the inner wheel is the sky.</b> Not a birth chart cast from
         // whatever moment the field happened to hold - there is no chart, and the honest
         // thing to draw is the one thing that always exists.
-        if (!this.innerIsBirthChart && !relationship && this.skySd != null) {
-            this.baseSd = this.skySd;
-            this.baseChartTime = this.skyChartTime;
+        if (!this.innerIsBirthChart && !relationship && this.skyRing.sd != null) {
+            this.natalRing.sd = this.skyRing.sd;
+            this.natalRing.time = this.skyRing.time;
         }
         double[] dArray = new double[10];
-        if (this.baseSd != null && !relationship) {
-            double innerLat = this.innerIsBirthChart ? this.baseLatitude : this.skyLatitude;
-            double innerLon = this.innerIsBirthChart ? this.baseLongitude : this.skyLongitude;
-            this.sw.swe_houses(this.baseSd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), innerLat, innerLon, this.houseSystem, this.baseCusps, dArray);
-            this.baseAscendant = dArray[0];
+        if (this.natalRing.sd != null && !relationship) {
+            double innerLat = this.innerIsBirthChart ? this.natalRing.latitude : this.skyRing.latitude;
+            double innerLon = this.innerIsBirthChart ? this.natalRing.longitude : this.skyRing.longitude;
+            this.sw.swe_houses(this.natalRing.sd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), innerLat, innerLon, this.houseSystem, this.natalRing.cusps, dArray);
+            this.natalRing.ascendant = dArray[0];
             System.arraycopy(dArray, 0, this.baseAscmc, 0, this.baseAscmc.length);
         }
         // <b>The outer wheel is a second person only in a synastry.</b> Everywhere else it
@@ -7666,63 +7643,63 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // chart where this moment should have been, and pressing Partner after looking at the
         // sky drew this moment where the partner should have been. One pair of fields, two
         // meanings, and the chips switched the meaning without switching the value.
-        SweDate outerSd = this.isSynastryChart() ? this.transitSd : this.skySd;
+        SweDate outerSd = this.isSynastryChart() ? this.outerRing.sd : this.skyRing.sd;
         // The place follows the moment: Chart B's birthplace for Chart B, the sky's own
         // location for the sky.
-        double outerLat = this.isSynastryChart() ? this.transitLatitude : this.skyLatitude;
-        double outerLon = this.isSynastryChart() ? this.transitLongitude : this.skyLongitude;
+        double outerLat = this.isSynastryChart() ? this.outerRing.latitude : this.skyRing.latitude;
+        double outerLon = this.isSynastryChart() ? this.outerRing.longitude : this.skyRing.longitude;
         // A day of ephemeris for a year of life. Everything downstream - houses, bodies, the
         // ring, the aspect lines - is unchanged; only the moment it is asked about moves.
         boolean progressedRing = this.showProgressed() && !relationship
-            && this.baseSd != null && outerSd != null;
+            && this.natalRing.sd != null && outerSd != null;
         if (progressedRing) {
             outerSd = new SweDate(com.zodiacomputing.ourania.astro.Progressions.progressedJd(
-                this.baseSd.getJulDay(), outerSd.getJulDay()));
+                this.natalRing.sd.getJulDay(), outerSd.getJulDay()));
         }
         // <b>What the middle ring was actually cast at, kept.</b> The readouts printed
-        // transitChartTime beside it, which is Chart B's birth moment - right in a synastry and
+        // outerRing.time beside it, which is Chart B's birth moment - right in a synastry and
         // wrong everywhere else, and wrong in a new way for a progressed ring, whose moment is
         // a date in the reader's infancy that no field on the form holds. One place computes
         // this; now one place remembers it, and the readouts ask rather than guess.
         this.outerCastAt = outerSd;
         if (this.showTransitChart && outerSd != null && !progressedRing) {
             double[] dArray2 = new double[10];
-            this.sw.swe_houses(outerSd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), outerLat, outerLon, this.houseSystem, this.transitCusps, dArray2);
-            this.transitAscendant = dArray2[0];
+            this.sw.swe_houses(outerSd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), outerLat, outerLon, this.houseSystem, this.outerRing.cusps, dArray2);
+            this.outerRing.ascendant = dArray2[0];
             System.arraycopy(dArray2, 0, this.transitAscmc, 0, this.transitAscmc.length);
         } else {
-            System.arraycopy(this.baseCusps, 0, this.transitCusps, 0, this.transitCusps.length);
-            this.transitAscendant = this.baseAscendant;
+            System.arraycopy(this.natalRing.cusps, 0, this.outerRing.cusps, 0, this.outerRing.cusps.length);
+            this.outerRing.ascendant = this.natalRing.ascendant;
             System.arraycopy(this.baseAscmc, 0, this.transitAscmc, 0, this.transitAscmc.length);
         }
-        if (this.baseSd != null && !relationship) {
-            this.computeBodies(this.baseSd, this.baseCusps, this.bLon, this.bSpeed, this.bOk, this.bValid);
+        if (this.natalRing.sd != null && !relationship) {
+            this.computeBodies(this.natalRing.sd, this.natalRing.cusps, this.natalRing.lon, this.natalRing.speed, this.natalRing.ok, this.natalRing.valid);
         }
         if (this.showTransitChart && outerSd != null) {
-            this.computeBodies(outerSd, this.transitCusps, this.tLon, this.tSpeed, this.tOk, this.tValid);
+            this.computeBodies(outerSd, this.outerRing.cusps, this.outerRing.lon, this.outerRing.speed, this.outerRing.ok, this.outerRing.valid);
         } else {
-            Arrays.fill(this.tValid, false);
-            Arrays.fill(this.tOk, false);
+            Arrays.fill(this.outerRing.valid, false);
+            Arrays.fill(this.outerRing.ok, false);
         }
-        // Tri-wheel: the sky at skyChartTime wrapped around the synastry pair.
-        // skyChartTime defaults to now and is driven by the same Now/Play controls,
+        // Tri-wheel: the sky at skyRing.time wrapped around the synastry pair.
+        // skyRing.time defaults to now and is driven by the same Now/Play controls,
         // so the animation sweeps the sky without touching either person's birth data.
-        if (this.showTriWheel && this.skySd != null) {
+        if (this.showTriWheel && this.skyRing.sd != null) {
             double[] triAux = new double[10];
-            this.sw.swe_houses(this.skySd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2),
-                this.skyLatitude, this.skyLongitude, this.houseSystem,
-                this.triCusps, triAux);
-            this.triAscendant = triAux[0];
+            this.sw.swe_houses(this.skyRing.sd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2),
+                this.skyRing.latitude, this.skyRing.longitude, this.houseSystem,
+                this.skyRing.cusps, triAux);
+            this.skyRing.ascendant = triAux[0];
             System.arraycopy(triAux, 0, this.triAscmc, 0, this.triAscmc.length);
-            this.computeBodies(this.skySd, this.triCusps,
-                this.cLon, this.cSpeed, this.cOk, this.cValid);
+            this.computeBodies(this.skyRing.sd, this.skyRing.cusps,
+                this.skyRing.lon, this.skyRing.speed, this.skyRing.ok, this.skyRing.valid);
         } else {
-            Arrays.fill(this.cValid, false);
-            Arrays.fill(this.cOk, false);
+            Arrays.fill(this.skyRing.valid, false);
+            Arrays.fill(this.skyRing.ok, false);
         }
         // The harmonic, applied once, after every other source has finished writing positions.
         //
-        // <b>Here rather than at each filler.</b> bLon is written by two different paths - the
+        // <b>Here rather than at each filler.</b> natalRing.lon is written by two different paths - the
         // composite goes through loadFrameIntoBase, everything else through computeBodies - and
         // mapping in both would be one rule in two places. This is the point where the arrays
         // are settled and nothing else has read them yet.
@@ -7732,7 +7709,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (com.zodiacomputing.ourania.astro.Harmonics.isActive(this.harmonic)) {
             for (int i = 0; i < BODY_COUNT; i++) {
                 // <b>Angles are skipped, matching Harmonics.of.</b> The house cusps and the
-                // ASC/DSC axis are drawn from baseCusps and baseAscendant, which are never
+                // ASC/DSC axis are drawn from natalRing.cusps and natalRing.ascendant, which are never
                 // mapped - so mapping the angle GLYPHS here put a harmonic Ascendant marker
                 // on a radix horizon. At H5 it had walked to the top of the wheel while the
                 // axis line stayed on the left. Caught by rendering the wheel, not by any
@@ -7740,24 +7717,24 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 if (Bodies.at(i).isAngle()) {
                     continue;
                 }
-                this.bLon[i] = com.zodiacomputing.ourania.astro.Harmonics.map(
-                    this.bLon[i], this.harmonic);
-                this.bSpeed[i] *= this.harmonic;
-                this.tLon[i] = com.zodiacomputing.ourania.astro.Harmonics.map(
-                    this.tLon[i], this.harmonic);
-                this.tSpeed[i] *= this.harmonic;
-                this.cLon[i] = com.zodiacomputing.ourania.astro.Harmonics.map(
-                    this.cLon[i], this.harmonic);
-                this.cSpeed[i] *= this.harmonic;
+                this.natalRing.lon[i] = com.zodiacomputing.ourania.astro.Harmonics.map(
+                    this.natalRing.lon[i], this.harmonic);
+                this.natalRing.speed[i] *= this.harmonic;
+                this.outerRing.lon[i] = com.zodiacomputing.ourania.astro.Harmonics.map(
+                    this.outerRing.lon[i], this.harmonic);
+                this.outerRing.speed[i] *= this.harmonic;
+                this.skyRing.lon[i] = com.zodiacomputing.ourania.astro.Harmonics.map(
+                    this.skyRing.lon[i], this.harmonic);
+                this.skyRing.speed[i] *= this.harmonic;
             }
         }
 
         if (this.showTransitChart && "Transit".equals(this.houseAlignment)) {
-            System.arraycopy(this.transitCusps, 0, this.activeCusps, 0, this.activeCusps.length);
-            this.activeAscendant = this.transitAscendant;
+            System.arraycopy(this.outerRing.cusps, 0, this.activeCusps, 0, this.activeCusps.length);
+            this.activeAscendant = this.outerRing.ascendant;
         } else {
-            System.arraycopy(this.baseCusps, 0, this.activeCusps, 0, this.activeCusps.length);
-            this.activeAscendant = this.baseAscendant;
+            System.arraycopy(this.natalRing.cusps, 0, this.activeCusps, 0, this.activeCusps.length);
+            this.activeAscendant = this.natalRing.ascendant;
         }
         if (this.window != null) {
             // Three parts, three accordion sections. One document would mean the
@@ -7777,25 +7754,25 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * Copy a computed frame into the inner-wheel arrays.
      *
      * <b>Index-for-index, and that is safe because both are the Bodies registry.</b>
-     * ChartFrame.bodies and this panel's bLon/bValid are each built by walking
+     * ChartFrame.bodies and this panel's natalRing.lon/natalRing.valid are each built by walking
      * {@link Bodies} in order, so entry i is the same body in both. The NAME remains the key
      * anywhere something is looked up rather than indexed.
      *
      * {@code ok} already accounts for the user's body selection - ChartFrame.compute applies
-     * Settings.loadBodySelection before returning - so bValid follows it rather than being
+     * Settings.loadBodySelection before returning - so natalRing.valid follows it rather than being
      * recomputed here from a second reading of the settings.
      */
     private void loadFrameIntoBase(ChartFrame frame) {
-        System.arraycopy(frame.cusps, 0, this.baseCusps, 0,
-            Math.min(frame.cusps.length, this.baseCusps.length));
-        this.baseAscendant = frame.asc;
+        System.arraycopy(frame.cusps, 0, this.natalRing.cusps, 0,
+            Math.min(frame.cusps.length, this.natalRing.cusps.length));
+        this.natalRing.ascendant = frame.asc;
         for (int i = 0; i < BODY_COUNT && i < frame.bodies.length; i++) {
             ChartFrame.Body b = frame.bodies[i];
             boolean usable = b != null && b.ok;
-            this.bLon[i] = usable ? b.lon : 0.0;
-            this.bSpeed[i] = usable ? b.lonSpeed : 0.0;
-            this.bOk[i] = usable;
-            this.bValid[i] = usable;
+            this.natalRing.lon[i] = usable ? b.lon : 0.0;
+            this.natalRing.speed[i] = usable ? b.lonSpeed : 0.0;
+            this.natalRing.ok[i] = usable;
+            this.natalRing.valid[i] = usable;
         }
     }
 
@@ -7862,10 +7839,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     private double[] triAscmc = new double[10];
 
     private double[] ascmcFor(double[] cusps) {
-        if (cusps == this.transitCusps) {
+        if (cusps == this.outerRing.cusps) {
             return this.transitAscmc;
         }
-        if (cusps == this.triCusps) {
+        if (cusps == this.skyRing.cusps) {
             return this.triAscmc;
         }
         return this.baseAscmc;
@@ -7893,9 +7870,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             return 0.0;
         }
         if ("Transit Asc".equals(this.wheelPin) && this.showTransitChart) {
-            return this.transitAscendant;
+            return this.outerRing.ascendant;
         }
-        return this.baseAscendant;
+        return this.natalRing.ascendant;
     }
 
     /** Pure lookup, static so a check can call it without standing up a whole window. */
@@ -8088,8 +8065,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy HH:mm z");
         if (wantNatal) {
         stringBuilder.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(string).append("</h2>");
-        String string2 = this.baseChartTime != null ? this.baseChartTime.format(dateTimeFormatter) : "";
-        String string3 = String.format("%.2f, %.2f", this.baseLatitude, this.baseLongitude);
+        String string2 = this.natalRing.time != null ? this.natalRing.time.format(dateTimeFormatter) : "";
+        String string3 = String.format("%.2f, %.2f", this.natalRing.latitude, this.natalRing.longitude);
         stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(string2).append("<br>").append(string3).append("</div>");
         // <b>The one link that is always on screen.</b> Everything else in the index is
         // reached from a page you have to open first; this panel is up from the moment the
@@ -8131,8 +8108,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
 
         stringBuilder.append("<h3 style='color:#add8e6;'>Placements</h3>");
         for (n3 = 0; n3 < BODY_COUNT; ++n3) {
-            if (!this.bValid[n3]) continue;
-            stringBuilder.append(this.formatPlanetPlacement(n3, this.bLon[n3], this.bSpeed[n3], BASE_PREFIX));
+            if (!this.natalRing.valid[n3]) continue;
+            stringBuilder.append(this.formatPlanetPlacement(n3, this.natalRing.lon[n3], this.natalRing.speed[n3], BASE_PREFIX));
         }
         }
         if (wantTransits && this.showTransitChart) {
@@ -8142,29 +8119,29 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 : (this.showProgressed() ? "Progressed Chart" : "Transit Chart");
             stringBuilder.append("<br><h2 style='color:#ffa500; margin-bottom: 2px;'>").append(string4).append("</h2>");
             stringArray = this.outerCastLabel();
-            if (stringArray.isEmpty() && this.transitChartTime != null) {
-                stringArray = this.transitChartTime.format(dateTimeFormatter);
+            if (stringArray.isEmpty() && this.outerRing.time != null) {
+                stringArray = this.outerRing.time.format(dateTimeFormatter);
             }
-            String stringArray2 = String.format("%.2f, %.2f", this.transitLatitude, this.transitLongitude);
+            String stringArray2 = String.format("%.2f, %.2f", this.outerRing.latitude, this.outerRing.longitude);
             stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(stringArray).append("<br>").append(stringArray2).append("</div>");
             stringBuilder.append("<h3 style='color:#ffa500;'>Placements</h3>");
             for (n2 = 0; n2 < BODY_COUNT; ++n2) {
-                if (!this.tValid[n2]) continue;
-                stringBuilder.append(this.formatPlanetPlacement(n2, this.tLon[n2], this.tSpeed[n2], "transit_"));
+                if (!this.outerRing.valid[n2]) continue;
+                stringBuilder.append(this.formatPlanetPlacement(n2, this.outerRing.lon[n2], this.outerRing.speed[n2], "transit_"));
             }
         }
         if (wantTransits && this.showTriWheel) {
             stringBuilder.append("<br><h2 style='color:#a0d2ff; margin-bottom: 2px;'>Sky (Transiting)</h2>");
-            String stringSkyTime = this.skyChartTime != null ? this.skyChartTime.format(dateTimeFormatter) : "";
+            String stringSkyTime = this.skyRing.time != null ? this.skyRing.time.format(dateTimeFormatter) : "";
             // Its own coordinates. This printed Chart B's, which is the same borrowing the
             // houses were doing until the sky got a row of its own - right whenever the two
             // happened to be the same city and quietly wrong otherwise.
-            String stringSkyLoc = String.format("%.2f, %.2f", this.skyLatitude, this.skyLongitude);
+            String stringSkyLoc = String.format("%.2f, %.2f", this.skyRing.latitude, this.skyRing.longitude);
             stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(stringSkyTime).append("<br>").append(stringSkyLoc).append("</div>");
             stringBuilder.append("<h3 style='color:#a0d2ff;'>Placements</h3>");
             for (int k = 0; k < BODY_COUNT; ++k) {
-                if (!this.cValid[k]) continue;
-                stringBuilder.append(this.formatPlanetPlacement(k, this.cLon[k], this.cSpeed[k], "sky_"));
+                if (!this.skyRing.valid[k]) continue;
+                stringBuilder.append(this.formatPlanetPlacement(k, this.skyRing.lon[k], this.skyRing.speed[k], "sky_"));
             }
         }
         // Cross-chart placement, above the grid because it outranks it: a body on the
@@ -8213,7 +8190,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // to drag sideways to finish one row is worse than a small one you can take in whole.
         int gridCols = 0;
         for (n = 0; n < BODY_COUNT; ++n) {
-            if (SkymapPanel.aspecting(n, this.bValid)) {
+            if (SkymapPanel.aspecting(n, this.natalRing.valid)) {
                 gridCols++;
             }
         }
@@ -8224,7 +8201,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         stringBuilder.append("<table border='1' cellspacing='0' cellpadding='0' style='border-collapse: collapse; border-color: #555; text-align:center;'>");
         stringBuilder.append("<tr><td style='width:").append(cell).append("px;'></td>");
         for (n = 0; n < BODY_COUNT; ++n) {
-            if (!SkymapPanel.aspecting(n, this.bValid)) continue;
+            if (!SkymapPanel.aspecting(n, this.natalRing.valid)) continue;
             stringBuilder.append("<td style='color:").append(this.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
         }
         stringBuilder.append("</tr>");
@@ -8269,12 +8246,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                .append("; font-size:").append(glyph).append("px; width:").append(cell)
                .append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
             for (int i = 0; i < BODY_COUNT; ++i) {
-                if (!SkymapPanel.aspecting(i, this.bValid)) continue;
+                if (!SkymapPanel.aspecting(i, this.natalRing.valid)) continue;
                 if ((wheel == WHEEL_NATAL && i >= n) || Bodies.isOppositePair(n, i)) {
                     out.append("<td style='background-color:#111;'></td>");
                     continue;
                 }
-                double sep = Math.abs(lon[n] - this.bLon[i]);
+                double sep = Math.abs(lon[n] - this.natalRing.lon[i]);
                 if (sep > 180.0) {
                     sep = 360.0 - sep;
                 }
@@ -8491,7 +8468,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             graphics.setColor(ChartPalette.colorOr(ChartPalette.backgroundHex(null),
                 Color.BLACK));
             graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
-            if (SkymapPanel.this.sw == null || SkymapPanel.this.baseSd == null) {
+            if (SkymapPanel.this.sw == null || SkymapPanel.this.natalRing.sd == null) {
                 return;
             }
             Graphics2D graphics2D = (Graphics2D)graphics;
@@ -8722,7 +8699,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 for (int i = 1; i <= 12; ++i) {
                     // Across the partner band, which is where those cusps belong - not from
                     // the decan ring, which the reorder moved to the other side of the wheel.
-                    double d9 = Math.toRadians(180.0 + d4 - SkymapPanel.this.transitCusps[i]);
+                    double d9 = Math.toRadians(180.0 + d4 - SkymapPanel.this.outerRing.cusps[i]);
                     n = n12 + (int)((double)nBodyTop * Math.cos(d9));
                     n7 = n13 + (int)((double)nBodyTop * Math.sin(d9));
                     n6 = n12 + (int)((double)n15 * Math.cos(d9));
@@ -8774,19 +8751,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             int n25 = n = aspectLayer && SkymapPanel.this.drawsCrossAspects() ? 1 : 0;
             if (bl) {
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.bValid)) continue;
+                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.natalRing.valid)) continue;
                     for (n6 = n7 + 1; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid) || Bodies.isOppositePair(n7, n6)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, discNatal, discNatal, WHEEL_NATAL, n7, n6);
+                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid) || Bodies.isOppositePair(n7, n6)) continue;
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.natalRing.lon[n7], SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discNatal, discNatal, WHEEL_NATAL, n7, n6);
                     }
                 }
             }
             if (n != 0) {
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.tValid)) continue;
+                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.outerRing.valid)) continue;
                     for (n6 = 0; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.tLon[n7], SkymapPanel.this.bLon[n6], d4, n12, n13, discOuter, discOuter, WHEEL_OUTER, n7, n6);
+                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid)) continue;
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.outerRing.lon[n7], SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discOuter, discOuter, WHEEL_OUTER, n7, n6);
                     }
                 }
             }
@@ -8796,11 +8773,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // put them where they do not cross the other two.
             if (n != 0 && SkymapPanel.this.triRingDrawn()) {
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.cValid)) continue;
+                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.skyRing.valid)) continue;
                     for (n6 = 0; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.bValid)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.cLon[n7],
-                            SkymapPanel.this.bLon[n6], d4, n12, n13, discSky, discSky,
+                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid)) continue;
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.skyRing.lon[n7],
+                            SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discSky, discSky,
                             WHEEL_SKY, n7, n6);
                     }
                 }
@@ -8826,12 +8803,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     for (int lj = li + 1; lj < lit.length; lj++) {
                         int pa = lit[li];
                         int pb = lit[lj];
-                        if (!SkymapPanel.aspecting(pa, SkymapPanel.this.bValid)
-                            || !SkymapPanel.aspecting(pb, SkymapPanel.this.bValid)) {
+                        if (!SkymapPanel.aspecting(pa, SkymapPanel.this.natalRing.valid)
+                            || !SkymapPanel.aspecting(pb, SkymapPanel.this.natalRing.valid)) {
                             continue;
                         }
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.bLon[pa],
-                            SkymapPanel.this.bLon[pb], d4, n12, n13, discNatal, discNatal,
+                        this.drawAspectLine(graphics2D, SkymapPanel.this.natalRing.lon[pa],
+                            SkymapPanel.this.natalRing.lon[pb], d4, n12, n13, discNatal, discNatal,
                             WHEEL_NATAL, pa, pb);
                     }
                 }
@@ -8848,9 +8825,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 int hlDisc = hlWheel == WHEEL_SKY ? discSky
                     : (hlWheel == WHEEL_OUTER ? discOuter : discNatal);
                 if (SkymapPanel.aspecting(hlA, SkymapPanel.this.wheelValid(hlWheel))
-                    && SkymapPanel.aspecting(hlB, SkymapPanel.this.bValid)) {
+                    && SkymapPanel.aspecting(hlB, SkymapPanel.this.natalRing.valid)) {
                     this.drawAspectLine(graphics2D,
-                        SkymapPanel.this.wheelLon(hlWheel)[hlA], SkymapPanel.this.bLon[hlB],
+                        SkymapPanel.this.wheelLon(hlWheel)[hlA], SkymapPanel.this.natalRing.lon[hlB],
                         d4, n12, n13, hlDisc, hlDisc, hlWheel, hlA, hlB);
                 }
             }
@@ -8858,8 +8835,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // before anything else is painted - every loop below resets to it.
             final java.awt.geom.AffineTransform bodyTx = graphics2D.getTransform();
             for (n7 = 0; SkymapPanel.this.layerShown(Layer.NATAL) && n7 < BODY_COUNT; ++n7) {
-                if (!SkymapPanel.this.bValid[n7]) continue;
-                double d10 = Math.toRadians(180.0 + d4 - SkymapPanel.this.bLon[n7]);
+                if (!SkymapPanel.this.natalRing.valid[n7]) continue;
+                double d10 = Math.toRadians(180.0 + d4 - SkymapPanel.this.natalRing.lon[n7]);
                 n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));
                 int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
                 SkymapPanel.bulge(graphics2D, bodyTx, n4, n26, SkymapPanel.this.hoverBody == n7);
@@ -8895,8 +8872,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 graphics2D.setFont(glyphSize.font);
                 this.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
                     new Color(192, 192, 192), Settings.natalMarker());
-                if (n7 == MOON && SkymapPanel.this.bValid[SUN]) {
-                    double d11 = (SkymapPanel.this.bLon[MOON] - SkymapPanel.this.bLon[SUN]) % 360.0;
+                if (n7 == MOON && SkymapPanel.this.natalRing.valid[SUN]) {
+                    double d11 = (SkymapPanel.this.natalRing.lon[MOON] - SkymapPanel.this.natalRing.lon[SUN]) % 360.0;
                     if (d11 < 0.0) {
                         d11 += 360.0;
                     }
@@ -8951,8 +8928,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // synastry this wheel is a second person, anywhere else it is a moment.
                 final AngleRole outerRole = SkymapPanel.this.angleRoleFor(false, true);
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.this.tValid[n7]) continue;
-                    double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.tLon[n7]);
+                    if (!SkymapPanel.this.outerRing.valid[n7]) continue;
+                    double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.outerRing.lon[n7]);
                     n4 = n12 + (int)((double)nArray2[n7] * Math.cos(d12));
                     int n27 = n13 + (int)((double)nArray2[n7] * Math.sin(d12));
                     SkymapPanel.bulge(graphics2D, bodyTx, n4, n27,
@@ -8978,8 +8955,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     this.drawBodyMarker(graphics2D, n4, n27, glyphSize2.radius,
                         SkymapPanel.ringBead(outerRole),
                         SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
-                    if (n7 == MOON && SkymapPanel.this.tValid[SUN]) {
-                        double d13 = (SkymapPanel.this.tLon[MOON] - SkymapPanel.this.tLon[SUN]) % 360.0;
+                    if (n7 == MOON && SkymapPanel.this.outerRing.valid[SUN]) {
+                        double d13 = (SkymapPanel.this.outerRing.lon[MOON] - SkymapPanel.this.outerRing.lon[SUN]) % 360.0;
                         if (d13 < 0.0) {
                             d13 += 360.0;
                         }
@@ -9004,8 +8981,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         AlphaComposite.getInstance(AlphaComposite.SRC_OVER, triA));
                 }
                 for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.this.cValid[n7]) continue;
-                    double d14 = Math.toRadians(180.0 + d4 - SkymapPanel.this.cLon[n7]);
+                    if (!SkymapPanel.this.skyRing.valid[n7]) continue;
+                    double d14 = Math.toRadians(180.0 + d4 - SkymapPanel.this.skyRing.lon[n7]);
                     n4 = n12 + (int)((double)nArrayC[n7] * Math.cos(d14));
                     int n28 = n13 + (int)((double)nArrayC[n7] * Math.sin(d14));
                     // The sky ring never had this at all: its chords could light and the two
@@ -9030,8 +9007,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     Color cColor = SkymapPanel.this.ringInk(n7, AngleRole.SKY);
                     this.drawBodyMarker(graphics2D, n4, n28, glyphSize3.radius,
                         SkymapPanel.ringBead(AngleRole.SKY), Settings.transitMarker());
-                    if (n7 == MOON && SkymapPanel.this.cValid[SUN]) {
-                        double d15 = (SkymapPanel.this.cLon[MOON] - SkymapPanel.this.cLon[SUN]) % 360.0;
+                    if (n7 == MOON && SkymapPanel.this.skyRing.valid[SUN]) {
+                        double d15 = (SkymapPanel.this.skyRing.lon[MOON] - SkymapPanel.this.skyRing.lon[SUN]) % 360.0;
                         if (d15 < 0.0) d15 += 360.0;
                         SkymapPanel.this.drawMoonPhase(graphics2D, n4, n28, Math.round((float)glyphSize3.radius * 0.44f), d15 / 360.0);
                         continue;

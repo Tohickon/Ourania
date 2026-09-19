@@ -161,15 +161,15 @@ final class GlobeRenderer {
             int innerDeck = panel.ringDeck(0);
             r.ribbon(natalR, r.faded(shade(chartInk(innerDeck), 54), SkymapPanel.Layer.NATAL),
                 inclinationOf(innerDeck, r.stacked), liftOf(innerDeck, r.stacked), turning);
-            r.bodies(panel.bLon, panel.bValid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
+            r.bodies(panel.natalRing.lon, panel.natalRing.valid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
                 false, 0);
         }
         if (panel.outerRingDrawn()) {
-            r.bodies(panel.tLon, panel.tValid, partnerR,
+            r.bodies(panel.outerRing.lon, panel.outerRing.valid, partnerR,
                 panel.angleRoleFor(false, true), panel, true, 1);
         }
         if (panel.triRingDrawn()) {
-            r.bodies(panel.cLon, panel.cValid, skyR, SkymapPanel.AngleRole.SKY, panel, true, 2);
+            r.bodies(panel.skyRing.lon, panel.skyRing.valid, skyR, SkymapPanel.AngleRole.SKY, panel, true, 2);
         }
 
         r.flush();
@@ -264,9 +264,9 @@ final class GlobeRenderer {
 
         // Outermost first only matters for ties; nearest-wins settles the rest.
         for (int ring = 0; ring < 3; ring++) {
-            double[] lon = ring == 0 ? panel.bLon : (ring == 1 ? panel.tLon : panel.cLon);
-            boolean[] valid = ring == 0 ? panel.bValid
-                : (ring == 1 ? panel.tValid : panel.cValid);
+            double[] lon = ring == 0 ? panel.natalRing.lon : (ring == 1 ? panel.outerRing.lon : panel.skyRing.lon);
+            boolean[] valid = ring == 0 ? panel.natalRing.valid
+                : (ring == 1 ? panel.outerRing.valid : panel.skyRing.valid);
             if (ring == 1 && !panel.outerRingDrawn()) {
                 continue;
             }
@@ -1322,11 +1322,11 @@ final class GlobeRenderer {
         int[][] chords = panel.globeChords(() -> buildChords(panel));
         double origin = this.origin;
         int[][] levels = {
-            Globe.stackLevels(panel.bLon, panel.bValid, 7.0),
-            Globe.stackLevels(panel.tLon, panel.tValid, 7.0),
-            Globe.stackLevels(panel.cLon, panel.cValid, 7.0),
+            Globe.stackLevels(panel.natalRing.lon, panel.natalRing.valid, 7.0),
+            Globe.stackLevels(panel.outerRing.lon, panel.outerRing.valid, 7.0),
+            Globe.stackLevels(panel.skyRing.lon, panel.skyRing.valid, 7.0),
         };
-        double[][] lons = {panel.bLon, panel.tLon, panel.cLon};
+        double[][] lons = {panel.natalRing.lon, panel.outerRing.lon, panel.skyRing.lon};
 
         // <b>The reader's filter, applied when drawing rather than when building.</b> It
         // decides which families are shown, not which pairs are in aspect, so it belongs here
@@ -1353,7 +1353,7 @@ final class GlobeRenderer {
             double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
                 liftOf(deck, this.stacked) + levels[ring][c[1]] * Globe.STACK_STEP,
                 inclinationOf(deck, this.stacked));
-            double[] to = Globe.onShell(panel.bLon[c[2]], origin, shells[0],
+            double[] to = Globe.onShell(panel.natalRing.lon[c[2]], origin, shells[0],
                 liftOf(innerDeck, this.stacked) + levels[0][c[2]] * Globe.STACK_STEP,
                 inclinationOf(innerDeck, this.stacked));
             // <b>The hovered chord, at full strength and on its own ring.</b> The globe drew
@@ -1383,8 +1383,8 @@ final class GlobeRenderer {
      */
     private static int[][] buildChords(SkymapPanel panel) {
         java.util.List<int[]> out = new java.util.ArrayList<>();
-        double[][] lons = {panel.bLon, panel.tLon, panel.cLon};
-        boolean[][] valids = {panel.bValid, panel.tValid, panel.cValid};
+        double[][] lons = {panel.natalRing.lon, panel.outerRing.lon, panel.skyRing.lon};
+        boolean[][] valids = {panel.natalRing.valid, panel.outerRing.valid, panel.skyRing.valid};
         for (int ring = 0; ring < 3; ring++) {
             boolean cross = ring > 0;
             for (int a = 0; a < SkymapPanel.BODY_COUNT && a < lons[ring].length; a++) {
@@ -1392,7 +1392,7 @@ final class GlobeRenderer {
                     continue;
                 }
                 for (int b = cross ? 0 : a + 1; b < SkymapPanel.BODY_COUNT; b++) {
-                    if (!SkymapPanel.aspecting(b, panel.bValid)) {
+                    if (!SkymapPanel.aspecting(b, panel.natalRing.valid)) {
                         continue;
                     }
                     if (!cross && Bodies.isOppositePair(a, b)) {
@@ -1402,7 +1402,7 @@ final class GlobeRenderer {
                     // is judged at natal orbs, the same as the flat wheel and the grid judge
                     // it. Passing "cross" for both halved the sky ring's orbs in a synastry
                     // chart and dropped chords the flat view was drawing.
-                    Color ink = panel.aspectInkFor(lons[ring][a], panel.bLon[b], a, b,
+                    Color ink = panel.aspectInkFor(lons[ring][a], panel.natalRing.lon[b], a, b,
                         ring == SkymapPanel.WHEEL_OUTER);
                     if (ink != null) {
                         out.add(new int[] {ring, a, b, ink.getRGB()});

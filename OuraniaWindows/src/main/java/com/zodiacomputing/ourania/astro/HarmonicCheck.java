@@ -200,38 +200,38 @@ public final class HarmonicCheck {
                 set(p, "transitsEnabled", Boolean.FALSE);
                 set(p, "showTransitChart",
                     Boolean.valueOf(SkymapPanel.outerWheelShown(mode, false)));
-                set(p, "baseChartTime", ta);
-                set(p, "transitChartTime", tb);
-                set(p, "skyChartTime",
+                set(p, "natalRing.time", ta);
+                set(p, "outerRing.time", tb);
+                set(p, "skyRing.time",
                     ZonedDateTime.of(2026, 8, 26, 12, 0, 0, 0, ZoneId.of("UTC")));
-                set(p, "baseSd", new SweDate(1982, 8, 10, 19 + 1.0 / 60.0));
-                set(p, "transitSd", new SweDate(1972, 9, 23, 1 + 28.0 / 60.0));
-                set(p, "baseLatitude", Double.valueOf(40.45));
-                set(p, "baseLongitude", Double.valueOf(-75.3333));
-                set(p, "transitLatitude", Double.valueOf(34.05));
-                set(p, "transitLongitude", Double.valueOf(-118.25));
+                set(p, "natalRing.sd", new SweDate(1982, 8, 10, 19 + 1.0 / 60.0));
+                set(p, "outerRing.sd", new SweDate(1972, 9, 23, 1 + 28.0 / 60.0));
+                set(p, "natalRing.latitude", Double.valueOf(40.45));
+                set(p, "natalRing.longitude", Double.valueOf(-75.3333));
+                set(p, "outerRing.latitude", Double.valueOf(34.05));
+                set(p, "outerRing.longitude", Double.valueOf(-118.25));
                 set(p, "houseSystem", Character.valueOf('P'));
 
                 set(p, "harmonic", Integer.valueOf(1));
                 p.updateChartData();
-                double radix = p.bLon[sun];
+                double radix = p.natalRing.lon[sun];
 
                 set(p, "harmonic", Integer.valueOf(5));
                 p.updateChartData();
                 near(mode + ": wheel is radix x5, not x25",
-                    Harmonics.map(radix, 5), p.bLon[sun], PANEL_TOL);
+                    Harmonics.map(radix, 5), p.natalRing.lon[sun], PANEL_TOL);
 
                 ChartFrame cur = p.getCurrentChart();
                 if (cur != null && cur.body("Sun") != null && cur.body("Sun").ok) {
                     near(mode + ": the reading frame agrees with the wheel",
-                        p.bLon[sun], cur.body("Sun").lon, PANEL_TOL);
+                        p.natalRing.lon[sun], cur.body("Sun").lon, PANEL_TOL);
                 }
 
                 // Going back must restore, not leave a residue. The map is applied to the
                 // arrays in place, so a rebuild that re-multiplied would compound silently.
                 set(p, "harmonic", Integer.valueOf(1));
                 p.updateChartData();
-                near(mode + ": returning to H1 restores the radix", radix, p.bLon[sun],
+                near(mode + ": returning to H1 restores the radix", radix, p.natalRing.lon[sun],
                     PANEL_TOL);
             }
         } catch (Exception e) {
@@ -293,23 +293,23 @@ public final class HarmonicCheck {
             set(p, "chartMode", ChartMode.SINGLE);
             set(p, "transitsEnabled", Boolean.FALSE);
             set(p, "showTransitChart", Boolean.FALSE);
-            set(p, "baseChartTime",
+            set(p, "natalRing.time",
                 ZonedDateTime.of(1982, 8, 10, 19, 1, 0, 0, ZoneId.of("UTC")));
-            set(p, "baseSd", new SweDate(1982, 8, 10, 19 + 1.0 / 60.0));
-            set(p, "baseLatitude", Double.valueOf(40.45));
-            set(p, "baseLongitude", Double.valueOf(-75.3333));
+            set(p, "natalRing.sd", new SweDate(1982, 8, 10, 19 + 1.0 / 60.0));
+            set(p, "natalRing.latitude", Double.valueOf(40.45));
+            set(p, "natalRing.longitude", Double.valueOf(-75.3333));
             set(p, "houseSystem", Character.valueOf('P'));
 
             set(p, "harmonic", Integer.valueOf(1));
             p.updateChartData();
             int ascIdx = Bodies.indexOfName("Ascendant");
-            double radixAsc = p.bLon[ascIdx];
+            double radixAsc = p.natalRing.lon[ascIdx];
 
             for (int n : new int[] {5, 7}) {
                 set(p, "harmonic", Integer.valueOf(n));
                 p.updateChartData();
                 near("H" + n + ": the wheel's Ascendant glyph has not moved",
-                    radixAsc, p.bLon[ascIdx], PANEL_TOL);
+                    radixAsc, p.natalRing.lon[ascIdx], PANEL_TOL);
             }
         } catch (Exception e) {
             checks++;
@@ -319,9 +319,7 @@ public final class HarmonicCheck {
     }
 
     private static void set(Object target, String field, Object value) throws Exception {
-        Field f = SkymapPanel.class.getDeclaredField(field);
-        f.setAccessible(true);
-        f.set(target, value);
+        com.zodiacomputing.ourania.gui.CheckReflect.set(target, field, value);
     }
 
     private static void ok(String label, boolean condition) {

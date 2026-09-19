@@ -68,9 +68,9 @@ public class NameListPanel extends JPanel {
         StringBuilder sb = new StringBuilder();
         sb.append("<h2 style='color:#add8e6;'>").append(title).append("</h2>");
 
-        double[] lonArray = isTransit ? skymapPanel.tLon : skymapPanel.bLon;
-        double[] speedArray = isTransit ? skymapPanel.tSpeed : skymapPanel.bSpeed;
-        boolean[] validArray = isTransit ? skymapPanel.tValid : skymapPanel.bValid;
+        double[] lonArray = isTransit ? skymapPanel.outerRing.lon : skymapPanel.natalRing.lon;
+        double[] speedArray = isTransit ? skymapPanel.outerRing.speed : skymapPanel.natalRing.speed;
+        boolean[] validArray = isTransit ? skymapPanel.outerRing.valid : skymapPanel.natalRing.valid;
         double[] cusps = skymapPanel.activeCusps;
 
         // Placements Table

@@ -401,8 +401,8 @@ public final class AspectGridCheck {
                 SkymapPanel sky = skyOf(w);
                 setField(sky, "showTransitChart", true);
                 setField(sky, "aspectFilter", "Transit-Natal");
-                java.util.Arrays.fill((boolean[]) getField(sky, "tValid"), true);
-                double[] lon = (double[]) getField(sky, "tLon");
+                java.util.Arrays.fill((boolean[]) getField(sky, "outerRing.valid"), true);
+                double[] lon = (double[]) getField(sky, "outerRing.lon");
                 for (int i = 0; i < lon.length; i++) {
                     lon[i] = (i * 30.0) % 360.0;
                 }
@@ -548,10 +548,10 @@ public final class AspectGridCheck {
     /** One mode: every cell of the grid, both directions of the contract. Returns cells lit. */
     private static int check(ChartMode mode, boolean expectHalved) throws Exception {
         String html = Probe.gridHtml(mode);
-        double[] bLon = (double[]) getField(Probe.panel, "bLon");
-        double[] tLon = (double[]) getField(Probe.panel, "tLon");
-        boolean[] bValid = (boolean[]) getField(Probe.panel, "bValid");
-        boolean[] tValid = (boolean[]) getField(Probe.panel, "tValid");
+        double[] bLon = (double[]) getField(Probe.panel, "natalRing.lon");
+        double[] tLon = (double[]) getField(Probe.panel, "outerRing.lon");
+        boolean[] bValid = (boolean[]) getField(Probe.panel, "natalRing.valid");
+        boolean[] tValid = (boolean[]) getField(Probe.panel, "outerRing.valid");
 
         Method parse = SkymapPanel.class.getDeclaredMethod("parseAspectHref", String.class);
         parse.setAccessible(true);
@@ -632,12 +632,12 @@ public final class AspectGridCheck {
                     setField(panel, "aspectFilter", "Both");
                     double[] base = PANEL_CHARTS.get("base");
                     double[] tr = PANEL_CHARTS.get("transit");
-                    setField(panel, "baseChartTime", utc(base));
-                    setField(panel, "transitChartTime", utc(tr));
-                    setField(panel, "baseLatitude", base[4]);
-                    setField(panel, "baseLongitude", base[5]);
-                    setField(panel, "transitLatitude", tr[4]);
-                    setField(panel, "transitLongitude", tr[5]);
+                    setField(panel, "natalRing.time", utc(base));
+                    setField(panel, "outerRing.time", utc(tr));
+                    setField(panel, "natalRing.latitude", base[4]);
+                    setField(panel, "natalRing.longitude", base[5]);
+                    setField(panel, "outerRing.latitude", tr[4]);
+                    setField(panel, "outerRing.longitude", tr[5]);
                     setField(panel, "houseSystem", (char) PANEL_HSYS);
                     panel.updateChartData();
                     Method gen =
@@ -932,19 +932,19 @@ public final class AspectGridCheck {
             setField(sky, "chartMode", mode);
             setField(sky, "showTransitChart", composite);
             setField(sky, "cachedFrame", null);
-            setField(sky, "baseChartTime", utc(base));
-            setField(sky, "transitChartTime", utc(tr));
-            setField(sky, "skyChartTime",
+            setField(sky, "natalRing.time", utc(base));
+            setField(sky, "outerRing.time", utc(tr));
+            setField(sky, "skyRing.time",
                 java.time.ZonedDateTime.of(2026, 8, 24, 20, 0, 0, 0, java.time.ZoneOffset.UTC));
-            setField(sky, "baseLatitude", base[4]);
-            setField(sky, "baseLongitude", base[5]);
-            setField(sky, "transitLatitude", tr[4]);
-            setField(sky, "transitLongitude", tr[5]);
+            setField(sky, "natalRing.latitude", base[4]);
+            setField(sky, "natalRing.longitude", base[5]);
+            setField(sky, "outerRing.latitude", tr[4]);
+            setField(sky, "outerRing.longitude", tr[5]);
             setField(sky, "houseSystem", (char) PANEL_HSYS);
             sky.updateChartData();
 
-            double[] inner = (double[]) getField(sky, "bLon");
-            boolean[] outerLive = (boolean[]) getField(sky, "tValid");
+            double[] inner = (double[]) getField(sky, "natalRing.lon");
+            boolean[] outerLive = (boolean[]) getField(sky, "outerRing.valid");
             int live = 0;
             for (boolean v : outerLive) {
                 if (v) live++;
@@ -1199,12 +1199,12 @@ public final class AspectGridCheck {
             SkymapPanel.triWheelShown(ChartMode.SYNASTRY, true));
         double[] base = PANEL_CHARTS.get("base");
         double[] tr = PANEL_CHARTS.get("transit");
-        setField(sky, "baseChartTime", utc(base));
-        setField(sky, "transitChartTime", utc(tr));
-        setField(sky, "baseLatitude", base[4]);
-        setField(sky, "baseLongitude", base[5]);
-        setField(sky, "transitLatitude", tr[4]);
-        setField(sky, "transitLongitude", tr[5]);
+        setField(sky, "natalRing.time", utc(base));
+        setField(sky, "outerRing.time", utc(tr));
+        setField(sky, "natalRing.latitude", base[4]);
+        setField(sky, "natalRing.longitude", base[5]);
+        setField(sky, "outerRing.latitude", tr[4]);
+        setField(sky, "outerRing.longitude", tr[5]);
         setField(sky, "houseSystem", (char) PANEL_HSYS);
         sky.updateChartData();
 
@@ -1279,7 +1279,7 @@ public final class AspectGridCheck {
      */
     private static int[] skyClickTally(SkymapPanel sky, javax.swing.JEditorPane ip, boolean angles)
             throws Exception {
-        boolean[] cValid = (boolean[]) getField(sky, "cValid");
+        boolean[] cValid = (boolean[]) getField(sky, "skyRing.valid");
         final int[] tally = new int[2];
         for (int i = 0; i < Bodies.count(); i++) {
             if (!cValid[i] || Bodies.at(i).isAngle() != angles) continue;
@@ -1336,8 +1336,8 @@ public final class AspectGridCheck {
         int h = chart.getHeight();
         int[] rings = SkymapPanel.ringRadii(w, h, true, true);
         double pin = (Double) pinLon.invoke(sky);
-        double[] cLon = (double[]) getField(sky, "cLon");
-        boolean[] cValid = (boolean[]) getField(sky, "cValid");
+        double[] cLon = (double[]) getField(sky, "skyRing.lon");
+        boolean[] cValid = (boolean[]) getField(sky, "skyRing.valid");
         int[] radii = SkymapPanel.bandRadii(cLon, cValid,
             rings[SkymapPanel.RING_TRI], rings[SkymapPanel.RING_TRANSIT]);
         int cx = w / 2;
@@ -1613,12 +1613,12 @@ public final class AspectGridCheck {
                 setField(sky, "aspectFilter", "Both");
                 double[] base = PANEL_CHARTS.get("base");
                 double[] tr = PANEL_CHARTS.get("transit");
-                setField(sky, "baseChartTime", utc(base));
-                setField(sky, "transitChartTime", utc(tr));
-                setField(sky, "baseLatitude", base[4]);
-                setField(sky, "baseLongitude", base[5]);
-                setField(sky, "transitLatitude", tr[4]);
-                setField(sky, "transitLongitude", tr[5]);
+                setField(sky, "natalRing.time", utc(base));
+                setField(sky, "outerRing.time", utc(tr));
+                setField(sky, "natalRing.latitude", base[4]);
+                setField(sky, "natalRing.longitude", base[5]);
+                setField(sky, "outerRing.latitude", tr[4]);
+                setField(sky, "outerRing.longitude", tr[5]);
                 setField(sky, "houseSystem", (char) PANEL_HSYS);
                 sky.updateChartData();
 
@@ -1744,12 +1744,12 @@ public final class AspectGridCheck {
         setField(sky, "showTriWheel", SkymapPanel.triWheelShown(ChartMode.SYNASTRY, true));
         double[] base = PANEL_CHARTS.get("base");
         double[] tr = PANEL_CHARTS.get("transit");
-        setField(sky, "baseChartTime", utc(base));
-        setField(sky, "transitChartTime", utc(tr));
-        setField(sky, "baseLatitude", base[4]);
-        setField(sky, "baseLongitude", base[5]);
-        setField(sky, "transitLatitude", tr[4]);
-        setField(sky, "transitLongitude", tr[5]);
+        setField(sky, "natalRing.time", utc(base));
+        setField(sky, "outerRing.time", utc(tr));
+        setField(sky, "natalRing.latitude", base[4]);
+        setField(sky, "natalRing.longitude", base[5]);
+        setField(sky, "outerRing.latitude", tr[4]);
+        setField(sky, "outerRing.longitude", tr[5]);
         setField(sky, "houseSystem", (char) PANEL_HSYS);
         // Cross-chart lines on, or there is nothing on the partner or sky rings to hover -
         // and the grid is right not to list them, since the wheel does not draw them either.
@@ -1897,15 +1897,11 @@ public final class AspectGridCheck {
     }
 
     private static void setField(Object target, String name, Object value) throws Exception {
-        java.lang.reflect.Field f = SkymapPanel.class.getDeclaredField(name);
-        f.setAccessible(true);
-        f.set(target, value);
+        CheckReflect.set(target, name, value);
     }
 
     private static Object getField(Object target, String name) throws Exception {
-        java.lang.reflect.Field f = SkymapPanel.class.getDeclaredField(name);
-        f.setAccessible(true);
-        return f.get(target);
+        return CheckReflect.get(target, name);
     }
 
     /** "" when clean, otherwise " - 3 failed, e.g. aspect|...". Keeps the label diagnostic. */

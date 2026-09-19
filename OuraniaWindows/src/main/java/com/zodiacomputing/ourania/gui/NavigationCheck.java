@@ -858,7 +858,7 @@ public final class NavigationCheck {
             ok("the sky is always selectable, because it defaults to now",
                 chipAvailable(bar, "Sky"));
             ok("the wheel does not claim to hold a Chart A", !sky.hasChartA());
-            ok("Chart B forms no outer ring", live(sky.tValid) == 0);
+            ok("Chart B forms no outer ring", live(sky.outerRing.valid) == 0);
 
             String empty = (String) drawer.invoke(sky, whole);
             ok("nothing calls the wheel a natal chart", !empty.contains("Natal Chart"));
@@ -866,7 +866,7 @@ public final class NavigationCheck {
             ok("the drawer names it as the sky", empty.contains("The Sky Now"));
             ok("and its grid as the sky's", empty.contains("Sky Aspects Grid"));
             ok("the wheel is drawing the sky's own moment",
-                skyNow.moment.equals(get(sky, "baseChartTime")));
+                skyNow.moment.equals(get(sky, "natalRing.time")));
 
             // ---- and with somebody in Chart A, the naming comes back ----
             install.invoke(sky, person,
@@ -881,7 +881,7 @@ public final class NavigationCheck {
             ok("and now it is a natal chart", filled.contains("Natal Chart"));
             ok("with a natal grid", filled.contains("Natal Aspects Grid"));
             ok("drawing the person's moment",
-                person.moment.equals(get(sky, "baseChartTime")));
+                person.moment.equals(get(sky, "natalRing.time")));
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
@@ -1018,22 +1018,22 @@ public final class NavigationCheck {
 
             // Chart A's fields hold Chart A, and Chart A is the only place they could
             // have come from - 11 is not 22 and is not 33.
-            same("Chart A's moment", a.moment, get(sky, "baseChartTime"));
-            same("Chart A's latitude", a.latitude, get(sky, "baseLatitude"));
-            same("Chart A's longitude", a.longitude, get(sky, "baseLongitude"));
+            same("Chart A's moment", a.moment, get(sky, "natalRing.time"));
+            same("Chart A's latitude", a.latitude, get(sky, "natalRing.latitude"));
+            same("Chart A's longitude", a.longitude, get(sky, "natalRing.longitude"));
             same("Chart A's place", a.placeName, get(sky, "baseLocationName"));
             same("Chart A's zone", a.zoneId, get(sky, "baseTimeZoneId"));
             same("Chart A's time-unknown flag", a.timeUnknown, get(sky, "baseTimeUnknown"));
 
-            same("Chart B's moment", b.moment, get(sky, "transitChartTime"));
-            same("Chart B's latitude", b.latitude, get(sky, "transitLatitude"));
-            same("Chart B's longitude", b.longitude, get(sky, "transitLongitude"));
+            same("Chart B's moment", b.moment, get(sky, "outerRing.time"));
+            same("Chart B's latitude", b.latitude, get(sky, "outerRing.latitude"));
+            same("Chart B's longitude", b.longitude, get(sky, "outerRing.longitude"));
             same("Chart B's place", b.placeName, get(sky, "transitLocationName"));
             same("Chart B's zone", b.zoneId, get(sky, "transitTimeZoneId"));
 
-            same("the sky's moment", s.moment, get(sky, "skyChartTime"));
-            same("the sky's latitude", s.latitude, get(sky, "skyLatitude"));
-            same("the sky's longitude", s.longitude, get(sky, "skyLongitude"));
+            same("the sky's moment", s.moment, get(sky, "skyRing.time"));
+            same("the sky's latitude", s.latitude, get(sky, "skyRing.latitude"));
+            same("the sky's longitude", s.longitude, get(sky, "skyRing.longitude"));
             same("the sky's zone", s.zoneId, get(sky, "skyTimeZoneId"));
 
             // And the subjects themselves come back as they went in.
@@ -1050,11 +1050,11 @@ public final class NavigationCheck {
             install.invoke(sky,
                 com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A"), b, s);
             ok("an unentered Chart A promotes Chart B onto the inner wheel",
-                b.moment.equals(get(sky, "baseChartTime")));
+                b.moment.equals(get(sky, "natalRing.time")));
             ok("and the panel still says there is no Chart A", !sky.hasChartA());
             ok("but the inner wheel is a birth chart", sky.innerIsBirthChart());
-            ok("with nothing left on the outer ring", get(sky, "transitChartTime") == null);
-            ok("or the sky", s.moment.equals(get(sky, "skyChartTime")));
+            ok("with nothing left on the outer ring", get(sky, "outerRing.time") == null);
+            ok("or the sky", s.moment.equals(get(sky, "skyRing.time")));
 
             // Moving the sky moves the sky.
             install.invoke(sky, a, b, s);
@@ -1063,10 +1063,10 @@ public final class NavigationCheck {
             move.setAccessible(true);
             java.time.ZonedDateTime later = s.moment.plusDays(400);
             move.invoke(sky, later);
-            same("the sky moved", later, get(sky, "skyChartTime"));
-            same("Chart A did not", a.moment, get(sky, "baseChartTime"));
-            same("Chart B did not", b.moment, get(sky, "transitChartTime"));
-            same("and the sky kept its place", s.latitude, get(sky, "skyLatitude"));
+            same("the sky moved", later, get(sky, "skyRing.time"));
+            same("Chart A did not", a.moment, get(sky, "natalRing.time"));
+            same("Chart B did not", b.moment, get(sky, "outerRing.time"));
+            same("and the sky kept its place", s.latitude, get(sky, "skyRing.latitude"));
 
             // A chip changes which wheels are drawn and touches nothing on them.
             //
@@ -1096,9 +1096,7 @@ public final class NavigationCheck {
     }
 
     private static Object get(SkymapPanel sky, String name) throws Exception {
-        java.lang.reflect.Field f = SkymapPanel.class.getDeclaredField(name);
-        f.setAccessible(true);
-        return f.get(sky);
+        return CheckReflect.get(sky, name);
     }
 
     /** Object equality with the value printed, since eq here is for ints. */
@@ -1142,10 +1140,7 @@ public final class NavigationCheck {
                 fd.setAccessible(true);
                 String formDate =
                     ((javax.swing.text.JTextComponent) fd.get(setup)).getText().trim();
-                java.lang.reflect.Field bt =
-                    SkymapPanel.class.getDeclaredField("baseChartTime");
-                bt.setAccessible(true);
-                Object drawn = bt.get(sky);
+                Object drawn = sky.natalRing.time;
                 ok("the wheel has a moment to draw", drawn != null);
                 String drawnDate = drawn == null ? "" : drawn.toString().substring(0, 10);
                 System.out.println("  the form says " + formDate
@@ -1429,7 +1424,7 @@ public final class NavigationCheck {
             int sameAsSky = 0;
             int compared = 0;
             for (int i = 0; i < SkymapPanel.BODY_COUNT; i++) {
-                if (!panel.bValid[i] || !panel.tValid[i] || !panel.cValid[i]) {
+                if (!panel.natalRing.valid[i] || !panel.outerRing.valid[i] || !panel.skyRing.valid[i]) {
                     continue;
                 }
                 // <b>The angles are supposed to match.</b> A progressed bi-wheel is progressed
@@ -1441,10 +1436,10 @@ public final class NavigationCheck {
                     continue;
                 }
                 compared++;
-                if (Math.abs(panel.tLon[i] - panel.bLon[i]) < 0.001) {
+                if (Math.abs(panel.outerRing.lon[i] - panel.natalRing.lon[i]) < 0.001) {
                     sameAsNatal++;
                 }
-                if (Math.abs(panel.tLon[i] - panel.cLon[i]) < 0.001) {
+                if (Math.abs(panel.outerRing.lon[i] - panel.skyRing.lon[i]) < 0.001) {
                     sameAsSky++;
                 }
             }
@@ -1458,7 +1453,7 @@ public final class NavigationCheck {
             // about a degree a progressed year, so forty-three years of life is a Sun somewhere
             // between thirty and fifty degrees on from birth - and nothing else the middle ring
             // could be carrying puts it there.
-            double sunMoved = ((panel.tLon[0] - panel.bLon[0]) % 360.0 + 360.0) % 360.0;
+            double sunMoved = ((panel.outerRing.lon[0] - panel.natalRing.lon[0]) % 360.0 + 360.0) % 360.0;
             System.out.printf("  the progressed Sun has moved %.1f degrees from natal%n",
                 sunMoved);
             ok("the progressed Sun has moved about a degree per year of life",
@@ -1686,20 +1681,20 @@ public final class NavigationCheck {
         set(sky, "showTransitChart", SkymapPanel.outerWheelShown(mode, true));
         set(sky, "showTriWheel", SkymapPanel.triWheelShown(mode, sky3));
         set(sky, "innerIsBirthChart", Boolean.TRUE);
-        set(sky, "baseChartTime", java.time.ZonedDateTime.of(
+        set(sky, "natalRing.time", java.time.ZonedDateTime.of(
             1972, 9, 22, 18, 38, 0, 0, java.time.ZoneId.of("America/Los_Angeles")));
-        set(sky, "baseLatitude", 34.0522);
-        set(sky, "baseLongitude", -118.2437);
+        set(sky, "natalRing.latitude", 34.0522);
+        set(sky, "natalRing.longitude", -118.2437);
         set(sky, "baseTimeZoneId", "America/Los_Angeles");
-        set(sky, "transitChartTime", java.time.ZonedDateTime.of(
+        set(sky, "outerRing.time", java.time.ZonedDateTime.of(
             1975, 3, 14, 9, 20, 0, 0, java.time.ZoneId.of("America/New_York")));
-        set(sky, "transitLatitude", 39.9526);
-        set(sky, "transitLongitude", -75.1652);
+        set(sky, "outerRing.latitude", 39.9526);
+        set(sky, "outerRing.longitude", -75.1652);
         set(sky, "transitTimeZoneId", "America/New_York");
-        set(sky, "skyChartTime", java.time.ZonedDateTime.now(
+        set(sky, "skyRing.time", java.time.ZonedDateTime.now(
             java.time.ZoneId.of("America/Los_Angeles")));
-        set(sky, "skyLatitude", 34.0522);
-        set(sky, "skyLongitude", -118.2437);
+        set(sky, "skyRing.latitude", 34.0522);
+        set(sky, "skyRing.longitude", -118.2437);
         set(sky, "skyTimeZoneId", "America/Los_Angeles");
         set(sky, "aspectFilter", "Both");
         // <b>And the aspects themselves, for the same reason as the coordinates.</b> Which
@@ -1735,9 +1730,9 @@ public final class NavigationCheck {
         String last = "";
         int steady = 0;
         while (System.currentTimeMillis() < deadline) {
-            String now = live(sky.bValid) + "/" + live(sky.tValid) + "/" + live(sky.cValid);
-            boolean enough = live(sky.bValid) > 0 && live(sky.tValid) > 0
-                && (!needSky || live(sky.cValid) > 0);
+            String now = live(sky.natalRing.valid) + "/" + live(sky.outerRing.valid) + "/" + live(sky.skyRing.valid);
+            boolean enough = live(sky.natalRing.valid) > 0 && live(sky.outerRing.valid) > 0
+                && (!needSky || live(sky.skyRing.valid) > 0);
             steady = now.equals(last) ? steady + 1 : 0;
             last = now;
             if (enough && steady >= 5) {
@@ -1751,11 +1746,11 @@ public final class NavigationCheck {
         // <b>Only the wheels this chart actually has.</b> Demanding an outer wheel of every
         // chart fails a single chart for not being two - which is what it reported on the
         // cold-open part, where SINGLE is the whole point.
-        ok("the chart under test finished computing: natal " + live(sky.bValid)
-            + ", outer " + live(sky.tValid) + ", sky " + live(sky.cValid),
-            live(sky.bValid) > 0
-                && (!sky.outerRingDrawn() || live(sky.tValid) > 0)
-                && (!needSky || live(sky.cValid) > 0));
+        ok("the chart under test finished computing: natal " + live(sky.natalRing.valid)
+            + ", outer " + live(sky.outerRing.valid) + ", sky " + live(sky.skyRing.valid),
+            live(sky.natalRing.valid) > 0
+                && (!sky.outerRingDrawn() || live(sky.outerRing.valid) > 0)
+                && (!needSky || live(sky.skyRing.valid) > 0));
     }
 
     private static int live(boolean[] valid) {
@@ -1879,8 +1874,8 @@ public final class NavigationCheck {
                 boolean.class);
             inkFor.setAccessible(true);
 
-            double[][] lons = {sky.bLon, sky.tLon, sky.cLon};
-            boolean[][] valids = {sky.bValid, sky.tValid, sky.cValid};
+            double[][] lons = {sky.natalRing.lon, sky.outerRing.lon, sky.skyRing.lon};
+            boolean[][] valids = {sky.natalRing.valid, sky.outerRing.valid, sky.skyRing.valid};
             String[] named = {"natal", "partner", "sky"};
             int[] reached = new int[3];
             int consistent = 0;
@@ -1893,14 +1888,14 @@ public final class NavigationCheck {
                         continue;
                     }
                     for (int b = ring == 0 ? a + 1 : 0; b < SkymapPanel.BODY_COUNT; b++) {
-                        if (!SkymapPanel.aspecting(b, sky.bValid)
+                        if (!SkymapPanel.aspecting(b, sky.natalRing.valid)
                             || (ring == 0 && com.zodiacomputing.ourania.astro.Bodies.isOppositePair(a, b))
-                            || inkFor.invoke(sky, lons[ring][a], sky.bLon[b], a, b,
+                            || inkFor.invoke(sky, lons[ring][a], sky.natalRing.lon[b], a, b,
                                 ring == 1) == null) {
                             continue;
                         }
                         double ra = Math.toRadians(180.0 + pin - lons[ring][a]);
-                        double rb = Math.toRadians(180.0 + pin - sky.bLon[b]);
+                        double rb = Math.toRadians(180.0 + pin - sky.natalRing.lon[b]);
                         double ax = cx + d * Math.cos(ra);
                         double ay = cy + d * Math.sin(ra);
                         double bx = cx + d * Math.cos(rb);
@@ -1921,7 +1916,7 @@ public final class NavigationCheck {
                         consistent++;
                         ok("what the cursor found on the " + named[ring]
                             + " field is a line that is drawn",
-                            inkFor.invoke(sky, lons[hit[0]][hit[1]], sky.bLon[hit[2]],
+                            inkFor.invoke(sky, lons[hit[0]][hit[1]], sky.natalRing.lon[hit[2]],
                                 hit[1], hit[2], hit[0] == 1) != null);
                     }
                 }
@@ -1940,9 +1935,7 @@ public final class NavigationCheck {
     }
 
     private static Object fieldOf(Object o, String name) throws Exception {
-        java.lang.reflect.Field f = o.getClass().getDeclaredField(name);
-        f.setAccessible(true);
-        return f.get(o);
+        return CheckReflect.get(o, name);
     }
 
     private static void hoveredLineEnds() throws Exception {
@@ -2481,9 +2474,7 @@ public final class NavigationCheck {
     }
 
     private static void set(Object target, String name, Object value) throws Exception {
-        java.lang.reflect.Field f = target.getClass().getDeclaredField(name);
-        f.setAccessible(true);
-        f.set(target, value);
+        CheckReflect.set(target, name, value);
     }
 
     private static void ok(String label, boolean condition) {

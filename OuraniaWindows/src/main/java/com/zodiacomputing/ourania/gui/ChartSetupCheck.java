@@ -905,7 +905,7 @@ public final class ChartSetupCheck {
                 frame[0] = hold[0].radixChartForSearch();
                 for (int k = 0; k < ids.length; k++) {
                     int i = com.zodiacomputing.ourania.astro.Bodies.indexOf(ids[k]);
-                    got[k] = new double[]{panel.bLon[i], panel.bValid[i] ? 1 : 0};
+                    got[k] = new double[]{panel.natalRing.lon[i], panel.natalRing.valid[i] ? 1 : 0};
                 }
             });
             for (int k = 0; k < ids.length; k++) {

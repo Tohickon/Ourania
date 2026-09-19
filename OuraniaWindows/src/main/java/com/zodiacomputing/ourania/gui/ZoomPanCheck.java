@@ -118,8 +118,8 @@ public final class ZoomPanCheck {
         Method geometry = SkymapPanel.class.getDeclaredMethod("geometry");
         geometry.setAccessible(true);
         javax.swing.JEditorPane selection = (javax.swing.JEditorPane) field(w, "selectionPane");
-        boolean[] bValid = (boolean[]) field(sky, "bValid");
-        double[] bLon = (double[]) field(sky, "bLon");
+        boolean[] bValid = (boolean[]) field(sky, "natalRing.valid");
+        double[] bLon = (double[]) field(sky, "natalRing.lon");
 
         int W = chart.getWidth();
         int H = chart.getHeight();
@@ -342,9 +342,7 @@ public final class ZoomPanCheck {
     }
 
     private static Object field(Object o, String name) throws Exception {
-        Field f = o.getClass().getDeclaredField(name);
-        f.setAccessible(true);
-        return f.get(o);
+        return CheckReflect.get(o, name);
     }
 
     private interface Body {

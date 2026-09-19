@@ -1596,8 +1596,8 @@ public class InterpretationPanel extends JPanel {
                 if (d.group != g) {
                     continue;
                 }
-                boolean on = skymapPanel != null && i < skymapPanel.bValid.length
-                    && skymapPanel.bValid[i];
+                boolean on = skymapPanel != null && i < skymapPanel.natalRing.valid.length
+                    && skymapPanel.natalRing.valid[i];
                 html.append("<tr><td style='padding-right:10px;'>").append(d.glyph)
                     .append("</td><td style='padding-right:14px;'><a href='body|").append(i)
                     .append("' style='color:").append(on ? "#7FB3FF" : "#6b7785").append(";'>")
@@ -1605,7 +1605,7 @@ public class InterpretationPanel extends JPanel {
                 html.append("<td style='padding-right:14px; color:#9AA5B1;'>");
                 if (on) {
                     html.append(com.zodiacomputing.ourania.astro.Zodiac
-                        .format(skymapPanel.bLon[i]));
+                        .format(skymapPanel.natalRing.lon[i]));
                 } else {
                     html.append("<span style='color:#6b7785;'>not in this chart</span>");
                 }
@@ -1767,7 +1767,7 @@ public class InterpretationPanel extends JPanel {
         if (skymapPanel == null || index < 0 || index >= SkymapPanel.BODY_COUNT) {
             return;
         }
-        if (!skymapPanel.bValid[index]) {
+        if (!skymapPanel.natalRing.valid[index]) {
             StringBuilder html = new StringBuilder();
             html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding:20px;'>");
             html.append("<h2 style='color:#FFFFFF;'>").append(Bodies.at(index).name)
@@ -1781,7 +1781,7 @@ public class InterpretationPanel extends JPanel {
             setHtml(html.toString(), false);
             return;
         }
-        double lon = skymapPanel.bLon[index];
+        double lon = skymapPanel.natalRing.lon[index];
         int signIdx = com.zodiacomputing.ourania.astro.Zodiac.signIndex(lon);
         int degree = (int) (lon % 30.0) + 1;
         int decan = (int) (lon % 30.0 / 10.0) + 1;
@@ -1917,15 +1917,15 @@ public class InterpretationPanel extends JPanel {
         int found = 0;
         StringBuilder rows = new StringBuilder();
         for (int i = 0; i < SkymapPanel.BODY_COUNT; i++) {
-            if (!skymapPanel.bValid[i]) {
+            if (!skymapPanel.natalRing.valid[i]) {
                 continue;
             }
             for (int j = i + 1; j < SkymapPanel.BODY_COUNT; j++) {
-                if (!skymapPanel.bValid[j] || Bodies.isOppositePair(i, j)) {
+                if (!skymapPanel.natalRing.valid[j] || Bodies.isOppositePair(i, j)) {
                     continue;
                 }
                 double sep = com.zodiacomputing.ourania.astro.Aspects.separation(
-                    skymapPanel.bLon[i], skymapPanel.bLon[j]);
+                    skymapPanel.natalRing.lon[i], skymapPanel.natalRing.lon[j]);
                 if (com.zodiacomputing.ourania.astro.Aspects.typeOf(
                         sep, Bodies.at(i).name, Bodies.at(j).name) != type) {
                     continue;
@@ -2163,11 +2163,11 @@ public class InterpretationPanel extends JPanel {
         html.append("<h3 style='color:#add8e6;'>This chart</h3><table style='font-size:12px;'>");
         for (String body : com.zodiacomputing.ourania.astro.Dignity.TRADITIONAL) {
             int idx = Bodies.indexOfName(body);
-            if (idx < 0 || idx >= SkymapPanel.BODY_COUNT || !skymapPanel.bValid[idx]) {
+            if (idx < 0 || idx >= SkymapPanel.BODY_COUNT || !skymapPanel.natalRing.valid[idx]) {
                 continue;
             }
             com.zodiacomputing.ourania.astro.Dignity.Result r = com.zodiacomputing.ourania.astro.Dignity.evaluate(
-                body, skymapPanel.bLon[idx], frame.diurnal);
+                body, skymapPanel.natalRing.lon[idx], frame.diurnal);
             html.append("<tr><td style='padding-right:14px;'><a href='body|").append(idx)
                 .append("' style='color:#7FB3FF;'>").append(body).append("</a></td>")
                 .append("<td style='padding-right:14px; color:#9AA5B1;'>").append(r.sign)
@@ -2193,11 +2193,11 @@ public class InterpretationPanel extends JPanel {
         StringBuilder rows = new StringBuilder();
         for (String body : com.zodiacomputing.ourania.astro.Dignity.TRADITIONAL) {
             int idx = Bodies.indexOfName(body);
-            if (idx < 0 || idx >= SkymapPanel.BODY_COUNT || !skymapPanel.bValid[idx]) {
+            if (idx < 0 || idx >= SkymapPanel.BODY_COUNT || !skymapPanel.natalRing.valid[idx]) {
                 continue;
             }
             com.zodiacomputing.ourania.astro.Dignity.Result r = com.zodiacomputing.ourania.astro.Dignity.evaluate(
-                body, skymapPanel.bLon[idx], frame.diurnal);
+                body, skymapPanel.natalRing.lon[idx], frame.diurnal);
             boolean here;
             switch (key) {
                 case "domicile":   here = r.domicile; break;
@@ -3365,8 +3365,8 @@ public class InterpretationPanel extends JPanel {
             + "Browse everything the app knows &rarr;</a></div>");
 
         boolean isTransit = skymapPanel.showTransitChart;
-        double[] lonArray = isTransit ? skymapPanel.tLon : skymapPanel.bLon;
-        boolean[] validArray = isTransit ? skymapPanel.tValid : skymapPanel.bValid;
+        double[] lonArray = isTransit ? skymapPanel.outerRing.lon : skymapPanel.natalRing.lon;
+        boolean[] validArray = isTransit ? skymapPanel.outerRing.valid : skymapPanel.natalRing.valid;
         double[] cusps = skymapPanel.activeCusps;
 
         // Macro dynamics come from Gestalt, and the geometries from AspectPatterns.

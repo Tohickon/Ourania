@@ -326,12 +326,12 @@ public final class CompositeCheck {
                 .newInstance(new Object[] {null});
 
             set(panelCls, panel, "sw", sw);
-            set(panelCls, panel, "baseSd", a);
-            set(panelCls, panel, "transitSd", b);
-            set(panelCls, panel, "baseLatitude", aLat);
-            set(panelCls, panel, "baseLongitude", aLon);
-            set(panelCls, panel, "transitLatitude", bLat);
-            set(panelCls, panel, "transitLongitude", bLon);
+            set(panelCls, panel, "natalRing.sd", a);
+            set(panelCls, panel, "outerRing.sd", b);
+            set(panelCls, panel, "natalRing.latitude", aLat);
+            set(panelCls, panel, "natalRing.longitude", aLon);
+            set(panelCls, panel, "outerRing.latitude", bLat);
+            set(panelCls, panel, "outerRing.longitude", bLon);
             set(panelCls, panel, "houseSystem", hsys);
             set(panelCls, panel, "chartMode",
                 Enum.valueOf((Class<Enum>) modeCls.asSubclass(Enum.class), "COMPOSITE_MIDPOINT"));
@@ -734,6 +734,11 @@ public final class CompositeCheck {
 
     private static void set(Class<?> cls, Object target, String field, Object value)
             throws Exception {
+        // A dotted path ("natalRing.sd") is followed through the ring it names.
+        if (field.indexOf('.') >= 0) {
+            com.zodiacomputing.ourania.gui.CheckReflect.set(target, field, value);
+            return;
+        }
         java.lang.reflect.Field f = cls.getDeclaredField(field);
         f.setAccessible(true);
         f.set(target, value);
