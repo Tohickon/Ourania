@@ -256,7 +256,14 @@ behind this same decision.
 
 ---
 
-## K11 — The interpretive hierarchy · **DECIDED 2026-09-19, NOT YET BUILT**
+## K11 — The interpretive hierarchy · **BUILT 2026-09-19 (`045495f5`)**
+
+> Built as written below. `InterpretationPanel.natalPieces` splits the reading into thirteen
+> pieces; `generatePlanetHtml` joins them in the old order (byte-identical over 288 readings, so
+> the selection pane is unchanged) and `hierarchyHtml` arranges them for the Interpretation tab.
+> The synthesis needed no change - measured, it already ranks with no Level 3/4 input and reads
+> sign, house, aspects - so it got a guard instead. `InterpretationHierarchyCheck` holds all of
+> it; five mutations, all caught.
 
 **Decision (David, 2026-09-19).** Every interpretation is built from the macro foundation down
 to the micro nuance, in four levels:
