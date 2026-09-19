@@ -286,6 +286,13 @@ public class InterpretationPanel extends JPanel {
             showAllMansions();
             return true;
         }
+        if (href.equals(LAYERS_HREF)) {
+            this.showLayers = !this.showLayers;
+            if (this.lastPlanetReading != null) {
+                this.lastPlanetReading.run();
+            }
+            return true;
+        }
         if (href.equals("index") || href.startsWith("index|")) {
             showIndex(href.equals("index") ? "" : href.substring(6));
             return true;
@@ -364,10 +371,30 @@ public class InterpretationPanel extends JPanel {
     public void showPlanetInterpretation(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects, double lon) {
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
-        html.append(generatePlanetHtml(planetName, signName, degree, decanNum, houseNum, activeAspects, lon));
+        // K11: a natal placement reads in the interpretive hierarchy here, and only here. The
+        // outer ring - a transit, or a partner in synastry - keeps its own reading, which is a
+        // timing or a relationship frame rather than a placement to be stacked.
+        if (planetName.toLowerCase().startsWith("transit_")) {
+            this.lastPlanetReading = null;
+            html.append(generatePlanetHtml(planetName, signName, degree, decanNum, houseNum, activeAspects, lon));
+        } else {
+            this.lastPlanetReading = () -> showPlanetInterpretation(planetName, signName, degree,
+                decanNum, houseNum, activeAspects, lon);
+            html.append(hierarchyHtml(planetName, signName, degree, decanNum, houseNum,
+                activeAspects, lon, this.showLayers));
+        }
         html.append("</body></html>");
         setHtml(html.toString(), false);
     }
+
+    /** Whether the Interpretation tab shows the layer breakdown under the main account. */
+    private boolean showLayers = false;
+
+    /** Redraws the planet reading on screen, so the breakdown can open and close in place. */
+    private Runnable lastPlanetReading;
+
+    /** The link that opens and closes the layer breakdown. */
+    static final String LAYERS_HREF = "k11:layers";
 
     public String generatePlanetHtml(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects) {
         return generatePlanetHtml(planetName, signName, degree, decanNum, houseNum, activeAspects, Double.NaN);
@@ -395,24 +422,7 @@ public class InterpretationPanel extends JPanel {
         // later, then the registry's bare one-liner. The last of those is a placeholder and
         // says so below, so that a gap in the data reads as a gap rather than as a bug.
         InterpretationService svc = InterpretationService.getInstance();
-        String header = coreText;
-        if (header == null || header.isEmpty()) {
-            header = svc.getBodyCore(displayPlanetName);
-        }
-        boolean placeholder = header == null || header.isEmpty();
-        if (placeholder) {
-            header = Bodies.meaningOf(displayPlanetName);
-        }
-        if (header != null && !header.isEmpty()) {
-            html.append("<p style='font-size:14px; font-style:italic; color:#cccccc; border-bottom: 1px solid #444; padding-bottom: 10px;'>").append(header).append("</p>");
-        }
-        if (placeholder && !svc.hasSignProse(displayPlanetName)
-                && Bodies.byName(displayPlanetName) != null) {
-            html.append("<p style='font-size:11px; color:#9AA5B1;'>Full prose for this point "
-                + "is not written yet; the sign and house sections below will read as "
-                + "not-found. The degree, decan and Sabian material underneath them is "
-                + "per-degree and applies to any point.</p>");
-        }
+        html.append(coreHtml(displayPlanetName, coreText));
 
         String transitContext = null;
         if (isTransit && pIndex != -1) {
@@ -522,165 +532,450 @@ public class InterpretationPanel extends JPanel {
                 }
             }
         } else {
-            // Sign
-            html.append("<h2 style='color:#E0E0E0;'><b>").append(displayPlanetName).append(" in ").append(signName).append("</b></h2>");
-            html.append("<p>").append(InterpretationService.getInstance().getPlanetInSign(planetName, signName)).append("</p>");
-            
-            // Decan. Both rulers are named above the prose, each with the job it actually
-            // does, so that the prose opening "Sub-ruled by Jupiter" and the tarot line
-            // below reading "Chaldean face ruler Venus" arrive already reconciled.
-            //
-            // <b>This used to be a footnote apologising for the disagreement.</b> The decan
-            // detail page was given the two-role table on 2026-08-23 and the reading was
-            // not, so the surface a reader actually meets kept the grey italic note and
-            // never got the face ruler as a first-class part of the reading at all.
-            appendDecanSection(html, signName, decanNum, "h3");
-
-            // <b>The decan ring has been drawn since August with nothing to say about the body</b>
-            // standing in it. appendDecanSection above describes the decan - its two rulers and
-            // what each does. This is the other half: what this particular body does from there.
-            // Composite charts get their own entry rather than the natal one, because a decan
-            // sub-rulership acting on a relationship is not the same statement as it acting on
-            // a person.
-            boolean relChart = skymapPanel != null && skymapPanel.isRelationshipChart();
-            String decanProse = InterpretationService.getInstance()
-                .getBodyDecan(planetName, signName, decanNum, relChart);
-            if (decanProse != null) {
-                html.append("<p>").append(decanProse).append("</p>");
-            }
-            
-            // Sabian Symbol
-            html.append("<h3 style='color:#E0E0E0;'><b>Sabian Symbol (").append(signName).append(" ").append(degree).append("&deg;)</b></h3>");
-            html.append("<p><i>\"").append(InterpretationService.getInstance().getSabianSymbol(signName, degree)).append("\"</i></p>");
-            html.append(modernSabianHtml(signName, degree));
-
-            // Expanded Sabian detail: interpretation, shadow expression, keywords
-            String sabianFullText = InterpretationService.getInstance().getSabianFullText(signName, degree);
-            String sabianShadow = InterpretationService.getInstance().getSabianShadow(signName, degree);
-            String sabianKeywords = InterpretationService.getInstance().getSabianKeywords(signName, degree);
-            // <b>The mansion is resolved from the longitude, never rebuilt from sign+degree.</b>
-            // 12.857 degrees wide and unaligned to the signs, so a truncated degree can name the
-            // wrong station. Callers without a longitude pass NaN and this section is absent -
-            // which is the honest outcome, rather than a confidently wrong mansion.
-            if (!Double.isNaN(lon)) {
-                com.zodiacomputing.ourania.astro.LunarMansions.Mansion man =
-                    com.zodiacomputing.ourania.astro.LunarMansions.at(lon);
-                if (man != null) {
-                    String manProse = InterpretationService.getInstance()
-                        .getBodyMansion(planetName, man.number, relChart);
-                    if (manProse != null) {
-                        html.append("<h3 style='color:#E0E0E0;'><b>Lunar Mansion ")
-                            .append(man.number).append(" - <a href='")
-                            .append(mansionHref(man.number)).append("'>").append(man.name)
-                            .append("</a></b></h3>");
-                        html.append("<p>").append(manProse).append("</p>");
-                    }
-                }
-            }
-
-            // <b>The body on the degree, not just the degree.</b> The three blocks below
-            // describe the Sabian symbol itself and have since July; this says what this
-            // particular body does standing on it, and reads the composite entry in a
-            // relationship chart.
-            // The technical note on the exact degree - critical degrees and their kin.
-            // One entry per body-sign-degree, natal and composite alike, so no flag.
-            String techDeg = InterpretationService.getInstance()
-                .getBodyTechnicalDegree(planetName, signName, degree);
-            if (techDeg != null) {
-                html.append("<p>").append(techDeg).append("</p>");
-            }
-
-            String bodySabian = InterpretationService.getInstance()
-                .getBodySabian(planetName, signName, degree, relChart);
-            if (bodySabian != null) {
-                html.append("<p>").append(bodySabian).append("</p>");
-            }
-
-            if (!sabianFullText.isEmpty()) {
-                html.append("<p>").append(sabianFullText).append("</p>");
-            }
-            if (!sabianShadow.isEmpty()) {
-                html.append("<p style='color:#D08A8A;'><b>Shadow:</b> ").append(sabianShadow).append("</p>");
-            }
-            if (!sabianKeywords.isEmpty()) {
-                html.append("<p style='color:#9AA5B1;'><i>Keywords: ").append(sabianKeywords).append("</i></p>");
-            }
-
-            // 360 Degree Interpretation
-            String degreeSummary = InterpretationService.getInstance().getDegreeSummary(signName, degree);
-            String degreeFullText = InterpretationService.getInstance().getDegreeFullText(signName, degree);
-            if (!degreeSummary.isEmpty() || !degreeFullText.isEmpty()) {
-                html.append("<h3 style='color:#E0E0E0;'><b>Degree Interpretation (").append(signName).append(" ").append(degree).append("&deg;)</b></h3>");
-                if (!degreeSummary.isEmpty()) {
-                    html.append("<p><b>Summary:</b> ").append(degreeSummary).append("</p>");
-                }
-                if (!degreeFullText.isEmpty()) {
-                    html.append("<p><b>Full Text:</b> ").append(degreeFullText).append("</p>");
-                }
-            }
-            
-            // Tarot Associations
-            html.append("<h2 style='color:#E0E0E0; margin-top: 30px;'><b>Tarot Associations</b></h2>");
-            // "&nbsp; " after the </i>, same reason as the decan heading: a plain space at
-            // an inline tag boundary collapses, closing these up to read "Planet Card(Sun)".
-            // <b>The classical ten first, then the bodies the Golden Dawn never covered.</b>
-            // getTarotPlanetCard returns the string "Unknown" for anything outside its ten,
-            // and that was being printed on screen for nineteen of the twenty-nine registry
-            // points - "Planet Card (Chiron): Unknown". The card name for those comes from
-            // the lead of the tarot_body entry, and the reasoning goes underneath it.
-            InterpretationService tarotSvc = InterpretationService.getInstance();
-            String classical = tarotSvc.getTarotPlanetCard(planetName);
-            String bodyEntry = null;
-            if (classical == null || "Unknown".equals(classical)) {
-                com.zodiacomputing.ourania.astro.Bodies.Def def =
-                    com.zodiacomputing.ourania.astro.Bodies.byName(displayPlanetName);
-                bodyEntry = def == null ? null : tarotSvc.getTarotBody(def.id);
-            }
-            String card = bodyEntry != null ? SkymapPanel.boldLead(bodyEntry) : classical;
-            // <b>An absent field is omitted, not printed as the word Unknown.</b>
-            // getTarotPlanetCard returns the literal string "Unknown" outside its ten, and
-            // nine registry points still have no card of any kind - both nodes, the four
-            // angles, both Lots and Black Moon Lilith. Rendering "Planet Card (Black Moon
-            // Lilith): Unknown" tells the reader nothing except that the app has a hole in it.
-            String shownCard = card == null || "Unknown".equals(card) ? classical : card;
-            boolean haveCard = shownCard != null && !"Unknown".equals(shownCard);
-            if (haveCard) {
-                html.append("<p><i>Planet Card</i>&nbsp; (").append(displayPlanetName)
-                    .append("): ").append(shownCard).append("</p>");
-            }
-            if (bodyEntry != null) {
-                int cut = bodyEntry.indexOf("</b>");
-                html.append("<div style='color:#cccccc; font-size:12px; margin:-6px 0 12px 0;'>")
-                    .append(cut >= 0 ? bodyEntry.substring(cut + 4) : bodyEntry).append("</div>");
-            }
-            html.append("<p><i>Sign Card</i>&nbsp; (").append(signName).append("): ").append(InterpretationService.getInstance().getTarotSignCard(signName)).append("</p>");
-            // The Golden Dawn attributions are defined in Chaldean order, so the card is
-            // named with the face ruler it actually encodes, not the triplicity sub-ruler.
-            String faceRuler = Zodiac.chaldeanDecanRuler(signName, decanNum);
-            html.append("<p><i>Decan Card</i>&nbsp; (").append(signName).append(" Decan ").append(decanNum);
-            if (!faceRuler.isEmpty()) {
-                html.append(", Chaldean face ruler ").append(faceRuler);
-            }
-            html.append("): ").append(InterpretationService.getInstance().getTarotDecanCard(signName, decanNum)).append("</p>");
-            
-            // House
-            html.append("<h3 style='color:#E0E0E0;'><b>In House ").append(houseNum).append("</b></h3>");
-            html.append("<p>").append(InterpretationService.getInstance().getPlanetInHouse(planetName, houseNum)).append("</p>");
-            
-            // Aspects
-            if (activeAspects != null && !activeAspects.isEmpty()) {
-                html.append("<h2 style='color:#E0E0E0; margin-top: 30px;'><b>Active Aspects</b></h2>");
-                for (String[] aspectData : activeAspects) {
-                    String otherPlanet = aspectData[0];
-                    String aspectType = aspectData[1];
-                    String applyState = (aspectData.length > 2) ? aspectData[2] : "";
-                    String displayAspect = applyState.isEmpty() ? aspectType : applyState + " " + aspectType;
-                    html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect).append("</i> ").append(otherPlanet).append("</h3>");
-                    html.append("<p>").append(InterpretationService.getInstance().getAspect(planetName, otherPlanet, aspectType)).append("</p>");
-                }
+            for (String piece : natalPieces(planetName, signName, degree, decanNum,
+                    houseNum, activeAspects, lon, displayPlanetName).values()) {
+                html.append(piece);
             }
         }
 
+        return html.toString();
+    }
+
+    /**
+     * The natal planet reading as named pieces, in the order generatePlanetHtml has always
+     * printed them (K11, 2026-09-19).
+     *
+     * <b>Two surfaces, one renderer per piece.</b> The selection pane is cut from
+     * generatePlanetHtml, which joins these in exactly this order, and must not change; the
+     * Interpretation tab arranges the same pieces into the interpretive hierarchy. Splitting
+     * the method rather than writing a second one is what guarantees the two can differ only
+     * in order, never in a word - a second renderer of one corpus is how surfaces drift.
+     */
+    java.util.LinkedHashMap<String, String> natalPieces(String planetName, String signName,
+            int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects,
+            double lon, String displayPlanetName) {
+        java.util.LinkedHashMap<String, String> pieces = new java.util.LinkedHashMap<>();
+        StringBuilder html = new StringBuilder();
+        // Sign
+        html.append("<h2 style='color:#E0E0E0;'><b>").append(displayPlanetName).append(" in ").append(signName).append("</b></h2>");
+        html.append("<p>").append(InterpretationService.getInstance().getPlanetInSign(planetName, signName)).append("</p>");
+        pieces.put("sign", flush(html));
+        
+        // Decan. Both rulers are named above the prose, each with the job it actually
+        // does, so that the prose opening "Sub-ruled by Jupiter" and the tarot line
+        // below reading "Chaldean face ruler Venus" arrive already reconciled.
+        //
+        // <b>This used to be a footnote apologising for the disagreement.</b> The decan
+        // detail page was given the two-role table on 2026-08-23 and the reading was
+        // not, so the surface a reader actually meets kept the grey italic note and
+        // never got the face ruler as a first-class part of the reading at all.
+        appendDecanSection(html, signName, decanNum, "h3");
+
+        // <b>The decan ring has been drawn since August with nothing to say about the body</b>
+        // standing in it. appendDecanSection above describes the decan - its two rulers and
+        // what each does. This is the other half: what this particular body does from there.
+        // Composite charts get their own entry rather than the natal one, because a decan
+        // sub-rulership acting on a relationship is not the same statement as it acting on
+        // a person.
+        boolean relChart = skymapPanel != null && skymapPanel.isRelationshipChart();
+        String decanProse = InterpretationService.getInstance()
+            .getBodyDecan(planetName, signName, decanNum, relChart);
+        if (decanProse != null) {
+            html.append("<p>").append(decanProse).append("</p>");
+        }
+        pieces.put("decan", flush(html));
+        
+        // Sabian Symbol
+        html.append("<h3 style='color:#E0E0E0;'><b>Sabian Symbol (").append(signName).append(" ").append(degree).append("&deg;)</b></h3>");
+        html.append("<p><i>\"").append(InterpretationService.getInstance().getSabianSymbol(signName, degree)).append("\"</i></p>");
+        html.append(modernSabianHtml(signName, degree));
+        pieces.put("sabian", flush(html));
+
+        // Expanded Sabian detail: interpretation, shadow expression, keywords
+        String sabianFullText = InterpretationService.getInstance().getSabianFullText(signName, degree);
+        String sabianShadow = InterpretationService.getInstance().getSabianShadow(signName, degree);
+        String sabianKeywords = InterpretationService.getInstance().getSabianKeywords(signName, degree);
+        // <b>The mansion is resolved from the longitude, never rebuilt from sign+degree.</b>
+        // 12.857 degrees wide and unaligned to the signs, so a truncated degree can name the
+        // wrong station. Callers without a longitude pass NaN and this section is absent -
+        // which is the honest outcome, rather than a confidently wrong mansion.
+        if (!Double.isNaN(lon)) {
+            com.zodiacomputing.ourania.astro.LunarMansions.Mansion man =
+                com.zodiacomputing.ourania.astro.LunarMansions.at(lon);
+            if (man != null) {
+                String manProse = InterpretationService.getInstance()
+                    .getBodyMansion(planetName, man.number, relChart);
+                if (manProse != null) {
+                    html.append("<h3 style='color:#E0E0E0;'><b>Lunar Mansion ")
+                        .append(man.number).append(" - <a href='")
+                        .append(mansionHref(man.number)).append("'>").append(man.name)
+                        .append("</a></b></h3>");
+                    html.append("<p>").append(manProse).append("</p>");
+                }
+            }
+        }
+        pieces.put("mansion", flush(html));
+
+        // <b>The body on the degree, not just the degree.</b> The three blocks below
+        // describe the Sabian symbol itself and have since July; this says what this
+        // particular body does standing on it, and reads the composite entry in a
+        // relationship chart.
+        // The technical note on the exact degree - critical degrees and their kin.
+        // One entry per body-sign-degree, natal and composite alike, so no flag.
+        String techDeg = InterpretationService.getInstance()
+            .getBodyTechnicalDegree(planetName, signName, degree);
+        if (techDeg != null) {
+            html.append("<p>").append(techDeg).append("</p>");
+        }
+
+        String bodySabian = InterpretationService.getInstance()
+            .getBodySabian(planetName, signName, degree, relChart);
+        if (bodySabian != null) {
+            html.append("<p>").append(bodySabian).append("</p>");
+        }
+        pieces.put("degreeNotes", flush(html));
+
+        if (!sabianFullText.isEmpty()) {
+            html.append("<p>").append(sabianFullText).append("</p>");
+        }
+        if (!sabianShadow.isEmpty()) {
+            html.append("<p style='color:#D08A8A;'><b>Shadow:</b> ").append(sabianShadow).append("</p>");
+        }
+        if (!sabianKeywords.isEmpty()) {
+            html.append("<p style='color:#9AA5B1;'><i>Keywords: ").append(sabianKeywords).append("</i></p>");
+        }
+        pieces.put("sabianDetail", flush(html));
+
+        // 360 Degree Interpretation
+        String degreeSummary = InterpretationService.getInstance().getDegreeSummary(signName, degree);
+        String degreeFullText = InterpretationService.getInstance().getDegreeFullText(signName, degree);
+        if (!degreeSummary.isEmpty() || !degreeFullText.isEmpty()) {
+            html.append("<h3 style='color:#E0E0E0;'><b>Degree Interpretation (").append(signName).append(" ").append(degree).append("&deg;)</b></h3>");
+            if (!degreeSummary.isEmpty()) {
+                html.append("<p><b>Summary:</b> ").append(degreeSummary).append("</p>");
+            }
+            if (!degreeFullText.isEmpty()) {
+                html.append("<p><b>Full Text:</b> ").append(degreeFullText).append("</p>");
+            }
+        }
+        pieces.put("degree", flush(html));
+        
+        // Tarot Associations
+        html.append("<h2 style='color:#E0E0E0; margin-top: 30px;'><b>Tarot Associations</b></h2>");
+        pieces.put("tarotHeading", flush(html));
+        // "&nbsp; " after the </i>, same reason as the decan heading: a plain space at
+        // an inline tag boundary collapses, closing these up to read "Planet Card(Sun)".
+        // <b>The classical ten first, then the bodies the Golden Dawn never covered.</b>
+        // getTarotPlanetCard returns the string "Unknown" for anything outside its ten,
+        // and that was being printed on screen for nineteen of the twenty-nine registry
+        // points - "Planet Card (Chiron): Unknown". The card name for those comes from
+        // the lead of the tarot_body entry, and the reasoning goes underneath it.
+        InterpretationService tarotSvc = InterpretationService.getInstance();
+        String classical = tarotSvc.getTarotPlanetCard(planetName);
+        String bodyEntry = null;
+        if (classical == null || "Unknown".equals(classical)) {
+            com.zodiacomputing.ourania.astro.Bodies.Def def =
+                com.zodiacomputing.ourania.astro.Bodies.byName(displayPlanetName);
+            bodyEntry = def == null ? null : tarotSvc.getTarotBody(def.id);
+        }
+        String card = bodyEntry != null ? SkymapPanel.boldLead(bodyEntry) : classical;
+        // <b>An absent field is omitted, not printed as the word Unknown.</b>
+        // getTarotPlanetCard returns the literal string "Unknown" outside its ten, and
+        // nine registry points still have no card of any kind - both nodes, the four
+        // angles, both Lots and Black Moon Lilith. Rendering "Planet Card (Black Moon
+        // Lilith): Unknown" tells the reader nothing except that the app has a hole in it.
+        String shownCard = card == null || "Unknown".equals(card) ? classical : card;
+        boolean haveCard = shownCard != null && !"Unknown".equals(shownCard);
+        if (haveCard) {
+            html.append("<p><i>Planet Card</i>&nbsp; (").append(displayPlanetName)
+                .append("): ").append(shownCard).append("</p>");
+        }
+        if (bodyEntry != null) {
+            int cut = bodyEntry.indexOf("</b>");
+            html.append("<div style='color:#cccccc; font-size:12px; margin:-6px 0 12px 0;'>")
+                .append(cut >= 0 ? bodyEntry.substring(cut + 4) : bodyEntry).append("</div>");
+        }
+        pieces.put("tarotPlanet", flush(html));
+        html.append("<p><i>Sign Card</i>&nbsp; (").append(signName).append("): ").append(InterpretationService.getInstance().getTarotSignCard(signName)).append("</p>");
+        pieces.put("tarotSign", flush(html));
+        // The Golden Dawn attributions are defined in Chaldean order, so the card is
+        // named with the face ruler it actually encodes, not the triplicity sub-ruler.
+        String faceRuler = Zodiac.chaldeanDecanRuler(signName, decanNum);
+        html.append("<p><i>Decan Card</i>&nbsp; (").append(signName).append(" Decan ").append(decanNum);
+        if (!faceRuler.isEmpty()) {
+            html.append(", Chaldean face ruler ").append(faceRuler);
+        }
+        html.append("): ").append(InterpretationService.getInstance().getTarotDecanCard(signName, decanNum)).append("</p>");
+        pieces.put("tarotDecan", flush(html));
+        
+        // House
+        html.append("<h3 style='color:#E0E0E0;'><b>In House ").append(houseNum).append("</b></h3>");
+        html.append("<p>").append(InterpretationService.getInstance().getPlanetInHouse(planetName, houseNum)).append("</p>");
+        pieces.put("house", flush(html));
+        
+        // Aspects
+        if (activeAspects != null && !activeAspects.isEmpty()) {
+            html.append("<h2 style='color:#E0E0E0; margin-top: 30px;'><b>Active Aspects</b></h2>");
+            for (String[] aspectData : activeAspects) {
+                String otherPlanet = aspectData[0];
+                String aspectType = aspectData[1];
+                String applyState = (aspectData.length > 2) ? aspectData[2] : "";
+                String displayAspect = applyState.isEmpty() ? aspectType : applyState + " " + aspectType;
+                html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect).append("</i> ").append(otherPlanet).append("</h3>");
+                html.append("<p>").append(InterpretationService.getInstance().getAspect(planetName, otherPlanet, aspectType)).append("</p>");
+            }
+        }
+        pieces.put("aspects", flush(html));
+        return pieces;
+    }
+
+    /** What was written since the last flush, and an empty builder for the next piece. */
+    private static String flush(StringBuilder sb) {
+        String s = sb.toString();
+        sb.setLength(0);
+        return s;
+    }
+
+    /**
+     * The planet's own core paragraph - Level 1's actor - with the placeholder notice when
+     * the point has no prose yet. Shared by the reading and the Interpretation tab.
+     */
+    /**
+     * The natal planet reading in the interpretive hierarchy - K11 in DECISIONS.md.
+     *
+     * <p><b>The Interpretation tab only.</b> The selection pane is cut from generatePlanetHtml
+     * and keeps every section in its order; this arranges the same {@link #natalPieces} for
+     * the tab. Nothing here renders corpus prose itself, so the two surfaces can differ in
+     * order and grouping but never in a word.
+     *
+     * <p><b>One account first, the stack underneath.</b> The main account takes the opening
+     * sentence of each layer's own entry, in level order: the planet, its sign, its house, its
+     * strongest aspect, the body in its decan - then the Sabian image. <b>No sentence in it is
+     * written by the app</b>; each is lifted from an entry somebody wrote (the C7 reason). The
+     * layer breakdown below gives every piece in full, grouped by level, and opens and closes
+     * in place.
+     *
+     * <p><b>What the engine adds is facts, not prose</b>: the sign's element and modality and
+     * the body's essential dignity at Level 1; the triplicity rulers and the Egyptian bound at
+     * Level 3. They were computed all along (Dignity, Zodiac) and the reading never said them.
+     *
+     * <p><b>The lunar mansion is atmosphere.</b> For the Moon it is its own station - the
+     * instinctual habitat - so it leads Level 4 and joins the main account. For every other
+     * body it is the setting the placement stands in, last in Level 4 and out of the account.
+     */
+    String hierarchyHtml(String planetName, String signName, int degree, int decanNum,
+                         int houseNum, java.util.List<String[]> activeAspects, double lon,
+                         boolean layers) {
+        String display = planetName.substring(0, 1).toUpperCase() + planetName.substring(1);
+        String core = coreHtmlFor(display);
+        java.util.LinkedHashMap<String, String> p = natalPieces(planetName, signName, degree,
+            decanNum, houseNum, activeAspects, lon, display);
+        boolean moon = "Moon".equalsIgnoreCase(display);
+
+        StringBuilder html = new StringBuilder();
+        appendRelationshipFrame(html, planetName, signName, houseNum);
+        html.append("<h2 style='color:#E0E0E0; margin-bottom:4px;'><b>").append(display)
+            .append(" in ").append(signName).append(", House ").append(houseNum)
+            .append("</b></h2>");
+        html.append("<div style='color:#9FB4C7; font-size:11px; margin-bottom:10px;'>")
+            .append(signFacts(display, signName, degree, lon)).append("</div>");
+
+        // ---- the main account: each layer's own opening sentence, in level order
+        java.util.List<String> account = new java.util.ArrayList<>();
+        addSentence(account, core);
+        addSentence(account, p.get("sign"));
+        addSentence(account, p.get("house"));
+        // The aspect's own sentence says what kind of contact it is but not with whom, so its
+        // heading goes in front of it - "Applying Square Mars:" - as the section heading would.
+        String aspectLead = pieceLead(p.get("aspects"));
+        java.util.regex.Matcher heading = java.util.regex.Pattern
+            .compile("(?s)<h3[^>]*>(.*?)</h3>").matcher(p.get("aspects"));
+        if (!aspectLead.isEmpty() && !aspectLead.toLowerCase().contains("not found")
+                && heading.find()) {
+            account.add("<i>" + heading.group(1).replaceAll("<[^>]+>", "").trim() + ":</i> "
+                + aspectLead);
+        }
+        addSentence(account, p.get("decan"));
+        if (moon) {
+            addSentence(account, p.get("mansion"));
+        }
+        if (!account.isEmpty()) {
+            html.append("<p style='font-size:14px;'>").append(String.join(" ", account))
+                .append("</p>");
+        }
+        String symbol = firstParagraph(p.get("sabian"));
+        if (!symbol.isEmpty() && !symbol.toLowerCase().contains("not found")) {
+            html.append("<p style='color:#cccccc;'>").append(symbol).append("</p>");
+        }
+
+        // ---- the layer breakdown
+        html.append("<p style='margin-top:14px;'><a href='").append(LAYERS_HREF)
+            .append("' style='color:#7FB3FF; text-decoration:none;'>")
+            .append(layers ? "&#9662; Hide the layer breakdown" : "&#9656; Show the layer breakdown")
+            .append("</a></p>");
+        if (!layers) {
+            return html.toString();
+        }
+        layer(html, "Core archetype", "the planet, its sign and its house");
+        html.append(core).append(p.get("sign")).append(p.get("house"))
+            .append(p.get("tarotPlanet")).append(p.get("tarotSign"));
+
+        layer(html, "Dynamic geometry", "its aspects and angles");
+        String aspects = p.get("aspects");
+        html.append(aspects.isEmpty()
+            ? "<p style='color:#9AA5B1;'>No aspects in orb.</p>" : aspects);
+
+        layer(html, "Sub-dignity &amp; boundary", "triplicity, bound and decan");
+        html.append("<p style='color:#cccccc;'>").append(refinementFacts(signName, degree, lon))
+            .append("</p>");
+        html.append(p.get("decan")).append(p.get("tarotDecan"));
+
+        layer(html, "Fine symbolism", "the degree and the mansion");
+        String mansion = p.get("mansion");
+        String caption = moon
+            ? "The Moon's own station: its instinctual habitat and emotional baseline."
+            : "The setting this placement stands in: atmosphere, not a trait.";
+        String framedMansion = mansion.isEmpty() ? ""
+            : mansion + "<p style='color:#9AA5B1; font-size:11px; margin-top:-6px;'><i>"
+                + caption + "</i></p>";
+        if (moon) {
+            html.append(framedMansion);
+        }
+        html.append(p.get("sabian")).append(p.get("degreeNotes")).append(p.get("sabianDetail"))
+            .append(p.get("degree"));
+        if (!moon) {
+            html.append(framedMansion);
+        }
+        return html.toString();
+    }
+
+    /** A divider in the layer breakdown, named the way the stack is described in K11. */
+    private static void layer(StringBuilder html, String name, String holds) {
+        html.append("<div style='border-top:1px solid #444; margin-top:18px; padding-top:4px;"
+            + " color:#FFD166; font-size:11px; letter-spacing:1px;'>").append(name.toUpperCase())
+            .append(" <span style='color:#9AA5B1; letter-spacing:0;'>&middot; ").append(holds)
+            .append("</span></div>");
+    }
+
+    /** Level 1's facts: element, modality and essential dignity. Computed, not written. */
+    private String signFacts(String body, String signName, int degree, double lon) {
+        int sign = Zodiac.signIndexOf(signName);
+        if (sign < 0) {
+            return "";
+        }
+        StringBuilder s = new StringBuilder(capitalised(Zodiac.elementName(sign)))
+            .append(" &middot; ").append(capitalised(Zodiac.modalityName(sign)));
+        double at = Double.isNaN(lon) ? sign * 30.0 + degree - 0.5 : lon;
+        com.zodiacomputing.ourania.astro.Dignity.Result d =
+            com.zodiacomputing.ourania.astro.Dignity.evaluate(body, at, true);
+        String dignity = d.domicile ? "in domicile" : d.exaltation ? "exalted"
+            : d.detriment ? "in detriment" : d.fall ? "in fall" : null;
+        if (dignity != null) {
+            s.append(" &middot; ").append(dignity);
+        }
+        return s.toString();
+    }
+
+    /** Level 3's facts: the sign's triplicity rulers and the bound the degree falls in. */
+    private String refinementFacts(String signName, int degree, double lon) {
+        int sign = Zodiac.signIndexOf(signName);
+        if (sign < 0) {
+            return "";
+        }
+        StringBuilder s = new StringBuilder("<b>Triplicity</b> (")
+            .append(capitalised(Zodiac.elementName(sign))).append("): ")
+            .append(com.zodiacomputing.ourania.astro.Dignity.triplicityRulerOf(sign, true))
+            .append(" by day, ")
+            .append(com.zodiacomputing.ourania.astro.Dignity.triplicityRulerOf(sign, false))
+            .append(" by night, ")
+            .append(com.zodiacomputing.ourania.astro.Dignity.participatingTriplicityRulerOf(sign))
+            .append(" participating.");
+        double at = Double.isNaN(lon) ? sign * 30.0 + degree - 0.5 : lon;
+        double into = at - sign * 30.0;
+        double[] edges = com.zodiacomputing.ourania.astro.Dignity.boundEdges(sign);
+        for (int i = 0; i + 1 < edges.length; i++) {
+            if (into >= edges[i] && into < edges[i + 1]) {
+                s.append(" <b>Bound</b> of ")
+                    .append(com.zodiacomputing.ourania.astro.Dignity.boundRulerOf(at))
+                    .append(", ").append((int) edges[i]).append("&deg;&ndash;")
+                    .append((int) edges[i + 1]).append("&deg; ").append(signName).append('.');
+                break;
+            }
+        }
+        return s.toString();
+    }
+
+    /** The first sentence of a piece's first paragraph, tags removed; "" when there is none. */
+    static String pieceLead(String pieceHtml) {
+        String text = firstParagraph(pieceHtml).replaceAll("<[^>]+>", "").trim();
+        if (text.isEmpty()) {
+            return "";
+        }
+        // "\\s*", not "\\s+": the corpus often runs sentences together with no space after the
+        // stop ("...authority.As the sovereign"), and requiring one took two or three at a time.
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("[.!?](?=\\s*[A-Z\"'])")
+            .matcher(text);
+        return m.find() ? text.substring(0, m.end()) : text;
+    }
+
+    /** The inner HTML of a piece's first non-empty paragraph. */
+    static String firstParagraph(String pieceHtml) {
+        if (pieceHtml == null) {
+            return "";
+        }
+        java.util.regex.Matcher m = java.util.regex.Pattern
+            .compile("(?s)<p(?:\\s[^>]*)?>(.*?)</p>").matcher(pieceHtml);
+        while (m.find()) {
+            String inner = m.group(1).trim();
+            if (!inner.replaceAll("<[^>]+>", "").trim().isEmpty()) {
+                return inner;
+            }
+        }
+        return "";
+    }
+
+    private static String capitalised(String s) {
+        return s == null || s.isEmpty() ? "" : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    private static void addSentence(java.util.List<String> account, String pieceHtml) {
+        String s = pieceLead(pieceHtml);
+        if (!s.isEmpty() && !s.toLowerCase().contains("not found")) {
+            account.add(s);
+        }
+    }
+
+    /** The core paragraph for a body by name, looking its original-dataset text up first. */
+    String coreHtmlFor(String displayPlanetName) {
+        for (int i = 0; i < PLANET_NAMES.length; i++) {
+            if (PLANET_NAMES[i].equalsIgnoreCase(displayPlanetName)) {
+                return coreHtml(displayPlanetName, InterpretationData.DATA.get(STA_KEYS[i]));
+            }
+        }
+        return coreHtml(displayPlanetName, null);
+    }
+
+    String coreHtml(String displayPlanetName, String coreText) {
+        StringBuilder html = new StringBuilder();
+    InterpretationService svc = InterpretationService.getInstance();
+    String header = coreText;
+    if (header == null || header.isEmpty()) {
+        header = svc.getBodyCore(displayPlanetName);
+    }
+    boolean placeholder = header == null || header.isEmpty();
+    if (placeholder) {
+        header = Bodies.meaningOf(displayPlanetName);
+    }
+    if (header != null && !header.isEmpty()) {
+        html.append("<p style='font-size:14px; font-style:italic; color:#cccccc; border-bottom: 1px solid #444; padding-bottom: 10px;'>").append(header).append("</p>");
+    }
+    if (placeholder && !svc.hasSignProse(displayPlanetName)
+            && Bodies.byName(displayPlanetName) != null) {
+        html.append("<p style='font-size:11px; color:#9AA5B1;'>Full prose for this point "
+            + "is not written yet; the sign and house sections below will read as "
+            + "not-found. The degree, decan and Sabian material underneath them is "
+            + "per-degree and applies to any point.</p>");
+    }
         return html.toString();
     }
 
