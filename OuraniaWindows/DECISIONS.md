@@ -373,6 +373,63 @@ then Mars/Sun dating of converged themes.
 
 ---
 
+## K13 — Momentary horoscopy: horary and electional · **DECIDED 2026-09-19, NOT YET BUILT (F10)**
+
+**Decision (David, 2026-09-19).** A section for charts of a single instant, in its two branches:
+**horary** (a question judged by the chart of the moment it is asked) and **electional /
+inceptional** (*katarche*: the quality of a moment to begin something). It is a deterministic
+judgement over significators, applying aspects and the dynamics of light - not a transit window.
+
+**Horary, four steps.**
+1. **Significators.** The querent: the Ascendant, its domicile ruler, and the Moon. The quesited:
+   the ruler of the house of the matter - 2nd money and lost things; 3rd communications and
+   siblings; 4th home and property; 5th romance, children, speculation; 6th health, work,
+   service; 7th partners, relationships, lawsuits; 10th career and status.
+2. **Radicality.** Whether the chart is fit to judge; the planetary-hour test - the hour ruler
+   (Chaldean order from sunrise) sharing the Ascendant ruler's nature or triplicity.
+3. **Perfection and the dynamics of light**, applying aspects only, **before either significator
+   changes sign**: direct perfection (conjunction, trine, sextile) is yes; **translation**
+   (a faster body, often the Moon, separating from one and applying to the other);
+   **collection** (both applying to a slower third); **prohibition / frustration** (a third body
+   perfecting with one first); **refranation** (a significator stationing before perfection);
+   the **void-of-course Moon** (no further applying major aspect in its sign - nothing comes of it).
+4. **The outcome**, with the reasons that produced it.
+
+**Electional, two measures.** **Planetary day and hour** (Sunday Sun ... Saturday Saturn; the
+hour from sunrise in Chaldean order) and the kind of work each hour favours; and **angularity**:
+Jupiter or Venus on an angle (above all the 1st and 10th) or aspecting the Moon raises a moment;
+Mars or Saturn undignified on the Ascendant or Midheaven, or the South Node on a significator,
+lowers it.
+
+**Measured against the engine, 2026-09-19.** The apparatus is mostly here, as F10 has said since
+2 September; nothing presents it as a judgement.
+
+| Piece | Status |
+|---|---|
+| Applying vs separating aspects | built - `Aspects.Hit.applying` |
+| Translation and collection of light | built - `TransferOfLight`, chart-wide; not yet restricted to two named significators or to "before a sign change" |
+| Void-of-course Moon | built - `ChartFrame.moonVoidOfCourse` (A9) |
+| Essential dignity, sect, domicile rulers of houses | built - `Dignity`, `Sect` |
+| Mansions with electional clauses | built - `LunarMansions` |
+| Planetary day and hour | **missing** - needs sunrise and sunset (check `astro.Horizon` first) |
+| Significators from a question's house | **missing** |
+| Prohibition, frustration, refranation | **missing** |
+| Radicality check | **missing** |
+| Angular benefic/malefic scoring for a moment | **missing** |
+| A screen: ask a question now, or rate a moment | **missing** |
+
+**Built differently from how the spec puts it, and why:**
+- *The confidence arithmetic* (+3 perfection, +2 translation, -2 void Moon; >= 2 is positive). Horary
+  is judged by the *first decisive* testimony - a prohibition overrides a perfection, refranation
+  undoes it - so the engine returns the **verdict with its chain of reasons in order**, not a sum
+  that lets a void Moon and a translation cancel out. It can still expose a score for ranking
+  elections, where comparing moments is the point.
+- *"Mercury hour: optimal for code commits."* The hour and day are computed and named with their
+  traditional significations; recommendations phrased for particular modern tasks are not
+  written by the app (the C7 reason again), though David may supply them as prose.
+
+---
+
 ## What these change about the audit
 
 Three items close with no work, one of them only needing a label. Six become buildable. Nothing here is still waiting on a
