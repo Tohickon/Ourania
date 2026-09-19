@@ -33,7 +33,9 @@ worked this tree until 2026-09-16 and was retired on 2026-09-19.) So:
 - **Never rewrite a shared data file — splice into it**, or put new bulk content in its own file
   and add it to `InterpretationService.EXTRA_FILES`.
 - **Run the check suites after touching anything shared, and measure a red suite against the
-  previous commit before believing it is yours** — the suites inherit David's saved settings.
+  previous commit before believing it is yours.** Since J14 (2026-09-19) every suite starts from
+  a fresh install, so a red suite is red on any machine - but some totals still drift with the
+  clock, so compare failure sets, not counts. `known-red.txt` lists the reds already explained.
 
 The rules, and the incidents that earned each one, are in `Resources/wiki/two-agents-one-repo.md`.
 
@@ -60,7 +62,11 @@ java -cp "src\main\java;lib\*" com.zodiacomputing.ourania.gui.OuraniaWindow
 
 - The app runs from `src\main\java`, **not** `out\`. The `out\` directory is stale and is
   not what executes.
-- No JDK on PATH. The only one is `C:\Program Files\Android\Android Studio\jbr\bin\javac.exe`.
+- **`.\build.ps1` is the build** and finds a JDK 21+ by itself (`JAVA_HOME`, PATH, then Android
+  Studio's). `-All` runs every suite against `known-red.txt`; `-Jar` and `-Package` make the
+  app. CI runs `-All` on every push (`.github/workflows/ci.yml`).
+- No JDK on PATH on David's machine. The only one is `C:\Program Files\Android\Android Studio\jbr\bin\javac.exe`,
+  and it has no `jpackage`.
 - **Do not glob** `astro\*.java` alone — it fails with ~89 errors. Compile both packages
   together with `-cp "src\main\java;lib\*"`.
 - **`lib\*` is on every classpath** since the PDF report brought `lib\openpdf.jar`

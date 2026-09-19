@@ -147,7 +147,10 @@ public final class SettingsIsolationCheck {
                 String name = f.getName();
                 if (!name.endsWith(".java") || name.endsWith("Check.java")
                         || name.equals("ZodiacSelfTest.java")
-                        || name.equals("Settings.java") || name.equals("SavedCharts.java")) {
+                        || name.equals("Settings.java") || name.equals("SavedCharts.java")
+                        // Names them to copy them once into a packaged app's own folder;
+                        // it reads them nowhere else.
+                        || name.equals("AppPaths.java")) {
                     continue;
                 }
                 String code = new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8)

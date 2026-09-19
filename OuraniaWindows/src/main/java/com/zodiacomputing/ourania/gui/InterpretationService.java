@@ -65,7 +65,7 @@ public class InterpretationService {
         {"title", "classic", "modern", "archetype", "meaning", "classicDiffers"};
 
     private void loadModernSabians() {
-        File file = new File("src/main/resources/data/modern_sabians.json");
+        File file = new File(DATA_DIR + "modern_sabians.json");
         if (!file.exists()) {
             return;
         }
@@ -302,8 +302,15 @@ public class InterpretationService {
         return sb.toString();
     }
 
-    /** Where every loader in this class reads from. */
-    public static final String DATA_DIR = "src/main/resources/data/";
+    /**
+     * Where every loader in this class reads from: {@code src/main/resources/data/} from
+     * classes, the {@code data} folder beside Ourania.jar when packaged (see AppPaths).
+     *
+     * <b>Eight loaders spelled the path out themselves</b> rather than using this, so a packaged
+     * app would have found the extra files and none of the core prose. They all go through
+     * here now.
+     */
+    public static final String DATA_DIR = com.zodiacomputing.ourania.astro.AppPaths.dataDir();
 
     /**
      * The supplementary files, as full paths, for anything that needs to check them.
@@ -691,7 +698,7 @@ public class InterpretationService {
 
     private void loadData() {
         try {
-            File file = new File("src/main/resources/data/interpretations.json");
+            File file = new File(DATA_DIR + "interpretations.json");
             if (!file.exists()) {
                 System.err.println("Interpretations JSON not found!");
                 return;
@@ -751,7 +758,7 @@ public class InterpretationService {
 
     private void loadDegreesData() {
         try {
-            File file = new File("src/main/resources/data/degree_interpretations.json");
+            File file = new File(DATA_DIR + "degree_interpretations.json");
             if (!file.exists()) {
                 System.err.println("Degree Interpretations JSON not found!");
                 return;
@@ -793,10 +800,10 @@ public class InterpretationService {
 
     private void loadAnglesData() {
         try {
-            File[] files = {new File("src/main/resources/data/Ascendent.json"),
-                            new File("src/main/resources/data/ic.json"),
-                            new File("src/main/resources/data/mc.json"),
-                            new File("src/main/resources/data/Descendant.json")};
+            File[] files = {new File(DATA_DIR + "Ascendent.json"),
+                            new File(DATA_DIR + "ic.json"),
+                            new File(DATA_DIR + "mc.json"),
+                            new File(DATA_DIR + "Descendant.json")};
             for (File file : files) {
                 if (!file.exists()) continue;
                 BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
@@ -847,7 +854,7 @@ public class InterpretationService {
      */
     private void loadSabianDetailData() {
         try {
-            File file = new File("src/main/resources/data/Sabian_interpretations.json");
+            File file = new File(DATA_DIR + "Sabian_interpretations.json");
             if (!file.exists()) {
                 System.err.println("Sabian detail JSON not found - shadow/keywords unavailable.");
                 return;

@@ -59,7 +59,10 @@ public final class Ephemeris {
             p = System.getenv(ENV);
         }
         if (p == null || p.trim().isEmpty()) {
-            return DEFAULT;
+            // Packaged, the files travel with the app, in an ephe folder beside Ourania.jar;
+            // from classes it is still the one path this project has always used (AppPaths).
+            String bundled = AppPaths.packagedEphemeris();
+            return bundled != null ? bundled : DEFAULT;
         }
         return p.trim();
     }

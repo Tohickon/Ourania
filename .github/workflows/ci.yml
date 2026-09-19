@@ -1,0 +1,93 @@
+# J7: build Ourania and run every check suite on a clean Windows machine, on every push.
+#
+# Why this exists: with several sessions working one tree, the suites are the only channel
+# between them, and until now nothing ran them but a person. This runs build.ps1 -All, which
+# fails on any red suite not listed in OuraniaWindows/known-red.txt.
+#
+# The Swiss Ephemeris files are not in the repository (see THIRD-PARTY-NOTICES.md). The five
+# main ones are fetched from the Swiss Ephemeris project's own repository. The four numbered-
+# asteroid files this machine has (Hygiea, Eros, Nessus, Eris) are only published through a
+# Dropbox folder now, so CI runs without them.
+
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: windows-latest
+    timeout-minutes: 240
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: OuraniaWindows
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Fetch the Swiss Ephemeris files
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP "ephe"
+          New-Item -ItemType Directory -Force -Path $dir | Out-Null
+          foreach ($f in "sepl_18.se1", "semo_18.se1", "seas_18.se1", "sefstars.txt", "seasnam.txt") {
+            Invoke-WebRequest "https://raw.githubusercontent.com/aloistr/swisseph/master/ephe/$f" -OutFile (Join-Path $dir $f)
+          }
+          "OURANIA_EPHE=$dir" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      - name: Build and run every suite
+        # known-red-ci.txt: the suites red only here, for want of the four asteroid files.
+        run: .\build.ps1 -Out out-ci -All -KnownRed known-red.txt,known-red-ci.txt
+
+      - name: Keep the suite logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: suite-logs
+          path: OuraniaWindows/out-ci-logs
+          retention-days: 14
+
+  package:
+    # J4: the app with its own Java runtime, so it runs on a machine with no Java installed.
+    # jpackage is part of a full JDK, which Android Studio's bundled runtime leaves out -
+    # so the package is built here rather than on David's machine.
+    runs-on: windows-latest
+    needs: check
+    if: github.event_name != 'pull_request'
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: OuraniaWindows
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Fetch the Swiss Ephemeris files
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP "ephe"
+          New-Item -ItemType Directory -Force -Path $dir | Out-Null
+          foreach ($f in "sepl_18.se1", "semo_18.se1", "seas_18.se1", "sefstars.txt", "seasnam.txt") {
+            Invoke-WebRequest "https://raw.githubusercontent.com/aloistr/swisseph/master/ephe/$f" -OutFile (Join-Path $dir $f)
+          }
+          "OURANIA_EPHE=$dir" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      - name: Build the app image
+        run: .\build.ps1 -Out out-pkg -Package
+
+      - name: Keep the app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ourania-windows
+          path: OuraniaWindows/dist/package
+          retention-days: 14

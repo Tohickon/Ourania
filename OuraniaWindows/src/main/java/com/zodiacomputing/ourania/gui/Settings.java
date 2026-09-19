@@ -46,7 +46,10 @@ public final class Settings {
 
     private static String file() {
         String override = System.getProperty(FILE_PROPERTY);
-        return override == null || override.isEmpty() ? "settings.properties" : override;
+        // AppPaths.userDir() is "" from classes - the working directory, as always - and the
+        // reader's own folder when packaged, where the working directory is Program Files.
+        return override == null || override.isEmpty()
+            ? com.zodiacomputing.ourania.astro.AppPaths.userDir() + "settings.properties" : override;
     }
 
     /** Comma-separated body ids; see {@link Bodies#parse}. */

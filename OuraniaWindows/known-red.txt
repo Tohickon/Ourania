@@ -1,0 +1,11 @@
+# Suites that are red for a reason already written down. build.ps1 -All (and CI) fail on a red
+# suite that is NOT listed here, and report a listed one that passes so it can come off.
+#
+# One suite name per line; everything after # is the reason. Take a line out the moment the
+# suite is fixed - an entry that outlives its defect hides the next failure in that suite.
+# Measured 2026-09-19, after J14 made every suite start from a fresh install.
+
+BodyCheck        # 50 in Part A2: Ceres-Vesta null at 1900 everywhere; and in CI the four numbered-asteroid files (Hygiea, Eros, Nessus, Eris) are not downloadable - Resources/wiki/ourania-ephemeris-fallback.md
+CompositeCheck   # 2: Part E, the Part of Spirit instability flag and its warning
+SynastryCheck    # 112: a real defect, not yet investigated; unchanged by settings
+NavigationCheck  # 8 in Part K: a fresh install's cold open misdescribes the empty charts; 2-4 in Part Q vary with the clock

@@ -1,0 +1,10 @@
+# Suites that are red ONLY on the CI runner, because of what the runner cannot have. CI reads
+# this on top of known-red.txt; nothing else does, so on a machine with the full ephemeris these
+# suites must still pass. Verified 2026-09-19: both clear against David's ephemeris directory,
+# both red against the five files CI downloads.
+#
+# The cause is the four numbered-asteroid files (Hygiea, Eros, Nessus, Eris), which Swiss
+# Ephemeris now publishes only through a Dropbox folder, so CI runs without them.
+
+SkyViewCheck     # 5: Eros and Eris cannot be placed, so the sky holds 17 of 19 chosen points
+ChartSetupCheck  # 1: "with the real directory every selectable body can be placed" (same four files)

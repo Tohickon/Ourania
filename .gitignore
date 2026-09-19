@@ -64,3 +64,6 @@ cfr-*.jar
 # duplicates is already tracked. The seven .pre-*.bak files above it predate this rule and
 # stay tracked deliberately - they are the record of specific splices.
 *.json.bak-*
+
+# --- packaged app (build.ps1 -Jar / -Package) ---
+dist/

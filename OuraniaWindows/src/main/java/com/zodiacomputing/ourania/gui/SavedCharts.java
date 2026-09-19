@@ -44,7 +44,10 @@ public final class SavedCharts {
     /** The chart book in use: the real one, or a check suite's scratch copy. */
     static String file() {
         String override = System.getProperty(FILE_PROPERTY);
-        return override == null || override.isEmpty() ? FILE : override;
+        // Beside settings.properties: the working directory from classes, the reader's own
+        // folder when packaged (AppPaths.userDir).
+        return override == null || override.isEmpty()
+            ? com.zodiacomputing.ourania.astro.AppPaths.userDir() + FILE : override;
     }
 
     /**
@@ -55,7 +58,8 @@ public final class SavedCharts {
      */
     static String legacyFile() {
         String override = System.getProperty(FILE_PROPERTY);
-        return override == null || override.isEmpty() ? LEGACY : override + ".legacy";
+        return override == null || override.isEmpty()
+            ? com.zodiacomputing.ourania.astro.AppPaths.userDir() + LEGACY : override + ".legacy";
     }
 
     /** One saved chart. Fields are raw form text, validated where they are used. */

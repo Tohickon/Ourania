@@ -980,6 +980,27 @@ public final class ChartSetupCheck {
                 Thread.sleep(100);
             }
         }
+        // <b>And for it to stop changing.</b> The right date is not the right chart: the moment
+        // can be recast after it first arrives (the place's zone settling), and the transit
+        // search below then read one chart or the other. Its answer - a Saturn conjunction to
+        // the natal Moon near the edge of the window, or only the trine - flickered between
+        // runs on identical code (2026-09-19, twice in one day). Wait for one second unchanged.
+        String last = null;
+        long steadySince = System.currentTimeMillis();
+        while (arrived && System.currentTimeMillis() < deadline) {
+            final String[] now = {null};
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                com.zodiacomputing.ourania.astro.ChartSubject a = panel.chartASubject();
+                now[0] = a == null || a.moment == null ? null : a.moment.toString();
+            });
+            if (last == null || !last.equals(now[0])) {
+                last = now[0];
+                steadySince = System.currentTimeMillis();
+            } else if (System.currentTimeMillis() - steadySince >= 1000) {
+                break;
+            }
+            Thread.sleep(100);
+        }
         javax.swing.SwingUtilities.invokeAndWait(() -> { });
         return blew[0] == null && arrived;
     }
