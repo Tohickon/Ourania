@@ -26,21 +26,34 @@ public final class ChartBookCheck {
     private static final List<String> failures = new ArrayList<>();
     private static int checks = 0;
 
-    private static final String FILE = "saved_charts.properties";
-    private static File backup;
+    /**
+     * The chart book this run writes: always the scratch book {@link Settings#useScratchFile}
+     * sets up, asked of SavedCharts so the two can never name different files.
+     *
+     * <b>This suite used to write the reader's real book.</b> It set the real file aside, deleted
+     * it, <i>moved</i> the reader's legacy transit book into a temp file, and put both back in a
+     * {@code finally}. A run killed part way - which has happened here, to hung suites - left the
+     * reader's charts in the temp directory. With the book redirected there is nothing of the
+     * reader's to protect, so there is no backup and no restore.
+     */
+    private static String book() {
+        return SavedCharts.file();
+    }
+
+    private static String legacyBook() {
+        return SavedCharts.legacyFile();
+    }
 
     public static void main(String[] args) throws Exception {
         // Never the reader's own settings file: a suite that generates a chart persists it,
         // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
         Settings.useScratchFile();
-        // The suite writes to the real store, so the real one is set aside first and put back
-        // in a finally - a check that eats the user's charts would be worse than no check.
-        File live = new File(FILE);
-        if (live.exists()) {
-            backup = File.createTempFile("chartbook", ".bak");
-            java.nio.file.Files.copy(live.toPath(), backup.toPath(),
-                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-        }
+        yes("the book this suite writes is a scratch book, not the reader's",
+            !new File(book()).getAbsoluteFile().equals(
+                new File("saved_charts.properties").getAbsoluteFile()));
+        yes("and so is the legacy book it reads",
+            !new File(legacyBook()).getAbsoluteFile().equals(
+                new File("saved_transits.properties").getAbsoluteFile()));
         try {
             fresh();
 
@@ -79,7 +92,7 @@ public final class ChartBookCheck {
             legacyDelete();
             report("Part F", before);
         } finally {
-            restore();
+            fresh();
         }
 
         System.out.println();
@@ -202,20 +215,20 @@ public final class ChartBookCheck {
 
         // A field this version does not know about must survive a write to the same chart.
         Properties p = new Properties();
-        try (java.io.FileInputStream in = new java.io.FileInputStream(FILE)) {
+        try (java.io.FileInputStream in = new java.io.FileInputStream(book())) {
             p.load(in);
         } catch (Exception ex) {
             failures.add("could not read the book back: " + ex);
         }
         p.setProperty("Chart3.futureField", "kept");
-        try (FileOutputStream out = new FileOutputStream(FILE)) {
+        try (FileOutputStream out = new FileOutputStream(book())) {
             p.store(out, "test");
         } catch (Exception ex) {
             failures.add("could not seed a future field: " + ex);
         }
         SavedCharts.put("Chart3", "1973-01-01", "12:00", "Place3");
         Properties after = new Properties();
-        try (java.io.FileInputStream in = new java.io.FileInputStream(FILE)) {
+        try (java.io.FileInputStream in = new java.io.FileInputStream(book())) {
             after.load(in);
         } catch (Exception ex) {
             failures.add("could not re-read the book: " + ex);
@@ -226,7 +239,7 @@ public final class ChartBookCheck {
         // And a delete removes that unknown field too, rather than orphaning it.
         SavedCharts.remove("Chart3");
         Properties gone = new Properties();
-        try (java.io.FileInputStream in = new java.io.FileInputStream(FILE)) {
+        try (java.io.FileInputStream in = new java.io.FileInputStream(book())) {
             gone.load(in);
         } catch (Exception ex) {
             failures.add("could not re-read after delete: " + ex);
@@ -268,24 +281,13 @@ public final class ChartBookCheck {
     /**
      * The legacy file, which {@code read()} merges in for any name the current file lacks.
      *
-     * The suite has to set this aside too, or every count here is one high - and that is how
-     * the delete bug below was found.
+     * The suite has to clear this too, or every count here is one high - and that is how the
+     * delete bug below was found.
      */
-    private static final String LEGACY = "saved_transits.properties";
-    private static File legacyBackup;
 
     private static void fresh() {
-        new File(FILE).delete();
-        File l = new File(LEGACY);
-        if (l.exists() && legacyBackup == null) {
-            try {
-                legacyBackup = File.createTempFile("legacy", ".bak");
-                java.nio.file.Files.move(l.toPath(), legacyBackup.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception ex) {
-                failures.add("could not set the legacy book aside: " + ex);
-            }
-        }
+        new File(book()).delete();
+        new File(legacyBook()).delete();
     }
 
     /**
@@ -303,7 +305,7 @@ public final class ChartBookCheck {
         old.setProperty("Ghost.date", "1900-01-01");
         old.setProperty("Ghost.time", "06:00");
         old.setProperty("Ghost.location", "Old Town");
-        try (FileOutputStream o = new FileOutputStream(LEGACY)) {
+        try (FileOutputStream o = new FileOutputStream(legacyBook())) {
             old.store(o, "legacy book");
         }
         SavedCharts.put("Living", "2000-01-01", "12:00", "New Town");
@@ -323,27 +325,7 @@ public final class ChartBookCheck {
         // The tombstone marker is bookkeeping, not a chart.
         yes("the deletion marker is not listed as a chart",
             !SavedCharts.names().contains("__deleted"));
-        new File(LEGACY).delete();
-    }
-
-    private static void restore() {
-        try {
-            File live = new File(FILE);
-            if (backup != null) {
-                java.nio.file.Files.copy(backup.toPath(), live.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                backup.delete();
-            } else {
-                live.delete();
-            }
-            if (legacyBackup != null) {
-                java.nio.file.Files.move(legacyBackup.toPath(), new File(LEGACY).toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                legacyBackup = null;
-            }
-        } catch (Exception ex) {
-            System.out.println("  WARNING: could not restore the real chart book: " + ex);
-        }
+        new File(legacyBook()).delete();
     }
 
     private static void yes(String label, boolean condition) {

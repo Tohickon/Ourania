@@ -60,6 +60,9 @@ public final class DataCheck {
     private DataCheck() { }
 
     public static void main(String[] args) {
+        // Never the reader's own settings file: a suite that generates a chart persists it,
+        // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
+        Settings.useScratchFile();
         // <b>A lazy getter that forgets to pull its section in returns null forever</b>, and
         // null is indistinguishable from prose nobody wrote. So the deferred path is exercised
         // FIRST, on a service that nothing has forced, before the load below makes it moot.

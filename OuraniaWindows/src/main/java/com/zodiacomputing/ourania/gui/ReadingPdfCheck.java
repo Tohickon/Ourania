@@ -37,13 +37,13 @@ public final class ReadingPdfCheck {
     private static int checks = 0;
 
     public static void main(String[] args) throws Exception {
+        Settings.useScratchFile();
         // The half of Part C that runs in a JVM launched WITHOUT the jar: it prints the answer.
         if (args.length > 0 && "probe".equals(args[0])) {
             String p = ChartExporter.pdfLibraryProblem();
             System.out.println("PROBLEM=" + (p == null ? "none" : p));
             System.exit(0);
         }
-        Settings.useScratchFile();
         File dir = Files.createTempDirectory("ourania-pdfcheck").toFile();
 
         part("A: the glyphs reach the page", () -> glyphs(dir));

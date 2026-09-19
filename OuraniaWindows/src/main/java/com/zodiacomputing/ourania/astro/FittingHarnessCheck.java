@@ -43,6 +43,10 @@ public final class FittingHarnessCheck {
     private static int checks = 0;
 
     public static void main(String[] args) throws IOException {
+        // A fresh install's settings and chart book, never the reader's. The engine reads the body
+        // selection, the transit orb and the node variant underneath this suite even where it never
+        // names Settings, so without this its answer depends on what the reader last saved (J14).
+        com.zodiacomputing.ourania.gui.Settings.useScratchFile();
         File dir = new File(System.getProperty("java.io.tmpdir"), "ourania-fitcheck");
         dir.mkdirs();
         SwissEph sw = new SwissEph(EPHE_PATH);

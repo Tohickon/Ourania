@@ -27,6 +27,37 @@ public final class SavedCharts {
     private static final String FILE = "saved_charts.properties";
     private static final String LEGACY = "saved_transits.properties";
 
+    /**
+     * System property naming a chart book to use instead of the real one; check suites only.
+     *
+     * <b>The chart book had no redirect, and two suites wrote the real one.</b> ChartBookCheck
+     * and ChartSetupCheck saved and deleted charts in the reader's own file, protected by a copy
+     * taken first and put back in a {@code finally}. A run killed part way - which has happened
+     * here, to hung suites - left the reader's charts in a temp file and the suite's in their
+     * book. Settings has had this redirect since a suite overwrote a saved birth chart;
+     * {@link Settings#useScratchFile} now sets this one too, so one call isolates both.
+     *
+     * The application never sets it, so it always gets the real book.
+     */
+    static final String FILE_PROPERTY = "ourania.savedCharts";
+
+    /** The chart book in use: the real one, or a check suite's scratch copy. */
+    static String file() {
+        String override = System.getProperty(FILE_PROPERTY);
+        return override == null || override.isEmpty() ? FILE : override;
+    }
+
+    /**
+     * The legacy transit book, which is read once and carried forward.
+     *
+     * Redirected with the book: a suite on a scratch book importing the reader's legacy entries
+     * would be reading the reader's data again by the side door.
+     */
+    static String legacyFile() {
+        String override = System.getProperty(FILE_PROPERTY);
+        return override == null || override.isEmpty() ? LEGACY : override + ".legacy";
+    }
+
     /** One saved chart. Fields are raw form text, validated where they are used. */
     public static final class Entry {
         public final String date;
@@ -77,8 +108,8 @@ public final class SavedCharts {
 
     private static Properties read() {
         Properties p = new Properties();
-        File f = new File(FILE);
-        File legacy = new File(LEGACY);
+        File f = new File(file());
+        File legacy = new File(legacyFile());
         // Prefer the current file; fall back to the old one so nothing saved before the
         // rename disappears from the list.
         File source = f.exists() ? f : legacy;
@@ -359,7 +390,7 @@ public final class SavedCharts {
     }
 
     private static boolean write(Properties p) {
-        try (FileOutputStream out = new FileOutputStream(FILE)) {
+        try (FileOutputStream out = new FileOutputStream(file())) {
             p.store(out, "Saved charts - natal and transit, shared");
             return true;
         } catch (Exception ex) {

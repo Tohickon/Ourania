@@ -24,6 +24,10 @@ public final class DignityCheck {
     private static int checks = 0;
 
     public static void main(String[] args) {
+        // A fresh install's settings and chart book, never the reader's. The engine reads the body
+        // selection, the transit orb and the node variant underneath this suite even where it never
+        // names Settings, so without this its answer depends on what the reader last saved (J14).
+        com.zodiacomputing.ourania.gui.Settings.useScratchFile();
         section("Part A: Egyptian bounds checksum", DignityCheck::boundsChecksum);
         section("Part B: derived detriment and fall", DignityCheck::derivedTables);
         section("Part C: worked placements", DignityCheck::workedPlacements);

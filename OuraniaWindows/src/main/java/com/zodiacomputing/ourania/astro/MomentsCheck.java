@@ -34,6 +34,10 @@ public final class MomentsCheck {
     private static final ZoneId NY = ZoneId.of("America/New_York");
 
     public static void main(String[] args) {
+        // A fresh install's settings and chart book, never the reader's. The engine reads the body
+        // selection, the transit orb and the node variant underneath this suite even where it never
+        // names Settings, so without this its answer depends on what the reader last saved (J14).
+        com.zodiacomputing.ourania.gui.Settings.useScratchFile();
         System.out.println("=== Part A: an ordinary time is resolved and not remarked on ===");
         int before = failures.size();
         ordinary();

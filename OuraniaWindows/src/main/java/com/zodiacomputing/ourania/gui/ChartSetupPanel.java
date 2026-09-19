@@ -392,17 +392,12 @@ public class ChartSetupPanel extends JPanel {
         
         // Load the home location from settings. It falls back to the old
         // default.transit.location key so an existing settings.properties still works.
-        java.util.Properties settings = new java.util.Properties();
-        java.io.File settingsFile = new java.io.File("settings.properties");
-        if (settingsFile.exists()) {
-            try (java.io.FileInputStream fis = new java.io.FileInputStream(settingsFile)) {
-                settings.load(fis);
-                homeLocation = settings.getProperty("home.location",
-                    settings.getProperty("default.transit.location", homeLocation));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+        // Through Settings.load, never the file by name: this was the one read that ignored a
+        // check suite's scratch file, so a cold open in NavigationCheck showed the reader's
+        // own saved chart and Part K failed or passed depending on whose machine ran it (J14).
+        java.util.Properties settings = Settings.load();
+        homeLocation = settings.getProperty("home.location",
+            settings.getProperty("default.transit.location", homeLocation));
 
         // Both sides open at home rather than at whatever place was last generated,
         // which is what left the form showing one city beside another city's clock.

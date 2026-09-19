@@ -29,6 +29,10 @@ public final class CalCheck {
     private static final double[] STEPS = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0 };
 
     public static void main(String[] args) {
+        // A fresh install's settings and chart book, never the reader's. The engine reads the body
+        // selection, the transit orb and the node variant underneath this suite even where it never
+        // names Settings, so without this its answer depends on what the reader last saved (J14).
+        com.zodiacomputing.ourania.gui.Settings.useScratchFile();
         SwissEph sw = new SwissEph(EPHE_PATH);
 
         if (args.length > 0 && "years".equals(args[0])) {

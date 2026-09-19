@@ -451,13 +451,8 @@ public final class ChartSetupCheck {
         final ChartSetupPanel[] cp = new ChartSetupPanel[1];
         SwingUtilities.invokeAndWait(() -> cp[0] = new ChartSetupPanel(rec));
 
-        java.io.File live = new java.io.File("saved_charts.properties");
-        java.io.File kept = null;
-        if (live.exists()) {
-            kept = java.io.File.createTempFile("book", ".bak");
-            java.nio.file.Files.copy(live.toPath(), kept.toPath(),
-                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-        }
+        // The two charts go into the scratch book useScratchFile set up; the reader's book is
+        // never addressed, so it no longer needs setting aside and putting back.
         try {
             SavedCharts.put("SuiteA", "1955-04-18", "09:30", "Bern, CH",
                 com.zodiacomputing.ourania.astro.Rodden.X, "", "");
@@ -527,11 +522,6 @@ public final class ChartSetupCheck {
             SavedCharts.remove("SuiteA");
             SavedCharts.remove("SuiteB");
         } finally {
-            if (kept != null) {
-                java.nio.file.Files.copy(kept.toPath(), live.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                kept.delete();
-            }
             SwingUtilities.invokeAndWait(rec::dispose);
         }
     }

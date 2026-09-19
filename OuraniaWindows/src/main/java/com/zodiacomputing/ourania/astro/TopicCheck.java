@@ -34,6 +34,10 @@ public final class TopicCheck {
     private static int failures;
 
     public static void main(String[] args) {
+        // A fresh install's settings and chart book, never the reader's. The engine reads the body
+        // selection, the transit orb and the node variant underneath this suite even where it never
+        // names Settings, so without this its answer depends on what the reader last saved (J14).
+        com.zodiacomputing.ourania.gui.Settings.useScratchFile();
         SwissEph sw = new SwissEph(EPHE_PATH);
         double natalJd = new SweDate(NATAL_Y, NATAL_M, NATAL_D, NATAL_UT).getJulDay();
         ChartFrame f = ChartFrame.compute(sw, natalJd, NATAL_LAT, NATAL_LON, 'P', false, 0.0);

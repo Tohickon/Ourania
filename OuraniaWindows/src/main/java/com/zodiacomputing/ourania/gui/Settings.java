@@ -25,7 +25,7 @@ public final class Settings {
 
     /** Beside the working directory, which is where the app is launched from. */
     /**
-     * The reader's settings file - or, for a check suite, a scratch copy of it.
+     * The reader's settings file - or, for a check suite, a scratch file standing in for it.
      *
      * <b>The suites were writing this file, and one of them overwrote a saved birth
      * chart.</b> settings.properties held David's natal data; a run of NavigationCheck left it
@@ -37,7 +37,8 @@ public final class Settings {
      * Per-suite discipline is not the fix, because the writes happen four layers down from
      * anything a suite can see: generating a chart persists it, and generating a chart is what
      * half these panels do when they are built. So the path itself is redirectable, and the
-     * suites point it at a temporary copy. A check cannot damage what it cannot address.
+     * suites point it at a temporary file that starts empty (see useScratchFile). A check cannot
+     * damage what it cannot address, nor depend on what it cannot read.
      *
      * The application never sets this property, so it always gets the real file.
      */
@@ -75,36 +76,49 @@ public final class Settings {
 
     /** Everything currently on disk, or an empty set if there is no file yet. */
     /**
-     * Points this process at a scratch copy of the reader's settings.
+     * Points this process at a fresh install's settings and chart book, for check suites.
      *
-     * <b>For check suites, and the reason is a repair rather than a precaution.</b> A run of
-     * NavigationCheck left settings.properties holding the suite's fixture birth data instead
-     * of David's - 1972-09-22 in Los Angeles where 1982-08-10 in Philadelphia had been - and
-     * separately `aspects.enabled` was found written empty, which this file reads as "the
-     * reader unticked every aspect" and which then failed three checks against correct code.
+     * <b>It used to copy the reader's settings, and that was the defect J14 names.</b> It was
+     * written to stop suites <i>writing</i> the reader's file - a run of NavigationCheck left
+     * settings.properties holding the suite's fixture birth data, and {@code aspects.enabled} was
+     * once found written empty - and it did stop that. But a copy carries the reader's choices
+     * in with it, so every suite answered for whatever the reader had last saved: on 2026-09-18
+     * ten suites were red because David had selected only the ten planets and the Ascendant and
+     * set the transit orb to 0.25, and every one of them failed identically on the commit
+     * before. A suite that goes red when the reader changes a preference cannot say whether the
+     * code is right.
      *
-     * The writes are not something a suite can simply refrain from: generating a chart
-     * persists it, and building half these panels generates a chart. Copying the file and
-     * redirecting to the copy is the only version of this that cannot be forgotten in one
-     * place. There is no cache to invalidate - load() reads the file every time.
+     * <b>So the scratch file now starts empty</b> - exactly what a fresh install reads, every
+     * key at its default. A suite that needs a particular setting sets it. The chart book is
+     * redirected to an empty scratch book the same way, so nothing a suite does can reach the
+     * reader's saved charts either (see {@link SavedCharts#FILE_PROPERTY}).
+     *
+     * Call it first in every suite's {@code main}. The engine reads settings underneath code
+     * that never names them - ChartFrame reads the body selection, the transit orb and the node
+     * variant are settings - so a suite with no Settings reference in it is not a suite that
+     * does not depend on them. SettingsIsolationCheck holds every suite to the call.
      */
     public static void useScratchFile() {
         try {
-            File real = new File("settings.properties");
             File scratch = File.createTempFile("ourania-settings-", ".properties");
             scratch.deleteOnExit();
-            if (real.exists()) {
-                java.nio.file.Files.copy(real.toPath(), scratch.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            // Empty is a fresh install. Deliberately not a copy: see above.
+            File book = File.createTempFile("ourania-charts-", ".properties");
+            book.deleteOnExit();
+            if (!book.delete()) {
+                // An absent book is a fresh install's; an empty file would read the same, but
+                // absent is the state SavedCharts is written to start from.
+                throw new java.io.IOException("could not clear the scratch chart book");
             }
             System.setProperty(FILE_PROPERTY, scratch.getAbsolutePath());
+            System.setProperty(SavedCharts.FILE_PROPERTY, book.getAbsolutePath());
             // The file underneath has changed identity, so anything parsed from the old one is
             // now the wrong answer.
             forget();
         } catch (Exception ex) {
-            // A suite that cannot get a scratch file must not silently write the real one.
+            // A suite that cannot get a scratch state must not silently use the reader's.
             throw new IllegalStateException(
-                "could not isolate settings.properties for this run", ex);
+                "could not isolate settings.properties and the chart book for this run", ex);
         }
     }
 

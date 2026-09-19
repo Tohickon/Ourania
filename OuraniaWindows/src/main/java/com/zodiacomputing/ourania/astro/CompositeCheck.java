@@ -1,6 +1,7 @@
 package com.zodiacomputing.ourania.astro;
 
 import com.zodiacomputing.ourania.gui.ChartMode;
+import com.zodiacomputing.ourania.gui.Settings;
 import com.zodiacomputing.ourania.gui.SkymapPanel;
 import de.thmac.swisseph.SweDate;
 import de.thmac.swisseph.SwissEph;
@@ -23,6 +24,9 @@ public final class CompositeCheck {
     private static int checks = 0;
 
     public static void main(String[] args) {
+        // Never the reader's own settings file: a suite that generates a chart persists it,
+        // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
+        Settings.useScratchFile();
         System.out.println("build: " + CompositeCheck.class.getProtectionDomain().getCodeSource().getLocation());
         System.out.println("=== Part A: Composite Checks ===");
         int before = failures.size();

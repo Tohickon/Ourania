@@ -1,6 +1,7 @@
 package com.zodiacomputing.ourania.astro;
 
 import com.zodiacomputing.ourania.gui.ChartMode;
+import com.zodiacomputing.ourania.gui.Settings;
 import com.zodiacomputing.ourania.gui.SkymapPanel;
 import de.thmac.swisseph.SweDate;
 import de.thmac.swisseph.SwissEph;
@@ -49,6 +50,9 @@ public final class HarmonicCheck {
     private static final double PANEL_TOL = 1e-4;
 
     public static void main(String[] args) {
+        // Never the reader's own settings file: a suite that generates a chart persists it,
+        // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
+        Settings.useScratchFile();
         System.out.println("=== Part A: the map ===");
         int before = failures.size();
         theMap();
