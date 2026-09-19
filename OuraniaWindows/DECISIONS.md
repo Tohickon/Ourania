@@ -256,6 +256,123 @@ behind this same decision.
 
 ---
 
+## K11 — The interpretive hierarchy · **DECIDED 2026-09-19, NOT YET BUILT**
+
+**Decision (David, 2026-09-19).** Every interpretation is built from the macro foundation down
+to the micro nuance, in four levels:
+
+| Level | Holds | Scope | Job |
+|---|---|---|---|
+| **1. Foundation** | The **planet** (the actor), the **house** (the arena) and the **sign** (the costume: element, modality, essential dignity - domicile or exaltation). **Major Arcana** card for the planet and sign. | 30° | What drive, where in life, and in what style |
+| **2. Geometry** | **Aspects** to other bodies, and contacts with the **angles** (Ascendant, Midheaven) | orbs | The conversations and triggers |
+| **3. Refinement** | **Triplicity** and **terms/bounds**, then the **decan** (10°) with its sub-ruler - "middle management", a sub-flavour that never changes the sign. The decan's **Minor Arcana pip** card (2-10) sits here. | 10° and the bounds | Sub-rulers that refine the expression |
+| **4. Fine detail** | The **Sabian symbol** and **degree meaning** (1°), and the **lunar mansion** (~12°51') | 1° / 12°51' | Poetic imagery for the exact degree; the ambient setting |
+
+**Tarot is inside the hierarchy, not beside it** (Golden Dawn): the Major Arcana map to planets
+and signs (Level 1), the 36 numbered pips to the 36 decans (Level 3).
+
+**Lunar mansions are atmosphere, not character.** They are chiefly activated by the transiting
+Moon (electional and horary timing - Avelar & Ribeiro, *On the Heavenly Spheres*). So:
+- **the natal Moon** - its mansion is the instinctual habitat and emotional baseline, and carries
+  real weight;
+- **every other natal body** - its mansion is the landscape the story takes place in, a faint
+  thematic colour that never alters the planet's function or dignity;
+- **a transiting Moon** - the mansion leads, as the weather of the day.
+
+**Where it applies: the Interpretation tab only** (David: "all the info should stay the same when
+an object or area is selected ... the hierarchy should just be in interpretation tab"). The
+selection pane keeps every section and its current order.
+
+That matters because the two share their source: the selection pane is cut from
+`InterpretationPanel.generatePlanetHtml` (through `OuraniaWindow.planetReadingHtml`), the same
+method that renders the tab. So `generatePlanetHtml` itself is **not reordered**. The hierarchy
+is a layer over it in the tab alone - it takes the same sections and arranges them, the way
+`SkymapPanel.selectionHtml` already cuts and folds them - so the two surfaces can never disagree
+about a word of prose, only about its order. Anything added for the hierarchy (element, modality,
+dignity, triplicity, bounds) is added in that layer, not in the shared method.
+
+**How the reading presents it.** No level headings in the main reading - a stack of labelled
+tiers is tiring to read. The main view is **one continuous account in hierarchy order**, and a
+collapsible **Layer breakdown** below it shows the four levels explicitly for anyone inspecting
+the stack.
+
+**Two things built differently from how they were first put, and why:**
+- *"One synthesised paragraph."* The app will not **write** new prose to join the layers: 600,000+
+  entries already make authored and generated text hard to tell apart, which is what C7 is about.
+  The main account is **assembled from the opening sentences of each layer's own entry**, in
+  hierarchy order; every sentence in it is still one somebody wrote.
+- *"Mansion +1, domicile +5, angularity +5."* Those figures assume a points system this engine
+  does not have. The **principle** is adopted - a non-Moon mansion is a faint colour that can never
+  outvote a Level 1 or 2 fact - and is set against K8's actual weights (lights and angles 5.0,
+  conjunction 3.0, and so on), measured, not guessed.
+
+**Synthesis weighting follows the same order**: what the synthesis says is ranked Level 1 first,
+Level 4 last, and no quantity of Level 4 detail can outrank a single Level 1 or 2 fact - the same
+guarantee K8 gives minor bodies against the major ones.
+
+**Already in place above and beyond the planet.** The chart-wide layer - hemispheres, element and
+modality balance, chart shape, sect, the chart ruler - is L5's Gestalt and opens the synthesis;
+aspect patterns (T-squares, grand trines, kites) are computed and lead the placements list; the
+timing layer - transits, progressions, solar arcs, profections, releasing - is F1-F7. K11 orders
+the planet reading inside that frame; it does not rebuild the frame.
+
+**What the planet reading lacks today, measured 2026-09-19** (`InterpretationPanel.generatePlanetHtml`):
+the house and the aspects come last, after all the Level 4 detail; the sign section states no
+element, modality or essential dignity; triplicity and bounds are not in it at all (they have
+their own pages); the mansion is written as a trait for every body; and the tarot sits after
+everything as its own section.
+
+---
+
+## K12 — The predictive pipeline and the Rule of Three · **DECIDED 2026-09-19, NOT YET BUILT**
+
+**Decision (David, 2026-09-19).** Prediction is a noise filter. On any day there are dozens of
+minor transits, and treating each as a prediction produces contradictions daily. A major event
+is only predicted when **at least three independent techniques name the same theme in the same
+window** - the classical Rule of Three - through four stages:
+
+1. **Macro time-lord filter (annual profections).** The Ascendant advances one sign a year; the
+   ruler of that sign is **Lord of the Year** and its house is the year's **topic**. The lord
+   and its houses carry a **3x** multiplier. A transit involving the lord, or through the
+   profected house, is a **primary driver**; an **un-activated transit is background noise**.
+2. **Internal growth (secondary progressions)** - a day for a year; the **progressed Moon** as
+   the mid-term clock; progressed-to-natal and progressed-to-progressed aspects at a **tight
+   orb (1° or less)**. An active progression is the "loaded gun".
+3. **External catalyst (transits).** Slow bodies (Jupiter to Pluto) making conjunctions, squares
+   and trines to **active** natal or progressed points; **fast catalysts** (Mars, the Sun,
+   stations, eclipses) to **date** the event. A transit to an inactive point passes with
+   little notice; one to a point already active in progressions or profections triggers.
+4. **Theme convergence matrix.** Everything is gathered into **theme buckets** - Career and
+   status (10th, MC, Saturn, Sun, the 10th's lord), Relationship (7th, DSC, Venus, Lot of Eros,
+   the 7th's lord), Health and vitality (1st, 6th, ASC, Mars, Sun, Moon), Home and relocation
+   (4th, IC, Moon, Mercury, 3rd/9th) - and a headline is only promoted when **three
+   testimonies** agree; otherwise it is a background trend.
+
+**Measured against the engine, 2026-09-19.** Much of this exists as L8 (`astro.Convergence`,
+K8) and L6 (`astro.Topics`); the pipeline is a reorganisation and three additions, not a rewrite.
+
+| Stage | Already built | Missing |
+|---|---|---|
+| 1 | `Profection`: lord of the year and house; the lord is a witness, and a witness whose moving body is the lord is multiplied (K8). Zodiacal releasing gates every witness: L1 lord x3, L2 x2, peak x2.5, loosing x4. | Transits **through the profected house**, and transits **to** the lord, as primary; un-activated transits **demoted** rather than voting equally. |
+| 2 | `Progressions` and `SolarArc` vote at their **dated moment of exactness** - stricter than a 1° orb, and chosen because a contact stays within orb about two years. | The **progressed Moon** as its own clock; progressed-to-progressed aspects. |
+| 3 | Slow-body transits vote when they **perfect** in the window (the orb is weather, the perfection is the event); eclipses and stations are families; a station duplicating a transit is discounted, not double-counted. | "Transit to an **active** point triggers": today every perfection votes whether or not its target is active. **Mars and the Sun as date-pinpointers** - excluded as voters on purpose (the Sun conjuncts every natal point every year and so agrees with everything), and should stay excluded as voters but be used to date a converged event. |
+| 4 | Convergence counts distinct **families** per natal point ("two transits to the same point are one witness, not two"), with thresholds relative to the chart's own distribution. `Topics` groups houses, rulers and significators into topics by three witnesses - for the natal chart. | **Theme buckets** for timing (grouping by theme, not by single natal point) and the **Rule of Three gate** as the headline test, with its testimonies listed. |
+
+**Built differently from how the spec puts it, and why:**
+- *The score (profection +1.5, progression +1.0, transit +1.0; confidence >= 3).* The rule is
+  adopted - **three independent testimonies**, counted by family as now - but the points are not
+  bolted on beside K8's weights; the gate is on the count of independent families agreeing on a
+  theme, and K8's weights keep ranking within it.
+- *The headline text* ("Major Career Elevation & Recognition Expected"). A converged theme will
+  be **named and its testimonies listed**, but the app will not write new predictive prose: the
+  same C7 reason as K11.
+
+**Order of work, when it is taken up:** theme buckets over Convergence's per-point targets
+(stage 4), then the activation filter (stages 1 and 3), then the progressed Moon clock (stage 2),
+then Mars/Sun dating of converged themes.
+
+---
+
 ## What these change about the audit
 
 Three items close with no work, one of them only needing a label. Six become buildable. Nothing here is still waiting on a
