@@ -15,6 +15,10 @@ public class InterpretationPanel extends JPanel {
     private JScrollPane scrollPane;
     private SwissEph sw;
 
+    public JEditorPane getEditorPane() {
+        return editorPane;
+    }
+
     /** True while showing the report tier, whose &lt;pre&gt; must be allowed to overflow. */
     private boolean preformatted;
 

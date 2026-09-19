@@ -52,13 +52,16 @@ copy of the build instructions or the layer status here would be exactly that de
 Summarized from `ourania-build-and-run.md`, which is authoritative if these disagree:
 
 ```bash
-java -cp src\main\java com.zodiacomputing.ourania.gui.OuraniaWindow
+java -cp "src\main\java;lib\*" com.zodiacomputing.ourania.gui.OuraniaWindow
 ```
 
 - The app runs from `src\main\java`, **not** `out\`. The `out\` directory is stale and is
   not what executes.
 - No JDK on PATH. The only one is `C:\Program Files\Android\Android Studio\jbr\bin\javac.exe`.
 - **Do not glob** `astro\*.java` alone — it fails with ~89 errors. Compile both packages
-  together with `-cp src\main\java`.
+  together with `-cp "src\main\java;lib\*"`.
+- **`lib\*` is on every classpath** since the PDF report brought `lib\openpdf.jar`
+  (2026-09-18). A `javac` without it fails on `ChartExporter`; a `java` without it runs,
+  but the PDF export can only say the library is missing.
 - Writing source files with PowerShell's `Set-Content -Encoding utf8` emits a BOM and
   `javac` rejects it. Use `[System.IO.File]::WriteAllText` with `UTF8Encoding $false`.

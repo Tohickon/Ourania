@@ -18,9 +18,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfTemplate;
+import com.lowagie.text.pdf.PdfWriter;
 
 /**
  * Everything that lets a chart leave the application.
@@ -222,6 +228,206 @@ public final class ChartExporter {
             } catch (PrinterException e) {
                 warn(parent, "Could not print: " + e.getMessage());
             }
+        }
+    }
+
+    /**
+     * The chart wheel on the first page, then the reading paginated after it.
+     *
+     * Added by Antigravity on 2026-09-16 for B3. Page 0 fits the wheel into the imageable area;
+     * every later page delegates to the editor pane's own printable, which lays the reading out
+     * at the page's width.
+     */
+    private static class ReportPrintable implements Printable {
+        private final Component chart;
+        private final Printable textPrintable;
+
+        ReportPrintable(Component chart, JEditorPane editorPane) {
+            this.chart = chart;
+            this.textPrintable = editorPane.getPrintable(null, null);
+        }
+
+        @Override
+        public int print(java.awt.Graphics g, PageFormat page, int index) throws PrinterException {
+            if (index == 0) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.translate(page.getImageableX(), page.getImageableY());
+                double sx = page.getImageableWidth() / chart.getWidth();
+                double sy = page.getImageableHeight() / chart.getHeight();
+                double s = Math.min(sx, sy);
+                g2.translate((page.getImageableWidth() - chart.getWidth() * s) / 2.0,
+                             (page.getImageableHeight() - chart.getHeight() * s) / 2.0);
+                g2.scale(s, s);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+                paintWhole(chart, g2);
+                return Printable.PAGE_EXISTS;
+            } else {
+                return textPrintable.print(g, page, index - 1);
+            }
+        }
+    }
+
+    /** True when the pane holds any reading text, rather than the empty skeleton of one. */
+    static boolean hasReading(JEditorPane editorPane) {
+        if (editorPane == null) {
+            return false;
+        }
+        // <b>Not getText().isEmpty().</b> An HTML pane with nothing in it still returns
+        // "<html><head></head><body></body></html>", so that test was never true and an empty
+        // reading would have exported as a wheel with nothing after it. The document's own text
+        // is the honest answer.
+        javax.swing.text.Document doc = editorPane.getDocument();
+        try {
+            return !doc.getText(0, doc.getLength()).trim().isEmpty();
+        } catch (javax.swing.text.BadLocationException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Prints the chart wheel followed by the reading, through the system print dialog.
+     *
+     * <b>This is the paper half of B3, not B7.</b> It arrived labelled B7, which on the master
+     * list is report templates and branding. The printer path is Java2D end to end, so the glyphs
+     * survive here without the outline treatment the PDF needs.
+     */
+    static void printReading(Component parent, final Component chart, final JEditorPane editorPane) {
+        if (!hasReading(editorPane)) {
+            warn(parent, "There is no reading to print.");
+            return;
+        }
+        if (chart == null || chart.getWidth() <= 0) {
+            warn(parent, "The chart has not been drawn yet.");
+            return;
+        }
+        PrinterJob job = PrinterJob.getPrinterJob();
+        job.setJobName("Ourania Report");
+        job.setPrintable(new ReportPrintable(chart, editorPane));
+        if (job.printDialog()) {
+            try {
+                job.print();
+            } catch (PrinterException e) {
+                warn(parent, "Could not print: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Whether the report's pages are drawn into the PDF as outlines rather than as PDF text.
+     *
+     * <b>Outlines, because PDF text lost every glyph.</b> The PDF's own text path maps each AWT
+     * font to one standard face - Helvetica - which has no astrological symbols, so they were
+     * dropped without a trace. Measured 2026-09-16 on a real reading: the wheel page had no sign
+     * glyph, no planet glyph and no decan or bound glyph, and the reading lost the ruler glyph
+     * beside each name. Outlines are Java's own rendering of the same composite font the screen
+     * uses, so the page shows what the reader saw.
+     *
+     * The cost, also measured, on a six-page reading: 1.38 MB rather than 250 KB, and text that
+     * cannot be selected or searched. False keeps selectable text and loses the glyphs again.
+     */
+    static final boolean PDF_TEXT_AS_OUTLINES = true;
+
+    /** A4 in PDF points, and the half-inch margin the report is laid out inside. */
+    static final float PDF_PAGE_W = 595.0f;
+    static final float PDF_PAGE_H = 842.0f;
+    private static final double PDF_MARGIN = 36.0;
+
+    /**
+     * Why this JVM cannot write a PDF, or null when it can.
+     *
+     * <b>The library is a jar in lib/, and the app was launched without it.</b> Run_Ourania.bat
+     * started the app with only src/main/java on the classpath, so the first PDF class touched
+     * threw NoClassDefFoundError - an Error, which a catch of Exception lets through, so the
+     * button did nothing at all. Asked up front instead, and answered in words.
+     */
+    static String pdfLibraryProblem() {
+        try {
+            Class.forName("com.lowagie.text.Document", false, ChartExporter.class.getClassLoader());
+            return null;
+        } catch (ClassNotFoundException | LinkageError e) {
+            return "The PDF library could not be found. Ourania needs lib\\openpdf.jar on its "
+                + "classpath - start it with Run_Ourania.bat, which includes lib\\*.";
+        }
+    }
+
+    /** B3. Saves the chart wheel and the reading as a PDF, through a save dialog. */
+    static void saveReadingPdf(Component parent, Component chart, JEditorPane editorPane) {
+        if (!hasReading(editorPane)) {
+            warn(parent, "There is no reading to save.");
+            return;
+        }
+        if (chart == null || chart.getWidth() <= 0) {
+            warn(parent, "The chart has not been drawn yet.");
+            return;
+        }
+        String problem = pdfLibraryProblem();
+        if (problem != null) {
+            warn(parent, problem);
+            return;
+        }
+        File file = chooseSaveFile(parent, "ourania-report.pdf", "PDF document", "pdf");
+        if (file == null) {
+            return;
+        }
+        try {
+            writeReadingPdf(chart, editorPane, file);
+        } catch (Exception | LinkageError e) {
+            // A PDF that failed half way is not a shorter PDF, it is a broken file under the name
+            // the reader chose; leaving it behind would look like success.
+            file.delete();
+            warn(parent, "Could not write the PDF: " + e.getMessage());
+        }
+    }
+
+    /**
+     * The report as a PDF file: the wheel, then the reading, and never a blank page.
+     *
+     * <b>Each page is drawn into a template and placed only if it exists.</b> The first version
+     * opened a new page before asking the printable whether there was one, so every export ended
+     * on an empty page - 7 pages for a 6-page report. Asking first with a throwaway graphics was
+     * tried and rejected: the reading's layout is fixed by whichever graphics lays it out first,
+     * and a 1-pixel image's font metrics ran words into each other wherever the text colour
+     * changed. A template is laid out by the PDF's own graphics and simply not placed when the
+     * printable says the page does not exist.
+     *
+     * Split from the dialog so it can be driven directly, by a check or by anything else.
+     */
+    static void writeReadingPdf(Component chart, JEditorPane editorPane, File file)
+            throws Exception {
+        ReportPrintable printable = new ReportPrintable(chart, editorPane);
+        PageFormat pf = new PageFormat();
+        java.awt.print.Paper paper = new java.awt.print.Paper();
+        paper.setSize(PDF_PAGE_W, PDF_PAGE_H);
+        paper.setImageableArea(PDF_MARGIN, PDF_MARGIN,
+            PDF_PAGE_W - 2 * PDF_MARGIN, PDF_PAGE_H - 2 * PDF_MARGIN);
+        pf.setPaper(paper);
+
+        Document document = new Document(new com.lowagie.text.Rectangle(PDF_PAGE_W, PDF_PAGE_H));
+        try (java.io.OutputStream out = new java.io.FileOutputStream(file)) {
+            PdfWriter writer = PdfWriter.getInstance(document, out);
+            document.open();
+            PdfContentByte cb = writer.getDirectContent();
+            for (int page = 0; ; page++) {
+                PdfTemplate template = cb.createTemplate(PDF_PAGE_W, PDF_PAGE_H);
+                Graphics2D g2 = PDF_TEXT_AS_OUTLINES
+                    ? template.createGraphicsShapes(PDF_PAGE_W, PDF_PAGE_H)
+                    : template.createGraphics(PDF_PAGE_W, PDF_PAGE_H);
+                int drawn;
+                try {
+                    drawn = printable.print(g2, pf, page);
+                } finally {
+                    g2.dispose();
+                }
+                if (drawn == Printable.NO_SUCH_PAGE) {
+                    break;
+                }
+                if (page > 0) {
+                    document.newPage();
+                }
+                cb.addTemplate(template, 0, 0);
+            }
+            document.close();
         }
     }
 

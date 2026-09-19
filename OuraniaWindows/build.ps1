@@ -67,7 +67,7 @@ $newestBefore = ($sources | Measure-Object -Property LastWriteTime -Maximum).Max
 # Exit code is the ONLY success signal. The previous version scanned output for the literal
 # "error:" and continued when it found none - so a javac failure that did not print that
 # string (internal error, OOM, unwritable -d) printed "Build OK" over a failed build.
-& $JAVAC -d $Out ($sources | Select-Object -ExpandProperty FullName)
+& $JAVAC -cp "lib\*" -d $Out ($sources | Select-Object -ExpandProperty FullName)
 $javacCode = $LASTEXITCODE
 if ($javacCode -ne 0) {
     Write-Host ""
@@ -102,7 +102,7 @@ if ($Suite -match '\.') {
 Write-Host ""
 Write-Host "Running $fq from $Out"
 Write-Host ""
-& $JAVA -cp $Out $fq
+& $JAVA -cp "$Out;lib\*" $fq
 $suiteCode = $LASTEXITCODE
 
 $newestAfter = (Get-ChildItem -Recurse "$SRC\*.java" |

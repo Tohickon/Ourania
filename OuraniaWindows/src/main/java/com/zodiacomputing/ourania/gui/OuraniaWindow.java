@@ -766,6 +766,20 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /** B3. The reading on screen with the chart wheel, as a PDF document. */
+    public void exportReadingPdf() {
+        if (interpretationPanel != null && skymapPanel != null) {
+            ChartExporter.saveReadingPdf(this, skymapPanel.chartComponent(), interpretationPanel.getEditorPane());
+        }
+    }
+
+    /** B3, on paper. Print the reading on screen with the chart wheel. */
+    public void printReading() {
+        if (interpretationPanel != null && skymapPanel != null) {
+            ChartExporter.printReading(this, skymapPanel.chartComponent(), interpretationPanel.getEditorPane());
+        }
+    }
+
     /**
      * One export, from the drawer's Export section.
      *
@@ -784,6 +798,8 @@ public class OuraniaWindow extends JFrame {
             case "COPY_POSITIONS":     copyPositions(); break;
             case "SAVE_POSITIONS":     savePositions(); break;
             case "SAVE_GRID":          exportAspectGrid(); break;
+            case "SAVE_READING_PDF":   exportReadingPdf(); break;
+            case "PRINT_READING":      printReading(); break;
             case "SAVE_READING":       exportReadingHtml(); break;
             case "SAVE_READING_TEXT":  exportReadingText(); break;
             case "COPY_READING":       copyReading(); break;

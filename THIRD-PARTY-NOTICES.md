@@ -59,6 +59,27 @@ covered by this notice.
 
 ---
 
+## OpenPDF
+
+Added 2026-09-18, with the PDF report (master list B3). The project's first library that is a
+dependency rather than vendored source.
+
+**Bundled at:** `OuraniaWindows/lib/openpdf.jar` — the unmodified binary jar, on the classpath of
+`build.ps1`, `Run_Ourania.bat` and the in-place compile.
+
+| | |
+|---|---|
+| Upstream | OpenPDF **1.3.30** (`com.github.librepdf:openpdf`), a fork of iText 4 |
+| Licence | **Dual**: GNU LGPL 2.1, **or** Mozilla Public Licence 2.0 — as declared in the jar's own `Bundle-License` manifest entry |
+| Integrity | SHA-1 `349778353ca669596888d4bff55fb05595c5a497`, identical to the checksum Maven Central publishes for this version (verified 2026-09-16) |
+
+The jar carries its own licence texts under `META-INF/` (`LICENSES.md`, `misc_licenses.txt`,
+and `APACHE-LICENSE-2.0.txt` for components it includes). What the licences require of a
+distribution is part of the same undecided question as the section above: nothing is distributed
+yet, and this records the facts rather than settling anything.
+
+---
+
 ## Status
 
 **UNDECIDED — and not yet urgent, because nothing has been distributed.**

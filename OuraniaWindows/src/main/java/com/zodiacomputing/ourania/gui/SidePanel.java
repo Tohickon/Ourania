@@ -151,6 +151,10 @@ public final class SidePanel extends JPanel {
             "The same positions as a .tsv file"));
         export.add(exportButton("Save Aspect Grid", "SAVE_GRID",
             "The aspect grid as an HTML table"));
+        export.add(exportButton("Save Reading as PDF", "SAVE_READING_PDF",
+            "The reading on screen with the chart wheel, as a PDF document"));
+        export.add(exportButton("Print Reading", "PRINT_READING",
+            "Print the reading on screen with the chart wheel"));
         export.add(exportButton("Save Reading", "SAVE_READING",
             "The reading on screen, as an HTML document"));
         export.add(exportButton("Save Reading as Text", "SAVE_READING_TEXT",
