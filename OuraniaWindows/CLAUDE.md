@@ -7,32 +7,35 @@ Vault root: `C:\Users\daver\Documents\BRAIN\Brain`
 
 | Read this | Path in vault |
 |---|---|
-| **Start here — live state, and who touched what last** | `HANDOVER.md` (vault root) |
+| **Start here — where the app stands, and what changed last** | `HANDOVER.md` (vault root), its first section |
+| **Progress, item by item** | the master checklist: https://claude.ai/code/artifact/eebb7efe-e625-4f24-a8d4-8c51d71986d4 |
 | **The project doc** | `Projects/astrology-app/CLAUDE.md` |
 | **The open work** | `Projects/astrology-app/Process/WORK-PLAN.md` |
 | Build and run gotchas | `Resources/wiki/ourania-build-and-run.md` |
 | Layer specs L0–L9 | `Projects/astrology-app/Process/` |
-| Session logs | `Resources/sessions/2026-08-*-ourania-*.md` |
+| Session notes, one per change | `Resources/sessions/*-ourania-handover-*.md` |
+| How sessions work alongside each other | `Resources/wiki/two-agents-one-repo.md` |
 
 The `obsidian-vault` MCP server reads these directly (`vault_read`), and it is the better
 path — the notes carry links and backlinks that the filesystem does not. If that server
 isn't connected, the paths above are plain files on disk.
 
-## You are not the only agent here
+## Other sessions work here too
 
-This project is also worked by **Google Antigravity**, editing the same tree and the same vault,
-with no visibility of your changes or you of its. **Read `HANDOVER.md` first and update it last.**
+David sometimes runs more than one Claude session, and no session can see what another did except
+through git, the vault's `HANDOVER.md` and the notes in `Resources/sessions/`. (Google Antigravity
+worked this tree until 2026-09-16 and was retired on 2026-09-19.) So:
 
-Three rules, in full at `Resources/wiki/two-agents-one-repo.md`:
+- **Read `HANDOVER.md` first and update it last.** Its first section, *Where the app stands*, is
+  kept current for exactly this reader. Give every change its own session note.
+- **Uncommitted changes you did not make are someone's work in progress.** Look before building
+  on them, and commit only your own files, by name.
+- **Never rewrite a shared data file — splice into it**, or put new bulk content in its own file
+  and add it to `InterpretationService.EXTRA_FILES`.
+- **Run the check suites after touching anything shared, and measure a red suite against the
+  previous commit before believing it is yours** — the suites inherit David's saved settings.
 
-1. **Never rewrite a shared data file — splice into it**, or put new bulk content in its own file
-   and add it to `InterpretationService.EXTRA_FILES`. A wholesale rewrite of `extra_bodies.json`
-   on 2026-08-13 deleted 192 entries belonging to the other agent, silently.
-2. **Run the check suites after touching anything shared** — twelve of them, 47,329 checks. They
-   are the only channel between two agents who never talk. A check suite caught that deletion;
-   nothing else would have.
-3. **Read `Resources/sessions/` before logging anything as open or unbuilt.** It may already be
-   done.
+The rules, and the incidents that earned each one, are in `Resources/wiki/two-agents-one-repo.md`.
 
 ## Why the split
 
