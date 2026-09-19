@@ -331,7 +331,7 @@ everything as its own section.
 
 ---
 
-## K12 — The predictive pipeline and the Rule of Three · **STAGE 4 BUILT 2026-09-19; stages 1-3 to come**
+## K12 — The predictive pipeline and the Rule of Three · **STAGE 4 AND THE ACTIVATION FILTER BUILT 2026-09-19**
 
 > **Stage 4 built:** `astro.ThemeConvergence` pools `Convergence.collect`'s per-point targets into
 > the four themes (named points, the rulers of the theme's houses, and those houses' occupants),
@@ -339,8 +339,13 @@ everything as its own section.
 > points counted once - adds the profection family when the year falls on a theme's house, and
 > makes a theme a **headline only at three**. The synthesis's timing section opens with it,
 > headlines with their testimonies listed, the rest as background trends. `ThemeConvergenceCheck`
-> 18; three mutations caught. **Next:** the activation filter (stages 1 and 3), the progressed
-> Moon clock (stage 2), then Mars/Sun dating.
+> 18; three mutations caught (`1b1d52ab`).
+>
+> **The activation filter built** (`de9972a5`): a point is active if it is the lord of the
+> year, sits in the profected sign, or is reached by a progression or solar arc in the window;
+> transits, stations and eclipses testify only to active points, and are otherwise listed as
+> background and not counted. **Still to come:** the progressed Moon as its own clock (stage 2),
+> then Mars/Sun dating of a converged theme.
 
 **Decision (David, 2026-09-19).** Prediction is a noise filter. On any day there are dozens of
 minor transits, and treating each as a prediction produces contradictions daily. A major event
