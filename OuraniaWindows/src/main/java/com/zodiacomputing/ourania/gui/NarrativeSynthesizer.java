@@ -59,6 +59,20 @@ public class NarrativeSynthesizer {
      * composite are the standard timing technique for a relationship chart.
      */
     public static String generateReport(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked, Themes.Result t, ChartFrame tf, Profection prof, List<Transits.Hit> hits, YearScan scan, List<Convergence.Target> convergence, boolean withTime, boolean relationship) {
+        // <b>Nothing selected is a state the reader can reach, and it has to be said, not thrown.</b>
+        // Settings has a None for every section, and with every body off the ranking is empty:
+        // the lead body below was ranked.get(0), so Synthesize threw IndexOutOfBounds, and
+        // showReading only prints a stack trace - the button simply did nothing. Found 2026-09-19
+        // when AspectGridCheck, isolated from David's settings by J14, left the selection empty.
+        if (ranked == null || ranked.isEmpty()) {
+            return "<html><body style='font-family: sans-serif; font-size: 14px; margin: 15px;"
+                + " color: #E0E0E0; background-color: #000000;'>"
+                + "<h1 style='color: #FFFFFF;'>Chart Synthesis</h1>"
+                + "<p>There is nothing to synthesize: no planets or points are selected. Turn some"
+                + " on under Settings, Chart Points, and synthesize again.</p>"
+                + "</body></html>";
+        }
+
         StringBuilder sb = new StringBuilder();
         InterpretationService svc = InterpretationService.getInstance();
         boolean isDiurnal = g.diurnal;

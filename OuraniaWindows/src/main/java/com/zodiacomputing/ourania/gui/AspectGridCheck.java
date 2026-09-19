@@ -888,8 +888,13 @@ public final class AspectGridCheck {
         try {
             compositeWithEveryBodyOn();
         } finally {
+            // <b>Absent is put back as absent.</b> An empty value is not "no preference" - it
+            // is Select none (see Settings.loadBodySelection) - so writing "" here left every
+            // later part running with no bodies at all. On David's machine the key always
+            // existed and this branch never ran; on a fresh install (J14) it emptied the chart
+            // and Part Q's six syntheses all threw.
             if (savedBodies == null) {
-                Settings.set(Settings.BODIES_KEY, "");
+                Settings.update(p -> p.remove(Settings.BODIES_KEY));
             } else {
                 Settings.set(Settings.BODIES_KEY, savedBodies);
             }
@@ -1035,8 +1040,18 @@ public final class AspectGridCheck {
                     html = NarrativeSynthesizer.generateReport(
                         f, g, ranked, themes, tf, prof, hits, null, null, withTime, rel);
                 } catch (Throwable ex) {
+                    // Where, not just what: "Index 0 out of bounds for length 0" alone names
+                    // no line, and this failure sat unexplained for a day on exactly that.
+                    String at = "";
+                    for (StackTraceElement e : ex.getStackTrace()) {
+                        if (e.getClassName().startsWith("com.zodiacomputing.")) {
+                            at = " at " + e.getClassName().replaceAll(".*\\.", "") + "."
+                                + e.getMethodName() + ":" + e.getLineNumber();
+                            break;
+                        }
+                    }
                     failures.add("Part Q: synthesis threw for " + label + " - "
-                        + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+                        + ex.getClass().getSimpleName() + ": " + ex.getMessage() + at);
                     checks++;
                     continue;
                 }
@@ -1114,6 +1129,38 @@ public final class AspectGridCheck {
         // went red on complete data.
         System.out.println("  relationship reports that had to borrow natal wording: "
             + borrowed[0] + " (0 means composite pair prose is complete)");
+
+        // <b>And with every body switched off.</b> Settings has a None per section, so this is a
+        // chart a reader can ask to have synthesized. It threw IndexOutOfBounds on the empty
+        // ranking, and the button did nothing; it must say why there is nothing to read.
+        String kept = Settings.get(Settings.BODIES_KEY, null);
+        try {
+            Settings.set(Settings.BODIES_KEY, "");
+            ChartFrame none = ChartFrame.compute(sw, jdA, 41.8781, -87.6298, 'P', false, 0.0);
+            Gestalt.Result ng = Gestalt.compute(none);
+            java.util.List<BodyScore.Vector> nr = BodyScore.rank(none, ng);
+            ok("Part Q: with nothing selected the ranking really is empty, so this tests the case",
+                nr.isEmpty());
+            String html = null;
+            String threw = "";
+            try {
+                html = NarrativeSynthesizer.generateReport(none, ng, nr,
+                    Themes.extract(none, ng, nr), null, null, null, null, null, false, false);
+            } catch (Throwable ex) {
+                threw = ex.getClass().getSimpleName() + ": " + ex.getMessage();
+            }
+            ok("Part Q: with nothing selected the synthesis does not throw " + threw,
+                threw.isEmpty());
+            ok("Part Q: with nothing selected the synthesis says so, and where to fix it",
+                html != null && html.contains("nothing to synthesize")
+                    && html.contains("Chart Points"));
+        } finally {
+            if (kept == null) {
+                Settings.update(p -> p.remove(Settings.BODIES_KEY));
+            } else {
+                Settings.set(Settings.BODIES_KEY, kept);
+            }
+        }
     }
 
     private static void triWheelSidePanel() throws Exception {
