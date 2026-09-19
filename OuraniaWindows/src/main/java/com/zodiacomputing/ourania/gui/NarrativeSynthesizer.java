@@ -394,6 +394,40 @@ public class NarrativeSynthesizer {
         if (relationship) {
             sb.append("<p><i>Convergence is scanned across a profection year, which a composite does not have. See the note above.</i></p>");
         } else if (withTime && scan != null && convergence != null) {
+            // K12, stage 4: the year by theme, and the Rule of Three. A theme is only a headline
+            // when three independent techniques name it; the rest are background trends. The
+            // testimonies are the witnesses' own details - named and listed, never written up.
+            List<com.zodiacomputing.ourania.astro.ThemeConvergence.Result> themes =
+                com.zodiacomputing.ourania.astro.ThemeConvergence.themes(f, prof, convergence);
+            sb.append("<h3 style='color: #FFFFFF;'>The year by theme (the Rule of Three)</h3>");
+            boolean anyHeadline = false;
+            for (com.zodiacomputing.ourania.astro.ThemeConvergence.Result th : themes) {
+                if (!th.headline()) {
+                    continue;
+                }
+                anyHeadline = true;
+                sb.append("<p><b style='color:#FFD166;'>").append(th.theme.label)
+                    .append("</b> &middot; ").append(th.families.size())
+                    .append(" independent testimonies</p><ul>");
+                for (String line : th.testimonies) {
+                    sb.append("<li>").append(line).append("</li>");
+                }
+                sb.append("</ul>");
+            }
+            if (!anyHeadline) {
+                sb.append("<p>No theme reaches three independent testimonies this year.</p>");
+            }
+            StringBuilder trends = new StringBuilder();
+            for (com.zodiacomputing.ourania.astro.ThemeConvergence.Result th : themes) {
+                if (!th.headline() && !th.families.isEmpty()) {
+                    trends.append(trends.length() == 0 ? "" : "; ").append(th.theme.label)
+                        .append(" (").append(th.families.size()).append(")");
+                }
+            }
+            if (trends.length() > 0) {
+                sb.append("<p style='color:#AAAAAA;'><i>Background trends:</i> ").append(trends)
+                    .append("</p>");
+            }
             sb.append("<p>Upcoming significant convergence events across the current profection year:</p><ul>");
             for (Convergence.Target target : convergence) {
                 if (target.score > 0.0) {
