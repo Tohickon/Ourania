@@ -209,6 +209,97 @@ public final class GlobeCheck {
         }
         yes("dragging cannot tip the globe past its pole",
             Math.abs(g.pitch) <= Globe.MAX_PITCH + 1e-9);
+
+        // <b>Nor under the chart.</b> David, 2026-09-18: "the chart when in globe mode has the
+        // houses going the wrong direction". The clamp was symmetric, so one upward drag put the
+        // camera beneath the chart's plane, where the houses and the signs both read clockwise
+        // and house 1 sits above the horizon - the chart in a mirror.
+        for (int i = 0; i < 200; i++) {
+            g.drag(0, -40, 800);
+        }
+        yes("dragging the other way stops above the chart's plane: pitch " + g.pitch,
+            g.pitch >= Globe.MIN_PITCH - 1e-9 && g.pitch > 0);
+        try {
+            housesTurnTheRightWay();
+        } catch (Exception e) {
+            yes("the house labels can be placed to be measured: " + e, false);
+        }
+    }
+
+    /**
+     * At every tilt a drag can reach, the houses run counterclockwise as the reader sees them.
+     *
+     * <b>Measured on the screen, through the real label placement.</b> Each house number is put
+     * where GlobeRenderer puts it and projected through the camera; the signed turn from house 1
+     * round to house 12 is summed about the projected centre. Screen y runs down, so a chart that
+     * reads the right way - counterclockwise, as on the flat wheel - totals -360 degrees, and a
+     * mirrored one +360. Equal houses from an Ascendant at 0 degrees Aries, pinned as the flat
+     * wheel pins it; the question is the camera, not the house system.
+     */
+    private static void housesTurnTheRightWay() throws Exception {
+        java.lang.reflect.Method label = GlobeRenderer.class.getDeclaredMethod(
+            "houseLabelAt", double[].class, int.class, double.class);
+        label.setAccessible(true);
+        double[] cusps = new double[13];
+        for (int i = 1; i <= 12; i++) {
+            cusps[i] = (i - 1) * 30.0;
+        }
+        double origin = 0.0;
+        int w = 900;
+        int h = 900;
+        int wrong = 0;
+        double worstTilt = Double.NaN;
+        for (double pitch = Globe.MIN_PITCH; pitch <= Globe.MAX_PITCH + 1e-9; pitch += 0.05) {
+            for (double yaw = 0.0; yaw < 2 * Math.PI; yaw += Math.PI / 3) {
+                Globe cam = new Globe();
+                cam.pitch = pitch;
+                cam.yaw = yaw;
+                Globe.Projected c = cam.project(0, 0, 0, w, h);
+                double total = 0.0;
+                double[] prev = null;
+                for (int k = 0; k <= 12; k++) {
+                    int house = k == 12 ? 1 : k + 1;
+                    double[] p = (double[]) label.invoke(null, cusps, house, origin);
+                    Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
+                    double[] here = {Math.atan2(q.y - c.y, q.x - c.x)};
+                    if (prev != null) {
+                        double d = here[0] - prev[0];
+                        while (d > Math.PI) {
+                            d -= 2 * Math.PI;
+                        }
+                        while (d <= -Math.PI) {
+                            d += 2 * Math.PI;
+                        }
+                        total += d;
+                    }
+                    prev = here;
+                }
+                if (Math.toDegrees(total) > 0) {
+                    wrong++;
+                    worstTilt = pitch;
+                }
+            }
+        }
+        yes("the houses run counterclockwise at every reachable tilt and turn; wrong at "
+            + wrong + " views, e.g. pitch " + worstTilt, wrong == 0);
+
+        // And the view the check exists for, stated directly: underneath, it is a mirror.
+        Globe under = new Globe();
+        under.pitch = -0.32;
+        Globe.Projected c = under.project(0, 0, 0, w, h);
+        double[] p1 = (double[]) label.invoke(null, cusps, 1, origin);
+        double[] p4 = (double[]) label.invoke(null, cusps, 4, origin);
+        Globe.Projected q1 = under.project(p1[0], p1[1], p1[2], w, h);
+        Globe.Projected q4 = under.project(p4[0], p4[1], p4[2], w, h);
+        double turn = Math.atan2(q4.y - c.y, q4.x - c.x) - Math.atan2(q1.y - c.y, q1.x - c.x);
+        while (turn > Math.PI) {
+            turn -= 2 * Math.PI;
+        }
+        while (turn <= -Math.PI) {
+            turn += 2 * Math.PI;
+        }
+        yes("seen from underneath the houses would run clockwise, which is why the camera "
+            + "is kept above", turn > 0);
     }
 
     private static void theShells() {

@@ -181,6 +181,23 @@ final class Globe {
     /** The tilt beyond which the poles cross the view and the scene reads as inverted. */
     static final double MAX_PITCH = 1.25;
 
+    /**
+     * The lowest the camera may tilt: just above the chart's plane, never under it.
+     *
+     * <b>The clamp used to be symmetric, -MAX_PITCH to MAX_PITCH, and the lower half was wrong.</b>
+     * David, 2026-09-18: "the chart when in globe mode has the houses going the wrong
+     * direction". Measured: at the default tilt of +0.32 the houses and the signs both run
+     * counterclockwise from an Ascendant on the left, houses 1 to 6 below the horizon - the chart
+     * convention and the flat wheel's. At -0.32 both run clockwise and house 1 is above the
+     * horizon, because the camera is underneath the plane and sees the chart in a mirror. One
+     * upward drag took it there.
+     *
+     * A chart has one side that reads correctly, so the camera stays on it. About three degrees
+     * above edge-on, rather than zero, because edge-on the whole plane collapses to a line and
+     * the direction of the houses is not visible at all.
+     */
+    static final double MIN_PITCH = 0.05;
+
     Globe() {
         this.yaw = 0.0;
         // <b>Nearly edge-on, at about eighteen degrees.</b> This was fifty for a while, on
@@ -197,7 +214,7 @@ final class Globe {
     void drag(double dx, double dy, int panelWidth) {
         int w = Math.max(1, panelWidth);
         this.yaw += (dx / w) * Math.PI * 2.0;
-        this.pitch = clamp(this.pitch + (dy / w) * Math.PI * 2.0, -MAX_PITCH, MAX_PITCH);
+        this.pitch = clamp(this.pitch + (dy / w) * Math.PI * 2.0, MIN_PITCH, MAX_PITCH);
     }
 
     /** Applies a scroll. Bounded so the reader cannot end up inside the core or in deep space. */
