@@ -232,6 +232,24 @@ public final class Convergence {
                                        List<Progressions.Contact> progressions,
                                        List<Returns.Contact> returns,
                                        Gate releasingGate) {
+        return collect(prof, perfections, events, arcs, progressions, returns, releasingGate, null);
+    }
+
+    /**
+     * As above, with K12 stage 2's progressed-to-progressed aspects.
+     *
+     * <p>A mutual aspect has no natal target of its own - both ends are progressed - so it is
+     * entered as a claim on <b>both</b> natal counterparts, which are the significators the
+     * technique is read through. Same family as a progressed-to-natal contact: two progressions
+     * are one witness, not two, and nothing about this one makes it independent of the other.
+     */
+    public static List<Target> collect(Profection prof, List<Transits.Perfection> perfections,
+                                       List<Transits.EventHit> events,
+                                       List<SolarArc.Contact> arcs,
+                                       List<Progressions.Contact> progressions,
+                                       List<Returns.Contact> returns,
+                                       Gate releasingGate,
+                                       List<Progressions.Mutual> mutuals) {
         Map<String, Target> byPoint = new LinkedHashMap<>();
 
         // Profection. The only family that is not a body arriving somewhere - it is
@@ -304,6 +322,25 @@ public final class Convergence {
                 w.detail = String.format("progressed %s%s %s exact",
                     c.progressed, c.retrograde ? " Rx" : "", c.type.label.toLowerCase());
                 target(byPoint, c.natal, c.why).witnesses.add(w);
+            }
+        }
+
+        if (mutuals != null) {
+            for (Progressions.Mutual m : mutuals) {
+                for (int end = 0; end < 2; end++) {
+                    String mine = end == 0 ? m.a : m.b;
+                    Witness w = new Witness();
+                    w.family = Family.PROGRESSION;
+                    // Symbolic, like every progression - see skyPosition. The moving body is
+                    // this end of the pair; the other end is in the detail, where the reader
+                    // can see which two significators met.
+                    w.movingBody = mine;
+                    w.aspect = m.type;
+                    w.jd = m.jd;
+                    w.offBy = 0.0;
+                    w.detail = m.toString();
+                    target(byPoint, mine, "its progressed self reached another").witnesses.add(w);
+                }
             }
         }
 

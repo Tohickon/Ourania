@@ -120,6 +120,33 @@ public final class Progressions {
     }
 
     /**
+     * Two progressed bodies reaching an aspect to <i>each other</i>.
+     *
+     * <p>K12 stage 2 asks for progressed-to-progressed aspects beside the progressed-to-natal
+     * ones, and they are a different kind of statement: a contact to a natal point says the
+     * chart's own past is being reached, while a contact between two progressed bodies says the
+     * unfolding chart has made a new configuration of its own. The two ends both move, so there
+     * is no fixed degree to solve against - the root is on the angle between two moving
+     * longitudes.
+     */
+    public static final class Mutual {
+        /** The faster body of the pair, by the order of {@link #progressedBodies}. */
+        public String a;
+        public String b;
+        public Aspects.Type type;
+        public double jd;
+        public boolean retrogradeA;
+        public boolean retrogradeB;
+
+        @Override
+        public String toString() {
+            return String.format("progressed %s%s %s progressed %s%s exact",
+                a, retrogradeA ? " Rx" : "", type.label.toLowerCase(),
+                b, retrogradeB ? " Rx" : "");
+        }
+    }
+
+    /**
      * A stretch of the window during which the progressed Moon tenants one natal house.
      *
      * <p>K12 stage 2 calls the progressed Moon "the mid-term clock", and this is the hand it
@@ -202,6 +229,80 @@ public final class Progressions {
         }
         cur.jdTo = jdTo;
         return out;
+    }
+
+    /**
+     * Aspects between two progressed bodies, perfecting inside the window.
+     *
+     * <p>Dated at exactness rather than admitted on a one-degree orb, for the same reason the
+     * progressed-to-natal scan is: the orb is weather and the perfection is the event, and a
+     * progressed contact sits inside a degree for about two years, which is no date at all.
+     *
+     * <p><b>The Sun and the Moon are left out of each other.</b> Their angle <i>is</i> the
+     * progressed lunation cycle, which {@link #changes} already reports as a phase change every
+     * 45 degrees - so scanning the pair here would report the progressed New Moon twice, once
+     * as a phase and once as a conjunction. Every other pair among {@link #progressedBodies} is
+     * scanned, unordered: an aspect belongs to the pair, not to a direction.
+     *
+     * <p>The progressed angles stay out. They are progressed by a rule of their own and only
+     * make dated events against a fixed degree; two of them against each other move together
+     * and would perfect nothing, and a progressed angle against a progressed body would be a
+     * fourth technique's worth of scanning for a contact nobody reads.
+     */
+    public static List<Mutual> mutual(SwissEph sw, double natalJd, double jdFrom, double jdTo) {
+        List<Mutual> out = new ArrayList<>();
+        if (jdTo <= jdFrom) {
+            return out;
+        }
+        java.util.Map<String, ProgressedLon> caches = new java.util.LinkedHashMap<>();
+        for (String body : progressedBodies) {
+            caches.put(body, new ProgressedLon(sw, body, natalJd));
+        }
+        for (int i = 0; i < progressedBodies.length; i++) {
+            for (int j = i + 1; j < progressedBodies.length; j++) {
+                String a = progressedBodies[i];
+                String b = progressedBodies[j];
+                if (lights(a, b)) {
+                    continue;
+                }
+                final ProgressedLon ca = caches.get(a);
+                final ProgressedLon cb = caches.get(b);
+                for (Aspects.Type type : Aspects.Type.values()) {
+                    for (double target : signedTargets(type)) {
+                        Almanac.OfTime f = jd -> Almanac.signedDelta(
+                            Almanac.signedDelta(ca.at(jd), cb.at(jd)), target);
+                        for (double jd : Almanac.roots(f, jdFrom, jdTo, SCAN_STEP_DAYS)) {
+                            Mutual m = new Mutual();
+                            m.a = a;
+                            m.b = b;
+                            m.type = type;
+                            m.jd = jd;
+                            m.retrogradeA = progressedSpeed(sw, natalJd, jd, a) < 0.0;
+                            m.retrogradeB = progressedSpeed(sw, natalJd, jd, b) < 0.0;
+                            out.add(m);
+                        }
+                    }
+                }
+            }
+        }
+        out.sort(Comparator.comparingDouble((Mutual m) -> m.jd)
+            .thenComparing(m -> m.a).thenComparing(m -> m.b));
+        return out;
+    }
+
+    /** The pair whose angle is the lunation cycle itself, reported as a phase and not twice. */
+    private static boolean lights(String a, String b) {
+        return ("Sun".equals(a) && "Moon".equals(b)) || ("Moon".equals(a) && "Sun".equals(b));
+    }
+
+    /** An aspect's exact angle and, where the two sides differ, its negative. */
+    private static List<Double> signedTargets(Aspects.Type type) {
+        List<Double> targets = new ArrayList<>();
+        targets.add(type.exactAngle);
+        if (type.exactAngle != 0.0 && type.exactAngle != 180.0) {
+            targets.add(-type.exactAngle);
+        }
+        return targets;
     }
 
     private static Tenancy tenancy(SwissEph sw, double natalJd, int house, double jd,
@@ -416,13 +517,8 @@ public final class Progressions {
     /** Exact moments at which one progressed body reaches one aspect to a fixed degree. */
     private static List<Double> perfections(ProgressedLon cache, double natalLon,
                                             Aspects.Type type, double jdFrom, double jdTo) {
-        List<Double> targets = new ArrayList<>();
-        targets.add(type.exactAngle);
-        if (type.exactAngle != 0.0 && type.exactAngle != 180.0) {
-            targets.add(-type.exactAngle);
-        }
         List<Double> out = new ArrayList<>();
-        for (double target : targets) {
+        for (double target : signedTargets(type)) {
             Almanac.OfTime f = jd -> Almanac.signedDelta(
                 Almanac.signedDelta(cache.at(jd), natalLon), target);
             out.addAll(Almanac.roots(f, jdFrom, jdTo, SCAN_STEP_DAYS));

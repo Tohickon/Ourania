@@ -353,8 +353,16 @@ everything as its own section.
 > theme's houses the Moon passes through - and it **activates the natal bodies of the house it
 > tenants**, exactly as stage 1 activates the bodies of the profected sign. The synthesis states
 > the clock before the themes, because it reads the same whether or not any theme reaches three.
-> `ProgressedMoonCheck` 26; seven mutations caught. **Still to come:** progressed-to-progressed
-> aspects, then Mars/Sun dating of a converged theme.
+> `ProgressedMoonCheck` 26; seven mutations caught.
+>
+> **Progressed-to-progressed built**, finishing stage 2: `Progressions.mutual` dates aspects
+> between two progressed bodies at exactness - both ends move, so the root is on the angle
+> between two moving longitudes rather than against a fixed degree. **The Sun and Moon are left
+> out of each other**, because their angle *is* the progressed lunation cycle, which `changes`
+> already reports as a phase; scanning the pair would report the progressed New Moon twice. A
+> mutual enters the convergence as a claim on **both** natal counterparts, in the `PROGRESSION`
+> family - two progressions are one witness, not two. `MutualProgressionCheck` 24; seven
+> mutations caught. **Still to come:** Mars/Sun dating of a converged theme.
 
 **Decision (David, 2026-09-19).** Prediction is a noise filter. On any day there are dozens of
 minor transits, and treating each as a prediction produces contradictions daily. A major event
@@ -384,7 +392,7 @@ K8) and L6 (`astro.Topics`); the pipeline is a reorganisation and three addition
 | Stage | Already built | Missing |
 |---|---|---|
 | 1 | `Profection`: lord of the year and house; the lord is a witness, and a witness whose moving body is the lord is multiplied (K8). Zodiacal releasing gates every witness: L1 lord x3, L2 x2, peak x2.5, loosing x4. | Transits **through the profected house**, and transits **to** the lord, as primary; un-activated transits **demoted** rather than voting equally. |
-| 2 | `Progressions` and `SolarArc` vote at their **dated moment of exactness** - stricter than a 1° orb, and chosen because a contact stays within orb about two years. The **progressed Moon's own clock** is built: `Progressions.clock` (2026-09-20). | Progressed-to-**progressed** aspects. |
+| 2 | `Progressions` and `SolarArc` vote at their **dated moment of exactness** - stricter than a 1° orb, and chosen because a contact stays within orb about two years. The **progressed Moon's own clock** is built: `Progressions.clock`, and **progressed-to-progressed** aspects: `Progressions.mutual` (both 2026-09-20). | Nothing; stage 2 is built. |
 | 3 | Slow-body transits vote when they **perfect** in the window (the orb is weather, the perfection is the event); eclipses and stations are families; a station duplicating a transit is discounted, not double-counted. | "Transit to an **active** point triggers": today every perfection votes whether or not its target is active. **Mars and the Sun as date-pinpointers** - excluded as voters on purpose (the Sun conjuncts every natal point every year and so agrees with everything), and should stay excluded as voters but be used to date a converged event. |
 | 4 | Convergence counts distinct **families** per natal point ("two transits to the same point are one witness, not two"), with thresholds relative to the chart's own distribution. `Topics` groups houses, rulers and significators into topics by three witnesses - for the natal chart. | **Theme buckets** for timing (grouping by theme, not by single natal point) and the **Rule of Three gate** as the headline test, with its testimonies listed. |
 
