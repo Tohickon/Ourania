@@ -182,19 +182,25 @@ final class Globe {
     static final double MAX_PITCH = 1.25;
 
     /**
-     * The lowest the camera may tilt: just above the chart's plane, never under it.
+     * How near edge-on the camera may come, on either side of the chart's plane.
      *
-     * <b>The clamp used to be symmetric, -MAX_PITCH to MAX_PITCH, and the lower half was wrong.</b>
-     * David, 2026-09-18: "the chart when in globe mode has the houses going the wrong
-     * direction". Measured: at the default tilt of +0.32 the houses and the signs both run
-     * counterclockwise from an Ascendant on the left, houses 1 to 6 below the horizon - the chart
-     * convention and the flat wheel's. At -0.32 both run clockwise and house 1 is above the
-     * horizon, because the camera is underneath the plane and sees the chart in a mirror. One
-     * upward drag took it there.
+     * <b>This was a floor, and the globe could only lean one way.</b> On 2026-09-18 the clamp
+     * became {@code [MIN_PITCH, MAX_PITCH]} because David reported the houses running the wrong
+     * way: at the default tilt of +0.32 the houses and signs run counterclockwise from an
+     * Ascendant on the left, houses 1 to 6 below the horizon - the chart convention and the flat
+     * wheel's - and at -0.32 both run clockwise with house 1 above the horizon, because the
+     * camera is underneath the plane and sees the chart in a mirror. One upward drag took it
+     * there, so the lower half was shut off.
      *
-     * A chart has one side that reads correctly, so the camera stays on it. About three degrees
-     * above edge-on, rather than zero, because edge-on the whole plane collapses to a line and
-     * the direction of the houses is not visible at all.
+     * <b>Shutting it off cost the other thing.</b> David, 2026-09-19: "i used to be able to tilt
+     * the chart more than one way". Both halves are back. Nothing is mirrored to make the
+     * underside read like the top - see {@link #project} for why that was tried and taken out
+     * again - so from below the chart reads as the back of a painted window, and the panel says
+     * which side is being looked at.
+     *
+     * So this is now a band either side of edge-on that the camera passes through rather than
+     * rests in: about three degrees, because edge-on the whole plane collapses to a line and the
+     * direction of the houses is not visible at all.
      */
     static final double MIN_PITCH = 0.05;
 
@@ -213,8 +219,35 @@ final class Globe {
     /** Applies a drag, in pixels, and keeps the camera somewhere a reader can understand. */
     void drag(double dx, double dy, int panelWidth) {
         int w = Math.max(1, panelWidth);
+        // Sideways is the same on both sides of the plane, because nothing is mirrored any more
+        // - see project(). Reversing it below would be the same discontinuity in the hand that
+        // the flip was in the picture.
         this.yaw += (dx / w) * Math.PI * 2.0;
-        this.pitch = clamp(this.pitch + (dy / w) * Math.PI * 2.0, MIN_PITCH, MAX_PITCH);
+        double step = (dy / w) * Math.PI * 2.0;
+        this.pitch = clampPitch(this.pitch + step, step);
+    }
+
+    /**
+     * The tilt, kept off the poles and out of the edge-on band.
+     *
+     * <b>Through the band, not stopped at its edge.</b> Snapping a tilt that lands inside the
+     * band back to the near edge would make the plane a wall: every drag toward it would stop
+     * dead and the reader could never reach the underside at all, which is the thing being
+     * given back. So a tilt that lands inside comes out the far side, in the direction the hand
+     * was already moving - one continuous motion from above the chart to below it, pausing
+     * nowhere.
+     */
+    static double clampPitch(double pitch, double step) {
+        double p = pitch;
+        if (Math.abs(p) < MIN_PITCH) {
+            p = step < 0.0 ? -MIN_PITCH : MIN_PITCH;
+        }
+        return clamp(p, -MAX_PITCH, MAX_PITCH);
+    }
+
+    /** True when the camera is under the chart's plane, looking up at it. */
+    boolean fromBelow() {
+        return this.pitch < 0.0;
     }
 
     /** Applies a scroll. Bounded so the reader cannot end up inside the core or in deep space. */
@@ -247,6 +280,27 @@ final class Globe {
         }
         double focal = Math.min(width, height) * ZOOM;
         double s = focal / zc;
+
+        // <b>Nothing is flipped when the camera goes under the plane, and that is the point.</b>
+        // It was, for one afternoon: below the plane the horizontal was mirrored so the houses
+        // would keep running counterclockwise down there. It works, and it is wrong, because a
+        // mirror applied on one side of a boundary is a discontinuity at it. David, 2026-09-20,
+        // on seeing it: "when i tilt up the signs shouldnt move at all you have them on one side
+        // and then when tilting over the horizon they appear to shoow up instantly on the other
+        // side."
+        //
+        // He is right, and the reason is worth keeping. Every other camera move here is
+        // continuous - a degree of drag moves the picture by a degree's worth - so the reader
+        // learns that the globe is a solid object they are walking around. One instant
+        // rearrangement at the horizon teaches the opposite, and it teaches it at exactly the
+        // moment the reader is trying to work out what they are looking at.
+        //
+        // So the projection is honest on both sides and the chart simply turns away from the
+        // viewer. Seen from below the houses do read clockwise - that is not a fault either,
+        // it is what the back of a painted window looks like: "I just wanted to see the bottom
+        // of the transluscent charts as if viewing painted glass from underneath and above."
+        // GlobeRenderer says which side is being looked at, so a reader cannot mistake the back
+        // for the front.
         return new Projected(width / 2.0 + xr * s, height / 2.0 - yr * s, zc, true);
     }
 

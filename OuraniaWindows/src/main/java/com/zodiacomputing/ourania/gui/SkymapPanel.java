@@ -761,9 +761,9 @@ extends JPanel {
             if (this.filterCombo != null) {
                 this.filterCombo.setSelectedItem("Natal-Natal");
             }
-            this.houseAlignment = "Natal";
+            this.houseAlignment = "Chart A";
             if (this.alignCombo != null) {
-                this.alignCombo.setSelectedItem("Natal");
+                this.alignCombo.setSelectedItem("Chart A");
                 this.alignCombo.setEnabled(false);
             }
             this.syncPinToTransitAvailability();
@@ -1077,7 +1077,19 @@ extends JPanel {
     private JComboBox<String> animateCombo;
     private JComboBox<String> filterCombo;
     private JComboBox<String> alignCombo;
-    private String houseAlignment = "Natal";
+    /** The "Houses:" caption beside {@link #alignCombo}, hidden with it when there is one chart. */
+    private JLabel alignLabel;
+    /**
+     * Whose houses the wheel draws: "Chart A", "Chart B", "Sky", or "Both".
+     *
+     * <b>The names used to be the engine's rather than the reader's.</b> They were "Natal" and
+     * "Transit", which named the two <i>rings</i> - and the outer ring is Chart B in a synastry
+     * and carries the second person's houses, not a transit's. So a reader in a synastry was
+     * offered a word that described neither thing in front of them, and the sky's own houses
+     * could not be chosen at all. David, 2026-09-20: "for synastry charts ... have a selector
+     * to align to either Chart A or Chart B or Transit houses."
+     */
+    private String houseAlignment = "Chart A";
     private String wheelPin = "Natal Asc";
     private JComboBox<String> pinCombo;
     /**
@@ -4826,7 +4838,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         jLabel3.setForeground(Color.WHITE);
         this.chartControls.add(jLabel3);
         this.chartControls.add(this.filterCombo);
-        String[] stringArray3 = new String[]{"Natal", "Transit", "Both"};
+        // <b>Built here with its neighbours, added to the scrub row.</b> It belongs beside the
+        // transport - David, 2026-09-20: "possibly down near the track buttons" - because it is
+        // a reading control, pressed while looking at the wheel, not a setting configured once
+        // in a sidebar. It is constructed in this method because every other combo is, and a
+        // second construction site is how two of a control come to exist.
+        String[] stringArray3 = new String[]{"Chart A", "Chart B", "Sky", "Both"};
         this.alignCombo = new JComboBox<String>(stringArray3);
         this.alignCombo.setSelectedItem(this.houseAlignment);
         this.alignCombo.addActionListener(actionEvent -> {
@@ -4834,13 +4851,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.updateChartData();
             this.chartPanel.repaint();
         });
-        this.alignCombo.setToolTipText("Which house ring is drawn - natal (inner wheel) or transit (outer wheel)");
+        this.alignCombo.setToolTipText(
+            "Whose houses the wheel is read against: Chart A, Chart B, the sky, "
+            + "or both sets drawn together");
         SkymapPanel.styleCompactCombo(this.alignCombo);
         this.alignCombo.setEnabled(this.showTransitChart);
-        JLabel jLabel4 = compactLabel("Align:", "Align Houses");
-        jLabel4.setForeground(Color.WHITE);
-        this.chartControls.add(jLabel4);
-        this.chartControls.add(this.alignCombo);
+        this.alignLabel = compactLabel("Houses:", "Align Houses");
+        this.alignLabel.setForeground(Color.WHITE);
+        if (this.scrubRow != null) {
+            this.scrubRow.add(this.alignLabel);
+            this.scrubRow.add(this.alignCombo);
+        }
         String[] stringArray4 = new String[]{"Aries", "Natal Asc", "Transit Asc"};
         this.pinCombo = new JComboBox<String>(stringArray4);
         this.pinCombo.setSelectedItem(this.wheelPin);
@@ -7352,6 +7373,20 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         this.showBar(ScrubTarget.CHART_A, this.innerIsBirthChart || relationship);
         this.showBar(ScrubTarget.CHART_B, this.isSynastryChart() || relationship);
         this.showBar(ScrubTarget.SKY, true);
+        // <b>Only where there is a choice to make.</b> David, 2026-09-20: "Only for synastry
+        // though." With one chart on the wheel there is one set of houses and a selector
+        // offering it is a control that cannot do anything; with two there are two frames and
+        // the reader has to say which one the planets are being read against. Hidden rather
+        // than disabled, because it shares a row with the scrub bars, which come and go the
+        // same way.
+        boolean twoCharts = this.isSynastryChart() || relationship;
+        if (this.alignCombo != null && this.alignCombo.isVisible() != twoCharts) {
+            this.alignCombo.setVisible(twoCharts);
+            this.alignLabel.setVisible(twoCharts);
+            if (this.scrubRow != null) {
+                this.scrubRow.revalidate();
+            }
+        }
         for (java.util.Map.Entry<ScrubTarget, JButton> e : this.scrubResets.entrySet()) {
             e.getValue().setEnabled(this.scrubOrigins.containsKey(e.getKey()));
         }
@@ -7803,9 +7838,22 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
         }
 
-        if (this.showTransitChart && "Transit".equals(this.houseAlignment)) {
+        // <b>Whose houses the wheel is read against.</b> Three frames exist - Chart A, Chart B
+        // and the sky - and a chart is read in exactly one of them at a time, which is why
+        // there is one activeCusps and not three. A frame whose chart is not on the wheel
+        // falls back to Chart A rather than leaving the houses cast from nothing.
+        // <b>The mode is not the same question as who is on the wheel.</b> showTransitChart is
+        // derived from the chart mode, so in a synastry it stays true after the reader takes
+        // Chart B off with the chips - and the houses went on being cast from a Chart B that
+        // was no longer there, which is an empty subject and a set of cusps for nowhere. The
+        // frame asks about the ring it is going to read instead.
+        boolean chartBFramed = this.showTransitChart && this.ringBOn && this.outerRing.time != null;
+        if (chartBFramed && "Chart B".equals(this.houseAlignment)) {
             System.arraycopy(this.outerRing.cusps, 0, this.activeCusps, 0, this.activeCusps.length);
             this.activeAscendant = this.outerRing.ascendant;
+        } else if ("Sky".equals(this.houseAlignment) && this.skyRing.time != null) {
+            System.arraycopy(this.skyRing.cusps, 0, this.activeCusps, 0, this.activeCusps.length);
+            this.activeAscendant = this.skyRing.ascendant;
         } else {
             System.arraycopy(this.natalRing.cusps, 0, this.activeCusps, 0, this.activeCusps.length);
             this.activeAscendant = this.natalRing.ascendant;

@@ -127,6 +127,12 @@ public final class GlobeCheck {
         report("Part J", before);
 
         System.out.println();
+        System.out.println("=== Part R: the houses are painted on the sphere ===");
+        before = failures.size();
+        theHousesTakeTheSphere();
+        report("Part R", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -210,15 +216,56 @@ public final class GlobeCheck {
         yes("dragging cannot tip the globe past its pole",
             Math.abs(g.pitch) <= Globe.MAX_PITCH + 1e-9);
 
-        // <b>Nor under the chart.</b> David, 2026-09-18: "the chart when in globe mode has the
-        // houses going the wrong direction". The clamp was symmetric, so one upward drag put the
-        // camera beneath the chart's plane, where the houses and the signs both read clockwise
-        // and house 1 sits above the horizon - the chart in a mirror.
+        // <b>And the other way, which now reaches the underside.</b> David, 2026-09-18: "the
+        // chart when in globe mode has the houses going the wrong direction" shut the lower half
+        // off; David, 2026-09-19: "i used to be able to tilt the chart more than one way" asked
+        // for it back. Both halves are reachable, the mirror is handled in the projection, and
+        // the camera still never rests edge-on, where the plane collapses to a line.
         for (int i = 0; i < 200; i++) {
             g.drag(0, -40, 800);
         }
-        yes("dragging the other way stops above the chart's plane: pitch " + g.pitch,
-            g.pitch >= Globe.MIN_PITCH - 1e-9 && g.pitch > 0);
+        yes("dragging the other way reaches under the chart's plane: pitch " + g.pitch,
+            g.pitch <= -Globe.MIN_PITCH + 1e-9 && g.pitch >= -Globe.MAX_PITCH - 1e-9);
+
+        // <b>Which way round the hand works, pinned in the reader's words.</b> David,
+        // 2026-09-20: "when the mouse pulls upward we are shown the bottom on view and pulled
+        // down the top". Swing's dy is negative when the pointer moves up the panel, so that is
+        // the direction that takes the camera under the chart - and this says so out loud,
+        // because a sign flipped in drag() would still leave every other tilt assertion green.
+        Globe hand = new Globe();
+        for (int i = 0; i < 40; i++) {
+            hand.drag(0, -20, 800);                       // pointer pulled UP the panel
+        }
+        yes("pulling the mouse up shows the underside: pitch " + hand.pitch,
+            hand.pitch < 0 && hand.fromBelow());
+        for (int i = 0; i < 40; i++) {
+            hand.drag(0, 20, 800);                        // pointer pushed DOWN the panel
+        }
+        yes("pulling it down shows the top again: pitch " + hand.pitch,
+            hand.pitch > 0 && !hand.fromBelow());
+
+        // <b>Through the band in one motion, never resting in it.</b> A drag from well above
+        // the plane to well below it is walked in single steps, and no step may leave the
+        // camera edge-on: that is the one tilt where the houses cannot be read at all.
+        Globe cross = new Globe();
+        cross.pitch = 0.4;
+        boolean rested = false;
+        boolean reached = false;
+        for (int i = 0; i < 60; i++) {
+            cross.drag(0, -6, 800);
+            if (Math.abs(cross.pitch) < Globe.MIN_PITCH - 1e-9) {
+                rested = true;
+            }
+            if (cross.pitch < 0) {
+                reached = true;
+            }
+        }
+        yes("a steady drag crosses the plane rather than stopping at it", reached);
+        yes("and never rests edge-on on the way through", !rested);
+        for (int i = 0; i < 60; i++) {
+            cross.drag(0, 6, 800);
+        }
+        yes("and comes back up again", cross.pitch > 0);
         try {
             housesTurnTheRightWay();
         } catch (Exception e) {
@@ -249,7 +296,9 @@ public final class GlobeCheck {
         int h = 900;
         int wrong = 0;
         double worstTilt = Double.NaN;
-        for (double pitch = Globe.MIN_PITCH; pitch <= Globe.MAX_PITCH + 1e-9; pitch += 0.05) {
+        for (double tilt = Globe.MIN_PITCH; tilt <= Globe.MAX_PITCH + 1e-9; tilt += 0.05) {
+          for (double side : new double[] {1.0}) {
+            double pitch = tilt * side;
             for (double yaw = 0.0; yaw < 2 * Math.PI; yaw += Math.PI / 3) {
                 Globe cam = new Globe();
                 cam.pitch = pitch;
@@ -279,11 +328,59 @@ public final class GlobeCheck {
                     worstTilt = pitch;
                 }
             }
+          }
         }
-        yes("the houses run counterclockwise at every reachable tilt and turn; wrong at "
-            + wrong + " views, e.g. pitch " + worstTilt, wrong == 0);
+        yes("the houses run counterclockwise at every tilt above the chart's plane and every "
+            + "turn; wrong at " + wrong + " views, e.g. pitch " + worstTilt, wrong == 0);
 
-        // And the view the check exists for, stated directly: underneath, it is a mirror.
+        // <b>Nothing jumps when the camera crosses the plane.</b> This is the assertion David's
+        // complaint earned. The underside was briefly rendered mirrored, so that the houses
+        // would keep running counterclockwise down there - and mirroring one side of a boundary
+        // is a discontinuity at it: "when i tilt up the signs shouldnt move at all you have them
+        // on one side and then when tilting over the horizon they appear to shoow up instantly
+        // on the other side."
+        //
+        // Measured as the reader would see it: the same twelve house numbers projected either
+        // side of the crossing, at the two tilts a drag actually visits. Edge-on the whole plane
+        // is nearly a line, so both frames are nearly the same picture and every point should
+        // barely have moved. A mirror puts each of them a full diameter away, which no tolerance
+        // hides.
+        Globe justAbove = new Globe();
+        justAbove.pitch = Globe.MIN_PITCH;
+        Globe justBelow = new Globe();
+        justBelow.pitch = -Globe.MIN_PITCH;
+        double worstJump = 0.0;
+        for (int i = 1; i <= 12; i++) {
+            double[] pt = (double[]) label.invoke(null, cusps, i, origin);
+            Globe.Projected up = justAbove.project(pt[0], pt[1], pt[2], w, h);
+            Globe.Projected down = justBelow.project(pt[0], pt[1], pt[2], w, h);
+            worstJump = Math.max(worstJump, Math.hypot(up.x - down.x, up.y - down.y));
+        }
+        yes(String.format("crossing the plane moves nothing on the panel: worst house number "
+            + "moves %.1f px of %d", worstJump, w), worstJump < w / 20.0);
+
+        // And the view itself, stated: the back of the glass reads in reverse, which is what it
+        // is. The Ascendant stays on the left on both sides - it is the order that turns over,
+        // not the picture that jumps across.
+        Globe below = new Globe();
+        below.pitch = -0.32;
+        Globe.Projected mid = below.project(0, 0, 0, w, h);
+        double[] asc = (double[]) label.invoke(null, cusps, 1, origin);
+        Globe.Projected qa = below.project(asc[0], asc[1], asc[2], w, h);
+        Globe above = new Globe();
+        above.pitch = 0.32;
+        Globe.Projected midAbove = above.project(0, 0, 0, w, h);
+        Globe.Projected qaAbove = above.project(asc[0], asc[1], asc[2], w, h);
+        yes("the first house stays on the left above the plane: " + (int) qaAbove.x
+            + " against " + (int) midAbove.x, qaAbove.x < midAbove.x);
+        yes("and on the left below it too - nothing swaps sides: " + (int) qa.x
+            + " against " + (int) mid.x, qa.x < mid.x);
+        yes("the camera knows which side it is on",
+            below.fromBelow() && !above.fromBelow());
+
+        // The underside reads clockwise, and that is the view rather than a fault: it is what
+        // the back of a painted window shows. Stated here so that a later change which quietly
+        // mirrors it again has to come through this line.
         Globe under = new Globe();
         under.pitch = -0.32;
         Globe.Projected c = under.project(0, 0, 0, w, h);
@@ -298,8 +395,7 @@ public final class GlobeCheck {
         while (turn <= -Math.PI) {
             turn += 2 * Math.PI;
         }
-        yes("seen from underneath the houses would run clockwise, which is why the camera "
-            + "is kept above", turn > 0);
+        yes("from below the chart reads in reverse, as the back of the glass does", turn > 0);
     }
 
     private static void theShells() {
@@ -786,6 +882,95 @@ public final class GlobeCheck {
      * Also asserted: a layer folds gradually rather than blinking out, because that is what
      * makes it read as folding away rather than as something failing to draw.
      */
+    /**
+     * The twelve house faces are actually painted on the sphere.
+     *
+     * <b>A mutation walked straight past every other assertion here.</b> Removing the call that
+     * fills the house lunes left all 11,029 checks green: the winding is measured through the
+     * label placement, the tilt through the camera, and none of it ever asks whether the
+     * surface a reader is looking at exists. So this paints two frames that differ in one
+     * setting and measures the difference where only the house faces live - the sphere above
+     * the chart's plane, outside the rings and inside the silhouette.
+     *
+     * Measured as a count of pixels that changed rather than as a mean, because a mean over a
+     * mostly-black frame is dominated by the black and a very translucent wedge - which these
+     * deliberately are - moves it by almost nothing.
+     */
+    private static void theHousesTakeTheSphere() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            Thread.sleep(2500);
+
+            boolean was = Settings.globeHouseFill();
+            try {
+                Settings.setGlobeHouseFill(true);
+                java.awt.image.BufferedImage on = paintGlobe(panel, 0.32);
+                Settings.setGlobeHouseFill(false);
+                java.awt.image.BufferedImage off = paintGlobe(panel, 0.32);
+
+                int changed = inkBetween(on, off, 0.0, 1.0);
+                yes("switching the house fill on changes the picture: " + changed + " pixels",
+                    changed > 500);
+
+                // And the change is on the sphere, not only in the plane: the lower cap is
+                // below every ring, so nothing but the house faces can have painted there.
+                int lowerCap = inkBetween(on, off, 0.62, 0.95);
+                yes("and reaches the sphere below the rings: " + lowerCap + " pixels",
+                    lowerCap > 100);
+            } finally {
+                Settings.setGlobeHouseFill(was);
+            }
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    private static java.awt.image.BufferedImage paintGlobe(SkymapPanel panel, double pitch)
+            throws Exception {
+        final int side = 600;
+        final java.awt.image.BufferedImage[] out = new java.awt.image.BufferedImage[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            Globe cam = new Globe();
+            cam.pitch = pitch;
+            java.awt.image.BufferedImage im = new java.awt.image.BufferedImage(
+                side, side, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            java.awt.Graphics2D g = im.createGraphics();
+            g.setColor(new java.awt.Color(10, 12, 16));
+            g.fillRect(0, 0, side, side);
+            GlobeRenderer.paint(g, cam, side, side, panel, false);
+            g.dispose();
+            out[0] = im;
+        });
+        Thread.sleep(120);
+        return out[0];
+    }
+
+    /** Pixels that visibly differ, between two fractions of the frame's height. */
+    private static int inkBetween(java.awt.image.BufferedImage a,
+                                  java.awt.image.BufferedImage b,
+                                  double fromY, double toY) {
+        int n = 0;
+        int y0 = (int) (a.getHeight() * fromY);
+        int y1 = (int) (a.getHeight() * toY);
+        for (int y = y0; y < y1; y++) {
+            for (int x = 0; x < a.getWidth(); x++) {
+                int p = a.getRGB(x, y);
+                int q = b.getRGB(x, y);
+                int d = Math.abs(((p >> 16) & 255) - ((q >> 16) & 255))
+                    + Math.abs(((p >> 8) & 255) - ((q >> 8) & 255))
+                    + Math.abs((p & 255) - (q & 255));
+                if (d > 6) {
+                    n++;
+                }
+            }
+        }
+        return n;
+    }
+
     private static void theLayers() throws Exception {
         final OuraniaWindow[] hold = new OuraniaWindow[1];
         javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());

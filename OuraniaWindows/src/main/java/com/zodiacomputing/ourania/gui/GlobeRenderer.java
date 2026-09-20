@@ -119,6 +119,13 @@ final class GlobeRenderer {
         if (!turning && r.shown(SkymapPanel.Layer.SIGNS) && Settings.globeSignPlane()) {
             r.signPlane();
         }
+        // <b>And the houses as twelve faces of the same kind, inside them.</b> David,
+        // 2026-09-20: "the houses should always be a stationary globe with all 12 sections
+        // going in wedges around the globe." Left out while turning for the same reason the
+        // sign shell is - the fills are what cost a drag its frame rate.
+        if (!turning && r.shown(SkymapPanel.Layer.HOUSES) && Settings.globeHouseFill()) {
+            r.housePlane(panel.activeCusps);
+        }
 
         r.focusWedges(panel);
         if (r.shown(SkymapPanel.Layer.DEGREES)) {
@@ -173,6 +180,35 @@ final class GlobeRenderer {
         }
 
         r.flush();
+        r.belowNotice();
+    }
+
+    /**
+     * A standing notice while the camera is under the chart's plane.
+     *
+     * <b>Because the back of a painted window looks like a chart until you read it.</b> Nothing
+     * is mirrored down there - see {@link Globe#project} - so the houses and the signs run
+     * clockwise, which is what the underside of the glass actually shows. That is the view
+     * David asked for, and it is also a view a reader can mistake for the front if they did not
+     * notice crossing the plane, because every glyph is still upright and every colour still
+     * right. One line is cheaper than that mistake.
+     *
+     * Painted last and outside the depth sort, because it describes the camera rather than
+     * anything in the scene, and it has to be legible over whatever it lands on.
+     */
+    private void belowNotice() {
+        if (!this.cam.fromBelow()) {
+            return;
+        }
+        String text = "viewed from below - the chart reads in reverse";
+        this.g.setFont(font(11));
+        int width = this.g.getFontMetrics().stringWidth(text);
+        int x = (this.w - width) / 2;
+        int y = this.h - 14;
+        this.g.setColor(new Color(10, 12, 16, 170));
+        this.g.fillRect(x - 8, y - 13, width + 16, 20);
+        this.g.setColor(new Color(226, 214, 184, 210));
+        this.g.drawString(text, x, y);
     }
 
     /**
@@ -580,15 +616,20 @@ final class GlobeRenderer {
             Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
             double from = sign * 30.0;
 
-            // <b>A wedge over the sphere, faint.</b> Twelve of these are the surface the
-            // bodies sit inside, and they carry their own edges - which is what the sign
-            // boundaries were being drawn twice for. Great circles on top of them read as the
-            // wireframe of a globe; the fills alone read as a sphere divided into signs.
-            wedgeOnSphere(from, from + 30.0, Globe.SHELL_SIGN_INNER,
-                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 26),
-                    SkymapPanel.Layer.SIGNS));
-
-            // <b>And a flat ring at the equator, brighter.</b> The plane is where a longitude
+            // <b>The zodiac is a belt, so it keeps the belt and gives up the sphere.</b> Twelve
+            // sign wedges used to be drawn over the whole shell, pole to pole. That was a good
+            // surface while it was the only one - but the houses are wedges of the same shape
+            // on a shell just inside it, and two sets of lunes nested together read as
+            // twenty-four divisions of nothing: a reader cannot tell a house boundary from a
+            // sign boundary, and the sphere goes muddy wherever both layers are on.
+            //
+            // David, 2026-09-20, looking at exactly that picture: "signs keep the flat band,
+            // houses get the sphere". It is also the truer division of labour. The zodiac IS a
+            // belt - a band either side of the ecliptic - and the degree scale hangs off this
+            // ring because the plane is where a longitude means what it says. A house divides
+            // the whole sky, pole to pole, which is the shape the sphere was always drawing.
+            //
+            // <b>A flat ring at the equator.</b> The plane is where a longitude
             // means what it says, so the zodiac gets a band there that a reader can measure
             // against - the degree scale hangs off its outer edge. This was a full disc from
             // the band to the centre, which washed the whole chart in sign colour and left
@@ -596,6 +637,52 @@ final class GlobeRenderer {
             quadRing(from, from + 30.0, Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER,
                 faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 96),
                     SkymapPanel.Layer.SIGNS));
+        }
+    }
+
+    /**
+     * The twelve houses as faces of a sphere, pole to pole - the segments of an orange.
+     *
+     * <b>What this replaces, and why it is not the picture that was rejected.</b> The cusps
+     * were drawn as meridians once and were taken down to flat spokes, because twelve great
+     * circles read as the wireframe of a globe rather than as the divisions of a chart. That
+     * objection was to <i>outlines</i>. These are filled faces, and a filled face carries its
+     * own edge - the same discovery that let {@link #signPlane} stop drawing sign boundaries on
+     * top of sign wedges. So the boundary is visible because the shading changes across it,
+     * not because a line has been drawn over the sphere.
+     *
+     * <b>Alternating, and the angles brighter.</b> Twelve faces in one shade are a sphere with
+     * no divisions in it; alternating them is what makes the reader count. The first, fourth,
+     * seventh and tenth are brighter again because those four are the chart's corners, and a
+     * reader looking for the Midheaven should not have to count round to it.
+     *
+     * <b>Unequal houses come out unequal.</b> Nothing here divides 360 by twelve - each face
+     * spans from its own cusp to the next - so a Placidus tenth at a high latitude is visibly
+     * fatter than its eleventh, which is a true thing about the chart that the flat wheel shows
+     * and the globe used to hide.
+     */
+    private void housePlane(double[] cusps) {
+        if (cusps == null || cusps.length < 13) {
+            return;                             // no chart cast yet; the shells still draw
+        }
+        for (int i = 1; i <= 12; i++) {
+            double from = cusps[i];
+            double span = arc(from, cusps[i == 12 ? 1 : i + 1]);
+            if (span <= 0.0 || span >= 360.0) {
+                continue;                       // a degenerate cusp pair has no face to fill
+            }
+            // <b>Very translucent, because everything is read through them.</b> David,
+            // 2026-09-20. These faces now own the whole sphere, and the aspect network, the
+            // three chart ribbons and every glyph sit inside it - so the wedges have to be
+            // the thing a reader stops noticing the moment they look at a planet. Alternating
+            // is what makes them countable; the difference between the two shades matters more
+            // than either one's weight, so the pair is kept close and both are kept low.
+            boolean angular = i == 1 || i == 4 || i == 7 || i == 10;
+            int alpha = angular ? 24 : (i % 2 == 1 ? 16 : 7);
+            Color ink = angular ? new Color(226, 214, 184) : new Color(150, 152, 164);
+            wedgeOnSphere(from, from + span, Globe.SHELL_HOUSE,
+                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), alpha),
+                    SkymapPanel.Layer.HOUSES));
         }
     }
 
