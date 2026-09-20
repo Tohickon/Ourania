@@ -7587,6 +7587,77 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
+    /**
+     * A subject nobody has given a place to. 0,0 is the Atlantic off Africa, not a choice.
+     */
+    private static boolean placeless(com.zodiacomputing.ourania.astro.ChartSubject s) {
+        return s == null || (s.latitude == 0.0 && s.longitude == 0.0
+            && (s.placeName == null || s.placeName.trim().isEmpty()));
+    }
+
+    /** Set once the sky's place has been settled, so a missing home is not looked up every frame. */
+    private boolean skyPlaceSettled;
+
+    /**
+     * <b>The sky is read from where the reader is, and had no place at all.</b>
+     *
+     * Chart A and Chart B are built from the form every time Generate runs; the sky subject was
+     * passed through untouched, and the two calls that do move it - the sky's Now and its zone
+     * override - keep the coordinates it already has. Nothing ever gave it any, so it stayed at
+     * the empty subject's 0,0 and every house it cast was cast in the Atlantic.
+     *
+     * It showed up as David's houses: with only the sky on the wheel the Ascendant sat in
+     * Sagittarius, switching Chart A on corrected it (the inner wheel then takes Chart A's
+     * place), and switching Chart A off put it back. Measured on a fresh install, 2026-09-19:
+     * the drawn Ascendant was Gemini 11.52, which is exactly the Ascendant at 0,0 for that
+     * moment - Pisces 21 at Philadelphia.
+     *
+     * So: the home location the reader has already set, which is what "the sky" means; then
+     * Chart A's place if there is no home; and if neither exists the sky keeps no place rather
+     * than inventing one, because a chart cast at a guessed place is the defect this replaces.
+     * Through Geocoder, which answers coordinates and known places from the offline atlas
+     * before it reaches for the network.
+     */
+    private void ensureSkyPlace() {
+        if (this.skyPlaceSettled || !placeless(this.subjectSky)) {
+            return;
+        }
+        this.skyPlaceSettled = true;
+        String home = Settings.get("home.location",
+            Settings.get("default.transit.location", "")).trim();
+        Geocoder.Result there = home.isEmpty() ? null : this.syncGeocode(home);
+        if (there != null) {
+            this.subjectSky = this.subjectSky.movedTo(there.name, there.lat, there.lon,
+                there.tzId == null || there.tzId.isEmpty() ? this.skyTimeZoneId : there.tzId);
+        } else if (!placeless(this.subjectA)) {
+            this.subjectSky = this.subjectSky.movedTo(this.subjectA.placeName,
+                this.subjectA.latitude, this.subjectA.longitude, this.subjectA.zoneId);
+        } else {
+            return;
+        }
+        this.castRoles();
+    }
+
+    /**
+     * Where the sky is read from, as the reader typed it. The Sky row's location field's door:
+     * it had none, so what the field said and what the wheel cast were never connected.
+     */
+    void setSkyPlace(String place) {
+        if (place == null || place.trim().isEmpty()) {
+            return;
+        }
+        Geocoder.Result there = this.syncGeocode(place.trim());
+        if (there == null) {
+            return;
+        }
+        this.skyPlaceSettled = true;
+        this.installSubjects(this.subjectA, this.subjectB,
+            this.subjectSky.movedTo(there.name, there.lat, there.lon,
+                there.tzId == null || there.tzId.isEmpty() ? this.skyTimeZoneId : there.tzId));
+        this.updateChartData();
+        this.repaintWheel();
+    }
+
     private SweDate createSweDate(ZonedDateTime zonedDateTime) {
         ZonedDateTime zonedDateTime2 = zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
         return new SweDate(zonedDateTime2.getYear(), zonedDateTime2.getMonthValue(), zonedDateTime2.getDayOfMonth(), (double)zonedDateTime2.getHour() + (double)zonedDateTime2.getMinute() / 60.0 + (double)zonedDateTime2.getSecond() / 3600.0);
@@ -7594,6 +7665,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
 
     public void updateChartData() {
         this.invalidateGlobeChords();
+        this.ensureSkyPlace();
         if (this.natalRing.time != null) {
             this.natalRing.sd = this.createSweDate(this.natalRing.time);
         }

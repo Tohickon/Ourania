@@ -1107,6 +1107,13 @@ public class OuraniaWindow extends JFrame {
      *
      * The subject is labelled so the readout says what is on the ring rather than "Sky".
      */
+    /** Where the sky is read from, from the Sky row's location field. */
+    public void setSkyPlace(String place) {
+        if (skymapPanel != null) {
+            skymapPanel.setSkyPlace(place);
+        }
+    }
+
     void showReturnOnWheel(com.zodiacomputing.ourania.astro.Returns.Return r) {
         if (skymapPanel == null || r == null) {
             return;

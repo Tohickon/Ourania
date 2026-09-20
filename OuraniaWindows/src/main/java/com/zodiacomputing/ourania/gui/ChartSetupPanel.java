@@ -472,6 +472,16 @@ public class ChartSetupPanel extends JPanel {
         skyLocationField.setToolTipText("<html><b>Where the sky is being read from.</b><br>"
             + "Its own field rather than Chart B's, so a transit ring is never cast for "
             + "somebody's birthplace.</html>");
+        // <b>And it now reaches the wheel.</b> The field had no door: the sky subject is
+        // passed through Generate untouched, so whatever was typed here changed nothing and
+        // the sky was cast at 0,0 - see SkymapPanel.ensureSkyPlace.
+        skyLocationField.addActionListener(e -> applySkyPlace());
+        skyLocationField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                applySkyPlace();
+            }
+        });
         skyZone = zoneBox(skyPanel);
 
         // <b>Seeded from the clock, not from the network.</b> Calling setSkyToNow here would
@@ -1342,6 +1352,14 @@ public class ChartSetupPanel extends JPanel {
      * from the system zone first so the field is never blank, then corrected once the
      * location's zone is known.
      */
+    /** Hands the Sky row's location to the wheel, which reads its houses from it. */
+    private void applySkyPlace() {
+        if (parentWindow == null) {
+            return;
+        }
+        parentWindow.setSkyPlace(skyLocationField.getText().trim());
+    }
+
     /** The Sky row's "Now", corrected to the sky location's zone the same way. */
     private void setSkyToNow() {
         applySkyInstant(ZonedDateTime.now());
