@@ -344,8 +344,17 @@ everything as its own section.
 > **The activation filter built** (`de9972a5`): a point is active if it is the lord of the
 > year, sits in the profected sign, or is reached by a progression or solar arc in the window;
 > transits, stations and eclipses testify only to active points, and are otherwise listed as
-> background and not counted. **Still to come:** the progressed Moon as its own clock (stage 2),
-> then Mars/Sun dating of a converged theme.
+> background and not counted.
+>
+> **The progressed Moon clock built** (stage 2): `Progressions.clock` gives the natal houses
+> the progressed Moon tenants across the window, with the ingress dates, the sign and the
+> lunation phase. A tenancy in one of a theme's houses is that theme's own testimony -
+> `Convergence.Family.PROGRESSED_MOON`, a family of its own, counted once however many of the
+> theme's houses the Moon passes through - and it **activates the natal bodies of the house it
+> tenants**, exactly as stage 1 activates the bodies of the profected sign. The synthesis states
+> the clock before the themes, because it reads the same whether or not any theme reaches three.
+> `ProgressedMoonCheck` 26; seven mutations caught. **Still to come:** progressed-to-progressed
+> aspects, then Mars/Sun dating of a converged theme.
 
 **Decision (David, 2026-09-19).** Prediction is a noise filter. On any day there are dozens of
 minor transits, and treating each as a prediction produces contradictions daily. A major event
@@ -375,7 +384,7 @@ K8) and L6 (`astro.Topics`); the pipeline is a reorganisation and three addition
 | Stage | Already built | Missing |
 |---|---|---|
 | 1 | `Profection`: lord of the year and house; the lord is a witness, and a witness whose moving body is the lord is multiplied (K8). Zodiacal releasing gates every witness: L1 lord x3, L2 x2, peak x2.5, loosing x4. | Transits **through the profected house**, and transits **to** the lord, as primary; un-activated transits **demoted** rather than voting equally. |
-| 2 | `Progressions` and `SolarArc` vote at their **dated moment of exactness** - stricter than a 1° orb, and chosen because a contact stays within orb about two years. | The **progressed Moon** as its own clock; progressed-to-progressed aspects. |
+| 2 | `Progressions` and `SolarArc` vote at their **dated moment of exactness** - stricter than a 1° orb, and chosen because a contact stays within orb about two years. The **progressed Moon's own clock** is built: `Progressions.clock` (2026-09-20). | Progressed-to-**progressed** aspects. |
 | 3 | Slow-body transits vote when they **perfect** in the window (the orb is weather, the perfection is the event); eclipses and stations are families; a station duplicating a transit is discounted, not double-counted. | "Transit to an **active** point triggers": today every perfection votes whether or not its target is active. **Mars and the Sun as date-pinpointers** - excluded as voters on purpose (the Sun conjuncts every natal point every year and so agrees with everything), and should stay excluded as voters but be used to date a converged event. |
 | 4 | Convergence counts distinct **families** per natal point ("two transits to the same point are one witness, not two"), with thresholds relative to the chart's own distribution. `Topics` groups houses, rulers and significators into topics by three witnesses - for the natal chart. | **Theme buckets** for timing (grouping by theme, not by single natal point) and the **Rule of Three gate** as the headline test, with its testimonies listed. |
 
@@ -390,7 +399,17 @@ K8) and L6 (`astro.Topics`); the pipeline is a reorganisation and three addition
 
 **Order of work, when it is taken up:** theme buckets over Convergence's per-point targets
 (stage 4), then the activation filter (stages 1 and 3), then the progressed Moon clock (stage 2),
-then Mars/Sun dating of converged themes.
+then Mars/Sun dating of converged themes. Taken in that order; the first three are built.
+
+**Decided while building the clock (2026-09-20): the progressed Moon loads the gun for a whole
+house.** The spec's activation list is about points - the lord of the year, the bodies in the
+profected sign, the points a progression or arc reaches. The progressed Moon's clock is about an
+*area*, so it had to be one thing or the other, and it activates the bodies of the house it
+tenants. The reason: stage 2 calls an active progression "the loaded gun", and the progressed
+Moon is a progression; without this the clock could name a theme and still leave every transit
+into that area demoted to background, which is the opposite of what a mid-term clock is for. It
+does loosen the filter, so it is written down rather than left implicit, and
+`ProgressedMoonCheck` pins both halves - the tenanted house's bodies wake, another house's do not.
 
 ---
 

@@ -3905,6 +3905,7 @@ extends JPanel {
         yearScan.perfections = Transits.perfectionsOverRange(swissEph, chartFrame, list, profection.lord, d5, d6);
         yearScan.arcs = SolarArc.contacts(swissEph, chartFrame, d, list, profection.lord, d5, d6);
         yearScan.progressions = Progressions.contacts(swissEph, chartFrame, d, list, profection.lord, d5, d6);
+        yearScan.moonClock = Progressions.clock(swissEph, d, chartFrame.cusps, d5, d6);
         ChartFrame.Body body2 = chartFrame.body("Sun");
         if (body2 != null && body2.ok && (return_ = Returns.solar(swissEph, d, body2.lon, profection.age, d3, d4, n)) != null) {
             yearScan.returns = Returns.contacts(return_, chartFrame, list, profection.lord);
@@ -9344,5 +9345,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         public List<SolarArc.Contact> arcs = Collections.emptyList();
         public List<Progressions.Contact> progressions = Collections.emptyList();
         public List<Returns.Contact> returns = Collections.emptyList();
+        /** K12 stage 2: the progressed Moon's tenancies of the natal houses across the year. */
+        public List<Progressions.Tenancy> moonClock = Collections.emptyList();
     }
 }

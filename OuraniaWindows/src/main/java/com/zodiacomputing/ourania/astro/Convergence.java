@@ -76,7 +76,7 @@ public final class Convergence {
      * collect() is the whole integration.
      */
     public enum Family {
-        PROFECTION, TRANSIT, ECLIPSE, STATION, SOLAR_ARC, PROGRESSION, RETURN
+        PROFECTION, TRANSIT, ECLIPSE, STATION, SOLAR_ARC, PROGRESSION, PROGRESSED_MOON, RETURN
     }
 
     /**
@@ -99,6 +99,11 @@ public final class Convergence {
      * <b>Classify every new family here before adding it.</b> A family that is wrongly
      * called a sky position gets silently discounted whenever it shares a body name and an
      * aspect with a transit, and nothing about the output looks wrong.
+     *
+     * PROGRESSED_MOON, added with K12's stage 2, is symbolic for the same reason as
+     * PROGRESSION: it is the Moon's house on a different day, read as this year's clock. It
+     * also carries no aspect and no body name a transit could match, so the guard would never
+     * reach it - but it is classified here anyway, because the next family might.
      */
     private static boolean skyPosition(Family f) {
         return f == Family.TRANSIT || f == Family.ECLIPSE || f == Family.STATION

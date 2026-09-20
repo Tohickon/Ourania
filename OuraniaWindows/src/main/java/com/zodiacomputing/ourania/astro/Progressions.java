@@ -119,7 +119,119 @@ public final class Progressions {
         }
     }
 
+    /**
+     * A stretch of the window during which the progressed Moon tenants one natal house.
+     *
+     * <p>K12 stage 2 calls the progressed Moon "the mid-term clock", and this is the hand it
+     * turns. Its aspects to natal points are already caught as {@link Contact}s, but those say
+     * <i>which point</i> is being reached, not <i>which area of life</i> is under the light -
+     * and a house is the only thing in the chart that answers that on the progressed Moon's own
+     * timescale. About two and a half years a house, so a one-year window holds one tenancy
+     * more often than two, and the boundary is the event.
+     */
+    public static final class Tenancy {
+        /** The natal house tenanted, 1 to 12. */
+        public int house;
+        /** When this tenancy begins - the ingress, or the start of the window if it began earlier. */
+        public double jdFrom;
+        /** When it ends - the next ingress, or the end of the window if it outlasts it. */
+        public double jdTo;
+        /** True when the Moon crossed into this house inside the window rather than arriving already there. */
+        public boolean entered;
+        /** The sign the progressed Moon holds at {@link #jdFrom}. */
+        public String sign;
+        /** The progressed lunation phase at {@link #jdFrom}. */
+        public String phase;
+
+        @Override
+        public String toString() {
+            return String.format("progressed Moon %s the %s house%s",
+                entered ? "enters" : "holds", ordinal(house),
+                sign == null || sign.isEmpty() ? "" : " (in " + capitalise(sign) + ")");
+        }
+    }
+
     private Progressions() { }
+
+    /**
+     * The progressed Moon's tenancies of the natal houses across a window, in order.
+     *
+     * <p>The first is the house it is already in when the window opens; each later one begins
+     * at a cusp crossing. A window with no crossing yields exactly one, which is the usual
+     * case, and that one is still the clock's reading - "this year is a fourth-house year" is
+     * a statement whether or not the boundary happens to fall inside it.
+     *
+     * <p>Retrograde progressed motion cannot happen for the Moon, so a crossing is always
+     * forward and the house arrived in is the one the crossing names.
+     *
+     * @param cusps the natal cusps, 1-based as {@link ChartFrame#cusps}; null or short yields nothing
+     */
+    public static List<Tenancy> clock(SwissEph sw, double natalJd, double[] cusps,
+                                      double jdFrom, double jdTo) {
+        List<Tenancy> out = new ArrayList<>();
+        if (cusps == null || cusps.length < 13 || jdTo <= jdFrom) {
+            return out;
+        }
+        ProgressedLon moon = new ProgressedLon(sw, "Moon", natalJd);
+        double first = moon.at(jdFrom);
+        if (Double.isNaN(first)) {
+            return out;
+        }
+        Tenancy cur = tenancy(sw, natalJd, Zodiac.houseOf(first, cusps), jdFrom, false, moon);
+        if (cur == null) {
+            return out;
+        }
+        out.add(cur);
+        for (double t = jdFrom + SCAN_STEP_DAYS; t <= jdTo; t += SCAN_STEP_DAYS) {
+            double now = moon.at(t);
+            if (Double.isNaN(now)) {
+                continue;
+            }
+            int h = Zodiac.houseOf(now, cusps);
+            if (h != 0 && h != cur.house) {
+                final double cusp = Zodiac.normalise(cusps[h]);
+                double jd = Almanac.bisect(
+                    x -> Almanac.signedDelta(moon.at(x), cusp), t - SCAN_STEP_DAYS, t);
+                cur.jdTo = jd;
+                Tenancy next = tenancy(sw, natalJd, h, jd, true, moon);
+                if (next != null) {
+                    out.add(next);
+                    cur = next;
+                }
+            }
+        }
+        cur.jdTo = jdTo;
+        return out;
+    }
+
+    private static Tenancy tenancy(SwissEph sw, double natalJd, int house, double jd,
+                                   boolean entered, ProgressedLon moon) {
+        if (house == 0) {
+            return null;
+        }
+        Tenancy t = new Tenancy();
+        t.house = house;
+        t.jdFrom = jd;
+        t.jdTo = jd;
+        t.entered = entered;
+        double lon = moon.at(jd);
+        t.sign = Double.isNaN(lon) ? "" : Zodiac.signName(lon);
+        t.phase = lunationPhase(sw, natalJd, jd);
+        return t;
+    }
+
+    private static String ordinal(int n) {
+        int t = n % 100;
+        if (t >= 11 && t <= 13) {
+            return n + "th";
+        }
+        switch (n % 10) {
+            case 1: return n + "st";
+            case 2: return n + "nd";
+            case 3: return n + "rd";
+            default: return n + "th";
+        }
+    }
 
     /** The progressed moment for a target date: a day for a year. */
     public static double progressedJd(double natalJd, double targetJd) {

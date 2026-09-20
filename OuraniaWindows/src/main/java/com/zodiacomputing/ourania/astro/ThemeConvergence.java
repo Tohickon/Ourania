@@ -98,8 +98,19 @@ public final class ThemeConvergence {
      * @param targets  {@link Convergence#collect}'s output for the same year
      */
     public static List<Result> themes(ChartFrame f, Profection prof, List<Convergence.Target> targets) {
+        return themes(f, prof, targets, null);
+    }
+
+    /**
+     * The same, with K12's stage 2: the progressed Moon's own clock.
+     *
+     * @param clock {@link Progressions#clock}'s tenancies for the same window; null leaves the
+     *              clock's testimony out, which is what the three-argument form does
+     */
+    public static List<Result> themes(ChartFrame f, Profection prof, List<Convergence.Target> targets,
+                                      List<Progressions.Tenancy> clock) {
         List<Result> out = new ArrayList<>();
-        Set<String> active = activePoints(f, prof, targets);
+        Set<String> active = activePoints(f, prof, targets, clock);
         for (Theme theme : Theme.values()) {
             Result r = new Result();
             r.theme = theme;
@@ -108,6 +119,22 @@ public final class ThemeConvergence {
                 r.families.add(Convergence.Family.PROFECTION);
                 r.testimonies.add("PROFECTION: the year falls on the " + ordinal(prof.house)
                     + " house (lord " + prof.lord + ")");
+            }
+            // K12 stage 2. The progressed Moon tenanting one of the theme's houses is that
+            // theme's own mid-term clock speaking, and it says so about the area of life
+            // rather than about any one point - so it is a testimony here, next to the
+            // profection, and not a witness on a natal point. One family however many of the
+            // theme's houses it passes through: it is one Moon, and it agrees with itself.
+            if (clock != null) {
+                for (Progressions.Tenancy t : clock) {
+                    if (!theme.hasHouse(t.house)) {
+                        continue;
+                    }
+                    boolean fresh = r.families.add(Convergence.Family.PROGRESSED_MOON);
+                    r.testimonies.add("PROGRESSED_MOON: " + t
+                        + (t.phase == null || t.phase.isEmpty() ? "" : ", lunation " + t.phase)
+                        + (fresh ? "" : " (same technique, counted once)"));
+                }
             }
             for (Convergence.Target t : targets) {
                 if (!r.members.contains(t.natal)) {
@@ -159,7 +186,32 @@ public final class ThemeConvergence {
      * window (the "loaded gun"). Only these can be triggered by a transit, station or eclipse.
      */
     static Set<String> activePoints(ChartFrame f, Profection prof, List<Convergence.Target> targets) {
+        return activePoints(f, prof, targets, null);
+    }
+
+    /**
+     * The same, with the progressed Moon's clock included.
+     *
+     * <p>K12 stage 2 calls an active progression "the loaded gun", and the progressed Moon is a
+     * progression: the natal bodies in the house it tenants are woken by it, exactly as the
+     * bodies in the profected sign are woken by stage 1. Without this the clock could name a
+     * theme and still leave every transit into that area demoted to background, which is the
+     * opposite of what a mid-term clock is for.
+     */
+    static Set<String> activePoints(ChartFrame f, Profection prof, List<Convergence.Target> targets,
+                                    List<Progressions.Tenancy> clock) {
         Set<String> a = new LinkedHashSet<>();
+        if (clock != null && f != null) {
+            for (Progressions.Tenancy t : clock) {
+                for (int i = 0; i < Bodies.count(); i++) {
+                    String name = Bodies.at(i).name;
+                    ChartFrame.Body b = f.body(name);
+                    if (b != null && b.ok && Zodiac.houseOf(b.lon, f.cusps) == t.house) {
+                        a.add(name);
+                    }
+                }
+            }
+        }
         if (prof != null) {
             if (prof.lord != null) {
                 a.add(prof.lord);

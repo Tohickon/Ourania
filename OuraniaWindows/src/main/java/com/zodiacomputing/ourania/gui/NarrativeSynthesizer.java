@@ -398,7 +398,21 @@ public class NarrativeSynthesizer {
             // when three independent techniques name it; the rest are background trends. The
             // testimonies are the witnesses' own details - named and listed, never written up.
             List<com.zodiacomputing.ourania.astro.ThemeConvergence.Result> themes =
-                com.zodiacomputing.ourania.astro.ThemeConvergence.themes(f, prof, convergence);
+                com.zodiacomputing.ourania.astro.ThemeConvergence.themes(f, prof, convergence,
+                    scan.moonClock);
+            // K12 stage 2. The mid-term clock reads the same whether or not any theme reaches
+            // three, so it is stated before them rather than only inside a headline.
+            if (scan.moonClock != null && !scan.moonClock.isEmpty()) {
+                StringBuilder clock = new StringBuilder();
+                for (com.zodiacomputing.ourania.astro.Progressions.Tenancy ten : scan.moonClock) {
+                    clock.append(clock.length() == 0 ? "" : "; ").append(ten);
+                    if (ten.phase != null && !ten.phase.isEmpty()) {
+                        clock.append(", lunation ").append(ten.phase);
+                    }
+                }
+                sb.append("<p><b style='color:#FFD166;'>The mid-term clock:</b> ")
+                    .append(clock).append(".</p>");
+            }
             sb.append("<h3 style='color: #FFFFFF;'>The year by theme (the Rule of Three)</h3>");
             boolean anyHeadline = false;
             for (com.zodiacomputing.ourania.astro.ThemeConvergence.Result th : themes) {
