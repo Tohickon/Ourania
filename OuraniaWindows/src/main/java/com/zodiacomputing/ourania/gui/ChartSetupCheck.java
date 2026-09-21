@@ -609,7 +609,7 @@ public final class ChartSetupCheck {
             ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
             Thread.sleep(2000);
 
-            ok("a repeated hour reaches the wheel as an uncertain subject",
+            okGen("a repeated hour reaches the wheel as an uncertain subject",
                 generateAt(hold[0], setup, panel, "2006-10-29", "01:30"));
             com.zodiacomputing.ourania.astro.ChartSubject a = panel.chartASubject();
             ok("and the subject carries the sentence", a != null && a.timeIsUncertain());
@@ -619,7 +619,7 @@ public final class ChartSetupCheck {
             // The strip is visible, and it is visible because of this chart.
             ok("the form shows a notice", awaitNotice(setup, true));
 
-            ok("a skipped hour also reaches the wheel",
+            okGen("a skipped hour also reaches the wheel",
                 generateAt(hold[0], setup, panel, "2006-04-02", "02:30"));
             com.zodiacomputing.ourania.astro.ChartSubject skipped = panel.chartASubject();
             ok("and is also reported", skipped != null && skipped.timeIsUncertain());
@@ -629,7 +629,7 @@ public final class ChartSetupCheck {
             // <b>And an ordinary birth time says nothing at all.</b> A notice that is always up
             // is a notice nobody reads, and this is the case that proves the strip is driven by
             // the chart rather than merely switched on once and left.
-            ok("an ordinary time generates",
+            okGen("an ordinary time generates",
                 generateAt(hold[0], setup, panel, "1982-08-10", "15:01"));
             com.zodiacomputing.ourania.astro.ChartSubject plain = panel.chartASubject();
             ok("an unremarkable birth time raises nothing",
@@ -721,13 +721,13 @@ public final class ChartSetupCheck {
             ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
             Thread.sleep(2000);
 
-            ok("a Tromso chart generates",
+            okGen("a Tromso chart generates",
                 generateAt(hold[0], setup, panel, "1990-01-15", "12:00", "69.65, 18.96"));
             String shown = awaitPrecision(setup, true);
             ok("and the form says its houses are Porphyry: " + shown,
                 shown.contains("Chart A") && shown.contains("Porphyry"));
 
-            ok("a Philadelphia chart generates",
+            okGen("a Philadelphia chart generates",
                 generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
             ok("and the notice goes away", awaitPrecision(setup, false).isEmpty());
         } finally {
@@ -757,7 +757,7 @@ public final class ChartSetupCheck {
             TransitSearchPanel search = (TransitSearchPanel) ft.get(hold[0]);
             Thread.sleep(2000);
 
-            ok("David's chart generates",
+            okGen("David's chart generates",
                 generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 hold[0].switchScreen("TRANSIT_SEARCH");
@@ -824,7 +824,7 @@ public final class ChartSetupCheck {
             fd.setAccessible(true);
             Drawer drawer = (Drawer) fd.get(panel);
             Thread.sleep(2000);
-            ok("a chart generates",
+            okGen("a chart generates",
                 generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
 
             final String[] label = {""};
@@ -896,7 +896,7 @@ public final class ChartSetupCheck {
             fc.setAccessible(true);
             ChartSetupPanel setup = (ChartSetupPanel) fc.get(hold[0]);
             Thread.sleep(2000);
-            ok("a chart generates",
+            okGen("a chart generates",
                 generateAt(hold[0], setup, panel, "1982-08-10", "15:01", "39.95, -75.17"));
             Thread.sleep(1500);
             final double[][] got = new double[ids.length][];
@@ -938,13 +938,32 @@ public final class ChartSetupCheck {
     }
 
     /** Types a date and time into Chart A, presses Generate, and waits for the wheel. */
-    private static boolean generateAt(OuraniaWindow window, ChartSetupPanel setup,
+    /**
+     * Asserts a chart was cast, and says what went wrong when it was not.
+     *
+     * <b>A bare boolean here cost an evening.</b> On 2026-09-20 this suite came back 7 of 175
+     * inside a full regression, having been clear in four regressions the same day, and the
+     * whole failing chain hung off one line that said only "David's chart generates" - no
+     * distinction between the cast throwing, the cast never arriving, and the cast arriving but
+     * never settling. It had to be re-run four times, twice at HEAD, to establish that it was a
+     * flake at all. The reason was always known inside {@code generateAt}; it was simply thrown
+     * away at the door.
+     */
+    private static void okGen(String label, String reason) {
+        ok(label + (reason.isEmpty() ? "" : " - " + reason), reason.isEmpty());
+    }
+
+    private static String generateAt(OuraniaWindow window, ChartSetupPanel setup,
             SkymapPanel panel, String date, String time) throws Exception {
         return generateAt(window, setup, panel, date, time, "40.71, -74.01");
     }
 
-    /** The same, at a place given as coordinates. */
-    private static boolean generateAt(OuraniaWindow window, ChartSetupPanel setup,
+    /**
+     * The same, at a place given as coordinates.
+     *
+     * @return the empty string when the chart cast and settled, or why it did not
+     */
+    private static String generateAt(OuraniaWindow window, ChartSetupPanel setup,
             SkymapPanel panel, String date, String time, String place) throws Exception {
         final Exception[] blew = new Exception[1];
         java.lang.reflect.Method gen =
@@ -966,7 +985,13 @@ public final class ChartSetupCheck {
         // this check failed once and passed the next run on identical code, which is the worst
         // way for a check to behave. Poll for the subject the form was told to build, then let
         // the event queue drain - after which everything done() queued has actually happened.
-        long deadline = System.currentTimeMillis() + 20000;
+        // <b>Generous, because it is bounding a hang and not a reasonable time.</b> It was 20
+        // seconds, which is a fine bound for a cast on an idle machine and is not what this
+        // number is for: inside a full regression, sixty suites deep, a cast that would take a
+        // second can take far longer, and a check that goes red because the machine was busy
+        // teaches a session to disbelieve the suites. The only thing worth failing on here is a
+        // cast that never finishes at all.
+        long deadline = System.currentTimeMillis() + 90000;
         boolean arrived = false;
         while (System.currentTimeMillis() < deadline && !arrived) {
             final boolean[] ready = {false};
@@ -985,9 +1010,16 @@ public final class ChartSetupCheck {
         // search below then read one chart or the other. Its answer - a Saturn conjunction to
         // the natal Moon near the edge of the window, or only the trine - flickered between
         // runs on identical code (2026-09-19, twice in one day). Wait for one second unchanged.
+        // <b>Its own budget, not the remains of the arrival one.</b> Sharing a deadline meant a
+        // slow arrival left no time to settle, so on a loaded machine the chart was accepted
+        // mid-recast - and the transit search below then read one chart or the other, which is
+        // the flicker this settle loop was written to stop. It cannot do that job out of
+        // whatever the first loop happened to leave.
+        long settleBy = System.currentTimeMillis() + 20000;
         String last = null;
         long steadySince = System.currentTimeMillis();
-        while (arrived && System.currentTimeMillis() < deadline) {
+        boolean settled = false;
+        while (arrived && System.currentTimeMillis() < settleBy) {
             final String[] now = {null};
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 com.zodiacomputing.ourania.astro.ChartSubject a = panel.chartASubject();
@@ -997,12 +1029,22 @@ public final class ChartSetupCheck {
                 last = now[0];
                 steadySince = System.currentTimeMillis();
             } else if (System.currentTimeMillis() - steadySince >= 1000) {
+                settled = true;
                 break;
             }
             Thread.sleep(100);
         }
         javax.swing.SwingUtilities.invokeAndWait(() -> { });
-        return blew[0] == null && arrived;
+        if (blew[0] != null) {
+            return "the cast threw " + blew[0];
+        }
+        if (!arrived) {
+            return "no chart for " + date + " after 90s (the cast never finished)";
+        }
+        if (!settled) {
+            return "the chart for " + date + " was still being recast after 20s";
+        }
+        return "";
     }
 
     private static javax.swing.JTextField field(ChartSetupPanel p, String name) {

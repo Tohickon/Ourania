@@ -1301,11 +1301,61 @@ public final class NavigationCheck {
             boolean b, boolean sky, ChartMode mode, String anchorLabel, boolean skyExpected)
             throws Exception {
         javax.swing.SwingUtilities.invokeAndWait(() -> w.setRings(a, b, sky));
-        Thread.sleep(1600);
         String what = (a ? "A" : "-") + (b ? "B" : "-") + (sky ? "S" : "-");
 
         java.lang.reflect.Field fm = SkymapPanel.class.getDeclaredField("chartMode");
         fm.setAccessible(true);
+
+        // <b>Wait for the composition to land, not for a number of milliseconds.</b> Changing
+        // the rings recasts on a worker, and this was a flat 1.6-second sleep - long enough on
+        // an idle machine and a guess either way. Inside a full regression on 2026-09-20 it was
+        // not long enough once: the step that takes both charts off reported an outer ring that
+        // had not yet gone, the suite came back 13 of 746 against its usual 12, and it took four
+        // runs at two commits to establish that nothing was wrong.
+        //
+        // <b>Waited for, and the first attempt waited for the wrong thing.</b> Polling until the
+        // chart mode matched looked obvious and was worse than the sleep it replaced - two ring
+        // assertions started failing. setRings sets the mode at once and recasts afterwards, so
+        // the mode lands immediately and the poll fell through before any ring existed. The flat
+        // sleep had been covering that gap by accident.
+        //
+        // So the condition is that the thing has stopped changing, not that it has reached a
+        // value. That costs the assertions nothing - they still read the rings and still fail if
+        // the rings are wrong - where waiting for the rings themselves would have made them
+        // assert only that the check had waited long enough.
+        // <b>And a floor under it, which the second attempt needed too.</b> "Stopped changing"
+        // is only meaningful once the change has started, and the recast does not start on this
+        // thread - so a settle poll that begins immediately finds the old state sitting still
+        // and breaks out of it, which failed the same two assertions all over again. The old
+        // 1.6-second wait was never wrong, it was only unable to wait longer; it stays as the
+        // floor, and the polling above it is what covers a loaded machine.
+        long floor = System.currentTimeMillis() + 1600;
+        long deadline = System.currentTimeMillis() + 30000;
+        String last = null;
+        long steadySince = System.currentTimeMillis();
+        while (System.currentTimeMillis() < deadline) {
+            if (System.currentTimeMillis() < floor) {
+                Thread.sleep(50);
+                continue;
+            }
+            final String[] now = {null};
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                try {
+                    now[0] = fm.get(panel) + "|" + panel.outerRingDrawn()
+                        + "|" + panel.triRingDrawn();
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            if (last == null || !last.equals(now[0])) {
+                last = now[0];
+                steadySince = System.currentTimeMillis();
+            } else if (System.currentTimeMillis() - steadySince >= 500) {
+                break;
+            }
+            Thread.sleep(50);
+        }
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
         java.lang.reflect.Field fa = SkymapPanel.class.getDeclaredField("anchorSubject");
         fa.setAccessible(true);
         Object anchor = fa.get(panel);
