@@ -2066,137 +2066,70 @@ extends JPanel {
     // ------------------------------------------------------------------ zoom and pan
 
     /**
-     * Master list E6: "Zoom &amp; pan - wheel is fixed to the panel; no zoom, pan, or
-     * fit-to-window."
+     * How far in the wheel is being looked at, and how far across.
      *
-     * <b>One view transform, applied at the two ends and nowhere in between.</b> The painter
-     * draws the wheel through it, and every mouse position is carried back through its inverse
-     * before any hit test sees it. Geometry, bodyAt, chordAt, ringTargetAt and
-     * handleChartClick are untouched and still work in the wheel's own unzoomed coordinates -
-     * the alternative, a zoom factor threaded into the radius chain, is the four-copies defect
-     * Geometry exists to end, and a hit test that missed the factor would put clicks beside
-     * what is drawn.
+     * <b>J13, step 2: this used to be four fields and seven methods here.</b> The design is
+     * unchanged and is written down in {@link WheelView} - one transform applied at the two
+     * ends, the hit tests left in the wheel's own coordinates, screen only, zoom about the
+     * cursor. What changed is where it lives: the panel now asks the view, and passes it the
+     * size, rather than the view reading the size off the panel it happens to sit on.
      *
-     * <b>Screen only.</b> A saved PNG or a print is the whole chart whatever the screen is
-     * zoomed to: ChartExporter marks the panel while it paints, and the transform is skipped.
-     *
-     * Fit is zoom 1 with no pan: the wheel already sizes itself to the panel.
+     * The methods below stay so that the call sites - the mouse listeners, the painter, the
+     * exporter - are untouched by the move. They are one line each, and each one is the panel
+     * supplying the only thing the view cannot know for itself.
      */
-    double viewZoom = 1.0;
-    /** The view's offset in screen pixels, applied after the zoom. */
-    double viewPanX;
-    double viewPanY;
-    static final double VIEW_MAX_ZOOM = 8.0;
-    /** Each wheel notch zooms by this much, so four notches is about double. */
-    static final double VIEW_STEP = 1.19;
-    /** Set while a drag has been panning, so its closing click does not also select. */
-    private boolean viewPanned;
+    final WheelView view = new WheelView();
 
-    /** Screen from wheel: scale about the panel's centre, then shift by the pan. */
+    private int viewW() {
+        return this.chartPanel == null ? 0 : this.chartPanel.getWidth();
+    }
+
+    private int viewH() {
+        return this.chartPanel == null ? 0 : this.chartPanel.getHeight();
+    }
+
     java.awt.geom.AffineTransform viewTransform(int w, int h) {
-        java.awt.geom.AffineTransform t = new java.awt.geom.AffineTransform();
-        t.translate(w / 2.0 + this.viewPanX, h / 2.0 + this.viewPanY);
-        t.scale(this.viewZoom, this.viewZoom);
-        t.translate(-w / 2.0, -h / 2.0);
-        return t;
+        return this.view.transform(w, h);
     }
 
     boolean viewIsFit() {
-        return this.viewZoom == 1.0 && this.viewPanX == 0.0 && this.viewPanY == 0.0;
+        return this.view.isFit();
     }
 
-    /** A screen point in the wheel's own coordinates - what every hit test is asked about. */
     java.awt.Point toWheel(int x, int y) {
-        if (this.viewIsFit() || this.chartPanel == null) {
-            return new java.awt.Point(x, y);
-        }
-        double w = this.chartPanel.getWidth();
-        double h = this.chartPanel.getHeight();
-        double wx = (x - w / 2.0 - this.viewPanX) / this.viewZoom + w / 2.0;
-        double wy = (y - h / 2.0 - this.viewPanY) / this.viewZoom + h / 2.0;
-        return new java.awt.Point((int) Math.round(wx), (int) Math.round(wy));
+        return this.chartPanel == null
+            ? new java.awt.Point(x, y)
+            : this.view.toWheel(x, y, this.viewW(), this.viewH());
     }
 
-    /**
-     * Zooms by a number of wheel notches, keeping the point under the cursor where it is.
-     *
-     * <b>About the cursor, not the centre.</b> Zooming about the centre sends whatever the
-     * reader was pointing at off towards the edge, so every zoom would need a pan after it.
-     */
     void zoomAt(int x, int y, double notches) {
-        if (this.chartPanel == null) {
-            return;
+        if (this.chartPanel != null) {
+            this.view.zoomAt(x, y, notches, this.viewW(), this.viewH());
         }
-        double w = this.chartPanel.getWidth();
-        double h = this.chartPanel.getHeight();
-        double z = Math.max(1.0, Math.min(VIEW_MAX_ZOOM, this.viewZoom * Math.pow(VIEW_STEP, -notches)));
-        // The wheel point under the cursor, before the change, in the wheel's coordinates.
-        double wx = (x - w / 2.0 - this.viewPanX) / this.viewZoom + w / 2.0;
-        double wy = (y - h / 2.0 - this.viewPanY) / this.viewZoom + h / 2.0;
-        this.viewZoom = z;
-        this.viewPanX = x - w / 2.0 - z * (wx - w / 2.0);
-        this.viewPanY = y - h / 2.0 - z * (wy - h / 2.0);
-        this.clampView();
     }
 
-    /** Moves the view by a screen distance. */
     void panBy(double dx, double dy) {
-        this.viewPanX += dx;
-        this.viewPanY += dy;
-        this.clampView();
+        if (this.chartPanel != null) {
+            this.view.panBy(dx, dy, this.viewW(), this.viewH());
+        }
     }
 
-    /** Back to the whole wheel, fitted to the panel. */
     void fitView() {
-        this.viewZoom = 1.0;
-        this.viewPanX = 0.0;
-        this.viewPanY = 0.0;
+        this.view.fit();
     }
 
-    /**
-     * Keeps the zoomed wheel covering the panel.
-     *
-     * The scaled canvas is viewZoom times the panel, so it can slide (viewZoom - 1) half-panels
-     * each way before an edge comes into view. At zoom 1 that is nothing: fit cannot be panned
-     * off centre, and zooming all the way out always lands back on it.
-     */
-    private void clampView() {
-        if (this.chartPanel == null) {
-            return;
-        }
-        double limX = (this.viewZoom - 1.0) * this.chartPanel.getWidth() / 2.0;
-        double limY = (this.viewZoom - 1.0) * this.chartPanel.getHeight() / 2.0;
-        this.viewPanX = Math.max(-limX, Math.min(limX, this.viewPanX));
-        this.viewPanY = Math.max(-limY, Math.min(limY, this.viewPanY));
-        if (this.viewZoom <= 1.0) {
-            this.viewZoom = 1.0;
-            this.viewPanX = 0.0;
-            this.viewPanY = 0.0;
+    void clampView() {
+        if (this.chartPanel != null) {
+            this.view.reclamp(this.viewW(), this.viewH());
         }
     }
 
-    /** Where the "Fit" chip sits while zoomed: the top-left corner, clear of the wheel's rim. */
     static java.awt.Rectangle fitChipBounds() {
-        return new java.awt.Rectangle(10, 10, 104, 24);
+        return WheelView.fitChipBounds();
     }
 
-    /** The chip that says how far in the view is and puts it back, drawn in screen space. */
     void paintFitChip(Graphics2D g2) {
-        if (this.viewIsFit()) {
-            return;
-        }
-        java.awt.Rectangle r = fitChipBounds();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(new Color(22, 28, 43, 225));
-        g2.fillRoundRect(r.x, r.y, r.width, r.height, 12, 12);
-        g2.setColor(new Color(56, 132, 190));
-        g2.drawRoundRect(r.x, r.y, r.width, r.height, 12, 12);
-        g2.setFont(Theme.font("Segoe UI", Font.BOLD, 12));
-        g2.setColor(Color.WHITE);
-        String label = Math.round(this.viewZoom * 100) + "%  ·  Fit";
-        java.awt.FontMetrics fm = g2.getFontMetrics();
-        g2.drawString(label, r.x + (r.width - fm.stringWidth(label)) / 2,
-            r.y + (r.height + fm.getAscent() - fm.getDescent()) / 2);
+        this.view.paintFitChip(g2);
     }
 
     static final int GLOBE_NONE = 0;
@@ -3421,7 +3354,7 @@ extends JPanel {
                 if (SkymapPanel.this.scrubDragged) {
                     SkymapPanel.this.scrubDragged = false;
                     SkymapPanel.this.globeTurned = false;
-                    SkymapPanel.this.viewPanned = false;
+                    SkymapPanel.this.view.panned(false);
                     return;
                 }
                 // A drag on the globe turns it; a click still selects. The threshold is what
@@ -3435,8 +3368,8 @@ extends JPanel {
                     return;
                 }
                 // A drag that panned ends in a click as well; it moved the view, it chose nothing.
-                if (SkymapPanel.this.viewPanned) {
-                    SkymapPanel.this.viewPanned = false;
+                if (SkymapPanel.this.view.panned()) {
+                    SkymapPanel.this.view.panned(false);
                     return;
                 }
                 if (!SkymapPanel.this.viewIsFit() && fitChipBounds().contains(mouseEvent.getPoint())) {
@@ -3459,7 +3392,7 @@ extends JPanel {
             public void mousePressed(MouseEvent mouseEvent) {
                 SkymapPanel.this.dragFrom = mouseEvent.getPoint();
                 SkymapPanel.this.globeTurned = false;
-                SkymapPanel.this.viewPanned = false;
+                SkymapPanel.this.view.panned(false);
                 SkymapPanel.this.scrubDragged = false;
             }
 
@@ -3518,10 +3451,10 @@ extends JPanel {
                     }
                     int pdx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
                     int pdy = mouseEvent.getY() - SkymapPanel.this.dragFrom.y;
-                    if (!SkymapPanel.this.viewPanned && pdx * pdx + pdy * pdy < 9) {
+                    if (!SkymapPanel.this.view.panned() && pdx * pdx + pdy * pdy < 9) {
                         return;
                     }
-                    SkymapPanel.this.viewPanned = true;
+                    SkymapPanel.this.view.panned(true);
                     SkymapPanel.this.panBy(pdx, pdy);
                     SkymapPanel.this.dragFrom = mouseEvent.getPoint();
                     SkymapPanel.this.chartPanel.setCursor(

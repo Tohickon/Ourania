@@ -39,6 +39,7 @@ public final class ZoomPanCheck {
             part("A: the view is one invertible transform, clamped to the wheel", () -> view(sky, chart));
             part("B: zoomed and panned, each body lights and opens where it is drawn", () -> clicks(w[0], sky, chart));
             part("C: the wheel, the chip, and a saved image", () -> painting(sky, chart));
+            part("D: the view is its own object, and needs no window", () -> theView(sky));
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
@@ -73,9 +74,9 @@ public final class ZoomPanCheck {
             Point before = sky.toWheel(zx, zy);
             sky.zoomAt(zx, zy, -(1 + rnd.nextInt(10)));
             Point after = sky.toWheel(zx, zy);
-            double limX = (sky.viewZoom - 1.0) * W / 2.0;
-            double limY = (sky.viewZoom - 1.0) * H / 2.0;
-            if (Math.abs(sky.viewPanX) < limX - 1 && Math.abs(sky.viewPanY) < limY - 1) {
+            double limX = (sky.view.zoom() - 1.0) * W / 2.0;
+            double limY = (sky.view.zoom() - 1.0) * H / 2.0;
+            if (Math.abs(sky.view.panX()) < limX - 1 && Math.abs(sky.view.panY()) < limY - 1) {
                 worstAnchor = Math.max(worstAnchor, before.distance(after));
             }
             sky.panBy(rnd.nextInt(400) - 200, rnd.nextInt(400) - 200);
@@ -87,11 +88,11 @@ public final class ZoomPanCheck {
                 Point2D back = t.transform(new Point2D.Double(p.x, p.y), null);
                 // The wheel point is rounded to a pixel, so the round trip is good to one wheel
                 // pixel - viewZoom screen pixels.
-                worstInverse = Math.max(worstInverse, back.distance(x, y) / sky.viewZoom);
+                worstInverse = Math.max(worstInverse, back.distance(x, y) / sky.view.zoom());
             }
-            ok("zoom stays within 1x to 8x, trial " + trial, sky.viewZoom >= 1.0 && sky.viewZoom <= SkymapPanel.VIEW_MAX_ZOOM);
+            ok("zoom stays within 1x to 8x, trial " + trial, sky.view.zoom() >= 1.0 && sky.view.zoom() <= WheelView.MAX_ZOOM);
             ok("the pan never shows past the wheel's canvas, trial " + trial,
-                Math.abs(sky.viewPanX) <= limX + 1e-9 && Math.abs(sky.viewPanY) <= limY + 1e-9);
+                Math.abs(sky.view.panX()) <= limX + 1e-9 && Math.abs(sky.view.panY()) <= limY + 1e-9);
         }
         ok("toWheel inverts the painter's transform, worst " + String.format("%.3f", worstInverse) + " wheel px",
             worstInverse <= 0.75);
@@ -100,14 +101,14 @@ public final class ZoomPanCheck {
 
         sky.fitView();
         sky.zoomAt(200, 200, -12);
-        ok("twelve notches in stops at the ceiling, " + sky.viewZoom, sky.viewZoom == SkymapPanel.VIEW_MAX_ZOOM);
+        ok("twelve notches in stops at the ceiling, " + sky.view.zoom(), sky.view.zoom() == WheelView.MAX_ZOOM);
         sky.zoomAt(200, 200, 40);
         ok("zooming all the way out lands exactly on fit", sky.viewIsFit());
         sky.panBy(300, -300);
         ok("fit cannot be panned off centre", sky.viewIsFit());
         sky.zoomAt(450, 410, -4);
-        ok("four notches is about double, " + String.format("%.2f", sky.viewZoom),
-            sky.viewZoom > 1.9 && sky.viewZoom < 2.1);
+        ok("four notches is about double, " + String.format("%.2f", sky.view.zoom()),
+            sky.view.zoom() > 1.9 && sky.view.zoom() < 2.1);
         sky.fitView();
         ok("fit is zoom 1 and no pan", sky.viewIsFit());
     }
@@ -228,7 +229,7 @@ public final class ZoomPanCheck {
         // A drag pans, and the click that ends it selects nothing.
         sky.fitView();
         sky.zoomAt(450, 410, -6);
-        double panX = sky.viewPanX;
+        double panX = sky.view.panX();
         SwingUtilities.invokeAndWait(() -> {
             selection.setText("<html><body>zp-nothing-opened</body></html>");
             send(chart, MouseEvent.MOUSE_PRESSED, 400, 400, 1);
@@ -238,7 +239,7 @@ public final class ZoomPanCheck {
             send(chart, MouseEvent.MOUSE_CLICKED, 470, 410, 1);
         });
         ok("a drag on the zoomed wheel pans by the distance dragged, "
-            + String.format("%.0f", sky.viewPanX - panX), Math.abs(sky.viewPanX - panX - 70) < 1.5);
+            + String.format("%.0f", sky.view.panX() - panX), Math.abs(sky.view.panX() - panX - 70) < 1.5);
         ok("and the click that ends the drag opens nothing", selection.getText().contains("zp-nothing-opened"));
         // At fit, a drag is still nothing at all.
         sky.fitView();
@@ -252,7 +253,7 @@ public final class ZoomPanCheck {
         // The wheel, through its real listener.
         SwingUtilities.invokeAndWait(() -> chart.dispatchEvent(new MouseWheelEvent(chart,
             MouseEvent.MOUSE_WHEEL, 0, 0, 300, 300, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, -3)));
-        ok("the mouse wheel zooms the flat wheel, " + String.format("%.2f", sky.viewZoom), sky.viewZoom > 1.5);
+        ok("the mouse wheel zooms the flat wheel, " + String.format("%.2f", sky.view.zoom()), sky.view.zoom() > 1.5);
 
         // The chip puts it back; so does a double-click.
         java.awt.Rectangle chip = SkymapPanel.fitChipBounds();
@@ -333,6 +334,96 @@ public final class ZoomPanCheck {
             }
         }
         return true;
+    }
+
+    /**
+     * J13, step 2: the zoom and pan are a {@link WheelView}, and the panel keeps no copy.
+     *
+     * <b>Two things worth pinning, and one of them is the reason for the move.</b> The view
+     * takes the panel's size as an argument rather than reading it off a component, so it can
+     * be asked what it would do at any size with no window open at all - which is what the
+     * whole of this part does, on a bare object. And the panel must hold no zoom or pan state
+     * of its own: a refactor that leaves the old fields behind "for now" is how one fact comes
+     * to be kept in two places, which is the defect J13 is unpicking rather than an acceptable
+     * step on the way.
+     */
+    private static void theView(SkymapPanel sky) throws Exception {
+        // <b>No second copy on the panel.</b> Read by reflection over every field it declares,
+        // so a field added later under any name is caught by its type and its use, not by this
+        // check happening to know what it was called.
+        java.util.List<String> strays = new java.util.ArrayList<>();
+        for (java.lang.reflect.Field f : SkymapPanel.class.getDeclaredFields()) {
+            String n = f.getName().toLowerCase();
+            boolean looksLikeView = n.startsWith("viewzoom") || n.startsWith("viewpan")
+                || n.equals("zoom") || n.equals("panx") || n.equals("pany");
+            if (looksLikeView) {
+                strays.add(f.getName());
+            }
+        }
+        ok("the panel keeps no zoom or pan state of its own" + (strays.isEmpty() ? "" : ": " + strays),
+            strays.isEmpty());
+        ok("it holds a view instead", field(sky, "view") instanceof WheelView);
+
+        // ---- and the view answers without a window
+        WheelView v = new WheelView();
+        ok("a fresh view is fitted", v.isFit() && v.zoom() == 1.0
+            && v.panX() == 0.0 && v.panY() == 0.0);
+
+        // <b>The inverse, round-tripped at several sizes and zooms.</b> This is what the two
+        // copies of the unprojection used to risk: transform a wheel point to the screen, ask
+        // the view where that screen point is in the wheel, and land back where you began.
+        double worst = 0.0;
+        int[][] sizes = {{900, 820}, {640, 480}, {1400, 300}, {301, 1103}};
+        for (int[] wh : sizes) {
+            for (double notches : new double[] {-1, -3, -6, -12}) {
+                WheelView t = new WheelView();
+                t.zoomAt(wh[0] / 3, wh[1] / 4, notches, wh[0], wh[1]);
+                java.awt.geom.AffineTransform at = t.transform(wh[0], wh[1]);
+                for (int[] pt : new int[][] {{0, 0}, {wh[0] / 2, wh[1] / 2}, {wh[0] - 1, wh[1] - 1}}) {
+                    java.awt.geom.Point2D screen =
+                        at.transform(new java.awt.Point(pt[0], pt[1]), null);
+                    java.awt.Point back = t.toWheel((int) Math.round(screen.getX()),
+                        (int) Math.round(screen.getY()), wh[0], wh[1]);
+                    worst = Math.max(worst, back.distance(pt[0], pt[1]));
+                }
+            }
+        }
+        ok(String.format("the transform and its inverse agree at every size and zoom "
+            + "(worst %.2f px)", worst), worst <= 1.5);
+
+        // ---- the bounds, on a bare object
+        WheelView deep = new WheelView();
+        deep.zoomAt(100, 100, -40, 800, 600);
+        ok("zooming in stops at the ceiling: " + deep.zoom(), deep.zoom() == WheelView.MAX_ZOOM);
+        deep.zoomAt(100, 100, 40, 800, 600);
+        ok("and zooming out lands back on fit", deep.isFit());
+
+        WheelView slid = new WheelView();
+        slid.zoomAt(400, 300, -4, 800, 600);
+        slid.panBy(100000, 100000, 800, 600);
+        double limX = (slid.zoom() - 1.0) * 800 / 2.0;
+        ok("a pan cannot run past the wheel's edge: " + (int) slid.panX() + " of " + (int) limX,
+            Math.abs(slid.panX() - limX) < 1e-9);
+
+        // <b>Re-clamped at the size being painted.</b> The window made smaller while zoomed is
+        // the case this exists for: the pan was measured against the old width and now points
+        // past the edge, and the reader would see background where the chart should be.
+        double wide = slid.panX();
+        slid.reclamp(400, 300);
+        ok("shrinking the window pulls the pan back inside: " + (int) wide + " to "
+            + (int) slid.panX(), Math.abs(slid.panX()) < Math.abs(wide));
+
+        // <b>The invariant behind the clamp's last line, asserted as behaviour.</b> "Not zoomed
+        // means centred" cannot be reached through the zoom floor, so it is tested by what a
+        // reader can actually do: drag hard at fit, and go nowhere.
+        WheelView atFit = new WheelView();
+        atFit.panBy(500, -400, 800, 600);
+        ok("panning while fitted moves nothing", atFit.isFit());
+
+        WheelView flag = new WheelView();
+        ok("a fresh view has not been panned", !flag.panned());
+        flag.panned(true);
+        ok("and remembers when it has", flag.panned());
     }
 
     private static void send(Component c, int id, int x, int y, int clicks) {
