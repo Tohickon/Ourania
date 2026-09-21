@@ -3919,6 +3919,9 @@ extends JPanel {
         yearScan.progressions = Progressions.contacts(swissEph, chartFrame, d, list, profection.lord, d5, d6);
         yearScan.moonClock = Progressions.clock(swissEph, d, chartFrame.cusps, d5, d6);
         yearScan.mutuals = Progressions.mutual(swissEph, d, d5, d6);
+        // K12 stage 3: the days, for whichever themes turn out to be headlines.
+        yearScan.catalysts = Transits.datingHits(swissEph, chartFrame,
+            com.zodiacomputing.ourania.astro.ThemeConvergence.allThemePoints(chartFrame), d5, d6);
         ChartFrame.Body body2 = chartFrame.body("Sun");
         if (body2 != null && body2.ok && (return_ = Returns.solar(swissEph, d, body2.lon, profection.age, d3, d4, n)) != null) {
             yearScan.returns = Returns.contacts(return_, chartFrame, list, profection.lord);
@@ -9398,5 +9401,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         public List<Progressions.Tenancy> moonClock = Collections.emptyList();
         /** K12 stage 2: aspects between two progressed bodies perfecting in the year. */
         public List<Progressions.Mutual> mutuals = Collections.emptyList();
+        /** K12 stage 3: Sun and Mars touches on the themes' points, for dating - never voting. */
+        public List<Transits.Perfection> catalysts = Collections.emptyList();
     }
 }

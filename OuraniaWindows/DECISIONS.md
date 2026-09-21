@@ -331,7 +331,7 @@ everything as its own section.
 
 ---
 
-## K12 — The predictive pipeline and the Rule of Three · **STAGE 4 AND THE ACTIVATION FILTER BUILT 2026-09-19**
+## K12 — The predictive pipeline and the Rule of Three · **BUILT 2026-09-19/20, ALL FOUR STAGES**
 
 > **Stage 4 built:** `astro.ThemeConvergence` pools `Convergence.collect`'s per-point targets into
 > the four themes (named points, the rulers of the theme's houses, and those houses' occupants),
@@ -362,7 +362,18 @@ everything as its own section.
 > already reports as a phase; scanning the pair would report the progressed New Moon twice. A
 > mutual enters the convergence as a claim on **both** natal counterparts, in the `PROGRESSION`
 > family - two progressions are one witness, not two. `MutualProgressionCheck` 24; seven
-> mutations caught. **Still to come:** Mars/Sun dating of a converged theme.
+> mutations caught.
+>
+> **The dating built, and K12 complete** (2026-09-20): `Transits.datingHits` scans **only the Sun
+> and Mars** (`Transits.dateMarkers`), Ptolemaic aspects only, against the points the four themes
+> stand on. A **headline** gets those touches; a background trend gets none, because dating what
+> nothing has agreed on is the false precision the Rule of Three exists to prevent. The
+> distribution runs *after* the sort and touches only `Result.dates`, so no family, score or
+> headline can depend on it. A year gives ~144 touches and one headline ~39, so a **peak** is two
+> or more within `PEAK_SPAN_DAYS`, and the synthesis shows the four fullest - stating that the
+> Sun reaches every point monthly, so these are the strongest of a monthly beat rather than rare
+> events. `DatingCheck` 32; eight mutations caught, including "a catalyst is allowed to vote",
+> which **survived** the first fixture because that fixture already carried a TRANSIT family.
 
 **Decision (David, 2026-09-19).** Prediction is a noise filter. On any day there are dozens of
 minor transits, and treating each as a prediction produces contradictions daily. A major event
@@ -393,7 +404,7 @@ K8) and L6 (`astro.Topics`); the pipeline is a reorganisation and three addition
 |---|---|---|
 | 1 | `Profection`: lord of the year and house; the lord is a witness, and a witness whose moving body is the lord is multiplied (K8). Zodiacal releasing gates every witness: L1 lord x3, L2 x2, peak x2.5, loosing x4. | Transits **through the profected house**, and transits **to** the lord, as primary; un-activated transits **demoted** rather than voting equally. |
 | 2 | `Progressions` and `SolarArc` vote at their **dated moment of exactness** - stricter than a 1° orb, and chosen because a contact stays within orb about two years. The **progressed Moon's own clock** is built: `Progressions.clock`, and **progressed-to-progressed** aspects: `Progressions.mutual` (both 2026-09-20). | Nothing; stage 2 is built. |
-| 3 | Slow-body transits vote when they **perfect** in the window (the orb is weather, the perfection is the event); eclipses and stations are families; a station duplicating a transit is discounted, not double-counted. | "Transit to an **active** point triggers": today every perfection votes whether or not its target is active. **Mars and the Sun as date-pinpointers** - excluded as voters on purpose (the Sun conjuncts every natal point every year and so agrees with everything), and should stay excluded as voters but be used to date a converged event. |
+| 3 | Slow-body transits vote when they **perfect** in the window (the orb is weather, the perfection is the event); eclipses and stations are families; a station duplicating a transit is discounted, not double-counted. | Nothing. The **activation filter** is built (`de9972a5`) - a transit, station or eclipse testifies only to a point the year has woken - and so is the **Mars/Sun dating** (2026-09-20): they stay excluded as voters, and `Transits.datingHits` uses them to date a theme the Rule of Three has already carried. |
 | 4 | Convergence counts distinct **families** per natal point ("two transits to the same point are one witness, not two"), with thresholds relative to the chart's own distribution. `Topics` groups houses, rulers and significators into topics by three witnesses - for the natal chart. | **Theme buckets** for timing (grouping by theme, not by single natal point) and the **Rule of Three gate** as the headline test, with its testimonies listed. |
 
 **Built differently from how the spec puts it, and why:**

@@ -399,7 +399,7 @@ public class NarrativeSynthesizer {
             // testimonies are the witnesses' own details - named and listed, never written up.
             List<com.zodiacomputing.ourania.astro.ThemeConvergence.Result> themes =
                 com.zodiacomputing.ourania.astro.ThemeConvergence.themes(f, prof, convergence,
-                    scan.moonClock);
+                    scan.moonClock, scan.catalysts);
             // K12 stage 2. The mid-term clock reads the same whether or not any theme reaches
             // three, so it is stated before them rather than only inside a headline.
             if (scan.moonClock != null && !scan.moonClock.isEmpty()) {
@@ -427,6 +427,26 @@ public class NarrativeSynthesizer {
                     sb.append("<li>").append(line).append("</li>");
                 }
                 sb.append("</ul>");
+                // K12 stage 3: the days, for a theme that has already been agreed. The Sun and
+                // Mars are kept out of the voting because they agree with everything, which is
+                // the same fact that makes them good clocks - so they say when and never
+                // whether, and the line says so.
+                if (!th.peaks.isEmpty()) {
+                    sb.append("<p style='color:#AAAAAA;'><i>Dates to watch</i> - the year's "
+                        + "fullest gatherings of Sun and Mars on this theme's own points. The "
+                        + "Sun reaches every point monthly, so these are the strongest of a "
+                        + "monthly beat rather than rare events, and they mark the day without "
+                        + "making the case.</p><ul style='color:#AAAAAA;'>");
+                    for (com.zodiacomputing.ourania.astro.ThemeConvergence.Peak peak
+                            : th.strongest(4)) {
+                        String span = dayOf(peak.from()).equals(dayOf(peak.to()))
+                            ? dayOf(peak.from())
+                            : dayOf(peak.from()) + " to " + dayOf(peak.to());
+                        sb.append("<li><b>").append(span).append("</b> - ")
+                            .append(peak).append("</li>");
+                    }
+                    sb.append("</ul>");
+                }
             }
             if (!anyHeadline) {
                 sb.append("<p>No theme reaches three independent testimonies this year.</p>");
@@ -498,5 +518,18 @@ public class NarrativeSynthesizer {
 
         sb.append("</body></html>");
         return sb.toString();
+    }
+
+    /**
+     * A Julian day as a calendar date, for the dating line.
+     *
+     * The day and not the hour: the fast bodies date an event to about a day, and printing a
+     * time would claim a precision the technique does not have - the perfection is exact to the
+     * minute, the thing it is supposed to mark is not.
+     */
+    private static String dayOf(double jd) {
+        de.thmac.swisseph.SweDate d = new de.thmac.swisseph.SweDate();
+        d.setJulDay(jd);
+        return String.format("%04d-%02d-%02d", d.getYear(), d.getMonth(), d.getDay());
     }
 }

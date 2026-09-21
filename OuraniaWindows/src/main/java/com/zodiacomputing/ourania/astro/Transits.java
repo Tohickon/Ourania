@@ -721,6 +721,92 @@ public final class Transits {
         "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Chiron", "North Node"
     };
 
+    /**
+     * The fast bodies used to <i>date</i> an event, never to vote for one.
+     *
+     * <b>The same fact makes them useless as witnesses and ideal as clocks.</b> The Sun
+     * conjuncts every natal point once a year without fail and Mars does it in most two-year
+     * spans - which is exactly why {@link #yearMarkers} leaves them out, and exactly why they
+     * can say <i>when</i>. A year that three independent techniques have already agreed is a
+     * career year does not need the Sun's opinion about whether it is; it needs the handful of
+     * days the Sun crosses the Midheaven, and those days are reliable precisely because the
+     * crossing is guaranteed.
+     *
+     * K12 stage 3: "fast catalysts (Mars, the Sun, stations, eclipses) to date the event... they
+     * stay excluded as voters but are used to date a converged event". Stations and eclipses are
+     * already families of their own; these two are not, and must not become one.
+     */
+    public static String[] dateMarkers = {"Sun", "Mars"};
+
+    /**
+     * When the fast catalysts touch a given set of natal points, for dating a converged theme.
+     *
+     * <p><b>Ptolemaic aspects only.</b> A date is worth naming when a reader could recognise
+     * the day from it, and the whole scan is otherwise the Sun making a septile to the eleventh
+     * ruler - perfectly real, and no use to anyone marking a calendar. The five aspects with no
+     * orb ceiling are the tradition's own skeleton and the discriminator already exists on the
+     * type, so this reads it rather than restating the list.
+     *
+     * <p><b>No {@code why}, no rank, no intensity.</b> These are not witnesses and the fields a
+     * witness carries would invite them to be used as one; a caller wanting to score them has to
+     * do something visible to get there.
+     *
+     * @param members the natal points to watch - a theme's own, not the chart's significant ones
+     */
+    public static List<Perfection> datingHits(SwissEph sw, ChartFrame natal,
+                                              java.util.Set<String> members,
+                                              double jdFrom, double jdTo) {
+        List<Perfection> out = new ArrayList<>();
+        if (natal == null || members == null || members.isEmpty() || jdTo <= jdFrom) {
+            return out;
+        }
+        // <b>Once each.</b> The angles are in the body list as well as in ANGLE_NAMES, so
+        // adding both lists whole gives the Ascendant two targets at one degree and every hit
+        // on it twice - which looked like a doubled ephemeris and was a doubled loop.
+        List<NatalTarget> targets = new ArrayList<>();
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        for (ChartFrame.Body n : natal.bodies) {
+            if (n != null && n.ok && members.contains(n.name) && seen.add(n.name)) {
+                targets.add(new NatalTarget(n.name, n.lon, "theme member", -1));
+            }
+        }
+        double[] angleLons = {natal.asc, natal.mc, natal.dsc, natal.ic};
+        for (int i = 0; i < ANGLE_NAMES.length; i++) {
+            if (members.contains(ANGLE_NAMES[i]) && seen.add(ANGLE_NAMES[i])) {
+                targets.add(new NatalTarget(ANGLE_NAMES[i], angleLons[i], "theme member", -1));
+            }
+        }
+        if (targets.isEmpty()) {
+            return out;
+        }
+        for (String body : dateMarkers) {
+            LonCache cache = new LonCache(sw, body);
+            double step = stepFor(body);
+            for (NatalTarget target : targets) {
+                for (Aspects.Type type : Aspects.Type.values()) {
+                    if (type.maxOrb != Double.MAX_VALUE) {
+                        continue;               // not one of the five; see above
+                    }
+                    if (body.equals(target.name) && type == Aspects.Type.CONJUNCTION) {
+                        continue;               // the solar return, and it is not a theme's date
+                    }
+                    for (double jd : perfections(cache, target.lon, type, jdFrom, jdTo, step)) {
+                        Perfection p = new Perfection();
+                        p.transiting = body;
+                        p.natal = target.name;
+                        p.type = type;
+                        p.jd = jd;
+                        p.retrograde = speedOf(sw, jd, body) < 0.0;
+                        out.add(p);
+                    }
+                }
+            }
+        }
+        out.sort(Comparator.comparingDouble((Perfection p) -> p.jd)
+            .thenComparing(p -> p.natal));
+        return out;
+    }
+
     private static String[] withMoon() {
         String[] out = new String[yearMarkers.length + 1];
         System.arraycopy(yearMarkers, 0, out, 0, yearMarkers.length);
