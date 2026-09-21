@@ -1,5 +1,8 @@
 package com.zodiacomputing.ourania.astro;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.thmac.swisseph.SwissEph;
 
 /**
@@ -173,5 +176,529 @@ public final class Horary {
         r.sameRuler = r.hourRuler.equals(r.ascendantRuler);
         r.sharesTriplicity = r.hourRuler.equals(r.triplicityRuler);
         return r;
+    }
+
+    // ======================================================= stage 3: the dynamics of light
+
+    /**
+     * The five aspects a perfection can be made by.
+     *
+     * <p>The Ptolemaic set, and only it. A horary judgement turns on whether two bodies
+     * <i>meet</i>, and the minor aspects were never part of that question - admitting them
+     * would let a septile decide a case, which no source this project holds asks for.
+     */
+    private static final Aspects.Type[] PTOLEMAIC = {
+        Aspects.Type.CONJUNCTION, Aspects.Type.SEXTILE, Aspects.Type.SQUARE,
+        Aspects.Type.TRINE, Aspects.Type.OPPOSITION
+    };
+
+    /** The seven planets a traditional judgement is made from. */
+    private static final String[] TRADITIONAL =
+        {"Moon", "Mercury", "Venus", "Sun", "Mars", "Jupiter", "Saturn"};
+
+    /**
+     * How far ahead a perfection is still an answer to the question, in days.
+     *
+     * <p><b>Why there is a cap at all.</b> The rule is "before either significator changes
+     * sign", and two slow significators can sit in one sign for years - Saturn takes about two
+     * and a half. Scanning that is both unbounded work and a false answer: a meeting thirty
+     * months after the question was asked is not what was asked about. A year is a convention
+     * rather than a measurement, so it is named here rather than buried in a loop bound.
+     */
+    public static final double MAX_WINDOW_DAYS = 365.0;
+
+    /**
+     * Mean daily motion in degrees, for deciding which of two bodies is the faster.
+     *
+     * <p><b>Mean, not instantaneous.</b> A planet's actual speed passes through zero at a
+     * station, so an instantaneous comparison would call Saturn faster than Mars for the days
+     * either side of a turn, and translation - which is defined by a faster body carrying light
+     * to a slower - would flip with it. The ordering the tradition uses is a property of the
+     * bodies, not of the moment.
+     */
+    private static double meanMotion(String body) {
+        switch (body) {
+            case "Moon":    return 13.176;
+            case "Mercury": return 1.383;
+            case "Venus":   return 1.602;
+            case "Sun":     return 0.986;
+            case "Mars":    return 0.524;
+            case "Jupiter": return 0.083;
+            case "Saturn":  return 0.034;
+            default:        return 0.0;
+        }
+    }
+
+    /**
+     * A safe coarse scanning step for a body, in days.
+     *
+     * <p>Small enough that two successive crossings of the same aspect cannot both fall inside
+     * one step, which is the only property the root finder needs of it.
+     */
+    private static double stepFor(String body) {
+        switch (body) {
+            case "Moon":                                 return 0.125;
+            case "Sun": case "Mercury": case "Venus":    return 0.5;
+            case "Mars":                                 return 1.0;
+            default:                                     return 2.0;
+        }
+    }
+
+    /** One meeting of two bodies: when, and by which aspect. */
+    public static final class Meeting {
+        public double jd;
+        public Aspects.Type type;
+        public String a;
+        public String b;
+    }
+
+    /** What kind of testimony a line of the chain is. */
+    public enum Kind {
+        /** The two significators perfect an aspect with each other. */
+        DIRECT,
+        /** A faster body separates from one significator and applies to the other. */
+        TRANSLATION,
+        /** Both significators apply to a slower third body. */
+        COLLECTION,
+        /** A third body perfects with a significator first - prohibition, or frustration. */
+        PROHIBITION,
+        /** A significator stations before the perfection it was applying to. */
+        REFRANATION,
+        /** The Moon completes no further aspect in its sign. */
+        VOID_MOON,
+        /** One planet rules both sides of the question. */
+        SHARED_RULER,
+        /** The chart is not fit to judge. */
+        NOT_RADICAL,
+        /** Nothing perfects inside the window. */
+        NO_PERFECTION
+    }
+
+    /** The answer a chart gives. */
+    public enum Verdict {
+        YES,
+        /** It perfects, but by square or opposition - the matter completes through difficulty. */
+        YES_WITH_DIFFICULTY,
+        NO,
+        /** Not fit to judge, so no answer is given. */
+        NOT_RADICAL,
+        /** The method has no answer here, and saying so is the answer. */
+        UNDECIDED
+    }
+
+    /** One reason, in the order the method found it. */
+    public static final class Testimony {
+        public Kind kind;
+        public String a;
+        public String b;
+        /** The aspect, where there is one. Null otherwise. */
+        public Aspects.Type type;
+        /** When it perfects, Julian day UT. NaN where the testimony is not an event. */
+        public double jd = Double.NaN;
+        /** One sentence, in the reader's language rather than the engine's. */
+        public String because;
+
+        @Override
+        public String toString() {
+            return kind + ": " + because;
+        }
+    }
+
+    /** A judged chart: who stands for whom, whether it may be read, and why the answer. */
+    public static final class Judgement {
+        public Significators significators;
+        public Radicality radicality;
+        /** The reasons, in the order the method found them. Never null. */
+        public final List<Testimony> chain = new ArrayList<>();
+        public Verdict verdict = Verdict.UNDECIDED;
+        /** The moment the first significator leaves its sign - the end of the window. */
+        public double windowEnds = Double.NaN;
+        /** Which significator ends the window, or "the year" when the cap did. */
+        public String windowEndedBy;
+
+        /** The first testimony of a kind, or null. */
+        public Testimony first(Kind kind) {
+            for (Testimony t : this.chain) {
+                if (t.kind == kind) {
+                    return t;
+                }
+            }
+            return null;
+        }
+
+        public boolean has(Kind kind) {
+            return first(kind) != null;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder(String.valueOf(verdict));
+            for (Testimony t : this.chain) {
+                sb.append("\n  ").append(t);
+            }
+            return sb.toString();
+        }
+    }
+
+    private static Testimony say(Kind kind, String a, String b, Aspects.Type type,
+                                 double jd, String because) {
+        Testimony t = new Testimony();
+        t.kind = kind;
+        t.a = a;
+        t.b = b;
+        t.type = type;
+        t.jd = jd;
+        t.because = because;
+        return t;
+    }
+
+    /**
+     * When this body leaves the sign it is in now, or {@code horizon} if it does not.
+     *
+     * <p>Leaving covers backing out of a sign as well as entering the next one: a retrograde
+     * significator that returns to the sign behind it has changed sign, and the rule is about
+     * the sign the significator held when the question was asked.
+     *
+     * <p><b>One case this cannot see:</b> a body that leaves a sign and returns inside a single
+     * scanning step, which needs a station within a fraction of a degree of a cusp. The step is
+     * an eighth of a day for the Moon and two days for the slow planets, so the body would have
+     * to cross, turn and cross back inside that - and in that case the significator is in its
+     * own sign at both ends of the step, which is what this returns.
+     */
+    private static double signExit(SwissEph sw, String body, double jd, double horizon) {
+        int start = Zodiac.signIndex(Almanac.bodyLongitude(sw, jd, body));
+        double step = stepFor(body);
+        for (double t = jd + step; t <= horizon; t += step) {
+            if (Zodiac.signIndex(Almanac.bodyLongitude(sw, t, body)) == start) {
+                continue;
+            }
+            double lo = t - step;
+            double hi = t;
+            for (int i = 0; i < 40; i++) {
+                double mid = (lo + hi) / 2.0;
+                if (Zodiac.signIndex(Almanac.bodyLongitude(sw, mid, body)) == start) {
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+            }
+            return hi;
+        }
+        return horizon;
+    }
+
+    /**
+     * The first moment in the window at which these two bodies perfect any Ptolemaic aspect,
+     * or null when they do not meet inside it.
+     *
+     * <p><b>Both ends move</b>, which is what separates this from a transit to a fixed natal
+     * degree: the scan is over the two bodies' separation, not over one body's longitude.
+     */
+    public static Meeting firstMeeting(SwissEph sw, String a, String b,
+                                       double from, double to) {
+        if (!(to > from)) {
+            return null;
+        }
+        double step = Math.min(stepFor(a), stepFor(b));
+        Meeting best = null;
+        for (Aspects.Type type : PTOLEMAIC) {
+            List<Double> targets = new ArrayList<>();
+            targets.add(type.exactAngle);
+            if (type.exactAngle != 0.0 && type.exactAngle != 180.0) {
+                targets.add(-type.exactAngle);
+            }
+            for (double target : targets) {
+                Almanac.OfTime g = t -> Almanac.signedDelta(
+                    Almanac.signedDelta(Almanac.bodyLongitude(sw, t, a),
+                                        Almanac.bodyLongitude(sw, t, b)),
+                    target);
+                for (double root : Almanac.roots(g, from, to, step)) {
+                    if (best == null || root < best.jd) {
+                        best = new Meeting();
+                        best.jd = root;
+                        best.type = type;
+                        best.a = a;
+                        best.b = b;
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
+    /**
+     * Judge a question: who stands for whom, whether the chart may be read, and what the light
+     * between the significators does before either of them changes sign.
+     *
+     * <h3>Why a chain of reasons and not a score</h3>
+     *
+     * <p>David's decision is explicit about this, and it is the one place the spec's own
+     * arithmetic was set aside. A confidence sum lets a void Moon and a translation cancel out,
+     * which is not how the judgement works: horary answers on the <b>first decisive
+     * testimony</b>, and a prohibition overrides a perfection that has not happened yet rather
+     * than being averaged against it. So the verdict arrives with the chain that produced it,
+     * in the order the method found it, and a reader can disagree with a step instead of with a
+     * number.
+     *
+     * <h3>The order the testimonies are asked in</h3>
+     *
+     * <p>Radicality first, because an unfit chart is not judged at all. Then a shared ruler,
+     * which removes the two significators the rest of the method is about. Then the window -
+     * until the first significator changes sign, and never more than a year. Inside it: a direct
+     * perfection, and if there is one, whether anything gets in front of it (prohibition) or
+     * withdraws from it (refranation). Only where the significators never meet does the method
+     * look for light carried by a third body - translation, then collection.
+     *
+     * @param jd the moment the question was asked, Julian day UT
+     */
+    public static Judgement judge(SwissEph sw, ChartFrame f, Matter matter,
+                                  double jd, double lat, double lon) {
+        Judgement j = new Judgement();
+        j.significators = significators(f, matter);
+        j.radicality = radicality(sw, f, jd, lat, lon);
+
+        if (j.radicality.unknown || !j.radicality.radical()) {
+            j.verdict = j.radicality.unknown ? Verdict.UNDECIDED : Verdict.NOT_RADICAL;
+            j.chain.add(say(Kind.NOT_RADICAL, j.radicality.hourRuler,
+                j.radicality.ascendantRuler, null, jd, j.radicality.toString()));
+            return j;
+        }
+
+        String querent = j.significators.querent;
+        String quesited = j.significators.quesited;
+
+        if (j.significators.shared()) {
+            j.chain.add(say(Kind.SHARED_RULER, querent, quesited, null, Double.NaN,
+                querent + " rules both the Ascendant and the house of the matter, so there are "
+                + "not two significators to perfect with each other. The tradition generally "
+                + "reads one planet for both sides favourably - the parties are already of one "
+                + "interest - but that is a reading of a structural fact rather than of a "
+                + "motion, and this engine does not turn it into a yes without a source that "
+                + "says to"));
+            j.verdict = Verdict.UNDECIDED;
+            return j;
+        }
+
+        // ---- the window: before either significator changes sign, and inside a year ----
+        double cap = jd + MAX_WINDOW_DAYS;
+        double outQuerent = signExit(sw, querent, jd, cap);
+        double outQuesited = signExit(sw, quesited, jd, cap);
+        j.windowEnds = Math.min(outQuerent, outQuesited);
+        if (j.windowEnds >= cap) {
+            j.windowEndedBy = "the year";
+        } else {
+            j.windowEndedBy = outQuerent <= outQuesited ? querent : quesited;
+        }
+
+        // The void Moon colours the whole judgement rather than deciding it, so it is entered
+        // wherever it is true and the motion testimonies are still asked for.
+        if (f.moonVoidOfCourse) {
+            j.chain.add(say(Kind.VOID_MOON, "Moon", null, null, Double.NaN,
+                "the Moon is void of course - it completes no further aspect in the sign it "
+                + "holds - and the tradition reads that as nothing coming of the matter"));
+        }
+
+        List<Aspects.Hit> now = Aspects.betweenBodies(f);
+        Meeting direct = firstMeeting(sw, querent, quesited, jd, j.windowEnds);
+
+        // Prohibition and refranation are only asked about where there is a perfection for them
+        // to prevent. A third body perfecting with a significator in a chart where the
+        // significators never meet is not a prohibition - it is an unrelated aspect.
+        if (direct != null) {
+            double horizon = direct.jd;
+
+            Meeting blocker = null;
+            String blockerBody = null;
+            String blocked = null;
+            for (String third : TRADITIONAL) {
+                if (third.equals(querent) || third.equals(quesited) || cannotProhibit(third)) {
+                    continue;
+                }
+                for (int k = 0; k < 2; k++) {
+                    String side = k == 0 ? querent : quesited;
+                    Meeting m = firstMeeting(sw, third, side, jd, horizon);
+                    if (m != null && (blocker == null || m.jd < blocker.jd)) {
+                        blocker = m;
+                        blockerBody = third;
+                        blocked = side;
+                    }
+                }
+            }
+            if (blocker != null) {
+                j.chain.add(say(Kind.PROHIBITION, blockerBody, blocked, blocker.type, blocker.jd,
+                    blockerBody + " perfects a " + blocker.type.name().toLowerCase()
+                    + " with " + blocked + " before " + querent + " and " + quesited
+                    + " reach each other, so the light between them is taken first"));
+                j.verdict = Verdict.NO;
+                return j;
+            }
+
+            // <b>No refranation test here, and that is the correction.</b> This branch has a
+            // perfection that the ephemeris says happens, and {@link #firstMeeting} finds it by
+            // walking the real separation of two real bodies - so it already accounts for every
+            // station between now and then. A planet that turns and later completes the aspect
+            // anyway has not refranated; it has taken a longer road to the same meeting.
+            // Refranation belongs where the meeting never arrives, below.
+
+            boolean hard = throughDifficulty(direct.type);
+            j.chain.add(say(Kind.DIRECT, querent, quesited, direct.type, direct.jd,
+                querent + " and " + quesited + " perfect a "
+                + direct.type.name().toLowerCase() + " before either changes sign"
+                + (hard ? ", by an aspect of difficulty rather than of ease" : "")));
+            j.verdict = hard ? Verdict.YES_WITH_DIFFICULTY : Verdict.YES;
+            return j;
+        }
+
+        // ---- translation: a faster body carries the light from one significator to the other --
+        for (String third : TRADITIONAL) {
+            if (third.equals(querent) || third.equals(quesited)) {
+                continue;
+            }
+            if (meanMotion(third) <= meanMotion(querent)
+                || meanMotion(third) <= meanMotion(quesited)) {
+                continue;                       // only a faster body can carry light
+            }
+            for (int k = 0; k < 2; k++) {
+                String from = k == 0 ? querent : quesited;
+                String to = k == 0 ? quesited : querent;
+                if (!separating(now, third, from)) {
+                    continue;
+                }
+                Meeting m = firstMeeting(sw, third, to, jd, j.windowEnds);
+                if (m == null) {
+                    continue;
+                }
+                j.chain.add(say(Kind.TRANSLATION, third, to, m.type, m.jd,
+                    third + " separates from " + from + " and applies to " + to
+                    + ", carrying the light between them"));
+                j.verdict = Verdict.YES;
+                return j;
+            }
+        }
+
+        // ---- collection: both significators apply to a slower third ----
+        for (String third : TRADITIONAL) {
+            if (third.equals(querent) || third.equals(quesited)) {
+                continue;
+            }
+            if (meanMotion(third) >= meanMotion(querent)
+                || meanMotion(third) >= meanMotion(quesited)) {
+                continue;                       // only a slower body can collect
+            }
+            Meeting one = firstMeeting(sw, querent, third, jd, j.windowEnds);
+            Meeting two = firstMeeting(sw, quesited, third, jd, j.windowEnds);
+            if (one == null || two == null) {
+                continue;
+            }
+            j.chain.add(say(Kind.COLLECTION, third, null, null, Math.max(one.jd, two.jd),
+                "both " + querent + " and " + quesited + " apply to " + third
+                + ", which is slower than either and collects their light"));
+            j.verdict = Verdict.YES;
+            return j;
+        }
+
+        // ---- refranation: they were coming to it, and one of them turned back ----
+        //
+        // <b>This is the only place refranation can live.</b> It is not a rival to a perfection
+        // - a perfection the ephemeris reports is a perfection, whatever the bodies did on the
+        // way - it is the reason a perfection the chart was promising never arrives. So the
+        // three conditions are read together: the significators are in an applying aspect at
+        // the moment of the question, no perfection is found before the window closes, and one
+        // of the two stations inside it. Written the other way round, as a station before a
+        // perfection that does happen, the test could never be true, and it never was: it
+        // fired zero times in 392 judgements, which is what sent me back to it.
+        if (applyingNow(now, querent, quesited)) {
+            List<Almanac.Event> turns =
+                Almanac.stations(sw, jd, j.windowEnds, querent, quesited);
+            if (!turns.isEmpty()) {
+                Almanac.Event turn = turns.get(0);
+                j.chain.add(say(Kind.REFRANATION, turn.body, null, null, turn.jd,
+                    querent + " and " + quesited + " are applying, but " + turn.body
+                    + " stations before the aspect completes and withdraws from it"));
+                j.verdict = Verdict.NO;
+                return j;
+            }
+        }
+
+        j.chain.add(say(Kind.NO_PERFECTION, querent, quesited, null, Double.NaN,
+            querent + " and " + quesited + " neither meet nor have their light carried before "
+            + ("the year".equals(j.windowEndedBy) ? "a year is out"
+               : j.windowEndedBy + " changes sign")));
+        j.verdict = Verdict.NO;
+        return j;
+    }
+
+    /** Are these two in an aspect they are closing on, at the moment of the question? */
+    private static boolean applyingNow(List<Aspects.Hit> hits, String a, String b) {
+        for (Aspects.Hit h : hits) {
+            boolean pair = (h.a.equals(a) && h.b.equals(b))
+                || (h.a.equals(b) && h.b.equals(a));
+            if (pair && h.applying) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Bodies that cannot prohibit, however early they perfect.
+     *
+     * <p><b>The Moon, and the reason is structural rather than a preference.</b> This engine
+     * makes the Moon the querent's co-significator in every chart ({@link Significators#moon}),
+     * so it is already a party to the question - and a party cannot also be the third body that
+     * cuts in between the two sides. Letting it do both is how the same planet ends up
+     * testifying twice, which is the defect the convergence work spent K8 removing.
+     *
+     * <p><b>It was measured before it was decided.</b> With the Moon admitted, prohibition fired
+     * <b>28 times against 4 surviving direct perfections</b> over 392 judgements - because the
+     * Moon perfects with something every couple of days, so any window wider than that contains
+     * a Moon aspect to a significator and the answer is NO almost everywhere. An engine that
+     * answers NO almost always is not a judgement, and the number is what showed it.
+     *
+     * <p><b>This narrows the decision's words</b> - "a third body perfecting with one first" -
+     * rather than following them exactly, and that was put to David on 21 September with the
+     * measurement, and taken. The Moon still <i>translates</i> light, which is its classical
+     * office here and the commonest yes this engine gives.
+     */
+    private static boolean cannotProhibit(String body) {
+        return "Moon".equals(body);
+    }
+
+
+    /**
+     * Does this aspect complete a matter only through difficulty?
+     *
+     * <p>The square and the opposition. The decision calls conjunction, trine and sextile a
+     * plain yes, and the two hard aspects still perfect - the matter completes - but the
+     * tradition is unanimous that it completes the hard way, which is a different answer from
+     * either yes or no.
+     *
+     * <p><b>Why this is a named method and not two terms inside {@code judge}.</b> Inline, the
+     * rule could only be observed through whichever aspects the sky supplied: a mutation making
+     * the trine an aspect of difficulty <b>survived</b> the suite on 21 September, because in
+     * the fortnight it sampled no pair of significators ever perfected a square or a trine.
+     * Named, it can be asserted over all five aspects at once, and a suite that covers the
+     * weather instead of the rule is exactly the kind of green this project does not want.
+     */
+    public static boolean throughDifficulty(Aspects.Type type) {
+        return type == Aspects.Type.SQUARE || type == Aspects.Type.OPPOSITION;
+    }
+
+    /**
+     * Is this body separating from that one - past the exact aspect rather than approaching it?
+     *
+     * <p>Read off the chart's own aspects rather than recomputed here, so translation uses the
+     * same orbs and the same applying flag as every other surface in the app.
+     */
+    private static boolean separating(List<Aspects.Hit> hits, String a, String b) {
+        for (Aspects.Hit h : hits) {
+            boolean pair = (h.a.equals(a) && h.b.equals(b))
+                || (h.a.equals(b) && h.b.equals(a));
+            if (pair && !h.applying) {
+                return true;
+            }
+        }
+        return false;
     }
 }
