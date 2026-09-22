@@ -34,8 +34,34 @@ final class Globe {
      * near and what is far.
      */
     static final double SHELL_CORE = 0.90;
-    static final double SHELL_NATAL = 1.20;
-    static final double SHELL_PARTNER = 1.50;
+    /**
+     * The obliquity of the ecliptic, in radians - and the reason the ribbons sit where they do.
+     *
+     * <b>A number with a source rather than a number that looked right.</b> The three chart
+     * ribbons are circles of latitude on one sphere, and this is the latitude the outer two
+     * ride: the tropics. It was arrived at twice over, which is why it is worth keeping. David
+     * drew the three bands at +23.5, 0 and -23.5 in a design sketch; separately, measuring how
+     * far apart the decks have to be before the sky ring visibly clears Chart A at the working
+     * tilt gave <b>0.75</b>. A ribbon at the obliquity on a shell of 1.75 sits at
+     * {@code 1.75 * sin(23.44) = 0.696}, and on the 1.92 house shell at 0.764. The tuned
+     * number and the astronomical one are the same number, so the astronomical one is used.
+     */
+    static final double OBLIQUITY = Math.toRadians(23.4392911);
+
+    /**
+     * The one shell all three chart ribbons ride, just inside the houses.
+     *
+     * <b>One radius, not three, and that is the whole fix.</b> The rings used to nest - 1.20,
+     * 1.50, 1.80 - and nested rings cannot read as a stack at any tilt, because the depth term
+     * scales with the radius and a bigger ring always straddles a smaller one however far it is
+     * lifted. Measured on 2026-09-21: at the default tilt Chart B rose above Chart A, and from
+     * beneath the sky fell below it. On one shell the radius term is identical for all three
+     * and the latitude alone decides, which is what makes a bloom a bloom.
+     */
+    static final double SHELL_CHART = 1.75;
+
+    static final double SHELL_NATAL = SHELL_CHART;
+    static final double SHELL_PARTNER = SHELL_CHART;
     /**
      * The sky ring, now inside the zodiac rather than outside it.
      *
@@ -44,7 +70,7 @@ final class Globe {
      * is in - which is the one thing the zodiac is for. Every body ring is inside the plane
      * now: natal, partner and sky, in that order, with the zodiac wrapped around all three.
      */
-    static final double SHELL_SKY = 1.80;
+    static final double SHELL_SKY = SHELL_CHART;
     static final double SHELL_HOUSE = 1.92;
     /** Egyptian bounds, just inside the signs - the flat wheel's order, kept. */
     static final double SHELL_BOUND = 1.99;
@@ -136,10 +162,17 @@ final class Globe {
      * by 0.045 of its radius to stay on its shell - the same arithmetic that keeps a stacked
      * body on the sphere.
      */
-    static final double LIFT_SKY = 0.40;
+    static final double LIFT_SKY = SHELL_CHART * Math.sin(OBLIQUITY);
 
-    /** The partner ring, the same distance the other way. */
-    static final double LIFT_PARTNER = -0.40;
+    /** The partner ring, at the southern tropic.
+     *
+     * <b>Not a compile-time constant any more, and that is deliberate.</b> A
+     * {@code static final double} with a literal initialiser is inlined into every class that
+     * mentions it, so changing one and rebuilding only this file leaves GlobeRenderer holding
+     * the old value. That cost a measurement run on 2026-09-21: three deck lifts were rendered
+     * and produced three identical sets of numbers. Derived from {@link #OBLIQUITY} through a
+     * method call, it cannot be folded, so every reader sees the same number as this file. */
+    static final double LIFT_PARTNER = -LIFT_SKY;
 
     /** Half-height of a meridian arc, in radians of latitude. Matches the prototype's 0.92. */
     static final double MERIDIAN_SPAN = 0.92;
@@ -213,7 +246,13 @@ final class Globe {
         // scribble. It stopped being true when the signs became coloured wedges over the
         // surface - a sphere with shading reads as a sphere from any angle, and the low camera
         // is what makes the equatorial ring a ring rather than a disc seen from above.
-        this.pitch = 0.32;
+        // <b>Shallower since the ribbons became a bloom.</b> Three circles of latitude on one
+        // sphere separate on screen by their height times the cosine of the tilt, while each
+        // one's own ellipse opens as the sine - so the stack is plainest near edge-on and
+        // collapses toward the overhead view, where cosine goes to nothing. Measured rather
+        // than reasoned: at 0.32 the sky ribbon still overlapped Chart A by 87 pixels, at 0.18
+        // it clears. See MAX_PITCH for the other end of the same arithmetic.
+        this.pitch = 0.18;
     }
 
     /** Applies a drag, in pixels, and keeps the camera somewhere a reader can understand. */
@@ -476,6 +515,51 @@ final class Globe {
      */
     static double[] arcLift(double[] a, double[] b) {
         return arcLift(a, b, ARC_RISE);
+    }
+
+    /**
+     * The rise that lands this arc's apex on a chosen shell - cracks on one egg.
+     *
+     * <b>Why a function and not the constant it replaces.</b> {@link #ARC_RISE} is 1.0 because
+     * that is the rise whose apex lands back on the <i>bodies' own</i> shell, whatever the
+     * aspect. That was the right rule while the aspects were the outermost thing drawn; it is
+     * the wrong one now the houses sit outside the ribbons, because every arc then overshoots
+     * the house sphere it is meant to be drawn on. Asking instead for a named shell gives every
+     * arc in the scene one surface, and the widest and the tightest aspects land on it alike.
+     *
+     * <p>{@link #arcLift} sets the apex offset to {@code rise * chord / 2}, and the apex sits at
+     * the chord's midpoint plus that offset square to the chord. So with {@code m} the
+     * midpoint's distance from the centre, the apex lands at {@code sqrt(m^2 + h^2)} and the
+     * rise wanted is {@code 2 * sqrt(shell^2 - m^2) / chord}. For bodies on one shell that is
+     * exact - a constant 1.15 would put an opposition at 1.92 and a sextile at 2.04, which is
+     * two eggs, not one.
+     *
+     * <p><b>Where it is only nearly exact:</b> an arc between two <i>different</i> decks has
+     * endpoints at different heights, so the perpendicular the bow rides is not square to the
+     * midpoint vector and the apex lands a little off the shell. The error is small at the
+     * latitudes the ribbons use and the alternative - solving for a bow that is neither
+     * vertical nor square to the chord - would give up the property that every arc in the scene
+     * bows the same way. GlobeCheck asserts the exact case exactly and this one within a band.
+     *
+     * @return 0 when the shell is inside the chord's own midpoint, where no bow reaches it
+     */
+    static double riseToShell(double[] a, double[] b, double shell) {
+        double dx = b[0] - a[0];
+        double dy = b[1] - a[1];
+        double dz = b[2] - a[2];
+        double len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (len < 1e-9) {
+            return 0.0;
+        }
+        double mx = (a[0] + b[0]) / 2.0;
+        double my = (a[1] + b[1]) / 2.0;
+        double mz = (a[2] + b[2]) / 2.0;
+        double m2 = mx * mx + my * my + mz * mz;
+        double h2 = shell * shell - m2;
+        if (h2 <= 0.0) {
+            return 0.0;
+        }
+        return 2.0 * Math.sqrt(h2) / len;
     }
 
     /** As above, over a chosen rise. */

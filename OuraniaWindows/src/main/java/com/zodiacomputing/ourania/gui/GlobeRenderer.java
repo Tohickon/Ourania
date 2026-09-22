@@ -1911,13 +1911,22 @@ final class GlobeRenderer {
      * up with the sky. Shared with the check suite for the same reason inclinationOf is: a
      * sample that bowed the other way would look for ink on the wrong side of the globe.
      *
+     * <b>A direction, not a distance, since 2026-09-21.</b> This used to return the rise
+     * itself, {@code +/-ARC_RISE}, which put every apex back on the bodies' own shell. The
+     * houses now sit outside the ribbons, so how far an arc rises is a question about the house
+     * shell and is answered per arc by {@link Globe#riseToShell}; which way it bows is still a
+     * question about the line's own deck and is answered here. Splitting them is what lets the
+     * suite assert the two separately - a bow that went the wrong way and a bow that overshot
+     * were previously one number and one failure.
+     *
      * @param bowed false when the reader has switched arcs off, which is the chord either way
+     * @return +1 up, -1 down, 0 when arcs are off
      */
     static double riseFor(SkymapPanel panel, int ring, boolean bowed) {
         if (!bowed) {
             return 0.0;
         }
-        return panel.ringDeck(ring) == SkymapPanel.DECK_LOWER ? -Globe.ARC_RISE : Globe.ARC_RISE;
+        return panel.ringDeck(ring) == SkymapPanel.DECK_LOWER ? -1.0 : 1.0;
     }
 
     /** True while the reader is dragging - what every "draw less" decision here reads. */
@@ -1937,6 +1946,37 @@ final class GlobeRenderer {
     /** Whether an aspect bows over the middle in this frame. */
     private boolean bowed;
 
+    /**
+     * The signed rise the painter actually draws an arc with: direction times distance.
+     *
+     * <b>Shared with the check suite, and it has to be.</b> GlobeCheck walks the arc to find the
+     * ink the painter laid down, and it can only do that if it walks the same curve. While this
+     * arithmetic sat inline in {@link #chord} the suite used {@code riseFor} instead - which
+     * became a direction on 2026-09-21 - and sampled a path the painter no longer drew:
+     * <b>0 chords measured of 81 in the chart</b>, every sample missing its line. One rule in
+     * one place is the fix, the same reason {@code riseFor} and {@code inclinationOf} are
+     * shared.
+     *
+     * <b>The distance is a target shell, interpolated by how wide the aspect is.</b> A fixed
+     * outer shell makes a conjunction rise vertically out of two touching bodies - a spike, and
+     * Part O caught it. Scaling between the bodies' own shell and the houses' keeps tight
+     * aspects flat and lets wide ones sweep, so a chart's figure has a silhouette.
+     *
+     * @param rise the direction from {@link #riseFor}: +1 up, -1 down, 0 for a straight chord
+     */
+    static double reachOf(double rise, double[] a, double[] b) {
+        if (rise == 0.0) {
+            return 0.0;
+        }
+        double dx = b[0] - a[0];
+        double dy = b[1] - a[1];
+        double dz = b[2] - a[2];
+        double len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        double wide = Math.min(1.0, len / (2.0 * Globe.SHELL_CHART));
+        double target = Globe.SHELL_CHART + (Globe.SHELL_HOUSE - Globe.SHELL_CHART) * wide;
+        return Math.signum(rise) * Globe.riseToShell(a, b, target);
+    }
+
     private void chord(double[] a, double[] b, double rise, Color ink, float width,
                        boolean dim) {
         Globe.Projected pa = at(a);
@@ -1954,7 +1994,20 @@ final class GlobeRenderer {
         // and handed to Java2D, and a polyline of a dozen points is one drawing call exactly as
         // a single segment is. See subdivisions for how fine.
         int sub = bowed ? subdivisions(pa, pb, steps, this.turning) : 1;
-        double[][] path = Globe.arc(a, b, steps * sub, rise);
+        // <b>The direction comes in, the distance is worked out here.</b> riseFor says which
+        // way this line's deck bows; how far is a question about which shell the arc should top
+        // out on, answered per arc so the scene's arcs share a surface instead of each riding
+        // its own.
+        //
+        // <b>And the shell is interpolated by how wide the aspect is.</b> Sending every apex to
+        // the house shell was the first attempt and GlobeCheck Part O caught it: a conjunction's
+        // chord is nearly zero, so reaching a fixed outer shell means rising vertically out of
+        // two touching bodies - a spike, not a crack on an egg. Scaling the target between the
+        // bodies' own shell and the houses' keeps the old rule for tight aspects, which was
+        // right, and gives the wide ones the sweep David asked for. It is also what the arc
+        // javadoc already claimed as a virtue: the widest aspects ride highest, so the figure a
+        // chart makes has a silhouette.
+        double[][] path = Globe.arc(a, b, steps * sub, reachOf(rise, a, b));
         Globe.Projected[] p = new Globe.Projected[path.length];
         for (int i = 0; i < path.length; i++) {
             p[i] = at(path[i]);

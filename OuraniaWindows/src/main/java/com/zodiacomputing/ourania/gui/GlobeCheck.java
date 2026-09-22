@@ -3,6 +3,8 @@ package com.zodiacomputing.ourania.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zodiacomputing.ourania.astro.Aspects;
+
 /**
  * The celestial globe's arithmetic, asserted before anything is painted.
  *
@@ -131,6 +133,12 @@ public final class GlobeCheck {
         before = failures.size();
         theHousesTakeTheSphere();
         report("Part R", before);
+
+        System.out.println();
+        System.out.println("=== Part S: three ribbons on one sphere, and one egg of arcs ===");
+        before = failures.size();
+        theRibbonsBloom();
+        report("Part S", before);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -432,11 +440,15 @@ public final class GlobeCheck {
         // <b>Every body ring inside the zodiac, and the zodiac inside its own scale.</b>
         // The sky used to ride outside the sign plane, which put a transiting body outside the
         // band that says which sign it is in.
+        // <b>The three chart ribbons no longer nest - they share one shell.</b> Until
+        // 2026-09-21 they were 1.20, 1.50 and 1.80, and that nesting is exactly what stopped
+        // them reading as a stack: the depth term scales with the radius, so the widest ring
+        // straddles the narrower ones at any tilt however far it is lifted. They now ride one
+        // shell at three latitudes, which is asserted in Part S; what still has to nest is
+        // everything outside them.
         yes("the shells nest outward",
-            Globe.SHELL_CORE < Globe.SHELL_NATAL
-                && Globe.SHELL_NATAL < Globe.SHELL_PARTNER
-                && Globe.SHELL_PARTNER < Globe.SHELL_SKY
-                && Globe.SHELL_SKY < Globe.SHELL_HOUSE
+            Globe.SHELL_CORE < Globe.SHELL_CHART
+                && Globe.SHELL_CHART < Globe.SHELL_HOUSE
                 && Globe.SHELL_HOUSE < Globe.SHELL_BOUND
                 && Globe.SHELL_BOUND < Globe.SHELL_SIGN_INNER
                 && Globe.SHELL_SIGN_INNER < Globe.SHELL_SIGN_OUTER
@@ -1429,18 +1441,31 @@ public final class GlobeCheck {
                     int outer = panel.ringDeck(SkymapPanel.WHEEL_OUTER);
                     int tri = panel.ringDeck(SkymapPanel.WHEEL_SKY);
 
-                    // Whoever is on the inner wheel, the sky is above it whenever it is
-                    // transits rather than the chart itself.
-                    eq("with " + state + " the sky ring is the upper deck",
-                        SkymapPanel.DECK_UPPER, chartA && chartB ? tri : outer);
+                    // <b>The sky holds the middle, and the people float either side of it.</b>
+                    // Reversed on 2026-09-21, David's call: the sky is the one ring that is
+                    // nobody's chart - it is where everything actually is - so it is the frame
+                    // and the two charts are what sit above and below it. Before that Chart A
+                    // held the middle and the sky rode above, which crowded a synastry's two
+                    // people onto one side of the sky.
+                    if (chartA || chartB) {
+                        eq("with " + state + " the sky ring takes the middle deck",
+                            SkymapPanel.DECK_MIDDLE, chartA && chartB ? tri : outer);
+                    } else {
+                        // <b>Both people out, so there are two skies.</b> The sky is the chart
+                        // and holds the middle on the inner wheel; this ring is the sky at the
+                        // scrubbed moment and has to go somewhere else, or two rings draw at
+                        // one radius in one plane as a single ring holding both.
+                        eq("with " + state + " the transiting sky rides above the sky chart",
+                            SkymapPanel.DECK_UPPER, outer);
+                    }
                     if (chartA) {
-                        eq("with " + state + " Chart A keeps the middle deck",
-                            SkymapPanel.DECK_MIDDLE, inner);
+                        eq("with " + state + " Chart A rides above the sky",
+                            SkymapPanel.DECK_UPPER, inner);
                     } else if (chartB) {
                         eq("with " + state + " Chart B keeps the lower deck",
                             SkymapPanel.DECK_LOWER, inner);
                     } else {
-                        eq("with " + state + " the sky is the chart and takes the middle",
+                        eq("with " + state + " the sky is the chart and still takes the middle",
                             SkymapPanel.DECK_MIDDLE, inner);
                     }
                     if (chartA && chartB) {
@@ -1701,7 +1726,11 @@ public final class GlobeCheck {
         // A conjunction has almost no chord to bow out of, so it stays on the surface.
         double[][] tight = Globe.arc(Globe.onShell(0.0, origin, r, 0.0),
             Globe.onShell(2.0, origin, r, 0.0), 32);
-        yes("a conjunction barely leaves the ring", tight[16][1] < 0.03);
+        // <b>Measured against the shell, not against a remembered number.</b> This was a flat
+        // 0.03, which was two percent of the 1.20 shell the ribbons used to ride. They ride
+        // 1.75 now, so the same two-degree chord is half again as long and its bow cleared the
+        // old threshold by a whisker - a red that was the constant's age, not the code's.
+        yes("a conjunction barely leaves the ring", tight[16][1] < 0.02 * r);
 
         // <b>Across two charts, where the bodies are on different shells and different
         // planes.</b> The synastry chord is the one this view exists for, and it is the one
@@ -2039,8 +2068,12 @@ public final class GlobeCheck {
                 // fade failing, it is a check looking in the wrong place. The painter strokes
                 // curves that follow the arc to a tenth of a pixel, which Part O asserts, so
                 // walking the arc finely lands on ink the painter laid down.
-                double[][] path = Globe.arc(from, to, 128,
-                    GlobeRenderer.riseFor(panel, ring, Settings.globeAspectArcs()));
+                // <b>Walked with the painter's own rule, not a copy of it.</b> riseFor gives
+                // the direction and reachOf turns it into the distance the painter used. This
+                // read riseFor alone until 2026-09-21, when riseFor became a direction: the
+                // sampler then walked a curve nobody drew and measured 0 chords of 81.
+                double[][] path = Globe.arc(from, to, 128, GlobeRenderer.reachOf(
+                    GlobeRenderer.riseFor(panel, ring, Settings.globeAspectArcs()), from, to));
                 boolean backwards = pb.depth < pa.depth;
                 double nearInk = along(frame, cam, path, backwards, 0.25, size);
                 double farInk = along(frame, cam, path, backwards, 0.75, size);
@@ -2449,6 +2482,179 @@ public final class GlobeCheck {
             }
         }
         return true;
+    }
+
+    /**
+     * The three properties that kept going wrong, asserted where they can be measured.
+     *
+     * <p>All three come out of one week of getting this wrong repeatedly, and each is written
+     * against the geometry rather than against a remembered number.
+     *
+     * <p><b>One shell.</b> The ribbons used to nest - 1.20, 1.50, 1.80 - and nested rings cannot
+     * read as a stack at any tilt, because the depth term scales with the radius so a bigger
+     * ring straddles a smaller one however far it is lifted. Measured on 2026-09-21: Chart B
+     * rose above Chart A at a steep tilt and the sky fell below it from beneath. Asserting the
+     * three radii are equal is what stops that returning.
+     *
+     * <p><b>The order, at every tilt.</b> The sky highest on screen, then Chart A, then Chart B,
+     * across the whole allowed range and on both sides of the plane. It does <i>not</i> invert
+     * under the plane: the lift reaches the screen through cos(pitch), which is positive
+     * throughout, so a ribbon above the plane stays above even when the camera is beneath
+     * looking up. What mirrors down there is the house sequence, not the stack - a probe that
+     * assumed otherwise called twenty-five good tilts wrong.
+     *
+     * <p><b>One egg.</b> Every arc's apex lands on the house shell, whatever its aspect. The old
+     * rule - a fixed rise of 1.0 - landed each apex back on the bodies' own shell, which was
+     * right while the aspects were the outermost thing drawn and wrong once the houses moved
+     * outside them. A constant cannot do it: at these radii a single rise that puts an
+     * opposition on the shell puts a sextile well past it.
+     */
+    private static void theRibbonsBloom() {
+        // ---- one shell
+        near("the natal and partner ribbons share a shell",
+            Globe.SHELL_NATAL, Globe.SHELL_PARTNER, 1e-9);
+        near("and the sky rides it too", Globe.SHELL_NATAL, Globe.SHELL_SKY, 1e-9);
+        yes("the ribbons sit inside the houses", Globe.SHELL_CHART < Globe.SHELL_HOUSE);
+        yes("and the houses inside the bounds", Globe.SHELL_HOUSE < Globe.SHELL_BOUND);
+
+        // ---- the latitude is the obliquity, not a tuned number
+        near("the outer ribbons ride the obliquity",
+            Globe.SHELL_CHART * Math.sin(Globe.OBLIQUITY), Globe.LIFT_SKY, 1e-9);
+        near("and the partner rides it the other way", -Globe.LIFT_SKY, Globe.LIFT_PARTNER, 1e-9);
+        yes("which is a real latitude, not a height off the sphere",
+            Math.abs(Globe.LIFT_SKY) < Globe.SHELL_CHART);
+
+        // ---- the order, swept across the whole allowed range and both sides of the plane
+        int tilts = 0;
+        boolean ordered = true;
+        for (int i = -125; i <= 125; i += 5) {
+            double pitch = i / 100.0;
+            if (Math.abs(pitch) < Globe.MIN_PITCH) {
+                continue;
+            }
+            Globe cam = new Globe();
+            cam.pitch = pitch;
+            cam.yaw = 0.0;
+            double upper = ribbonMiddle(cam, GlobeRenderer.liftOf(SkymapPanel.DECK_UPPER, true));
+            double middle = ribbonMiddle(cam, GlobeRenderer.liftOf(SkymapPanel.DECK_MIDDLE, true));
+            double lower = ribbonMiddle(cam, GlobeRenderer.liftOf(SkymapPanel.DECK_LOWER, true));
+            ordered &= upper < middle && middle < lower;
+            tilts++;
+        }
+        // <b>Asserted by deck, not by chart.</b> Which chart rides which deck is a decision and
+        // it changed on 2026-09-21 - the sky moved to the middle with Chart A above it. Written
+        // as "the sky is on top" this assertion would have had to be edited to follow, which is
+        // a check that agrees with whatever the code says. The decks' own order is the geometry
+        // and does not move.
+        yes("the upper deck rides above the middle and the middle above the lower, at every "
+            + "tilt (" + tilts + ")", ordered && tilts > 40);
+
+        // ---- one egg: every apex on the shell its width asks for, over every aspect
+        //
+        // <b>Not one shell for all of them, and Part O is why.</b> The first version of this
+        // sent every apex to the house shell; a conjunction's chord is nearly zero, so that
+        // meant rising vertically out of two touching bodies and Part O's "a conjunction barely
+        // leaves the ring" went red. The target is interpolated between the bodies' shell and
+        // the houses' by how wide the aspect is, so the tight ones stay flat and the wide ones
+        // sweep - which is what an egg's cracks do.
+        boolean onTheShell = true;
+        double worst = 0.0;
+        for (Aspects.Type type : new Aspects.Type[] {Aspects.Type.CONJUNCTION,
+                Aspects.Type.SEXTILE, Aspects.Type.SQUARE, Aspects.Type.TRINE,
+                Aspects.Type.OPPOSITION}) {
+            if (type.exactAngle < 1.0) {
+                continue;                       // a conjunction has no chord to bow across
+            }
+            double[] a = Globe.onShell(0.0, 0.0, Globe.SHELL_CHART, 0.0);
+            double[] b = Globe.onShell(type.exactAngle, 0.0, Globe.SHELL_CHART, 0.0);
+            double target = targetShell(a, b);
+            double[][] path = Globe.arc(a, b, 64, Globe.riseToShell(a, b, target));
+            double apex = 0.0;
+            for (double[] q : path) {
+                apex = Math.max(apex, Math.sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2]));
+            }
+            worst = Math.max(worst, Math.abs(apex - target));
+            onTheShell &= Math.abs(apex - target) < 0.01;
+        }
+        yes(String.format("every aspect tops out on the shell its width asks for (worst %.4f)",
+            worst), onTheShell);
+
+        double[] a = Globe.onShell(0.0, 0.0, Globe.SHELL_CHART, 0.0);
+        double[] opp = Globe.onShell(180.0, 0.0, Globe.SHELL_CHART, 0.0);
+        double[] sex = Globe.onShell(60.0, 0.0, Globe.SHELL_CHART, 0.0);
+        double[] tight = Globe.onShell(2.0, 0.0, Globe.SHELL_CHART, 0.0);
+
+        // <b>The widest aspect rides highest and the tightest stays home.</b> This is the
+        // property that makes them cracks rather than spikes, and it is the one a fixed rise
+        // cannot have.
+        yes("an opposition sweeps out to the houses",
+            Math.abs(targetShell(a, opp) - Globe.SHELL_HOUSE) < 0.01);
+        yes("and a near conjunction stays on the ribbon",
+            Math.abs(targetShell(a, tight) - Globe.SHELL_CHART) < 0.05);
+        yes("with a sextile somewhere between the two",
+            targetShell(a, sex) > Globe.SHELL_CHART && targetShell(a, sex) < Globe.SHELL_HOUSE);
+
+        // <b>And the same three, through the painter's own rule rather than this file's copy.</b>
+        // The copy above exists so that editing the painter turns Part S red; but a copy alone
+        // asserts nothing about what is drawn. Mutation-tested on 2026-09-21: sending every apex
+        // back to the house shell in GlobeRenderer <b>survived</b> the whole suite, because
+        // nothing called reachOf. These three do.
+        yes("the painter sweeps an opposition out to the houses",
+            Math.abs(paintedApex(a, opp) - Globe.SHELL_HOUSE) < 0.02);
+        yes("and the painter keeps a near conjunction on the ribbon",
+            Math.abs(paintedApex(a, tight) - Globe.SHELL_CHART) < 0.05);
+        yes("and puts a sextile between them",
+            paintedApex(a, sex) > Globe.SHELL_CHART + 0.02
+                && paintedApex(a, sex) < Globe.SHELL_HOUSE - 0.02);
+
+        // <b>A shell inside the chord's own midpoint cannot be reached by any bow.</b> The case
+        // has to be a tight aspect: an opposition's midpoint is the centre of the sphere, so
+        // every shell is reachable from it and the first version of this assertion picked an
+        // example that proved nothing.
+        near("a shell no bow can reach asks for no rise", 0.0,
+            Globe.riseToShell(a, sex, 0.5), 1e-9);
+    }
+
+    /**
+     * The shell an arc of this width should top out on.
+     *
+     * <b>A second copy of the renderer's rule, deliberately.</b> If the painter's interpolation
+     * is edited this one does not follow, and Part S goes red - which is the point of asserting
+     * a rule the painter also holds an opinion about.
+     */
+    private static double targetShell(double[] a, double[] b) {
+        double dx = b[0] - a[0];
+        double dy = b[1] - a[1];
+        double dz = b[2] - a[2];
+        double len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        double wide = Math.min(1.0, len / (2.0 * Globe.SHELL_CHART));
+        return Globe.SHELL_CHART + (Globe.SHELL_HOUSE - Globe.SHELL_CHART) * wide;
+    }
+
+    /**
+     * How far from the centre the painter's own arc actually reaches.
+     *
+     * Built through {@link GlobeRenderer#reachOf}, so this measures the curve that gets drawn
+     * rather than a restatement of the rule that produces it.
+     */
+    private static double paintedApex(double[] a, double[] b) {
+        double[][] path = Globe.arc(a, b, 96, GlobeRenderer.reachOf(1.0, a, b));
+        double apex = 0.0;
+        for (double[] q : path) {
+            apex = Math.max(apex, Math.sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2]));
+        }
+        return apex;
+    }
+
+    /** Where a ribbon's centre lands on screen, walked round the ring. */
+    private static double ribbonMiddle(Globe cam, double lift) {
+        Globe.Projected centre = cam.project(0, 0, 0, 900, 900);
+        double sum = 0.0;
+        for (int d = 0; d < 360; d += 2) {
+            double[] pt = Globe.onShell(d, 0.0, Globe.SHELL_CHART, lift);
+            sum += cam.project(pt[0], pt[1], pt[2], 900, 900).y - centre.y;
+        }
+        return sum / 180.0;
     }
 
     private static void yes(String label, boolean condition) {

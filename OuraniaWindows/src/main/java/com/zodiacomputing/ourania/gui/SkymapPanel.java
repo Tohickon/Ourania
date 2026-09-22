@@ -5783,28 +5783,51 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * radii and planes, so nothing downstream has to learn a second vocabulary - the callers
      * pass this instead of the wheel index and everything else is as it was.
      */
+    /**
+     * Which deck a wheel rides: <b>the sky in the middle, Chart A above it, Chart B below</b>.
+     *
+     * <b>The sky is the frame the charts are read against, so it holds the middle.</b> This was
+     * the other way round until 2026-09-21 - Chart A in the middle with the sky lifted above it
+     * - on the reading that the natal chart is the subject and the transits are weather passing
+     * over it. David's call reverses that, and the reversal is the better picture: the sky is
+     * the one ring that is not anybody's chart, it is where everything actually is, and the two
+     * people are what float above and below it. It also means a synastry reads symmetrically,
+     * with one person over the sky and one under it rather than both crowded to one side.
+     *
+     * <b>Two wheels must never land on one deck.</b> They would be drawn at one radius in one
+     * plane and the reader would see a single ring holding two charts. The sky owns the middle
+     * outright now, so Chart A takes the upper deck and Chart B the lower, and a promoted
+     * Chart B stays on the lower deck it would have had anyway.
+     */
     int ringDeck(int wheel) {
         if (wheel == WHEEL_SKY) {
-            return DECK_UPPER;
+            return DECK_MIDDLE;
         }
         if (wheel == WHEEL_OUTER) {
             // The outer slot is a second person in a synastry and the sky in every other mode
             // - the same rule outerRingMarker states, read here for the same reason.
-            return this.isSynastryChart() ? DECK_LOWER : DECK_UPPER;
+            if (this.isSynastryChart()) {
+                return DECK_LOWER;
+            }
+            // <b>Unless the inner wheel is already the sky.</b> With both people out, the sky
+            // is the chart and sits on the inner wheel in the middle, while this ring is the
+            // sky at the scrubbed moment - two different moments of the same sky, and two
+            // rings on one deck would draw them at one radius in one plane as a single ring
+            // holding both.
+            return (!this.ringAOn && !this.ringBOn) ? DECK_UPPER : DECK_MIDDLE;
         }
-        // <b>The inner slot is the middle deck unless Chart B has been promoted into it.</b>
-        // A composite is its own chart rather than either person's and belongs in the middle;
-        // so does the sky when the sky is the whole chart, because then it is not transits
-        // over something, it is the thing being read, and a lone ring floating above an empty
-        // middle would say otherwise.
+        // <b>The sky keeps the middle even when it is the chart.</b> With both people out, the
+        // sky is not transits over anything - it is the thing being read - and it moves to the
+        // inner wheel. It must not take Chart A's upper deck with it: a lone ribbon floating
+        // above an empty middle says there is something underneath it that is not there.
+        if (!this.ringAOn && !this.ringBOn) {
+            return DECK_MIDDLE;
+        }
+        // The inner slot is Chart A, which now rides above the sky - unless Chart B has been
+        // promoted into it, and then it keeps the lower deck that belongs to Chart B.
         boolean chartBIsTheChart = !this.isRelationshipChart()
             && this.anchorSubject != null && this.anchorSubject == this.subjectB;
-        // <b>Two wheels must never land on one deck.</b> They would be drawn at one radius in
-        // one plane and the reader would see one ring holding two charts. A synastry already
-        // has Chart B on the lower deck, and a chart with two people in it has Chart A on the
-        // inner wheel anyway - so this only ever fires for a half-built state, and it fires
-        // toward the middle rather than into a collision.
-        return chartBIsTheChart && !this.isSynastryChart() ? DECK_LOWER : DECK_MIDDLE;
+        return chartBIsTheChart && !this.isSynastryChart() ? DECK_LOWER : DECK_UPPER;
     }
 
     /** The wheel a grid row label names, for the rows that predate the wheel field. */
