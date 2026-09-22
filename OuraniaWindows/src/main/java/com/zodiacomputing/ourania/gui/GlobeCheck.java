@@ -2549,6 +2549,32 @@ public final class GlobeCheck {
         yes("the upper deck rides above the middle and the middle above the lower, at every "
             + "tilt (" + tilts + ")", ordered && tilts > 40);
 
+        // ---- the ribbons are lit at the edge and translucent through the body
+        //
+        // <b>What makes a stack of strokes read as light.</b> Each pass narrower than the last
+        // and brighter than the last: a bloom that got wider as it got brighter would be a
+        // halo round a hollow line, and one drawn at a single width is just a thick line. The
+        // painter's own table is read here rather than restated - a suite that keeps its own
+        // copy of a rule can only prove the copy agrees with itself.
+        float[][] passes = GlobeRenderer.rimPasses();
+        yes("a lit rim is drawn in more than one pass", passes.length >= 3);
+        boolean narrowing = true;
+        boolean brightening = true;
+        for (int i = 1; i < passes.length; i++) {
+            narrowing &= passes[i][0] < passes[i - 1][0];
+            brightening &= passes[i][1] > passes[i - 1][1];
+        }
+        yes("each pass is narrower than the one before it", narrowing);
+        yes("and brighter than the one before it", brightening);
+        yes("the faintest pass really is faint", passes[0][1] < 1.0);
+        yes("and the core really is the bright one",
+            passes[passes.length - 1][1] > 1.0
+                && passes[passes.length - 1][0] < 2.0);
+        // The body stays translucent: a band whose fill matched its lit edge would be a solid
+        // wall and the ribbons behind it would be gone.
+        yes("the core outshines the band's own body by a wide margin",
+            passes[passes.length - 1][1] >= 3.0);
+
         // ---- one egg: every apex on the shell its width asks for, over every aspect
         //
         // <b>Not one shell for all of them, and Part O is why.</b> The first version of this

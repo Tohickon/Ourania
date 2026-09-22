@@ -439,7 +439,6 @@ final class GlobeRenderer {
                 fill);
         }
         // The two rims, which are what a band reads by when it turns edge-on.
-        Color edge = shade(fill, Math.min(255, fill.getAlpha() * 3));
         double[][] top = new double[steps + 1][];
         double[][] bottom = new double[steps + 1][];
         for (int i = 0; i <= steps; i++) {
@@ -447,8 +446,59 @@ final class GlobeRenderer {
             top[i] = bandPoint(lon, radius, RIBBON_HALF, inclination, lift);
             bottom[i] = bandPoint(lon, radius, -RIBBON_HALF, inclination, lift);
         }
-        polyline(top, edge, 1.0f);
-        polyline(bottom, edge, 1.0f);
+        glowingRim(top, fill, turning);
+        glowingRim(bottom, fill, turning);
+    }
+
+    /**
+     * A rim drawn as a bloom rather than a hairline: luminous edge, translucent body.
+     *
+     * <b>Java2D has no light, so a lit edge is three passes and an honest trick.</b> A wide
+     * very faint stroke, a narrower brighter one, then a near-white core a pixel or so across.
+     * Each pass composites over the last, so the edge reads as something emitting rather than
+     * something outlined - while the band's own fill stays low enough that the sphere and the
+     * ribbons behind it still show through. David's words for the target: <i>"luminous yet
+     * translucent bands."</i>
+     *
+     * <b>The halo goes when the hand moves.</b> Three passes on two rims of three ribbons is
+     * eighteen polylines a frame instead of six, and the drag budget is already the thing the
+     * quads are skipped for. Mid-drag the core alone carries the shape, which is what the
+     * single hairline did before this.
+     */
+    /**
+     * The bloom's passes: stroke width, and what the band's own alpha is multiplied by.
+     *
+     * <b>Widest and faintest first, narrowest and brightest last</b> - which is the whole of
+     * what makes a stack of strokes read as light rather than as a thick line, and is therefore
+     * the thing worth asserting. Shared with the suite rather than restated there, for the same
+     * reason {@code reachOf} is: a check that keeps its own copy of a rule can only prove the
+     * copy is consistent with itself. Mutation-tested.
+     *
+     * <b>The core keeps the ribbon's own colour.</b> An earlier version lifted it toward white,
+     * on the reasoning that a lit edge tends toward white at its centre - true of light, wrong
+     * here, because Chart A's ink is already near-silver and the lift flattened it to plain
+     * white, losing the one thing that says which ribbon it is. Four treatments were rendered
+     * side by side and David picked the one that keeps the hue; brightness comes from alpha.
+     */
+    static float[][] rimPasses() {
+        return new float[][] {
+            {7.0f, 0.5f},
+            {3.2f, 2.0f},
+            {1.3f, 4.0f},
+        };
+    }
+
+    private void glowingRim(double[][] path, Color fill, boolean turning) {
+        int base = fill.getAlpha();
+        float[][] passes = rimPasses();
+        // <b>The halo goes while the hand moves, the core never does.</b> Three passes on two
+        // rims of three ribbons is eighteen polylines a frame instead of six, and the drag
+        // budget is already what the filled quads are skipped for. The core alone carries the
+        // band mid-drag, which is exactly what the single hairline did before the bloom.
+        for (int i = turning ? passes.length - 1 : 0; i < passes.length; i++) {
+            int alpha = (int) Math.round(base * passes[i][1]);
+            polyline(path, shade(fill, Math.max(10, Math.min(255, alpha))), passes[i][0]);
+        }
     }
 
     /**
