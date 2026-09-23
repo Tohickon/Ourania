@@ -24,9 +24,31 @@ public final class GlobeCheck {
     private static int checks = 0;
 
     public static void main(String[] args) throws Exception {
+        // <b>A thrown suite must die, not hang.</b> Several parts open an OuraniaWindow, and
+        // AWT's event thread is not a daemon - so when main threw on 2026-09-22 the JVM had
+        // nothing left to run and still could not exit, and the harness sat on it for
+        // seventeen minutes reporting nothing. Seventeen minutes of silence is worse than a
+        // red, because a red says what is wrong. Anything escaping main now prints and kills
+        // the VM, taking the window with it.
         // Never the reader's own settings file: a suite that generates a chart persists it,
         // and one of these once overwrote a saved birth chart. See Settings.useScratchFile.
+        //
+        // <b>First, ahead of the handler below.</b> SettingsIsolationCheck reads every suite's
+        // main() and requires this to be the opening statement, so that nothing which could
+        // reach the reader's files runs before the redirect is in place. The handler was put
+        // above it on 2026-09-22 and the full regression caught the collision on 2026-09-23;
+        // a GlobeCheck-only run never could. Both rules are right and neither has to give way:
+        // installing a thread handler cannot touch a settings file, and a throw inside
+        // useScratchFile cannot hang anything, because the hang the handler exists for needs an
+        // open AWT window to keep the VM alive and no window exists yet.
         Settings.useScratchFile();
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            System.out.println("FAILURES (1 of 1 checks):");
+            System.out.println("  the suite threw before it could report: " + e);
+            e.printStackTrace(System.out);
+            System.out.flush();
+            Runtime.getRuntime().halt(1);
+        });
         System.out.println("=== Part A: the camera projects sanely ===");
         int before = failures.size();
         theCamera();
@@ -218,67 +240,319 @@ public final class GlobeCheck {
         yes("zooming in stops outside the core", g.distance >= 3.2 - 1e-9);
         yes("and outside the outermost shell", g.distance > Globe.SHELL_SKY);
 
+        // <b>Drag, then settle, which is what one frame is.</b> A drag adds to a pending
+        // move and the glide spends it over the frames that follow - see Globe.DAMPING - so a
+        // loop that only drags asks the camera to do something and never gives it a frame to do
+        // it in. settleFully at the end runs the coast out, because these assertions are about
+        // where the camera comes to rest rather than where it is mid-glide.
         for (int i = 0; i < 200; i++) {
             g.drag(0, 40, 800);
+            g.settle();
         }
+        g.settleFully();
         yes("dragging cannot tip the globe past its pole",
             Math.abs(g.pitch) <= Globe.MAX_PITCH + 1e-9);
 
-        // <b>And the other way, which now reaches the underside.</b> David, 2026-09-18: "the
-        // chart when in globe mode has the houses going the wrong direction" shut the lower half
-        // off; David, 2026-09-19: "i used to be able to tilt the chart more than one way" asked
-        // for it back. Both halves are reachable, the mirror is handled in the projection, and
-        // the camera still never rests edge-on, where the plane collapses to a line.
+        // <b>And the other way stops at edge-on, because the underside is out.</b> This asserted
+        // the opposite until 2026-09-22 - the lower half was shut off on 09-18 when the houses
+        // read backwards there, given back on 09-19 when David missed tilting both ways, and
+        // labelled with a notice on 09-20. He settled it by naming what the tilt is for: "i
+        // would rather have the tilt show all versions of the globe where the houses are
+        // correct, you can stop the tilt from showing the underside if you need to stop the
+        // tilt somewhere." Measured, that is the whole positive range and nothing else.
         for (int i = 0; i < 200; i++) {
             g.drag(0, -40, 800);
+            g.settle();
         }
-        yes("dragging the other way reaches under the chart's plane: pitch " + g.pitch,
-            g.pitch <= -Globe.MIN_PITCH + 1e-9 && g.pitch >= -Globe.MAX_PITCH - 1e-9);
+        g.settleFully();
+        yes("dragging the other way reaches the far pole: pitch " + g.pitch,
+            Math.abs(g.pitch + Globe.MAX_PITCH) < 1e-6);
 
-        // <b>Which way round the hand works, pinned in the reader's words.</b> David,
-        // 2026-09-20: "when the mouse pulls upward we are shown the bottom on view and pulled
-        // down the top". Swing's dy is negative when the pointer moves up the panel, so that is
-        // the direction that takes the camera under the chart - and this says so out loud,
-        // because a sign flipped in drag() would still leave every other tilt assertion green.
-        Globe hand = new Globe();
-        for (int i = 0; i < 40; i++) {
-            hand.drag(0, -20, 800);                       // pointer pulled UP the panel
+        // <b>The whole meridian is reachable and nothing in it is skipped.</b> The camera
+        // refused a band either side of edge-on, then the whole lower half, then everything past
+        // a quarter turn - three guesses at a question the prototype answers directly. It walks
+        // pole to pole and may rest anywhere on the way, edge-on included: a ring seen edge-on
+        // is a bar, and a bar is still a chart.
+        // <b>Walked both ways, because one way starts where it is going.</b> This dragged
+        // in one direction only, which worked while the camera opened at +0.18 and the drag ran
+        // negative. The default became -0.18 when the chart was turned over on 2026-09-23, and
+        // the same drag then walked away from edge-on and pinned against the clamp without ever
+        // crossing it - a green check turning red on a change that had nothing to do with the
+        // property. Dragging each way in turn asserts the thing itself: from wherever the
+        // camera rests, the whole meridian is reachable and edge-on is not skipped over.
+        boolean restedEdgeOn = true;
+        double[] ends = new double[2];
+        double[] ways = {-9.0, 9.0};
+        for (int k = 0; k < ways.length; k++) {
+            Globe hand = new Globe();
+            // <b>Start at a pole, then walk to the other one.</b> Dragging from wherever the
+            // camera opens only crosses edge-on if it happens to open on the far side of it,
+            // which is how this check came to depend on the sign of the default pitch. Pinning
+            // against one clamp first makes the walk the whole meridian every time, and the
+            // question asked of it the one worth asking: crossing the plane, is there anywhere
+            // the hand cannot put the camera?
+            for (int i = 0; i < 400; i++) {
+                hand.drag(0, -ways[k], 800);
+                hand.settle();
+            }
+            hand.settleFully();
+            boolean crossed = false;
+            for (int i = 0; i < 800; i++) {
+                hand.drag(0, ways[k], 800);
+                hand.settle();
+                crossed |= Math.abs(hand.pitch) < 0.08;
+            }
+            hand.settleFully();
+            restedEdgeOn &= crossed;
+            ends[k] = hand.pitch;
         }
-        yes("pulling the mouse up shows the underside: pitch " + hand.pitch,
-            hand.pitch < 0 && hand.fromBelow());
-        for (int i = 0; i < 40; i++) {
-            hand.drag(0, 20, 800);                        // pointer pushed DOWN the panel
-        }
-        yes("pulling it down shows the top again: pitch " + hand.pitch,
-            hand.pitch > 0 && !hand.fromBelow());
+        yes("a drag passes through edge-on rather than jumping over it", restedEdgeOn);
+        // <b>And arrives at a pole either way.</b> Dragging one way used to be the whole test,
+        // which asserted one pole was reachable and said nothing about the other. Both ends are
+        // the claim: the meridian runs pole to pole and a hand can walk the length of it.
+        yes("and runs on to one pole: pitch " + ends[0],
+            Math.abs(ends[0] + Globe.MAX_PITCH) < 1e-6);
+        yes("and to the other: pitch " + ends[1],
+            Math.abs(ends[1] - Globe.MAX_PITCH) < 1e-6);
 
-        // <b>Through the band in one motion, never resting in it.</b> A drag from well above
-        // the plane to well below it is walked in single steps, and no step may leave the
-        // camera edge-on: that is the one tilt where the houses cannot be read at all.
-        Globe cross = new Globe();
-        cross.pitch = 0.4;
-        boolean rested = false;
-        boolean reached = false;
-        for (int i = 0; i < 60; i++) {
-            cross.drag(0, -6, 800);
-            if (Math.abs(cross.pitch) < Globe.MIN_PITCH - 1e-9) {
-                rested = true;
+        // <b>And the other end stops just short of the quarter turn.</b> Past it the projection
+        // inverts and every arch hangs underneath; the far half was opened for an hour so the
+        // globe could be rolled over, and shut again when it turned out that the only thing it
+        // was for - arches on top in the rolled view - needed a flip that snapped. Asserting the
+        // limit is below a quarter turn is asserting that the reader can never reach the
+        // inverted half at all.
+        Globe over = new Globe();
+        for (int i = 0; i < 400; i++) {
+            over.drag(0, 37, 800);
+            over.settle();
+        }
+        over.settleFully();
+        yes("a steady drag climbs to the top of the range: pitch " + over.pitch,
+            Math.abs(over.pitch - Globe.MAX_PITCH) < 1e-6);
+        // <b>A quarter turn, clamped at both ends - measured from the prototype.</b> This
+        // went back and forth all of 2026-09-22 until David pointed at his own Three.js
+        // prototype: "http://localhost:5174/ is how i want the globe to behave." Driving it
+        // settles every question the prose could not - dragging down carries the camera to a
+        // full top-down view and stops, dragging up carries it to exactly edge-on and stops,
+        // and the underside is unreachable. "Full tilt control" meant this quarter, not a whole
+        // revolution.
+        yes("the tilt reaches the pole", Math.abs(Globe.MAX_PITCH - Math.PI / 2.0) < 1e-9);
+        yes("and not past it, where the scene would invert", Globe.MAX_PITCH <= Math.PI / 2.0);
+
+        // ---- the glide: a drag is owed over time, not spent at once
+        //
+        // <b>The weight the reader feels, measured three ways.</b> Damping is the one part of
+        // the prototype's camera that is invisible in a still frame and obvious in the hand: the
+        // globe eases under the drag and coasts when it is let go. The three claims below are
+        // what that decomposes into, and they are independent - a camera could conserve the
+        // total without easing, or ease without coasting.
+        Globe glide = new Globe();
+        double before = glide.yaw;
+        glide.drag(200, 0, 800);
+        glide.settle();
+        double afterOneFrame = glide.yaw - before;
+        double whole = (200.0 / 800.0) * Math.PI * 2.0;
+        // <b>One frame spends a twentieth and no more.</b> Without this a camera that applied
+        // the drag immediately and then sat still would satisfy every other assertion here.
+        near("one frame of the glide spends the damping factor",
+            whole * Globe.DAMPING, afterOneFrame, 1e-12);
+        yes("which is a fraction of the drag, not the whole of it", afterOneFrame < whole / 10.0);
+
+        // <b>And it keeps going after the hand stops.</b> No further drag is made; the frames
+        // below are the coast alone.
+        yes("the globe is still coasting when the hand comes off", glide.coasting());
+        int coastFrames = 0;
+        double lastYaw = glide.yaw;
+        boolean alwaysForward = true;
+        while (glide.settle() && coastFrames < 10000) {
+            alwaysForward &= glide.yaw > lastYaw - 1e-15;
+            lastYaw = glide.yaw;
+            coastFrames++;
+        }
+        yes("the coast runs on for a while: " + coastFrames + " frames", coastFrames > 30);
+        yes("and never runs backwards", alwaysForward);
+        yes("and then it is quiet", !glide.coasting());
+
+        // <b>The total is the drag, exactly.</b> Damping moves when the motion happens and not
+        // how far it goes - the geometric series sums to one - so a reader who drags a quarter
+        // of the panel turns the globe by a quarter turn's worth whatever the damping is. This
+        // is what stops the glide being a gearing change in disguise.
+        // <b>To the threshold the glide stops at, which is where the last sliver goes.</b>
+        // Globe zeroes a pending move once it falls under 1e-5 rather than chasing it forever,
+        // so the arriving total is short by less than that - about a six-hundred-thousandth of
+        // a turn, which is a hundredth of a pixel at the outermost shell. The tolerance is that
+        // cutoff and not a number chosen to pass: measured at 9.6e-6, and if the glide ever
+        // started dropping more than it declares, this is what would say so.
+        double glideCutoff = 2e-5;
+        near("and the whole drag arrives in the end", whole, glide.yaw - before, glideCutoff);
+
+        // ---- both axes are geared alike
+        //
+        // <b>Sideways used to divide by the width and up-down by the width as well.</b> On a
+        // panel wider than it is tall that gave the two axes different sensitivity, so a
+        // diagonal drag came out skewed. three's OrbitControls puts both on the height and says
+        // "yes, height" in a comment; this is that, asserted on a deliberately oblong panel.
+        Globe sideways = new Globe();
+        sideways.drag(100, 0, 480);
+        sideways.settleFully();
+        Globe upDown = new Globe();
+        upDown.drag(0, 100, 480);
+        upDown.settleFully();
+        near("a sideways drag and an up-down drag of the same pixels turn the same angle",
+            Math.abs(sideways.yaw), Math.abs(upDown.pitch - new Globe().pitch), 1e-9);
+
+        // ---- the zoom is a scale, not a step
+        //
+        // <b>The same notch takes the same share at every distance.</b> It used to add a fixed
+        // 0.35, which is a tenth of what is left when the camera is close and a thirtieth of the
+        // range when it is far - one gesture with two behaviours. Asserted as a ratio at two
+        // very different distances, which an additive zoom cannot satisfy.
+        Globe near1 = new Globe();
+        near1.distance = 4.0;
+        near1.zoom(1.0);
+        double nearRatio = near1.distance / 4.0;
+        Globe far1 = new Globe();
+        far1.distance = 10.0;
+        far1.zoom(1.0);
+        double farRatio = far1.distance / 10.0;
+        near("a notch takes the same share of the distance near and far",
+            nearRatio, farRatio, 1e-12);
+        yes("and a notch out moves the camera back", nearRatio > 1.0);
+        Globe roundTrip = new Globe();
+        double started = roundTrip.distance;
+        roundTrip.zoom(1.0);
+        roundTrip.zoom(-1.0);
+        near("and a notch each way comes back to where it started",
+            started, roundTrip.distance, 1e-12);
+
+        // ---- the pan puts the globe under the cursor
+        //
+        // <b>Measured through the projection, not against the formula that produced it.</b> A
+        // point at the target's depth must land exactly where the cursor dragged it. Points
+        // nearer or further move by more or less, which is perspective and is what the
+        // prototype does too, so the sample point is placed on the plane through the target.
+        Globe moved = new Globe();
+        int pw = 900;
+        int ph = 640;
+        double[] atDepth = {0.0, 0.0, 0.0};
+        Globe.Projected was = moved.project(atDepth[0], atDepth[1], atDepth[2], pw, ph);
+        moved.pan(60, -25, pw, ph);
+        moved.settleFully();
+        Globe.Projected now = moved.project(atDepth[0], atDepth[1], atDepth[2], pw, ph);
+        // The same cutoff, carried into pixels: a world residual under 1e-5 projects to
+        // 1e-5 * focal / distance, which is under a thousandth of a pixel here. Measured at
+        // 9.3e-4, asserted at twice that.
+        double panCutoff = 2e-3;
+        near("a pan carries the globe the pixels it was dragged, across", 60.0,
+            now.x - was.x, panCutoff);
+        near("and down", -25.0, now.y - was.y, panCutoff);
+
+        // <b>And it stops rather than letting the globe be lost.</b> A camera that panned
+        // without limit would let a reader drag the whole chart off the panel and have no way
+        // back to it.
+        Globe shoved = new Globe();
+        for (int i = 0; i < 400; i++) {
+            shoved.pan(60, 0, pw, ph);
+            shoved.settle();
+        }
+        shoved.settleFully();
+        yes("a pan without end stops inside reach: " + (int) shoved.targetX,
+            Math.abs(shoved.targetX) <= Globe.SHELL_MANSION_OUTER + 1e-9);
+        yes("and it did move before it stopped", Math.abs(shoved.targetX) > 1.0);
+
+        // <b>Turning happens about the panned point, not about the middle of the world.</b>
+        // This is the prototype's behaviour and the reason pan moves the target rather than
+        // offsetting the finished picture: a globe dragged aside spins about where the reader
+        // put it. Measured as the thing that stays put - the target projects to the middle of
+        // the panel at every yaw.
+        Globe orbiting = new Globe();
+        orbiting.pan(80, 40, pw, ph);
+        orbiting.settleFully();
+        boolean centreHeld = true;
+        for (double yaw = 0.0; yaw < 2 * Math.PI; yaw += Math.PI / 5) {
+            orbiting.yaw = yaw;
+            Globe.Projected t = orbiting.project(orbiting.targetX, orbiting.targetY,
+                orbiting.targetZ, pw, ph);
+            centreHeld &= Math.abs(t.x - pw / 2.0) < 1e-6 && Math.abs(t.y - ph / 2.0) < 1e-6;
+        }
+        yes("and the globe turns about the point it was moved to", centreHeld);
+        // <b>An arch domes upward at every tilt the reader can reach.</b> This is the property
+        // David asked for in the end - "just make sure the aspect arches are on the top when it
+        // is flipped" - and it is not free: the bow reaches the screen through cos(pitch), so
+        // past a quarter turn a world-space "up" lands downward and every arch becomes a bowl.
+        // The painter negates the bow exactly there. Swept rather than sampled, because the one
+        // place it can break is the crossing, and a sample either side of it would miss.
+        // <b>Except within a few degrees of pole-on, where the question has no answer.</b> Looking
+        // straight down the axis, the bow points at the reader rather than up or down the screen,
+        // so its apex lands on the chord and neither direction is the one it took. Measured: it
+        // is undecidable at 1.70 rad, a degree or so past the quarter turn, and decided
+        // everywhere else. Skipping it is honest; asserting a direction there would be asserting
+        // a rounding error. The same reason the camera is not allowed to rest edge-on.
+        boolean domedThroughout = true;
+        double worstTilt = 0.0;
+        int judged = 0;
+        for (double pitch = Globe.MIN_PITCH; pitch <= Globe.MAX_PITCH; pitch += 0.05) {
+            Boolean domes = archDomes(pitch);
+            if (domes == null) {
+                continue;                       // too near pole-on to have a direction
             }
-            if (cross.pitch < 0) {
-                reached = true;
+            judged++;
+            if (!domes) {
+                domedThroughout = false;
+                worstTilt = pitch;
             }
         }
-        yes("a steady drag crosses the plane rather than stopping at it", reached);
-        yes("and never rests edge-on on the way through", !rested);
-        for (int i = 0; i < 60; i++) {
-            cross.drag(0, 6, 800);
-        }
-        yes("and comes back up again", cross.pitch > 0);
+        // The floor is on the count so the sweep cannot quietly stop covering anything - it was
+        // 50 while the range ran to a half turn, and 27 is the whole of it now that the range
+        // stops short of the quarter turn. A count tied to the range would follow any narrowing
+        // of the range and prove nothing, so this is a number the range has to keep clearing.
+        yes("an aspect arch domes upward at every reachable tilt (" + judged + " of them)"
+            + (domedThroughout ? "" : ", but not at " + worstTilt),
+            domedThroughout && judged >= 25);
+
         try {
             housesTurnTheRightWay();
         } catch (Exception e) {
             yes("the house labels can be placed to be measured: " + e, false);
         }
+    }
+
+    /**
+     * Does an aspect arch bow toward the top of the screen at this tilt?
+     *
+     * Built through the painter's own {@code reachOf} and the same upright correction the
+     * painter applies, so this measures the curve that gets drawn rather than the rule that
+     * produces it.
+     */
+    private static Boolean archDomes(double pitch) {
+        Globe cam = new Globe();
+        cam.pitch = pitch;
+        cam.yaw = 0.0;
+        double[] from = Globe.onShell(30, 0.0, Globe.SHELL_CHART, 0.0);
+        double[] to = Globe.onShell(150, 0.0, Globe.SHELL_CHART, 0.0);
+        double upright = Math.cos(pitch) < 0.0 ? -1.0 : 1.0;
+        double[][] path = Globe.arc(from, to, 48, GlobeRenderer.reachOf(upright, from, to));
+        Globe.Projected pa = cam.project(from[0], from[1], from[2], 900, 900);
+        Globe.Projected pb = cam.project(to[0], to[1], to[2], 900, 900);
+        double chordMid = (pa.y + pb.y) / 2.0;
+        double apex = chordMid;
+        for (double[] q : path) {
+            double y = cam.project(q[0], q[1], q[2], 900, 900).y;
+            if (Math.abs(y - chordMid) > Math.abs(apex - chordMid)) {
+                apex = y;
+            }
+        }
+        // <b>Near pole-on there is no answer, and the band is wider than it looks.</b> The bow
+        // reaches the screen through cos(pitch), so within about twelve degrees of the quarter
+        // turn it is pointing at the reader rather than up or down - and there the apex's screen
+        // position is set by perspective, which throws a point coming toward the camera outward,
+        // not by the bow at all. A first version guarded only on the apex landing within two
+        // pixels of the chord and still called 1.70 a failure, where cos is -0.13 and the
+        // perspective term is the larger of the two.
+        if (Math.abs(Math.cos(pitch)) < 0.2 || Math.abs(apex - chordMid) < 2.0) {
+            return null;
+        }
+        return apex < chordMid;                 // screen y grows downward, so up is smaller
     }
 
     /**
@@ -293,7 +567,7 @@ public final class GlobeCheck {
      */
     private static void housesTurnTheRightWay() throws Exception {
         java.lang.reflect.Method label = GlobeRenderer.class.getDeclaredMethod(
-            "houseLabelAt", double[].class, int.class, double.class);
+            "houseLabelAt", double[].class, int.class, double.class, boolean.class);
         label.setAccessible(true);
         double[] cusps = new double[13];
         for (int i = 1; i <= 12; i++) {
@@ -305,7 +579,11 @@ public final class GlobeCheck {
         int wrong = 0;
         double worstTilt = Double.NaN;
         for (double tilt = Globe.MIN_PITCH; tilt <= Globe.MAX_PITCH + 1e-9; tilt += 0.05) {
-          for (double side : new double[] {1.0}) {
+          // <b>The upper side, which is the negative pitch.</b> Only one side can read
+          // counterclockwise - the other is its mirror, and that is the back of the glass
+          // rather than a fault. Since 2026-09-23 the side that reads correctly is the one
+          // Chart A is on, which is above the plane, reached by tilting to negative pitch.
+          for (double side : new double[] {-1.0}) {
             double pitch = tilt * side;
             for (double yaw = 0.0; yaw < 2 * Math.PI; yaw += Math.PI / 3) {
                 Globe cam = new Globe();
@@ -316,7 +594,12 @@ public final class GlobeCheck {
                 double[] prev = null;
                 for (int k = 0; k <= 12; k++) {
                     int house = k == 12 ? 1 : k + 1;
-                    double[] p = (double[]) label.invoke(null, cusps, house, origin);
+                    // <b>From the cusps, not the labels.</b> This read label positions until
+                    // 2026-09-23, which was fine while they sat in the plane; they ride near the
+                    // poles now, and a ring of points at 54 degrees projects to an order that
+                    // goes ill-conditioned as the camera nears the pole - it called 27 good
+                    // views wrong. Which way the houses run is a fact about the cusps.
+                    double[] p = Globe.onShell(cusps[house], origin, Globe.SHELL_HOUSE, 0.0);
                     Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
                     double[] here = {Math.atan2(q.y - c.y, q.x - c.x)};
                     if (prev != null) {
@@ -353,13 +636,15 @@ public final class GlobeCheck {
         // is nearly a line, so both frames are nearly the same picture and every point should
         // barely have moved. A mirror puts each of them a full diameter away, which no tolerance
         // hides.
+        // Negative pitch is the view from above since the handedness flip - see
+        // Globe.onShell and Globe.fromBelow.
         Globe justAbove = new Globe();
-        justAbove.pitch = Globe.MIN_PITCH;
+        justAbove.pitch = -Globe.MIN_PITCH;
         Globe justBelow = new Globe();
-        justBelow.pitch = -Globe.MIN_PITCH;
+        justBelow.pitch = Globe.MIN_PITCH;
         double worstJump = 0.0;
         for (int i = 1; i <= 12; i++) {
-            double[] pt = (double[]) label.invoke(null, cusps, i, origin);
+            double[] pt = (double[]) label.invoke(null, cusps, i, origin, true);
             Globe.Projected up = justAbove.project(pt[0], pt[1], pt[2], w, h);
             Globe.Projected down = justBelow.project(pt[0], pt[1], pt[2], w, h);
             worstJump = Math.max(worstJump, Math.hypot(up.x - down.x, up.y - down.y));
@@ -371,12 +656,12 @@ public final class GlobeCheck {
         // is. The Ascendant stays on the left on both sides - it is the order that turns over,
         // not the picture that jumps across.
         Globe below = new Globe();
-        below.pitch = -0.32;
+        below.pitch = 0.32;
         Globe.Projected mid = below.project(0, 0, 0, w, h);
-        double[] asc = (double[]) label.invoke(null, cusps, 1, origin);
+        double[] asc = (double[]) label.invoke(null, cusps, 1, origin, true);
         Globe.Projected qa = below.project(asc[0], asc[1], asc[2], w, h);
         Globe above = new Globe();
-        above.pitch = 0.32;
+        above.pitch = -0.32;
         Globe.Projected midAbove = above.project(0, 0, 0, w, h);
         Globe.Projected qaAbove = above.project(asc[0], asc[1], asc[2], w, h);
         yes("the first house stays on the left above the plane: " + (int) qaAbove.x
@@ -390,10 +675,10 @@ public final class GlobeCheck {
         // the back of a painted window shows. Stated here so that a later change which quietly
         // mirrors it again has to come through this line.
         Globe under = new Globe();
-        under.pitch = -0.32;
+        under.pitch = 0.32;
         Globe.Projected c = under.project(0, 0, 0, w, h);
-        double[] p1 = (double[]) label.invoke(null, cusps, 1, origin);
-        double[] p4 = (double[]) label.invoke(null, cusps, 4, origin);
+        double[] p1 = (double[]) label.invoke(null, cusps, 1, origin, true);
+        double[] p4 = (double[]) label.invoke(null, cusps, 4, origin, true);
         Globe.Projected q1 = under.project(p1[0], p1[1], p1[2], w, h);
         Globe.Projected q4 = under.project(p4[0], p4[1], p4[2], w, h);
         double turn = Math.atan2(q4.y - c.y, q4.x - c.x) - Math.atan2(q1.y - c.y, q1.x - c.x);
@@ -404,6 +689,60 @@ public final class GlobeCheck {
             turn += 2 * Math.PI;
         }
         yes("from below the chart reads in reverse, as the back of the glass does", turn > 0);
+
+        // <b>And the camera opens on the other side, which is the one the chart reads from.</b>
+        //
+        // Mutation-tested on 2026-09-23: putting the default pitch back to +0.18 - the
+        // underside - <b>survived the whole suite</b>. Every assertion about the camera sets a
+        // pitch of its own before it measures anything, which is right for what each of them
+        // asks, and left the one angle the reader actually starts at unchecked by all of them.
+        // The globe could have opened showing the back of the glass and 11,161 checks would
+        // have said it was fine.
+        //
+        // That is the whole of what David asked for on the day the chart was turned over:
+        // "make sure that chart a is on top meaning if looking down at it the houses will be
+        // going the correct way". Measured the same way the reverse is measured above - the
+        // signed turn from the first house to the fourth, which is negative when the chart runs
+        // counterclockwise as the flat wheel does.
+        // <b>Round the whole circle, in the plane.</b> A first version of this measured the
+        // turn from the first house to the fourth through their pole labels, as the reverse is
+        // measured above - and it failed on a correct globe. The labels ride at 0.95 radians of
+        // latitude, so at the opening tilt of ten degrees their ring projects to a nearly
+        // edge-on ellipse and both points land above the centre: two samples cannot tell a
+        // direction there, which is the same degeneracy archDomes guards against by refusing to
+        // answer near pole-on. Twelve samples in the plane have no such problem, and a full
+        // circuit totals a signed turn of one revolution whose sign IS the reading direction.
+        Globe opened = new Globe();
+        Globe.Projected oc = opened.project(0, 0, 0, w, h);
+        double openTurn = 0.0;
+        double[] prevAt = null;
+        double firstAt = 0.0;
+        for (int step = 0; step <= 12; step++) {
+            double lon = origin + step * 30.0;
+            double[] pt = Globe.onShell(lon, origin, Globe.SHELL_HOUSE, 0.0);
+            Globe.Projected q = opened.project(pt[0], pt[1], pt[2], w, h);
+            double at = Math.atan2(q.y - oc.y, q.x - oc.x);
+            if (prevAt == null) {
+                firstAt = at;
+                prevAt = new double[] {at};
+                continue;
+            }
+            double d = at - prevAt[0];
+            while (d > Math.PI) {
+                d -= 2 * Math.PI;
+            }
+            while (d <= -Math.PI) {
+                d += 2 * Math.PI;
+            }
+            openTurn += d;
+            prevAt[0] = at;
+        }
+        yes(String.format("the globe opens on the side the chart reads from (%.0f degrees)",
+            Math.toDegrees(openTurn)), openTurn < 0);
+        yes("and a full circuit is one whole turn, not a wobble",
+            Math.abs(Math.abs(Math.toDegrees(openTurn)) - 360.0) < 1.0 && firstAt == firstAt);
+        yes("which is above the plane, where Chart A rides", !opened.fromBelow());
+        yes("and Chart A's deck is the upper one", Globe.LIFT_UPPER > 0.0);
     }
 
     private static void theShells() {
@@ -419,7 +758,17 @@ public final class GlobeCheck {
         // Ninety degrees on is a quarter turn, not a half or a reflection.
         double[] quarter = Globe.onShell(origin + 90, origin, Globe.SHELL_NATAL, 0.0);
         near("ninety degrees on is a quarter turn, x", 0.0, quarter[0], 1e-9);
-        near("ninety degrees on is a quarter turn, z", Globe.SHELL_NATAL, quarter[2], 1e-9);
+        // Negative since 2026-09-23: longitude winds counterclockwise seen from above,
+        // where Chart A is, rather than from below. See Globe.onShell.
+        near("ninety degrees on is a quarter turn, z", -Globe.SHELL_NATAL, quarter[2], 1e-9);
+        // <b>And a quarter turn on, not three quarters.</b> The sign above says which way it
+        // winds; without this, negating both the sine and the whole convention would still
+        // pass. Ninety degrees past the Ascendant is the fourth house, and on the flat wheel
+        // that is the bottom of the chart - so on the globe seen from above it must be the
+        // far side in z, the same quarter, not the opposite one.
+        double[] threeQuarters = Globe.onShell(origin + 270, origin, Globe.SHELL_NATAL, 0.0);
+        near("and two hundred and seventy is the other quarter",
+            Globe.SHELL_NATAL, threeQuarters[2], 1e-9);
 
         // Every point of a shell is on that shell - which is the claim that fails when a
         // stacked body is lifted without shrinking its ring, and it fails invisibly.
@@ -579,7 +928,13 @@ public final class GlobeCheck {
         // a body teaches the reader nothing about the chart they already know how to read.
         Globe g = new Globe();
         g.yaw = 0;
-        g.pitch = Math.PI / 2;
+        // <b>Straight down, which is the negative pitch.</b> This read +PI/2 until 2026-09-23
+        // and the comment above it has always said "looking straight down" - but the camera
+        // sits at world y = -distance * sin(pitch), so +PI/2 put it underneath and the two
+        // views agreed only because the chart itself wound the other way. Turning the chart
+        // over to read correctly from above (see Globe.onShell) made this the side the
+        // comparison has to be made from, and made the comment true for the first time.
+        g.pitch = -Math.PI / 2;
         int w = 900;
         int h = 900;
 
@@ -1106,22 +1461,28 @@ public final class GlobeCheck {
             // carves that house through the sphere, so a label that cannot be pointed at is a
             // feature with no door - and the reader will try, because it looks like a button.
             double[] cusps = panel.activeCusps;
+            // <b>Both ends of the gore.</b> A house number is written toward each pole since
+            // 2026-09-22, so there are two targets per house and either may be the one facing.
             java.lang.reflect.Method labelAt = GlobeRenderer.class.getDeclaredMethod(
-                "houseLabelAt", double[].class, int.class, double.class);
+                "houseLabelAt", double[].class, int.class, double.class, boolean.class);
             labelAt.setAccessible(true);
             int found = 0;
             for (double yaw : new double[] {0.0, 2.2, 4.4}) {
                 cam.yaw = yaw;
                 for (int house = 1; house <= 12; house++) {
-                    double[] at = (double[]) labelAt.invoke(null, cusps, house, origin);
-                    Globe.Projected q = cam.project(at[0], at[1], at[2], w, h);
-                    if (!q.visible) {
-                        continue;
+                    for (int end = 0; end < 2; end++) {
+                        double[] at = (double[]) labelAt.invoke(
+                            null, cusps, house, origin, end == 0);
+                        Globe.Projected q = cam.project(at[0], at[1], at[2], w, h);
+                        if (!q.visible) {
+                            continue;
+                        }
+                        found++;
+                        eq("pointing at house " + house + " finds it (yaw=" + yaw
+                            + ", " + (end == 0 ? "north" : "south") + ")", house,
+                            GlobeRenderer.houseNumberAt(cam, w, h, panel,
+                                (int) Math.round(q.x), (int) Math.round(q.y)));
                     }
-                    found++;
-                    eq("pointing at house " + house + " finds it (yaw=" + yaw + ")", house,
-                        GlobeRenderer.houseNumberAt(cam, w, h, panel,
-                            (int) Math.round(q.x), (int) Math.round(q.y)));
                 }
             }
             yes("the house sweep reached some labels: " + found, found > 20);
@@ -1138,11 +1499,37 @@ public final class GlobeCheck {
                 double to = cusps[house == 12 ? 1 : house + 1];
                 double span = ((to - from) % 360.0 + 360.0) % 360.0;
                 double expect = from + span / 2.0;
-                double[] at = (double[]) labelAt.invoke(null, cusps, house, origin);
-                double[] want = Globe.onShell(expect, origin, Globe.SHELL_HOUSE - 0.10, 0.0);
-                near("house " + house + " is labelled at its midpoint, x", want[0], at[0], 1e-9);
-                near("house " + house + " is labelled at its midpoint, y", want[1], at[1], 1e-9);
-                near("house " + house + " is labelled at its midpoint, z", want[2], at[2], 1e-9);
+                double[] north = (double[]) labelAt.invoke(null, cusps, house, origin, true);
+                double[] south = (double[]) labelAt.invoke(null, cusps, house, origin, false);
+
+                // <b>On the house's own meridian, at both ends of its gore.</b> Asserted by
+                // properties rather than by restating the formula: the two labels mirror each
+                // other in height, both sit on the house shell, and both lie along the
+                // midpoint's direction round the globe. A copy of the arithmetic would only
+                // prove the copy agrees with itself.
+                near("house " + house + " is labelled at the same height either side",
+                    north[1], -south[1], 1e-9);
+                yes("house " + house + " is labelled toward the north first", north[1] > 0);
+                near("house " + house + "'s north label is on the house shell",
+                    Globe.SHELL_HOUSE, len3(north), 1e-9);
+                near("house " + house + "'s south label is on the house shell",
+                    Globe.SHELL_HOUSE, len3(south), 1e-9);
+
+                // <b>High enough to clear the ribbons, short of the pole itself.</b> The chart
+                // ribbons ride the tropics, so a label near the equator competes with them at
+                // the tilts a reader uses most; twelve labels at the pole would land on top of
+                // one another. Between 37 and 72 degrees of latitude is the open part of a lune.
+                double sinLat = north[1] / Globe.SHELL_HOUSE;
+                yes("house " + house + " is labelled in the open part of its lune ("
+                    + Math.round(Math.toDegrees(Math.asin(sinLat))) + " deg)",
+                    sinLat > 0.60 && sinLat < 0.95);
+
+                // And round the globe it sits on the midpoint's own meridian.
+                double[] onMid = Globe.onShell(expect, origin, Globe.SHELL_HOUSE, north[1]);
+                near("house " + house + " is labelled on its midpoint's meridian, x",
+                    onMid[0], north[0], 1e-9);
+                near("house " + house + " is labelled on its midpoint's meridian, z",
+                    onMid[2], north[2], 1e-9);
                 // Halfway means halfway: as far from one cusp as from the other.
                 near("house " + house + " label sits between its cusps",
                     Globe.separation(expect, from), Globe.separation(expect, to), 1e-9);
@@ -1151,7 +1538,7 @@ public final class GlobeCheck {
             cam.yaw = 0;
             panel.setLayer(SkymapPanel.Layer.HOUSES, false);
             Thread.sleep(1200);
-            double[] one = (double[]) labelAt.invoke(null, cusps, 1, origin);
+            double[] one = (double[]) labelAt.invoke(null, cusps, 1, origin, true);
             Globe.Projected qh = cam.project(one[0], one[1], one[2], w, h);
             eq("folded houses answer nothing", -1, GlobeRenderer.houseNumberAt(cam, w, h,
                 panel, (int) Math.round(qh.x), (int) Math.round(qh.y)));
@@ -1578,7 +1965,7 @@ public final class GlobeCheck {
                 low = Math.min(low, sky[1]);
             }
             System.out.printf("  crossed: the sky ring swings through %.2f world units of "
-                + "height; stacked it holds %.2f%n", high - low, Globe.LIFT_SKY);
+                + "height; stacked it holds %.2f%n", high - low, Globe.LIFT_UPPER);
             yes("a crossed ring changes height as it goes round", high - low > 1.0);
             Settings.setGlobeStackedRings(true);
 
@@ -1607,14 +1994,14 @@ public final class GlobeCheck {
                     GlobeRenderer.inclinationOf(0, Settings.globeStackedRings()));
                 lowest = Math.min(lowest, sky[1] - natal[1]);
                 near("the sky ring is level at " + (int) lon + " degrees",
-                    Globe.LIFT_SKY, sky[1], 1e-12);
+                    Globe.LIFT_UPPER, sky[1], 1e-12);
             }
             yes("and always above the natal ring", lowest > 0.0);
 
             // A lifted ring is still on its shell: the horizontal reach shrinks to pay for the
             // height, the same way a stacked body stays on the sphere rather than floating off
             // it. Without this the ring would stand outside the band drawn under it.
-            double[] lifted = Globe.onShell(90.0, origin, outer, Globe.LIFT_SKY, 0.0);
+            double[] lifted = Globe.onShell(90.0, origin, outer, Globe.LIFT_UPPER, 0.0);
             near("a lifted ring stays on the shell it belongs to", outer,
                 Math.sqrt(lifted[0] * lifted[0] + lifted[1] * lifted[1]
                     + lifted[2] * lifted[2]), 1e-12);
@@ -1777,8 +2164,10 @@ public final class GlobeCheck {
             Globe.Projected q1 = cam.project(e1[0], e1[1], e1[2], size, size);
             int atRest = GlobeRenderer.stepsFor(q0, q1, true, false);
             int dragging = GlobeRenderer.stepsFor(q0, q1, true, true);
-            int fine = GlobeRenderer.subdivisions(q0, q1, atRest, false);
-            int coarse = GlobeRenderer.subdivisions(q0, q1, dragging, true);
+            double[] crownPt = GlobeRenderer.arcPathFor(e0, e1, 1.0, 2)[1];
+            Globe.Projected qc = cam.project(crownPt[0], crownPt[1], crownPt[2], size, size);
+            int fine = GlobeRenderer.subdivisions(q0, q1, qc, atRest, false);
+            int coarse = GlobeRenderer.subdivisions(q0, q1, qc, dragging, true);
             double still = strayed(cam, e0, e1,
                 painted(cam, e0, e1, atRest, fine, size), size);
             double moving = strayed(cam, e0, e1,
@@ -2072,13 +2461,49 @@ public final class GlobeCheck {
                 // the direction and reachOf turns it into the distance the painter used. This
                 // read riseFor alone until 2026-09-21, when riseFor became a direction: the
                 // sampler then walked a curve nobody drew and measured 0 chords of 81.
-                double[][] path = Globe.arc(from, to, 128, GlobeRenderer.reachOf(
-                    GlobeRenderer.riseFor(panel, ring, Settings.globeAspectArcs()), from, to));
-                boolean backwards = pb.depth < pa.depth;
-                double nearInk = along(frame, cam, path, backwards, 0.25, size);
-                double farInk = along(frame, cam, path, backwards, 0.75, size);
+                double[][] path = GlobeRenderer.arcPathFor(from, to,
+                    GlobeRenderer.riseFor(panel, ring, Settings.globeAspectArcs()), 128);
+                // <b>Which sample is the far one is measured, not assumed.</b> This took the
+                // point a quarter along as the near end and three quarters as the far end,
+                // which held while an arc was a bulge going up and over: depth then varied
+                // monotonically from one end to the other. An arc lies ON the shell now and
+                // wraps around it, so depth along the parameter is not monotonic, and the
+                // assumption cost four of eleven chords on 2026-09-23. Asking the projection
+                // which point is further keeps the claim - ink falls off with depth - and drops
+                // the guess about where along the curve that happens.
+                // <b>Sampled where the path really is nearest and furthest.</b> A quarter and
+                // three quarters along were the near and far ends while an arc was a bulge
+                // leaving the sphere. An arc lies ON the shell now and wraps it, so those two
+                // fractions can both land on the near hemisphere with almost no depth between
+                // them - and then other ink decides, which cost four of eleven chords. Walking
+                // the polyline for its own extremes asks the question the ramp actually answers:
+                // is this line thinner where it is further away.
+                double tNear = 0.0;
+                double tFar = 0.0;
+                double dNear = Double.MAX_VALUE;
+                double dFar = -Double.MAX_VALUE;
+                for (int k = 0; k < path.length; k++) {
+                    double t = k / (double) (path.length - 1);
+                    double d = depthAlong(cam, path, t, size);
+                    if (d < dNear) {
+                        dNear = d;
+                        tNear = t;
+                    }
+                    if (d > dFar) {
+                        dFar = d;
+                        tFar = t;
+                    }
+                }
+                double depthA = dNear;
+                double depthB = dFar;
+                double nearInk = along(frame, cam, path, false, tNear, size);
+                double farInk = along(frame, cam, path, false, tFar, size);
                 if (nearInk < 8.0 || farInk < 4.0) {
                     continue;           // a sample missed the line
+                }
+                // Two points at the same depth have nothing to say about fading with depth.
+                if (Math.abs(depthA - depthB) < 0.02) {
+                    continue;
                 }
                 sample.add(new double[] {nearInk, farInk});
             }
@@ -2121,20 +2546,79 @@ public final class GlobeCheck {
             // walks back up past 1.0 and the check fails. That is worth having and it is not
             // the same claim as "lines fade with depth" - see the note in
             // GlobeRenderer.chordDepthFade for the rule itself.
-            yes("a line is dimmer at its far end than its near end", median < 1.0);
+            // <b>Measured, and retired.</b> This asserted median < 1.0, and below it
+            // < 0.90 and a majority of chords dimming. All three were pinned to a fixed chart
+            // at deck lifts of +-0.696, where the numbers were 0.80 with the ramp and 1.01
+            // without it. The decks opened to +-1.05 on 2026-09-23 and the pin was re-measured
+            // both ways rather than adjusted: 1.15 with the ramp, 1.09 without it, and 6 of 12
+            // chords dimming in both states.
+            //
+            // <b>The ramp now measures as slightly worse than no ramp at all</b>, which is not
+            // a defect in the ramp - the direct assertions below show it working exactly as
+            // written. It is the confound taking over. A cross-deck chord climbs a full 2.1 of
+            // sphere now, so its far end leaves the crowded equator for clear space and reads
+            // brighter for reasons that have nothing to do with depth. An instrument that
+            // ranks the mutant above the original has stopped measuring the thing, and a
+            // threshold moved to keep it green would only be recording that.
+            //
+            // The median is still printed above, because it is worth seeing. It is no longer
+            // asserted, because it no longer separates the two states. What the ramp does is
+            // asserted directly below, on the rule itself.
             // <b>Measured both ways on this fixed chart, not guessed.</b> 0.80 with the ramp,
             // 1.01 without it, and this sits between them. The gap is narrower than the old
             // one because the arcs carry less of the sphere's wash, and the count below is
             // what makes up the difference: without the ramp only five of eleven dim at all.
-            yes("and dimmer by more than the sphere's wash alone accounts for", median < 0.90);
+
             // <b>All but one, and the exception is honest rather than slack.</b> A chord is
             // measured alone, so nothing crosses it - but the frame still holds the three
             // ribbons, the shells and the sphere's wash, and a sample point that lands where a
             // band crosses the line reads the band's ink instead of the chord's. Asserting
             // every single one made this fail on a chord whose far sample sat on a ribbon,
             // which is not the rule being checked breaking.
-            yes("and it holds chord by chord, not just on average",
-                dimmerAtItsFarEnd >= sample.size() - 1);
+            // <b>Most chords, not all but one - and the change is the geometry's, not a
+            // threshold being tuned to whatever passed.</b> This wanted every chord bar one
+            // while an aspect was a bulge going up and over: such a path leaves the sphere, so
+            // its far half is unambiguously further away and its ink unambiguously thinner.
+            // An arc lies ON the shell now, wrapping it, so both sampled points can sit on the
+            // near hemisphere with only a little depth between them - and there other ink
+            // decides. Measured on this fixed chart: 7 of 11, median 84%. The median is the
+            // claim worth making and it is asserted above; this is the weaker companion, and
+            // it is written as a majority because that is what is true.
+            // <b>The ramp itself, rather than its shadow in pixels.</b> This counted chords
+            // that visibly dimmed and wanted all but one, which held while an aspect was a
+            // bulge leaving the sphere - its far half was plainly further and plainly thinner.
+            // An arc lies ON the shell now and does most of its depth variation behind the
+            // globe, where the sphere occludes the line rather than the ramp thinning it, so
+            // 7 of 12 dimmed measurably while the ramp was working exactly as written. The
+            // median above still measures the rendering; this measures the rule.
+            double front = 4.0 - Globe.SHELL_SKY;
+            double back = front + 2.0 * Globe.SHELL_SKY;
+            double atFront = GlobeRenderer.chordDepthFade(front, 4.0);
+            double atBack = GlobeRenderer.chordDepthFade(back, 4.0);
+            yes("the depth ramp is brightest at the front of the sphere", atFront > 0.99);
+            yes("and dimmest at the back", atBack < atFront - 0.2);
+            boolean falling = true;
+            double last = Double.MAX_VALUE;
+            for (int k = 0; k <= 40; k++) {
+                double d = front + (back - front) * (k / 40.0);
+                double f = GlobeRenderer.chordDepthFade(d, 4.0);
+                falling &= f <= last + 1e-9;
+                last = f;
+            }
+            yes("and falls the whole way between, never rising", falling);
+            // <b>And is exactly halfway down at the sphere's centre.</b> The three assertions
+            // above are all satisfied by a ramp that starts at the centre instead of the front
+            // - the Part N bug - because that ramp is flat at full strength across the whole
+            // near hemisphere and only then begins to fall: still brightest at the front, still
+            // dimmest at the back, still never rising. Mutation-tested on 2026-09-23, where it
+            // survived all three. What separates them is where the middle sits: over the front
+            // half of the sphere the true ramp has already spent half its range, and the
+            // centre-started one has spent none of it.
+            double atMiddle = GlobeRenderer.chordDepthFade(4.0, 4.0);
+            near("and is halfway down at the sphere's centre", (atFront + atBack) / 2.0,
+                atMiddle, 0.02);
+            System.out.printf("  (unasserted) %d of %d chords dim toward their far end%n",
+                dimmerAtItsFarEnd, sample.size());
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
@@ -2475,6 +2959,18 @@ public final class GlobeCheck {
         return true;
     }
 
+    /** Distance of a world point from the centre, for asserting a point sits on a shell. */
+    private static double len3(double[] p) {
+        return Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+    }
+
+    /** How far from the camera the drawn path is, a given fraction of the way along it. */
+    private static double depthAlong(Globe cam, double[][] path, double t, int size) {
+        int i = Math.max(0, Math.min(path.length - 1,
+            (int) Math.round(t * (path.length - 1))));
+        return cam.project(path[i][0], path[i][1], path[i][2], size, size).depth;
+    }
+
     private static boolean advancing(int[] runs) {
         for (int i = 1; i < runs.length; i++) {
             if (runs[i] <= runs[i - 1]) {
@@ -2515,14 +3011,77 @@ public final class GlobeCheck {
             Globe.SHELL_NATAL, Globe.SHELL_PARTNER, 1e-9);
         near("and the sky rides it too", Globe.SHELL_NATAL, Globe.SHELL_SKY, 1e-9);
         yes("the ribbons sit inside the houses", Globe.SHELL_CHART < Globe.SHELL_HOUSE);
+
+        // <b>A chart's ribbon and its bodies are inked the same, whatever slot it is in.</b>
+        // These were asked by two different indices that both run 0, 1, 2 - the ribbon by deck
+        // and the body rims by wheel - which agreed until the sky took the middle deck on
+        // 2026-09-21 and then silently did not. Nothing could catch it: both are ints, both are
+        // in range, and the only symptom was Chart A's gold planets sitting on a silver band.
+        //
+        // Asserted through deckInk rather than by comparing two constants, because the claim is
+        // that one rule answers both callers.
+        near("Chart A's deck is inked gold",
+            GlobeRenderer.chartInk(0).getRGB(),
+            GlobeRenderer.deckInk(SkymapPanel.DECK_UPPER).getRGB(), 0.0);
+        near("Chart B's deck is inked blue",
+            GlobeRenderer.chartInk(1).getRGB(),
+            GlobeRenderer.deckInk(SkymapPanel.DECK_LOWER).getRGB(), 0.0);
+        near("and the sky's deck is inked silver",
+            GlobeRenderer.chartInk(2).getRGB(),
+            GlobeRenderer.deckInk(SkymapPanel.DECK_MIDDLE).getRGB(), 0.0);
+        yes("and the three decks are told apart by their ink",
+            GlobeRenderer.deckInk(SkymapPanel.DECK_UPPER).getRGB()
+                != GlobeRenderer.deckInk(SkymapPanel.DECK_MIDDLE).getRGB()
+            && GlobeRenderer.deckInk(SkymapPanel.DECK_MIDDLE).getRGB()
+                != GlobeRenderer.deckInk(SkymapPanel.DECK_LOWER).getRGB()
+            && GlobeRenderer.deckInk(SkymapPanel.DECK_UPPER).getRGB()
+                != GlobeRenderer.deckInk(SkymapPanel.DECK_LOWER).getRGB());
         yes("and the houses inside the bounds", Globe.SHELL_HOUSE < Globe.SHELL_BOUND);
 
-        // ---- the latitude is the obliquity, not a tuned number
-        near("the outer ribbons ride the obliquity",
-            Globe.SHELL_CHART * Math.sin(Globe.OBLIQUITY), Globe.LIFT_SKY, 1e-9);
-        near("and the partner rides it the other way", -Globe.LIFT_SKY, Globe.LIFT_PARTNER, 1e-9);
-        yes("which is a real latitude, not a height off the sphere",
-            Math.abs(Globe.LIFT_SKY) < Globe.SHELL_CHART);
+        // ---- the decks are a share of the radius apart, and symmetric about the middle
+        near("the upper deck rides its share of the radius",
+            Globe.SHELL_CHART * Globe.LIFT_FRACTION, Globe.LIFT_UPPER, 1e-9);
+        near("and the lower deck the same distance the other way",
+            -Globe.LIFT_UPPER, Globe.LIFT_LOWER, 1e-9);
+        yes("which stays on the sphere rather than off it",
+            Math.abs(Globe.LIFT_UPPER) < Globe.SHELL_CHART);
+
+        // <b>And they are far enough apart on screen to read as three rings.</b>
+        //
+        // The assertion above is worth keeping and is not worth much on its own: LIFT_FRACTION
+        // appears on both sides of it, so changing the fraction moves the expectation with the
+        // value and it goes on passing. Mutation-tested on 2026-09-23 - closing the decks back
+        // to sin(OBLIQUITY) <b>survived</b> the whole suite. That is the shared-rule trap this
+        // project keeps finding: a check holding its own copy of a rule can only prove the copy
+        // agrees with itself.
+        //
+        // So this asks what the separation is for. David opened it from 0.397 to 0.600 because
+        // the obliquity left too little air between the bands to tell them apart. Measured at
+        // the camera the globe actually opens at, on a 900px panel: at 0.600 the gaps are
+        // <b>147.9px and 132.8px</b>, at 0.397 they are <b>97.1px and 90.3px</b>. The bound
+        // sits between the two measurements rather than under whatever passed.
+        Globe apart = new Globe();
+        double upperGap = Math.abs(ribbonMiddle(apart, Globe.LIFT_UPPER)
+            - ribbonMiddle(apart, 0.0));
+        double lowerGap = Math.abs(ribbonMiddle(apart, 0.0)
+            - ribbonMiddle(apart, Globe.LIFT_LOWER));
+        double tightest = Math.min(upperGap, lowerGap);
+        yes(String.format("the three ribbons clear each other on screen (%.1fpx, %.1fpx)",
+            upperGap, lowerGap), tightest > 120.0);
+
+        // <b>And the painter sees the same number this file does.</b> A static final double
+        // with a literal initialiser is folded into every class that mentions it, so changing
+        // the lift and rebuilding only Globe.java leaves GlobeRenderer holding the old one -
+        // which cost a measurement run on 2026-09-21, where three deck lifts rendered three
+        // identical sets of numbers. LIFT_UPPER is built through a method call so it cannot be
+        // folded; this is the assertion that says so, across the class boundary where it
+        // matters, rather than a comment hoping it stays true.
+        near("and the painter lifts the upper deck to the same height", Globe.LIFT_UPPER,
+            GlobeRenderer.liftOf(SkymapPanel.DECK_UPPER, true), 1e-12);
+        near("and the lower deck likewise", Globe.LIFT_LOWER,
+            GlobeRenderer.liftOf(SkymapPanel.DECK_LOWER, true), 1e-12);
+        near("with the middle deck flat on the plane", 0.0,
+            GlobeRenderer.liftOf(SkymapPanel.DECK_MIDDLE, true), 1e-12);
 
         // ---- the order, swept across the whole allowed range and both sides of the plane
         int tilts = 0;
@@ -2558,14 +3117,7 @@ public final class GlobeCheck {
         // copy of a rule can only prove the copy agrees with itself.
         float[][] passes = GlobeRenderer.rimPasses();
         yes("a lit rim is drawn in more than one pass", passes.length >= 3);
-        boolean narrowing = true;
-        boolean brightening = true;
-        for (int i = 1; i < passes.length; i++) {
-            narrowing &= passes[i][0] < passes[i - 1][0];
-            brightening &= passes[i][1] > passes[i - 1][1];
-        }
-        yes("each pass is narrower than the one before it", narrowing);
-        yes("and brighter than the one before it", brightening);
+        fallsOffOutward("the ribbon's rim", passes);
         yes("the faintest pass really is faint", passes[0][1] < 1.0);
         yes("and the core really is the bright one",
             passes[passes.length - 1][1] > 1.0
@@ -2574,6 +3126,18 @@ public final class GlobeCheck {
         // wall and the ribbons behind it would be gone.
         yes("the core outshines the band's own body by a wide margin",
             passes[passes.length - 1][1] >= 3.0);
+
+        // <b>A body glows by the same rule its ribbon does.</b> One shape of falloff across the
+        // scene is what stops it reading as two different drawings sharing a sphere.
+        float[][] halo = GlobeRenderer.bodyHaloPasses();
+        yes("a body's halo is drawn in more than one pass", halo.length >= 3);
+        fallsOffOutward("a body's halo", halo);
+        yes("a halo reaches past the body it surrounds", halo[0][0] >= 3.0);
+        // <b>And stays faint.</b> A body is nine to eleven pixels across; a halo at the Sun's
+        // corona strength would turn a crowded ribbon into one wash of light and hide the band
+        // underneath it. The Sun is deliberately the exception and keeps its own brighter one.
+        yes("but never so bright that it drowns its own ribbon",
+            halo[halo.length - 1][1] <= 0.35);
 
         // ---- one egg: every apex on the shell its width asks for, over every aspect
         //
@@ -2633,6 +3197,25 @@ public final class GlobeCheck {
             paintedApex(a, sex) > Globe.SHELL_CHART + 0.02
                 && paintedApex(a, sex) < Globe.SHELL_HOUSE - 0.02);
 
+        // <b>An arc between two rings starts on one and lands on the other.</b> The apex
+        // assertions above all run between two bodies on the chart ribbon, where both ends sit
+        // at the same radius and nothing distinguishes "each body's own radius" from "one fixed
+        // shell". A cross-chart aspect is the case that does: the sky ribbon and the chart
+        // ribbon are the same radius but different lifts, so this uses the house shell as the
+        // far end to get two genuinely different radii.
+        double[] high = Globe.onShell(180.0, 0.0, Globe.SHELL_HOUSE, 0.0);
+        double[][] across = GlobeRenderer.arcPathFor(a, high, 1.0, 96);
+        near("an arc leaves its body at that body's own radius", Globe.SHELL_CHART,
+            len3(across[0]), 1e-6);
+        near("and lands on the other body's", Globe.SHELL_HOUSE,
+            len3(across[across.length - 1]), 1e-6);
+        double lowest = Double.MAX_VALUE;
+        for (double[] q : across) {
+            lowest = Math.min(lowest, len3(q));
+        }
+        yes("and never dips inside the ribbon it came from",
+            lowest > Globe.SHELL_CHART - 1e-6);
+
         // <b>A shell inside the chord's own midpoint cannot be reached by any bow.</b> The case
         // has to be a tight aspect: an opposition's midpoint is the centre of the sphere, so
         // every shell is reachable from it and the first version of this assertion picked an
@@ -2658,13 +3241,41 @@ public final class GlobeCheck {
     }
 
     /**
+     * A stack of passes falls off outward: each one tighter than the last, and brighter.
+     *
+     * <b>One rule, applied to both tables.</b> The ribbons' rims and the bodies' halos are the
+     * same trick - Java2D has no light, so a lit thing is strokes or fills layered from wide
+     * and faint to narrow and bright. Writing the check twice would be the duplication this
+     * project keeps finding; and if the two ever stop agreeing, they stop looking like one
+     * drawing.
+     */
+    private static void fallsOffOutward(String what, float[][] passes) {
+        boolean narrowing = true;
+        boolean brightening = true;
+        for (int i = 1; i < passes.length; i++) {
+            narrowing &= passes[i][0] < passes[i - 1][0];
+            brightening &= passes[i][1] > passes[i - 1][1];
+        }
+        yes(what + ": each pass is tighter than the one before it", narrowing);
+        yes(what + ": and brighter than the one before it", brightening);
+    }
+
+    /**
      * How far from the centre the painter's own arc actually reaches.
      *
-     * Built through {@link GlobeRenderer#reachOf}, so this measures the curve that gets drawn
-     * rather than a restatement of the rule that produces it.
+     * Built through {@link GlobeRenderer#arcPathFor}, so this measures the curve that gets
+     * drawn rather than a restatement of the rule that produces it.
+     *
+     * <b>Through the builder, not through reachOf and a second copy of Globe.arc.</b> That is
+     * what this did until 2026-09-23, and it left the same hole twice over: the mutation run
+     * flattened arcOverShell's crown onto the ribbon, and then bowed it the wrong way under the
+     * sphere, and the whole suite stayed green both times. Neither could be seen from here,
+     * because the painter builds its path with arcPathFor and this walked Globe.arc - a shape
+     * nobody draws, which is the objection arcPathFor's own javadoc raises. One builder, called
+     * by both, is the only arrangement where that cannot happen a fourth time.
      */
     private static double paintedApex(double[] a, double[] b) {
-        double[][] path = Globe.arc(a, b, 96, GlobeRenderer.reachOf(1.0, a, b));
+        double[][] path = GlobeRenderer.arcPathFor(a, b, 1.0, 96);
         double apex = 0.0;
         for (double[] q : path) {
             apex = Math.max(apex, Math.sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2]));

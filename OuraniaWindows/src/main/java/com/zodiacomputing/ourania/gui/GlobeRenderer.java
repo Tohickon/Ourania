@@ -152,13 +152,15 @@ final class GlobeRenderer {
         // chords and the bodies so they read as the ground those sit on.
         if (panel.outerRingDrawn()) {
             int outerDeck = panel.ringDeck(1);
-            r.ribbon(partnerR, shade(chartInk(outerDeck), 54),
-                inclinationOf(outerDeck, r.stacked), liftOf(outerDeck, r.stacked), turning);
+            r.ribbon(partnerR, shade(deckInk(outerDeck), 54),
+                inclinationOf(outerDeck, r.stacked),
+                liftFor(outerDeck, r.stacked, r.cam), turning);
         }
         if (panel.triRingDrawn()) {
             int triDeck = panel.ringDeck(2);
-            r.ribbon(skyR, shade(chartInk(triDeck), 54),
-                inclinationOf(triDeck, r.stacked), liftOf(triDeck, r.stacked), turning);
+            r.ribbon(skyR, shade(deckInk(triDeck), 54),
+                inclinationOf(triDeck, r.stacked),
+                liftFor(triDeck, r.stacked, r.cam), turning);
         }
 
         if (r.shown(SkymapPanel.Layer.ASPECTS)) {
@@ -166,8 +168,9 @@ final class GlobeRenderer {
         }
         if (r.shown(SkymapPanel.Layer.NATAL)) {
             int innerDeck = panel.ringDeck(0);
-            r.ribbon(natalR, r.faded(shade(chartInk(innerDeck), 54), SkymapPanel.Layer.NATAL),
-                inclinationOf(innerDeck, r.stacked), liftOf(innerDeck, r.stacked), turning);
+            r.ribbon(natalR, r.faded(shade(deckInk(innerDeck), 54), SkymapPanel.Layer.NATAL),
+                inclinationOf(innerDeck, r.stacked),
+                liftFor(innerDeck, r.stacked, r.cam), turning);
             r.bodies(panel.natalRing.lon, panel.natalRing.valid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
                 false, 0);
         }
@@ -271,12 +274,32 @@ final class GlobeRenderer {
      * stacked, never both. The height joins a body stack rather than replacing it, so a crowd
      * on a lifted ring still steps up its shell from wherever that ring starts.
      */
+    /**
+     * The lift the scene is actually drawn with: the deck's own, negated once the globe has
+     * turned far enough over that the projection inverts.
+     *
+     * <b>Today it returns the deck's own lift unchanged, and the seam is kept on purpose.</b>
+     * It briefly negated the lift past a quarter turn, so Chart A would stay visually above the
+     * sky however far the globe was rolled. That lasted an hour: a sign that changes at a
+     * threshold changes in one frame, and the whole stack snapped as the drag crossed it - the
+     * same discontinuity as the 2026-09-19 horizontal mirror, removed for the same reason.
+     *
+     * The method stays because it is the one place the painter and the hit test agree about
+     * where a deck sits. If the stack is ever made to follow the camera, it has to happen here
+     * and it has to be continuous - easing the lift through the crossing rather than flipping
+     * it - or a body will be drawn above the sky and clicked below it, which is the
+     * see-it-but-cannot-click-it defect this file has already had once.
+     */
+    static double liftFor(int deck, boolean stacked, Globe cam) {
+        return liftOf(deck, stacked);
+    }
+
     static double liftOf(int deck, boolean stacked) {
         if (!stacked) {
             return 0.0;
         }
-        return deck == SkymapPanel.DECK_LOWER ? Globe.LIFT_PARTNER
-            : (deck == SkymapPanel.DECK_UPPER ? Globe.LIFT_SKY : 0.0);
+        return deck == SkymapPanel.DECK_LOWER ? Globe.LIFT_LOWER
+            : (deck == SkymapPanel.DECK_UPPER ? Globe.LIFT_UPPER : 0.0);
     }
 
     /**
@@ -316,7 +339,7 @@ final class GlobeRenderer {
                 }
                 int deck = panel.ringDeck(ring);
                 double[] p = Globe.onShell(lon[i], origin, shells[ring],
-                    liftOf(deck, stacked) + level[i] * Globe.STACK_STEP,
+                    liftFor(deck, stacked, cam) + level[i] * Globe.STACK_STEP,
                     inclinationOf(deck, stacked));
                 Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
                 if (!q.visible) {
@@ -513,6 +536,35 @@ final class GlobeRenderer {
      * not the duplication this project keeps finding; it would only become that if one were
      * made to stand in for the other.
      */
+    /**
+     * The same palette, asked by deck - which is the only index that says whose chart it is.
+     *
+     * <b>Deck and ring are both 0, 1, 2 and they stopped meaning the same thing.</b> The deck
+     * numbers were deliberately made to match the ring numbers, on the reasoning that nothing
+     * downstream would have to learn a second vocabulary. That held while Chart A was the
+     * middle ring: ring 0 was the natal chart and deck 0 was the middle, which was the natal
+     * chart. {@link SkymapPanel#ringDeck} moved the sky to the middle on 2026-09-21 and the two
+     * vocabularies came apart with no compiler able to see it - both are still ints, and both
+     * are still 0, 1, 2.
+     *
+     * The visible result, from then until 2026-09-23: the ribbons asked by deck and the body
+     * rims asked by wheel, so Chart A's gold planets sat on a silver ribbon and the sky's
+     * silver planets sat on a gold one. The band under a chart disagreed with the chart on it.
+     *
+     * A ring index is a slot and which chart fills it moves with the selection; a deck is the
+     * chart. So this is what both callers ask now, and {@code chartInk} below is what it
+     * answers with.
+     */
+    static Color deckInk(int deck) {
+        if (deck == SkymapPanel.DECK_LOWER) {
+            return chartInk(1);                     // Chart B, blue
+        }
+        if (deck == SkymapPanel.DECK_MIDDLE) {
+            return chartInk(2);                     // the sky, silver
+        }
+        return chartInk(0);                         // Chart A, gold
+    }
+
     static Color chartInk(int ring) {
         if (ring == 1) {
             return new Color(120, 170, 225);        // Chart B, blue
@@ -899,19 +951,40 @@ final class GlobeRenderer {
     }
 
     /**
-     * The house numbers, in the plane, each in the middle of its own house.
+     * How far up its own gore a house number is written, in radians of latitude.
      *
-     * <b>They followed the houses.</b> They were at the poles because the houses were wedges
-     * of a sphere and a pole is where those converge; with the cusps drawn as flat spokes the
-     * poles have nothing to do with a house any more, and a number floating there would be
-     * labelling empty sky. In the middle of the sector it names is where the flat wheel puts
-     * it and where a reader looks for it.
+     * <b>Clear of everything that lives near the equator.</b> The three chart ribbons ride the
+     * tropics and the zodiac belt sits in the plane, so a number anywhere near there competes
+     * with them at exactly the tilts a reader spends most time at. At 0.95 - about 54 degrees -
+     * a number sits in the open part of its own lune, well above the ribbons and short of the
+     * point where twelve of them would crowd into the pole itself.
      */
-    /** Where house i's number is written, in world coordinates. */
-    private static double[] houseLabelAt(double[] cusps, int house, double origin) {
+    private static final double HOUSE_LABEL_LAT = 0.95;
+
+    /**
+     * The house numbers, written twice: once toward each pole, on the house's own meridian.
+     *
+     * <b>Back where they started, and this time the geometry agrees.</b> They were at the poles
+     * once, moved into the plane when the cusps became flat spokes - "the poles have nothing to
+     * do with a house any more" - and the houses have since become twelve lune faces running
+     * pole to pole again, so the poles are precisely where a house converges. What was true when
+     * they were moved stopped being true when the houses took the sphere.
+     *
+     * <b>Twice, because a sphere hides half of itself.</b> David: "lets move the house numbers
+     * along the north and south poles of the globe, that way no matter the tilt the houses
+     * should always stay the same." One label per house sits near whichever pole is turned away
+     * at half the tilts the reader can now reach - the range runs the whole way over - so each
+     * house carries a number at both ends of its gore and at least one is always facing.
+     *
+     * @param north which end of the house's meridian this label sits on
+     */
+    private static double[] houseLabelAt(double[] cusps, int house, double origin,
+                                         boolean north) {
         double span = ((cusps[house == 12 ? 1 : house + 1] - cusps[house]) % 360.0 + 360.0)
             % 360.0;
-        return Globe.onShell(cusps[house] + span / 2.0, origin, Globe.SHELL_HOUSE - 0.10, 0.0);
+        double lat = north ? HOUSE_LABEL_LAT : -HOUSE_LABEL_LAT;
+        return Globe.onShell(cusps[house] + span / 2.0, origin, Globe.SHELL_HOUSE,
+            Globe.SHELL_HOUSE * Math.sin(lat));
     }
 
     /**
@@ -931,15 +1004,18 @@ final class GlobeRenderer {
         int best = -1;
         double bestDist = 14.0;
         for (int i = 1; i <= 12; i++) {
-            double[] pt = houseLabelAt(cusps, i, origin);
-            Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
-            if (!q.visible) {
-                continue;
-            }
-            double dist = Math.hypot(q.x - px, q.y - py);
-            if (dist < bestDist) {
-                bestDist = dist;
-                best = i;
+            // Both ends of the gore, because both are drawn and either may be the one facing.
+            for (int end = 0; end < 2; end++) {
+                double[] pt = houseLabelAt(cusps, i, origin, end == 0);
+                Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                if (!q.visible) {
+                    continue;
+                }
+                double dist = Math.hypot(q.x - px, q.y - py);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = i;
+                }
             }
         }
         return best;
@@ -952,9 +1028,12 @@ final class GlobeRenderer {
         int lit = this.panel.focusedHouse();
         for (int i = 1; i <= 12; i++) {
             boolean here = i == lit;
-            billboard(houseLabelAt(cusps, i, this.origin), String.valueOf(i),
-                faded(here ? new Color(255, 238, 170) : new Color(206, 208, 216),
-                    SkymapPanel.Layer.HOUSES), here ? 15 : 12);
+            Color ink = faded(here ? new Color(255, 238, 170) : new Color(206, 208, 216),
+                SkymapPanel.Layer.HOUSES);
+            billboard(houseLabelAt(cusps, i, this.origin, true), String.valueOf(i),
+                ink, here ? 15 : 12);
+            billboard(houseLabelAt(cusps, i, this.origin, false), String.valueOf(i),
+                ink, here ? 15 : 12);
         }
 
         // <b>The house cut through the sphere, and only from its number.</b> A house is a
@@ -1488,10 +1567,12 @@ final class GlobeRenderer {
             int deck = panel.ringDeck(ring);
             int innerDeck = panel.ringDeck(0);
             double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
-                liftOf(deck, this.stacked) + levels[ring][c[1]] * Globe.STACK_STEP,
+                liftFor(deck, this.stacked, this.cam)
+                    + levels[ring][c[1]] * Globe.STACK_STEP,
                 inclinationOf(deck, this.stacked));
             double[] to = Globe.onShell(panel.natalRing.lon[c[2]], origin, shells[0],
-                liftOf(innerDeck, this.stacked) + levels[0][c[2]] * Globe.STACK_STEP,
+                liftFor(innerDeck, this.stacked, this.cam)
+                    + levels[0][c[2]] * Globe.STACK_STEP,
                 inclinationOf(innerDeck, this.stacked));
             // <b>The hovered chord, at full strength and on its own ring.</b> The globe drew
             // every chord alike, so pointing at a cell of the grid lit the flat wheel and did
@@ -1560,7 +1641,8 @@ final class GlobeRenderer {
                 continue;
             }
             int deck = this.panel.ringDeck(ring);
-            double y = liftOf(deck, this.stacked) + level[i] * Globe.STACK_STEP;
+            double y = liftFor(deck, this.stacked, this.cam)
+                + level[i] * Globe.STACK_STEP;
             double[] p = Globe.onShell(lon[i], this.origin, radius, y,
                 inclinationOf(deck, this.stacked));
             Globe.Projected q = at(p);
@@ -1613,7 +1695,9 @@ final class GlobeRenderer {
             // different marks and neither has to carry the other.
             final boolean asPlanet = Settings.globePlanets() && PLANET_FACE[i] != FACE_NONE
                 && (!outer || Settings.globePlanetsAllRings());
-            final Color chartRim = shade(chartInk(ring), alpha);
+            // By deck, so a body is circled in the ink of the ribbon it is standing on -
+            // see deckInk for the two vocabularies that came apart here.
+            final Color chartRim = shade(deckInk(panel.ringDeck(ring)), alpha);
             final int bodyIndex = i;
             final int half = this.g.getFontMetrics(font(13)).stringWidth(glyph) / 2;
             this.pieces.add(new Piece(q.depth, () -> {
@@ -1735,6 +1819,27 @@ final class GlobeRenderer {
      * and the direction has to be the same for every body - a ring of objects lit from
      * different places reads as a mistake even when the reader could not say what is wrong.
      */
+    /**
+     * A body's halo: pixels added to its radius, and the fraction of its alpha at that reach.
+     *
+     * <b>The same shape as {@link #rimPasses}, and asserted by the same rule</b> - each pass
+     * tighter than the last and brighter than the last, so the stack falls off outward and
+     * reads as light rather than as a fat ring round a disc. Shared with the suite rather than
+     * restated in it, for the reason a surviving mutation taught on 2026-09-21: a check holding
+     * its own copy of a rule can only prove the copy agrees with itself.
+     *
+     * The numbers are small on purpose. A body is 9 to 11 pixels; a halo that reached as far as
+     * the Sun's five-ring corona would make twenty-eight of them into one wash of light and the
+     * ribbon they sit on would be gone behind it.
+     */
+    static float[][] bodyHaloPasses() {
+        return new float[][] {
+            {10.0f, 0.06f},
+            {6.0f, 0.10f},
+            {3.0f, 0.16f},
+        };
+    }
+
     private void drawPlanet(int body, int x, int y, int rad, int alpha, boolean lit) {
         int face = PLANET_FACE[body];
         Color base = faceColour(body);
@@ -1775,6 +1880,21 @@ final class GlobeRenderer {
             this.g.setColor(shade(new Color(206, 186, 142), (int) (alpha * 0.72)));
             this.g.setStroke(stroke(1.4f));
             this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 0, 180);
+        }
+
+        // <b>A halo in the body's own colour, before the disc.</b> The planets were already
+        // spheres - a radial gradient lit from the upper left, Jupiter's belts, Saturn's rings -
+        // but only the Sun glowed, so on a lit globe every other body read as a painted bead
+        // sitting on the band rather than a light sitting above it. The Sun keeps its own,
+        // stronger corona above: it should stay the brightest thing on the ring, which is the
+        // one fact about it nobody has to be taught.
+        if (!this.turning) {
+            for (float[] pass : bodyHaloPasses()) {
+                int glow = rad + Math.round(pass[0]);
+                this.g.setColor(shade(lighten(base, 0.35),
+                    (int) Math.round(alpha * pass[1])));
+                this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
+            }
         }
 
         this.g.setPaint(new java.awt.RadialGradientPaint(
@@ -1912,7 +2032,15 @@ final class GlobeRenderer {
      * @param depth distance from the camera - {@code cam.distance} is the globe's own centre
      * @return 1.0 in front, falling to {@link #CHORD_BEHIND} at the back of the sphere
      */
-    private double chordDepthFade(double depth) {
+    /**
+     * <b>Package-private and given the distance, so the rule can be asserted directly.</b> It
+     * was private and read this.cam, so the only way to check it was to render and count
+     * pixels - and once the arcs came to lie on the shell that stopped working: a surface arc
+     * does most of its depth variation behind the globe, where the sphere occludes the line
+     * rather than this ramp thinning it, so a third of the chords stopped dimming measurably
+     * while the ramp was working perfectly well. Asserting the ramp beats inferring it.
+     */
+    static double chordDepthFade(double depth, double cameraDistance) {
         // <b>Across the whole sphere, not just the half behind its centre.</b> The first
         // version ramped from cam.distance - the centre - which measured as very nearly a
         // no-op: a chord's depth is the mean of its two ends, and a chord with one end in
@@ -1920,7 +2048,7 @@ final class GlobeRenderer {
         // Only chords with both ends well round the back faded at all, which is a small
         // minority, and the picture barely changed. Front of the sphere to back of it is the
         // range a chord actually varies over, so that is the range the ramp covers.
-        double front = this.cam.distance - Globe.SHELL_SKY;
+        double front = cameraDistance - Globe.SHELL_SKY;
         double t = (depth - front) / (2.0 * Globe.SHELL_SKY);
         t = Math.max(0.0, Math.min(1.0, t));
         return 1.0 - (1.0 - CHORD_BEHIND) * t;
@@ -2014,6 +2142,29 @@ final class GlobeRenderer {
      *
      * @param rise the direction from {@link #riseFor}: +1 up, -1 down, 0 for a straight chord
      */
+    /**
+     * The exact polyline the painter draws for an aspect - shared with the suite.
+     *
+     * <b>Shared because a check that builds its own curve measures its own curve.</b> The
+     * chord sampler walks the path looking for the ink the painter laid down, and it went to
+     * zero chords of eighty-one twice on 2026-09-22: once when riseFor became a direction, and
+     * again when the bow became {@link Globe#arcOverShell}. Both times the suite was walking a
+     * shape nobody drew. One builder, called by both, is the only arrangement where that cannot
+     * happen a third time.
+     */
+    static double[][] arcPathFor(double[] a, double[] b, double rise, int segments) {
+        if (rise == 0.0) {
+            return Globe.arc(a, b, segments, 0.0);
+        }
+        double dx = b[0] - a[0];
+        double dy = b[1] - a[1];
+        double dz = b[2] - a[2];
+        double len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        double wide = Math.min(1.0, len / (2.0 * Globe.SHELL_CHART));
+        double crown = Globe.SHELL_CHART + (Globe.SHELL_HOUSE - Globe.SHELL_CHART) * wide;
+        return Globe.arcOverShell(a, b, segments, crown, Math.signum(rise));
+    }
+
     static double reachOf(double rise, double[] a, double[] b) {
         if (rise == 0.0) {
             return 0.0;
@@ -2043,7 +2194,11 @@ final class GlobeRenderer {
         // the bow smooth without making it expensive: the pieces are what get sorted, coloured
         // and handed to Java2D, and a polyline of a dozen points is one drawing call exactly as
         // a single segment is. See subdivisions for how fine.
-        int sub = bowed ? subdivisions(pa, pb, steps, this.turning) : 1;
+        // The crown is taken from the builder the painter draws with, at its coarsest, so
+        // the estimate cannot drift away from the shape - see arcPathFor.
+        Globe.Projected crown = this.bowed && rise != 0.0
+            ? at(arcPathFor(a, b, rise, 2)[1]) : null;
+        int sub = bowed ? subdivisions(pa, pb, crown, steps, this.turning) : 1;
         // <b>The direction comes in, the distance is worked out here.</b> riseFor says which
         // way this line's deck bows; how far is a question about which shell the arc should top
         // out on, answered per arc so the scene's arcs share a surface instead of each riding
@@ -2057,7 +2212,25 @@ final class GlobeRenderer {
         // right, and gives the wide ones the sweep David asked for. It is also what the arc
         // javadoc already claimed as a virtue: the widest aspects ride highest, so the figure a
         // chart makes has a silhouette.
-        double[][] path = Globe.arc(a, b, steps * sub, reachOf(rise, a, b));
+        // <b>The bow is NOT flipped when the globe turns over, and that was tried.</b> Past a
+        // quarter turn the projection inverts, so an arch that domes below the crossing hangs as
+        // a bowl above it, and negating the world bow exactly there puts it back on top - which
+        // is what David asked for. Built on 2026-09-22 and taken out the same hour: a sign that
+        // changes at a threshold changes in ONE FRAME, so every arch in the scene snapped
+        // upside down as the drag passed the quarter turn. David: "the arches do something weird
+        // right now, not even sure how its doing it."
+        //
+        // It is the same defect as the horizontal mirror of 2026-09-19, which was built to the
+        // same kind of reasoning and removed for the same reason: "when i tilt up the signs
+        // shouldnt move at all - you have them on one side and then when tilting over the
+        // horizon they appear to show up instantly on the other side." A view that rearranges
+        // itself at an invisible line is worse than one that is simply upside down, because the
+        // reader cannot tell what moved. Turning a thing over puts its top underneath; that is
+        // what turning over means, and it stays continuous.
+        // <b>Hair on the head, not a wire above it.</b> The bow used to be a straight push off
+        // the chord, so the path left the sphere entirely; arcOverShell keeps every point on a
+        // real radius, running from one body's, over the crown, to the other's.
+        double[][] path = arcPathFor(a, b, rise, steps * sub);
         Globe.Projected[] p = new Globe.Projected[path.length];
         for (int i = 0; i < path.length; i++) {
             p[i] = at(path[i]);
@@ -2103,7 +2276,7 @@ final class GlobeRenderer {
             // the piece is the depth its colour is mixed at.
             final double stepDepth = p[lo + sub / 2].depth;
             final Color step = shade(ink, (int) Math.round(ink.getAlpha()
-                * chordDepthFade(stepDepth)));
+                * chordDepthFade(stepDepth, this.cam.distance)));
             final int[] xs = new int[sub + 1];
             final int[] ys = new int[sub + 1];
             for (int k = 0; k <= sub; k++) {
@@ -2144,9 +2317,21 @@ final class GlobeRenderer {
      * the chord did and not a few tens of them. It is the lesson the GradientPaint taught one
      * change earlier, in a new costume.
      */
-    static int subdivisions(Globe.Projected pa, Globe.Projected pb, int steps,
-                            boolean turning) {
-        double span = Math.hypot(pb.x - pa.x, pb.y - pa.y);
+    static int subdivisions(Globe.Projected pa, Globe.Projected pb, Globe.Projected crown,
+                            int steps, boolean turning) {
+        // <b>The length of the curve, not of the line between its ends.</b> This measured the
+        // chord, which is the one quantity that does not track how much curve there is to cut:
+        // a bow seen from the side has ends far apart and little sag, and the same bow seen
+        // from nearer its own plane has ends close together and all of its sag on the screen.
+        // The chord shrinks exactly when the drawing needs more pieces. Turning the chart over
+        // on 2026-09-23 moved the default camera to the other side of the plane and caught it:
+        // a 60 degree arc went from 4 subdivisions straying 0.46px to 3 straying 2.09px, with
+        // nothing about the arc or the rule having changed but the viewpoint. Going through the
+        // crown is the shortest honest estimate of what actually gets stroked.
+        double span = crown == null
+            ? Math.hypot(pb.x - pa.x, pb.y - pa.y)
+            : Math.hypot(crown.x - pa.x, crown.y - pa.y)
+                + Math.hypot(pb.x - crown.x, pb.y - crown.y);
         double fineness = turning ? ARC_FINENESS_TURNING : ARC_FINENESS;
         int most = turning ? 8 : 16;
         return Math.max(2,

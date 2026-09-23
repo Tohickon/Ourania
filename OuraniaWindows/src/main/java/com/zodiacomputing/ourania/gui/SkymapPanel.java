@@ -444,6 +444,33 @@ extends JPanel {
     private java.awt.Point dragFrom;
 
     /**
+     * The frame clock for the globe's glide, alive only while something is moving.
+     *
+     * <b>Started on every drag and every release, stopped as soon as the globe is still.</b> A
+     * timer that ran all the time would repaint a motionless globe sixty times a second for the
+     * whole life of the window; one that only ran on release would miss the easing under the
+     * hand, which is half of what the weight feels like. So it is started wherever a move is
+     * added and it turns itself off when {@link Globe#settle} says there is nothing left.
+     */
+    private javax.swing.Timer globeGlide;
+
+    /** Runs the glide until the globe is still, repainting each frame. */
+    private void startGlobeGlide() {
+        if (this.globeGlide == null) {
+            this.globeGlide = new javax.swing.Timer(16, e -> {
+                if (!this.globe.settle()) {
+                    this.globeGlide.stop();
+                }
+                this.chartPanel.repaint();
+            });
+            this.globeGlide.setCoalesce(true);
+        }
+        if (!this.globeGlide.isRunning()) {
+            this.globeGlide.start();
+        }
+    }
+
+    /**
      * Whether the drag in progress has moved far enough to be a turn rather than a click.
      *
      * <b>Every drag ends in a click event too.</b> Without this, turning the globe and
@@ -3405,6 +3432,9 @@ extends JPanel {
                 }
                 if (SkymapPanel.this.globeDragging) {
                     SkymapPanel.this.globeDragging = false;
+                    // The hand is off, but the globe is not necessarily still - the glide runs
+                    // on until it is, and the timer repaints it the whole way.
+                    SkymapPanel.this.startGlobeGlide();
                     SkymapPanel.this.chartPanel.repaint();
                 }
             }
@@ -3470,8 +3500,21 @@ extends JPanel {
                 }
                 SkymapPanel.this.globeTurned = true;
                 SkymapPanel.this.globeDragging = true;
-                SkymapPanel.this.globe.drag(dx, dy, SkymapPanel.this.chartPanel.getWidth());
+                // <b>The right button moves the globe, the left one turns it.</b> The same
+                // split the prototype has, and the same one every orbit camera has: a reader
+                // who wants to look at the far side drags, and a reader who wants the globe
+                // out of the way of the drawer moves it. Panning was fenced off behind
+                // {@code if (!globeMode)} until 2026-09-23 - the flat wheel could be pushed
+                // around and the globe could not be moved at all.
+                if (javax.swing.SwingUtilities.isRightMouseButton(mouseEvent)) {
+                    SkymapPanel.this.globe.pan(dx, dy, SkymapPanel.this.chartPanel.getWidth(),
+                        SkymapPanel.this.chartPanel.getHeight());
+                } else {
+                    SkymapPanel.this.globe.drag(dx, dy,
+                        SkymapPanel.this.chartPanel.getHeight());
+                }
                 SkymapPanel.this.dragFrom = mouseEvent.getPoint();
+                SkymapPanel.this.startGlobeGlide();
                 SkymapPanel.this.chartPanel.repaint();
             }
 
@@ -8558,9 +8601,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // branch, at the top, because the two share no drawing at all - the alternative
             // is a flag threaded through five thousand lines of painter.
             if (SkymapPanel.this.globeMode) {
+                // <b>Coasting counts as turning.</b> The cheap path - no halos, coarser
+                // arcs - is for frames the reader cannot study, and a globe still gliding to a
+                // stop is exactly that. Reading only globeDragging would switch the expensive
+                // path back on the instant the button came up, which is the one moment the
+                // frame rate has to hold.
                 GlobeRenderer.paint(graphics2D, SkymapPanel.this.globe,
                     this.getWidth(), this.getHeight(), SkymapPanel.this,
-                    SkymapPanel.this.globeDragging);
+                    SkymapPanel.this.globeDragging || SkymapPanel.this.globe.coasting());
                 SkymapPanel.paintZodiacTag(graphics2D, this.getWidth(), this.getHeight());
                 SkymapPanel.this.paintScrubTag(graphics2D, this.getWidth());
                 return;

@@ -140,8 +140,25 @@ final class Globe {
     static final double INCLINE_SKY = -0.48;
 
     /**
-     * How far the partner and sky rings sit above and below the natal plane, when they are
-     * stacked rather than crossed.
+     * How far apart the three decks sit, as a share of the ribbon's own radius.
+     *
+     * <b>Chosen for the eye, not taken from the sky.</b> This was {@code sin(OBLIQUITY)} -
+     * 0.397, the true tilt between the ecliptic and the equator - which is the honest number
+     * and reads as too little air. David compared it against his prototype on 2026-09-23,
+     * where the three planes sit at 1.5 on a radius of 2.5, and chose that: 0.60, half again
+     * as much separation, about eight times a body's bead rather than five.
+     *
+     * The obliquity has not gone anywhere - {@link #OBLIQUITY} still tilts the meridians and
+     * still sets {@link #INCLINE_SKY}. What it stopped doing is deciding how far apart three
+     * parallel rings are drawn, which was never a question about the sky: the rings are not
+     * the ecliptic and the equator, they are three charts that have to be told apart.
+     */
+    static final double LIFT_FRACTION = 0.60;
+
+    /**
+     * How far the upper deck sits above the middle one, when the decks are stacked rather
+     * than crossed. Chart A rides this, the sky holds the middle, and Chart B takes its
+     * negative - see {@link SkymapPanel#ringDeck} for which chart lands where.
      *
      * <b>The other way of keeping three rings apart, and it keeps a different promise.</b>
      * Tilting separates the planes and costs the one thing a reader crosses rings to do:
@@ -158,13 +175,21 @@ final class Globe {
      * <b>A height rather than an angle.</b> Latitude would put the outer ring further up than
      * the inner one for the same tilt; a height puts all three at the same remove, which is
      * what "just above" and "just below" mean when you look at the globe edge-on. At 0.40 the
-     * gap is about five times a body's bead, and the horizontal reach of the sky ring shrinks
+     * gap is about five times a body's bead, and the horizontal reach of the upper ring shrinks
      * by 0.045 of its radius to stay on its shell - the same arithmetic that keeps a stacked
      * body on the sphere.
+     *
+     * <b>Named for the deck, not for what is on it.</b> This was LIFT_SKY until 2026-09-23,
+     * from when the sky rode above the chart. {@link SkymapPanel#ringDeck} reversed that on
+     * 2026-09-21 - the sky took the middle and Chart A went up - and the constant kept the old
+     * name, so for two days the upper deck was called the sky while carrying Chart A. On
+     * 2026-09-23 that name was read back as the arrangement and reported to David as a
+     * difference from his prototype that did not exist. A constant that names its contents is
+     * wrong the moment the contents move; one that names its place cannot go stale.
      */
-    static final double LIFT_SKY = SHELL_CHART * Math.sin(OBLIQUITY);
+    static final double LIFT_UPPER = SHELL_CHART * Math.min(LIFT_FRACTION, 1.0);
 
-    /** The partner ring, at the southern tropic.
+    /** The lower deck, the same distance under the middle as the upper one is over it.
      *
      * <b>Not a compile-time constant any more, and that is deliberate.</b> A
      * {@code static final double} with a literal initialiser is inlined into every class that
@@ -172,7 +197,7 @@ final class Globe {
      * the old value. That cost a measurement run on 2026-09-21: three deck lifts were rendered
      * and produced three identical sets of numbers. Derived from {@link #OBLIQUITY} through a
      * method call, it cannot be folded, so every reader sees the same number as this file. */
-    static final double LIFT_PARTNER = -LIFT_SKY;
+    static final double LIFT_LOWER = -LIFT_UPPER;
 
     /** Half-height of a meridian arc, in radians of latitude. Matches the prototype's 0.92. */
     static final double MERIDIAN_SPAN = 0.92;
@@ -211,8 +236,35 @@ final class Globe {
      */
     private static final double ZOOM = 0.82;
 
-    /** The tilt beyond which the poles cross the view and the scene reads as inverted. */
-    static final double MAX_PITCH = 1.25;
+    /**
+     * The far end of the tilt: overhead, looking straight down at the chart.
+     *
+     * <b>A quarter turn is the whole range, and the reason is a haircut.</b> This was 1.25, then
+     * briefly a half turn, and the churn was all one mistake - treating the limit as a number to
+     * tune rather than asking what the reader is looking at. David settled it with a picture:
+     * "imagine the aspect arches are the hair on top of the head that is the wheel. I want to
+     * see the haircut, all of it, from the top of the head and the sides. Chart A would be the
+     * headband around the forehead, the chart and transit would be where the face is. The
+     * haircut is funky but it's always on top of the head."
+     *
+     * A head is looked at from the top and from the sides - which is exactly edge-on to
+     * overhead, and nothing past it. Beyond a quarter turn the camera is under the chin: the
+     * projection inverts, every arch hangs below, and there is no hair down there to see.
+     *
+     * <b>Which is why two attempts to fix that view both failed.</b> Flipping the arches back at
+     * the crossing made every one of them snap upside down in a single frame - the same
+     * discontinuity as the 2026-09-19 horizontal mirror, and rejected for the same reason.
+     * Leaving them alone made half the range a view of the underside. Neither was fixable
+     * because the range itself was the error.
+     *
+     * Stopping here, the arch domes at every tilt the reader can reach, the houses read the
+     * right way at every tilt, and nothing ever jumps.
+     *
+     * Written out rather than {@code Math.PI / 2 - MIN_PITCH}, which javac rejects as a forward
+     * reference: MIN_PITCH is declared below, and reordering two constants to satisfy the
+     * compiler would put them in an order that reads worse than it computes.
+     */
+    static final double MAX_PITCH = Math.PI / 2;
 
     /**
      * How near edge-on the camera may come, on either side of the chart's plane.
@@ -235,7 +287,7 @@ final class Globe {
      * rests in: about three degrees, because edge-on the whole plane collapses to a line and the
      * direction of the houses is not visible at all.
      */
-    static final double MIN_PITCH = 0.05;
+    static final double MIN_PITCH = 0.01;
 
     Globe() {
         this.yaw = 0.0;
@@ -252,18 +304,151 @@ final class Globe {
         // collapses toward the overhead view, where cosine goes to nothing. Measured rather
         // than reasoned: at 0.32 the sky ribbon still overlapped Chart A by 87 pixels, at 0.18
         // it clears. See MAX_PITCH for the other end of the same arithmetic.
-        this.pitch = 0.18;
+        // <b>Negative, which is now the view from above.</b> The sign of the pitch that
+        // looks down changed with the handedness flip on 2026-09-23: the camera sits at world
+        // y = -distance * sin(pitch), so a negative pitch puts it over the plane, looking down
+        // at Chart A with the houses running the right way.
+        this.pitch = -0.18;
     }
 
-    /** Applies a drag, in pixels, and keeps the camera somewhere a reader can understand. */
-    void drag(double dx, double dy, int panelWidth) {
-        int w = Math.max(1, panelWidth);
-        // Sideways is the same on both sides of the plane, because nothing is mirrored any more
-        // - see project(). Reversing it below would be the same discontinuity in the hand that
-        // the flip was in the picture.
-        this.yaw += (dx / w) * Math.PI * 2.0;
-        double step = (dy / w) * Math.PI * 2.0;
-        this.pitch = clampPitch(this.pitch + step, step);
+    /**
+     * The share of a pending move applied each frame, and the share of the rest that survives.
+     *
+     * <b>0.05, which is three's dampingFactor.</b> A drag does not move the camera; it adds to
+     * a pending delta, and each frame takes a twentieth of what is pending and lets the rest
+     * decay. The total applied comes to exactly the raw delta - the sum of {@code d * 0.95^n}
+     * is {@code d / (1 - 0.95)} times {@code 0.05}, which is 1 - so this changes when the
+     * motion happens and never how far it goes. Half of it is spent in about thirteen frames
+     * and it is quiet inside a second.
+     *
+     * That is the whole of the weight the reader feels: the globe eases under the hand rather
+     * than tracking it exactly, and it coasts to rest when the hand lets go instead of stopping
+     * dead. David, 2026-09-23, on the prototype: "i wanted it to move and tilt and spin and
+     * bloom and zoom like this".
+     */
+    static final double DAMPING = 0.05;
+
+    /** Below this a pending move is over, and is zeroed so it cannot drift. */
+    private static final double SETTLED = 1e-5;
+
+    /** Yaw still owed to the camera by drags already made. */
+    private double pendingYaw;
+
+    /** Pitch still owed, as above. */
+    private double pendingPitch;
+
+    /** World offset still owed to the target by pans already made. */
+    private double pendingPanX;
+    private double pendingPanY;
+    private double pendingPanZ;
+
+    /** The point the camera looks at and turns about. Panning moves this, not the camera. */
+    double targetX;
+    double targetY;
+    double targetZ;
+
+    /** How far the target may be dragged from the middle before it stops. */
+    private static final double PAN_REACH = SHELL_MANSION_OUTER;
+
+    /**
+     * Applies a drag, in pixels. Nothing moves until {@link #settle} runs.
+     *
+     * <b>Both axes on the height, which is what the prototype does.</b> Sideways used to divide
+     * by the panel's width and up-down by the same width, so on a panel wider than it is tall
+     * the two axes had different gearing and a diagonal drag came out skewed. three's
+     * OrbitControls puts both on {@code clientHeight} and says so in a comment - "yes, height" -
+     * for exactly this reason: the hand should not learn a different sensitivity when the window
+     * is resized.
+     *
+     * Sideways is the same on both sides of the plane, because nothing is mirrored - see
+     * {@link #project}. Reversing it below would be the same discontinuity in the hand that the
+     * flip was in the picture.
+     */
+    void drag(double dx, double dy, int panelHeight) {
+        int h = Math.max(1, panelHeight);
+        this.pendingYaw += (dx / h) * Math.PI * 2.0;
+        this.pendingPitch += (dy / h) * Math.PI * 2.0;
+    }
+
+    /**
+     * Applies a pan, in pixels, moving the point the camera orbits rather than the camera.
+     *
+     * <b>Screen-space, so the globe follows the cursor.</b> The target slides along the camera's
+     * own right and up axes by the world distance that projects to the pixels asked for, which
+     * is {@code distance / focal} per pixel. Checked numerically against {@link #project} over
+     * four thousand random cameras before it was written: a point at the target's depth lands
+     * exactly under the cursor, to within a ten-thousandth of a pixel. Points nearer or further
+     * than the target slide by more or less, which is perspective doing its job and is what the
+     * prototype does too.
+     *
+     * The axes come from inverting the yaw-then-pitch order in {@link #project}: camera right is
+     * {@code (cos yaw, 0, sin yaw)} and camera up is
+     * {@code (sin pitch sin yaw, cos pitch, -sin pitch cos yaw)}.
+     */
+    void pan(double dx, double dy, int panelWidth, int panelHeight) {
+        double focal = Math.max(1.0, Math.min(panelWidth, panelHeight) * ZOOM);
+        double k = this.distance / focal;
+        double cy = Math.cos(this.yaw);
+        double sy = Math.sin(this.yaw);
+        double cp = Math.cos(this.pitch);
+        double sp = Math.sin(this.pitch);
+        // Dragging right carries the globe right, which is the target going left.
+        this.pendingPanX += -cy * dx * k + sp * sy * dy * k;
+        this.pendingPanY += cp * dy * k;
+        this.pendingPanZ += -sy * dx * k - sp * cy * dy * k;
+    }
+
+    /**
+     * Advances one frame of the glide. True while anything is still moving.
+     *
+     * The caller runs this on a timer and repaints while it answers true; see SkymapPanel.
+     */
+    boolean settle() {
+        boolean moving = false;
+        if (Math.abs(this.pendingYaw) > SETTLED) {
+            this.yaw += this.pendingYaw * DAMPING;
+            this.pendingYaw *= 1.0 - DAMPING;
+            moving = true;
+        } else {
+            this.pendingYaw = 0.0;
+        }
+        if (Math.abs(this.pendingPitch) > SETTLED) {
+            double step = this.pendingPitch * DAMPING;
+            this.pitch = clampPitch(this.pitch + step, step);
+            this.pendingPitch *= 1.0 - DAMPING;
+            moving = true;
+        } else {
+            this.pendingPitch = 0.0;
+        }
+        if (Math.abs(this.pendingPanX) > SETTLED || Math.abs(this.pendingPanY) > SETTLED
+            || Math.abs(this.pendingPanZ) > SETTLED) {
+            this.targetX = clamp(this.targetX + this.pendingPanX * DAMPING, -PAN_REACH, PAN_REACH);
+            this.targetY = clamp(this.targetY + this.pendingPanY * DAMPING, -PAN_REACH, PAN_REACH);
+            this.targetZ = clamp(this.targetZ + this.pendingPanZ * DAMPING, -PAN_REACH, PAN_REACH);
+            this.pendingPanX *= 1.0 - DAMPING;
+            this.pendingPanY *= 1.0 - DAMPING;
+            this.pendingPanZ *= 1.0 - DAMPING;
+            moving = true;
+        } else {
+            this.pendingPanX = 0.0;
+            this.pendingPanY = 0.0;
+            this.pendingPanZ = 0.0;
+        }
+        return moving;
+    }
+
+    /** True while the glide is still running, which is what "the globe is moving" means. */
+    boolean coasting() {
+        return Math.abs(this.pendingYaw) > SETTLED || Math.abs(this.pendingPitch) > SETTLED
+            || Math.abs(this.pendingPanX) > SETTLED || Math.abs(this.pendingPanY) > SETTLED
+            || Math.abs(this.pendingPanZ) > SETTLED;
+    }
+
+    /** Runs the glide to a standstill. For measurement, where there are no frames. */
+    void settleFully() {
+        for (int i = 0; i < 10000 && settle(); i++) {
+            continue;
+        }
     }
 
     /**
@@ -277,21 +462,56 @@ final class Globe {
      * nowhere.
      */
     static double clampPitch(double pitch, double step) {
-        double p = pitch;
-        if (Math.abs(p) < MIN_PITCH) {
-            p = step < 0.0 ? -MIN_PITCH : MIN_PITCH;
-        }
-        return clamp(p, -MAX_PITCH, MAX_PITCH);
+        // <b>Pole to pole, with nothing excluded in between.</b> David, pointing at his own
+        // prototype: "i can go full tilt from south pole to north pole on that site." So the
+        // camera walks the whole meridian - down on the north pole, through edge-on, up at the
+        // south - and rests wherever it is let go, edge-on included.
+        //
+        // <b>This clamp has been rewritten four times in two days and the churn was one
+        // mistake:</b> treating the range as a number to tune instead of asking what the reader
+        // is looking at. It excluded a band either side of edge-on, then the whole lower half,
+        // then everything past a quarter turn. Each was a guess at a question the prototype
+        // answers directly.
+        //
+        // <b>What the lower half costs, and why it is affordable now.</b> Below the plane the
+        // house sequence reads backwards - that is what shut it off on 2026-09-18. It is
+        // affordable because the house numbers now ride near both poles rather than in the
+        // plane, so whichever way the globe is turned, a set of them faces the reader and says
+        // which house is which.
+        return clamp(pitch, -MAX_PITCH, MAX_PITCH);
     }
 
-    /** True when the camera is under the chart's plane, looking up at it. */
+    /**
+     * True when the camera is under the chart's plane, looking up at it.
+     *
+     * <b>Positive pitch is underneath.</b> The camera sits at world y =
+     * {@code -distance * sin(pitch)}, so the sign that puts it below the plane is the positive
+     * one. This read {@code pitch < 0} until 2026-09-23, when the chart was turned over so it
+     * reads correctly from above - see {@link #onShell}. The projection is unchanged; what
+     * changed is which side the right-way-round view is on.
+     */
     boolean fromBelow() {
-        return this.pitch < 0.0;
+        return this.pitch > 0.0;
     }
 
-    /** Applies a scroll. Bounded so the reader cannot end up inside the core or in deep space. */
+    /** How much of the distance one notch of the wheel takes away. three's zoomSpeed of 1. */
+    private static final double ZOOM_STEP = 0.95;
+
+    /**
+     * Applies a scroll. Bounded so the reader cannot end up inside the core or in deep space.
+     *
+     * <b>A scale, not a step.</b> This added 0.35 per notch to a distance between 3.2 and 12,
+     * which is a ninth of the way in when you are far out and a tenth of everything you have
+     * left when you are close - so the same gesture lurched near the globe and did almost
+     * nothing far from it. Multiplying takes the same share every time, which is what makes a
+     * zoom feel like one thing rather than two, and it is what the prototype does:
+     * {@code radius *= pow(0.95, ...)}.
+     *
+     * The wheel reports positive when it is rolled away, which should move the camera back, so
+     * the exponent is negated - a notch out is 1/0.95, about five and a quarter percent.
+     */
     void zoom(double ticks) {
-        this.distance = clamp(this.distance + ticks * 0.35, 3.2, 12.0);
+        this.distance = clamp(this.distance * Math.pow(ZOOM_STEP, -ticks), 3.2, 12.0);
     }
 
     /**
@@ -302,7 +522,15 @@ final class Globe {
      * - the classic gimbal complaint, and the reason this is one method rather than a matrix
      * assembled at each call site.
      */
-    Projected project(double x, double y, double z, int width, int height) {
+    Projected project(double worldX, double worldY, double worldZ, int width, int height) {
+        // <b>Everything is measured from the target, not from the middle of the world.</b>
+        // Panning moves the target; the camera keeps looking at it and keeps turning about it,
+        // so a globe dragged into the corner spins about the point under the cursor rather than
+        // about a centre that is no longer on the screen. That is the prototype's behaviour and
+        // it is the reason pan is a camera move rather than a screen offset applied at the end.
+        double x = worldX - this.targetX;
+        double y = worldY - this.targetY;
+        double z = worldZ - this.targetZ;
         double cy = Math.cos(this.yaw);
         double sy = Math.sin(this.yaw);
         double xr = x * cy + z * sy;
@@ -376,7 +604,16 @@ final class Globe {
         double ring = Math.sqrt(Math.max(0.0, radius * radius - lift * lift));
         double x = -ring * Math.cos(t);
         double yy = lift;
-        double z = ring * Math.sin(t);
+        // <b>Counterclockwise seen from above, where Chart A is.</b> This was +sin until
+        // 2026-09-23, which wound longitude the other way: the houses read correctly only from
+        // the south side, and Chart A rides LIFT_UPPER at +y, so the one view that read the
+        // right way was the one looking at Chart A's underside. David: "make sure that chart a
+        // is on top meaning if looking down at it the houses will be going the correct way."
+        //
+        // The Ascendant does not move. It sits at t = 0, where the point is (-ring, 0, 0) and
+        // sin is zero, so flipping z leaves it exactly on the left where the flat wheel puts
+        // it. The order turns over; the picture does not slide.
+        double z = -ring * Math.sin(t);
         if (inclination == 0.0) {
             return new double[] {x, yy, z};
         }
@@ -515,6 +752,59 @@ final class Globe {
      */
     static double[] arcLift(double[] a, double[] b) {
         return arcLift(a, b, ARC_RISE);
+    }
+
+    /**
+     * An aspect as hair lying over the crown: a path <b>on</b> a shell, not a bulge through the
+     * air above one.
+     *
+     * <b>What was wrong with the bulge.</b> {@link #arc} takes the chord and pushes its middle
+     * out along a straight perpendicular, so the path leaves the sphere, climbs through empty
+     * space and comes back. Seen from the side that reads as a dome and looks right; seen from
+     * anywhere else it reads as wrong, and no amount of tilting or flipping fixes it - which is
+     * what a whole afternoon of trying either established. David: "it wouldn't matter to view it
+     * upside down or underneath if you could get the placement of the aspect arches correct",
+     * and the placement he means is a haircut: "the hair on top of the head that is the wheel...
+     * the haircut is funky but it's always on top of the head."
+     *
+     * <b>So every point of the path sits at a real radius.</b> The line between the two bodies
+     * is bowed toward the crown as before, but each point is then pushed back out to a radius
+     * that runs from the first body's, through the shell at the middle of the span, to the
+     * second body's. The ends therefore land exactly on their glyphs, and everything between
+     * lies on a surface - hair on a scalp rather than a wire over it.
+     *
+     * @param shell how far out the middle of the span rides - the crown it combs over
+     * @param sign  +1 to comb over the top, -1 under the chin, from the deck's own rule
+     */
+    static double[][] arcOverShell(double[] a, double[] b, int segments, double shell,
+                                   double sign) {
+        int n = Math.max(1, segments);
+        double[] dir = arcLift(a, b, 1.0);
+        double dl = Math.sqrt(dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2]);
+        double ra = Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+        double rb = Math.sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2]);
+        if (dl < 1e-9 || ra < 1e-9 || rb < 1e-9) {
+            return arc(a, b, n, 0.0);
+        }
+        double[][] pts = new double[n + 1][];
+        for (int i = 0; i <= n; i++) {
+            double t = i / (double) n;
+            double bow = Math.sin(Math.PI * t);
+            double x = a[0] + (b[0] - a[0]) * t + sign * dir[0] * bow;
+            double y = a[1] + (b[1] - a[1]) * t + sign * dir[1] * bow;
+            double z = a[2] + (b[2] - a[2]) * t + sign * dir[2] * bow;
+            double len = Math.sqrt(x * x + y * y + z * z);
+            if (len < 1e-9) {
+                pts[i] = new double[] {x, y, z};
+                continue;
+            }
+            // The radius this point should sit at: the bodies' own at the ends, the crown in
+            // the middle. Without this the path would be a great circle and hug the ring it
+            // came from, which is the objection arc()'s own javadoc raises against them.
+            double want = (ra + (rb - ra) * t) * (1.0 - bow) + shell * bow;
+            pts[i] = new double[] {x / len * want, y / len * want, z / len * want};
+        }
+        return pts;
     }
 
     /**
