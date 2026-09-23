@@ -1192,6 +1192,37 @@ public final class AspectGridCheck {
             SkymapPanel.triWheelShown(ChartMode.SYNASTRY, true));
         ok("triWheelShown: SYNASTRY without transits is not",
             !SkymapPanel.triWheelShown(ChartMode.SYNASTRY, false));
+
+        // <b>Where the outer wheel's moment is kept, which is a different question.</b> The
+        // outer ring is a second person in a synastry and the sky in every other mode, so its
+        // moment and place live on outerRing in the first case and skyRing in the rest. That
+        // rule existed in two places and the copies came apart: the reading worker read
+        // outerRing in every mode, and since outerRing is empty when nobody typed a transit
+        // subject, Synthesize told David transits were not enabled while they were. Swept over
+        // every mode rather than the one that broke, because the next mode added is the next
+        // chance to get it wrong.
+        ok("outerIsSecondPerson: a synastry's outer ring is the second person",
+            SkymapPanel.outerIsSecondPerson(ChartMode.SYNASTRY));
+        for (ChartMode mode : ChartMode.values()) {
+            if (mode != ChartMode.SYNASTRY) {
+                ok("and in " + mode + " the outer ring is the sky",
+                    !SkymapPanel.outerIsSecondPerson(mode));
+            }
+        }
+
+        // <b>And the method that turns that answer into a ring, which is the thing the
+        // callers use.</b> The sweep above states the rule and holds nothing that applies it:
+        // mutation-tested on 2026-09-23, making outerSource return outerRing in every mode
+        // <b>survived</b> it completely, which is the shared-rule trap one more time - the rule
+        // and its only consumer, checked apart. Asked through the panel, by identity, because
+        // the claim is which ring and not which value it happens to hold.
+        for (ChartMode mode : ChartMode.values()) {
+            setField(sky, "chartMode", mode);
+            WheelRing want = mode == ChartMode.SYNASTRY ? sky.outerRing : sky.skyRing;
+            ok("outerSource in " + mode + " is the "
+                + (mode == ChartMode.SYNASTRY ? "outer" : "sky") + " ring",
+                sky.outerSource() == want);
+        }
         setField(sky, "chartMode", ChartMode.SYNASTRY);
         setField(sky, "showTransitChart",
             SkymapPanel.outerWheelShown(ChartMode.SYNASTRY, true));

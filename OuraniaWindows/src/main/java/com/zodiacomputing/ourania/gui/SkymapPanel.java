@@ -203,6 +203,32 @@ extends JPanel {
      * composite's own bodies; now the third moment is drawn only when it was asked for, and a
      * composite by itself is a single wheel.
      */
+    /**
+     * Whether the outer wheel is a second person rather than the sky.
+     *
+     * <b>Which decides where its moment and its place are kept.</b> A synastry's outer ring is
+     * Chart B and carries that person's birth moment; in every other mode the outer ring is the
+     * sky, and the sky's moment and place live on {@code skyRing} - which
+     * {@link #updateChartData} defaults to now, while {@code outerRing} is left empty for a
+     * transit subject nobody typed.
+     *
+     * <b>This existed twice and the copies came apart.</b> The house-warning code knew it; the
+     * reading worker read {@code outerRing} in every mode, so with transits on in Natal &amp;
+     * Transit the moment was null and three sections of Synthesize reported "Transit data not
+     * enabled" with transits plainly enabled. David, 2026-09-23: "even though transit is
+     * enabled". The place followed the moment, so a transit frame was being cast at the second
+     * person's coordinates in a mode that has no second person. Both callers ask this now, and
+     * {@link #outerSource} is the one place that turns the answer into a ring.
+     */
+    public static boolean outerIsSecondPerson(ChartMode mode) {
+        return mode == ChartMode.SYNASTRY;
+    }
+
+    /** The ring carrying the outer wheel's moment and place. See {@link #outerIsSecondPerson}. */
+    WheelRing outerSource() {
+        return outerIsSecondPerson(this.chartMode) ? this.outerRing : this.skyRing;
+    }
+
     public static boolean outerWheelShown(ChartMode mode, boolean transits) {
         if (mode == ChartMode.SYNASTRY) {
             return true;
@@ -3753,11 +3779,12 @@ extends JPanel {
                     label, lat, this.houseSystem));
             }
         }
-        SweDate outerSd = this.isSynastryChart() ? this.outerRing.sd : this.skyRing.sd;
+        WheelRing outerFrom = this.outerSource();
+        SweDate outerSd = outerFrom.sd;
         if (this.showTransitChart && outerSd != null && !this.showProgressed()) {
-            boolean synastry = this.isSynastryChart();
-            double lat = synastry ? this.outerRing.latitude : this.skyRing.latitude;
-            double lon = synastry ? this.outerRing.longitude : this.skyRing.longitude;
+            boolean synastry = outerIsSecondPerson(this.chartMode);
+            double lat = outerFrom.latitude;
+            double lon = outerFrom.longitude;
             if (com.zodiacomputing.ourania.astro.Precision.housesFellBack(
                     this.sw, outerSd.getJulDay(), lat, lon, this.houseSystem)) {
                 notes.add(com.zodiacomputing.ourania.astro.Precision.housesNote(
@@ -4442,10 +4469,23 @@ extends JPanel {
         final char c = this.houseSystem;
         final String string = this.baseLocationName;
         final String string2 = this.natalRing.time == null ? "" : this.natalRing.time.format(DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm z"));
-        final boolean bl = this.showTransitChart && this.outerRing.sd != null;
-        final double d4 = bl ? this.outerRing.sd.getJulDay() : Double.NaN;
-        final double d5 = this.outerRing.latitude;
-        final double d6 = this.outerRing.longitude;
+        // <b>The outer wheel's moment lives on skyRing in every mode but synastry.</b> This
+        // read outerRing.sd in all of them, which is the second person's ring - empty whenever
+        // there is no second person. With the transit box ticked on Natal & Transit it was
+        // null, so the reading concluded there was no moment to read against and three sections
+        // of Synthesize said "Transit data not enabled" with transits plainly enabled. David
+        // reported it on 2026-09-23: "even though transit is enabled".
+        //
+        // The rule is not new and is not invented here - it is the one stated where the house
+        // warnings are gathered, a few hundred lines up. This is the copy that had never been
+        // told, which is the one-rule-two-implementations defect this project logs more than
+        // any other. The place followed the moment: a transit frame was being cast at the
+        // second person's coordinates in a mode that has no second person.
+        final WheelRing outerFrom = this.outerSource();
+        final boolean bl = this.showTransitChart && outerFrom.sd != null;
+        final double d4 = bl ? outerFrom.sd.getJulDay() : Double.NaN;
+        final double d5 = outerFrom.latitude;
+        final double d6 = outerFrom.longitude;
         new SwingWorker<String, Void>(){
 
             @Override

@@ -2482,6 +2482,37 @@ public final class NavigationCheck {
             SwingUtilities.invokeAndWait(() -> rail.reveal(OuraniaWindow.READING_PAGE));
             ok("and the Interpretation page still opens onto its panel",
                 visibleCards(cards, pages).equals(java.util.List.of(OuraniaWindow.READING_PAGE)));
+
+            // <b>Every reading door opens the rail, not just the one that was noticed.</b>
+            // showSynthesis revealed the reading page and carried a comment saying why - a
+            // reading written into a shut rail is never seen, so the button reads as doing
+            // nothing. showReport and showSnapshot did not, so both appeared dead. David,
+            // 2026-09-23: "also report and snapshot no longer yield anything". Each door is
+            // driven from a closed rail, because a rail that happened to be open already would
+            // pass whether the door opened it or not.
+            for (String door : new String[] {"report", "snapshot", "synthesis"}) {
+                SwingUtilities.invokeAndWait(() -> w[0].closeInterpretationPanel());
+                ok("the rail is shut before the " + door + " door", !rail.isOpen());
+                SwingUtilities.invokeAndWait(() -> {
+                    switch (door) {
+                        case "report":
+                            w[0].showReport("1 Jan 2000, 12:00", "Somewhere",
+                                "<html><body><p>a report</p></body></html>");
+                            break;
+                        case "snapshot":
+                            w[0].showSnapshot("1 Jan 2000, 12:00", "Somewhere",
+                                "<html><body><p>a snapshot</p></body></html>");
+                            break;
+                        default:
+                            w[0].showSynthesis("<html><body><p>a synthesis</p></body></html>");
+                            break;
+                    }
+                });
+                SwingUtilities.invokeAndWait(() -> { });
+                ok("the " + door + " door opens the rail on the reading, showing "
+                    + rail.selected(),
+                    OuraniaWindow.READING_PAGE.equals(rail.selected()) && rail.isOpen());
+            }
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }

@@ -901,6 +901,14 @@ public class OuraniaWindow extends JFrame {
     public void showSnapshot(String when, String where, String paragraph) {
         if (interpretationPanel != null) {
             interpretationPanel.showSnapshot(when, where, paragraph);
+            // <b>Open the rail on the reading, not just fill it.</b> The same fix
+            // showSynthesis carries, and for the same reason: as a rail page, a reading
+            // written into a shut rail is never seen, so the button reads as doing nothing.
+            // It was applied to one of the three doors when the panel became a rail page and
+            // not to the other two, which is why Synthesize worked and these did not.
+            if (chartRail != null) {
+                chartRail.reveal(READING_PAGE);
+            }
             revalidate();
             repaint();
         }
@@ -910,6 +918,14 @@ public class OuraniaWindow extends JFrame {
     public void showReport(String when, String where, String report) {
         if (interpretationPanel != null) {
             interpretationPanel.showReport(when, where, report);
+            // <b>Open the rail on the reading, not just fill it.</b> The same fix
+            // showSynthesis carries, and for the same reason: as a rail page, a reading
+            // written into a shut rail is never seen, so the button reads as doing nothing.
+            // It was applied to one of the three doors when the panel became a rail page and
+            // not to the other two, which is why Synthesize worked and these did not.
+            if (chartRail != null) {
+                chartRail.reveal(READING_PAGE);
+            }
             revalidate();
             repaint();
         }
