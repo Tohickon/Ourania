@@ -629,7 +629,9 @@ public final class Convergence {
         if (w.aspect == null || Double.isNaN(w.offBy)) {
             return 1.0;
         }
-        double max = w.aspect.maxOrb;
+        // The ceiling actually in force, so a narrowed aspect scores its precision
+        // against the width it was judged at rather than the built-in one.
+        double max = Aspects.capOf(w.aspect);
         if (max <= 0.0) {
             return 1.0;
         }

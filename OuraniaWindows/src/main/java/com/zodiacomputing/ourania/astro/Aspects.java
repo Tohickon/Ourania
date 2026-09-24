@@ -269,6 +269,78 @@ public final class Aspects {
         return name == null ? ANGLE_ORB : ORBS.getOrDefault(name, ANGLE_ORB);
     }
 
+    /**
+     * The reader's ceilings, by aspect. Empty is the normal case.
+     *
+     * <b>Separate from {@link #CUSTOM} because they are separate settings</b>, and separate from
+     * {@link Type#maxOrb} because that field has a second job: {@link Type#isMinor} reads it to
+     * say which family an aspect belongs to. A reader narrowing a trine must not turn it into a
+     * minor aspect, and before 2026-09-24 three places asked that question by comparing maxOrb
+     * against a literal, which would have done exactly that.
+     */
+    private static volatile java.util.Map<Type, Double> CUSTOM_CAPS = java.util.Map.of();
+
+    /**
+     * The ceiling this aspect is judged under - the reader's if they have set one.
+     *
+     * <b>Every place that applies a ceiling asks this.</b> The field is still read directly for
+     * the family question and nowhere else; a cap that the aspect list honours and the
+     * interpretation panel prints differently is the defect this project keeps finding.
+     */
+    public static double capOf(Type t) {
+        if (t == null) {
+            return Double.MAX_VALUE;
+        }
+        Double mine = CUSTOM_CAPS.get(t);
+        return mine != null ? mine : t.maxOrb;
+    }
+
+    /** The built-in ceiling, whatever the reader has done to it. */
+    public static double defaultCapOf(Type t) {
+        return t == null ? Double.MAX_VALUE : t.maxOrb;
+    }
+
+    /**
+     * Put the reader's ceilings in force, replacing any set before.
+     *
+     * <b>Narrowed, never lifted, and only where there is a ceiling to begin with.</b> The six
+     * capped aspects may be tightened below their declared degree; the five Ptolemaic ones take
+     * no ceiling at all, because their width comes from the bodies and H1's first half already
+     * put those in the reader's hands. Refused rather than clamped, as the body widths are.
+     */
+    public static void setCustomCaps(java.util.Map<Type, Double> caps) {
+        if (caps == null || caps.isEmpty()) {
+            CUSTOM_CAPS = java.util.Map.of();
+            return;
+        }
+        java.util.Map<Type, Double> kept = new java.util.EnumMap<>(Type.class);
+        for (java.util.Map.Entry<Type, Double> e : caps.entrySet()) {
+            Type t = e.getKey();
+            Double v = e.getValue();
+            if (t == null || v == null || v.isNaN()) {
+                continue;
+            }
+            // <b>Only an aspect that already has a ceiling.</b> The five Ptolemaic aspects
+            // are uncapped because the bodies decide their width, and H1's first half already
+            // made those widths the reader's - so a ceiling here would be a second control over
+            // one number, free to disagree with the first. The test below would have let one
+            // through on its own: an uncapped aspect's default is Double.MAX_VALUE, so every
+            // finite value is at or under it.
+            if (!t.isMinor()) {
+                continue;
+            }
+            if (v >= MIN_BODY_ORB && v <= defaultCapOf(t)) {
+                kept.put(t, v);
+            }
+        }
+        CUSTOM_CAPS = java.util.Collections.unmodifiableMap(kept);
+    }
+
+    /** The ceilings in force that differ from the declared ones. Never null. */
+    public static java.util.Map<Type, Double> customCaps() {
+        return CUSTOM_CAPS;
+    }
+
     /** The narrowest and widest a point may be set to. A zero orb would switch a body off. */
     public static final double MIN_BODY_ORB = 0.25;
     public static final double MAX_BODY_ORB = 15.0;
@@ -398,7 +470,7 @@ public final class Aspects {
      * always were.
      */
     public static double effectiveOrb(String nameA, String nameB, Type t, boolean isSynastry) {
-        double cap = isSynastry ? t.maxOrb / 2.0 : t.maxOrb;
+        double cap = isSynastry ? capOf(t) / 2.0 : capOf(t);
         return Math.min(orbFor(nameA, nameB, isSynastry), cap);
     }
 
@@ -476,7 +548,7 @@ public final class Aspects {
         double bestOff = Double.MAX_VALUE;
         for (Type t : Type.values()) {
             double off = Math.abs(separation - t.exactAngle);
-            if (off <= Math.min(orb, t.maxOrb) && off < bestOff) {
+            if (off <= Math.min(orb, capOf(t)) && off < bestOff) {
                 best = t;
                 bestOff = off;
             }

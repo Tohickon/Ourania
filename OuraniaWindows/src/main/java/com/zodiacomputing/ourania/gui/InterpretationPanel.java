@@ -2154,8 +2154,12 @@ public class InterpretationPanel extends JPanel {
 
         html.append("<h3 style='color:#add8e6;'>The orb it is allowed</h3>");
         html.append("<p>A pair is judged on the <b>larger</b> of the two bodies' orbs");
-        if (type.maxOrb < 1000.0) {
-            html.append(", capped for this aspect at <b>").append(trimAngle(type.maxOrb))
+        // isCapped rather than a comparison against 1000: the ceiling for a major is
+        // Double.MAX_VALUE, and "< 1000" is a magic number that works by accident of how much
+        // larger that is. See Aspects.Type.isMinor.
+        if (type.isMinor()) {
+            html.append(", capped for this aspect at <b>").append(trimAngle(
+                    com.zodiacomputing.ourania.astro.Aspects.capOf(type)))
                 .append("&deg;</b> - which is tighter than most bodies allow, so the cap is "
                     + "usually what decides it");
         } else {
@@ -2182,7 +2186,7 @@ public class InterpretationPanel extends JPanel {
         row(html, "Planetary nature", type.planetaryNature == null
             ? "none assigned - the minors postdate the doctrine"
             : type.planetaryNature);
-        row(html, "Family", type.maxOrb >= 1000.0
+        row(html, "Family", !type.isMinor()
             ? "Ptolemaic - one of the five the tradition is built on"
             : "minor - capped at a degree, and added to this engine in 2026");
         html.append("</table>");

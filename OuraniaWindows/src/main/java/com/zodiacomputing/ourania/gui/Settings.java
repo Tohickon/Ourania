@@ -902,6 +902,80 @@ public final class Settings {
         com.zodiacomputing.ourania.astro.Aspects.setCustomOrbs(bodyOrbs());
     }
 
+    /**
+     * H1's other half: the ceiling each capped aspect is judged under.
+     *
+     * <b>Keyed by the enum's own name</b>, which is as stable as a registry id and is the only
+     * name these have. Only the six capped aspects can appear: the Ptolemaic five take their
+     * width from the bodies, which the widths above already put in the reader's hands.
+     */
+    public static final String ASPECT_CAP_PREFIX = "orb.aspect.";
+
+    /** The reader's ceilings, by aspect. Empty when nothing has been changed. */
+    public static java.util.Map<com.zodiacomputing.ourania.astro.Aspects.Type, Double>
+            aspectCaps() {
+        java.util.Map<com.zodiacomputing.ourania.astro.Aspects.Type, Double> out =
+            new java.util.EnumMap<>(com.zodiacomputing.ourania.astro.Aspects.Type.class);
+        for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+            if (!t.isMinor()) {
+                continue;
+            }
+            String raw = get(ASPECT_CAP_PREFIX + t.name(), "").trim();
+            if (raw.isEmpty()) {
+                continue;
+            }
+            try {
+                double v = Double.parseDouble(raw);
+                if (v >= com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB
+                        && v <= com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t)) {
+                    out.put(t, v);
+                }
+            } catch (NumberFormatException ignored) {
+                // A hand-edited file is not a reason to refuse to start.
+            }
+        }
+        return out;
+    }
+
+    /** The ceiling in force for an aspect - the reader's if set, the declared one otherwise. */
+    public static double aspectCap(com.zodiacomputing.ourania.astro.Aspects.Type t) {
+        Double mine = aspectCaps().get(t);
+        return mine != null ? mine
+            : com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t);
+    }
+
+    /** Narrow one aspect's ceiling and put it in force, as the body widths are. */
+    public static void setAspectCap(com.zodiacomputing.ourania.astro.Aspects.Type t,
+                                    double degrees) {
+        if (t == null || !t.isMinor()) {
+            return;
+        }
+        double built = com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t);
+        double v = Math.max(com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB,
+            Math.min(built, degrees));
+        if (Math.abs(v - built) < 1e-9) {
+            set(ASPECT_CAP_PREFIX + t.name(), "");
+        } else {
+            set(ASPECT_CAP_PREFIX + t.name(), String.valueOf(v));
+        }
+        applyAspectCaps();
+    }
+
+    /** Back to the declared ceilings. */
+    public static void resetAspectCaps() {
+        for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+            set(ASPECT_CAP_PREFIX + t.name(), "");
+        }
+        applyAspectCaps();
+    }
+
+    /** Push the reader's ceilings into the engine. See applyBodyOrbs for the direction. */
+    public static void applyAspectCaps() {
+        com.zodiacomputing.ourania.astro.Aspects.setCustomCaps(aspectCaps());
+    }
+
     /** The one transit orb in degrees; see Transits.orb for why it is one flat width. */
     public static final String TRANSIT_ORB_KEY = "transit.orb";
     public static final double TRANSIT_ORB_MIN = 0.25;

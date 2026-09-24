@@ -1334,6 +1334,52 @@ public class SettingsPanel extends JPanel {
             names.add(name);
         }
         p.add(grid);
+        p.add(Box.createRigidArea(new Dimension(0, 14)));
+
+        // <b>Only the aspects that have a ceiling.</b> The Ptolemaic five are uncapped because
+        // their width comes from the bodies, which the grid above already sets - a ceiling here
+        // would be a second control over one number, free to disagree with the first.
+        p.add(note("The six capped aspects may be tightened below their built-in ceiling. The "
+            + "Ptolemaic five have none: their width is the bodies' above."));
+        p.add(Box.createRigidArea(new Dimension(0, 6)));
+
+        JPanel capGrid = new JPanel(new java.awt.GridLayout(0, 4, 14, 4));
+        capGrid.setBackground(Color.BLACK);
+        capGrid.setAlignmentX(Component.LEFT_ALIGNMENT);
+        final java.util.List<javax.swing.JSpinner> capSpinners = new java.util.ArrayList<>();
+        final java.util.List<com.zodiacomputing.ourania.astro.Aspects.Type> capTypes =
+            new java.util.ArrayList<>();
+        for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+            if (!t.isMinor()) {
+                continue;
+            }
+            final com.zodiacomputing.ourania.astro.Aspects.Type type = t;
+            JPanel cell = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+            cell.setBackground(Color.BLACK);
+            JLabel l = new JLabel(t.label + " ");
+            l.setForeground(TEXT);
+            final javax.swing.JSpinner s = new javax.swing.JSpinner(
+                new javax.swing.SpinnerNumberModel(Settings.aspectCap(t),
+                    com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB,
+                    com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t), 0.25));
+            s.setToolTipText("<html><b>" + t.label + "</b><br>Built in at "
+                + com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t)
+                + "&deg;, and may only be tightened.</html>");
+            s.addChangeListener(e -> {
+                Settings.setAspectCap(type, ((Number) s.getValue()).doubleValue());
+                status.setText("Saved");
+                if (window != null) {
+                    window.applyBodySelection();
+                }
+            });
+            cell.add(l);
+            cell.add(s);
+            capGrid.add(cell);
+            capSpinners.add(s);
+            capTypes.add(t);
+        }
+        p.add(capGrid);
         p.add(Box.createRigidArea(new Dimension(0, 8)));
 
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -1343,9 +1389,13 @@ public class SettingsPanel extends JPanel {
         reset.setToolTipText("Forget every width you have set and go back to the built-in table.");
         reset.addActionListener(e -> {
             Settings.resetBodyOrbs();
+            Settings.resetAspectCaps();
             for (int i = 0; i < spinners.size(); i++) {
                 spinners.get(i).setValue(Settings.bodyOrb(names.get(i)));
                 markChanged(labels.get(i), names.get(i));
+            }
+            for (int i = 0; i < capSpinners.size(); i++) {
+                capSpinners.get(i).setValue(Settings.aspectCap(capTypes.get(i)));
             }
             status.setText("Saved");
             if (window != null) {

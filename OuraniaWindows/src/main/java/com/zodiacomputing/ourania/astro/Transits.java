@@ -455,7 +455,7 @@ public final class Transits {
         c.type = type;
         c.separation = sep;
         c.offBy = Math.abs(sep - type.exactAngle);
-        c.orbUsed = Math.min(orb, type.maxOrb);
+        c.orbUsed = Math.min(orb, Aspects.capOf(type));
         c.tightness = c.orbUsed <= 0 ? 0.0 : Math.max(0.0, 1.0 - c.offBy / c.orbUsed);
         return c;
     }
@@ -784,7 +784,11 @@ public final class Transits {
             double step = stepFor(body);
             for (NatalTarget target : targets) {
                 for (Aspects.Type type : Aspects.Type.values()) {
-                    if (type.maxOrb != Double.MAX_VALUE) {
+                    // <b>The question is which family, not how wide.</b> Asked as
+                    // "maxOrb != MAX_VALUE" until 2026-09-24, which reads as a width comparison
+                    // and becomes one the moment a cap is the reader's to set - a reader capping
+                    // a trine would have quietly changed which aspects are scanned here.
+                    if (type.isMinor()) {
                         continue;               // not one of the five; see above
                     }
                     if (body.equals(target.name) && type == Aspects.Type.CONJUNCTION) {

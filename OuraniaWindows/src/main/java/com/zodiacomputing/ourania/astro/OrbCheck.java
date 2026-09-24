@@ -43,8 +43,10 @@ public final class OrbCheck {
             part("B: a width the reader sets is the one that judges", OrbCheck::inForce);
             part("C: the bounds are refused, not bent", OrbCheck::bounds);
             part("D: the setting round-trips", OrbCheck::roundTrip);
+            part("E: the aspect ceilings", OrbCheck::caps);
         } finally {
             Aspects.setCustomOrbs(null);
+            Aspects.setCustomCaps(null);
         }
 
         System.out.println();
@@ -181,6 +183,90 @@ public final class OrbCheck {
         near("a width past the maximum is clamped when it comes from the screen",
             Aspects.MAX_BODY_ORB, Settings.bodyOrb("Venus"), 1e-9);
         Settings.resetBodyOrbs();
+    }
+
+    /**
+     * <b>The ceiling and the family are two questions about one field.</b> Type.maxOrb is a
+     * width for the six capped aspects and Double.MAX_VALUE for the five Ptolemaic ones, so it
+     * also answers "is this a major" - and until 2026-09-24 three places asked that by comparing
+     * it against a literal, two of them against 1000.0, a number that works only because
+     * MAX_VALUE is so much larger. Narrowing a trine would have moved it between families.
+     */
+    private static void caps() {
+        Aspects.setCustomCaps(null);
+
+        Aspects.Type minor = Aspects.Type.SEMISEXTILE;
+        Aspects.Type major = Aspects.Type.TRINE;
+        ok("a minor aspect has a ceiling", minor.isMinor());
+        ok("and a Ptolemaic one does not", !major.isMinor());
+        near("an untouched ceiling is the declared one", Aspects.defaultCapOf(minor),
+            Aspects.capOf(minor), 1e-9);
+
+        Map<Aspects.Type, Double> mine = new java.util.EnumMap<>(Aspects.Type.class);
+        mine.put(minor, 0.5);
+        Aspects.setCustomCaps(mine);
+        near("a ceiling the reader tightened is the one in force", 0.5,
+            Aspects.capOf(minor), 1e-9);
+
+        // <b>Which is the point: the cap decides, not the bodies.</b> Two luminaries allow ten
+        // degrees between them; a semisextile at half a degree has to override that.
+        near("and it caps the pair, not the other way round", 0.5,
+            Aspects.effectiveOrb("Sun", "Moon", minor, false), 1e-9);
+        ok("while an uncapped aspect is still the bodies' to decide",
+            Aspects.effectiveOrb("Sun", "Moon", major, false) > 1.0);
+
+        // <b>And it decides what IS the aspect, not only how wide one may be.</b> typeWithin
+        // is what turns a separation into an aspect; a ceiling that reached effectiveOrb and
+        // not that would narrow what gets reported while leaving what gets detected alone, so
+        // the reader would see the old aspects listed at the new width. Mutation-tested on
+        // 2026-09-24: reading the declared field here instead of the ceiling in force
+        // <b>survived</b> every other assertion in this part.
+        near("the aspect is still found inside the tightened ceiling", 30.0,
+            Aspects.Type.SEMISEXTILE.exactAngle, 1e-9);
+        ok("a separation inside the tightened ceiling is still that aspect",
+            Aspects.typeWithin(30.3, "Sun", "Moon", 10.0) == minor);
+        ok("and one outside it is no longer that aspect",
+            Aspects.typeWithin(30.8, "Sun", "Moon", 10.0) != minor);
+
+        // <b>Narrowing does not change what kind of aspect it is.</b>
+        ok("a tightened aspect is still the same family", minor.isMinor());
+        ok("and a Ptolemaic one is still uncapped", !major.isMinor());
+
+        // <b>A ceiling on an uncapped aspect is refused.</b> Its width is the bodies', which
+        // H1's first half already made the reader's - two controls over one number would be
+        // free to disagree. The bound test alone would have let this through: an uncapped
+        // aspect's default is Double.MAX_VALUE, so every finite value is under it.
+        Map<Aspects.Type, Double> onMajor = new java.util.EnumMap<>(Aspects.Type.class);
+        onMajor.put(major, 3.0);
+        Aspects.setCustomCaps(onMajor);
+        ok("a ceiling on a Ptolemaic aspect is refused", Aspects.customCaps().isEmpty());
+        ok("and it stays uncapped", Double.isInfinite(Aspects.capOf(major))
+            || Aspects.capOf(major) == Double.MAX_VALUE);
+
+        // <b>Widened is refused too.</b> Only tightening, or the ceiling stops being one.
+        Map<Aspects.Type, Double> wider = new java.util.EnumMap<>(Aspects.Type.class);
+        wider.put(minor, Aspects.defaultCapOf(minor) + 4.0);
+        Aspects.setCustomCaps(wider);
+        near("a ceiling wider than the declared one is refused", Aspects.defaultCapOf(minor),
+            Aspects.capOf(minor), 1e-9);
+
+        Aspects.setCustomCaps(null);
+        near("clearing puts the declared ceiling back", Aspects.defaultCapOf(minor),
+            Aspects.capOf(minor), 1e-9);
+
+        // ---- and the same through Settings
+        Settings.resetAspectCaps();
+        ok("a fresh install has no ceilings of its own", Settings.aspectCaps().isEmpty());
+        Settings.setAspectCap(minor, 0.5);
+        near("what was set comes back", 0.5, Settings.aspectCap(minor), 1e-9);
+        near("and is in force at once", 0.5, Aspects.capOf(minor), 1e-9);
+        Settings.setAspectCap(major, 2.0);
+        ok("an uncapped aspect cannot be given one from the screen either",
+            Settings.aspectCaps().size() == 1);
+        Settings.setAspectCap(minor, Aspects.defaultCapOf(minor));
+        ok("putting it back to the declared ceiling forgets the setting",
+            Settings.aspectCaps().isEmpty());
+        Settings.resetAspectCaps();
     }
 
     private static void part(String title, Runnable body) {
