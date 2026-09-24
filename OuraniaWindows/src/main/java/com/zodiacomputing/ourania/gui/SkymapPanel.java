@@ -4486,6 +4486,11 @@ extends JPanel {
         final double d4 = bl ? outerFrom.sd.getJulDay() : Double.NaN;
         final double d5 = outerFrom.latitude;
         final double d6 = outerFrom.longitude;
+        // <b>The moment the reading is being made at, which exists whatever rings are drawn.</b>
+        // skyRing carries one in every mode and updateChartData defaults it to now. The
+        // chronometry below needs this and not the transit wheel's.
+        final double dNow = this.skyRing.sd != null
+            ? this.skyRing.sd.getJulDay() : Double.NaN;
         new SwingWorker<String, Void>(){
 
             @Override
@@ -4500,14 +4505,33 @@ extends JPanel {
                 List<Transits.Hit> list2 = null;
                 YearScan yearScan = null;
                 List<Convergence.Target> list3 = null;
+                // <b>The profection is not a transit and does not wait for one.</b> It is
+                // age in years to a house, wanting a birth date and a moment - and the moment is
+                // now, which the app always knows. This sat inside the branch below because its
+                // "now" was read off the transit wheel's Julian day, so a Single Chart, which
+                // has no outer wheel at all, reported no chronometry and blamed transits for it.
+                // David, 2026-09-23, on Synthesize saying transits were off with transits on -
+                // this is the other half of what he was looking at.
+                //
+                // <b>One moment, and it is now.</b> An earlier version fell back to the
+                // transit wheel's moment when the sky had none, which cannot happen -
+                // updateChartData gives skyRing a moment in every mode - and left a seam where
+                // the chronometry could be pointed back at the transit wheel, which is the bug
+                // this is fixing. No check on this side can catch that: the worker is private
+                // and wants a window, so AspectGridCheck reaches generateReport directly and
+                // never sees which moment was passed. Mutation-tested on 2026-09-23 and it
+                // survived. Taking the alternative away is worth more than naming the rule.
+                if (!Double.isNaN(dNow)) {
+                    profection = Profection.at(d, dNow, chartFrame.asc);
+                    ChartFrame.Body theSun = chartFrame.body("Sun");
+                    if (theSun != null && theSun.ok) {
+                        double d7 = Profection.solarReturnJd(SkymapPanel.this.sw, d, theSun.lon,
+                            profection.age);
+                        profection.computeSubPeriods(dNow, d7);
+                    }
+                }
                 if (bl) {
                     chartFrame2 = ChartFrame.compute(SkymapPanel.this.sw, d4, d5, d6, c, false, 0.0);
-                    profection = Profection.at(d, d4, chartFrame.asc);
-                    object = chartFrame.body("Sun");
-                    if (object != null && ((ChartFrame.Body)object).ok) {
-                        double d7 = Profection.solarReturnJd(SkymapPanel.this.sw, d, ((ChartFrame.Body)object).lon, profection.age);
-                        profection.computeSubPeriods(d4, d7);
-                    }
                     list2 = Transits.toNatal(chartFrame, chartFrame2, list, profection.lord);
                     if (readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
                         yearScan = SkymapPanel.scanProfectionYear(chartFrame, d, d4, profection, list, d2, d3, c);

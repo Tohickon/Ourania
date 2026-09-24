@@ -262,12 +262,16 @@ public class NarrativeSynthesizer {
         sb.append("<h2 style='color: #FFD700;'>4. Current Chronometry</h2>");
         if (relationship) {
             sb.append("<p><i>A profection year and a solar return are keyed to a birthday - an age in years, and the Sun's return to its natal degree. A composite has no birthday: its moment is the midpoint of two births, so an &quot;age&quot; here would be the average of the partners' ages rather than the age of the relationship. Transits to the composite are shown below instead, which is the standard timing technique for a relationship chart.</i></p>");
-        } else if (withTime && prof != null) {
+        } else if (prof != null) {
             sb.append("<p>You are currently in a <b>House ").append(prof.house).append(" Profection (").append(prof.sign).append(")</b> at age ").append(prof.age).append(". ");
             sb.append("The structural focus of your year shifts to the ").append(prof.house).append("th House, ruled by <b>").append(prof.lord).append("</b>. ");
             sb.append("As the 'Lord of the Year', themes surrounding this planet are paramount.</p>");
         } else {
-            sb.append("<p><i>Transit data not enabled to calculate current chronometry. Enable transits to see Time Layers.</i></p>");
+            // <b>Names what is actually absent.</b> This said "Transit data not enabled",
+            // which was never the condition it tested and is not the condition now: a profection
+            // wants a birth moment to count an age from, and transits have nothing to do with
+            // it. The two sections further down do need transits and say so on their own.
+            sb.append("<p><i>No birth moment to count a profection from, so there is no age and no Lord of the Year.</i></p>");
         }
 
         // 5. Complex Geometric Circuitry

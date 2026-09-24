@@ -1086,6 +1086,20 @@ public final class AspectGridCheck {
                         html.contains("Profection (") && html.contains("at age"));
                 }
 
+                // <b>And reaches it with no transit ring at all.</b> A profection is age in
+                // years to a house: it wants a birth moment and nothing else, and the reading
+                // gated it behind a transit wheel existing because that is where its "now" was
+                // read from. A Single Chart therefore reported no chronometry and named
+                // transits as the reason. Asserted with a profection supplied and every transit
+                // argument null, which is the shape the old code could not print.
+                if (!rel) {
+                    Profection lone = Profection.at(baseJd, jdNow, f.asc);
+                    String noRing = NarrativeSynthesizer.generateReport(
+                        f, g, ranked, themes, null, lone, null, null, null, false, false);
+                    ok("Part Q: " + label + " reads the chronometry with no transit ring",
+                        noRing.contains("Profection (") && noRing.contains("at age"));
+                }
+
                 // <b>A relationship reading must not invent an age.</b> A composite has no
                 // birthday, so a profection age is the mean of the partners' ages printed
                 // as the age of the pairing - 41 and 59 came out as 50. Transits stay: they
