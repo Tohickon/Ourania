@@ -1030,7 +1030,9 @@ public final class AspectGridCheck {
                     ChartFrame.Body sun = f.body("Sun");
                     if (sun != null && sun.ok) {
                         double sr = Profection.solarReturnJd(sw, baseJd, sun.lon, prof.age);
-                        prof.computeSubPeriods(jdNow, sr);
+                        double srNext = Profection.solarReturnJd(sw, baseJd, sun.lon,
+                            prof.age + 1);
+                        prof.computeSubPeriods(jdNow, sr, srNext);
                     }
                     hits = Transits.toNatal(f, tf, ranked, prof.lord);
                 }
@@ -1098,6 +1100,39 @@ public final class AspectGridCheck {
                         f, g, ranked, themes, null, lone, null, null, null, false, false);
                     ok("Part Q: " + label + " reads the chronometry with no transit ring",
                         noRing.contains("Profection (") && noRing.contains("at age"));
+
+                    // <b>The sign, not its index.</b> This line printed prof.sign, an int, so it
+                    // read "Profection (4)" - a number where a sign belongs, for as long as the
+                    // section has existed.
+                    ok("Part Q: " + label + " names the profected sign rather than numbering it",
+                        !noRing.contains("Profection (0)") && !noRing.contains("Profection (1)")
+                            && !noRing.contains("Profection (2)")
+                            && !noRing.contains("Profection (3)"));
+
+                    // <b>Master list F6: the door.</b> The monthly and daily profections were
+                    // computed and never shown. With the sub-periods filled the section has to
+                    // carry both, and without them it must not pretend to.
+                    ok("Part Q: " + label + " shows no sub-periods before they are computed",
+                        !noRing.contains("the <b>month</b> profects"));
+                    ChartFrame.Body theSun = f.body("Sun");
+                    if (theSun != null && theSun.ok) {
+                        double r0 = Profection.solarReturnJd(sw, baseJd, theSun.lon, lone.age);
+                        double r1 = Profection.solarReturnJd(sw, baseJd, theSun.lon, lone.age + 1);
+                        lone.computeSubPeriods(jdNow, r0, r1);
+                        String withSub = NarrativeSynthesizer.generateReport(
+                            f, g, ranked, themes, null, lone, null, null, null, false, false);
+                        ok("Part Q: " + label + " shows the monthly profection",
+                            withSub.contains("the <b>month</b> profects to")
+                                && withSub.contains(NarrativeSynthesizer.signName(
+                                    lone.monthlySign)));
+                        ok("Part Q: " + label + " and the daily one",
+                            withSub.contains("the <b>day</b> to")
+                                && withSub.contains(NarrativeSynthesizer.signName(
+                                    lone.dailySign)));
+                        ok("Part Q: " + label + " with the ruler of each",
+                            withSub.contains(lone.monthlyLord)
+                                && withSub.contains(lone.dailyLord));
+                    }
                 }
 
                 // <b>A relationship reading must not invent an age.</b> A composite has no

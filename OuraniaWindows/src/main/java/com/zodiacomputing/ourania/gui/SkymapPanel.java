@@ -4527,7 +4527,12 @@ extends JPanel {
                     if (theSun != null && theSun.ok) {
                         double d7 = Profection.solarReturnJd(SkymapPanel.this.sw, d, theSun.lon,
                             profection.age);
-                        profection.computeSubPeriods(dNow, d7);
+                        // The year this chart actually has, not a mean one - see
+                        // computeSubPeriods for the thirteenth month that came of a round
+                        // number. One more root-find, once per reading.
+                        double d8 = Profection.solarReturnJd(SkymapPanel.this.sw, d, theSun.lon,
+                            profection.age + 1);
+                        profection.computeSubPeriods(dNow, d7, d8);
                     }
                 }
                 if (bl) {

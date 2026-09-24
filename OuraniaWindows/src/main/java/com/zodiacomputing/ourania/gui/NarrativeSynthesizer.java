@@ -12,6 +12,7 @@ import com.zodiacomputing.ourania.astro.Profection;
 import com.zodiacomputing.ourania.astro.Sect;
 import com.zodiacomputing.ourania.astro.Themes;
 import com.zodiacomputing.ourania.astro.Topics;
+import de.thmac.swisseph.SweDate;
 import com.zodiacomputing.ourania.astro.TransferOfLight;
 import com.zodiacomputing.ourania.astro.Transits;
 import com.zodiacomputing.ourania.astro.Zodiac;
@@ -36,6 +37,28 @@ public class NarrativeSynthesizer {
     }
 
     /** Natal voice. Kept so every pre-2026-08-31 caller compiles unchanged. */
+    /** A sign index as its name, capitalised. Out of range reads as unknown rather than throwing. */
+    static String signName(int sign) {
+        if (sign < 0 || sign >= Zodiac.SIGNS.length) {
+            return "unknown";
+        }
+        String s = Zodiac.SIGNS[sign];
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    /** " until 3 October", or nothing at all when the period has no end recorded. */
+    static String until(double jd) {
+        if (Double.isNaN(jd)) {
+            return "";
+        }
+        SweDate d = new SweDate(jd);
+        return String.format(" until %d %s", d.getDay(), MONTHS[Math.max(1,
+            Math.min(12, d.getMonth())) - 1]);
+    }
+
+    private static final String[] MONTHS = {"January", "February", "March", "April", "May",
+        "June", "July", "August", "September", "October", "November", "December"};
+
     public static String generateReport(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked, Themes.Result t, ChartFrame tf, Profection prof, List<Transits.Hit> hits, YearScan scan, List<Convergence.Target> convergence, boolean withTime) {
         return generateReport(f, g, ranked, t, tf, prof, hits, scan, convergence, withTime, false);
     }
@@ -263,9 +286,37 @@ public class NarrativeSynthesizer {
         if (relationship) {
             sb.append("<p><i>A profection year and a solar return are keyed to a birthday - an age in years, and the Sun's return to its natal degree. A composite has no birthday: its moment is the midpoint of two births, so an &quot;age&quot; here would be the average of the partners' ages rather than the age of the relationship. Transits to the composite are shown below instead, which is the standard timing technique for a relationship chart.</i></p>");
         } else if (prof != null) {
-            sb.append("<p>You are currently in a <b>House ").append(prof.house).append(" Profection (").append(prof.sign).append(")</b> at age ").append(prof.age).append(". ");
-            sb.append("The structural focus of your year shifts to the ").append(prof.house).append("th House, ruled by <b>").append(prof.lord).append("</b>. ");
+            // <b>The sign, not its index.</b> This printed prof.sign, which is an int, so the
+            // line read "House 5 Profection (4)" - a number where a sign belongs. Profection's
+            // own toString had always named it properly; this was the one place that did not.
+            sb.append("<p>You are currently in a <b>House ").append(prof.house)
+                .append(" Profection (").append(signName(prof.sign)).append(")</b> at age ")
+                .append(prof.age).append(". ");
+            sb.append("The structural focus of your year shifts to the ").append(prof.house)
+                .append("th House, ruled by <b>").append(prof.lord).append("</b>. ");
             sb.append("As the 'Lord of the Year', themes surrounding this planet are paramount.</p>");
+
+            // <b>Master list F6.</b> The engine has computed the monthly and daily profections
+            // for as long as the annual one, and nothing has ever shown them - which is the
+            // whole of what that item is. The year divides into twelve and each month again, so
+            // these are the same technique at two shorter scales: the month names where the
+            // year's theme is being worked out now, and the day is the finest the method goes.
+            if (prof.monthlyLord != null && prof.dailyLord != null) {
+                sb.append("<p>Within that year, the <b>month</b> profects to <b>")
+                    .append(signName(prof.monthlySign)).append("</b>, ruled by <b>")
+                    .append(prof.monthlyLord).append("</b>")
+                    .append(until(prof.monthlyUntil))
+                    .append("; and the <b>day</b> to <b>").append(signName(prof.dailySign))
+                    .append("</b>, ruled by <b>").append(prof.dailyLord).append("</b>")
+                    .append(until(prof.dailyUntil)).append(".</p>");
+                sb.append("<p><i>The year divides into twelve and each month into twelve again, "
+                    + "against this chart's own solar return year rather than a round number - "
+                    + "so a profected month here is about ")
+                    .append(String.format("%.1f", prof.monthLength))
+                    .append(" days and a profected day about ")
+                    .append(String.format("%.1f", prof.monthLength / 12.0))
+                    .append(".</i></p>");
+            }
         } else {
             // <b>Names what is actually absent.</b> This said "Transit data not enabled",
             // which was never the condition it tested and is not the condition now: a profection
