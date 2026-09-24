@@ -36,7 +36,7 @@ public final class NavigationCheck {
      */
     private static final String[] SCREENS = {
         "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH", "RETURNS", "TRANSIT_CALENDAR",
-        "DIAL", "SKY_VIEW", "SETTINGS",
+        "DIAL", "SKY_VIEW", "HORARY", "SETTINGS",
     };
 
     private static final List<String> failures = new ArrayList<>();

@@ -72,6 +72,9 @@ public final class SidePanel extends JPanel {
             "Chart A's month, each day shaded by the transits in orb and those going exact"},
         {"Dial", "DIAL",
             "The 90, 45 and 22.5 degree dials: hard aspects and midpoint pictures under one pointer"},
+        {"Horary", "HORARY",
+            "A question answered by the chart of the moment it is asked: the two significators, "
+            + "whether the chart may be judged at all, and the verdict with its reasons in order"},
         {"Settings", "SETTINGS",
             "Which points the chart shows, house system defaults and the rest"},
     };
