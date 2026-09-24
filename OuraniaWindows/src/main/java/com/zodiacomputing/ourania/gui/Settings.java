@@ -906,8 +906,9 @@ public final class Settings {
      * H1's other half: the ceiling each capped aspect is judged under.
      *
      * <b>Keyed by the enum's own name</b>, which is as stable as a registry id and is the only
-     * name these have. Only the six capped aspects can appear: the Ptolemaic five take their
-     * width from the bodies, which the widths above already put in the reader's hands.
+     * name these have. All fifteen may appear since 2026-09-24: the points set the width and the
+     * aspect sets a ceiling over it, and a Ptolemaic aspect's default ceiling is
+     * {@code Aspects.MAX_BODY_ORB}, which cannot bind.
      */
     public static final String ASPECT_CAP_PREFIX = "orb.aspect.";
 
@@ -918,9 +919,11 @@ public final class Settings {
             new java.util.EnumMap<>(com.zodiacomputing.ourania.astro.Aspects.Type.class);
         for (com.zodiacomputing.ourania.astro.Aspects.Type t
                 : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
-            if (!t.isMinor()) {
-                continue;
-            }
+            // <b>No family test here.</b> There was one, and it was the third copy of a rule
+            // that Aspects.setCustomCaps and setAspectCap also carried - OrbCheck found this
+            // one after the other two had been changed, which is what a check earns its keep
+            // for. The bound below is the whole rule: a value between MIN_BODY_ORB and this
+            // aspect's own default, which is finite for all fifteen now.
             String raw = get(ASPECT_CAP_PREFIX + t.name(), "").trim();
             if (raw.isEmpty()) {
                 continue;
@@ -945,10 +948,17 @@ public final class Settings {
             : com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t);
     }
 
-    /** Narrow one aspect's ceiling and put it in force, as the body widths are. */
+    /**
+     * Narrow one aspect's ceiling and put it in force, as the body widths are.
+     *
+     * <b>Every aspect, not only the six minors.</b> David, 2026-09-24: the orb belongs beside
+     * the aspect, and all fifteen have one now. A Ptolemaic aspect's default is
+     * {@code Aspects.MAX_BODY_ORB}, which cannot bind, so leaving one alone is the same as
+     * having no ceiling - and the clamp below still refuses to lift any of them.
+     */
     public static void setAspectCap(com.zodiacomputing.ourania.astro.Aspects.Type t,
                                     double degrees) {
-        if (t == null || !t.isMinor()) {
+        if (t == null) {
             return;
         }
         double built = com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t);

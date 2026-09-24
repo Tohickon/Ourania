@@ -27,6 +27,19 @@ public class SettingsPanel extends JPanel {
     /** The aspect boxes, so a change to any one can write the whole set. */
     private JCheckBox[] aspectBoxRefs;
 
+    /**
+     * One ceiling spinner an aspect, indexed by {@link Aspects.Type#ordinal}.
+     *
+     * <b>Beside the aspect rather than in a table of its own.</b> David, 2026-09-24: the width
+     * belongs next to the tick and the colour chip, because the three are one decision about one
+     * aspect. H1 built the six capped ones as a separate grid lower down the screen, which meant
+     * reading a name in one place and setting its number in another.
+     *
+     * <b>Held as a field because the Reset button is elsewhere.</b> It sits with the point widths
+     * in {@link #natalOrbs}, since it puts both sets back.
+     */
+    private javax.swing.JSpinner[] aspectCapSpinners;
+
     /** True while every aspect box is being set at once. See aspectBulkButton. */
     private boolean aspectBulkUpdate;
 
@@ -612,10 +625,22 @@ public class SettingsPanel extends JPanel {
         boolean[] on = Settings.loadAspectSelection();
         aspectBoxRefs = new JCheckBox[Aspects.Type.values().length];
 
-        JPanel panel = new JPanel(new GridLayout(0, 3, 8, 2));
+        aspectCapSpinners = new javax.swing.JSpinner[Aspects.Type.values().length];
+
+        // <b>One GridBag, three aspects across, three columns each.</b> A GridLayout of
+        // FlowLayouts put every spinner at the end of a label of a different length, and the
+        // widths then read as a ragged edge - which is no use to a reader comparing them, and
+        // comparing them is what this control is for. Nine grid columns, five rows.
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Theme.SURFACE);
         panel.setBorder(Theme.card(Theme.EDGE, Theme.GAP_L));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.anchor = GridBagConstraints.WEST;
+        gc.fill = GridBagConstraints.NONE;
+        gc.insets = new Insets(1, 0, 1, 6);
+        int across = 3;
+        int seen = 0;
 
         for (final Aspects.Type t : Aspects.Type.values()) {
             final JCheckBox box = new JCheckBox(t.label, on[t.ordinal()]);
@@ -631,19 +656,81 @@ public class SettingsPanel extends JPanel {
             box.addItemListener(e -> saveAspects());
             aspectBoxRefs[t.ordinal()] = box;
 
-            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
-            row.setBackground(Theme.SURFACE);
-            row.add(chip(() -> ChartPalette.colorFor(t.label),
+            gc.gridy = seen / across;
+            int base = (seen % across) * 3;
+            seen++;
+
+            gc.gridx = base;
+            panel.add(chip(() -> ChartPalette.colorFor(t.label),
                 hex -> ChartPalette.setOverride(t.label, hex),
                 t.label + " colour",
                 "<html>The colour " + t.label + " is drawn in."
                     + "<br>Click to choose another; right-click to go back to the "
                     + "template.</html>",
-                () -> box.setForeground(ChartPalette.colorFor(t.label))));
-            row.add(box);
-            panel.add(row);
+                () -> box.setForeground(ChartPalette.colorFor(t.label))), gc);
+            gc.gridx = base + 1;
+            panel.add(box, gc);
+            gc.gridx = base + 2;
+            gc.insets = new Insets(1, 0, 1, 18);
+            panel.add(capSpinner(t), gc);
+            gc.insets = new Insets(1, 0, 1, 6);
         }
         return panel;
+    }
+
+    /**
+     * The orb spinner beside one aspect: the ceiling it is judged under.
+     *
+     * <b>A ceiling over the points' width, not a second copy of it.</b> A pair is judged at the
+     * wider of its two points - that is the H1 grid lower down - and this is the most that width
+     * may reach for this aspect. Narrowing it is the only direction: {@code Settings.setAspectCap}
+     * clamps, and {@code Aspects.setCustomCaps} refuses outright, which is the same split between
+     * screen and engine the point widths use.
+     *
+     * <b>The Ptolemaic five sit at {@code MAX_BODY_ORB} by default and do not bind there.</b> No
+     * point may be set wider than that, so leaving one alone is the same as the ceiling it never
+     * had. {@code OrbCheck} walks every ordered pair to hold that, because it is the whole reason
+     * the five could be given a number at all.
+     */
+    private javax.swing.JSpinner capSpinner(final Aspects.Type t) {
+        final javax.swing.JSpinner s = new javax.swing.JSpinner(
+            new javax.swing.SpinnerNumberModel(Settings.aspectCap(t),
+                Aspects.MIN_BODY_ORB, Aspects.defaultCapOf(t), 0.25));
+        s.setToolTipText("<html><b>" + t.label + "</b> orb, in degrees"
+            + "<br>The most a pair may be apart and still count as this aspect."
+            + "<br>Built in at " + Aspects.defaultCapOf(t) + "&deg;, and may only be tightened."
+            + (t.isMinor()
+                ? "<br><br>A minor aspect carries its own narrow ceiling."
+                : "<br><br>A Ptolemaic aspect takes its width from the two points"
+                    + "<br>(Natal Orbs, below). At " + Aspects.MAX_BODY_ORB
+                    + "&deg; this cannot bind,<br>because no point may be set wider.")
+            + "</html>");
+        java.awt.Dimension size = new java.awt.Dimension(64, s.getPreferredSize().height);
+        s.setPreferredSize(size);
+        s.setMaximumSize(size);
+        s.addChangeListener(e -> {
+            Settings.setAspectCap(t, ((Number) s.getValue()).doubleValue());
+            markCapChanged(s, t);
+            status.setText("Saved");
+            if (window != null) {
+                window.applyBodySelection();
+            }
+        });
+        markCapChanged(s, t);
+        aspectCapSpinners[t.ordinal()] = s;
+        return s;
+    }
+
+    /** Bold while an aspect is not at its built-in ceiling, as the point widths are. */
+    private void markCapChanged(javax.swing.JSpinner spinner, Aspects.Type t) {
+        boolean changed = Math.abs(Settings.aspectCap(t) - Aspects.defaultCapOf(t)) > 1e-9;
+        java.awt.Component editor = spinner.getEditor();
+        if (editor instanceof javax.swing.JSpinner.DefaultEditor) {
+            javax.swing.JTextField field =
+                ((javax.swing.JSpinner.DefaultEditor) editor).getTextField();
+            field.setFont(field.getFont().deriveFont(changed ? java.awt.Font.BOLD
+                : java.awt.Font.PLAIN));
+        }
     }
 
     /**
@@ -1294,6 +1381,9 @@ public class SettingsPanel extends JPanel {
             + "at the wider of its two points, and each aspect keeps its own ceiling over that - "
             + "so widening Pluto does not widen a semisextile. Cross-chart readings halve it. "
             + "Bold means you have changed it."));
+        p.add(note("These are the natal widths: the wheel, the aspect grid and the readings. "
+            + "Transits are judged on one flat orb instead, set under Transits & Progressions - "
+            + "though the aspect ceilings above do reach transits."));
         p.add(Box.createRigidArea(new Dimension(0, 10)));
 
         JPanel grid = new JPanel(new java.awt.GridLayout(0, 4, 14, 4));
@@ -1336,50 +1426,12 @@ public class SettingsPanel extends JPanel {
         p.add(grid);
         p.add(Box.createRigidArea(new Dimension(0, 14)));
 
-        // <b>Only the aspects that have a ceiling.</b> The Ptolemaic five are uncapped because
-        // their width comes from the bodies, which the grid above already sets - a ceiling here
-        // would be a second control over one number, free to disagree with the first.
-        p.add(note("The six capped aspects may be tightened below their built-in ceiling. The "
-            + "Ptolemaic five have none: their width is the bodies' above."));
-        p.add(Box.createRigidArea(new Dimension(0, 6)));
-
-        JPanel capGrid = new JPanel(new java.awt.GridLayout(0, 4, 14, 4));
-        capGrid.setBackground(Color.BLACK);
-        capGrid.setAlignmentX(Component.LEFT_ALIGNMENT);
-        final java.util.List<javax.swing.JSpinner> capSpinners = new java.util.ArrayList<>();
-        final java.util.List<com.zodiacomputing.ourania.astro.Aspects.Type> capTypes =
-            new java.util.ArrayList<>();
-        for (com.zodiacomputing.ourania.astro.Aspects.Type t
-                : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
-            if (!t.isMinor()) {
-                continue;
-            }
-            final com.zodiacomputing.ourania.astro.Aspects.Type type = t;
-            JPanel cell = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
-            cell.setBackground(Color.BLACK);
-            JLabel l = new JLabel(t.label + " ");
-            l.setForeground(TEXT);
-            final javax.swing.JSpinner s = new javax.swing.JSpinner(
-                new javax.swing.SpinnerNumberModel(Settings.aspectCap(t),
-                    com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB,
-                    com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t), 0.25));
-            s.setToolTipText("<html><b>" + t.label + "</b><br>Built in at "
-                + com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t)
-                + "&deg;, and may only be tightened.</html>");
-            s.addChangeListener(e -> {
-                Settings.setAspectCap(type, ((Number) s.getValue()).doubleValue());
-                status.setText("Saved");
-                if (window != null) {
-                    window.applyBodySelection();
-                }
-            });
-            cell.add(l);
-            cell.add(s);
-            capGrid.add(cell);
-            capSpinners.add(s);
-            capTypes.add(t);
-        }
-        p.add(capGrid);
+        // <b>The ceilings are not here.</b> Each one sits beside its own aspect, up in the
+        // aspect list - David, 2026-09-24 - because the tick, the colour and the width are one
+        // decision about one aspect. What is left here is the half that is about a point.
+        p.add(note("Each aspect's own ceiling is the spinner beside it in the aspect list above. "
+            + "A Ptolemaic aspect sits at " + com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB
+            + "\u00b0 there, which cannot bind, so its width is whatever the two points allow."));
         p.add(Box.createRigidArea(new Dimension(0, 8)));
 
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -1394,8 +1446,16 @@ public class SettingsPanel extends JPanel {
                 spinners.get(i).setValue(Settings.bodyOrb(names.get(i)));
                 markChanged(labels.get(i), names.get(i));
             }
-            for (int i = 0; i < capSpinners.size(); i++) {
-                capSpinners.get(i).setValue(Settings.aspectCap(capTypes.get(i)));
+            if (aspectCapSpinners != null) {
+                for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                        : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+                    javax.swing.JSpinner s = aspectCapSpinners[t.ordinal()];
+                    if (s == null) {
+                        continue;
+                    }
+                    s.setValue(Settings.aspectCap(t));
+                    markCapChanged(s, t);
+                }
             }
             status.setText("Saved");
             if (window != null) {

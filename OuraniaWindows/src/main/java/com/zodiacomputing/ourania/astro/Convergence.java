@@ -629,6 +629,24 @@ public final class Convergence {
         if (w.aspect == null || Double.isNaN(w.offBy)) {
             return 1.0;
         }
+
+        // <b>Only an aspect with a ceiling of its own is scored against one.</b> The javadoc
+        // above says what this is for: a minor aspect sitting at the edge of its own narrow cap
+        // should not count as much as an exact one. A Ptolemaic aspect has no such cap - its
+        // width is the two bodies' - so it keeps full precision, which is what this method has
+        // always done.
+        //
+        // <b>It used to do it by accident.</b> capOf returned Double.MAX_VALUE for an uncapped
+        // aspect, so offBy/max was zero and precision came out at 1.0. On 2026-09-24 the five
+        // were given a default of MAX_BODY_ORB, because a spinner beside each aspect cannot
+        // show infinity - and that silently turned this into a real division, docking every
+        // Ptolemaic witness a fifteenth of its weight for each degree off exact. That is a
+        // change to how themes converge, it was nobody's intention, and no measurement was made
+        // to support it. The rule is written out here so it no longer rests on a sentinel.
+        if (!w.aspect.isMinor()) {
+            return 1.0;
+        }
+
         // The ceiling actually in force, so a narrowed aspect scores its precision
         // against the width it was judged at rather than the built-in one.
         double max = Aspects.capOf(w.aspect);

@@ -197,8 +197,17 @@ public final class OrbCheck {
 
         Aspects.Type minor = Aspects.Type.SEMISEXTILE;
         Aspects.Type major = Aspects.Type.TRINE;
-        ok("a minor aspect has a ceiling", minor.isMinor());
+        ok("a minor aspect declares a ceiling of its own", minor.isMinor());
         ok("and a Ptolemaic one does not", !major.isMinor());
+
+        // <b>But it still has a default, and the default is a number.</b> David, 2026-09-24:
+        // every aspect carries an orb beside it on the screen, and a spinner cannot show
+        // Double.MAX_VALUE. MAX_BODY_ORB is what "no ceiling" is written as.
+        ok("a Ptolemaic aspect's default ceiling is a real number, not infinity",
+            !Double.isInfinite(Aspects.defaultCapOf(major))
+                && Aspects.defaultCapOf(major) < Double.MAX_VALUE);
+        near("and it is the widest a point may be set to", Aspects.MAX_BODY_ORB,
+            Aspects.defaultCapOf(major), 1e-9);
         near("an untouched ceiling is the declared one", Aspects.defaultCapOf(minor),
             Aspects.capOf(minor), 1e-9);
 
@@ -230,18 +239,48 @@ public final class OrbCheck {
 
         // <b>Narrowing does not change what kind of aspect it is.</b>
         ok("a tightened aspect is still the same family", minor.isMinor());
-        ok("and a Ptolemaic one is still uncapped", !major.isMinor());
+        ok("and a Ptolemaic one is still a Ptolemaic one", !major.isMinor());
 
-        // <b>A ceiling on an uncapped aspect is refused.</b> Its width is the bodies', which
-        // H1's first half already made the reader's - two controls over one number would be
-        // free to disagree. The bound test alone would have let this through: an uncapped
-        // aspect's default is Double.MAX_VALUE, so every finite value is under it.
+        // <b>A Ptolemaic aspect takes a ceiling now, and it binds.</b> Before 2026-09-24 one
+        // was refused, on the grounds that its width was the bodies' and a second control over
+        // one number would be free to disagree. David's answer is that they are not two controls
+        // over one number: the points set the width and the aspect sets a ceiling over it, which
+        // is exactly what the six minors always did.
         Map<Aspects.Type, Double> onMajor = new java.util.EnumMap<>(Aspects.Type.class);
         onMajor.put(major, 3.0);
         Aspects.setCustomCaps(onMajor);
-        ok("a ceiling on a Ptolemaic aspect is refused", Aspects.customCaps().isEmpty());
-        ok("and it stays uncapped", Double.isInfinite(Aspects.capOf(major))
-            || Aspects.capOf(major) == Double.MAX_VALUE);
+        near("a ceiling on a Ptolemaic aspect is kept", 3.0, Aspects.capOf(major), 1e-9);
+        near("and it caps the pair below what the bodies allow", 3.0,
+            Aspects.effectiveOrb("Sun", "Moon", major, false), 1e-9);
+        ok("and one outside it is no longer that aspect",
+            Aspects.typeWithin(124.0, "Sun", "Moon", 10.0) != major);
+
+        // <b>Lifting one is still refused.</b> MAX_BODY_ORB is a bound now, not a formality -
+        // this is the assertion that would have caught H1's hole, where an uncapped aspect's
+        // default of Double.MAX_VALUE admitted every finite value the guard was meant to stop.
+        Map<Aspects.Type, Double> liftMajor = new java.util.EnumMap<>(Aspects.Type.class);
+        liftMajor.put(major, Aspects.MAX_BODY_ORB + 5.0);
+        Aspects.setCustomCaps(liftMajor);
+        ok("a Ptolemaic ceiling above the widest a point may be is refused",
+            Aspects.customCaps().isEmpty());
+
+        // <b>And the default cannot bind, which is the whole case for the number.</b> Walked
+        // over every ordered pair rather than argued: no point may be set wider than
+        // MAX_BODY_ORB and orbFor is the wider of two points, so capping there is the width.
+        Aspects.setCustomCaps(null);
+        int pairs = 0;
+        boolean everNarrowed = false;
+        for (int i = 0; i < Bodies.count(); i++) {
+            for (int j = 0; j < Bodies.count(); j++) {
+                double width = Aspects.orbFor(Bodies.at(i).name, Bodies.at(j).name);
+                if (Math.min(width, Aspects.defaultCapOf(major)) < width - 1e-9) {
+                    everNarrowed = true;
+                }
+                pairs++;
+            }
+        }
+        ok("every ordered pair was walked, so the claim below is not vacuous", pairs > 100);
+        ok("a Ptolemaic aspect at its default ceiling narrows no pair at all", !everNarrowed);
 
         // <b>Widened is refused too.</b> Only tightening, or the ceiling stops being one.
         Map<Aspects.Type, Double> wider = new java.util.EnumMap<>(Aspects.Type.class);
@@ -261,7 +300,11 @@ public final class OrbCheck {
         near("what was set comes back", 0.5, Settings.aspectCap(minor), 1e-9);
         near("and is in force at once", 0.5, Aspects.capOf(minor), 1e-9);
         Settings.setAspectCap(major, 2.0);
-        ok("an uncapped aspect cannot be given one from the screen either",
+        ok("a Ptolemaic aspect can be given one from the screen too",
+            Settings.aspectCaps().size() == 2);
+        near("and it is in force at once", 2.0, Aspects.capOf(major), 1e-9);
+        Settings.setAspectCap(major, Aspects.defaultCapOf(major));
+        ok("putting it back to its default forgets that one",
             Settings.aspectCaps().size() == 1);
         Settings.setAspectCap(minor, Aspects.defaultCapOf(minor));
         ok("putting it back to the declared ceiling forgets the setting",

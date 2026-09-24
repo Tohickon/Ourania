@@ -292,21 +292,46 @@ public final class Aspects {
             return Double.MAX_VALUE;
         }
         Double mine = CUSTOM_CAPS.get(t);
-        return mine != null ? mine : t.maxOrb;
+        return mine != null ? mine : defaultCapOf(t);
     }
 
-    /** The built-in ceiling, whatever the reader has done to it. */
+    /**
+     * The built-in ceiling, whatever the reader has done to it.
+     *
+     * <b>The Ptolemaic five default to {@link #MAX_BODY_ORB}, not to infinity.</b> They carry no
+     * ceiling in the tradition - their width is the bodies' - but "no ceiling" has to be a number
+     * a reader can see and set, now that every aspect has a spinner of its own (David,
+     * 2026-09-24). Fifteen degrees is that number, and it is not a narrowing: no point may be set
+     * wider than {@code MAX_BODY_ORB}, {@link #orbFor} is the wider of a pair's two points, and
+     * the one transit orb caps at five. So {@code min(width, 15.0)} is the width, everywhere.
+     * {@code OrbCheck} asserts exactly that over every ordered pair rather than taking it on
+     * trust, because the whole case for the number is that it cannot bind.
+     *
+     * <b>{@link Type#maxOrb} is still what the six minors declare</b>, and still what
+     * {@link Type#isMinor} reads to say which family an aspect belongs to. Narrowing a trine to
+     * one degree must not make it a minor aspect, which is why that question was moved off a
+     * comparison against a literal on 2026-09-24.
+     */
     public static double defaultCapOf(Type t) {
-        return t == null ? Double.MAX_VALUE : t.maxOrb;
+        if (t == null) {
+            return Double.MAX_VALUE;
+        }
+        return t.isMinor() ? t.maxOrb : MAX_BODY_ORB;
     }
 
     /**
      * Put the reader's ceilings in force, replacing any set before.
      *
-     * <b>Narrowed, never lifted, and only where there is a ceiling to begin with.</b> The six
-     * capped aspects may be tightened below their declared degree; the five Ptolemaic ones take
-     * no ceiling at all, because their width comes from the bodies and H1's first half already
-     * put those in the reader's hands. Refused rather than clamped, as the body widths are.
+     * <b>Narrowed, never lifted - and now for all fifteen.</b> Every aspect may be tightened
+     * below its own default: the six minors below their declared degree, the five Ptolemaic ones
+     * below {@link #MAX_BODY_ORB}, which is where {@link #defaultCapOf} puts them and which
+     * cannot bind on its own. Refused rather than clamped, as the body widths are.
+     *
+     * <b>The bound test is only now doing any work for a Ptolemaic aspect.</b> Before
+     * {@code defaultCapOf} gave them a finite default, {@code v <= defaultCapOf(t)} compared
+     * against {@code Double.MAX_VALUE} and admitted every finite number - so the javadoc above it
+     * promised a narrowing-only rule that the code did not keep, and an explicit {@code isMinor}
+     * skip was standing in for it. The skip is gone because the bound is real now.
      */
     public static void setCustomCaps(java.util.Map<Type, Double> caps) {
         if (caps == null || caps.isEmpty()) {
@@ -320,15 +345,11 @@ public final class Aspects {
             if (t == null || v == null || v.isNaN()) {
                 continue;
             }
-            // <b>Only an aspect that already has a ceiling.</b> The five Ptolemaic aspects
-            // are uncapped because the bodies decide their width, and H1's first half already
-            // made those widths the reader's - so a ceiling here would be a second control over
-            // one number, free to disagree with the first. The test below would have let one
-            // through on its own: an uncapped aspect's default is Double.MAX_VALUE, so every
-            // finite value is at or under it.
-            if (!t.isMinor()) {
-                continue;
-            }
+            // <b>One test, and it now holds for every aspect.</b> This used to be preceded
+            // by an isMinor skip, because a Ptolemaic aspect's default was Double.MAX_VALUE and
+            // the bound admitted every finite value - the guard was standing in for a bound that
+            // was not binding. defaultCapOf gives the five a real number now, so the bound is
+            // the whole rule and there is one rule rather than two.
             if (v >= MIN_BODY_ORB && v <= defaultCapOf(t)) {
                 kept.put(t, v);
             }
