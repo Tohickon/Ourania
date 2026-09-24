@@ -231,8 +231,79 @@ public final class Aspects {
         return java.util.Collections.unmodifiableMap(m);
     }
 
+    /**
+     * What the reader has widened or narrowed, by point name. Empty is the normal case.
+     *
+     * <b>Pushed in from Settings, never read out of it.</b> Settings is in gui and this class is
+     * in astro, and the wiring that already exists goes one way: OuraniaWindow sets
+     * {@code Transits.orb} from {@code Settings.transitOrb()} at startup. Reversing that here
+     * would put a settings file behind every aspect in the engine and take the suites' ability
+     * to measure it with no window open.
+     *
+     * <b>Volatile because the reader changes it on the event thread while a reading is being
+     * computed on another.</b> Replaced whole rather than mutated, so a half-applied set of
+     * widths is never visible: a reading either used the old orbs or the new ones.
+     */
+    private static volatile java.util.Map<String, Double> CUSTOM = java.util.Map.of();
+
+    /**
+     * The width this point is judged at, the reader's if they have set one.
+     *
+     * The empty case costs one map lookup on an immutable empty map, which is a null check.
+     */
     private static double bodyOrb(String name) {
+        if (name == null) {
+            return ANGLE_ORB;
+        }
+        Double mine = CUSTOM.get(name);
+        return mine != null ? mine : ORBS.getOrDefault(name, ANGLE_ORB);
+    }
+
+    /**
+     * The built-in width for a point, whatever the reader has done to it.
+     *
+     * For the settings screen, which has to show what "reset" would go back to, and for the
+     * checks, which assert the table itself rather than whatever happens to be in force.
+     */
+    public static double defaultBodyOrb(String name) {
         return name == null ? ANGLE_ORB : ORBS.getOrDefault(name, ANGLE_ORB);
+    }
+
+    /** The narrowest and widest a point may be set to. A zero orb would switch a body off. */
+    public static final double MIN_BODY_ORB = 0.25;
+    public static final double MAX_BODY_ORB = 15.0;
+
+    /**
+     * Put the reader's widths in force, replacing any set before.
+     *
+     * <b>Out-of-range and unnamed entries are dropped rather than clamped.</b> A width this
+     * class cannot honour is a settings file that has been edited by hand or written by an
+     * older version, and silently turning 400 into 15 would tell the reader their number was
+     * accepted. Settings clamps what it accepts from the screen; this refuses what it cannot.
+     *
+     * @param widths point name to orb in degrees; null or empty restores the table
+     */
+    public static void setCustomOrbs(java.util.Map<String, Double> widths) {
+        if (widths == null || widths.isEmpty()) {
+            CUSTOM = java.util.Map.of();
+            return;
+        }
+        java.util.Map<String, Double> kept = new java.util.HashMap<>();
+        for (java.util.Map.Entry<String, Double> e : widths.entrySet()) {
+            Double v = e.getValue();
+            if (e.getKey() == null || v == null || v.isNaN()) {
+                continue;
+            }
+            if (v >= MIN_BODY_ORB && v <= MAX_BODY_ORB) {
+                kept.put(e.getKey(), v);
+            }
+        }
+        CUSTOM = java.util.Collections.unmodifiableMap(kept);
+    }
+
+    /** The widths in force that differ from the table. Never null. */
+    public static java.util.Map<String, Double> customOrbs() {
+        return CUSTOM;
     }
 
     /**
@@ -253,6 +324,10 @@ public final class Aspects {
      * copies of a list were edited, and stops meaning anything the day only one of them is.
      */
     public static boolean hasExplicitOrb(String name) {
+        // <b>The table, not the reader's widths.</b> The question this answers is whether the
+        // registry and this class agree about which points exist - a reader widening Neptune
+        // says nothing about that, and letting an override answer it would make the agreement
+        // check pass because someone had been in the settings screen.
         return name != null && ORBS.containsKey(name);
     }
 

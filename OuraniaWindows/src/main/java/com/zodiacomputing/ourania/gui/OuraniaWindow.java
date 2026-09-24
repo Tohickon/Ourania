@@ -110,6 +110,8 @@ public class OuraniaWindow extends JFrame {
         com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(Settings.zodiac());
         // And the transit orb, read by every transit list, search and calendar.
         com.zodiacomputing.ourania.astro.Transits.orb = Settings.transitOrb();
+        // H1: the reader's natal orbs, pushed the same way and for the same reason.
+        Settings.applyBodyOrbs();
         // And the rule that progresses the angles.
         com.zodiacomputing.ourania.astro.ProgressedAngles.method = Settings.progressedAngleMethod();
         setTitle("Ourania+ (Windows Edition)");

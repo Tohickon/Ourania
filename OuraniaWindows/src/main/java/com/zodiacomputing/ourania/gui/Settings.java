@@ -816,6 +816,92 @@ public final class Settings {
         com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(label);
     }
 
+    /**
+     * Master list H1: the natal orbs, per point, as the reader's to set.
+     *
+     * <b>Keyed by the registry's stable id, one key per point, absent until changed.</b> Writing all twenty-odd out at their
+     * defaults would freeze today's table into every reader's settings file, so a later change
+     * to the built-in widths would silently not reach anyone who had ever opened this screen.
+     * Absent means "whatever Aspects says", which is the answer that keeps being right.
+     */
+    public static final String BODY_ORB_PREFIX = "orb.body.";
+
+    /** The reader's widths, by point name. Empty when nothing has been changed. */
+    public static java.util.Map<String, Double> bodyOrbs() {
+        java.util.Map<String, Double> out = new java.util.HashMap<>();
+        for (int i = 0; i < com.zodiacomputing.ourania.astro.Bodies.count(); i++) {
+            com.zodiacomputing.ourania.astro.Bodies.Def def =
+                com.zodiacomputing.ourania.astro.Bodies.at(i);
+            String name = def.name;
+            String raw = get(BODY_ORB_PREFIX + def.id, "").trim();
+            if (raw.isEmpty()) {
+                continue;
+            }
+            try {
+                double v = Double.parseDouble(raw);
+                if (v >= com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB
+                        && v <= com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB) {
+                    out.put(name, v);
+                }
+            } catch (NumberFormatException ignored) {
+                // A hand-edited file is not a reason to refuse to start; the default stands.
+            }
+        }
+        return out;
+    }
+
+    /** The width in force for a point - the reader's if set, the built-in one otherwise. */
+    public static double bodyOrb(String name) {
+        Double mine = bodyOrbs().get(name);
+        return mine != null ? mine
+            : com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name);
+    }
+
+    /**
+     * Set one point's width and put it in force at once, as the transit orb does.
+     *
+     * <b>A value equal to the built-in width clears the key rather than storing it.</b> The
+     * reader who nudges Neptune and puts it back has no setting, which is the same state they
+     * started in - and it keeps the file saying only what was actually chosen.
+     */
+    public static void setBodyOrb(String name, double degrees) {
+        // <b>Keyed by the registry's id, not the display name.</b> Bodies.Def.id says of itself
+        // "stable key written into settings.properties, never change a published one", and the
+        // name is what Aspects looks an orb up by. Storing under the name would tie every
+        // reader's saved widths to a label that is allowed to be reworded.
+        com.zodiacomputing.ourania.astro.Bodies.Def def =
+            com.zodiacomputing.ourania.astro.Bodies.byName(name);
+        if (def == null) {
+            return;
+        }
+        double v = Math.max(com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB,
+            Math.min(com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB, degrees));
+        if (Math.abs(v - com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name)) < 1e-9) {
+            set(BODY_ORB_PREFIX + def.id, "");
+        } else {
+            set(BODY_ORB_PREFIX + def.id, String.valueOf(v));
+        }
+        applyBodyOrbs();
+    }
+
+    /** Back to the built-in table, forgetting every width the reader set. */
+    public static void resetBodyOrbs() {
+        for (int i = 0; i < com.zodiacomputing.ourania.astro.Bodies.count(); i++) {
+            set(BODY_ORB_PREFIX + com.zodiacomputing.ourania.astro.Bodies.at(i).id, "");
+        }
+        applyBodyOrbs();
+    }
+
+    /**
+     * Push the reader's widths into the engine.
+     *
+     * Called at startup beside the transit orb, and again whenever one changes. The engine is
+     * never asked to read a settings file; see Aspects.setCustomOrbs for why that direction.
+     */
+    public static void applyBodyOrbs() {
+        com.zodiacomputing.ourania.astro.Aspects.setCustomOrbs(bodyOrbs());
+    }
+
     /** The one transit orb in degrees; see Transits.orb for why it is one flat width. */
     public static final String TRANSIT_ORB_KEY = "transit.orb";
     public static final double TRANSIT_ORB_MIN = 0.25;

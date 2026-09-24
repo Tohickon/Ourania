@@ -494,6 +494,7 @@ public class SettingsPanel extends JPanel {
 
         body.add(Box.createRigidArea(new Dimension(0, 16)));
         body.add(variantToggles());
+        body.add(natalOrbs());
         body.add(Box.createRigidArea(new Dimension(0, 8)));
         body.add(note("Aspect lines are drawn between bodies, not to the four angles. Click "
             + "an angle on the wheel to see what it currently contacts."));
@@ -1266,6 +1267,103 @@ public class SettingsPanel extends JPanel {
         }
         status.setText(on + " of " + boxes.length
             + " points shown. Saved to settings.properties; applies to the chart at once.");
+    }
+
+    /**
+     * Master list H1: the natal orbs, per point, as the reader's to set.
+     *
+     * <b>One spinner a point, and no table of its own.</b> The widths live in
+     * {@link com.zodiacomputing.ourania.astro.Aspects} and the registry says which points there
+     * are; this reads both rather than listing anything, so a point added to the registry
+     * appears here without anyone remembering to come back.
+     *
+     * <b>A point left at its built-in width stores nothing.</b> Settings.setBodyOrb clears the
+     * key when the value matches the default, so a reader who nudges Neptune and puts it back
+     * has the same file they started with - and a later change to the built-in table still
+     * reaches them, which it could not if opening this screen had frozen today's numbers into
+     * their settings.
+     */
+    private JPanel natalOrbs() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(Color.BLACK);
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        p.add(heading("Natal Orbs"));
+        p.add(note("How close an aspect must be to exact, in degrees, per point. A pair is judged "
+            + "at the wider of its two points, and each aspect keeps its own ceiling over that - "
+            + "so widening Pluto does not widen a semisextile. Cross-chart readings halve it. "
+            + "Bold means you have changed it."));
+        p.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JPanel grid = new JPanel(new java.awt.GridLayout(0, 4, 14, 4));
+        grid.setBackground(Color.BLACK);
+        grid.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        final java.util.List<javax.swing.JSpinner> spinners = new java.util.ArrayList<>();
+        final java.util.List<JLabel> labels = new java.util.ArrayList<>();
+        final java.util.List<String> names = new java.util.ArrayList<>();
+
+        for (int i = 0; i < com.zodiacomputing.ourania.astro.Bodies.count(); i++) {
+            final String name = com.zodiacomputing.ourania.astro.Bodies.at(i).name;
+            JPanel cell = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+            cell.setBackground(Color.BLACK);
+            final JLabel l = new JLabel(name + " ");
+            l.setForeground(TEXT);
+            final javax.swing.JSpinner s = new javax.swing.JSpinner(
+                new javax.swing.SpinnerNumberModel(Settings.bodyOrb(name),
+                    com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB,
+                    com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB, 0.25));
+            s.setToolTipText("<html><b>" + name + "</b><br>Built in at "
+                + com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name)
+                + "&deg;.<br>A pair is judged at the wider of its two points.</html>");
+            s.addChangeListener(e -> {
+                Settings.setBodyOrb(name, ((Number) s.getValue()).doubleValue());
+                markChanged(l, name);
+                status.setText("Saved");
+                if (window != null) {
+                    window.applyBodySelection();
+                }
+            });
+            markChanged(l, name);
+            cell.add(l);
+            cell.add(s);
+            grid.add(cell);
+            spinners.add(s);
+            labels.add(l);
+            names.add(name);
+        }
+        p.add(grid);
+        p.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        row.setBackground(Color.BLACK);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        javax.swing.JButton reset = new javax.swing.JButton("Reset to defaults");
+        reset.setToolTipText("Forget every width you have set and go back to the built-in table.");
+        reset.addActionListener(e -> {
+            Settings.resetBodyOrbs();
+            for (int i = 0; i < spinners.size(); i++) {
+                spinners.get(i).setValue(Settings.bodyOrb(names.get(i)));
+                markChanged(labels.get(i), names.get(i));
+            }
+            status.setText("Saved");
+            if (window != null) {
+                window.applyBodySelection();
+            }
+        });
+        row.add(reset);
+        p.add(row);
+        p.add(Box.createRigidArea(new Dimension(0, 14)));
+        return p;
+    }
+
+    /** Bold while a point is not at its built-in width, so a changed set is readable at a glance. */
+    private void markChanged(JLabel label, String name) {
+        boolean changed = Math.abs(Settings.bodyOrb(name)
+            - com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name)) > 1e-9;
+        label.setFont(label.getFont().deriveFont(changed ? java.awt.Font.BOLD
+            : java.awt.Font.PLAIN));
     }
 
     private JLabel heading(String text) {
