@@ -140,6 +140,74 @@ public final class HoraryCheck {
         ok("no hour ruler inside the polar night, so radicality is not judged", none.unknown);
         ok("and an unjudged chart is not called radical", !none.radical());
 
+        // ---- the considerations before judgement: measured, reported, and not a refusal
+        //
+        // <b>They warn and do not refuse, which is the whole of what was decided.</b> Folded
+        // into radical() they turn away 26.7% of all moments - six degrees of every thirty for
+        // the Ascendant and about a house in twelve for Saturn - and David's call was that a
+        // reader should be told what is doubtful rather than handed silence for one question in
+        // four. So the assertion that matters here is the negative one: a chart carrying every
+        // caution at once is still judged.
+        //
+        // Walked across a whole day rather than sampled, because the Ascendant moves through
+        // every degree of every sign in one and the boundaries are what is being asserted.
+        double dayStart = new SweDate(2026, 5, 14, 0.0).getJulDay();
+        boolean earlyRight = true;
+        boolean lateRight = true;
+        boolean middleClear = true;
+        boolean cautionNeverRefuses = true;
+        boolean degreeRight = true;
+        int earlySeen = 0;
+        int lateSeen = 0;
+        int saturnSeen = 0;
+        for (int step = 0; step < 288; step++) {
+            double when = dayStart + step * (1.0 / 288.0);
+            ChartFrame g = ChartFrame.compute(sw, when, LAT, LON, 'P', false, 0.0);
+            Horary.Radicality r = Horary.radicality(sw, g, when, LAT, LON);
+            if (r.unknown) {
+                continue;
+            }
+            double deg = ((g.asc % 30.0) + 30.0) % 30.0;
+            degreeRight &= Math.abs(deg - r.ascendantDegree) < 1e-9;
+            if (deg < Horary.CAVEAT_DEGREES) {
+                earlyRight &= r.tooEarly;
+                earlySeen++;
+            } else if (deg > 30.0 - Horary.CAVEAT_DEGREES) {
+                lateRight &= r.tooLate;
+                lateSeen++;
+            } else {
+                middleClear &= !r.tooEarly && !r.tooLate;
+            }
+            if (r.saturnInSeventh) {
+                saturnSeen++;
+            }
+            // The property David chose: a caution changes what is said, never what is judged.
+            boolean byHour = r.sameRuler || r.sharesTriplicity;
+            cautionNeverRefuses &= r.radical() == byHour;
+        }
+        ok("the Ascendant's degree is measured from its own sign", degreeRight);
+        ok("an Ascendant inside the first three degrees is called too early (" + earlySeen + ")",
+            earlyRight && earlySeen > 0);
+        ok("inside the last three, too late (" + lateSeen + ")", lateRight && lateSeen > 0);
+        ok("and anywhere between, neither", middleClear);
+        ok("a caution never changes whether the chart is judged", cautionNeverRefuses);
+        ok("Saturn in the seventh is seen at some point in the day (" + saturnSeen + ")",
+            saturnSeen > 0);
+
+        // <b>And each caution is said out loud.</b> A consideration nobody is told about is the
+        // same as one that was never measured.
+        Horary.Radicality spoken = new Horary.Radicality();
+        ok("with nothing wrong there is nothing to say", spoken.cautions().isEmpty());
+        spoken.ascendantDegree = 1.4;
+        spoken.tooEarly = true;
+        ok("too early is reported", spoken.cautions().size() == 1
+            && spoken.cautions().get(0).contains("too early"));
+        spoken.tooLate = true;
+        spoken.saturnInSeventh = true;
+        ok("and all three are, when all three apply", spoken.cautions().size() == 3);
+        ok("the seventh-house one names the astrologer, not the question",
+            spoken.cautions().get(2).contains("reader"));
+
 
         // =================================================== stage 3: the dynamics of light
 

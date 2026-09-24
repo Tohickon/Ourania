@@ -115,6 +115,61 @@ public final class Horary {
         /** True when the hours could not be computed at all: no sunrise, so no hour ruler. */
         public boolean unknown;
 
+        /**
+         * How far into its sign the Ascendant is, in degrees. NaN before it is measured.
+         *
+         * <b>Carried rather than recomputed.</b> Two of the three caveats below are read off
+         * this one number, and the sentence the reader is given quotes it.
+         */
+        public double ascendantDegree = Double.NaN;
+
+        /**
+         * The Ascendant is in the first three degrees of its sign - the matter is not ripe.
+         *
+         * <b>"Too early to judge."</b> Bonatti's first consideration: the question has been put
+         * before the situation has taken shape, so the chart describes something that has not
+         * happened yet. The degree is a convention and this project states its conventions -
+         * three degrees is the usual figure and the one Lilly uses.
+         */
+        public boolean tooEarly;
+
+        /**
+         * The Ascendant is in the last three degrees - the matter is already settled.
+         *
+         * The mirror of the above, and the more commonly cited of the two: the case is past
+         * deciding, so a judgement would be describing an outcome rather than predicting it.
+         */
+        public boolean tooLate;
+
+        /**
+         * Saturn in the seventh house, which is the astrologer's own.
+         *
+         * <b>The one caveat that is about the reader rather than the question.</b> The seventh
+         * is the house of the astrologer in a horary chart, and Saturn there is the traditional
+         * sign that the judgement will go wrong - not that the answer is unknowable, but that
+         * this reader will misread it. Kept because leaving it out would be choosing which of
+         * the considerations to honour, and the decision named it.
+         */
+        public boolean saturnInSeventh;
+
+        /** True when any consideration says this chart should not be judged. */
+        public boolean cautioned() {
+            return this.tooEarly || this.tooLate || this.saturnInSeventh;
+        }
+
+        /**
+         * Whether the chart may be judged at all: the hour test, and only that.
+         *
+         * <b>The considerations warn, they do not refuse.</b> They were folded in here for one
+         * measurement and taken back out: too early, too late or Saturn in the seventh refuses
+         * <b>26.7% of all moments</b> - six degrees of every thirty for the Ascendant, about a
+         * house in twelve for Saturn - and David's call was that a reader who asks a question
+         * should be told what is doubtful about the moment rather than handed silence for one
+         * question in four. K13's decision words radicality as the planetary-hour test, and this
+         * is that.
+         *
+         * What the considerations do instead is {@link #cautioned}, reported beside the verdict.
+         */
         public boolean radical() {
             return this.sameRuler || this.sharesTriplicity;
         }
@@ -133,6 +188,34 @@ public final class Horary {
             }
             return "not radical: the hour ruler " + hourRuler
                 + " shares neither nature nor triplicity with " + ascendantRuler;
+        }
+
+        /**
+         * The considerations that apply, in the reader's language, or empty.
+         *
+         * <b>Beside the verdict rather than instead of it.</b> These say the moment is doubtful,
+         * not that it cannot be read - see {@link #radical}. A reader who is told "too late to
+         * judge" and given no answer cannot tell whether the method had nothing to say or was
+         * never asked; told "the answer is no, and note that the Ascendant is at 27.8 degrees",
+         * they can weigh it themselves, which is what the considerations are for.
+         */
+        public java.util.List<String> cautions() {
+            java.util.List<String> out = new java.util.ArrayList<>();
+            if (this.tooEarly) {
+                out.add(String.format("The Ascendant is at %.1f degrees of its sign, inside the "
+                    + "first three: traditionally too early to judge, the matter not yet having "
+                    + "taken shape.", this.ascendantDegree));
+            }
+            if (this.tooLate) {
+                out.add(String.format("The Ascendant is at %.1f degrees of its sign, inside the "
+                    + "last three: traditionally too late, the matter already decided.",
+                    this.ascendantDegree));
+            }
+            if (this.saturnInSeventh) {
+                out.add("Saturn is in the seventh, the astrologer's own house: the traditional "
+                    + "sign that the reader, rather than the chart, will be at fault.");
+            }
+            return out;
         }
     }
 
@@ -175,6 +258,21 @@ public final class Horary {
         r.triplicityRuler = Dignity.triplicityRulerOf(sign, Sect.isDiurnal(sun.lon, f.asc));
         r.sameRuler = r.hourRuler.equals(r.ascendantRuler);
         r.sharesTriplicity = r.hourRuler.equals(r.triplicityRuler);
+
+        // <b>The considerations before judgement.</b> Read off the chart rather than the hour,
+        // because they are about the moment being readable at all - see Radicality.radical.
+        r.ascendantDegree = ((f.asc % 30.0) + 30.0) % 30.0;
+        r.tooEarly = r.ascendantDegree < CAVEAT_DEGREES;
+        r.tooLate = r.ascendantDegree > 30.0 - CAVEAT_DEGREES;
+
+        ChartFrame.Body saturn = f.body("Saturn");
+        if (saturn != null && saturn.ok) {
+            // <b>By the chart's own cusps, through Zodiac.houseOf.</b> Not by counting signs
+            // from the Ascendant - the rest of this engine reads a quadrant system, where the
+            // seventh house is not the seventh sign. And not a house walk written here: that
+            // rule already exists and a second copy of it is the defect this project logs most.
+            r.saturnInSeventh = Zodiac.houseOf(saturn.lon, f.cusps) == 7;
+        }
         return r;
     }
 
@@ -206,6 +304,14 @@ public final class Horary {
      * rather than a measurement, so it is named here rather than buried in a loop bound.
      */
     public static final double MAX_WINDOW_DAYS = 365.0;
+
+    /**
+     * How near either end of a sign the Ascendant may not be, in degrees.
+     *
+     * Three, which is Lilly's figure and the usual one. A convention rather than a measurement,
+     * so it is named here rather than written into the test twice.
+     */
+    public static final double CAVEAT_DEGREES = 3.0;
 
     /**
      * Mean daily motion in degrees, for deciding which of two bodies is the faster.

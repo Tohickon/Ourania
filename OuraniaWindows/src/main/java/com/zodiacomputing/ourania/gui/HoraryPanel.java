@@ -183,6 +183,18 @@ public final class HoraryPanel extends JPanel {
         b.append("<p><b>Whether the chart may be judged.</b> ")
             .append(escape(String.valueOf(j.radicality))).append("</p>");
 
+        // <b>The considerations before judgement, beside the verdict rather than instead of
+        // it.</b> They refuse 26.7% of all moments if taken as bars, and David's call was that a
+        // reader should be told what is doubtful about the moment rather than handed silence for
+        // one question in four. So they are printed and the answer still comes.
+        if (j.radicality != null && !j.radicality.cautions().isEmpty()) {
+            b.append("<p><b>Worth knowing before you weigh it.</b></p><ul>");
+            for (String caution : j.radicality.cautions()) {
+                b.append("<li>").append(escape(caution)).append("</li>");
+            }
+            b.append("</ul>");
+        }
+
         if (j.chain.isEmpty()) {
             b.append("<p>No testimony was found inside the window.</p>");
         } else {
