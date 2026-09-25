@@ -80,9 +80,12 @@ extends JPanel {
      * The wheel's three rings - the chart, the outer ring (transits, progressions or Chart B),
      * and the sky. See {@link WheelRing}: these were thirty loose fields until J13.
      */
-    public final WheelRing natalRing = new WheelRing();
-    public final WheelRing outerRing = new WheelRing();
-    public final WheelRing skyRing = new WheelRing();
+    // <b>Each ring starts as what it usually is</b>, so that a read before the first
+    // updateChartData gets a sensible answer rather than three rings all claiming to be Chart A.
+    // assignRingKinds settles the outer one, which is the only one whose contents vary.
+    public final WheelRing natalRing = WheelRing.of(WheelRing.Kind.CHART_A);
+    public final WheelRing outerRing = WheelRing.of(WheelRing.Kind.TRANSIT);
+    public final WheelRing skyRing = WheelRing.of(WheelRing.Kind.SKY);
     private String baseLocationName = "Los Angeles, CA";
     private String baseTimeZoneId = ZoneId.systemDefault().getId();
     public boolean showTransitChart = false;
@@ -114,7 +117,49 @@ extends JPanel {
      * which is the drift that hid the empty aspect selection for a whole morning. aspectShown
      * is seeded the same way and pinned in the same place for the same reason.
      */
-    private boolean showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+    // Package-private, like chartMode beside it: assignRingKinds reads both to decide what
+    // the outer ring holds, and a suite that cannot set both cannot walk the modes.
+    boolean showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+
+    /**
+     * What to call a body when opening a full reading for it, given the ring it was clicked on.
+     *
+     * <b>The outer ring is not always a transit.</b> In SYNASTRY it is a second person and in
+     * PROGRESSED it is this person moved on, and {@code generatePlanetHtml} decides which prose
+     * to write from a {@code transit_} prefix on the name. So this is a rule, not a formatting
+     * detail, and getting it wrong heads a standing relationship "Transiting Venus".
+     *
+     * <b>Asked once because it was already answered twice.</b> This ternary was inlined at both
+     * body-click sites, and the Interpretation panel's "Read in full" link needed a third. The
+     * comment on {@code AngleOwner} a few hundred lines below says what happens next: the copies
+     * do not diverge on the day they are written, they diverge the day one of them is edited.
+     *
+     * @param index the body, and
+     * @param outer true when it was read from the outer ring rather than the natal one
+     */
+    public String interpretationNameFor(int index, boolean outer) {
+        this.assignRingKinds();
+        return this.interpretationNameFor(index,
+            outer ? this.outerRing.kind : this.natalRing.kind);
+    }
+
+    /**
+     * The same question asked of a ring rather than of a position, which is the form that is
+     * actually right - a caller holding the sky ring could not say "outer" and mean it.
+     */
+    public String interpretationNameFor(int index, WheelRing.Kind kind) {
+        if (index < 0 || index >= BODY_COUNT) {
+            return "";
+        }
+        // <b>The prefix is the wire format, not the meaning.</b> It marks "not the inner
+        // wheel", and generatePlanetHtml splits on it before asking separately whether the ring
+        // is a person - so a partner's body keeps it and gets the partner branch behind it.
+        // Only PROGRESSED drops it, which is the guard the click path already carried.
+        if (kind == null || !kind.takesTransitPrefix()) {
+            return BODY_NAMES[index];
+        }
+        return "transit_" + BODY_NAMES[index].toLowerCase();
+    }
 
     private boolean showProgressed() {
         return this.showProgressed;
@@ -122,7 +167,8 @@ extends JPanel {
 
     /** What the outer ring's bodies are, for any label that has to name them. */
     private String outerRingWord() {
-        return this.showProgressed() ? "progressed" : "transiting";
+        this.assignRingKinds();
+        return this.outerRing.kind.ringWord;
     }
 
     /**
@@ -155,19 +201,26 @@ extends JPanel {
      * but prose about a pair of bodies has to name both ends.
      */
     String innerOwnerWord() {
-        return this.isSynastryChart() ? "Chart A's" : "natal";
+        // Still a special case, but of the INNER ring's kind rather than of the mode: the word
+        // is possessive here and bare everywhere else, which is a wording rule, not an identity.
+        this.assignRingKinds();
+        return this.natalRing.kind == WheelRing.Kind.CHART_A && this.isSynastryChart()
+            ? "Chart A's" : "natal";
     }
 
     String ringWord(int ring) {
-        if (ring == WHEEL_NATAL) {
-            return null;
-        }
+        // <b>Asked of the ring, not worked out here.</b> This method used to re-derive the
+        // outer ring's identity from isSynastryChart(), which was one of six places doing it.
+        this.assignRingKinds();
+        return this.ringAt(ring).kind.ringWord;
+    }
+
+    /** The ring a wheel index names. */
+    WheelRing ringAt(int ring) {
         if (ring == WHEEL_SKY) {
-            return SKY_RING_WORD;
+            return this.skyRing;
         }
-        // The outer ring is a second person in a synastry and a later moment everywhere else -
-        // the same rule updateChartData follows when it decides which moment to cast it from.
-        return this.isSynastryChart() ? "Chart B" : this.outerRingWord();
+        return ring == WHEEL_OUTER ? this.outerRing : this.natalRing;
     }
     public ChartMode chartMode = ChartMode.SINGLE;
 
@@ -1025,9 +1078,19 @@ extends JPanel {
             // the assumption now has a sentence and the other reading has a handle.
             com.zodiacomputing.ourania.astro.Moments.Resolved r =
                 com.zodiacomputing.ourania.astro.Moments.resolve(d, t, ZoneId.of(zone));
+            // <b>And the reader is told when the runtime's own zone data is wrong.</b> D5:
+            // this JDK's Europe/Amsterdam rules are Europe/Brussels', so a Dutch birth between
+            // 1892 and 1940 is cast about twenty minutes out - five degrees of Ascendant. The
+            // chart is still cast, because quietly correcting it would move charts people have
+            // already saved; it goes through the same notice an ambiguous hour uses, which is
+            // already the place a reader looks before pressing Generate.
+            String note = r.note;
+            if (r.zoneDataDoubt != null) {
+                note = note == null ? r.zoneDataDoubt : note + " " + r.zoneDataDoubt;
+            }
             return com.zodiacomputing.ourania.astro.ChartSubject.of(label,
                 r.when, name, lat, lon, zone, timeUnknown)
-                .withTimeNote(r.note, r.other);
+                .withTimeNote(note, r.other);
         } catch (Exception notADate) {
             // Half a date is not a moment. The place is kept, so a reader who has typed a
             // location and not yet a birthday does not lose the location too.
@@ -5265,8 +5328,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // rows that read as transit rows, guarded before it could happen rather than
                 // after.
                 this.window.showInterpretationForPlanet(
-                    this.showProgressed() ? BODY_NAMES[n3]
-                        : "transit_" + BODY_NAMES[n3].toLowerCase(),
+                    this.interpretationNameFor(n3, true),
                     SIGN_NAMES[n15c], n14c, n16c, n17c, arrayListC);
                 return;
             }
@@ -5308,8 +5370,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 }
                 n14 = (int)(this.outerRing.lon[n3] % 30.0) + 1;
                 this.window.showInterpretationForPlanet(
-                    this.showProgressed() ? BODY_NAMES[n3]
-                        : "transit_" + BODY_NAMES[n3].toLowerCase(),
+                    this.interpretationNameFor(n3, true),
                     SIGN_NAMES[n15], n14, n16, n17, arrayList);
                 return;
             }
@@ -7825,7 +7886,41 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return new SweDate(zonedDateTime2.getYear(), zonedDateTime2.getMonthValue(), zonedDateTime2.getDayOfMonth(), (double)zonedDateTime2.getHour() + (double)zonedDateTime2.getMinute() / 60.0 + (double)zonedDateTime2.getSecond() / 3600.0);
     }
 
+    /**
+     * Decides what each ring holds, once.
+     *
+     * <b>This is the only place the mode flags are read for this purpose.</b> Everything that
+     * needs to know what a ring contains asks {@link WheelRing#kind}; before this existed, six
+     * places worked it out for themselves and disagreed. Called at the top of
+     * {@link #updateChartData}, which every path goes through before anything is drawn, clicked
+     * or read.
+     */
+    void assignRingKinds() {
+        // <b>Cheap enough to call on every read, and it has to be.</b> The first version assigned
+        // only from updateChartData, and AspectGridCheck caught it at once: set chartMode and ask
+        // ringWord, and you got the old answer, because the identity had gone stale. The old code
+        // derived live from isSynastryChart() every time and so had no staleness to have.
+        //
+        // The point of this method was never that the answer is cached - it is that ONE place
+        // decides it. Three comparisons and three writes keep both properties.
+        this.natalRing.kind = this.chartMode == ChartMode.COMPOSITE_MIDPOINT
+            || this.chartMode == ChartMode.COMPOSITE_DAVISON
+            ? WheelRing.Kind.COMPOSITE : WheelRing.Kind.CHART_A;
+
+        // The outer wheel, in the order the modes actually take precedence: a second person
+        // first, because in a synastry that ring is never a moment; then the same person moved
+        // on; then the sky over the chart.
+        this.outerRing.kind = this.isSynastryChart() ? WheelRing.Kind.CHART_B
+            : this.showProgressed ? WheelRing.Kind.PROGRESSED
+            : WheelRing.Kind.TRANSIT;
+
+        // The third ring is only ever the sky - which is why it was the one name that never
+        // caused trouble.
+        this.skyRing.kind = WheelRing.Kind.SKY;
+    }
+
     public void updateChartData() {
+        this.assignRingKinds();
         this.invalidateGlobeChords();
         this.ensureSkyPlace();
         if (this.natalRing.time != null) {

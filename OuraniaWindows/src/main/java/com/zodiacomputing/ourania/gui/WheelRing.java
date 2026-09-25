@@ -20,6 +20,105 @@ import java.time.ZonedDateTime;
  */
 public final class WheelRing {
 
+    /**
+     * What this ring holds - not where it is drawn.
+     *
+     * <b>The distinction this enum exists for.</b> Two of the three rings were named for their
+     * contents ({@code natalRing}, {@code skyRing}) and one for its position ({@code outerRing}),
+     * and the positional one is where the defects were, because its contents change with the
+     * mode. Everything that needed to know what was in it re-derived the answer from some
+     * combination of {@code chartMode}, {@code showTransitChart}, {@code transitsEnabled},
+     * {@code showTriWheel}, {@code isSynastryChart()} and {@code showProgressed}. Those
+     * re-derivations disagreed with each other, one at a time, for months:
+     *
+     * <ul>
+     *   <li>a partner's Venus read as "Transiting Venus" - a person described as a passing
+     *       event (31 Aug);</li>
+     *   <li>a composite reading read the transit array ({@code showTransitChart}'s own
+     *       javadoc says so);</li>
+     *   <li>a progressed body needed a hand-written guard against being headed as a transit;</li>
+     *   <li>{@code ringWord} was implemented six separate times (24 Sep);</li>
+     *   <li>"Read in full" opened Chart A whatever ring the card came from (25 Sep).</li>
+     * </ul>
+     *
+     * A ring that knows what it is cannot be asked the wrong question.
+     */
+    public enum Kind {
+        /** The chart being read: the inner wheel, and the thing everything else is read against. */
+        CHART_A("Chart A", null, false),
+        /** One chart made out of two. Still the inner wheel, but it belongs to nobody. */
+        COMPOSITE("the composite", null, false),
+        /** A second person, in a synastry. Their placements are their NATAL placements. */
+        CHART_B("Chart B", "Chart B", true),
+        /** The same person, moved on. A placement, not a passing event. */
+        PROGRESSED("progressed", "progressed", false),
+        /** The sky at a chosen moment, laid over the chart. */
+        TRANSIT("transiting", "transiting", false),
+        /** The sky now, wrapped around everything else. */
+        SKY("sky", SkymapPanel.SKY_RING_WORD, false);
+
+        /** How a reader refers to this ring in running prose. */
+        public final String label;
+        /**
+         * The qualifier that stands in front of a body name from this ring, or null when the
+         * ring takes none - the inner wheel is understood to be the chart being read.
+         */
+        public final String ringWord;
+        /** True when this ring is a person rather than a moment, so prose is read as theirs. */
+        public final boolean isPerson;
+
+        Kind(String label, String ringWord, boolean isPerson) {
+            this.label = label;
+            this.ringWord = ringWord;
+            this.isPerson = isPerson;
+        }
+
+        /**
+         * Whether a body from this ring is read as a passing event rather than a placement.
+         *
+         * <b>PROGRESSED and CHART_B are both false, and both were once true.</b> A progressed
+         * body is where the person has moved to, and a partner's Venus really is their natal
+         * Venus - neither is an event passing over the chart. Those were the two defects.
+         */
+        public boolean readsAsEvent() {
+            return this == TRANSIT || this == SKY;
+        }
+
+        /**
+         * Whether a body from this ring carries the {@code transit_} prefix on its name.
+         *
+         * <b>Deliberately NOT the same question as {@link #readsAsEvent}, and this is the
+         * trap.</b> That prefix is the wire format, and it means "not the inner wheel" - it is
+         * what {@code generatePlanetHtml} splits on before asking, separately, whether the ring
+         * is a person. Making the prefix follow the meaning instead drops CHART_B out of the
+         * prefixed set, and a synastry reading silently loses its "Their Venus in Scorpio"
+         * framing and its overlay house prose: the partner branch is behind the prefix.
+         *
+         * <p>So the two stay apart until the wire format itself is narrowed, which is a change
+         * with a much wider blast radius - saved links, aspect row labels, {@code isTransitLabel}
+         * and the pipe-delimited grid rows all read it.
+         *
+         * <p>PROGRESSED is the one outer kind that takes no prefix, which is the behaviour the
+         * click path already had and the reason it carried a hand-written guard.
+         */
+        public boolean takesTransitPrefix() {
+            return this == CHART_B || this == TRANSIT || this == SKY;
+        }
+    }
+
+    /**
+     * What this ring holds. Assigned in one place - {@code SkymapPanel.assignRingKinds} - so it
+     * cannot be derived differently by two callers.
+     */
+    public Kind kind = Kind.CHART_A;
+
+    /** A ring that starts out knowing what it is. */
+    public static WheelRing of(Kind kind) {
+        WheelRing r = new WheelRing();
+        r.kind = kind;
+        return r;
+    }
+
     /** Each body's ecliptic longitude on this ring, by registry index. */
     public double[] lon = new double[SkymapPanel.BODY_COUNT];
     /** Each body's speed in longitude, degrees per day; negative is retrograde. */

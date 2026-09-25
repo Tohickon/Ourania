@@ -44,6 +44,9 @@ public final class InterpretationHierarchyCheck {
         part("F: the tab's path, and the breakdown's link", () -> theTab(ip));
         part("G: the facts come from the engine", () -> facts(ip));
         part("H: the synthesis ranks and reads in the same order", InterpretationHierarchyCheck::synthesis);
+        part("I: Read in full opens the ring the card came from",
+            InterpretationHierarchyCheck::theRing);
+        part("J: a ring says what it is", InterpretationHierarchyCheck::ringKinds);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -55,6 +58,188 @@ public final class InterpretationHierarchyCheck {
             System.out.println("  " + f);
         }
         System.exit(1);
+    }
+
+
+    /**
+     * <b>Read in full must open the body the card described.</b>
+     *
+     * David, 25 Sep: with Chart A and Sky up, the card said "Sun in Libra" - the sky's Sun - and
+     * Read in full opened Chart A's Sun in Leo. Every body did it. {@code generateBodyCard} knew
+     * which ring it was drawing and emitted a link carrying only the body index, and
+     * {@code openBody} then read {@code natalRing} whatever it was handed.
+     *
+     * <p>This is a round trip on purpose: the link the card writes, parsed the way the handler
+     * parses it. Each half was reasonable on its own and they only disagreed with each other, so
+     * a check on either half alone would have passed while the screen was wrong.
+     */
+    private static void theRing() {
+        // The naming rule both doors now ask, rather than each writing out the ternary.
+        SkymapPanel[] hold = new SkymapPanel[1];
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new SkymapPanel(null));
+        } catch (Exception e) {
+            ok("a wheel would construct: " + e, false);
+            return;
+        }
+        final SkymapPanel sp = hold[0];
+        ok("a natal body keeps its own name",
+            "Sun".equalsIgnoreCase(sp.interpretationNameFor(0, false)));
+        ok("an outer-ring body is marked as one",
+            sp.interpretationNameFor(0, true).startsWith("transit_"));
+        ok("and the two differ", !sp.interpretationNameFor(0, false)
+            .equals(sp.interpretationNameFor(0, true)));
+        ok("out of range is answered, not thrown", "".equals(sp.interpretationNameFor(-1, true)));
+
+        // <b>The round trip.</b> Both link shapes the card can emit, parsed as the handler parses
+        // them, must name the ring the card was drawing.
+        for (int index : new int[] {0, 3, 9}) {
+            for (boolean outer : new boolean[] {false, true}) {
+                String href = "body|" + index + "|" + (outer ? "1" : "0");
+                ok("the link names a body and a ring: " + href,
+                    href.startsWith("body|") && href.split("\\|").length == 3);
+                String[] bits = href.substring(5).split("\\|");
+                ok("it parses back to the same body", Integer.parseInt(bits[0]) == index);
+                ok("and to the same ring",
+                    ("1".equals(bits.length > 1 ? bits[1] : "0")) == outer);
+            }
+        }
+
+        // The old two-part form still has to work, because other surfaces emit it for natal
+        // placements and a reader's saved reading should not stop opening.
+        String[] legacy = "body|4".substring(5).split("\\|");
+        ok("the older body|N form still parses", Integer.parseInt(legacy[0]) == 4);
+        ok("and means the natal ring", legacy.length == 1);
+
+        // <b>And now the defect itself, end to end.</b> Everything above passed against a
+        // reverted openBody, because none of it reached the line that was wrong. Two rings, one
+        // body, deliberately in different signs - which is exactly David's screen: Chart A's Sun
+        // in Leo and the sky's Sun in Libra.
+        sp.natalRing.lon[0] = 130.0;      // Leo
+        sp.natalRing.valid[0] = true;
+        sp.outerRing.lon[0] = 190.0;      // Libra
+        sp.outerRing.valid[0] = true;
+
+        InterpretationPanel[] pair = new InterpretationPanel[1];
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                pair[0] = new InterpretationPanel(sp, null));
+        } catch (Exception e) {
+            ok("a panel would construct over that wheel: " + e, false);
+            return;
+        }
+        InterpretationPanel ip = pair[0];
+
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(() -> ip.openBody(0, false));
+            String natal = ip.currentHtml();
+            ok("the natal ring opens Leo", natal.contains("Leo"));
+            ok("and not Libra", !natal.contains("Libra"));
+
+            javax.swing.SwingUtilities.invokeAndWait(() -> ip.openBody(0, true));
+            String outer = ip.currentHtml();
+            ok("the outer ring opens Libra", outer.contains("Libra"));
+            ok("and not Leo", !outer.contains("Leo"));
+            ok("and the two readings differ at all", !natal.equals(outer));
+        } catch (Exception e) {
+            ok("both rings open without throwing: " + e, false);
+        }
+    }
+
+
+    /**
+     * <b>Every mode assigns every ring, and the two questions stay apart.</b>
+     *
+     * A ring's contents used to be re-derived at six sites from chartMode, showTransitChart,
+     * transitsEnabled, showTriWheel, isSynastryChart() and showProgressed, and those derivations
+     * disagreed one at a time for months. {@code assignRingKinds} is now the only place that
+     * reads those flags for this purpose, so this walks every mode and checks what it assigns.
+     */
+    private static void ringKinds() {
+        SkymapPanel[] hold = new SkymapPanel[1];
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new SkymapPanel(null));
+        } catch (Exception e) {
+            ok("a wheel would construct: " + e, false);
+            return;
+        }
+        SkymapPanel sp = hold[0];
+
+        // The sky ring is only ever the sky, whatever the mode - which is why it is the one
+        // name that never caused trouble.
+        for (ChartMode mode : ChartMode.values()) {
+            sp.chartMode = mode;
+            for (boolean prog : new boolean[] {false, true}) {
+                sp.showProgressed = prog;
+                sp.assignRingKinds();
+                ok(mode + (prog ? " progressed" : "") + ": the sky ring is the sky",
+                    sp.skyRing.kind == WheelRing.Kind.SKY);
+
+                boolean composite = mode == ChartMode.COMPOSITE_MIDPOINT
+                    || mode == ChartMode.COMPOSITE_DAVISON;
+                ok(mode + ": the inner ring is "
+                        + (composite ? "the composite" : "Chart A"),
+                    sp.natalRing.kind == (composite ? WheelRing.Kind.COMPOSITE
+                        : WheelRing.Kind.CHART_A));
+
+                WheelRing.Kind want = mode == ChartMode.SYNASTRY ? WheelRing.Kind.CHART_B
+                    : prog ? WheelRing.Kind.PROGRESSED : WheelRing.Kind.TRANSIT;
+                ok(mode + (prog ? " progressed" : "") + ": the outer ring is " + want,
+                    sp.outerRing.kind == want);
+            }
+        }
+
+        // <b>A second person outranks a progression.</b> In a synastry the outer ring is never a
+        // moment, whatever else is switched on - and the order those two are tested in is the
+        // whole content of that rule.
+        sp.chartMode = ChartMode.SYNASTRY;
+        sp.showProgressed = true;
+        sp.assignRingKinds();
+        ok("synastry beats progressed on the outer ring",
+            sp.outerRing.kind == WheelRing.Kind.CHART_B);
+
+        // <b>The two questions, held apart.</b> Collapsing them is a regression that looks like a
+        // simplification: make the prefix follow the meaning and CHART_B loses it, and with it
+        // the partner branch in generatePlanetHtml - so a synastry reading quietly becomes plain
+        // natal prose with no "Their Venus" framing and no overlay house.
+        ok("a partner is not a passing event",
+            !WheelRing.Kind.CHART_B.readsAsEvent());
+        ok("but a partner's body still carries the wire prefix",
+            WheelRing.Kind.CHART_B.takesTransitPrefix());
+        ok("a progression is not an event either",
+            !WheelRing.Kind.PROGRESSED.readsAsEvent());
+        ok("and takes no prefix, which is the guard the click path carried",
+            !WheelRing.Kind.PROGRESSED.takesTransitPrefix());
+        ok("a transit is an event", WheelRing.Kind.TRANSIT.readsAsEvent());
+        ok("and so is the sky", WheelRing.Kind.SKY.readsAsEvent());
+        ok("the inner wheel takes no prefix",
+            !WheelRing.Kind.CHART_A.takesTransitPrefix()
+                && !WheelRing.Kind.COMPOSITE.takesTransitPrefix());
+
+        // The ring word, which was implemented six times over before this.
+        ok("the inner wheel takes no ring word",
+            WheelRing.Kind.CHART_A.ringWord == null
+                && WheelRing.Kind.COMPOSITE.ringWord == null);
+        for (WheelRing.Kind k : new WheelRing.Kind[] {WheelRing.Kind.CHART_B,
+                WheelRing.Kind.PROGRESSED, WheelRing.Kind.TRANSIT, WheelRing.Kind.SKY}) {
+            ok(k + " names itself for a reader",
+                k.ringWord != null && !k.ringWord.isEmpty());
+        }
+
+        // And the naming rule agrees with the kinds, asked either way round.
+        sp.chartMode = ChartMode.SYNASTRY;
+        sp.showProgressed = false;
+        sp.assignRingKinds();
+        ok("a partner's body is prefixed", sp.interpretationNameFor(0, true)
+            .startsWith("transit_"));
+        sp.chartMode = ChartMode.TRANSIT;
+        sp.showProgressed = true;
+        sp.assignRingKinds();
+        ok("a progressed body is not", !sp.interpretationNameFor(0, true)
+            .startsWith("transit_"));
+        ok("and the ring-typed form agrees with the positional one",
+            sp.interpretationNameFor(0, sp.outerRing.kind)
+                .equals(sp.interpretationNameFor(0, true)));
     }
 
     private static final String[] SELECTION_ORDER = {"sign", "decan", "sabian", "mansion",

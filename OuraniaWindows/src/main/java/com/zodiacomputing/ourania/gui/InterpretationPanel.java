@@ -298,7 +298,10 @@ public class InterpretationPanel extends JPanel {
             return true;
         }
         if (href.startsWith("body|")) {
-            openBody(parseInt(href.substring(5), -1));
+            // body|N is the natal ring, body|N|1 the outer one. The two-part form is still
+            // accepted because other surfaces emit it for natal placements.
+            String[] bits = href.substring(5).split("\\|");
+            openBody(parseInt(bits[0], -1), bits.length > 1 && "1".equals(bits[1]));
             return true;
         }
         if (href.startsWith("house|")) {
@@ -2058,11 +2061,23 @@ public class InterpretationPanel extends JPanel {
      * supplies - an index link carries only the registry index, so the rest is rebuilt here
      * from the panel exactly as a click on the wheel would.
      */
-    private void openBody(int index) {
+    /**
+     * The full reading for one body, on the ring the reader clicked.
+     *
+     * <b>It used to read natalRing whatever it was given</b>, so on any chart with an outer
+     * wheel the summary card and the reading it opened described different bodies - the card
+     * from the outer ring, the reading from Chart A. What the body is called comes from
+     * {@link SkymapPanel#interpretationNameFor}, the same rule the wheel's own click uses, so
+     * the two doors onto this card cannot answer differently.
+     */
+    // Package-private for the suite: as a private method this could not be reached, and the
+    // first version of Part I passed against the very defect it was written for.
+    void openBody(int index, boolean outer) {
         if (skymapPanel == null || index < 0 || index >= SkymapPanel.BODY_COUNT) {
             return;
         }
-        if (!skymapPanel.natalRing.valid[index]) {
+        WheelRing ring = outer ? skymapPanel.outerRing : skymapPanel.natalRing;
+        if (!ring.valid[index]) {
             StringBuilder html = new StringBuilder();
             html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding:20px;'>");
             html.append("<h2 style='color:#FFFFFF;'>").append(Bodies.at(index).name)
@@ -2076,13 +2091,14 @@ public class InterpretationPanel extends JPanel {
             setHtml(html.toString(), false);
             return;
         }
-        double lon = skymapPanel.natalRing.lon[index];
+        double lon = ring.lon[index];
         int signIdx = com.zodiacomputing.ourania.astro.Zodiac.signIndex(lon);
         int degree = (int) (lon % 30.0) + 1;
         int decan = (int) (lon % 30.0 / 10.0) + 1;
         int house = com.zodiacomputing.ourania.astro.Zodiac.houseOf(lon, skymapPanel.activeCusps);
-        showPlanetInterpretation(Bodies.at(index).name, SkymapPanel.SIGN_NAMES[signIdx],
-            degree, decan, house, skymapPanel.getActiveAspectsFor(index, false));
+        showPlanetInterpretation(skymapPanel.interpretationNameFor(index, outer),
+            SkymapPanel.SIGN_NAMES[signIdx],
+            degree, decan, house, skymapPanel.getActiveAspectsFor(index, outer));
     }
 
     /** The lead sentence of a prose entry, for an index row. Never the whole paragraph. */
@@ -3645,8 +3661,11 @@ public class InterpretationPanel extends JPanel {
             cardMeta(html, aspectCount + (aspectCount == 1 ? " active aspect" : " active aspects"));
         }
 
+        // <b>The ring goes in the link.</b> This card knows which wheel it is describing and
+        // used to drop that on the way out, so Read in full always opened Chart A - with Chart A
+        // and Sky up, a card reading "Sun in Libra" opened the natal Sun in Leo. David, 25 Sep.
         cardLinks(html, new String[][] {
-            {"body|" + index, "Read in full"},
+            {"body|" + index + "|" + (isTransit ? "1" : "0"), "Read in full"},
             {"sign|" + signName, signName},
             {"decan|" + signName + "|" + decanNum, "Decan " + decanNum},
             {"sabian|" + signName + "|" + degree, "Sabian"}
