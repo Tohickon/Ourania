@@ -88,6 +88,19 @@ public final class Moments {
      * @param zone  the zone of the place it was written in
      */
     public static Resolved resolve(LocalDate date, LocalTime time, ZoneId zone) {
+        return resolve(date, time, zone, Double.NaN);
+    }
+
+    /**
+     * The same, for a caller that knows where the birth happened.
+     *
+     * <b>The longitude is not decoration.</b> Before a place kept standard time its offset was
+     * its own longitude, and this runtime has no record of that for most zones - so a birth early
+     * enough can only be placed correctly by the place itself. See
+     * {@link ZoneCorpus#meanTimeDoubt}.
+     */
+    public static Resolved resolve(LocalDate date, LocalTime time, ZoneId zone,
+                                   double longitude) {
         LocalDateTime local = LocalDateTime.of(date, time);
         List<ZoneOffset> valid = zone.getRules().getValidOffsets(local);
 
@@ -96,6 +109,12 @@ public final class Moments {
         // told, because the alternative - quietly applying a correction - would move charts
         // people have already saved without saying so.
         ZoneCorpus.Doubt doubt = ZoneCorpus.doubtAbout(zone, local);
+        if (doubt == null) {
+            // The hand-sourced spans first, because where both could apply the sourced
+            // figure is the better one: it knows what a country legislated, while the
+            // geographic one only knows where the sun was.
+            doubt = ZoneCorpus.meanTimeDoubt(zone, local, longitude);
+        }
         String doubtNote = doubt == null ? null : doubt.note;
 
         if (valid.size() == 1) {

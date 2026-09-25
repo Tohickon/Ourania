@@ -284,6 +284,78 @@ public final class ZoneCorpus {
         return null;
     }
 
+    /**
+     * How far a local mean time may sit from the longitude that produces it before it is treated
+     * as another city's. Two minutes is half a degree of longitude and well outside the error in
+     * a place's coordinates.
+     */
+    public static final int LMT_TOLERANCE_SECONDS = 120;
+
+    /**
+     * The offset the sun gives a meridian: four minutes of time per degree of longitude.
+     *
+     * <b>This is what local mean time IS</b>, not an approximation of it. Before a place kept
+     * standard time, noon was when the sun crossed its own meridian.
+     */
+    public static int meanTimeAt(double longitudeDegrees) {
+        return (int) Math.round(longitudeDegrees * 240.0);
+    }
+
+    /**
+     * A correction for a birth that predates any transition this runtime records for its zone.
+     *
+     * <p><b>The general half of D5.</b> The hand-written {@link #DOUBTS} fix one country in one
+     * period. This fixes every place, in the period where the answer is derivable rather than
+     * sourced: before the first transition the zone reports local mean time, and if that is not
+     * the local mean time of the place the birth happened at, it belongs to whichever city the
+     * zone was merged onto. 375 of this runtime's 604 zones share a history with another, so this
+     * is not a rare case.
+     *
+     * <p>Returns null when there is nothing to correct - when the moment is after the zone's first
+     * transition, when the offsets agree, or when no longitude is known.
+     *
+     * @param zone      the zone the birth place is in,
+     * @param local     the written local date and time, and
+     * @param longitude the birth place's longitude, east positive
+     */
+    public static Doubt meanTimeDoubt(ZoneId zone, LocalDateTime local, double longitude) {
+        if (zone == null || local == null || Double.isNaN(longitude)) {
+            return null;
+        }
+        java.util.List<java.time.zone.ZoneOffsetTransition> ts = zone.getRules().getTransitions();
+        if (ts.isEmpty()) {
+            return null;
+        }
+        // Only before the first transition. After it the offset is political - a decision about
+        // which zone a country joined - and longitude says nothing about that.
+        LocalDateTime firstChange = ts.get(0).getDateTimeBefore();
+        if (!local.isBefore(firstChange)) {
+            return null;
+        }
+        int asRecorded = ts.get(0).getOffsetBefore().getTotalSeconds();
+        int fromTheSun = meanTimeAt(longitude);
+        int out = Math.abs(fromTheSun - asRecorded);
+        if (out <= LMT_TOLERANCE_SECONDS) {
+            return null;
+        }
+        return new Doubt(zone.getId(), LocalDateTime.MIN, firstChange, out / 60.0,
+            fromTheSun - asRecorded,
+            "Before " + firstChange.toLocalDate() + " this place kept local mean time - noon was "
+                + "when the sun crossed its own meridian. This Java runtime has no record of that "
+                + "for " + zone.getId() + ": it reports " + fmt(asRecorded) + ", which belongs to "
+                + "whichever city the zone was merged onto, where this longitude gives "
+                + fmt(fromTheSun) + ". <b>The chart has been cast at the second</b>, computed from "
+                + "the birth place itself, which is about " + (out / 60) + " minutes "
+                + (fromTheSun > asRecorded ? "ahead of" : "behind") + " what the runtime believed.");
+    }
+
+    /** An offset in seconds, as a reader would write it. */
+    private static String fmt(int seconds) {
+        int s = Math.abs(seconds);
+        return (seconds < 0 ? "-" : "+") + String.format("%02d:%02d:%02d",
+            s / 3600, (s / 60) % 60, s % 60);
+    }
+
     /** The cases this runtime is expected to get right. */
     public static List<Case> sound() {
         List<Case> out = new java.util.ArrayList<>();

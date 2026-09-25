@@ -1076,8 +1076,12 @@ extends JPanel {
             // was cast on an assumption nobody was told about. Moments.resolve returns the same
             // instant Java would, deliberately, so no saved chart moves; what it adds is that
             // the assumption now has a sentence and the other reading has a handle.
+            // <b>The longitude goes in too.</b> Before a place kept standard time its offset
+            // WAS its longitude, and this runtime has no record of that for most zones - 375 of
+            // its 604 share a history with another. A birth early enough can only be placed by
+            // the place itself.
             com.zodiacomputing.ourania.astro.Moments.Resolved r =
-                com.zodiacomputing.ourania.astro.Moments.resolve(d, t, ZoneId.of(zone));
+                com.zodiacomputing.ourania.astro.Moments.resolve(d, t, ZoneId.of(zone), lon);
             // <b>And the reader is told when the runtime's own zone data is wrong.</b> D5:
             // this JDK's Europe/Amsterdam rules are Europe/Brussels', so a Dutch birth between
             // 1892 and 1940 is cast about twenty minutes out - five degrees of Ascendant. The

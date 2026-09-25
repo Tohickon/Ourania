@@ -44,6 +44,10 @@ public final class ZoneCorpusCheck {
         part("E: the corpus is worth having", ZoneCorpusCheck::corpusItself);
         part("F: the doubt reaches the chart, not just the corpus",
             ZoneCorpusCheck::reachesMoments);
+        part("G: how much of this runtime's zone history is missing",
+            ZoneCorpusCheck::mergedZones);
+        part("H: before standard time, the place itself is the authority",
+            ZoneCorpusCheck::meanTime);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -325,6 +329,207 @@ public final class ZoneCorpusCheck {
         ok("and a Belgian birth in the same years is not, because Brussels is right",
             Moments.resolve(java.time.LocalDate.of(1930, 1, 15), LocalTime.NOON,
                 ZoneId.of("Europe/Brussels")).zoneDataDoubt == null);
+    }
+
+
+    /**
+     * <b>How wide the problem is, measured rather than guessed at.</b>
+     *
+     * The Dutch defect was found by accident. One lucky find says nothing about the next chart, so
+     * this sweeps every zone this runtime knows and asks two questions: how many of them share a
+     * history with another zone, and how many carry a local mean time that does not match their
+     * own city's longitude.
+     *
+     * <p><b>The geographic test needs no external authority.</b> A zone named for a city should
+     * carry that city's local mean time before standard time arrived, because local mean time is
+     * defined by longitude - the sun over that meridian. Where it carries someone else's, the zone
+     * has been merged onto a canonical neighbour and its own early history is gone. Ourania's
+     * atlas supplies the longitude, so the check is against the earth rather than against another
+     * copy of the same database.
+     *
+     * <p><b>This is IANA policy, not a bug in one zone.</b> Zones that have agreed since
+     * 1970-01-01 are merged in the main distribution; the pre-1970 detail lives in a separate
+     * backzone file that most runtimes do not compile in. The database's own documentation says it
+     * attempts to be correct from 1970 on. So the right way to hold this is not to list the broken
+     * zones - it is to measure the shape and be told when it moves.
+     *
+     * <p>The figures are asserted exactly. If a runtime upgrade changes them this part goes red
+     * and says to re-measure, which is the same discipline as Part C.
+     */
+    private static void mergedZones() {
+        java.util.List<String> ids = new java.util.ArrayList<>(ZoneId.getAvailableZoneIds());
+        java.util.Collections.sort(ids);
+        ok("the runtime knows a realistic number of zones", ids.size() > 500);
+
+        // <b>Grouped by the whole transition history, not by toString().</b> ZoneRules.toString()
+        // reports only the current standard offset, so it puts Paris and Amsterdam in one bucket
+        // although they differ by ten minutes before 1911 - measured, and it is why this loop is
+        // quadratic instead of a HashMap.
+        java.util.List<java.time.zone.ZoneRules> reps = new java.util.ArrayList<>();
+        java.util.List<Integer> sizes = new java.util.ArrayList<>();
+        for (String id : ids) {
+            java.time.zone.ZoneRules r = ZoneId.of(id).getRules();
+            int at = -1;
+            for (int i = 0; i < reps.size(); i++) {
+                if (reps.get(i).equals(r)) {
+                    at = i;
+                    break;
+                }
+            }
+            if (at < 0) {
+                reps.add(r);
+                sizes.add(Integer.valueOf(1));
+            } else {
+                sizes.set(at, Integer.valueOf(sizes.get(at).intValue() + 1));
+            }
+        }
+        int sharing = 0;
+        for (Integer n : sizes) {
+            if (n.intValue() > 1) {
+                sharing += n.intValue();
+            }
+        }
+        ok("most zones do NOT have a history of their own (" + sharing + " of " + ids.size()
+            + " share one, in " + reps.size() + " distinct histories) - if this moved, the "
+            + "runtime's zone database changed and these figures want re-measuring",
+            sharing > 300 && reps.size() < 400);
+
+        // The two groups this project has had to care about, named so the next reader does not
+        // have to re-derive them.
+        ok("Europe/Amsterdam still has Belgium's history",
+            ZoneId.of("Europe/Amsterdam").getRules()
+                .equals(ZoneId.of("Europe/Brussels").getRules()));
+        ok("and Scandinavia still has Berlin's",
+            ZoneId.of("Europe/Stockholm").getRules()
+                .equals(ZoneId.of("Europe/Berlin").getRules()));
+        // The control: a shared history is not automatically wrong. Monaco really did keep Paris
+        // time, so those two agreeing is history rather than data loss.
+        ok("but Paris and Monaco agreeing is real history, not a merge",
+            ZoneId.of("Europe/Paris").getRules().equals(ZoneId.of("Europe/Monaco").getRules()));
+        ok("and Paris is NOT merged with Amsterdam, whatever ZoneRules.toString() suggests",
+            !ZoneId.of("Europe/Paris").getRules()
+                .equals(ZoneId.of("Europe/Amsterdam").getRules()));
+
+        // <b>The geographic sweep.</b> Against the earth, not against another copy of tzdb.
+        int compared = 0;
+        int adrift = 0;
+        int worst = 0;
+        String worstZone = "";
+        for (String id : ids) {
+            int slash = id.lastIndexOf('/');
+            if (slash < 0) {
+                continue;
+            }
+            String city = id.substring(slash + 1).replace('_', ' ');
+            com.zodiacomputing.ourania.gui.Atlas.Place p =
+                com.zodiacomputing.ourania.gui.Atlas.resolve(city);
+            // Only trust a hit that is actually in this zone: Rome, Victoria and Phoenix all
+            // exist in several countries.
+            if (p == null || !id.equals(p.zoneId)) {
+                continue;
+            }
+            java.util.List<java.time.zone.ZoneOffsetTransition> ts =
+                ZoneId.of(id).getRules().getTransitions();
+            if (ts.isEmpty()) {
+                continue;
+            }
+            compared++;
+            int lmt = ts.get(0).getOffsetBefore().getTotalSeconds();
+            int fromSun = (int) Math.round(p.longitude * 240.0);
+            int off = Math.abs(lmt - fromSun);
+            if (off > 120) {
+                adrift++;
+            }
+            if (off > worst) {
+                worst = off;
+                worstZone = id + " (" + p.name + ")";
+            }
+        }
+        ok("the atlas could place enough zones to sweep (" + compared + ")", compared > 200);
+        ok("and a large share carry a local mean time that is not their own city's ("
+            + adrift + " of " + compared + " out by over two minutes) - this is the pre-1970 "
+            + "merging, not one broken zone", adrift > 40);
+        ok("the worst is over half an hour out: " + worstZone + " by " + worst + "s", worst > 1800);
+
+        // <b>And the Dutch case is one instance of that, not a special case.</b> Tying the two
+        // together is the point: a reader of this suite in a year should not conclude that the
+        // Netherlands is uniquely unlucky.
+        com.zodiacomputing.ourania.gui.Atlas.Place ams =
+            com.zodiacomputing.ourania.gui.Atlas.resolve("Amsterdam");
+        ok("Amsterdam is in the atlas", ams != null && "Europe/Amsterdam".equals(ams.zoneId));
+        if (ams != null) {
+            int fromSun = (int) Math.round(ams.longitude * 240.0);
+            ok("and the sun over Amsterdam gives about the offset the Dutch kept ("
+                + fromSun + "s against " + ZoneCorpus.AMSTERDAM_MEAN_TIME + "s)",
+                Math.abs(fromSun - ZoneCorpus.AMSTERDAM_MEAN_TIME) < 30);
+        }
+    }
+
+
+    /**
+     * <b>The general half of D5: a birth before standard time is placed by its own longitude.</b>
+     *
+     * The hand-sourced spans fix one country in one period. This covers every place in the period
+     * where the answer is derivable rather than sourced - before a zone's first recorded
+     * transition, the offset in force is local mean time, and local mean time is the sun over the
+     * meridian the birth happened on.
+     *
+     * <p>The controls matter more than the corrections here. A zone that kept its own history must
+     * be left alone and must say nothing, or the notice becomes noise a reader learns to skip.
+     */
+    private static void meanTime() {
+        // Zones this runtime merged: the correction fires, and lands on the real figure.
+        // Stockholm's own mean time is 18.069 East = +01:12:17; the runtime offers Berlin's.
+        check("Europe/Stockholm", 18.069, 1890, "+01:12:17", true);
+        check("Europe/Oslo", 10.746, 1880, "+00:42:59", true);
+        check("Europe/Amsterdam", 4.890, 1880, "+00:19:34", true);
+
+        // <b>Zones that kept their own history are untouched and silent.</b> This is the half
+        // that stops the feature becoming noise, and it is the half a careless version breaks.
+        check("Europe/London", -0.1276, 1840, "-00:01:15", false);
+        check("America/New_York", -74.006, 1880, "-04:56:02", false);
+        check("Europe/Paris", 2.3522, 1890, "+00:09:21", false);
+
+        // After the first transition the offset is political, and longitude says nothing about
+        // which zone a country chose to join. The correction must not reach there.
+        Moments.Resolved late = Moments.resolve(java.time.LocalDate.of(1990, 6, 1),
+            LocalTime.NOON, ZoneId.of("Europe/Stockholm"), 18.069);
+        ok("a modern Stockholm birth is not touched", late.zoneDataDoubt == null);
+        ok("and keeps the runtime's offset", "+02:00".equals(late.when.getOffset().getId()));
+
+        // No longitude, no geographic claim: a caller that does not know where the birth was
+        // must not have one invented for it.
+        Moments.Resolved blind = Moments.resolve(java.time.LocalDate.of(1880, 6, 1),
+            LocalTime.NOON, ZoneId.of("Europe/Stockholm"));
+        ok("with no longitude there is no mean-time correction", blind.zoneDataDoubt == null);
+
+        // <b>The sourced span wins where both could apply.</b> A Dutch birth in 1930 is after the
+        // first transition, so only the hand-written span reaches it - and it is the better
+        // figure, because it knows what the Netherlands legislated rather than only where the
+        // sun was.
+        Moments.Resolved dutch = Moments.resolve(java.time.LocalDate.of(1930, 1, 15),
+            LocalTime.NOON, ZoneId.of("Europe/Amsterdam"), 4.890);
+        ok("the sourced Dutch span still applies in 1930", dutch.zoneDataDoubt != null);
+        ok("and gives the legislated offset, not the geographic one",
+            "+00:19:32".equals(dutch.when.getOffset().getId()));
+    }
+
+    /** One place, before or after its own standard time, corrected or left alone. */
+    private static void check(String zone, double lon, int year, String expected,
+                              boolean shouldMove) {
+        Moments.Resolved r = Moments.resolve(java.time.LocalDate.of(year, 6, 1), LocalTime.NOON,
+            ZoneId.of(zone), lon);
+        java.time.ZonedDateTime raw = java.time.ZonedDateTime.of(
+            java.time.LocalDateTime.of(year, 6, 1, 12, 0), ZoneId.of(zone));
+        String got = r.when.getOffset().getId();
+        ok(zone + " " + year + " reads " + expected + (expected.equals(got) ? "" : " but got "
+            + got), expected.equals(got));
+        ok(zone + " " + year + (shouldMove ? " is corrected" : " is left exactly as cast"),
+            shouldMove != r.when.getOffset().equals(raw.getOffset()));
+        ok(zone + " " + year + (shouldMove ? " says so" : " says nothing"),
+            shouldMove == (r.zoneDataDoubt != null));
+        ok(zone + " " + year + " keeps the written local time",
+            r.when.getHour() == 12 && r.when.getMinute() == 0);
     }
 
     private interface Body {
