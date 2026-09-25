@@ -1106,9 +1106,20 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
-    public void showInterpretationForTransitAspect(String transiting, String natal, String aspectType) {
+    /**
+     * A reading for a contact between a moving body and the chart being read.
+     *
+     * @param movingWord what ring the moving body came from - "sky", "transiting", "progressed".
+     *     {@code SkymapPanel.ringWord} is where that is decided; nothing here should guess it.
+     * @param natalOwner what the inner wheel's body belongs to - "natal", or "Chart A's" in a
+     *     synastry, where "natal" alone does not say which of the two people is meant.
+     */
+    public void showInterpretationForTransitAspect(String transiting, String natal,
+                                                   String aspectType, String movingWord,
+                                                   String natalOwner) {
         if (interpretationPanel != null) {
-            selectReading(() -> interpretationPanel.showTransitAspectInterpretation(transiting, natal, aspectType));
+            selectReading(() -> interpretationPanel.showTransitAspectInterpretation(
+                transiting, natal, aspectType, movingWord, natalOwner));
         }
     }
 

@@ -2423,7 +2423,8 @@ public final class NavigationCheck {
                         case "house": win.showInterpretationForHouse(5); break;
                         case "aspect": win.showInterpretationForAspect("Sun", "Moon", "Trine"); break;
                         case "synastry aspect": win.showInterpretationForSynastryAspect("Sun", "Moon", "Trine"); break;
-                        case "transit aspect": win.showInterpretationForTransitAspect("Mars", "Sun", "Square"); break;
+                        case "transit aspect": win.showInterpretationForTransitAspect(
+                            "Mars", "Sun", "Square", "transiting", "natal"); break;
                         case "index": win.showIndexPanel(""); break;
                         case "pattern": win.handlePlacementClick(InterpretationPanel.patternHref("Grand trine",
                             java.util.List.of("Moon", "Sun", "Venus"))); break;

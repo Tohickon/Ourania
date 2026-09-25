@@ -2808,11 +2808,25 @@ public class InterpretationPanel extends JPanel {
      * handing "transit_sun" to getAspect as a body name returns "Interpretation not found",
      * which is what every transit cell would have shown had they ever been clickable.
      */
-    public void showTransitAspectInterpretation(String transiting, String natal, String aspectType) {
+    /**
+     * @param movingWord which ring the moving body came from, from
+     *     {@code SkymapPanel.ringWord}. The heading said "Transiting" whatever the ring, so a
+     *     sky contact was described in the outer wheel's vocabulary and a progressed body was
+     *     called a transit.
+     * @param natalOwner what the inner wheel's body belongs to, from
+     *     {@code SkymapPanel.innerOwnerWord}. "natal" does not say whose in a synastry.
+     */
+    public void showTransitAspectInterpretation(String transiting, String natal,
+                                                String aspectType, String movingWord,
+                                                String natalOwner) {
+        String ring = movingWord == null || movingWord.isEmpty() ? "transiting" : movingWord;
+        String owner = natalOwner == null || natalOwner.isEmpty() ? "natal" : natalOwner;
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
-        html.append("<h2 style='color:#00BFFF;'>Transiting ").append(transiting).append(" ")
-            .append(aspectType).append(" natal ").append(natal).append("</h2>");
+        html.append("<h2 style='color:#00BFFF;'>").append(transiting)
+            .append(" (").append(ring).append(") ")
+            .append(aspectType).append(" ").append(owner).append(" ")
+            .append(natal).append("</h2>");
         html.append("<p>").append(InterpretationService.getInstance()
             .getTransitAspect(transiting, natal, aspectType)).append("</p>");
         html.append("</body></html>");

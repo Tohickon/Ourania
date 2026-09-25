@@ -142,6 +142,22 @@ extends JPanel {
      * the aspect readout has drawn it since the sky got its own row - it had simply never
      * reached the tooltip. One statement of it now, and both read it.
      */
+    /**
+     * What the inner wheel's bodies belong to, ready to stand in front of a body name.
+     *
+     * <b>"natal" does not say whose.</b> In a synastry there are two people and the inner wheel
+     * is Chart A, so a reading headed "conjunct natal Sun" leaves the reader to work out which
+     * of them it means - and the answer is never on the screen. David asked exactly that on
+     * 2026-09-24.
+     *
+     * <b>Separate from {@link #ringWord} because the inner wheel takes no qualifier on the
+     * wheel itself</b> - a body with no ring word is understood to be the chart being read -
+     * but prose about a pair of bodies has to name both ends.
+     */
+    String innerOwnerWord() {
+        return this.isSynastryChart() ? "Chart A's" : "natal";
+    }
+
     String ringWord(int ring) {
         if (ring == WHEEL_NATAL) {
             return null;
@@ -6405,11 +6421,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             + " background:#12151A; color:#E0E0E0;'>");
         sb.append("<div style='font-size:13px;'><b>").append(BODY_NAMES[a]);
         if (transit) {
-            // Named for its own ring: "(partner)" and "(sky)" are different claims about the
-            // same glyph, and the card used to say the outer wheel's word for both.
-            sb.append(" <span style='color:#5A7FBF;'>(")
-                  .append(wheel == WHEEL_SKY ? SKY_RING_WORD : this.outerRingWord())
-                  .append(")</span>");
+            // Named for its own ring: "(Chart B)" and "(sky)" are different claims about
+            // the same glyph, and the card used to say the outer wheel's word for both.
+            //
+            // <b>Through ringWord, which is where that rule lives.</b> This line was a second
+            // copy of it and had no synastry branch, so in a synastry Chart B's Uranus was
+            // labelled "(transiting)" - a person described as a passing event. ringWord's own
+            // javadoc records this being fixed for the hover card; this surface was not given
+            // the same treatment, which is the shape this project logs more than any other.
+            String word = this.ringWord(wheel);
+            if (word != null) {
+                sb.append(" <span style='color:#5A7FBF;'>(").append(word).append(")</span>");
+            }
         }
         sb.append("</b> <span style='color:").append(this.getAspectColorHex(type.label))
           .append("; font-size:15px;'>").append(this.getAspectSymbol(type.label))
@@ -6843,8 +6866,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         this.window.showInterpretationForSynastryAspect(
                             outer, aspectParts[1], aspectParts[2]);
                     } else {
+                        // <b>Both ends named, from the one rule.</b> The heading used to be
+                        // "Transiting X conjunct natal Y" whatever the ring and whatever the
+                        // mode: it called the sky ring by the outer ring's word, called a
+                        // progressed body a transit, and never said which person "natal" meant.
                         this.window.showInterpretationForTransitAspect(
-                            outer, aspectParts[1], aspectParts[2]);
+                            outer, aspectParts[1], aspectParts[2],
+                            this.ringWord(wheelOf(aspectParts)), this.innerOwnerWord());
                     }
                 } else {
                     this.window.showInterpretationForAspect(aspectParts[0], aspectParts[1], aspectParts[2]);
@@ -8398,6 +8426,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             stringBuilder.append("<td style='color:").append(this.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
         }
         stringBuilder.append("</tr>");
+        // <b>And the block above the sky one had no band at all.</b> Its rows sat straight
+        // under the heading, so in a synastry the grid never said "Chart B" anywhere - which is
+        // what David asked about on 2026-09-24: where are chart A and chart B in any of it.
+        // A natal-only grid still gets none, because ringWord has no word for the inner wheel:
+        // rows that are simply the chart being read need no qualifier.
+        this.appendGridBand(stringBuilder, n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL, gridCols);
         this.appendGridRows(stringBuilder, n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL, cell, glyph);
         // <b>The sky ring had no rows here at all.</b> It is drawn, it is hovered, it has its
         // own field of chords - and the grid, which is where a reader goes to find an aspect
@@ -8408,9 +8442,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // reader's filter had cross-chart lines switched off would be naming pairs the wheel
         // deliberately does not draw.
         if (n3 != 0 && this.triRingDrawn()) {
-            stringBuilder.append("<tr><td colspan='").append(gridCols + 1)
-                .append("' style='color:#8FD0FF; font-size:10px; text-align:left; padding:3px 0 1px 2px; background-color:#111;'>")
-                .append("sky</td></tr>");
+            this.appendGridBand(stringBuilder, WHEEL_SKY, gridCols);
             this.appendGridRows(stringBuilder, WHEEL_SKY, cell, glyph);
         }
         stringBuilder.append("</table>");
@@ -8429,6 +8461,30 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * Columns are always the natal points: every aspect on this grid is something aspecting
      * the chart. The natal rows are the triangular half, since a natal pair appears once.
      */
+    /**
+     * A band across the grid naming the ring whose rows follow it.
+     *
+     * <b>Through ringWord, not a literal.</b> The sky band used to be the string "sky" written
+     * here, which is a second copy of a rule that already had a home - and the copies on this
+     * particular question have drifted apart five times now, most recently leaving Chart B
+     * labelled "(transiting)" on the aspect card. One helper, one source, and the grid cannot
+     * disagree with the card about what a ring is called.
+     *
+     * <b>Silent for the inner wheel.</b> {@link #ringWord} returns null there: rows that are
+     * simply the chart being read need no qualifier, and a band saying "natal" over a natal-only
+     * grid would be noise.
+     */
+    private void appendGridBand(StringBuilder sb, int ring, int gridCols) {
+        String word = this.ringWord(ring);
+        if (word == null) {
+            return;
+        }
+        sb.append("<tr><td colspan='").append(gridCols + 1)
+          .append("' style='color:#8FD0FF; font-size:10px; text-align:left;"
+              + " padding:3px 0 1px 2px; background-color:#111;'>")
+          .append(word).append("</td></tr>");
+    }
+
     private void appendGridRows(StringBuilder out, int wheel, int cell, int glyph) {
         double[] lon = this.wheelLon(wheel);
         boolean[] valid = this.wheelValid(wheel);

@@ -1288,6 +1288,43 @@ public final class AspectGridCheck {
         setField(sky, "houseSystem", (char) PANEL_HSYS);
         sky.updateChartData();
 
+        // <b>The ring words, and the card that prints them, asserted together.</b> ringWord
+        // states the rule; aspectHoverHtml is what a reader actually sees. Checked apart, a
+        // second copy of the rule inside the card survives every assertion about the rule -
+        // which is precisely what had happened: the card carried its own "sky or transiting"
+        // fork with no synastry branch, so Chart B's body was labelled a transit. David saw it
+        // on 2026-09-24 and asked, reasonably, where Chart A and Chart B were in any of it.
+        Method ringWord = SkymapPanel.class.getDeclaredMethod("ringWord", int.class);
+        ringWord.setAccessible(true);
+        Method innerOwner = SkymapPanel.class.getDeclaredMethod("innerOwnerWord");
+        innerOwner.setAccessible(true);
+
+        ok("in a synastry the outer ring is Chart B",
+            "Chart B".equals(ringWord.invoke(sky, SkymapPanel.WHEEL_OUTER)));
+        ok("and the sky ring is still the sky",
+            "sky".equals(ringWord.invoke(sky, SkymapPanel.WHEEL_SKY)));
+        ok("and the inner wheel is Chart A's, because natal does not say whose",
+            "Chart A's".equals(innerOwner.invoke(sky)));
+
+        // The consumer, in the mode where the bug lived.
+        String cardB = sky.aspectHoverHtml(
+            "aspect|transit_Uranus|Saturn|Conjunction|" + SkymapPanel.WHEEL_OUTER);
+        ok("the aspect card names Chart B's body Chart B", cardB.contains("(Chart B)"));
+        ok("and does not call a person a transit", !cardB.contains("(transiting)"));
+
+        String cardSky = sky.aspectHoverHtml(
+            "aspect|transit_Jupiter|Sun|Conjunction|" + SkymapPanel.WHEEL_SKY);
+        ok("a sky body is called the sky, in the same chart", cardSky.contains("(sky)"));
+        ok("and is not called Chart B", !cardSky.contains("(Chart B)"));
+
+        // And outside a synastry the inner wheel needs no owner.
+        setField(sky, "chartMode", ChartMode.TRANSIT);
+        ok("outside a synastry the inner wheel is just natal",
+            "natal".equals(innerOwner.invoke(sky)));
+        ok("and the outer ring is a moment again",
+            "transiting".equals(ringWord.invoke(sky, SkymapPanel.WHEEL_OUTER)));
+        setField(sky, "chartMode", ChartMode.SYNASTRY);
+
         Method gen = SkymapPanel.class.getDeclaredMethod("generatePlanetPlacementsHtml");
         gen.setAccessible(true);
         String htmlTri = (String) gen.invoke(sky);
@@ -1911,6 +1948,17 @@ public final class AspectGridCheck {
         System.out.println("  tri-wheel grid: " + outerCells + " partner cells, "
             + skyCells + " sky cells");
         ok("the tri-wheel grid carries sky cells", skyCells > 0);
+
+        // <b>And the grid says whose rows they are.</b> The sky block had a band reading "sky",
+        // written here as a literal; the partner block above it had no band at all, so a reader
+        // scanning a synastry grid found nowhere that said "Chart B" - which is what David asked
+        // on 2026-09-24. Both bands come from ringWord now, so the grid, the aspect card and the
+        // reading heading cannot drift apart about what a ring is called, which they had done
+        // five times before this.
+        ok("the synastry grid names the partner block Chart B", withSky.contains(">Chart B</td>"));
+        ok("and names the sky block sky", withSky.contains(">sky</td>"));
+        ok("and does not call the partner block a transit",
+            !withSky.contains(">transiting</td>"));
         ok("the tri-wheel grid still carries partner cells", outerCells > 0);
 
         setField(sky, "showTriWheel", Boolean.FALSE);
