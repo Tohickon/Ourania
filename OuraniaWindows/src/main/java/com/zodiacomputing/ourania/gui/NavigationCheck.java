@@ -1498,6 +1498,11 @@ public final class NavigationCheck {
             java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
             fs.setAccessible(true);
             SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            // <b>A settle, and knowingly still a guess.</b> This waits for a freshly opened
+            // window rather than for any computed result, so there is no condition here that
+            // honestly means "it has settled" - and waiting on one that can never become true
+            // would trade a flake for a hang. The wait that DID have a condition, for the rings
+            // below, is a deadline loop now.
             Thread.sleep(2500);
 
             com.zodiacomputing.ourania.astro.ChartSubject a =
@@ -1528,7 +1533,18 @@ public final class NavigationCheck {
             flags.setAccessible(true);
             flags.invoke(panel);
             panel.updateChartData();
-            Thread.sleep(1500);
+
+            // <b>Wait for the rings, do not guess how long they take.</b> This was
+            // Thread.sleep(1500), and under regression load it stopped being enough: reg17 on
+            // 2026-09-25 reported both assertions below as failures on a tree where they pass
+            // standalone, twice. That is the defect ec44b792 fixed in two other suites, and the
+            // idiom is already used further down this same part. Returning as soon as the rings
+            // are drawn also makes the ordinary case faster than the sleep it replaces.
+            long drawnBy = System.currentTimeMillis() + 30000;
+            while (System.currentTimeMillis() < drawnBy
+                    && !(panel.outerRingDrawn() && panel.triRingDrawn())) {
+                Thread.sleep(100);
+            }
 
             ok("the middle ring is drawn", panel.outerRingDrawn());
             ok("and the sky has a ring of its own", panel.triRingDrawn());

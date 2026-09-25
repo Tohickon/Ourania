@@ -125,6 +125,10 @@ public class SettingsPanel extends JPanel {
     /** The sentence under the Orbs heading, and the button that puts one profile back. */
     private JLabel orbProfileNote;
     private javax.swing.JButton orbResetButton;
+
+    /** The four tabs, and the preset bar that sits above them. Held so the bar can be hidden. */
+    private javax.swing.JTabbedPane tabs;
+    private JPanel orbBar;
     private final JLabel status = new JLabel(" ");
     /** Settings > Calculation Variants: the one transit orb. */
     javax.swing.JSpinner transitOrb;
@@ -172,14 +176,19 @@ public class SettingsPanel extends JPanel {
         header.add(title, BorderLayout.CENTER);
         add(header, BorderLayout.NORTH);
 
-        JPanel body = new JPanel();
-        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        body.setBackground(Color.BLACK);
-        body.setBorder(BorderFactory.createEmptyBorder(0, 30, 20, 30));
+        // <b>One column per tab, and `body` points at whichever is being filled.</b> Every
+        // section below is added to `body` in sequence, as it was when there was one column;
+        // what changed in the move to tabs is where `body` points, not a single add() call. A
+        // section therefore cannot be dropped or duplicated by the restructure without the
+        // boundary that did it being visible in the diff.
+        JPanel display = column();
+        JPanel aspects = column();
+        JPanel points = column();
+        JPanel engine = column();
 
-        // First on the screen, because it is about everything below it.
-        body.add(savedSetsRow());
-        body.add(profileBar());
+        // Chart Settings first, and it is an engine rule: harmonic, house system, what the
+        // animation moves.
+        JPanel body = engine;
 
         // <b>The chart's own dropdowns, moved here off the wheel's control strip.</b> Seven
         // labelled combos sat under the chart beside the play button - harmonic, animate
@@ -202,6 +211,7 @@ public class SettingsPanel extends JPanel {
             body.add(Box.createRigidArea(new Dimension(0, 18)));
         }
 
+        body = aspects;
         body.add(heading("Aspects Shown"));
         body.add(note("Every aspect ticked here is drawn on the wheel and listed in the "
             + "aspect grid. Unticking one removes it from both - they read the same gate, so "
@@ -211,6 +221,7 @@ public class SettingsPanel extends JPanel {
         body.add(aspectBoxes());
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
+        body = display;
         body.add(heading("Colour Template"));
         body.add(note("A template sets the whole chart at once - every aspect, the four "
             + "elements, the mansion ring and the wheel's own background. Choosing one clears "
@@ -532,6 +543,7 @@ public class SettingsPanel extends JPanel {
         body.add(modeRow);
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
+        body = points;
         body.add(heading("Chart Points"));
         body.add(note("Everything ticked here is drawn on the wheel, listed in the "
             + "placements panel and included in the aspect grid. Everything unticked is "
@@ -552,18 +564,90 @@ public class SettingsPanel extends JPanel {
         body.add(groups);
 
         body.add(Box.createRigidArea(new Dimension(0, 16)));
+        body = engine;
         body.add(variantToggles());
+        body = aspects;
         body.add(natalOrbs());
         body.add(Box.createRigidArea(new Dimension(0, 8)));
         body.add(note("Aspect lines are drawn between bodies, not to the four angles. Click "
             + "an angle on the wheel to see what it currently contacts."));
 
+        // <b>A footer, not the bottom of one tab.</b> "Saved" is about whatever the reader
+        // just changed, and on a tabbed screen the tab they changed it on may not be showing.
         status.setForeground(DIM);
         status.setFont(Theme.font("Arial", Font.ITALIC, 12));
         status.setAlignmentX(Component.LEFT_ALIGNMENT);
-        body.add(Box.createRigidArea(new Dimension(0, 14)));
-        body.add(status);
 
+        // <b>What governs every tab sits above them.</b> The preset bar decides which orb
+        // table the Aspects and Bodies tabs are showing, and Reset puts that whole preset back -
+        // widths and ceilings together. On a tab, either would be a control silently reaching
+        // into another one. A single instance up here also means there is no second copy of the
+        // bar to keep in step, which is the defect this project logs most.
+        JPanel above = new JPanel();
+        above.setLayout(new BoxLayout(above, BoxLayout.Y_AXIS));
+        above.setBackground(Color.BLACK);
+        above.setBorder(BorderFactory.createEmptyBorder(0, 30, 6, 30));
+        above.add(savedSetsRow());
+        above.add(this.orbBar = profileBar());
+
+        this.tabs = new javax.swing.JTabbedPane();
+        this.tabs.setBackground(Color.BLACK);
+        this.tabs.setForeground(TEXT);
+        this.tabs.setFont(Theme.font("Arial", Font.PLAIN, 13));
+        this.tabs.addTab("Globe & Display", tabScroll(display));
+        this.tabs.addTab("Aspects & Orbs", tabScroll(aspects));
+        this.tabs.addTab("Bodies & Points", tabScroll(points));
+        this.tabs.addTab("Engine Rules", tabScroll(engine));
+        this.tabs.setToolTipTextAt(0, "<html>What the wheel and the globe look like:"
+            + "<br>colours, rings, markers and the globe's own layers.</html>");
+        this.tabs.setToolTipTextAt(1, "<html>Which aspects are drawn, and how wide each may be"
+            + "<br>before it stops counting. The preset above says which chart context.</html>");
+        this.tabs.setToolTipTextAt(2, "<html>Which points the chart shows, their colours, and"
+            + "<br>how wide an aspect to each may be. The preset above applies here too.</html>");
+        this.tabs.setToolTipTextAt(3, "<html>What the engine computes rather than how it is"
+            + "<br>drawn: house system, harmonic, zodiac, transit orb and the variants.</html>");
+
+        // <b>The bar is hidden where it governs nothing.</b> Leaving "Orbs shown for:" over the
+        // globe's colours would claim it applies to them.
+        this.tabs.addChangeListener(e -> syncOrbBar());
+        syncOrbBar();
+
+        JPanel centre = new JPanel(new BorderLayout());
+        centre.setBackground(Color.BLACK);
+        centre.add(above, BorderLayout.NORTH);
+        centre.add(this.tabs, BorderLayout.CENTER);
+
+        JPanel foot = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 4));
+        foot.setBackground(Color.BLACK);
+        foot.setBorder(BorderFactory.createEmptyBorder(0, 30, 6, 30));
+        foot.add(status);
+        centre.add(foot, BorderLayout.SOUTH);
+        add(centre, BorderLayout.CENTER);
+
+        refreshStatus();
+        constructing = false;
+    }
+
+    /** One tab's column, laid out exactly as the single column was. */
+    private JPanel column() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(Color.BLACK);
+        p.setBorder(BorderFactory.createEmptyBorder(8, 30, 20, 30));
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return p;
+    }
+
+    /** Which tabs the orb preset actually governs: the two with orb controls on them. */
+    private void syncOrbBar() {
+        if (this.orbBar == null || this.tabs == null) {
+            return;
+        }
+        int i = this.tabs.getSelectedIndex();
+        this.orbBar.setVisible(i == 1 || i == 2);
+    }
+
+    private JScrollPane tabScroll(JPanel body) {
         JScrollPane scroll = new JScrollPane(body);
         scroll.setBorder(null);
         // Three separate surfaces paint here: the scroll pane, its viewport, and the panel
@@ -574,12 +658,7 @@ public class SettingsPanel extends JPanel {
         scroll.getViewport().setOpaque(true);
         scroll.getViewport().setBackground(Color.BLACK);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
-        add(scroll, BorderLayout.CENTER);
-
-        refreshStatus();
-
-        // Everything is built; from here a change is a real one.
-        constructing = false;
+        return scroll;
     }
 
     private JPanel groupPanel(Bodies.Group group, boolean[] enabled) {
@@ -862,6 +941,8 @@ public class SettingsPanel extends JPanel {
             group.add(b);
             p.add(b);
         }
+        p.add(Box.createRigidArea(new Dimension(12, 0)));
+        p.add(orbReset());
         return p;
     }
 
@@ -1940,13 +2021,17 @@ public class SettingsPanel extends JPanel {
         p.add(orbProfileNote);
         p.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        row.setBackground(Color.BLACK);
-        row.setAlignmentX(Component.LEFT_ALIGNMENT);
-        // <b>It resets what is on screen, and nothing else.</b> The no-argument
-        // resetBodyOrbs now clears all four profiles, so a reader looking at Synastry and
-        // pressing a button labelled "Reset to defaults" would lose the natal table as well -
-        // the thing here they are most likely to have spent time on, with no warning and no undo.
+        // <b>The Reset button is not here.</b> It puts a whole preset back - the point
+        // widths AND the aspect ceilings - and those live on two different tabs, so on either
+        // one it would be a control silently reaching into the other. It is built in
+        // profileBar(), beside the toggles that decide which preset it acts on.
+        refreshProfileWording();
+        p.add(Box.createRigidArea(new Dimension(0, 14)));
+        return p;
+    }
+
+    /** The button that puts one preset back, built where it belongs: beside the preset bar. */
+    private javax.swing.JButton orbReset() {
         orbResetButton = new javax.swing.JButton("Reset Natal to defaults");
         orbResetButton.addActionListener(e -> {
             Settings.resetBodyOrbs(shownProfile);
@@ -1980,11 +2065,7 @@ public class SettingsPanel extends JPanel {
                 window.applyBodySelection();
             }
         });
-        refreshProfileWording();
-        row.add(orbResetButton);
-        p.add(row);
-        p.add(Box.createRigidArea(new Dimension(0, 14)));
-        return p;
+        return orbResetButton;
     }
 
     /**

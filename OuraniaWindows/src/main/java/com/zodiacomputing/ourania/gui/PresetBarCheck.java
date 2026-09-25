@@ -57,6 +57,7 @@ public final class PresetBarCheck {
         part("C: bold is measured against the shown profile", PresetBarCheck::bold);
         part("D: a ceiling's bound moves with the profile", PresetBarCheck::bound);
         part("E: Reset touches only what is on screen", PresetBarCheck::reset);
+        part("F: the four tabs, and what is on each", PresetBarCheck::tabs);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -198,6 +199,78 @@ public final class PresetBarCheck {
         ok("which is the whole point: the button said Synastry",
             !stored(Aspects.Profile.NATAL, NARROW).isEmpty());
         Settings.resetBodyOrbs();
+    }
+
+    // ------------------------------------------------------------------ F
+
+    /** The four tabs David named, in his order. Spelled here so a rename has to be deliberate. */
+    private static final String[] TABS = {
+        "Globe & Display", "Aspects & Orbs", "Bodies & Points", "Engine Rules",
+    };
+
+    /**
+     * Where each control actually landed.
+     *
+     * <b>Existing is not the same as being in the right place.</b> Every other suite here builds
+     * the panel and reaches its controls by field, so all of them would go on passing if a section
+     * boundary were off by one and a whole block of the screen moved to the wrong tab. This asks
+     * which tab a control is under.
+     */
+    private static void tabs() throws Exception {
+        SettingsPanel p = panel();
+        javax.swing.JTabbedPane pane =
+            (javax.swing.JTabbedPane) CheckReflect.get(p, "tabs");
+        ok("the screen has tabs", pane != null);
+        if (pane == null) {
+            return;
+        }
+        ok("four of them", pane.getTabCount() == TABS.length);
+        for (int i = 0; i < Math.min(TABS.length, pane.getTabCount()); i++) {
+            ok("tab " + i + " is " + TABS[i], TABS[i].equals(pane.getTitleAt(i)));
+            ok("and says what it holds", pane.getToolTipTextAt(i) != null
+                && pane.getToolTipTextAt(i).length() > 30);
+        }
+
+        // A point's orb is with the point, and an aspect's ceiling with the aspect - which is
+        // what David asked for on 24 Sep and what the tabs must not undo.
+        ok("a point's orb spinner is on Bodies & Points",
+            tabOf(pane, orbSpinner(p, NARROW)) == 2);
+        ok("an aspect's ceiling is on Aspects & Orbs",
+            tabOf(pane, capSpinner(p, Aspects.Type.values()[0])) == 1);
+
+        javax.swing.JSpinner transit = p.transitOrb;
+        ok("the flat transit orb is on Engine Rules", tabOf(pane, transit) == 3);
+
+        // <b>The bar is above the tabs, not on one.</b> It says which preset the orbs on two tabs
+        // are showing, and Reset puts that whole preset back - widths and ceilings together.
+        javax.swing.JPanel bar = (javax.swing.JPanel) CheckReflect.get(p, "orbBar");
+        ok("the preset bar exists", bar != null);
+        ok("and is on none of the tabs", bar != null && tabOf(pane, bar) < 0);
+        javax.swing.JButton resetButton =
+            (javax.swing.JButton) CheckReflect.get(p, "orbResetButton");
+        ok("Reset is not on a tab either", resetButton == null || tabOf(pane, resetButton) < 0);
+
+        // And it is hidden where it governs nothing.
+        for (int i = 0; i < pane.getTabCount(); i++) {
+            final int which = i;
+            javax.swing.SwingUtilities.invokeAndWait(() -> pane.setSelectedIndex(which));
+            boolean shouldShow = i == 1 || i == 2;
+            ok("the preset bar is " + (shouldShow ? "shown" : "hidden") + " on " + TABS[i],
+                bar != null && bar.isVisible() == shouldShow);
+        }
+    }
+
+    /** Which tab a component sits under, or -1 when it is not under any of them. */
+    private static int tabOf(javax.swing.JTabbedPane pane, Component c) {
+        if (c == null) {
+            return -1;
+        }
+        for (int i = 0; i < pane.getTabCount(); i++) {
+            if (javax.swing.SwingUtilities.isDescendingFrom(c, pane.getComponentAt(i))) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // ------------------------------------------------------------------ driving the panel

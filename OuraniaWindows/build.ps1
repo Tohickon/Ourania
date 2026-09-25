@@ -171,13 +171,35 @@ function Test-TreeUnchanged {
 # failure would be invisible behind them. So: a suite going red that is NOT listed fails the
 # run; a listed suite going green is reported so the list can be trimmed, but does not fail it.
 if ($All) {
+    # Each entry is a suite name and, optionally, how many failures are expected - a count
+    # or a min-max range. The name alone used to be the whole gate, which meant a listed suite
+    # could acquire brand new failures and still pass; reg17 did exactly that.
     $known = @{}
     # More than one list: CI adds known-red-ci.txt, the reds only its runner has.
     foreach ($list in $KnownRed) {
         if (-not (Test-Path $list)) { Write-Host "ERROR: no known-red list '$list'"; exit 1 }
         foreach ($line in Get-Content $list) {
-            $name = ($line -replace '#.*$', '').Trim()
-            if ($name) { $known[$name] = $true }
+            $entry = ($line -replace '#.*$', '').Trim()
+            if (-not $entry) { continue }
+            $parts = $entry -split '\s+'
+            $name = $parts[0]
+            $lo = $null
+            $hi = $null
+            if ($parts.Count -ge 2) {
+                $spec = $parts[1]
+                if ($spec -match '^(\d+)-(\d+)$') {
+                    $lo = [int] $Matches[1]; $hi = [int] $Matches[2]
+                } elseif ($spec -match '^(\d+)$') {
+                    $lo = [int] $Matches[1]; $hi = $lo
+                } else {
+                    Write-Host "ERROR: '$spec' is not a count or a range, for $name in $list"
+                    exit 1
+                }
+                if ($null -ne $hi -and $hi -lt $lo) {
+                    Write-Host "ERROR: range runs backwards for $name in $list"; exit 1
+                }
+            }
+            $known[$name] = @{ lo = $lo; hi = $hi }
         }
     }
     $suites = @()
@@ -199,6 +221,7 @@ if ($All) {
     $rows = @()
     $newRed = @()
     $nowGreen = @()
+    $unguarded = @()
     foreach ($s in $suites) {
         $name = $s[1]
         $fq = "com.zodiacomputing.ourania.$($s[0]).$name"
@@ -219,12 +242,19 @@ if ($All) {
         if ($null -eq $text) { $text = "" }
 
         $verdict = "no verdict"
+        $failCount = $null
         $m = [regex]::Match($text, "ALL CLEAR - ([\d,]+) checks")
         if ($m.Success) { $verdict = "clear, $($m.Groups[1].Value) checks" }
         $m = [regex]::Match($text, "FAILURES \((\d+) of ([\d,]+) checks\)")
-        if ($m.Success) { $verdict = "$($m.Groups[1].Value) of $($m.Groups[2].Value) failed" }
+        if ($m.Success) {
+            $verdict = "$($m.Groups[1].Value) of $($m.Groups[2].Value) failed"
+            $failCount = [int] $m.Groups[1].Value
+        }
         $m = [regex]::Match($text, "FAILURES - ([\d,]+) checks, (\d+) failures")
-        if ($m.Success) { $verdict = "$($m.Groups[2].Value) of $($m.Groups[1].Value) failed" }
+        if ($m.Success) {
+            $verdict = "$($m.Groups[2].Value) of $($m.Groups[1].Value) failed"
+            $failCount = [int] $m.Groups[2].Value
+        }
         if ($timedOut) { $verdict = "TIMED OUT after $SuiteTimeoutMinutes min" }
 
         # -cnotmatch, case-sensitive: PowerShell's -notmatch ignores case, and every clear suite
@@ -232,8 +262,28 @@ if ($All) {
         $passed = (-not $timedOut) -and ($p.ExitCode -eq 0) -and ($text -cnotmatch "FAILURES")
         $status = "pass"
         if (-not $passed) {
-            if ($known.ContainsKey($name)) { $status = "known red" }
-            else { $status = "RED"; $newRed += $name }
+            if ($known.ContainsKey($name)) {
+                $spec = $known[$name]
+                if ($null -eq $spec.hi) {
+                    # No count on the entry: the old behaviour, and named as such at the end so
+                    # nobody mistakes it for a guarded one.
+                    $status = "known red (unguarded)"
+                    $unguarded += $name
+                } elseif ($timedOut -or $null -eq $failCount) {
+                    # A listed suite that did not say how many failed cannot be checked against
+                    # its count, and waving it through is the hole this closes.
+                    $status = "known red, NO COUNT"
+                    $newRed += "$name (listed at $($spec.lo)-$($spec.hi) but printed no count)"
+                } elseif ($failCount -gt $spec.hi) {
+                    $status = "MORE RED THAN KNOWN"
+                    $newRed += "$name ($failCount failures, $($spec.hi) expected at most)"
+                } elseif ($failCount -lt $spec.lo) {
+                    $status = "less red than known"
+                    $nowGreen += "$name ($failCount failures, $($spec.lo) expected at least)"
+                } else {
+                    $status = "known red"
+                }
+            } else { $status = "RED"; $newRed += $name }
         } elseif ($known.ContainsKey($name)) {
             $status = "pass (listed as known red)"
             $nowGreen += $name
@@ -251,15 +301,19 @@ if ($All) {
     if (-not $valid) { exit 1 }
     if ($nowGreen.Count -gt 0) {
         Write-Host ""
-        Write-Host "Listed in known-red.txt but passed - take them off the list: $($nowGreen -join ', ')"
+        Write-Host "Listed as red but did better - tighten or remove the entry: $($nowGreen -join ', ')"
+    }
+    if ($unguarded.Count -gt 0) {
+        Write-Host ""
+        Write-Host "Listed with NO expected count, so new failures in them are invisible: $($unguarded -join ', ')"
     }
     if ($newRed.Count -gt 0) {
         Write-Host ""
-        Write-Host "REGRESSION RED - $($newRed.Count) suite(s) failed that are not in known-red.txt: $($newRed -join ', ')"
+        Write-Host "REGRESSION RED - $($newRed.Count): $($newRed -join '; ')"
         exit 1
     }
     Write-Host ""
-    Write-Host "REGRESSION OK - every suite passed, or failed only as known-red.txt expects."
+    Write-Host "REGRESSION OK - every suite passed, or failed exactly as known-red.txt expects."
     exit 0
 }
 

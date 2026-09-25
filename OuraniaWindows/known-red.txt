@@ -4,8 +4,13 @@
 # One suite name per line; everything after # is the reason. Take a line out the moment the
 # suite is fixed - an entry that outlives its defect hides the next failure in that suite.
 # Measured 2026-09-19, after J14 made every suite start from a fresh install.
+#
+# The number after the name is how many failures are expected - a count, or a range like
+# 10-12. MORE than that fails the run, which is the point: without it a listed suite could
+# acquire brand new breakage and still pass, and on 2026-09-25 one did. Fewer is reported so
+# the entry gets tightened. An entry with no number still works and is named as unguarded.
 
-BodyCheck        # 50 in Part A2: Ceres-Vesta null at 1900 everywhere; and in CI the four numbered-asteroid files (Hygiea, Eros, Nessus, Eris) are not downloadable - Resources/wiki/ourania-ephemeris-fallback.md
-CompositeCheck   # 2: Part E, the Part of Spirit instability flag and its warning
-SynastryCheck    # 112: a real defect, not yet investigated; unchanged by settings
-NavigationCheck  # 8 in Part K: a fresh install's cold open misdescribes the empty charts; 2-4 in Part Q vary with the clock
+BodyCheck        50     # 50 in Part A2: Ceres-Vesta null at 1900 everywhere; and in CI the four numbered-asteroid files (Hygiea, Eros, Nessus, Eris) are not downloadable - Resources/wiki/ourania-ephemeris-fallback.md
+CompositeCheck   2      # 2: Part E, the Part of Spirit instability flag and its warning
+SynastryCheck    112    # 112: a real defect, not yet investigated; unchanged by settings
+NavigationCheck  10     # 8 in Part K, a fresh install's cold open misdescribing the empty charts, and 2 in Part Q. The old note said Part Q varies 2-4 with the clock; measured 2026-09-25 it was exactly 2 in six runs, so this is 10 and not a range. Part P's two ring assertions sit behind a fixed Thread.sleep and fail under regression load - that is a flake to FIX, not to widen this for.
