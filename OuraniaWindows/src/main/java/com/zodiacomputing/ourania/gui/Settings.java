@@ -463,6 +463,64 @@ public final class Settings {
         set(GLOBE_PLANETS_ALL_KEY, on ? "true" : "false");
     }
 
+    /** Settings keys for how heavily an aspect line is inked. */
+    public static final String ASPECT_WEIGHT_MIN_KEY = "chart.aspectWeightMin";
+    public static final String ASPECT_WEIGHT_MAX_KEY = "chart.aspectWeightMax";
+    public static final String ASPECT_WEIGHT_ABSOLUTE_KEY = "chart.aspectWeightAbsolute";
+
+    /**
+     * The thinnest and thickest an aspect line is drawn, in pixels.
+     *
+     * <b>The old range was 0.3 to 1.0</b>, which is under one pixel of variation - so the rule
+     * that a tighter aspect draws heavier was true and invisible, and the alpha ramp beside it
+     * carried the whole signal. These defaults give the width something to say.
+     */
+    public static double aspectWeightMin() {
+        return weightSetting(ASPECT_WEIGHT_MIN_KEY, 0.6, 0.1, 8.0);
+    }
+
+    public static double aspectWeightMax() {
+        return weightSetting(ASPECT_WEIGHT_MAX_KEY, 3.2, 0.1, 8.0);
+    }
+
+    /**
+     * Whether an aspect's strength is measured in degrees from exact rather than as a fraction
+     * of the orb allowed.
+     *
+     * <b>Off by default, which keeps what the wheel has always done.</b> Relative is defensible:
+     * three degrees on a Sun-Moon conjunction is tight, while three degrees on a semisextile
+     * allowed one degree does not exist at all, so measuring against the orb in force keeps the
+     * minor aspects visible at their own scale.
+     *
+     * <b>But it couples appearance to a setting</b>, which David spotted on 25 Sep: the same
+     * conjunction three degrees from exact draws at alpha 70 under a five degree orb and alpha
+     * 143 under a ten degree one. Widen your orbs to see more aspects and every line already
+     * there gets heavier. Turn this on while tuning orbs and the picture holds still - a three
+     * degree aspect looks like a three degree aspect whatever you allow.
+     */
+    public static boolean aspectWeightAbsolute() {
+        return "true".equalsIgnoreCase(get(ASPECT_WEIGHT_ABSOLUTE_KEY, "false"));
+    }
+
+    /** The widest an aspect can be from exact and still be inked at all, in absolute mode. */
+    public static final double ABSOLUTE_FADE_DEGREES = 10.0;
+
+    /**
+     * A stored width, or the default when the file holds something unusable.
+     *
+     * <b>Out of range gets the default back rather than being clamped</b>, which is the rule H1
+     * settled for orbs on 24 Sep: quietly turning a 400 into a 15 would say the number was
+     * accepted. The screen is what clamps; the engine refuses.
+     */
+    private static double weightSetting(String key, double fallback, double lo, double hi) {
+        try {
+            double v = Double.parseDouble(get(key, String.valueOf(fallback)).trim());
+            return (Double.isNaN(v) || v < lo || v > hi) ? fallback : v;
+        } catch (RuntimeException notANumber) {
+            return fallback;
+        }
+    }
+
     /** Settings key for bowing the globe's aspect lines over the centre. */
     public static final String GLOBE_ASPECT_ARCS_KEY = "chart.globeAspectArcs";
 

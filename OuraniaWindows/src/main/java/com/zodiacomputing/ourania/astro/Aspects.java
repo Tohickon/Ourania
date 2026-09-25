@@ -123,6 +123,42 @@ public final class Aspects {
             this.signSteps = signSteps;
         }
 
+        /**
+         * How much force this aspect carries at its strongest, before orb is considered.
+         *
+         * <b>A property of the harmonic family, not of the individual aspect</b>, which is the
+         * tradition's own logic: aspects that divide the circle the same way carry the same
+         * weight. So this switches on {@link #harmonic} rather than listing fifteen numbers, and
+         * two aspects of one family cannot drift apart.
+         *
+         * <b>Not a formula.</b> No function of the harmonic gives the received weighting - the
+         * opposition divides the circle in two and carries as much as the conjunction, where
+         * 1/sqrt(h) would put it at 0.71. These are the tradition's rankings, set by David on
+         * 25 Sep, and they are a presentation choice rather than a measurement: they decide how
+         * heavily a line is inked, and nothing in the engine's own scoring reads them.
+         */
+        public double amplitude() {
+            switch (this.harmonic) {
+                case 1:  // conjunction
+                case 2:  // opposition
+                    return 1.00;
+                case 3:  // trine
+                case 4:  // square
+                    return 0.80;
+                case 6:  // sextile
+                    return 0.65;
+                case 8:  // semisquare, sesquiquadrate - the material-challenge family
+                    return 0.45;
+                case 5:  // quintile, biquintile
+                case 10: // decile, sesquiquintile - the same family, 10 being twice 5
+                    return 0.40;
+                case 12: // semisextile, quincunx - aversion
+                    return 0.35;
+                default: // septile 7, novile 9, and anything added later
+                    return 0.30;
+            }
+        }
+
         /** True for the five added 2026-08-23 plus the quincunx: the capped, subtler set. */
         public boolean isMinor() {
             return maxOrb != Double.MAX_VALUE;

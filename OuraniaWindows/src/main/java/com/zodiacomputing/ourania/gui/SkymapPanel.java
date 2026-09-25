@@ -9539,7 +9539,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     SkymapPanel.planetName(n6), drawn, syn);
             }
             if (color != null) {
-                double d7 = Math.min(1.0, Math.abs(d4 - d6) / d5);
+                // <b>What "close" is measured against.</b> Relative to the orb in force by
+                // default, which is what the wheel has always done; in absolute mode, degrees
+                // from exact, so that widening an orb adds lines without brightening the ones
+                // already drawn. David, 25 Sep.
+                double reach = Settings.aspectWeightAbsolute()
+                    ? Settings.ABSOLUTE_FADE_DEGREES : d5;
+                double d7 = Math.min(1.0, Math.abs(d4 - d6) / Math.max(0.0001, reach));
                 float f = (float)Math.pow(1.0 - d7, 2.0);
                 int n7 = (int)(35.0f + 220.0f * f);
                 n7 = Math.max(20, Math.min(255, n7));
@@ -9548,13 +9554,24 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // like one.
                 double focus = SkymapPanel.this.focusWeight(n5, n6, bl);
                 n7 = Math.max(6, (int)(n7 * focus));
+                // <b>Weight is the aspect's own force times how close it is to exact.</b> Before
+                // this the width carried only proximity, so a semisextile at 0 degrees inked
+                // exactly as heavily as a conjunction at 0 degrees - the two lines said the same
+                // thing about very different aspects. Amplitude belongs to the harmonic family
+                // and lives on Aspects.Type beside the harmonic it comes from.
+                double amplitude = drawn == null ? 1.0 : drawn.amplitude();
                 // A hovered line is drawn at full strength regardless of how wide its orb is.
                 // The normal alpha ramp fades a loose aspect almost to nothing, which is right
                 // for the background weave and useless for "show me the one I am pointing at".
                 boolean highlighted = SkymapPanel.this.isHighlighted(n5, n6, wheel);
                 color = new Color(color.getRed(), color.getGreen(), color.getBlue(),
                     highlighted ? 255 : n7);
-                float f2 = highlighted ? 3.0f : 0.3f + 0.7f * f;
+                // <b>Scaled into a range a reader can actually see.</b> 0.3 to 1.0 was under
+                // one pixel of variation, so the tightness rule was true and unreadable.
+                double lo = Settings.aspectWeightMin();
+                double hi = Settings.aspectWeightMax();
+                float f2 = highlighted ? (float)(hi * 1.4)
+                    : (float)(lo + (hi - lo) * f * amplitude);
                 double d8 = Math.toRadians(180.0 + d3 - d);
                 double d9 = Math.toRadians(180.0 + d3 - d2);
                 int n8 = n + (int)((double)n3 * Math.cos(d8));
