@@ -36,7 +36,7 @@ public final class NavigationCheck {
      */
     private static final String[] SCREENS = {
         "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH", "RETURNS", "TRANSIT_CALENDAR",
-        "DIAL", "SKY_VIEW", "HORARY", "SETTINGS",
+        "DIAL", "SKY_VIEW", "HORARY", "ELECTIONAL", "SETTINGS",
     };
 
     private static final List<String> failures = new ArrayList<>();
@@ -558,19 +558,7 @@ public final class NavigationCheck {
             return;
         }
 
-        // One pass over the gui sources; grepping per engine would be 52 reads of every file.
-        StringBuilder all = new StringBuilder();
-        for (java.io.File f : screens) {
-            if (f.getName().endsWith("Check.java")) {
-                continue;   // a suite referencing an engine is not a door for a reader
-            }
-            try {
-                all.append(new String(java.nio.file.Files.readAllBytes(f.toPath()), "UTF-8"));
-            } catch (Exception e) {
-                failures.add("could not read " + f.getName() + ": " + e);
-            }
-        }
-        String gui = all.toString();
+        String gui = guiCode(screens);
 
         for (java.io.File f : engines) {
             String name = f.getName().substring(0, f.getName().length() - ".java".length());
@@ -588,6 +576,84 @@ public final class NavigationCheck {
             }
             ok(name + " is reachable from the interface", gui.contains(name));
         }
+    }
+
+    /**
+     * The interface's code, as the sweep below searches it: one pass, literals and comments gone.
+     *
+     * <b>A method rather than a few lines inside the sweep, so the suite can read back what the
+     * sweep actually searches.</b> A mutation that reverted this to raw text survived a check
+     * which called {@link #codeOnly} directly - the helper still worked and the sweep had simply
+     * stopped using it, which is the rule and its consumer checked apart all over again.
+     */
+    static String guiCode(java.io.File[] screens) {
+        // One pass over the gui sources; grepping per engine would be 52 reads of every file.
+        StringBuilder all = new StringBuilder();
+        for (java.io.File f : screens) {
+            if (f.getName().endsWith("Check.java")) {
+                continue;   // a suite referencing an engine is not a door for a reader
+            }
+            try {
+                all.append(codeOnly(
+                    new String(java.nio.file.Files.readAllBytes(f.toPath()), "UTF-8")));
+            } catch (Exception e) {
+                failures.add("could not read " + f.getName() + ": " + e);
+            }
+        }
+        return all.toString();
+    }
+
+    /** The gui sources on disk, or null where the working directory is not the app's. */
+    static java.io.File[] guiSources() {
+        return new java.io.File("src/main/java/com/zodiacomputing/ourania/gui")
+            .listFiles((d, n) -> n.endsWith(".java"));
+    }
+
+    /**
+     * A source file with its string literals, character literals and comments removed.
+     *
+     * <b>Because a word inside a sentence is not a door.</b> The sweep below asks whether the
+     * interface names each engine, and it used to ask with a bare {@code contains} over the raw
+     * text. {@code Electional} passed that for a whole day while having no way in at all, because
+     * {@code InterpretationPanel}'s lunar-mansion note contains the phrase "Electional and horary
+     * machinery" - the check was most wrong about exactly the class it existed to catch.
+     *
+     * <p>Deliberately a small scanner rather than a regex: a regex over Java string literals has
+     * to get escapes right to avoid running off the end of one, and getting that subtly wrong
+     * would make this weaker again without anyone noticing.
+     */
+    static String codeOnly(String src) {
+        StringBuilder out = new StringBuilder(src.length());
+        int i = 0;
+        int n = src.length();
+        while (i < n) {
+            char c = src.charAt(i);
+            if (c == '/' && i + 1 < n && src.charAt(i + 1) == '/') {
+                while (i < n && src.charAt(i) != '\n') {
+                    i++;
+                }
+            } else if (c == '/' && i + 1 < n && src.charAt(i + 1) == '*') {
+                i += 2;
+                while (i + 1 < n && !(src.charAt(i) == '*' && src.charAt(i + 1) == '/')) {
+                    i++;
+                }
+                i = Math.min(n, i + 2);
+            } else if (c == '"' || c == '\'') {
+                char quote = c;
+                i++;
+                while (i < n && src.charAt(i) != quote) {
+                    // An escaped quote does not end the literal; skipping the pair is what keeps
+                    // this from running off the end of one and eating the code after it.
+                    i += src.charAt(i) == '\\' ? 2 : 1;
+                }
+                i++;
+                out.append(' ');
+            } else {
+                out.append(c);
+                i++;
+            }
+        }
+        return out.toString();
     }
 
     private static void collectButtons(Container c, List<JButton> out) {

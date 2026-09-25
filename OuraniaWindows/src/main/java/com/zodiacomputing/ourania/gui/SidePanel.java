@@ -75,6 +75,9 @@ public final class SidePanel extends JPanel {
         {"Horary", "HORARY",
             "A question answered by the chart of the moment it is asked: the two significators, "
             + "whether the chart may be judged at all, and the verdict with its reasons in order"},
+        {"Electional", "ELECTIONAL",
+            "A moment weighed for what it is shaped to carry: the planetary day and hour with "
+            + "what each favours, what raises and lowers it, and the whole day's unequal hours"},
         {"Settings", "SETTINGS",
             "Which points the chart shows, house system defaults and the rest"},
     };

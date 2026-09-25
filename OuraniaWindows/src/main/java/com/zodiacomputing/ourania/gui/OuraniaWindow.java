@@ -17,6 +17,7 @@ public class OuraniaWindow extends JFrame {
     private TransitCalendarPanel transitCalendarPanel;
     private ReturnsPanel returnsPanel;
     private HoraryPanel horaryPanel;
+    private ElectionalPanel electionalPanel;
 
     private ChartSetupPanel chartSetupPanel;
     private SidePanel sidePanel;
@@ -262,6 +263,9 @@ public class OuraniaWindow extends JFrame {
 
         horaryPanel = new HoraryPanel(this);
         contentPanel.add(horaryPanel, "HORARY");
+
+        electionalPanel = new ElectionalPanel(this);
+        contentPanel.add(electionalPanel, "ELECTIONAL");
         
         // <b>Share, Sync, Connect and Help are gone.</b> All four were placeholder cards
         // reading "(Under Construction)" behind live menu entries. A menu that offers ten
