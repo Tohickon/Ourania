@@ -46,17 +46,35 @@ public final class Moments {
         public final ZonedDateTime other;
         /** One sentence for a reader, or null when nothing had to be assumed. */
         public final String note;
+        /**
+         * Set when this Java runtime's zone database is known not to match the historical
+         * record for this moment, with a sentence saying so. Null the overwhelming majority of
+         * the time. See {@link ZoneCorpus}.
+         *
+         * <b>Separate from {@link #note}</b>, because they are different kinds of doubt: a note
+         * says the clocks were ambiguous that morning, which is a fact about the world; this
+         * says the software's own data is wrong, which is a fact about the software. A reader
+         * can act on the first by checking a birth certificate and on the second only by not
+         * trusting the chart.
+         */
+        public final String zoneDataDoubt;
 
         Resolved(ZonedDateTime when, Kind kind, ZonedDateTime other, String note) {
+            this(when, kind, other, note, null);
+        }
+
+        Resolved(ZonedDateTime when, Kind kind, ZonedDateTime other, String note,
+                 String zoneDataDoubt) {
             this.when = when;
             this.kind = kind;
             this.other = other;
             this.note = note;
+            this.zoneDataDoubt = zoneDataDoubt;
         }
 
         /** True when the caller assumed something a person might want to correct. */
         public boolean uncertain() {
-            return kind != Kind.NORMAL;
+            return kind != Kind.NORMAL || this.zoneDataDoubt != null;
         }
     }
 
@@ -73,8 +91,19 @@ public final class Moments {
         LocalDateTime local = LocalDateTime.of(date, time);
         List<ZoneOffset> valid = zone.getRules().getValidOffsets(local);
 
+        // <b>Whether the runtime's own zone data is trustworthy here.</b> Asked for every moment
+        // and almost always null; when it is not, the chart is cast anyway and the reader is
+        // told, because the alternative - quietly applying a correction - would move charts
+        // people have already saved without saying so.
+        ZoneCorpus.Doubt doubt = ZoneCorpus.doubtAbout(zone, local);
+        String doubtNote = doubt == null ? null : doubt.note;
+
         if (valid.size() == 1) {
-            return new Resolved(ZonedDateTime.of(local, zone), Kind.NORMAL, null, null);
+            ZonedDateTime when = ZonedDateTime.of(local, zone);
+            if (doubt != null && doubt.correctionSeconds != 0) {
+                when = corrected(local, when, doubt);
+            }
+            return new Resolved(when, Kind.NORMAL, null, null, doubtNote);
         }
 
         if (valid.isEmpty()) {
@@ -86,7 +115,7 @@ public final class Moments {
             return new Resolved(shifted, Kind.SKIPPED, null,
                 "The clocks went forward that morning and " + time + " did not occur in "
                     + zone.getId() + ". The chart is cast for " + moved + " instead. If the "
-                    + "birth time is right, the date or the place may not be.");
+                    + "birth time is right, the date or the place may not be.", doubtNote);
         }
 
         // Two valid offsets: the hour was repeated. Java takes the earlier, which is the one
@@ -97,7 +126,32 @@ public final class Moments {
             "The clocks went back that night, so " + time + " happened twice in "
                 + zone.getId() + ". This chart uses the first (" + earlier.getOffset()
                 + "); the second (" + later.getOffset() + ") is an hour later in real time "
-                + "and moves the Ascendant by roughly fifteen degrees.");
+                + "and moves the Ascendant by roughly fifteen degrees.", doubtNote);
+    }
+
+    /**
+     * The same local time, read at the offset history gives rather than the one this runtime has.
+     *
+     * <b>Applied, not merely reported - David, 25 Sep.</b> The earlier design followed this
+     * class's own precedent for ambiguous hours and left the chart as Java cast it. That
+     * precedent does not actually cover this case: an ambiguous hour is a fact about the world
+     * that the software cannot resolve for the reader, while a wrong zone database is a fact
+     * about the software, which it can.
+     *
+     * <b>The local time is preserved and the instant moves</b>, which is the right way round:
+     * what the reader knows is the time on the clock in the room, and what was wrong is the
+     * conversion from that to real time. A birth written 12:00 in Amsterdam in 1930 stays 12:00
+     * and becomes an instant 19 minutes 32 seconds earlier in UT than this runtime believed.
+     *
+     * <p>The returned moment carries a fixed offset rather than the named zone, because the named
+     * zone is precisely what is wrong here - handing it back would let any later re-resolution
+     * undo the correction silently.
+     */
+    private static ZonedDateTime corrected(LocalDateTime local, ZonedDateTime asRuntimeHasIt,
+                                           ZoneCorpus.Doubt doubt) {
+        ZoneOffset trueOffset = ZoneOffset.ofTotalSeconds(
+            asRuntimeHasIt.getOffset().getTotalSeconds() + doubt.correctionSeconds);
+        return local.atOffset(trueOffset).toZonedDateTime();
     }
 
     /**
