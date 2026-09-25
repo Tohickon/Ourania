@@ -79,6 +79,37 @@ public final class HouseSystems {
         new System('R', "Regiomontanus",
             "Divides the celestial equator into equal arcs and projects them onto the ecliptic. "
                 + "The medieval standard, and what traditional horary expects.", false),
+
+        // <b>Added 25 Sep, and their two awkward properties were measured rather than recalled.</b>
+        // Alcabitius and Topocentric are usually described as failing near the poles; asked at
+        // 78.2N this implementation casts both. And four systems deliberately do NOT put the
+        // Ascendant on the first cusp - Whole Sign starts the sign, Vehlow puts it in the middle
+        // of house one, and Morinus and Meridian ignore the horizon entirely.
+        new System('O', "Porphyry",
+            "Cuts each quarter of the chart into three equal parts. The simplest quadrant "
+                + "system, and the one this app substitutes when Placidus has no solution.", false),
+        new System('B', "Alcabitius",
+            "Divides the time the rising degree takes to reach the midheaven. The standard of "
+                + "medieval Arabic and Latin practice.", false),
+        new System('T', "Topocentric",
+            "Built from the observer's own place on the earth rather than its centre. Very "
+                + "close to Placidus in middle latitudes, and unlike Placidus it still answers "
+                + "in the far north.", false),
+        new System('M', "Morinus",
+            "Divides the equator and projects without reference to the horizon at all, so it "
+                + "works anywhere - and the Ascendant is not the first cusp.", false),
+        new System('X', "Meridian",
+            "Equal divisions of the equator projected onto the ecliptic, measured from the "
+                + "midheaven. The first cusp is the east point, not the Ascendant.", false),
+        new System('V', "Vehlow",
+            "Equal houses, but with the Ascendant in the middle of the first house instead of "
+                + "on its cusp - so a planet just past the Ascendant is still in the first.", false),
+        new System('U', "Krusinski",
+            "Divides the great circle through the Ascendant and the point overhead. A modern "
+                + "system, and stable at every latitude.", false),
+        new System('Y', "APC",
+            "Ascendant-parallel circles: each cusp is where a body rising at that moment would "
+                + "cross. Modern, and defined at any latitude.", false),
     };
 
     /** What a chart uses when nobody has chosen. */

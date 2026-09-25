@@ -25,11 +25,29 @@ public final class HouseSystemsCheck {
     private static final List<String> failures = new ArrayList<>();
     private static int checks = 0;
 
-    /** What the four copies produced, written out rather than derived. */
+    /**
+     * Every system offered, written out rather than read from the registry.
+     *
+     * <b>The first six are what the four hand-written copies produced</b>, and holding them in
+     * this order is what made H2a provably a refactor. The eight after them were added
+     * deliberately in H2b, which is why this list had to be edited on purpose for that commit to
+     * go green - a check that asked the registry what the registry says would have waved it
+     * through either way.
+     */
     private static final String[][] AS_IT_WAS = {
         {"Placidus", "P"}, {"Koch", "K"}, {"Equal", "E"},
         {"Whole Sign", "W"}, {"Campanus", "C"}, {"Regiomontanus", "R"},
+        {"Porphyry", "O"}, {"Alcabitius", "B"}, {"Topocentric", "T"}, {"Morinus", "M"},
+        {"Meridian", "X"}, {"Vehlow", "V"}, {"Krusinski", "U"}, {"APC", "Y"},
     };
+
+    /**
+     * The systems that deliberately do not put the Ascendant on the first cusp.
+     *
+     * <b>Measured, not recalled.</b> Whole Sign starts the rising sign, Vehlow puts the Ascendant
+     * in the middle of house one, and Morinus and Meridian ignore the horizon entirely.
+     */
+    private static final String ASC_ELSEWHERE = "WVMX";
 
     public static void main(String[] args) {
         com.zodiacomputing.ourania.gui.Settings.useScratchFile();
@@ -58,7 +76,7 @@ public final class HouseSystemsCheck {
 
     private static void unchanged() {
         String[] offered = HouseSystems.names();
-        ok("six systems are offered, as before (" + offered.length + ")",
+        ok("fourteen systems are offered (" + offered.length + ")",
             offered.length == AS_IT_WAS.length);
         for (int i = 0; i < Math.min(offered.length, AS_IT_WAS.length); i++) {
             ok("position " + i + " is still " + AS_IT_WAS[i][0],
@@ -149,9 +167,10 @@ public final class HouseSystemsCheck {
             }
             ok(s.name + " twelve houses close the circle (" + String.format("%.4f", total) + ")",
                 Math.abs(total - 360.0) < 0.0001);
-            ok(s.name + " puts the Ascendant on the first cusp",
-                Math.abs(Aspects.separation(ascmc[0], cusps[1])) < 0.0001
-                    || s.code == 'W' || s.code == 'M' || s.code == 'X');
+            boolean onCusp = Math.abs(Aspects.separation(ascmc[0], cusps[1])) < 0.0001;
+            boolean elsewhere = ASC_ELSEWHERE.indexOf(s.code) >= 0;
+            ok(s.name + (elsewhere ? " deliberately puts the Ascendant off the first cusp"
+                : " puts the Ascendant on the first cusp"), onCusp != elsewhere);
         }
 
         // The high-latitude claim each entry makes, against the engine rather than against
@@ -181,7 +200,7 @@ public final class HouseSystemsCheck {
         // <b>Caught, because the failure mode being tested for IS a throw.</b> An unguarded
         // call here takes the whole suite down with it, and a crashed suite reports no failures
         // at all - so the one assertion that matters would be the one you never see.
-        for (String odd : new String[] {"Alcabitius", "", "   ", "placidus", "Nonsense"}) {
+        for (String odd : new String[] {"Gauquelin", "", "   ", "placidus", "Nonsense"}) {
             boolean fellBack;
             try {
                 fellBack = HouseSystems.codeFor(odd) == HouseSystems.defaultCode();
@@ -193,7 +212,7 @@ public final class HouseSystemsCheck {
         ok("a null name does not throw", HouseSystems.byName(null) == null);
         // But a code the engine can return still gets a name, because a notice has to say which
         // system it substituted.
-        ok("an unoffered code is still named", "Alcabitius".equals(HouseSystems.nameFor('B')));
+        ok("an unoffered code is still named", "Horizontal".equals(HouseSystems.nameFor('H')));
         ok("and a meaningless one says so", "The selected".equals(HouseSystems.nameFor('%')));
     }
 
