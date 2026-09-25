@@ -49,18 +49,15 @@ public final class Precision {
         return sw.swe_houses(jdUt, 0, lat, lon, hsys, cusps, ascmc) < 0;
     }
 
-    /** The name the settings screen uses for a house system code. */
+    /**
+     * The name the settings screen uses for a house system code.
+     *
+     * <b>Kept as the one line it is now.</b> This was a switch of its own, and it was the only
+     * one of the four copies that knew Porphyry - which is how the system this class substitutes
+     * above the polar circle became one a reader could not choose. See {@link HouseSystems}.
+     */
     public static String houseSystemName(int hsys) {
-        switch (hsys) {
-            case 'P': return "Placidus";
-            case 'K': return "Koch";
-            case 'E': return "Equal";
-            case 'W': return "Whole Sign";
-            case 'C': return "Campanus";
-            case 'R': return "Regiomontanus";
-            case 'O': return "Porphyry";
-            default:  return "The selected";
-        }
+        return HouseSystems.nameFor(hsys);
     }
 
     /** The sentence for a house system that fell back, naming whose chart and where. */

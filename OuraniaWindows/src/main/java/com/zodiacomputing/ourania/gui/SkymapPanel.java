@@ -1302,7 +1302,7 @@ extends JPanel {
     private String aspectMode = Settings.aspectMode();
 
     private char houseSystem = (char)80;
-    private String currentHouseSystemName = "Placidus";
+    private String currentHouseSystemName = com.zodiacomputing.ourania.astro.HouseSystems.DEFAULT_NAME;
     public static final int BODY_COUNT = Bodies.count();
     private static final String[] BODY_NAMES = new String[BODY_COUNT];
     private static final String[] BODY_GLYPHS = new String[BODY_COUNT];
@@ -3433,32 +3433,14 @@ extends JPanel {
             String string = serializable.getProperty("home.location");
             this.baseLocationName = string != null ? string : serializable.getProperty("default.base.location", "Los Angeles, CA");
             this.transitLocationName = string != null ? string : serializable.getProperty("default.transit.location", "Los Angeles, CA");
-            this.currentHouseSystemName = serializable.getProperty("default.house.system", "Placidus");
-            switch (this.currentHouseSystemName) {
-                case "Koch": {
-                    this.houseSystem = (char)75;
-                    break;
-                }
-                case "Equal": {
-                    this.houseSystem = (char)69;
-                    break;
-                }
-                case "Whole Sign": {
-                    this.houseSystem = (char)87;
-                    break;
-                }
-                case "Campanus": {
-                    this.houseSystem = (char)67;
-                    break;
-                }
-                case "Regiomontanus": {
-                    this.houseSystem = (char)82;
-                    break;
-                }
-                default: {
-                    this.houseSystem = (char)80;
-                }
-            }
+            this.currentHouseSystemName = serializable.getProperty("default.house.system",
+                com.zodiacomputing.ourania.astro.HouseSystems.DEFAULT_NAME);
+            // <b>A name this build does not know falls back rather than throwing.</b> It can come
+            // from a hand-edited settings file, or one written by a later version of this app;
+            // refusing to draw a chart because a string was not recognised is a worse answer than
+            // drawing the usual one. That is the rule HouseSystems.codeFor carries.
+            this.houseSystem =
+                com.zodiacomputing.ourania.astro.HouseSystems.codeFor(this.currentHouseSystemName);
             try {
                 Object object = this.syncGeocode(this.baseLocationName);
                 if (object != null) {
@@ -5013,37 +4995,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         jLabel5.setForeground(Color.WHITE);
         this.chartControls.add(jLabel5);
         this.chartControls.add(this.pinCombo);
-        String[] stringArray5 = new String[]{"Placidus", "Koch", "Equal", "Whole Sign", "Campanus", "Regiomontanus"};
+        String[] stringArray5 = com.zodiacomputing.ourania.astro.HouseSystems.names();
         JComboBox<String> jComboBox2 = new JComboBox<String>(stringArray5);
         jComboBox2.setSelectedItem(this.currentHouseSystemName);
         jComboBox2.addActionListener(actionEvent -> {
             String string;
             this.currentHouseSystemName = string = (String)jComboBox2.getSelectedItem();
-            switch (string) {
-                case "Placidus": {
-                    this.houseSystem = (char)80;
-                    break;
-                }
-                case "Koch": {
-                    this.houseSystem = (char)75;
-                    break;
-                }
-                case "Equal": {
-                    this.houseSystem = (char)69;
-                    break;
-                }
-                case "Whole Sign": {
-                    this.houseSystem = (char)87;
-                    break;
-                }
-                case "Campanus": {
-                    this.houseSystem = (char)67;
-                    break;
-                }
-                case "Regiomontanus": {
-                    this.houseSystem = (char)82;
-                }
-            }
+            // <b>The second of the two switches this replaced.</b> Its Regiomontanus case had no
+            // break, which was harmless only because it happened to be written last - a new
+            // system added after it would have fallen through and cast the wrong houses.
+            this.houseSystem = com.zodiacomputing.ourania.astro.HouseSystems.codeFor(string);
             Settings.set("default.house.system", string);
             this.updateChartData();
             this.chartPanel.repaint();
