@@ -98,6 +98,33 @@ public class SettingsPanel extends JPanel {
      */
     private final javax.swing.JSpinner[] orbSpinners =
         new javax.swing.JSpinner[Bodies.count()];
+
+    /**
+     * Which of the four tables every orb control on this screen is showing.
+     *
+     * <b>The screen's state, not a setting.</b> It is not stored and not restored: a reader who
+     * leaves the panel on Synastry and comes back expects their natal widths, because natal is
+     * what the app reads unless it is told otherwise. Storing it would let a reader edit synastry
+     * without having chosen to.
+     */
+    private com.zodiacomputing.ourania.astro.Aspects.Profile shownProfile =
+        com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL;
+
+    /**
+     * Every column header that names the shown profile in its tooltip.
+     *
+     * <b>Lists, because these are made per group and not once.</b> {@code groupPanel} runs for
+     * each body group and {@code aspectBoxes} for each aspect column, so the screen carries
+     * several of each header. Held in a single field, only the last one built would ever be
+     * updated and the rest would go on describing a profile that is no longer shown - which is
+     * this project's recurring defect wearing a new hat.
+     */
+    private final java.util.List<JLabel> orbColumnHeaders = new java.util.ArrayList<>();
+    private final java.util.List<JLabel> capColumnHeaders = new java.util.ArrayList<>();
+
+    /** The sentence under the Orbs heading, and the button that puts one profile back. */
+    private JLabel orbProfileNote;
+    private javax.swing.JButton orbResetButton;
     private final JLabel status = new JLabel(" ");
     /** Settings > Calculation Variants: the one transit orb. */
     javax.swing.JSpinner transitOrb;
@@ -152,6 +179,7 @@ public class SettingsPanel extends JPanel {
 
         // First on the screen, because it is about everything below it.
         body.add(savedSetsRow());
+        body.add(profileBar());
 
         // <b>The chart's own dropdowns, moved here off the wheel's control strip.</b> Seven
         // labelled combos sat under the chart beside the play button - harmonic, animate
@@ -620,13 +648,10 @@ public class SettingsPanel extends JPanel {
                 + "<br>and include it in the aspect grid. Everything unticked is left out of"
                 + "<br>all three.</html>", Color.BLACK), gc);
         gc.gridx = 2;
-        rows.add(columnHeader("Orb\u00b0",
-            "<html>How close an aspect to this point must be to exact, in degrees."
-                + "<br><br>A pair is judged at the <b>wider</b> of its two points, under whatever"
-                + "<br>ceiling the aspect itself carries - so widening Pluto does not widen"
-                + "<br>a semisextile. Halved for a cross-chart reading."
-                + "<br><br>These are the <b>natal</b> widths. Transits are judged on their own"
-                + "<br>orb, set under Transits &amp; Progressions.</html>", Color.BLACK), gc);
+        // Collected, not held: groupPanel runs once per body group, so there are several.
+        JLabel orbHead = columnHeader("Orb\u00b0", orbHeaderTip(), Color.BLACK);
+        orbColumnHeaders.add(orbHead);
+        rows.add(orbHead, gc);
         int gridRow = 1;
 
         for (int i = 0; i < Bodies.count(); i++) {
@@ -808,6 +833,173 @@ public class SettingsPanel extends JPanel {
      * sentence that actually explains the control is on the hover, where it costs nothing until
      * it is wanted.
      */
+    /**
+     * The preset switch: which chart context the orb controls below are showing.
+     *
+     * <b>Driven from the enum, never a hand-written list of four.</b> A fifth profile would
+     * appear here without anyone coming back for it, and could not appear spelled differently -
+     * which is exactly how the wheel's legend lost its quincunx for months.
+     */
+    private JPanel profileBar() {
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
+        p.setBackground(Color.BLACK);
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel caption = new JLabel("Orbs shown for:");
+        caption.setForeground(DIM);
+        caption.setFont(Theme.font("Arial", Font.PLAIN, 12));
+        p.add(caption);
+
+        javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
+        for (final com.zodiacomputing.ourania.astro.Aspects.Profile profile
+                : com.zodiacomputing.ourania.astro.Aspects.Profile.values()) {
+            javax.swing.JToggleButton b = new javax.swing.JToggleButton(profileLabel(profile));
+            b.setFont(Theme.font("Arial", Font.PLAIN, 11));
+            b.setFocusPainted(false);
+            b.setToolTipText(profileTip(profile));
+            b.setSelected(profile == shownProfile);
+            b.addActionListener(e -> showProfile(profile));
+            group.add(b);
+            p.add(b);
+        }
+        return p;
+    }
+
+    /** What a profile is called on the screen. One place, so the four cannot drift apart. */
+    private static String profileLabel(
+            com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
+        switch (profile) {
+            case TRANSIT: return "Transits";
+            case SYNASTRY: return "Synastry";
+            case COMPOSITE: return "Composite";
+            default: return "Natal";
+        }
+    }
+
+    /** What each preset governs, and where its numbers come from when nobody has set them. */
+    private static String profileTip(
+            com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
+        switch (profile) {
+            case TRANSIT:
+                return "<html><b>Transits</b><br>The event lists: what the sky is doing to a"
+                    + " chart, and when.<br>Every point starts at one flat width, because the"
+                    + " natal table puts<br>21.6 transits in orb at any moment and keeps a Pluto"
+                    + "<br>conjunction open for over fourteen years."
+                    + "<br><br><b>The wheel is not this.</b> It draws sky-to-person aspects at"
+                    + " the<br>natal widths, so a slow contact stays visible while it"
+                    + " lasts.</html>";
+            case SYNASTRY:
+                return "<html><b>Synastry</b><br>One person's chart read against another's."
+                    + "<br>Every point starts at <b>half its natal width</b> - half of whatever"
+                    + "<br>you have set, not half of the built-in table - because a"
+                    + "<br>cross-chart contact wants to be closer to count."
+                    + "<br><br>Set one here and it stops following natal. The rest go on"
+                    + " following.</html>";
+            case COMPOSITE:
+                return "<html><b>Composite</b><br>The single chart derived from two people's"
+                    + " midpoints."
+                    + "<br>Every point starts at <b>its natal width</b>, because a composite is"
+                    + "<br>one chart and not a comparison between two.</html>";
+            default:
+                return "<html><b>Natal</b><br>The chart itself: the wheel, the aspect grid and"
+                    + " the readings."
+                    + "<br>The widths here are the built-in table until you change them,"
+                    + "<br>and the other three presets are measured from them.</html>";
+        }
+    }
+
+    /**
+     * Point every orb control on the screen at one profile.
+     *
+     * <b>The assignment below must stay above the loop.</b> Setting a spinner fires its change
+     * listener and that listener writes to {@code Settings} under {@code shownProfile}. Assigned
+     * first, every write lands on the profile being switched TO, carrying the value that profile
+     * already holds - a no-op. Assigned after the loop, every write lands on the profile being
+     * switched FROM, carrying the new one's numbers, and the reader's natal table is quietly
+     * overwritten with synastry widths. That mutation takes 14 assertions red in
+     * {@code PresetBarCheck}; removing the {@code seeding} guard takes none, which is the
+     * opposite of what the first version of this comment claimed.
+     */
+    private void showProfile(com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
+        if (profile == null || profile == shownProfile) {
+            return;
+        }
+        shownProfile = profile;   // before the loop - see above; moving it corrupts the tables
+        seeding = true;
+        try {
+            for (int i = 0; i < orbSpinners.length; i++) {
+                javax.swing.JSpinner s = orbSpinners[i];
+                if (s == null) {
+                    continue;
+                }
+                String name = Bodies.at(i).name;
+                s.setValue(Settings.bodyOrb(name, profile));
+                s.setToolTipText(orbTip(name));
+                markChanged(s, name);
+            }
+            if (aspectCapSpinners != null) {
+                for (com.zodiacomputing.ourania.astro.Aspects.Type type
+                        : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+                    javax.swing.JSpinner s = aspectCapSpinners[type.ordinal()];
+                    if (s == null) {
+                        continue;
+                    }
+                    retuneCapSpinner(s, type);
+                    s.setToolTipText(capTip(type));
+                    markCapChanged(s, type);
+                }
+            }
+        } finally {
+            seeding = false;
+        }
+        refreshProfileWording();
+        status.setText("Showing " + profileLabel(profile) + " orbs");
+    }
+
+    /**
+     * Move a ceiling spinner onto the shown profile, bound and all.
+     *
+     * <b>The maximum moves with the profile.</b> A synastry ceiling may not exceed half the
+     * declared one, so leaving the model's bound where natal left it would let a reader type a
+     * number {@code Settings.setAspectCap} then silently clamps - the screen and the file
+     * disagreeing, which is the shape of defect this session has spent its time closing.
+     */
+    private void retuneCapSpinner(javax.swing.JSpinner s,
+                                  com.zodiacomputing.ourania.astro.Aspects.Type type) {
+        if (!(s.getModel() instanceof javax.swing.SpinnerNumberModel)) {
+            return;
+        }
+        javax.swing.SpinnerNumberModel m = (javax.swing.SpinnerNumberModel) s.getModel();
+        double top = com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(type, shownProfile);
+        // Down to the new ceiling BEFORE the bound moves, or the model holds a value outside it.
+        if (((Number) m.getValue()).doubleValue() > top) {
+            m.setValue(top);
+        }
+        m.setMaximum(top);
+        m.setValue(Settings.aspectCap(type, shownProfile));
+    }
+
+    /** Everything on the screen that names the shown profile in words, from one source. */
+    private void refreshProfileWording() {
+        for (JLabel h : orbColumnHeaders) {
+            h.setToolTipText(orbHeaderTip());
+        }
+        for (JLabel h : capColumnHeaders) {
+            h.setToolTipText(capHeaderTip());
+        }
+        if (orbProfileNote != null) {
+            orbProfileNote.setText("<html><body style='width:600px'>" + profileSentence()
+                + "</body></html>");
+        }
+        if (orbResetButton != null) {
+            String name = profileLabel(shownProfile);
+            orbResetButton.setText("Reset " + name + " to defaults");
+            orbResetButton.setToolTipText("Forget every width and ceiling you have set under "
+                + name + ", and go back to what it starts at. The other three presets are left"
+                + " alone.");
+        }
+    }
+
     private JLabel columnHeader(String text, String tip, Color background) {
         JLabel l = new JLabel(text);
         l.setForeground(DIM);
@@ -832,21 +1024,25 @@ public class SettingsPanel extends JPanel {
     private javax.swing.JSpinner orbSpinner(final int index) {
         final String name = Bodies.at(index).name;
         final javax.swing.JSpinner s = new javax.swing.JSpinner(
-            new javax.swing.SpinnerNumberModel(Settings.bodyOrb(name),
+            new javax.swing.SpinnerNumberModel(Settings.bodyOrb(name, shownProfile),
                 Aspects.MIN_BODY_ORB, Aspects.MAX_BODY_ORB, 0.25));
-        s.setToolTipText("<html><b>" + name + "</b> orb, in degrees"
-            + "<br>How close an aspect to " + name + " must be to exact."
-            + "<br>Built in at " + Aspects.defaultBodyOrb(name)
-            + "&deg;. A pair is judged at the wider of its two points,"
-            + "<br>under whatever ceiling the aspect itself carries."
-            + "<br><br>This is the <b>natal</b> width: the wheel, the aspect grid and the"
-            + " readings,<br>halved for a cross-chart reading. <b>Transits do not use it</b> -"
-            + "<br>they are judged on the single Transit orb.</html>");
+        s.setToolTipText(orbTip(name));
         java.awt.Dimension size = new java.awt.Dimension(64, s.getPreferredSize().height);
         s.setPreferredSize(size);
         s.setMaximumSize(size);
         s.addChangeListener(e -> {
-            Settings.setBodyOrb(name, ((Number) s.getValue()).doubleValue());
+            // <b>What this guard is and is not for.</b> showProfile sets every one of these
+            // and each set fires this listener, so without it a profile switch runs 51 writes -
+            // 36 points and 15 aspects - each calling applyBodySelection and rebuilding the
+            // chart. It is NOT what keeps the tables apart: a mutation removing it left every
+            // assertion in PresetBarCheck green, because showProfile assigns shownProfile before
+            // the loop and each listener therefore writes the value already correct for the new
+            // profile, which setBodyOrb stores as "" for matching its default. The ordering is
+            // what protects the data; this protects the frame rate.
+            if (constructing || seeding) {
+                return;
+            }
+            Settings.setBodyOrb(name, ((Number) s.getValue()).doubleValue(), shownProfile);
             markChanged(s, name);
             status.setText("Saved");
             if (window != null) {
@@ -905,14 +1101,9 @@ public class SettingsPanel extends JPanel {
                 Theme.SURFACE), gc);
             gc.gridx = at + 2;
             gc.insets = new Insets(1, 0, 1, 18);
-            panel.add(columnHeader("Ceiling\u00b0",
-                "<html>The most a pair may be apart and still count as this aspect."
-                    + "<br><br>It is a <b>ceiling over the points' own width</b>, not a second"
-                    + "<br>copy of it: the pair is judged at the wider of its two points, and"
-                    + "<br>then held to this. Tightening only - it cannot be lifted."
-                    + "<br><br>A Ptolemaic aspect sits at " + Aspects.MAX_BODY_ORB
-                    + "\u00b0, which cannot bind, so its"
-                    + "<br>width is whatever the two points allow.</html>", Theme.SURFACE), gc);
+            JLabel capHead = columnHeader("Ceiling\u00b0", capHeaderTip(), Theme.SURFACE);
+            capColumnHeaders.add(capHead);
+            panel.add(capHead, gc);
             gc.insets = new Insets(1, 0, 1, 6);
         }
 
@@ -968,22 +1159,17 @@ public class SettingsPanel extends JPanel {
      */
     private javax.swing.JSpinner capSpinner(final Aspects.Type t) {
         final javax.swing.JSpinner s = new javax.swing.JSpinner(
-            new javax.swing.SpinnerNumberModel(Settings.aspectCap(t),
-                Aspects.MIN_BODY_ORB, Aspects.defaultCapOf(t), 0.25));
-        s.setToolTipText("<html><b>" + t.label + "</b> orb, in degrees"
-            + "<br>The most a pair may be apart and still count as this aspect."
-            + "<br>Built in at " + Aspects.defaultCapOf(t) + "&deg;, and may only be tightened."
-            + (t.isMinor()
-                ? "<br><br>A minor aspect carries its own narrow ceiling."
-                : "<br><br>A Ptolemaic aspect takes its width from the two points"
-                    + "<br>(Natal Orbs, below). At " + Aspects.MAX_BODY_ORB
-                    + "&deg; this cannot bind,<br>because no point may be set wider.")
-            + "</html>");
+            new javax.swing.SpinnerNumberModel(Settings.aspectCap(t, shownProfile),
+                Aspects.MIN_BODY_ORB, Aspects.defaultCapOf(t, shownProfile), 0.25));
+        s.setToolTipText(capTip(t));
         java.awt.Dimension size = new java.awt.Dimension(64, s.getPreferredSize().height);
         s.setPreferredSize(size);
         s.setMaximumSize(size);
         s.addChangeListener(e -> {
-            Settings.setAspectCap(t, ((Number) s.getValue()).doubleValue());
+            if (constructing || seeding) {
+                return;
+            }
+            Settings.setAspectCap(t, ((Number) s.getValue()).doubleValue(), shownProfile);
             markCapChanged(s, t);
             status.setText("Saved");
             if (window != null) {
@@ -995,9 +1181,98 @@ public class SettingsPanel extends JPanel {
         return s;
     }
 
+    /** The Orb column's own tooltip, naming the preset the column is showing. */
+    private String orbHeaderTip() {
+        return "<html>How close an aspect to this point must be to exact, in degrees."
+            + "<br><br>A pair is judged at the <b>wider</b> of its two points, under whatever"
+            + "<br>ceiling the aspect itself carries - so widening Pluto does not widen"
+            + "<br>a semisextile."
+            + "<br><br>Showing <b>" + profileLabel(shownProfile) + "</b>. "
+            + profileSentence() + "</html>";
+    }
+
+    /** The Ceiling column's own tooltip, naming the preset the column is showing. */
+    private String capHeaderTip() {
+        return "<html>The most a pair may be apart and still count as this aspect."
+            + "<br><br>It is a <b>ceiling over the points' own width</b>, not a second copy of"
+            + "<br>it: the pair is judged at the wider of its two points, and then held to"
+            + "<br>this. Tightening only - it cannot be lifted."
+            + "<br><br>Showing <b>" + profileLabel(shownProfile) + "</b>. "
+            + profileSentence() + "</html>";
+    }
+
+    /** One point's tooltip, in whichever profile is on screen. */
+    private String orbTip(String name) {
+        return "<html><b>" + name + "</b> orb, in degrees, under <b>"
+            + profileLabel(shownProfile) + "</b>"
+            + "<br>How close an aspect to " + name + " must be to exact."
+            + "<br>Starts at " + degreeText(Aspects.defaultBodyOrb(name, shownProfile))
+            + "&deg; here. A pair is judged at the wider of its"
+            + "<br>two points, under whatever ceiling the aspect itself carries."
+            + "<br><br>" + profileSentence() + "</html>";
+    }
+
+    /** One aspect's tooltip, in whichever profile is on screen. */
+    private String capTip(Aspects.Type t) {
+        double top = Aspects.defaultCapOf(t, shownProfile);
+        return "<html><b>" + t.label + "</b> ceiling, in degrees, under <b>"
+            + profileLabel(shownProfile) + "</b>"
+            + "<br>The most a pair may be apart and still count as this aspect."
+            + "<br>Starts at " + degreeText(top) + "&deg; here, and may only be tightened."
+            + (t.isMinor()
+                ? "<br><br>A minor aspect carries its own narrow ceiling."
+                : "<br><br>A Ptolemaic aspect takes its width from the two points, so"
+                    + "<br>at " + degreeText(top) + "&deg; this ceiling only binds where a point is"
+                    + " set wider.")
+            + "</html>";
+    }
+
+    /**
+     * What the shown profile governs, in one sentence.
+     *
+     * <b>Written once and used three times</b> - the tooltips, the column header and the note
+     * under the Orbs heading - because this project's recurring defect is one rule spelled out in
+     * several places and the copies drifting apart. isMinor was written three times and ringWord
+     * six, and both were found only when a suite went red.
+     */
+    private String profileSentence() {
+        switch (shownProfile) {
+            case TRANSIT:
+                return "These are the <b>transit</b> widths: the event lists, what the sky is "
+                    + "doing to a chart and when. Every point starts at one flat "
+                    + degreeText(com.zodiacomputing.ourania.astro.Transits.DEFAULT_ORB) + "&deg;, "
+                    + "because the natal table keeps a Pluto conjunction open for over fourteen "
+                    + "years. <b>The wheel does not use these</b> - it draws sky-to-person "
+                    + "aspects at the natal widths, so a slow contact stays visible while it "
+                    + "lasts.";
+            case SYNASTRY:
+                return "These are the <b>synastry</b> widths, for one chart read against "
+                    + "another. Each starts at <b>half its natal width</b> - half of whatever "
+                    + "you have set, not half of the built-in table - and setting one here "
+                    + "stops that point following natal. The rest go on following.";
+            case COMPOSITE:
+                return "These are the <b>composite</b> widths, for the single chart derived "
+                    + "from two people's midpoints. Each starts at <b>its natal width</b>, "
+                    + "because a composite is one chart and not a comparison between two. "
+                    + "Setting one here stops that point following natal.";
+            default:
+                return "These are the <b>natal</b> widths: the wheel, the aspect grid and the "
+                    + "readings. The other three presets are measured from them, so widening a "
+                    + "point here widens it everywhere that has not been set on its own.";
+        }
+    }
+
+    /** A width as a reader would write it - 6 rather than 6.0, 4.5 left alone. */
+    private static String degreeText(double degrees) {
+        return Math.abs(degrees - Math.rint(degrees)) < 1e-9
+            ? String.valueOf((long) Math.rint(degrees))
+            : String.valueOf(degrees);
+    }
+
     /** Bold while an aspect is not at its built-in ceiling, as the point widths are. */
     private void markCapChanged(javax.swing.JSpinner spinner, Aspects.Type t) {
-        boolean changed = Math.abs(Settings.aspectCap(t) - Aspects.defaultCapOf(t)) > 1e-9;
+        boolean changed = Math.abs(Settings.aspectCap(t, shownProfile)
+            - Aspects.defaultCapOf(t, shownProfile)) > 1e-9;
         java.awt.Component editor = spinner.getEditor();
         if (editor instanceof javax.swing.JSpinner.DefaultEditor) {
             javax.swing.JTextField field =
@@ -1655,45 +1930,52 @@ public class SettingsPanel extends JPanel {
         p.add(note("A Ptolemaic aspect sits at "
             + com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB
             + "\u00b0, which cannot bind, so its width is whatever the two points allow."));
-        p.add(note("The point widths are the natal ones: the wheel, the aspect grid and the "
-            + "readings, halved for a cross-chart reading. Transits are judged on one flat orb "
-            + "instead, set under Transits & Progressions - though the aspect ceilings do reach "
-            + "transits."));
+        orbProfileNote = note(profileSentence());
+        p.add(orbProfileNote);
         p.add(Box.createRigidArea(new Dimension(0, 8)));
 
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         row.setBackground(Color.BLACK);
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
-        javax.swing.JButton reset = new javax.swing.JButton("Reset to defaults");
-        reset.setToolTipText("Forget every width you have set and go back to the built-in table.");
-        reset.addActionListener(e -> {
-            Settings.resetBodyOrbs();
-            Settings.resetAspectCaps();
-            for (int i = 0; i < orbSpinners.length; i++) {
-                if (orbSpinners[i] == null) {
-                    continue;
-                }
-                String name = Bodies.at(i).name;
-                orbSpinners[i].setValue(Settings.bodyOrb(name));
-                markChanged(orbSpinners[i], name);
-            }
-            if (aspectCapSpinners != null) {
-                for (com.zodiacomputing.ourania.astro.Aspects.Type t
-                        : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
-                    javax.swing.JSpinner s = aspectCapSpinners[t.ordinal()];
-                    if (s == null) {
+        // <b>It resets what is on screen, and nothing else.</b> The no-argument
+        // resetBodyOrbs now clears all four profiles, so a reader looking at Synastry and
+        // pressing a button labelled "Reset to defaults" would lose the natal table as well -
+        // the thing here they are most likely to have spent time on, with no warning and no undo.
+        orbResetButton = new javax.swing.JButton("Reset Natal to defaults");
+        orbResetButton.addActionListener(e -> {
+            Settings.resetBodyOrbs(shownProfile);
+            Settings.resetAspectCaps(shownProfile);
+            seeding = true;
+            try {
+                for (int i = 0; i < orbSpinners.length; i++) {
+                    if (orbSpinners[i] == null) {
                         continue;
                     }
-                    s.setValue(Settings.aspectCap(t));
-                    markCapChanged(s, t);
+                    String name = Bodies.at(i).name;
+                    orbSpinners[i].setValue(Settings.bodyOrb(name, shownProfile));
+                    markChanged(orbSpinners[i], name);
                 }
+                if (aspectCapSpinners != null) {
+                    for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                            : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+                        javax.swing.JSpinner s = aspectCapSpinners[t.ordinal()];
+                        if (s == null) {
+                            continue;
+                        }
+                        retuneCapSpinner(s, t);
+                        markCapChanged(s, t);
+                    }
+                }
+            } finally {
+                seeding = false;
             }
-            status.setText("Saved");
+            status.setText(profileLabel(shownProfile) + " orbs reset");
             if (window != null) {
                 window.applyBodySelection();
             }
         });
-        row.add(reset);
+        refreshProfileWording();
+        row.add(orbResetButton);
         p.add(row);
         p.add(Box.createRigidArea(new Dimension(0, 14)));
         return p;
@@ -1707,8 +1989,12 @@ public class SettingsPanel extends JPanel {
      * exactly that. The mark belongs on the control it describes, as it does for the aspects.
      */
     private void markChanged(javax.swing.JSpinner spinner, String name) {
-        boolean changed = Math.abs(Settings.bodyOrb(name)
-            - Aspects.defaultBodyOrb(name)) > 1e-9;
+        // <b>Against the shown profile's default, not natal's.</b> Synastry starts at half
+        // the natal width, so comparing with defaultBodyOrb would show every untouched point in
+        // bold the moment the reader switched - "you changed this" about a table they had never
+        // opened.
+        boolean changed = Math.abs(Settings.bodyOrb(name, shownProfile)
+            - Aspects.defaultBodyOrb(name, shownProfile)) > 1e-9;
         java.awt.Component editor = spinner.getEditor();
         if (editor instanceof javax.swing.JSpinner.DefaultEditor) {
             javax.swing.JTextField field =
