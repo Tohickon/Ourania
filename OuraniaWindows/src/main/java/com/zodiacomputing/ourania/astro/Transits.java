@@ -447,7 +447,13 @@ public final class Transits {
     static Contact transitContact(String movingName, double movingLon,
                                   String natalName, double natalLon) {
         double sep = Aspects.separation(movingLon, natalLon);
-        Aspects.Type type = Aspects.typeWithin(sep, movingName, natalName, orb);
+        // <b>Judged in the transit profile.</b> Its widths default to this same flat orb for
+        // every point, so nothing moves on a fresh install - F3's measurement stands - but a
+        // reader who widens Pluto on the Transits preset widens it here and nowhere else. The
+        // wheel is not this: its sky-to-person aspects ask for NATAL, because the sky is not a
+        // person and a one-degree wheel would hide a Pluto contact for years at a time.
+        Aspects.Type type = Aspects.typeWithin(sep, movingName, natalName, orb,
+            Aspects.Profile.TRANSIT);
         if (type == null) {
             return null;
         }
@@ -455,7 +461,7 @@ public final class Transits {
         c.type = type;
         c.separation = sep;
         c.offBy = Math.abs(sep - type.exactAngle);
-        c.orbUsed = Math.min(orb, Aspects.capOf(type));
+        c.orbUsed = Math.min(orb, Aspects.capOf(type, Aspects.Profile.TRANSIT));
         c.tightness = c.orbUsed <= 0 ? 0.0 : Math.max(0.0, 1.0 - c.offBy / c.orbUsed);
         return c;
     }

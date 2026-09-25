@@ -826,14 +826,40 @@ public final class Settings {
      */
     public static final String BODY_ORB_PREFIX = "orb.body.";
 
+    /**
+     * Where one profile's width for a point is stored.
+     *
+     * <b>Natal keeps the unqualified key.</b> A reader who has already narrowed a point wrote
+     * {@code orb.body.moon}, and inventing {@code orb.natal.body.moon} would silently drop that
+     * the next time they opened the app - a migration bought for nothing. The other three
+     * profiles are new, so they take a qualified prefix and there is nothing to move.
+     */
+    static String bodyOrbKey(com.zodiacomputing.ourania.astro.Aspects.Profile profile, String id) {
+        return profile == null || profile == com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL
+            ? BODY_ORB_PREFIX + id
+            : "orb." + profile.key() + ".body." + id;
+    }
+
+    /** Where one profile's ceiling for an aspect is stored. See {@link #bodyOrbKey}. */
+    static String aspectCapKey(com.zodiacomputing.ourania.astro.Aspects.Profile profile, String type) {
+        return profile == null || profile == com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL
+            ? ASPECT_CAP_PREFIX + type
+            : "orb." + profile.key() + ".aspect." + type;
+    }
+
     /** The reader's widths, by point name. Empty when nothing has been changed. */
     public static java.util.Map<String, Double> bodyOrbs() {
+        return bodyOrbs(com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL);
+    }
+
+    /** One profile's widths, by point name. Empty when nothing in it has been changed. */
+    public static java.util.Map<String, Double> bodyOrbs(com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
         java.util.Map<String, Double> out = new java.util.HashMap<>();
         for (int i = 0; i < com.zodiacomputing.ourania.astro.Bodies.count(); i++) {
             com.zodiacomputing.ourania.astro.Bodies.Def def =
                 com.zodiacomputing.ourania.astro.Bodies.at(i);
             String name = def.name;
-            String raw = get(BODY_ORB_PREFIX + def.id, "").trim();
+            String raw = get(bodyOrbKey(profile, def.id), "").trim();
             if (raw.isEmpty()) {
                 continue;
             }
@@ -852,9 +878,14 @@ public final class Settings {
 
     /** The width in force for a point - the reader's if set, the built-in one otherwise. */
     public static double bodyOrb(String name) {
-        Double mine = bodyOrbs().get(name);
+        return bodyOrb(name, com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL);
+    }
+
+    /** The width in force for a point in one profile. */
+    public static double bodyOrb(String name, com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
+        Double mine = bodyOrbs(profile).get(name);
         return mine != null ? mine
-            : com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name);
+            : com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name, profile);
     }
 
     /**
@@ -865,6 +896,11 @@ public final class Settings {
      * started in - and it keeps the file saying only what was actually chosen.
      */
     public static void setBodyOrb(String name, double degrees) {
+        setBodyOrb(name, degrees, com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL);
+    }
+
+    /** As above, in one profile. */
+    public static void setBodyOrb(String name, double degrees, com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
         // <b>Keyed by the registry's id, not the display name.</b> Bodies.Def.id says of itself
         // "stable key written into settings.properties, never change a published one", and the
         // name is what Aspects looks an orb up by. Storing under the name would tie every
@@ -876,18 +912,22 @@ public final class Settings {
         }
         double v = Math.max(com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB,
             Math.min(com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB, degrees));
-        if (Math.abs(v - com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name)) < 1e-9) {
-            set(BODY_ORB_PREFIX + def.id, "");
-        } else {
-            set(BODY_ORB_PREFIX + def.id, String.valueOf(v));
-        }
+        double built = com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name, profile);
+        set(bodyOrbKey(profile, def.id), Math.abs(v - built) < 1e-9 ? "" : String.valueOf(v));
         applyBodyOrbs();
     }
 
     /** Back to the built-in table, forgetting every width the reader set. */
     public static void resetBodyOrbs() {
+        for (com.zodiacomputing.ourania.astro.Aspects.Profile p : com.zodiacomputing.ourania.astro.Aspects.Profile.values()) {
+            resetBodyOrbs(p);
+        }
+    }
+
+    /** Back to the built-in table for one profile only. */
+    public static void resetBodyOrbs(com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
         for (int i = 0; i < com.zodiacomputing.ourania.astro.Bodies.count(); i++) {
-            set(BODY_ORB_PREFIX + com.zodiacomputing.ourania.astro.Bodies.at(i).id, "");
+            set(bodyOrbKey(profile, com.zodiacomputing.ourania.astro.Bodies.at(i).id), "");
         }
         applyBodyOrbs();
     }
@@ -899,7 +939,9 @@ public final class Settings {
      * never asked to read a settings file; see Aspects.setCustomOrbs for why that direction.
      */
     public static void applyBodyOrbs() {
-        com.zodiacomputing.ourania.astro.Aspects.setCustomOrbs(bodyOrbs());
+        for (com.zodiacomputing.ourania.astro.Aspects.Profile p : com.zodiacomputing.ourania.astro.Aspects.Profile.values()) {
+            com.zodiacomputing.ourania.astro.Aspects.setCustomOrbs(p, bodyOrbs(p));
+        }
     }
 
     /**
@@ -915,6 +957,12 @@ public final class Settings {
     /** The reader's ceilings, by aspect. Empty when nothing has been changed. */
     public static java.util.Map<com.zodiacomputing.ourania.astro.Aspects.Type, Double>
             aspectCaps() {
+        return aspectCaps(com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL);
+    }
+
+    /** One profile's ceilings, by aspect. Empty when nothing in it has been changed. */
+    public static java.util.Map<com.zodiacomputing.ourania.astro.Aspects.Type, Double>
+            aspectCaps(com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
         java.util.Map<com.zodiacomputing.ourania.astro.Aspects.Type, Double> out =
             new java.util.EnumMap<>(com.zodiacomputing.ourania.astro.Aspects.Type.class);
         for (com.zodiacomputing.ourania.astro.Aspects.Type t
@@ -924,14 +972,15 @@ public final class Settings {
             // one after the other two had been changed, which is what a check earns its keep
             // for. The bound below is the whole rule: a value between MIN_BODY_ORB and this
             // aspect's own default, which is finite for all fifteen now.
-            String raw = get(ASPECT_CAP_PREFIX + t.name(), "").trim();
+            String raw = get(aspectCapKey(profile, t.name()), "").trim();
             if (raw.isEmpty()) {
                 continue;
             }
             try {
                 double v = Double.parseDouble(raw);
                 if (v >= com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB
-                        && v <= com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t)) {
+                        && v <= com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t,
+                            profile)) {
                     out.put(t, v);
                 }
             } catch (NumberFormatException ignored) {
@@ -943,9 +992,15 @@ public final class Settings {
 
     /** The ceiling in force for an aspect - the reader's if set, the declared one otherwise. */
     public static double aspectCap(com.zodiacomputing.ourania.astro.Aspects.Type t) {
-        Double mine = aspectCaps().get(t);
+        return aspectCap(t, com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL);
+    }
+
+    /** The ceiling in force for an aspect in one profile. */
+    public static double aspectCap(com.zodiacomputing.ourania.astro.Aspects.Type t,
+                                   com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
+        Double mine = aspectCaps(profile).get(t);
         return mine != null ? mine
-            : com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t);
+            : com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t, profile);
     }
 
     /**
@@ -958,32 +1013,43 @@ public final class Settings {
      */
     public static void setAspectCap(com.zodiacomputing.ourania.astro.Aspects.Type t,
                                     double degrees) {
+        setAspectCap(t, degrees, com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL);
+    }
+
+    /** As above, in one profile. */
+    public static void setAspectCap(com.zodiacomputing.ourania.astro.Aspects.Type t,
+                                    double degrees, com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
         if (t == null) {
             return;
         }
-        double built = com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t);
+        double built = com.zodiacomputing.ourania.astro.Aspects.defaultCapOf(t, profile);
         double v = Math.max(com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB,
             Math.min(built, degrees));
-        if (Math.abs(v - built) < 1e-9) {
-            set(ASPECT_CAP_PREFIX + t.name(), "");
-        } else {
-            set(ASPECT_CAP_PREFIX + t.name(), String.valueOf(v));
-        }
+        set(aspectCapKey(profile, t.name()), Math.abs(v - built) < 1e-9 ? "" : String.valueOf(v));
         applyAspectCaps();
     }
 
     /** Back to the declared ceilings. */
     public static void resetAspectCaps() {
+        for (com.zodiacomputing.ourania.astro.Aspects.Profile p : com.zodiacomputing.ourania.astro.Aspects.Profile.values()) {
+            resetAspectCaps(p);
+        }
+    }
+
+    /** Back to the declared ceilings for one profile only. */
+    public static void resetAspectCaps(com.zodiacomputing.ourania.astro.Aspects.Profile profile) {
         for (com.zodiacomputing.ourania.astro.Aspects.Type t
                 : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
-            set(ASPECT_CAP_PREFIX + t.name(), "");
+            set(aspectCapKey(profile, t.name()), "");
         }
         applyAspectCaps();
     }
 
     /** Push the reader's ceilings into the engine. See applyBodyOrbs for the direction. */
     public static void applyAspectCaps() {
-        com.zodiacomputing.ourania.astro.Aspects.setCustomCaps(aspectCaps());
+        for (com.zodiacomputing.ourania.astro.Aspects.Profile p : com.zodiacomputing.ourania.astro.Aspects.Profile.values()) {
+            com.zodiacomputing.ourania.astro.Aspects.setCustomCaps(p, aspectCaps(p));
+        }
     }
 
     // ------------------------------------------------------------------ saved settings sets

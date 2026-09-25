@@ -244,19 +244,26 @@ public final class Aspects {
      * computed on another.</b> Replaced whole rather than mutated, so a half-applied set of
      * widths is never visible: a reading either used the old orbs or the new ones.
      */
-    private static volatile java.util.Map<String, Double> CUSTOM = java.util.Map.of();
+    private static volatile java.util.Map<Profile, java.util.Map<String, Double>> CUSTOM =
+        emptyByProfile();
 
     /**
      * The width this point is judged at, the reader's if they have set one.
      *
      * The empty case costs one map lookup on an immutable empty map, which is a null check.
      */
-    private static double bodyOrb(String name) {
+    private static double bodyOrb(String name, Profile profile) {
         if (name == null) {
-            return ANGLE_ORB;
+            return defaultBodyOrb(null, profile);
         }
-        Double mine = CUSTOM.get(name);
-        return mine != null ? mine : ORBS.getOrDefault(name, ANGLE_ORB);
+        Profile p = profile == null ? Profile.NATAL : profile;
+        Double mine = CUSTOM.get(p).get(name);
+        return mine != null ? mine : defaultBodyOrb(name, p);
+    }
+
+    /** The natal width, which is what the built-in table holds. */
+    private static double bodyOrb(String name) {
+        return bodyOrb(name, Profile.NATAL);
     }
 
     /**
@@ -270,6 +277,42 @@ public final class Aspects {
     }
 
     /**
+     * The built-in width for a point in one profile.
+     *
+     * <b>Every one of these reproduces what the code did before the profiles existed</b>, so a
+     * fresh install computes what it always computed:
+     *
+     * <ul>
+     * <li><b>NATAL and COMPOSITE</b> take the table. A composite is one chart derived from two
+     *     people's midpoints, not a comparison between two charts - David, 2026-09-24.
+     * <li><b>SYNASTRY</b> takes it halved, which is the {@code o * 0.5} that lived in
+     *     {@code orbFor} until stage 1.
+     * <li><b>TRANSIT</b> takes one flat width for every point: {@link Transits#DEFAULT_ORB}.
+     *     That is F3's measurement, not a shortcut - the natal table gave 21.6 transits in orb at
+     *     any moment and a Pluto conjunction to the natal Sun lasting 14.6 years. A reader may
+     *     widen a point from here; the default cannot drift back on its own.
+     * </ul>
+     */
+    public static double defaultBodyOrb(String name, Profile profile) {
+        Profile p = profile == null ? Profile.NATAL : profile;
+        if (p == Profile.NATAL) {
+            return defaultBodyOrb(name);
+        }
+        if (p == Profile.TRANSIT) {
+            return Transits.DEFAULT_ORB;
+        }
+        // <b>Derived from the natal width IN FORCE, not from the built-in table.</b> This is
+        // the difference between "a synastry is half of natal" and "a synastry is half of the
+        // table", and it is not academic: a reader who has widened natal Sun to 12 was getting 6
+        // cross-chart before the profiles existed, and taking half of the built-in 10 would
+        // quietly give them 5. OrbCheck caught exactly that. Deriving keeps the old behaviour
+        // for everyone who has ever touched an orb, and setting a value on the Synastry preset
+        // still breaks the link for that one point - which is what the preset bar is for.
+        double natal = bodyOrb(name, Profile.NATAL);
+        return p == Profile.SYNASTRY ? natal * 0.5 : natal;
+    }
+
+    /**
      * The reader's ceilings, by aspect. Empty is the normal case.
      *
      * <b>Separate from {@link #CUSTOM} because they are separate settings</b>, and separate from
@@ -278,7 +321,8 @@ public final class Aspects {
      * minor aspect, and before 2026-09-24 three places asked that question by comparing maxOrb
      * against a literal, which would have done exactly that.
      */
-    private static volatile java.util.Map<Type, Double> CUSTOM_CAPS = java.util.Map.of();
+    private static volatile java.util.Map<Profile, java.util.Map<Type, Double>> CUSTOM_CAPS =
+        emptyByProfile();
 
     /**
      * The ceiling this aspect is judged under - the reader's if they have set one.
@@ -291,8 +335,17 @@ public final class Aspects {
         if (t == null) {
             return Double.MAX_VALUE;
         }
-        Double mine = CUSTOM_CAPS.get(t);
-        return mine != null ? mine : defaultCapOf(t);
+        return capOf(t, Profile.NATAL);
+    }
+
+    /** The ceiling this aspect is judged under in one profile - the reader's if they set one. */
+    public static double capOf(Type t, Profile profile) {
+        if (t == null) {
+            return Double.MAX_VALUE;
+        }
+        Profile p = profile == null ? Profile.NATAL : profile;
+        Double mine = CUSTOM_CAPS.get(p).get(t);
+        return mine != null ? mine : defaultCapOf(t, p);
     }
 
     /**
@@ -320,6 +373,29 @@ public final class Aspects {
     }
 
     /**
+     * The built-in ceiling for an aspect in one profile.
+     *
+     * <b>Halved for synastry, and only there.</b> That is the {@code capOf(t) / 2.0} which lived
+     * in {@code effectiveOrb} until stage 1 - a cross-chart reading tightens both ends, the point
+     * width and the aspect's own ceiling, or halving the width alone does almost nothing: the
+     * minors' one-degree ceilings already bind below half of even the narrowest point.
+     *
+     * <b>TRANSIT takes the declared ceilings, not halved ones.</b> {@code transitContact} has
+     * always computed {@code min(Transits.orb, capOf(t))} with the declared caps, so this is what
+     * that was.
+     */
+    public static double defaultCapOf(Type t, Profile profile) {
+        if (profile == null || profile == Profile.NATAL) {
+            return defaultCapOf(t);
+        }
+        // Derived from the ceiling in force natally, for the reason defaultBodyOrb gives: a
+        // reader who tightened the semisextile natally had it tightened cross-chart too, and
+        // halving the declared ceiling instead would hand them back width they had removed.
+        double natal = capOf(t, Profile.NATAL);
+        return profile == Profile.SYNASTRY ? natal * 0.5 : natal;
+    }
+
+    /**
      * Put the reader's ceilings in force, replacing any set before.
      *
      * <b>Narrowed, never lifted - and now for all fifteen.</b> Every aspect may be tightened
@@ -333,12 +409,12 @@ public final class Aspects {
      * promised a narrowing-only rule that the code did not keep, and an explicit {@code isMinor}
      * skip was standing in for it. The skip is gone because the bound is real now.
      */
-    public static void setCustomCaps(java.util.Map<Type, Double> caps) {
-        if (caps == null || caps.isEmpty()) {
-            CUSTOM_CAPS = java.util.Map.of();
-            return;
-        }
+    public static void setCustomCaps(Profile profile, java.util.Map<Type, Double> caps) {
+        Profile prof = profile == null ? Profile.NATAL : profile;
         java.util.Map<Type, Double> kept = new java.util.EnumMap<>(Type.class);
+        if (caps == null) {
+            caps = java.util.Map.of();
+        }
         for (java.util.Map.Entry<Type, Double> e : caps.entrySet()) {
             Type t = e.getKey();
             Double v = e.getValue();
@@ -350,16 +426,30 @@ public final class Aspects {
             // the bound admitted every finite value - the guard was standing in for a bound that
             // was not binding. defaultCapOf gives the five a real number now, so the bound is
             // the whole rule and there is one rule rather than two.
-            if (v >= MIN_BODY_ORB && v <= defaultCapOf(t)) {
+            if (v >= MIN_BODY_ORB && v <= defaultCapOf(t, prof)) {
                 kept.put(t, v);
             }
         }
-        CUSTOM_CAPS = java.util.Collections.unmodifiableMap(kept);
+        java.util.EnumMap<Profile, java.util.Map<Type, Double>> next =
+            new java.util.EnumMap<>(Profile.class);
+        next.putAll(CUSTOM_CAPS);
+        next.put(prof, java.util.Collections.unmodifiableMap(kept));
+        CUSTOM_CAPS = java.util.Collections.unmodifiableMap(next);
+    }
+
+    /** Every profile's ceilings cleared at once, for a reset and for the suites. */
+    public static void clearCustomCaps() {
+        CUSTOM_CAPS = emptyByProfile();
     }
 
     /** The ceilings in force that differ from the declared ones. Never null. */
     public static java.util.Map<Type, Double> customCaps() {
-        return CUSTOM_CAPS;
+        return customCaps(Profile.NATAL);
+    }
+
+    /** One profile's ceilings that differ from its defaults. Never null. */
+    public static java.util.Map<Type, Double> customCaps(Profile profile) {
+        return CUSTOM_CAPS.get(profile == null ? Profile.NATAL : profile);
     }
 
     /** The narrowest and widest a point may be set to. A zero orb would switch a body off. */
@@ -376,27 +466,43 @@ public final class Aspects {
      *
      * @param widths point name to orb in degrees; null or empty restores the table
      */
-    public static void setCustomOrbs(java.util.Map<String, Double> widths) {
-        if (widths == null || widths.isEmpty()) {
-            CUSTOM = java.util.Map.of();
-            return;
-        }
+    public static void setCustomOrbs(Profile profile, java.util.Map<String, Double> widths) {
+        Profile p = profile == null ? Profile.NATAL : profile;
         java.util.Map<String, Double> kept = new java.util.HashMap<>();
-        for (java.util.Map.Entry<String, Double> e : widths.entrySet()) {
-            Double v = e.getValue();
-            if (e.getKey() == null || v == null || v.isNaN()) {
-                continue;
-            }
-            if (v >= MIN_BODY_ORB && v <= MAX_BODY_ORB) {
-                kept.put(e.getKey(), v);
+        if (widths != null) {
+            for (java.util.Map.Entry<String, Double> e : widths.entrySet()) {
+                Double v = e.getValue();
+                if (e.getKey() == null || v == null || v.isNaN()) {
+                    continue;
+                }
+                if (v >= MIN_BODY_ORB && v <= MAX_BODY_ORB) {
+                    kept.put(e.getKey(), v);
+                }
             }
         }
-        CUSTOM = java.util.Collections.unmodifiableMap(kept);
+        // <b>Replaced whole, one profile at a time.</b> The map of maps is rebuilt rather than
+        // mutated for the reason the single map was: a reading running on another thread either
+        // used the old widths or the new ones, never half of each.
+        java.util.EnumMap<Profile, java.util.Map<String, Double>> next =
+            new java.util.EnumMap<>(Profile.class);
+        next.putAll(CUSTOM);
+        next.put(p, java.util.Collections.unmodifiableMap(kept));
+        CUSTOM = java.util.Collections.unmodifiableMap(next);
     }
 
-    /** The widths in force that differ from the table. Never null. */
+    /** Every profile's widths cleared at once, for a reset and for the suites. */
+    public static void clearCustomOrbs() {
+        CUSTOM = emptyByProfile();
+    }
+
+    /** The natal widths in force that differ from the table. Never null. */
     public static java.util.Map<String, Double> customOrbs() {
-        return CUSTOM;
+        return customOrbs(Profile.NATAL);
+    }
+
+    /** One profile's widths that differ from its defaults. Never null. */
+    public static java.util.Map<String, Double> customOrbs(Profile profile) {
+        return CUSTOM.get(profile == null ? Profile.NATAL : profile);
     }
 
     /**
@@ -481,17 +587,35 @@ public final class Aspects {
      * change the wheel. It is a stage 2 decision and is not smuggled in here.
      */
     public enum Profile {
-        NATAL(1.0),
-        TRANSIT(1.0),
-        SYNASTRY(0.5),
-        COMPOSITE(1.0);
+        NATAL,
+        TRANSIT,
+        SYNASTRY,
+        COMPOSITE;
 
-        /** What today's code multiplies the width by in this context. Temporary - see above. */
-        public final double scale;
-
-        Profile(double scale) {
-            this.scale = scale;
+        /** For a settings key, and stable: never rename a published one. */
+        public String key() {
+            return name().toLowerCase(java.util.Locale.ROOT);
         }
+
+        /** The profile a stored key names, or null. Unknown names are ignored, never guessed. */
+        public static Profile byKey(String key) {
+            for (Profile p : values()) {
+                if (p.key().equals(key)) {
+                    return p;
+                }
+            }
+            return null;
+        }
+    }
+
+    /** An empty table for each profile, which is the normal case. */
+    private static <K> java.util.Map<Profile, java.util.Map<K, Double>> emptyByProfile() {
+        java.util.EnumMap<Profile, java.util.Map<K, Double>> m =
+            new java.util.EnumMap<>(Profile.class);
+        for (Profile p : Profile.values()) {
+            m.put(p, java.util.Map.of());
+        }
+        return java.util.Collections.unmodifiableMap(m);
     }
 
     /** The orb a pair is judged on: the larger of the two bodies'. */
@@ -499,9 +623,17 @@ public final class Aspects {
         return Math.max(bodyOrb(nameA), bodyOrb(nameB));
     }
 
+    /**
+     * The width a pair is judged on in one profile: the wider of its two points, in that
+     * profile's own table.
+     *
+     * <b>No scaling any more.</b> Stage 1 multiplied one table by a per-profile factor, which
+     * could not express a reader setting Mercury to four degrees in synastry and six in natal -
+     * the whole point of the preset bar. Each profile carries its own widths now, and the
+     * halving survives as synastry's <i>default</i> rather than as an arithmetic rule.
+     */
     public static double orbFor(String nameA, String nameB, Profile profile) {
-        double o = orbFor(nameA, nameB);
-        return profile == null ? o : o * profile.scale;
+        return Math.max(bodyOrb(nameA, profile), bodyOrb(nameB, profile));
     }
 
     /**
@@ -536,9 +668,7 @@ public final class Aspects {
      * always were.
      */
     public static double effectiveOrb(String nameA, String nameB, Type t, Profile profile) {
-        double scale = profile == null ? 1.0 : profile.scale;
-        double cap = capOf(t) * scale;
-        return Math.min(orbFor(nameA, nameB, profile), cap);
+        return Math.min(orbFor(nameA, nameB, profile), capOf(t, profile));
     }
 
     /**
@@ -608,6 +738,12 @@ public final class Aspects {
      * and the nearest exact angle wins, so a wide setting cannot name the wrong aspect.
      */
     public static Type typeWithin(double separation, String nameA, String nameB, double orb) {
+        return typeWithin(separation, nameA, nameB, orb, Profile.NATAL);
+    }
+
+    /** As above, under one profile's ceilings. */
+    public static Type typeWithin(double separation, String nameA, String nameB, double orb,
+                                  Profile profile) {
         if (bothCalculated(nameA, nameB)) {
             return null;
         }
@@ -615,7 +751,7 @@ public final class Aspects {
         double bestOff = Double.MAX_VALUE;
         for (Type t : Type.values()) {
             double off = Math.abs(separation - t.exactAngle);
-            if (off <= Math.min(orb, capOf(t)) && off < bestOff) {
+            if (off <= Math.min(orb, capOf(t, profile)) && off < bestOff) {
                 best = t;
                 bestOff = off;
             }

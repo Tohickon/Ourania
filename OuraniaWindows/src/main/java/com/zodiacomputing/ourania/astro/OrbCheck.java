@@ -45,9 +45,11 @@ public final class OrbCheck {
             part("D: the setting round-trips", OrbCheck::roundTrip);
             part("E: the aspect ceilings", OrbCheck::caps);
             part("F: the profiles reproduce what the boolean did", OrbCheck::profiles);
+            part("G: each profile stores its own, and natal keeps its keys",
+                OrbCheck::profileStorage);
         } finally {
-            Aspects.setCustomOrbs(null);
-            Aspects.setCustomCaps(null);
+            Aspects.clearCustomOrbs();
+            Aspects.clearCustomCaps();
         }
 
         System.out.println();
@@ -68,7 +70,7 @@ public final class OrbCheck {
      * are the ones nobody thinks about, which is exactly what a sample leaves out.
      */
     private static void untouched() {
-        Aspects.setCustomOrbs(null);
+        Aspects.clearCustomOrbs();
         boolean all = true;
         String first = "";
         for (int i = 0; i < Bodies.count(); i++) {
@@ -102,7 +104,7 @@ public final class OrbCheck {
 
         Map<String, Double> mine = new HashMap<>();
         mine.put("Pluto", 12.0);
-        Aspects.setCustomOrbs(mine);
+        Aspects.setCustomOrbs(Aspects.Profile.NATAL, mine);
 
         near("the point the reader widened is judged at their width", 12.0,
             Aspects.orbOf("Pluto"), 1e-9);
@@ -121,7 +123,7 @@ public final class OrbCheck {
         ok("a minor aspect keeps its own ceiling over the reader's width",
             Aspects.orbFor("Sun", "Pluto") > minorCap);
 
-        Aspects.setCustomOrbs(null);
+        Aspects.clearCustomOrbs();
         near("clearing puts the table back", plutoWas, Aspects.orbOf("Pluto"), 1e-9);
     }
 
@@ -133,7 +135,7 @@ public final class OrbCheck {
         silly.put("Sun", -3.0);
         silly.put("Mars", Double.NaN);
         silly.put(null, 5.0);
-        Aspects.setCustomOrbs(silly);
+        Aspects.setCustomOrbs(Aspects.Profile.NATAL, silly);
 
         near("a width past the maximum is refused", plutoWas, Aspects.orbOf("Pluto"), 1e-9);
         near("a negative one is refused", Aspects.defaultBodyOrb("Sun"),
@@ -194,7 +196,7 @@ public final class OrbCheck {
      * MAX_VALUE is so much larger. Narrowing a trine would have moved it between families.
      */
     private static void caps() {
-        Aspects.setCustomCaps(null);
+        Aspects.clearCustomCaps();
 
         Aspects.Type minor = Aspects.Type.SEMISEXTILE;
         Aspects.Type major = Aspects.Type.TRINE;
@@ -214,7 +216,7 @@ public final class OrbCheck {
 
         Map<Aspects.Type, Double> mine = new java.util.EnumMap<>(Aspects.Type.class);
         mine.put(minor, 0.5);
-        Aspects.setCustomCaps(mine);
+        Aspects.setCustomCaps(Aspects.Profile.NATAL, mine);
         near("a ceiling the reader tightened is the one in force", 0.5,
             Aspects.capOf(minor), 1e-9);
 
@@ -249,7 +251,7 @@ public final class OrbCheck {
         // is exactly what the six minors always did.
         Map<Aspects.Type, Double> onMajor = new java.util.EnumMap<>(Aspects.Type.class);
         onMajor.put(major, 3.0);
-        Aspects.setCustomCaps(onMajor);
+        Aspects.setCustomCaps(Aspects.Profile.NATAL, onMajor);
         near("a ceiling on a Ptolemaic aspect is kept", 3.0, Aspects.capOf(major), 1e-9);
         near("and it caps the pair below what the bodies allow", 3.0,
             Aspects.effectiveOrb("Sun", "Moon", major, Aspects.Profile.NATAL), 1e-9);
@@ -261,14 +263,14 @@ public final class OrbCheck {
         // default of Double.MAX_VALUE admitted every finite value the guard was meant to stop.
         Map<Aspects.Type, Double> liftMajor = new java.util.EnumMap<>(Aspects.Type.class);
         liftMajor.put(major, Aspects.MAX_BODY_ORB + 5.0);
-        Aspects.setCustomCaps(liftMajor);
+        Aspects.setCustomCaps(Aspects.Profile.NATAL, liftMajor);
         ok("a Ptolemaic ceiling above the widest a point may be is refused",
             Aspects.customCaps().isEmpty());
 
         // <b>And the default cannot bind, which is the whole case for the number.</b> Walked
         // over every ordered pair rather than argued: no point may be set wider than
         // MAX_BODY_ORB and orbFor is the wider of two points, so capping there is the width.
-        Aspects.setCustomCaps(null);
+        Aspects.clearCustomCaps();
         int pairs = 0;
         boolean everNarrowed = false;
         for (int i = 0; i < Bodies.count(); i++) {
@@ -286,11 +288,11 @@ public final class OrbCheck {
         // <b>Widened is refused too.</b> Only tightening, or the ceiling stops being one.
         Map<Aspects.Type, Double> wider = new java.util.EnumMap<>(Aspects.Type.class);
         wider.put(minor, Aspects.defaultCapOf(minor) + 4.0);
-        Aspects.setCustomCaps(wider);
+        Aspects.setCustomCaps(Aspects.Profile.NATAL, wider);
         near("a ceiling wider than the declared one is refused", Aspects.defaultCapOf(minor),
             Aspects.capOf(minor), 1e-9);
 
-        Aspects.setCustomCaps(null);
+        Aspects.clearCustomCaps();
         near("clearing puts the declared ceiling back", Aspects.defaultCapOf(minor),
             Aspects.capOf(minor), 1e-9);
 
@@ -330,16 +332,39 @@ public final class OrbCheck {
      * what says so out loud.
      */
     private static void profiles() {
-        Aspects.setCustomCaps(null);
-        Aspects.setCustomOrbs(null);
+        Aspects.clearCustomCaps();
+        Aspects.clearCustomOrbs();
 
-        near("natal does not scale", 1.0, Aspects.Profile.NATAL.scale, 1e-9);
-        near("composite reads at natal widths - David, 2026-09-24", 1.0,
-            Aspects.Profile.COMPOSITE.scale, 1e-9);
-        near("synastry is halved, which is what the old o * 0.5 did", 0.5,
-            Aspects.Profile.SYNASTRY.scale, 1e-9);
-        near("transit is unscaled, and nothing produces it yet", 1.0,
-            Aspects.Profile.TRANSIT.scale, 1e-9);
+        // <b>Asserted on the defaults themselves, not on a scale factor.</b> Stage 1 carried a
+        // per-profile multiplier and this part asked about it; stage 2 gave each profile its own
+        // table, so the multiplier is gone and the claim has to be made against what a point is
+        // actually judged at. That is the stronger assertion in any case: a scale is an
+        // implementation, a width is the thing a reader sees.
+        near("natal takes the built-in table", Aspects.defaultBodyOrb("Sun"),
+            Aspects.defaultBodyOrb("Sun", Aspects.Profile.NATAL), 1e-9);
+        near("composite reads at natal widths - David, 2026-09-24",
+            Aspects.defaultBodyOrb("Sun"),
+            Aspects.defaultBodyOrb("Sun", Aspects.Profile.COMPOSITE), 1e-9);
+        near("synastry halves it, which is what the old o * 0.5 did",
+            Aspects.defaultBodyOrb("Sun") / 2.0,
+            Aspects.defaultBodyOrb("Sun", Aspects.Profile.SYNASTRY), 1e-9);
+        near("transit is one flat width, which is F3's measurement",
+            com.zodiacomputing.ourania.astro.Transits.DEFAULT_ORB,
+            Aspects.defaultBodyOrb("Sun", Aspects.Profile.TRANSIT), 1e-9);
+        near("and the same flat width for a point of a quite different size",
+            com.zodiacomputing.ourania.astro.Transits.DEFAULT_ORB,
+            Aspects.defaultBodyOrb("Pluto", Aspects.Profile.TRANSIT), 1e-9);
+
+        // <b>A profile's widths are its own.</b> This is what a scale could never express, and
+        // what the preset bar exists for.
+        Aspects.setCustomOrbs(Aspects.Profile.SYNASTRY, java.util.Map.of("Mercury", 4.0));
+        near("a width set in synastry is in force there", 4.0,
+            Aspects.orbFor("Mercury", "Mercury", Aspects.Profile.SYNASTRY), 1e-9);
+        near("and natal is untouched by it",
+            Aspects.defaultBodyOrb("Mercury"),
+            Aspects.orbFor("Mercury", "Mercury", Aspects.Profile.NATAL), 1e-9);
+        Aspects.clearCustomOrbs();
+
         ok("there are four profiles and no more", Aspects.Profile.values().length == 4);
 
         // <b>A spread of pairs, not one.</b> A luminary pair, an outer pair and a mixed pair
@@ -400,6 +425,81 @@ public final class OrbCheck {
         failures.add(label);
         loopFailures++;
         System.out.println("  FAIL " + label);
+    }
+
+    /**
+     * Stage 2: the storage behind the presets.
+     *
+     * <p><b>The legacy keys are the point of the first assertions.</b> A reader who has already
+     * narrowed a point wrote {@code orb.body.moon}; giving natal a qualified key of its own would
+     * have dropped that silently on the next launch. Natal keeps the unqualified prefix and the
+     * other three take one, so there is nothing to migrate and nothing to lose.
+     *
+     * <p><b>And the derivation, which is where this nearly went wrong.</b> Synastry is half of
+     * the natal width <i>in force</i>, not half of the built-in table. The first version of stage
+     * 2 took the table, which would have quietly narrowed the cross-chart widths of every reader
+     * who had ever touched an orb - from 6 degrees to 5 on a Sun widened to 12. Part B caught it.
+     */
+    private static void profileStorage() {
+        Settings.resetBodyOrbs();
+        Settings.resetAspectCaps();
+
+        // Natal writes where it always wrote.
+        Settings.setBodyOrb("Moon", 4.5);
+        ok("a natal width is stored under the unqualified key",
+            "4.5".equals(Settings.get("orb.body.moon", "(absent)")));
+        ok("and no qualified natal key is written",
+            Settings.get("orb.natal.body.moon", "(absent)").equals("(absent)"));
+
+        // The others write under their own.
+        Settings.setBodyOrb("Moon", 2.0, Aspects.Profile.SYNASTRY);
+        ok("a synastry width is stored under its own key",
+            "2.0".equals(Settings.get("orb.synastry.body.moon", "(absent)")));
+        near("and natal is untouched", 4.5, Settings.bodyOrb("Moon"), 1e-9);
+        near("and synastry is what was set", 2.0,
+            Settings.bodyOrb("Moon", Aspects.Profile.SYNASTRY), 1e-9);
+        near("and the engine is holding both", 4.5,
+            Aspects.orbFor("Moon", "Moon", Aspects.Profile.NATAL), 1e-9);
+        near("the engine holds the synastry one too", 2.0,
+            Aspects.orbFor("Moon", "Moon", Aspects.Profile.SYNASTRY), 1e-9);
+
+        // <b>The derivation, asserted on a point nobody has set in synastry.</b>
+        Settings.setBodyOrb("Sun", 12.0);
+        near("an unset synastry width is half the natal one IN FORCE, not half the table", 6.0,
+            Settings.bodyOrb("Sun", Aspects.Profile.SYNASTRY), 1e-9);
+        near("and composite follows natal outright - David, 2026-09-24", 12.0,
+            Settings.bodyOrb("Sun", Aspects.Profile.COMPOSITE), 1e-9);
+        near("while transit stays flat, whatever natal does",
+            com.zodiacomputing.ourania.astro.Transits.DEFAULT_ORB,
+            Settings.bodyOrb("Sun", Aspects.Profile.TRANSIT), 1e-9);
+
+        // <b>Setting one breaks the link for that point only.</b>
+        Settings.setBodyOrb("Sun", 3.0, Aspects.Profile.SYNASTRY);
+        near("a synastry width that was set does not follow natal", 3.0,
+            Settings.bodyOrb("Sun", Aspects.Profile.SYNASTRY), 1e-9);
+        Settings.setBodyOrb("Sun", 8.0);
+        near("even when natal moves again", 3.0,
+            Settings.bodyOrb("Sun", Aspects.Profile.SYNASTRY), 1e-9);
+        near("while a point nobody has set in synastry is still half of its natal width",
+            Aspects.defaultBodyOrb("Mercury") / 2.0,
+            Settings.bodyOrb("Mercury", Aspects.Profile.SYNASTRY), 1e-9);
+
+        // Resetting one profile leaves the others alone.
+        Settings.resetBodyOrbs(Aspects.Profile.SYNASTRY);
+        near("resetting synastry puts it back to half of natal", 4.0,
+            Settings.bodyOrb("Sun", Aspects.Profile.SYNASTRY), 1e-9);
+        near("and leaves natal where the reader put it", 8.0, Settings.bodyOrb("Sun"), 1e-9);
+
+        Settings.resetBodyOrbs();
+        Settings.resetAspectCaps();
+        // <b>Empty is how this file says unset</b> - bodyOrbs skips a key whose value is
+        // blank - so a reset is asserted the way the loader reads it, not by the key vanishing.
+        ok("a full reset forgets every profile",
+            Settings.get("orb.body.sun", "").trim().isEmpty()
+                && Settings.get("orb.synastry.body.moon", "").trim().isEmpty());
+        ok("and the widths are back to the built-in table",
+            Math.abs(Settings.bodyOrb("Sun") - Aspects.defaultBodyOrb("Sun")) < 1e-9
+                && Math.abs(Settings.bodyOrb("Moon") - Aspects.defaultBodyOrb("Moon")) < 1e-9);
     }
 
     private static void part(String title, Runnable body) {
