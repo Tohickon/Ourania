@@ -264,7 +264,7 @@ public final class SynastryCheck {
             for (int j = 0; j < n; j++) {
                 String b = Bodies.at(j).name;
                 double wide = Aspects.orbFor(a, b);
-                double tight = Aspects.orbFor(a, b, true);
+                double tight = Aspects.orbFor(a, b, Aspects.Profile.SYNASTRY);
                 near("synastry orb is half the natal orb " + a + "/" + b, wide / 2.0, tight, 1e-12);
                 near("orb is symmetric " + a + "/" + b, wide, Aspects.orbFor(b, a), 1e-12);
             }
@@ -277,11 +277,11 @@ public final class SynastryCheck {
         for (String a : probes) {
             for (String b : probes) {
                 for (double sep = 0.0; sep <= 180.0; sep += 0.25) {
-                    Aspects.Type tight = Aspects.typeOf(sep, a, b, true);
+                    Aspects.Type tight = Aspects.typeOf(sep, a, b, Aspects.Profile.SYNASTRY);
                     if (tight == null) {
                         continue;
                     }
-                    Aspects.Type wide = Aspects.typeOf(sep, a, b, false);
+                    Aspects.Type wide = Aspects.typeOf(sep, a, b, Aspects.Profile.NATAL);
                     eq("halved orb never finds what the full orb misses "
                         + a + "/" + b + " at " + sep, tight, wide);
                 }
@@ -291,18 +291,18 @@ public final class SynastryCheck {
         // The boundary, on a pair whose orb is known from the table: Sun and Moon are 10,
         // so synastry is 5.
         near("Sun/Moon natal orb", 10.0, Aspects.orbFor("Sun", "Moon"), 1e-12);
-        near("Sun/Moon synastry orb", 5.0, Aspects.orbFor("Sun", "Moon", true), 1e-12);
+        near("Sun/Moon synastry orb", 5.0, Aspects.orbFor("Sun", "Moon", Aspects.Profile.SYNASTRY), 1e-12);
         eq("conjunction holds at the halved orb",
-            Aspects.Type.CONJUNCTION, Aspects.typeOf(5.0, "Sun", "Moon", true));
+            Aspects.Type.CONJUNCTION, Aspects.typeOf(5.0, "Sun", "Moon", Aspects.Profile.SYNASTRY));
         eq("conjunction is gone just outside it",
-            null, Aspects.typeOf(5.5, "Sun", "Moon", true));
+            null, Aspects.typeOf(5.5, "Sun", "Moon", Aspects.Profile.SYNASTRY));
         eq("but the full orb still has it",
-            Aspects.Type.CONJUNCTION, Aspects.typeOf(5.5, "Sun", "Moon", false));
+            Aspects.Type.CONJUNCTION, Aspects.typeOf(5.5, "Sun", "Moon", Aspects.Profile.NATAL));
 
         // The two-argument form is the full orb, not the halved one. Stated because the
         // whole grid depends on it and it is one keystroke from being otherwise.
         eq("the two-argument typeOf is the natal reading",
-            Aspects.typeOf(5.5, "Sun", "Moon", false), Aspects.typeOf(5.5, "Sun", "Moon"));
+            Aspects.typeOf(5.5, "Sun", "Moon", Aspects.Profile.NATAL), Aspects.typeOf(5.5, "Sun", "Moon"));
 
         // ---- the cap halves in step with the orb (2026-08-24) ----
         //
@@ -314,8 +314,8 @@ public final class SynastryCheck {
             for (int j = 0; j < n; j++) {
                 String b = Bodies.at(j).name;
                 for (Aspects.Type t : Aspects.Type.values()) {
-                    double wide = Aspects.effectiveOrb(a, b, t, false);
-                    double tight = Aspects.effectiveOrb(a, b, t, true);
+                    double wide = Aspects.effectiveOrb(a, b, t, Aspects.Profile.NATAL);
+                    double tight = Aspects.effectiveOrb(a, b, t, Aspects.Profile.SYNASTRY);
 
                     // The whole point: exactly half, for EVERY aspect, not just the ones
                     // whose cap happens not to bind.
@@ -340,29 +340,31 @@ public final class SynastryCheck {
                 continue;
             }
             near(t.label + " is 1 degree natally", 1.0,
-                Aspects.effectiveOrb("Sun", "Moon", t, false), 1e-12);
+                Aspects.effectiveOrb("Sun", "Moon", t, Aspects.Profile.NATAL), 1e-12);
             near(t.label + " is half a degree in synastry", 0.5,
-                Aspects.effectiveOrb("Sun", "Moon", t, true), 1e-12);
+                Aspects.effectiveOrb("Sun", "Moon", t, Aspects.Profile.SYNASTRY), 1e-12);
         }
 
         // A boundary that would have been silent before, on the aspect this project has
         // already had two defects in. 150.75 is three quarters of a degree off exact:
         // inside the quincunx's 1.0 natal cap, outside its 0.5 synastry one.
         eq("a quincunx at 0.75 degrees is a natal aspect",
-            Aspects.Type.QUINCUNX, Aspects.typeOf(150.75, "Sun", "Moon", false));
+            Aspects.Type.QUINCUNX, Aspects.typeOf(150.75, "Sun", "Moon", Aspects.Profile.NATAL));
         eq("and is not a synastry aspect",
-            null, Aspects.typeOf(150.75, "Sun", "Moon", true));
+            null, Aspects.typeOf(150.75, "Sun", "Moon", Aspects.Profile.SYNASTRY));
         eq("at 0.4 it is both",
-            Aspects.Type.QUINCUNX, Aspects.typeOf(150.4, "Sun", "Moon", true));
+            Aspects.Type.QUINCUNX, Aspects.typeOf(150.4, "Sun", "Moon", Aspects.Profile.SYNASTRY));
 
         // typeOf and effectiveOrb are the same rule. They have to be - typeOf is written in
         // terms of it now, and this fails if anyone reintroduces a second Math.min.
         for (Aspects.Type t : Aspects.Type.values()) {
-            for (boolean syn : new boolean[] {false, true}) {
+            // <b>Every profile, not the two the boolean could name.</b> The sweep took
+            // false and true; with four profiles that would leave composite and transit
+            // unwalked, and a scale set wrongly on either would pass this untouched.
+            for (Aspects.Profile syn : Aspects.Profile.values()) {
                 double orb = Aspects.effectiveOrb("Mars", "Vesta", t, syn);
                 double at = t == Aspects.Type.CONJUNCTION ? orb : t.exactAngle + orb;
-                eq("typeOf agrees with effectiveOrb at the edge, " + t.label
-                        + (syn ? " synastry" : " natal"),
+                eq("typeOf agrees with effectiveOrb at the edge, " + t.label + " " + syn,
                     t, Aspects.typeOf(at, "Mars", "Vesta", syn));
             }
         }
@@ -684,7 +686,7 @@ public final class SynastryCheck {
                     // aspects without casting them. Being inside the orb is therefore not
                     // enough on its own to expect a contact - K5 made that the engine's rule
                     // and this is the suite catching up to it, one commit late.
-                    boolean inside = sep <= Aspects.orbFor(body.name, angle, true)
+                    boolean inside = sep <= Aspects.orbFor(body.name, angle, Aspects.Profile.SYNASTRY)
                         && !Aspects.bothCalculated(body.name, angle);
                     boolean reported = false;
                     for (Synastry.AngleContact h : hits) {
@@ -1222,10 +1224,10 @@ public final class SynastryCheck {
                 for (double gap : gaps) {
                     // Middle of the circle, nowhere near the join.
                     Aspects.Type open = Aspects.typeOf(
-                        Aspects.separation(100.0, 100.0 + gap), body, angle, true);
+                        Aspects.separation(100.0, 100.0 + gap), body, angle, Aspects.Profile.SYNASTRY);
                     // The same gap laid across zero.
                     Aspects.Type across = Aspects.typeOf(
-                        Aspects.separation(359.95, (359.95 + gap) % 360.0), body, angle, true);
+                        Aspects.separation(359.95, (359.95 + gap) % 360.0), body, angle, Aspects.Profile.SYNASTRY);
                     eq("the seam does not change the verdict for " + body + "/" + angle
                         + " at " + gap + " degrees", open, across);
 
@@ -1233,7 +1235,7 @@ public final class SynastryCheck {
                     // either, which is the order the two charts arrive in for the second
                     // person rather than the first.
                     Aspects.Type reversed = Aspects.typeOf(
-                        Aspects.separation((359.95 + gap) % 360.0, 359.95), body, angle, true);
+                        Aspects.separation((359.95 + gap) % 360.0, 359.95), body, angle, Aspects.Profile.SYNASTRY);
                     eq("argument order does not change the verdict for " + body + "/" + angle
                         + " at " + gap + " degrees", across, reversed);
                 }
@@ -1241,15 +1243,15 @@ public final class SynastryCheck {
                 // The halved synastry orb is Part B's contract; here it is only used to
                 // place a probe safely inside and safely outside, so this stays a statement
                 // about the seam rather than a second copy of the orb rule.
-                double orb = Aspects.orbFor(body, angle, true);
+                double orb = Aspects.orbFor(body, angle, Aspects.Profile.SYNASTRY);
                 eq("well inside the orb is a conjunction across the seam for "
                     + body + "/" + angle,
                     Aspects.Type.CONJUNCTION,
                     Aspects.typeOf(Aspects.separation(359.9, (359.9 + orb * 0.5) % 360.0),
-                        body, angle, true));
+                        body, angle, Aspects.Profile.SYNASTRY));
                 checks++;
                 if (Aspects.typeOf(Aspects.separation(359.9, (359.9 + orb + 5.0) % 360.0),
-                        body, angle, true) == Aspects.Type.CONJUNCTION) {
+                        body, angle, Aspects.Profile.SYNASTRY) == Aspects.Type.CONJUNCTION) {
                     failures.add("a conjunction was found " + (orb + 5.0)
                         + " degrees out across the seam for " + body + "/" + angle);
                 }

@@ -44,6 +44,7 @@ public final class OrbCheck {
             part("C: the bounds are refused, not bent", OrbCheck::bounds);
             part("D: the setting round-trips", OrbCheck::roundTrip);
             part("E: the aspect ceilings", OrbCheck::caps);
+            part("F: the profiles reproduce what the boolean did", OrbCheck::profiles);
         } finally {
             Aspects.setCustomOrbs(null);
             Aspects.setCustomCaps(null);
@@ -112,7 +113,7 @@ public final class OrbCheck {
         near("a pair takes the wider of the two", 12.0, Aspects.orbFor("Sun", "Pluto"), 1e-9);
         near("whichever way round it is asked", 12.0, Aspects.orbFor("Pluto", "Sun"), 1e-9);
         near("and a cross-chart pair is still halved from there", 6.0,
-            Aspects.orbFor("Sun", "Pluto", true), 1e-9);
+            Aspects.orbFor("Sun", "Pluto", Aspects.Profile.SYNASTRY), 1e-9);
 
         // <b>And the aspect's own ceiling still caps it.</b> A reader widening Pluto to 12 has
         // not widened a semisextile to 12; the minor aspects keep their 1 degree.
@@ -220,9 +221,9 @@ public final class OrbCheck {
         // <b>Which is the point: the cap decides, not the bodies.</b> Two luminaries allow ten
         // degrees between them; a semisextile at half a degree has to override that.
         near("and it caps the pair, not the other way round", 0.5,
-            Aspects.effectiveOrb("Sun", "Moon", minor, false), 1e-9);
+            Aspects.effectiveOrb("Sun", "Moon", minor, Aspects.Profile.NATAL), 1e-9);
         ok("while an uncapped aspect is still the bodies' to decide",
-            Aspects.effectiveOrb("Sun", "Moon", major, false) > 1.0);
+            Aspects.effectiveOrb("Sun", "Moon", major, Aspects.Profile.NATAL) > 1.0);
 
         // <b>And it decides what IS the aspect, not only how wide one may be.</b> typeWithin
         // is what turns a separation into an aspect; a ceiling that reached effectiveOrb and
@@ -251,7 +252,7 @@ public final class OrbCheck {
         Aspects.setCustomCaps(onMajor);
         near("a ceiling on a Ptolemaic aspect is kept", 3.0, Aspects.capOf(major), 1e-9);
         near("and it caps the pair below what the bodies allow", 3.0,
-            Aspects.effectiveOrb("Sun", "Moon", major, false), 1e-9);
+            Aspects.effectiveOrb("Sun", "Moon", major, Aspects.Profile.NATAL), 1e-9);
         ok("and one outside it is no longer that aspect",
             Aspects.typeWithin(124.0, "Sun", "Moon", 10.0) != major);
 
@@ -310,6 +311,95 @@ public final class OrbCheck {
         ok("putting it back to the declared ceiling forgets the setting",
             Settings.aspectCaps().isEmpty());
         Settings.resetAspectCaps();
+    }
+
+    /**
+     * Stage 1 of the presets: the four profiles compute exactly what isSynastry computed.
+     *
+     * <p><b>This is the whole claim of that stage, so it is the whole of this part.</b> The
+     * refactor replaced a boolean threaded through three methods and 38 call sites with a named
+     * profile. Nothing a reader sees was meant to move, and "meant to" is worth very little - so
+     * the two profiles that stood for {@code false} and {@code true} are asserted against the
+     * arithmetic those branches used, over every aspect type and a spread of pairs rather than a
+     * convenient one.
+     *
+     * <p><b>COMPOSITE is asserted equal to NATAL, not merely similar.</b> David's decision on
+     * 2026-09-24 is that a composite reads at natal widths; before the enum that was true only
+     * because a composite is not a synastry, which is a fact about a boolean rather than a
+     * decision about composites. If someone later gives COMPOSITE a scale of its own, this is
+     * what says so out loud.
+     */
+    private static void profiles() {
+        Aspects.setCustomCaps(null);
+        Aspects.setCustomOrbs(null);
+
+        near("natal does not scale", 1.0, Aspects.Profile.NATAL.scale, 1e-9);
+        near("composite reads at natal widths - David, 2026-09-24", 1.0,
+            Aspects.Profile.COMPOSITE.scale, 1e-9);
+        near("synastry is halved, which is what the old o * 0.5 did", 0.5,
+            Aspects.Profile.SYNASTRY.scale, 1e-9);
+        near("transit is unscaled, and nothing produces it yet", 1.0,
+            Aspects.Profile.TRANSIT.scale, 1e-9);
+        ok("there are four profiles and no more", Aspects.Profile.values().length == 4);
+
+        // <b>A spread of pairs, not one.</b> A luminary pair, an outer pair and a mixed pair
+        // have different widths, and a scale applied to the wrong end would survive a check
+        // that only ever asked about two bodies of the same orb.
+        String[][] pairs = {
+            {"Sun", "Moon"}, {"Pluto", "Neptune"}, {"Sun", "Pluto"}, {"Mercury", "Vesta"},
+        };
+        int compared = 0;
+        for (Aspects.Type type : Aspects.Type.values()) {
+            for (String[] pair : pairs) {
+                double natal = Aspects.effectiveOrb(pair[0], pair[1], type,
+                    Aspects.Profile.NATAL);
+                double composite = Aspects.effectiveOrb(pair[0], pair[1], type,
+                    Aspects.Profile.COMPOSITE);
+                double synastry = Aspects.effectiveOrb(pair[0], pair[1], type,
+                    Aspects.Profile.SYNASTRY);
+                if (Math.abs(composite - natal) > 1e-9) {
+                    fail("composite differs from natal for " + type.label + " "
+                        + pair[0] + "/" + pair[1]);
+                }
+                if (Math.abs(synastry - natal / 2.0) > 1e-9) {
+                    fail("synastry is not half of natal for " + type.label + " "
+                        + pair[0] + "/" + pair[1]);
+                }
+                compared++;
+            }
+        }
+        ok("every aspect type was compared across four pairs",
+            compared == Aspects.Type.values().length * pairs.length);
+        ok("composite equals natal, and synastry is half of it, at every one of them",
+            noNewFailures());
+
+        // <b>And the same through typeOf, which is what actually decides an aspect.</b> A scale
+        // honoured by effectiveOrb and not by typeOf would narrow what is reported while leaving
+        // what is detected alone - the same split that a mutation exploited on 2026-09-24.
+        double sep = 120.0 + Aspects.effectiveOrb("Sun", "Moon", Aspects.Type.TRINE,
+            Aspects.Profile.SYNASTRY) + 0.05;
+        ok("just outside the halved trine, synastry does not see it",
+            Aspects.typeOf(sep, "Sun", "Moon", Aspects.Profile.SYNASTRY) != Aspects.Type.TRINE);
+        ok("but natal still does, at the same separation",
+            Aspects.typeOf(sep, "Sun", "Moon", Aspects.Profile.NATAL) == Aspects.Type.TRINE);
+        ok("and composite agrees with natal there",
+            Aspects.typeOf(sep, "Sun", "Moon", Aspects.Profile.COMPOSITE) == Aspects.Type.TRINE);
+    }
+
+    private static int loopFailures = 0;
+    private static int loopFailuresSeen = 0;
+
+    /** True when no assertion inside a loop has failed since this was last asked. */
+    private static boolean noNewFailures() {
+        boolean clean = loopFailures == loopFailuresSeen;
+        loopFailuresSeen = loopFailures;
+        return clean;
+    }
+
+    private static void fail(String label) {
+        failures.add(label);
+        loopFailures++;
+        System.out.println("  FAIL " + label);
     }
 
     private static void part(String title, Runnable body) {

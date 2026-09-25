@@ -1456,7 +1456,7 @@ extends JPanel {
         if (sep > 180.0) {
             sep = 360.0 - sep;
         }
-        Aspects.Type type = this.visibleAspect(sep, a, b, this.isSynastryPair(cross));
+        Aspects.Type type = this.visibleAspect(sep, a, b, this.profileForPair(cross));
         if (type == null || !this.drawsPair(a, b)) {
             return null;
         }
@@ -2054,9 +2054,9 @@ extends JPanel {
                 || i >= mine.length) {
             return FOCUS_DIM;
         }
-        boolean synastry = transit != this.focusTransit;
+        Aspects.Profile profile = this.profileForPair(transit != this.focusTransit);
         double sep = Aspects.separation(mine[i], theirs[this.focusBody]);
-        return this.visibleAspect(sep, i, this.focusBody, synastry) != null ? 1.0 : FOCUS_DIM;
+        return this.visibleAspect(sep, i, this.focusBody, profile) != null ? 1.0 : FOCUS_DIM;
     }
 
     /** What an unfocused line and glyph fade to. Enough to recede, not enough to vanish. */
@@ -5233,17 +5233,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // nothing in the panel said a chart had been skipped.
                 //
                 // <b>Neither pass is a synastry pair.</b> chartMode IS SYNASTRY here, so
-                // isSynastryPair(true) would answer yes and halve the orb - but that rule is
+                // profileForPair(true) would answer yes and halve the orb - but that rule is
                 // for one person's chart against another's. The sky is not a person. Both
                 // passes are sky-to-person, which is a transit and takes the full orb, so
-                // both ask isSynastryPair(false) rather than passing a bare literal.
+                // both ask profileForPair(false) rather than passing a bare literal.
                 ArrayList<String[]> arrayListC = new ArrayList<String[]>();
                 for (n14c = 0; n14c < BODY_COUNT; ++n14c) {
                     String string;
                     if (!this.natalRing.valid[n14c]) continue;
                     double d14 = Math.abs(this.skyRing.lon[n3] - this.natalRing.lon[n14c]);
                     if (d14 > 180.0) d14 = 360.0 - d14;
-                    if ((string = this.getAspectType(d14, n3, n14c, this.isSynastryPair(false))) == null) continue;
+                    if ((string = this.getAspectType(d14, n3, n14c, this.profileForPair(false))) == null) continue;
                     boolean blA = this.isAspectApplying(this.skyRing.lon[n3], this.skyRing.speed[n3], this.natalRing.lon[n14c], this.natalRing.speed[n14c], string);
                     String string2 = this.describeAspect(d14, string, n3, n14c, this.skyRing.lon[n3], this.natalRing.lon[n14c], blA);
                     arrayListC.add(new String[]{BODY_NAMES[n14c], string, string2, "Chart A"});
@@ -5253,7 +5253,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!this.outerRing.valid[n14c]) continue;
                     double d14 = Math.abs(this.skyRing.lon[n3] - this.outerRing.lon[n14c]);
                     if (d14 > 180.0) d14 = 360.0 - d14;
-                    if ((string = this.getAspectType(d14, n3, n14c, this.isSynastryPair(false))) == null) continue;
+                    if ((string = this.getAspectType(d14, n3, n14c, this.profileForPair(false))) == null) continue;
                     boolean blB = this.isAspectApplying(this.skyRing.lon[n3], this.skyRing.speed[n3], this.outerRing.lon[n14c], this.outerRing.speed[n14c], string);
                     String string2 = this.describeAspect(d14, string, n3, n14c, this.skyRing.lon[n3], this.outerRing.lon[n14c], blB);
                     arrayListC.add(new String[]{BODY_NAMES[n14c], string, string2, "Chart B"});
@@ -5301,7 +5301,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (d14 > 180.0) {
                         d14 = 360.0 - d14;
                     }
-                    if ((string = this.getAspectType(d14, n3, n14, this.isSynastryPair(true))) == null) continue;
+                    if ((string = this.getAspectType(d14, n3, n14, this.profileForPair(true))) == null) continue;
                     boolean bl = this.isAspectApplying(this.outerRing.lon[n3], this.outerRing.speed[n3], this.natalRing.lon[n14], this.natalRing.speed[n14], string);
                     String string2 = this.describeAspect(d14, string, n3, n14, this.outerRing.lon[n3], this.natalRing.lon[n14], bl);
                     arrayList.add(new String[]{BODY_NAMES[n14], string, string2});
@@ -5347,7 +5347,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (d20 > 180.0) {
                         d20 = 360.0 - d20;
                     }
-                    if ((string = this.getAspectType(d20, n3, n19, false)) == null) continue;
+                    if ((string = this.getAspectType(d20, n3, n19, Aspects.Profile.NATAL)) == null) continue;
                     boolean bl2 = this.isAspectApplying(d2, this.natalRing.speed[n3], this.natalRing.lon[n19], this.natalRing.speed[n19], string);
                     String string3 = this.describeAspect(d20, string, n3, n19, d2, this.natalRing.lon[n19], bl2);
                     arrayList.add(new String[]{BODY_NAMES[n19], string, string3});
@@ -5528,8 +5528,34 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * One definition for all eight places that ask. See WORK-PLAN for the measurement behind
      * the halving itself, and {@link Aspects#effectiveOrb} for what it does.
      */
-    private boolean isSynastryPair(boolean crossChart) {
-        return crossChart && this.chartMode == ChartMode.SYNASTRY;
+    /**
+     * Which profile a pair of bodies is judged in.
+     *
+     * <b>This answered a boolean until 2026-09-24 and could only say two of the four things.</b>
+     * A composite rode the natal branch by being not-synastry rather than by anyone deciding it,
+     * and transit never reached the engine's orb code at all. The preset bar David specified
+     * needs all four named, so the question keeps its shape and gains a vocabulary.
+     *
+     * <b>COMPOSITE is named although it scales the same as NATAL.</b> David confirmed that a
+     * composite reads at natal widths - it is one chart derived from two people's midpoints, not
+     * a comparison between two charts, and {@code Aspects.effectiveOrb} halves only "for a
+     * cross-chart reading". Saying so costs nothing and makes it a decision rather than an
+     * inference.
+     *
+     * <b>TRANSIT is not returned here.</b> The wheel's sky-to-person aspects take natal widths on
+     * purpose - the sky is not a person - while {@code Transits} judges its own lists at one flat
+     * orb. Two different questions sharing a word; routing one into the other would visibly change
+     * the wheel and is a decision for the stage that builds the preset bar.
+     */
+    private Aspects.Profile profileForPair(boolean crossChart) {
+        if (crossChart && this.chartMode == ChartMode.SYNASTRY) {
+            return Aspects.Profile.SYNASTRY;
+        }
+        if (this.chartMode == ChartMode.COMPOSITE_MIDPOINT
+                || this.chartMode == ChartMode.COMPOSITE_DAVISON) {
+            return Aspects.Profile.COMPOSITE;
+        }
+        return Aspects.Profile.NATAL;
     }
 
     private static String planetName(int n) {
@@ -5673,7 +5699,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (d2 > 180.0) {
                 d2 = 360.0 - d2;
             }
-            if ((string = this.getAspectType(d2, n, i, false)) == null) continue;
+            if ((string = this.getAspectType(d2, n, i, Aspects.Profile.NATAL)) == null) continue;
             boolean bl = this.isAspectApplying(d, 361.0, this.natalRing.lon[i], this.natalRing.speed[i], string);
             String string2 = this.describeAspect(d2, string, n, i, d, this.natalRing.lon[i], bl);
             arrayList.add(bothCharts
@@ -5681,7 +5707,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 : new String[]{BODY_NAMES[i], string, string2});
         }
         // The second chart, for a sky angle only. Sky-to-person is a transit and takes the
-        // full orb, so this asks isSynastryPair(false) - chartMode IS SYNASTRY here and
+        // full orb, so this asks profileForPair(false) - chartMode IS SYNASTRY here and
         // answering true would halve an orb that belongs to person-against-person.
         if (bothCharts) {
             for (int i = 0; i < BODY_COUNT; ++i) {
@@ -5691,7 +5717,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 if (d2 > 180.0) {
                     d2 = 360.0 - d2;
                 }
-                if ((string = this.getAspectType(d2, n, i, this.isSynastryPair(false))) == null) continue;
+                if ((string = this.getAspectType(d2, n, i, this.profileForPair(false))) == null) continue;
                 boolean bl = this.isAspectApplying(d, 361.0, this.outerRing.lon[i], this.outerRing.speed[i], string);
                 String string2 = this.describeAspect(d2, string, n, i, d, this.outerRing.lon[i], bl);
                 arrayList.add(new String[]{BODY_NAMES[i], string, string2, "Chart B"});
@@ -5706,14 +5732,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             role.name(), hostHouse);
     }
 
-    private double getOrbFor(int n, int n2, boolean synastry) {
-        return Aspects.orbFor(SkymapPanel.planetName(n), SkymapPanel.planetName(n2), synastry);
+    private double getOrbFor(int n, int n2, Aspects.Profile profile) {
+        return Aspects.orbFor(SkymapPanel.planetName(n), SkymapPanel.planetName(n2), profile);
     }
 
     private String getAspectType(double d) {
         // No caller as of 2026-08-24. Left rather than deleted, and made to state its answer
         // like every other caller rather than inheriting a default.
-        return this.getAspectType(d, -1, -1, false);
+        return this.getAspectType(d, -1, -1, Aspects.Profile.NATAL);
     }
 
     /**
@@ -5726,8 +5752,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * a cell that should be filled is empty, and the wheel and the grid disagree quietly.
      * Ask {@link #isSynastryPair} rather than passing a literal.
      */
-    private String getAspectType(double d, int n, int n2, boolean synastry) {
-        Aspects.Type type = this.visibleAspect(d, n, n2, synastry);
+    private String getAspectType(double d, int n, int n2, Aspects.Profile profile) {
+        Aspects.Type type = this.visibleAspect(d, n, n2, profile);
         return type == null ? null : type.label;
     }
 
@@ -5740,9 +5766,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * disagreed about which aspects exist. That is this project's most-logged defect and it
      * would have been invisible: both surfaces look entirely plausible on their own.
      */
-    private Aspects.Type visibleAspect(double sep, int a, int b, boolean synastry) {
+    private Aspects.Type visibleAspect(double sep, int a, int b, Aspects.Profile profile) {
         Aspects.Type type = Aspects.typeOf(sep, SkymapPanel.planetName(a),
-            SkymapPanel.planetName(b), synastry);
+            SkymapPanel.planetName(b), profile);
         if (type == null) {
             return null;
         }
@@ -6925,7 +6951,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!this.natalRing.valid[i]) continue;
                     double d6 = Math.abs(d2 - this.natalRing.lon[i]);
                     if (d6 > 180.0) d6 = 360.0 - d6;
-                    String string2 = this.getAspectType(d6, n, i, this.isSynastryPair(false));
+                    String string2 = this.getAspectType(d6, n, i, this.profileForPair(false));
                     if (string2 == null) continue;
                     boolean blA = this.isAspectApplying(d2, speedArray[n], this.natalRing.lon[i], this.natalRing.speed[i], string2);
                     String string3 = this.describeAspect(d6, string2, n, i, d2, this.natalRing.lon[i], blA);
@@ -6935,7 +6961,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!this.outerRing.valid[i]) continue;
                     double d6 = Math.abs(d2 - this.outerRing.lon[i]);
                     if (d6 > 180.0) d6 = 360.0 - d6;
-                    String string2 = this.getAspectType(d6, n, i, this.isSynastryPair(false));
+                    String string2 = this.getAspectType(d6, n, i, this.profileForPair(false));
                     if (string2 == null) continue;
                     boolean blB = this.isAspectApplying(d2, speedArray[n], this.outerRing.lon[i], this.outerRing.speed[i], string2);
                     String string3 = this.describeAspect(d6, string2, n, i, d2, this.outerRing.lon[i], blB);
@@ -6949,7 +6975,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (d6 > 180.0) {
                         d6 = 360.0 - d6;
                     }
-                    if ((string2 = this.getAspectType(d6, n, i, this.isSynastryPair(isTransit))) == null) continue;
+                    if ((string2 = this.getAspectType(d6, n, i, this.profileForPair(isTransit))) == null) continue;
                     d = speedArray[n];
                     boolean bl2 = this.isAspectApplying(d2, d, this.natalRing.lon[i], this.natalRing.speed[i], string2);
                     String string3 = this.describeAspect(d6, string2, n, i, d2, this.natalRing.lon[i], bl2);
@@ -6990,7 +7016,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (d4 > 180.0) {
                 d4 = 360.0 - d4;
             }
-            if ((string = this.getAspectType(d4, n, i, this.isSynastryPair(bl))) == null) continue;
+            if ((string = this.getAspectType(d4, n, i, this.profileForPair(bl))) == null) continue;
             boolean bl2 = this.isAspectApplying(d2, d, this.natalRing.lon[i], this.natalRing.speed[i], string);
             String string2 = this.describeAspect(d4, string, n, i, d2, this.natalRing.lon[i], bl2);
             arrayList.add(new String[]{BODY_NAMES[i], string, string2});
@@ -7202,7 +7228,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         boolean cross = SkymapPanel.isTransitLabel(string) || SkymapPanel.isTransitLabel(string2);
         int idxA = SkymapPanel.bodyIndexOfLabel(string);
         int idxB = SkymapPanel.bodyIndexOfLabel(string2);
-        if ((string3 = this.getAspectType(d4, idxA, idxB, this.isSynastryPair(cross))) != null) {
+        if ((string3 = this.getAspectType(d4, idxA, idxB, this.profileForPair(cross))) != null) {
             double d5;
             double d6;
             double d7;
@@ -8507,7 +8533,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // Only the partner ring is a synastry pair. The sky ring is a moment and is
                 // judged at natal orbs - the same call the wheel and the hit test make.
                 String type = this.getAspectType(sep, n, i,
-                    this.isSynastryPair(wheel == WHEEL_OUTER));
+                    this.profileForPair(wheel == WHEEL_OUTER));
                 if (type == null) {
                     out.append("<td style='background-color:#222;'></td>");
                     continue;
@@ -9420,7 +9446,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // the sky ring is a moment and is judged at natal orbs, the same as the grid and
             // the hit test judge it.
             boolean bl = wheel != SkymapPanel.WHEEL_NATAL;
-            boolean syn = SkymapPanel.this.isSynastryPair(wheel == SkymapPanel.WHEEL_OUTER);
+            Aspects.Profile syn = SkymapPanel.this.profileForPair(
+                wheel == SkymapPanel.WHEEL_OUTER);
             double d5 = SkymapPanel.this.getOrbFor(n5, n6, syn);
             Color color = null;
             double d6 = 0.0;

@@ -449,14 +449,59 @@ public final class Aspects {
         return d > 180.0 ? 360.0 - d : d;
     }
 
+    /**
+     * Which chart context a pair is being judged in.
+     *
+     * <h3>Why this is an enum and was a boolean</h3>
+     *
+     * <p>The question "is this cross-chart" was carried as {@code isSynastry} from the panel down
+     * into the three methods below. A boolean can answer two of the four contexts the reader
+     * actually works in and cannot be asked about the other two, so composite rode the natal
+     * branch by being not-synastry rather than by anyone deciding it, and transit never reached
+     * here at all.
+     *
+     * <h3>What each one is, today</h3>
+     *
+     * <p><b>The scale is how this stage reproduces the old arithmetic exactly</b>, and it is
+     * temporary. {@code NATAL} and {@code COMPOSITE} are one; {@code SYNASTRY} is a half, which
+     * is the {@code o * 0.5} and {@code capOf(t) / 2.0} that were written into the two methods
+     * below. Stage 2 gives each profile its own stored table of widths and this field goes; it
+     * exists so that stage 1 can be measured against the commit before it and shown to have
+     * changed nothing.
+     *
+     * <p><b>COMPOSITE is one, by David's decision (2026-09-24), not by omission.</b> A composite
+     * is a single chart derived from two people's midpoints, not a comparison between two charts
+     * - and {@link #effectiveOrb} halves "for a cross-chart reading", which a composite is not.
+     * That was already the behaviour; naming the profile is what makes it a decision.
+     *
+     * <p><b>TRANSIT is named and nothing produces it yet.</b> The wheel draws sky-to-person
+     * aspects at natal widths on purpose - the sky is not a person, and {@code SkymapPanel} says
+     * so where it asks - while {@code Transits} judges its own lists at one flat orb. Those are
+     * two different questions that share a word, and routing one into the other would visibly
+     * change the wheel. It is a stage 2 decision and is not smuggled in here.
+     */
+    public enum Profile {
+        NATAL(1.0),
+        TRANSIT(1.0),
+        SYNASTRY(0.5),
+        COMPOSITE(1.0);
+
+        /** What today's code multiplies the width by in this context. Temporary - see above. */
+        public final double scale;
+
+        Profile(double scale) {
+            this.scale = scale;
+        }
+    }
+
     /** The orb a pair is judged on: the larger of the two bodies'. */
     public static double orbFor(String nameA, String nameB) {
         return Math.max(bodyOrb(nameA), bodyOrb(nameB));
     }
 
-    public static double orbFor(String nameA, String nameB, boolean isSynastry) {
+    public static double orbFor(String nameA, String nameB, Profile profile) {
         double o = orbFor(nameA, nameB);
-        return isSynastry ? o * 0.5 : o;
+        return profile == null ? o : o * profile.scale;
     }
 
     /**
@@ -490,16 +535,17 @@ public final class Aspects {
      * so halving their cap is a no-op by construction: they are governed by the body orb and
      * always were.
      */
-    public static double effectiveOrb(String nameA, String nameB, Type t, boolean isSynastry) {
-        double cap = isSynastry ? capOf(t) / 2.0 : capOf(t);
-        return Math.min(orbFor(nameA, nameB, isSynastry), cap);
+    public static double effectiveOrb(String nameA, String nameB, Type t, Profile profile) {
+        double scale = profile == null ? 1.0 : profile.scale;
+        double cap = capOf(t) * scale;
+        return Math.min(orbFor(nameA, nameB, profile), cap);
     }
 
     /**
      * The aspect a separation makes, or null. Tested in Ptolemaic order, conjunction
      * first, exactly as the wheel has always tested it.
      */
-    public static Type typeOf(double separation, String nameA, String nameB, boolean isSynastry) {
+    public static Type typeOf(double separation, String nameA, String nameB, Profile profile) {
         // <b>A calculated point can receive an aspect and cannot cast one.</b> Burk: the
         // angles, the nodes and the Arabic lots are not bodies, emit and reflect no light, and
         // so carry no moiety of their own - "these points... do not make aspects, they can
@@ -514,7 +560,7 @@ public final class Aspects {
         if (bothCalculated(nameA, nameB)) {
             return null;
         }
-        if (separation <= effectiveOrb(nameA, nameB, Type.CONJUNCTION, isSynastry)) {
+        if (separation <= effectiveOrb(nameA, nameB, Type.CONJUNCTION, profile)) {
             return Type.CONJUNCTION;
         }
         // Every declared aspect, each against its own ceiling. Iterating values() rather than
@@ -525,7 +571,7 @@ public final class Aspects {
             if (t == Type.CONJUNCTION) {
                 continue;
             }
-            if (Math.abs(separation - t.exactAngle) <= effectiveOrb(nameA, nameB, t, isSynastry)) {
+            if (Math.abs(separation - t.exactAngle) <= effectiveOrb(nameA, nameB, t, profile)) {
                 return t;
             }
         }
@@ -578,7 +624,7 @@ public final class Aspects {
     }
 
     public static Type typeOf(double separation, String nameA, String nameB) {
-        return typeOf(separation, nameA, nameB, false);
+        return typeOf(separation, nameA, nameB, Profile.NATAL);
     }
 
     /**

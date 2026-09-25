@@ -226,11 +226,11 @@ public final class Synastry {
             for (String angle : ANGLES) {
                 double angleLon = angleLon(host, angle);
                 double sep = Aspects.separation(b.lon, angleLon);
-                if (Aspects.typeOf(sep, b.name, angle, true) != Aspects.Type.CONJUNCTION) {
+                if (Aspects.typeOf(sep, b.name, angle, Aspects.Profile.SYNASTRY) != Aspects.Type.CONJUNCTION) {
                     continue;
                 }
                 out.add(new AngleContact(b.name, i, b.lon, angle, angleLon, sep,
-                    Aspects.orbFor(b.name, angle, true)));
+                    Aspects.orbFor(b.name, angle, Aspects.Profile.SYNASTRY)));
             }
         }
         // Tightest first. Two contacts at the same orb keep the order they were found in,

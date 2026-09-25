@@ -2168,13 +2168,13 @@ public class InterpretationPanel extends JPanel {
         html.append(". Across two charts every width is halved, cap included.</p>");
         html.append("<p style='color:#9AA5B1; font-size:12px;'>Sun or Moon ")
             .append(trimAngle(com.zodiacomputing.ourania.astro.Aspects.effectiveOrb(
-                "Sun", "Moon", type, false)))
+                "Sun", "Moon", type, com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL)))
             .append("&deg; natal, ")
             .append(trimAngle(com.zodiacomputing.ourania.astro.Aspects.effectiveOrb(
-                "Sun", "Moon", type, true)))
+                "Sun", "Moon", type, com.zodiacomputing.ourania.astro.Aspects.Profile.SYNASTRY)))
             .append("&deg; in synastry &nbsp;&middot;&nbsp; two outer planets ")
             .append(trimAngle(com.zodiacomputing.ourania.astro.Aspects.effectiveOrb(
-                "Pluto", "Neptune", type, false)))
+                "Pluto", "Neptune", type, com.zodiacomputing.ourania.astro.Aspects.Profile.NATAL)))
             .append("&deg; natal.</p>");
 
         html.append("<h3 style='color:#add8e6;'>What defines it</h3><table style='font-size:12px;'>");

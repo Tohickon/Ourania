@@ -586,7 +586,7 @@ public final class AspectGridCheck {
 
             double sep = Aspects.separation(cross ? tLon[row] : bLon[row], bLon[col]);
             Aspects.Type expected = Aspects.typeOf(sep, Bodies.at(row).name, Bodies.at(col).name,
-                cross && expectHalved);
+                cross && expectHalved ? Aspects.Profile.SYNASTRY : Aspects.Profile.NATAL);
             ok(mode + ": " + Bodies.at(row).name + "/" + Bodies.at(col).name + " is "
                     + parsed[2] + " at the " + (cross && expectHalved ? "halved" : "full") + " orb",
                 expected != null && expected.label.equals(parsed[2]));
@@ -609,7 +609,7 @@ public final class AspectGridCheck {
                 if (seen.contains(row + "/" + col)) continue;
                 double sep = Aspects.separation(tLon[row], bLon[col]);
                 Aspects.Type found = Aspects.typeOf(sep, Bodies.at(row).name, Bodies.at(col).name,
-                    crossGrid && expectHalved);
+                    crossGrid && expectHalved ? Aspects.Profile.SYNASTRY : Aspects.Profile.NATAL);
                 ok(mode + ": " + Bodies.at(row).name + "/" + Bodies.at(col).name
                         + " is blank and really has no aspect at that orb", found == null);
             }
