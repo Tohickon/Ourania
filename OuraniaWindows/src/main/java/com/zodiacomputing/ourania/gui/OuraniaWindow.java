@@ -274,6 +274,34 @@ public class OuraniaWindow extends JFrame {
     }
 
     /**
+     * Throw the settings screen away and build a new one, showing it.
+     *
+     * <b>For when the file changed underneath it</b> - restoring a saved set rewrites most of
+     * settings.properties at once, and every control on that screen is then showing a value that
+     * is no longer true.
+     *
+     * <b>Rebuilding rather than refreshing, and that is safe for a specific reason.</b> Pushing
+     * new values back into forty controls by hand would mean a second copy of what each control
+     * reads, free to drift from the first. A fresh panel reads the file the same way the first
+     * one did. It is only safe because {@code SettingsPanel} carries a {@code constructing}
+     * guard - added after building this screen was found to be writing to settings.properties
+     * mid-construction, once reducing twenty-nine points to five - so construction reads and
+     * never writes.
+     */
+    public void rebuildSettings() {
+        for (java.awt.Component c : contentPanel.getComponents()) {
+            if (c instanceof SettingsPanel) {
+                contentPanel.remove(c);
+                break;
+            }
+        }
+        contentPanel.add(new SettingsPanel(this), "SETTINGS");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+        cardLayout.show(contentPanel, "SETTINGS");
+    }
+
+    /**
      * Opens or folds a ring, from the wheel.
      *
      * Delegates to Chart Setup rather than touching the mode, so there is still exactly one

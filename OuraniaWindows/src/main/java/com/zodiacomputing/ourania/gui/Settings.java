@@ -986,6 +986,162 @@ public final class Settings {
         com.zodiacomputing.ourania.astro.Aspects.setCustomCaps(aspectCaps());
     }
 
+    // ------------------------------------------------------------------ saved settings sets
+
+    /** Where a saved set lives: one .properties a set, beside settings.properties. */
+    static String setsDir() {
+        String f = file();
+        int cut = Math.max(f.lastIndexOf('/'), f.lastIndexOf('\\'));
+        String dir = cut < 0 ? "" : f.substring(0, cut + 1);
+        return dir + "settings-sets";
+    }
+
+    /**
+     * Key prefixes a saved set never carries.
+     *
+     * <b>A set is the configuration, not the reader.</b> settings.properties also holds the
+     * chart - {@code natal.date}, {@code natal.time}, {@code natal.location} - the places the
+     * reader has named, and where their window was. A "save my settings" button that swept those
+     * up would, on a restore six months later, put an old birth time back without saying so: the
+     * chart would change and the settings screen would be the last place anyone looked. Window
+     * geometry is excluded for the smaller version of the same reason.
+     *
+     * <b>One list, asked by both save and restore.</b> Written twice, the two could disagree
+     * about what personal means, and the one that was wrong would be the one that wrote.
+     */
+    private static final String[] PERSONAL = {
+        "natal.",
+        "home.",
+        "default.base.location",
+        "default.transit.location",
+        "window.",
+    };
+
+    /** True for a key that belongs to the reader rather than to their configuration. */
+    public static boolean isPersonal(String key) {
+        if (key == null) {
+            return false;
+        }
+        for (String p : PERSONAL) {
+            if (key.startsWith(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** A file name that cannot escape the sets folder, whatever the reader typed. */
+    static String setFileName(String name) {
+        String safe = name == null ? "" : name.trim().replaceAll("[^A-Za-z0-9 _-]", "_");
+        return safe.isEmpty() ? "" : safe + ".properties";
+    }
+
+    /** The saved sets, by name, in alphabetical order. Never null. */
+    public static java.util.List<String> savedSets() {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        java.io.File dir = new java.io.File(setsDir());
+        java.io.File[] found = dir.listFiles((d, n) -> n.endsWith(".properties"));
+        if (found == null) {
+            return out;
+        }
+        for (java.io.File f : found) {
+            String n = f.getName();
+            out.add(n.substring(0, n.length() - ".properties".length()));
+        }
+        java.util.Collections.sort(out, String.CASE_INSENSITIVE_ORDER);
+        return out;
+    }
+
+    /**
+     * Store the configuration now in force under a name of the reader's own.
+     *
+     * @return false if the name was empty or the file could not be written.
+     */
+    public static synchronized boolean saveSet(String name) {
+        String fileName = setFileName(name);
+        if (fileName.isEmpty()) {
+            return false;
+        }
+        java.io.File dir = new java.io.File(setsDir());
+        if (!dir.isDirectory() && !dir.mkdirs()) {
+            return false;
+        }
+        Properties out = new Properties();
+        Properties now = load();
+        for (String key : now.stringPropertyNames()) {
+            if (!isPersonal(key)) {
+                out.setProperty(key, now.getProperty(key));
+            }
+        }
+        try (FileOutputStream fos = new FileOutputStream(new java.io.File(dir, fileName))) {
+            out.store(fos, "Ourania settings set: " + name.trim());
+            return true;
+        } catch (java.io.IOException ex) {
+            return false;
+        }
+    }
+
+    /**
+     * Put a saved set back in force.
+     *
+     * <b>Replace, not merge.</b> Every non-personal key is dropped first and then the set's own
+     * are written, so what comes back is the configuration as it was saved rather than a hybrid
+     * of two. A point the reader had widened since, and which the set never knew about, would
+     * otherwise survive a restore and read as part of it.
+     *
+     * <b>The reader's own keys are never touched</b>, going in or coming out - see
+     * {@link #isPersonal}. Their chart is the same chart before and after.
+     *
+     * @return false if there is no such set, or it could not be read.
+     */
+    public static synchronized boolean restoreSet(String name) {
+        String fileName = setFileName(name);
+        if (fileName.isEmpty()) {
+            return false;
+        }
+        java.io.File f = new java.io.File(setsDir(), fileName);
+        if (!f.isFile()) {
+            return false;
+        }
+        Properties saved = new Properties();
+        try (FileInputStream fis = new FileInputStream(f)) {
+            saved.load(fis);
+        } catch (java.io.IOException ex) {
+            return false;
+        }
+        // <b>Through update, not a write of our own.</b> It is the one path that sets the
+        // corrupt file aside rather than overwriting it, drops the cache either side of the
+        // write, and re-stamps the schema - so a set saved under an older version comes back
+        // carrying today's version rather than resurrecting an old one.
+        update(p -> {
+            for (String key : new java.util.ArrayList<>(p.stringPropertyNames())) {
+                if (!isPersonal(key)) {
+                    p.remove(key);
+                }
+            }
+            for (String key : saved.stringPropertyNames()) {
+                // Belt and braces: a set written by an older build, or edited by hand, does not
+                // get to reintroduce a personal key through the back door.
+                if (!isPersonal(key)) {
+                    p.setProperty(key, saved.getProperty(key));
+                }
+            }
+        });
+        applyBodyOrbs();
+        applyAspectCaps();
+        return true;
+    }
+
+    /** Forget a saved set. Returns false if it was not there. */
+    public static synchronized boolean deleteSet(String name) {
+        String fileName = setFileName(name);
+        if (fileName.isEmpty()) {
+            return false;
+        }
+        java.io.File f = new java.io.File(setsDir(), fileName);
+        return f.isFile() && f.delete();
+    }
+
     /** The one transit orb in degrees; see Transits.orb for why it is one flat width. */
     public static final String TRANSIT_ORB_KEY = "transit.orb";
     public static final double TRANSIT_ORB_MIN = 0.25;

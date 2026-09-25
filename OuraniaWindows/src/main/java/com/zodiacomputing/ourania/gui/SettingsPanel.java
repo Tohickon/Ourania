@@ -83,6 +83,21 @@ public class SettingsPanel extends JPanel {
 
     private final OuraniaWindow window;
     private final JCheckBox[] boxes = new JCheckBox[Bodies.count()];
+
+    /**
+     * One orb spinner a point, indexed like {@link #boxes}.
+     *
+     * <b>Beside the point rather than in a table of its own.</b> David, 2026-09-24: the width
+     * belongs next to the tick and the colour chip, because the three are one decision about one
+     * point - whether it is drawn, in what colour, and how wide it aspects. The same arrangement
+     * the aspect list uses, so the screen answers the question the same way twice.
+     *
+     * <b>Held as a field because two places need it.</b> The spinners are made in
+     * {@link #groupPanel}, a group at a time, and the Reset that puts them all back is further
+     * down in {@link #natalOrbs}.
+     */
+    private final javax.swing.JSpinner[] orbSpinners =
+        new javax.swing.JSpinner[Bodies.count()];
     private final JLabel status = new JLabel(" ");
     /** Settings > Calculation Variants: the one transit orb. */
     javax.swing.JSpinner transitOrb;
@@ -134,6 +149,9 @@ public class SettingsPanel extends JPanel {
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setBackground(Color.BLACK);
         body.setBorder(BorderFactory.createEmptyBorder(0, 30, 20, 30));
+
+        // First on the screen, because it is about everything below it.
+        body.add(savedSetsRow());
 
         // <b>The chart's own dropdowns, moved here off the wheel's control strip.</b> Seven
         // labelled combos sat under the chart beside the play button - harmonic, animate
@@ -576,6 +594,41 @@ public class SettingsPanel extends JPanel {
 
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
 
+        // <b>One grid, so the three controls read as columns.</b> A FlowLayout a row puts every
+        // spinner at the end of a name of a different length, which is the ragged edge that made
+        // the old orb grid look the way it did. Comparing widths down a column is what the
+        // control is for.
+        JPanel rows = new JPanel(new GridBagLayout());
+        rows.setBackground(Color.BLACK);
+        rows.setAlignmentX(Component.LEFT_ALIGNMENT);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(1, 0, 1, 6);
+        gc.anchor = GridBagConstraints.WEST;
+        gc.fill = GridBagConstraints.NONE;
+
+        // <b>A header over each column.</b> Three controls in a row is three questions about one
+        // point, and until now only the colour chip announced itself.
+        gc.gridy = 0;
+        gc.gridx = 0;
+        rows.add(columnHeader("Colour",
+            "<html>The colour this point is drawn in, on the wheel, the globe and the tables."
+                + "<br>Click the chip to choose another; right-click it to go back to the "
+                + "colour template.</html>", Color.BLACK), gc);
+        gc.gridx = 1;
+        rows.add(columnHeader("Point",
+            "<html>Tick a point to draw it on the wheel, list it in the placements panel"
+                + "<br>and include it in the aspect grid. Everything unticked is left out of"
+                + "<br>all three.</html>", Color.BLACK), gc);
+        gc.gridx = 2;
+        rows.add(columnHeader("Orb\u00b0",
+            "<html>How close an aspect to this point must be to exact, in degrees."
+                + "<br><br>A pair is judged at the <b>wider</b> of its two points, under whatever"
+                + "<br>ceiling the aspect itself carries - so widening Pluto does not widen"
+                + "<br>a semisextile. Halved for a cross-chart reading."
+                + "<br><br>These are the <b>natal</b> widths. Transits are judged on their own"
+                + "<br>orb, set under Transits &amp; Progressions.</html>", Color.BLACK), gc);
+        int gridRow = 1;
+
         for (int i = 0; i < Bodies.count(); i++) {
             Bodies.Def d = Bodies.at(i);
             if (d.group != group) {
@@ -603,14 +656,206 @@ public class SettingsPanel extends JPanel {
             // right here means the setting reads back where it was made.
             box.setForeground(bodyDisplayColor(index));
 
-            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
-            row.setBackground(Color.BLACK);
-            row.setAlignmentX(Component.LEFT_ALIGNMENT);
-            row.add(bodySwatch(index, box));
-            row.add(box);
-            panel.add(row);
+            gc.gridy = gridRow++;
+            gc.weightx = 0.0;
+            gc.gridx = 0;
+            rows.add(bodySwatch(index, box), gc);
+            gc.gridx = 1;
+            rows.add(box, gc);
+            gc.gridx = 2;
+            rows.add(orbSpinner(index), gc);
+
+            // The slack goes to a fourth column, so the three real ones keep their own width and
+            // the spinners line up instead of being pushed to the right edge.
+            gc.gridx = 3;
+            gc.weightx = 1.0;
+            rows.add(Box.createHorizontalGlue(), gc);
         }
+        panel.add(rows);
         return panel;
+    }
+
+    /**
+     * Keep the configuration you have, and get it back later.
+     *
+     * <b>A set is the configuration, not you.</b> {@code Settings.saveSet} leaves out the chart,
+     * the places you have named and where the window was - see {@code Settings.isPersonal} for
+     * the list and the reason. A button called "save my settings" that quietly put a
+     * six-month-old birth time back would be the worst kind of defect: the chart would change and
+     * this screen would be the last place anyone looked.
+     *
+     * <b>Restoring replaces rather than merges</b>, so what comes back is the configuration as it
+     * was saved and not a hybrid of it and whatever has been changed since. The screen is rebuilt
+     * afterwards because forty controls are then showing values that are no longer true.
+     */
+    private JPanel savedSetsRow() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(Color.BLACK);
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        p.add(heading("Saved Settings"));
+        p.add(note("Store everything on this screen under a name of your own, and put it back "
+            + "later - useful before trying a different set of orbs, or when an update changes "
+            + "something. Your chart, your saved places and your window are never part of a set."));
+        p.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        row.setBackground(Color.BLACK);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        final javax.swing.JComboBox<String> chooser = new javax.swing.JComboBox<>();
+        for (String name : Settings.savedSets()) {
+            chooser.addItem(name);
+        }
+        chooser.setToolTipText("<html>The sets you have saved.<br>Choose one and press Restore to "
+            + "put it back in force.</html>");
+        chooser.setEnabled(chooser.getItemCount() > 0);
+
+        javax.swing.JButton save = new javax.swing.JButton("Save current settings...");
+        save.setToolTipText("<html>Store everything on this screen under a name of your own."
+            + "<br>Your chart, your saved places and your window position are <b>not</b> included."
+            + "</html>");
+        Widgets.styleButton(save, Widgets.Role.PRIMARY);
+        save.addActionListener(e -> {
+            String name = JOptionPane.showInputDialog(SettingsPanel.this,
+                "Name for this set of settings:", "Save settings", JOptionPane.PLAIN_MESSAGE);
+            if (name == null || name.trim().isEmpty()) {
+                return;
+            }
+            if (Settings.savedSets().contains(name.trim())
+                && JOptionPane.showConfirmDialog(SettingsPanel.this,
+                    "Replace the set called " + name.trim() + "?", "Name in use",
+                    JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                return;
+            }
+            if (!Settings.saveSet(name)) {
+                JOptionPane.showMessageDialog(SettingsPanel.this,
+                    "That set could not be written.", "Not saved", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            status.setText("Saved");
+            if (window != null) {
+                window.rebuildSettings();
+            }
+        });
+
+        javax.swing.JButton restore = new javax.swing.JButton("Restore");
+        restore.setToolTipText("<html>Put the chosen set back in force, replacing everything on "
+            + "this screen.<br>Your chart and your saved places are left alone.</html>");
+        restore.setEnabled(chooser.getItemCount() > 0);
+        restore.addActionListener(e -> {
+            Object picked = chooser.getSelectedItem();
+            if (picked == null) {
+                return;
+            }
+            if (JOptionPane.showConfirmDialog(SettingsPanel.this,
+                "Replace every setting on this screen with the set called " + picked + "?",
+                "Restore settings", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                return;
+            }
+            if (!Settings.restoreSet(picked.toString())) {
+                JOptionPane.showMessageDialog(SettingsPanel.this,
+                    "That set could not be read.", "Not restored", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (window != null) {
+                window.applyBodySelection();
+                // Last, because it replaces this panel - and therefore this listener's own
+                // component - so nothing may follow it.
+                window.rebuildSettings();
+            }
+        });
+
+        javax.swing.JButton forget = new javax.swing.JButton("Forget");
+        forget.setToolTipText("Delete the chosen set. What is in force now does not change.");
+        forget.setEnabled(chooser.getItemCount() > 0);
+        forget.addActionListener(e -> {
+            Object picked = chooser.getSelectedItem();
+            if (picked == null) {
+                return;
+            }
+            if (JOptionPane.showConfirmDialog(SettingsPanel.this,
+                "Forget the set called " + picked + "? This cannot be undone.",
+                "Forget set", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                return;
+            }
+            Settings.deleteSet(picked.toString());
+            if (window != null) {
+                window.rebuildSettings();
+            }
+        });
+
+        row.add(save);
+        row.add(chooser);
+        row.add(restore);
+        row.add(forget);
+        p.add(row);
+        p.add(Box.createRigidArea(new Dimension(0, 16)));
+        return p;
+    }
+
+    /**
+     * One column header: what the column is, with the instruction on hover.
+     *
+     * <b>One helper for both lists.</b> The points and the aspects carry the same three columns -
+     * a colour, a tick and a number - and two hand-written sets of headings would be free to
+     * describe them differently, which is the shape of defect this project keeps finding. The
+     * words differ per list because the things differ; the styling and the behaviour do not.
+     *
+     * <b>Small and dim on purpose.</b> A header row as loud as the rows under it competes with
+     * the thing a reader came to find. It names the column and gets out of the way, and the
+     * sentence that actually explains the control is on the hover, where it costs nothing until
+     * it is wanted.
+     */
+    private JLabel columnHeader(String text, String tip, Color background) {
+        JLabel l = new JLabel(text);
+        l.setForeground(DIM);
+        l.setFont(Theme.font("Arial", Font.PLAIN, 10));
+        l.setBackground(background);
+        l.setToolTipText(tip);
+        return l;
+    }
+
+    /**
+     * The orb spinner for one point, beside its tick and its colour.
+     *
+     * <b>Reads the registry and {@link Aspects}, and lists nothing of its own.</b> The built-in
+     * width comes from {@code Aspects.defaultBodyOrb} and the current one from {@code Settings},
+     * so a point added to the registry gets a spinner without anyone coming back for it.
+     *
+     * <b>A point left at its built-in width stores nothing.</b> {@code Settings.setBodyOrb}
+     * clears the key when the value matches the default, so a reader who nudges Neptune and puts
+     * it back has the file they started with, and a later change to the built-in table still
+     * reaches them.
+     */
+    private javax.swing.JSpinner orbSpinner(final int index) {
+        final String name = Bodies.at(index).name;
+        final javax.swing.JSpinner s = new javax.swing.JSpinner(
+            new javax.swing.SpinnerNumberModel(Settings.bodyOrb(name),
+                Aspects.MIN_BODY_ORB, Aspects.MAX_BODY_ORB, 0.25));
+        s.setToolTipText("<html><b>" + name + "</b> orb, in degrees"
+            + "<br>How close an aspect to " + name + " must be to exact."
+            + "<br>Built in at " + Aspects.defaultBodyOrb(name)
+            + "&deg;. A pair is judged at the wider of its two points,"
+            + "<br>under whatever ceiling the aspect itself carries."
+            + "<br><br>This is the <b>natal</b> width: the wheel, the aspect grid and the"
+            + " readings,<br>halved for a cross-chart reading. <b>Transits do not use it</b> -"
+            + "<br>they are judged on the single Transit orb.</html>");
+        java.awt.Dimension size = new java.awt.Dimension(64, s.getPreferredSize().height);
+        s.setPreferredSize(size);
+        s.setMaximumSize(size);
+        s.addChangeListener(e -> {
+            Settings.setBodyOrb(name, ((Number) s.getValue()).doubleValue());
+            markChanged(s, name);
+            status.setText("Saved");
+            if (window != null) {
+                window.applyBodySelection();
+            }
+        });
+        markChanged(s, name);
+        orbSpinners[index] = s;
+        return s;
     }
 
     /**
@@ -642,6 +887,35 @@ public class SettingsPanel extends JPanel {
         int across = 3;
         int seen = 0;
 
+        // <b>Once per group across, not once per panel.</b> Three aspects sit side by side, so a
+        // single set of headings on the left would label the first group and leave the other two
+        // to be guessed at.
+        gc.gridy = 0;
+        for (int group = 0; group < across; group++) {
+            int at = group * 3;
+            gc.gridx = at;
+            panel.add(columnHeader("Colour",
+                "<html>The colour this aspect's lines are drawn in, on the wheel, the globe"
+                    + "<br>and the aspect grid. Click the chip to choose another; right-click"
+                    + "<br>it to go back to the colour template.</html>", Theme.SURFACE), gc);
+            gc.gridx = at + 1;
+            panel.add(columnHeader("Aspect",
+                "<html>Tick an aspect to draw it and include it in the grid and the readings."
+                    + "<br>Unticked, it is not drawn, not listed and not interpreted.</html>",
+                Theme.SURFACE), gc);
+            gc.gridx = at + 2;
+            gc.insets = new Insets(1, 0, 1, 18);
+            panel.add(columnHeader("Ceiling\u00b0",
+                "<html>The most a pair may be apart and still count as this aspect."
+                    + "<br><br>It is a <b>ceiling over the points' own width</b>, not a second"
+                    + "<br>copy of it: the pair is judged at the wider of its two points, and"
+                    + "<br>then held to this. Tightening only - it cannot be lifted."
+                    + "<br><br>A Ptolemaic aspect sits at " + Aspects.MAX_BODY_ORB
+                    + "\u00b0, which cannot bind, so its"
+                    + "<br>width is whatever the two points allow.</html>", Theme.SURFACE), gc);
+            gc.insets = new Insets(1, 0, 1, 6);
+        }
+
         for (final Aspects.Type t : Aspects.Type.values()) {
             final JCheckBox box = new JCheckBox(t.label, on[t.ordinal()]);
             // <b>The name wears the colour the chart draws it in.</b> The list was fifteen
@@ -656,7 +930,7 @@ public class SettingsPanel extends JPanel {
             box.addItemListener(e -> saveAspects());
             aspectBoxRefs[t.ordinal()] = box;
 
-            gc.gridy = seen / across;
+            gc.gridy = seen / across + 1;   // row 0 is the headings
             int base = (seen % across) * 3;
             seen++;
 
@@ -1357,18 +1631,14 @@ public class SettingsPanel extends JPanel {
     }
 
     /**
-     * Master list H1: the natal orbs, per point, as the reader's to set.
+     * What is left of H1's screen once every width sits beside what it belongs to: the notes,
+     * and the one Reset.
      *
-     * <b>One spinner a point, and no table of its own.</b> The widths live in
-     * {@link com.zodiacomputing.ourania.astro.Aspects} and the registry says which points there
-     * are; this reads both rather than listing anything, so a point added to the registry
-     * appears here without anyone remembering to come back.
-     *
-     * <b>A point left at its built-in width stores nothing.</b> Settings.setBodyOrb clears the
-     * key when the value matches the default, so a reader who nudges Neptune and puts it back
-     * has the same file they started with - and a later change to the built-in table still
-     * reaches them, which it could not if opening this screen had frozen today's numbers into
-     * their settings.
+     * <b>No control of its own any more.</b> The point widths are beside each point's tick and
+     * colour chip (see {@link #orbSpinner}) and the aspect ceilings are beside each aspect (see
+     * {@link #capSpinner}), because in both cases those are one decision about one thing. What
+     * stays here is the sentence explaining how the two combine, which belongs to neither list,
+     * and the button that puts both back - which is why the spinners are reached through fields.
      */
     private JPanel natalOrbs() {
         JPanel p = new JPanel();
@@ -1376,62 +1646,19 @@ public class SettingsPanel extends JPanel {
         p.setBackground(Color.BLACK);
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        p.add(heading("Natal Orbs"));
-        p.add(note("How close an aspect must be to exact, in degrees, per point. A pair is judged "
-            + "at the wider of its two points, and each aspect keeps its own ceiling over that - "
-            + "so widening Pluto does not widen a semisextile. Cross-chart readings halve it. "
-            + "Bold means you have changed it."));
-        p.add(note("These are the natal widths: the wheel, the aspect grid and the readings. "
-            + "Transits are judged on one flat orb instead, set under Transits & Progressions - "
-            + "though the aspect ceilings above do reach transits."));
-        p.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JPanel grid = new JPanel(new java.awt.GridLayout(0, 4, 14, 4));
-        grid.setBackground(Color.BLACK);
-        grid.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        final java.util.List<javax.swing.JSpinner> spinners = new java.util.ArrayList<>();
-        final java.util.List<JLabel> labels = new java.util.ArrayList<>();
-        final java.util.List<String> names = new java.util.ArrayList<>();
-
-        for (int i = 0; i < com.zodiacomputing.ourania.astro.Bodies.count(); i++) {
-            final String name = com.zodiacomputing.ourania.astro.Bodies.at(i).name;
-            JPanel cell = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
-            cell.setBackground(Color.BLACK);
-            final JLabel l = new JLabel(name + " ");
-            l.setForeground(TEXT);
-            final javax.swing.JSpinner s = new javax.swing.JSpinner(
-                new javax.swing.SpinnerNumberModel(Settings.bodyOrb(name),
-                    com.zodiacomputing.ourania.astro.Aspects.MIN_BODY_ORB,
-                    com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB, 0.25));
-            s.setToolTipText("<html><b>" + name + "</b><br>Built in at "
-                + com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name)
-                + "&deg;.<br>A pair is judged at the wider of its two points.</html>");
-            s.addChangeListener(e -> {
-                Settings.setBodyOrb(name, ((Number) s.getValue()).doubleValue());
-                markChanged(l, name);
-                status.setText("Saved");
-                if (window != null) {
-                    window.applyBodySelection();
-                }
-            });
-            markChanged(l, name);
-            cell.add(l);
-            cell.add(s);
-            grid.add(cell);
-            spinners.add(s);
-            labels.add(l);
-            names.add(name);
-        }
-        p.add(grid);
-        p.add(Box.createRigidArea(new Dimension(0, 14)));
-
-        // <b>The ceilings are not here.</b> Each one sits beside its own aspect, up in the
-        // aspect list - David, 2026-09-24 - because the tick, the colour and the width are one
-        // decision about one aspect. What is left here is the half that is about a point.
-        p.add(note("Each aspect's own ceiling is the spinner beside it in the aspect list above. "
-            + "A Ptolemaic aspect sits at " + com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB
-            + "\u00b0 there, which cannot bind, so its width is whatever the two points allow."));
+        p.add(heading("Orbs"));
+        p.add(note("Every width is set beside the thing it belongs to. Each point's own orb is "
+            + "the spinner next to its tick and colour, above; each aspect's ceiling is the "
+            + "spinner next to that aspect. A pair is judged at the wider of its two points, "
+            + "under whatever ceiling the aspect carries - so widening Pluto does not widen a "
+            + "semisextile. Bold means you have changed it."));
+        p.add(note("A Ptolemaic aspect sits at "
+            + com.zodiacomputing.ourania.astro.Aspects.MAX_BODY_ORB
+            + "\u00b0, which cannot bind, so its width is whatever the two points allow."));
+        p.add(note("The point widths are the natal ones: the wheel, the aspect grid and the "
+            + "readings, halved for a cross-chart reading. Transits are judged on one flat orb "
+            + "instead, set under Transits & Progressions - though the aspect ceilings do reach "
+            + "transits."));
         p.add(Box.createRigidArea(new Dimension(0, 8)));
 
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -1442,9 +1669,13 @@ public class SettingsPanel extends JPanel {
         reset.addActionListener(e -> {
             Settings.resetBodyOrbs();
             Settings.resetAspectCaps();
-            for (int i = 0; i < spinners.size(); i++) {
-                spinners.get(i).setValue(Settings.bodyOrb(names.get(i)));
-                markChanged(labels.get(i), names.get(i));
+            for (int i = 0; i < orbSpinners.length; i++) {
+                if (orbSpinners[i] == null) {
+                    continue;
+                }
+                String name = Bodies.at(i).name;
+                orbSpinners[i].setValue(Settings.bodyOrb(name));
+                markChanged(orbSpinners[i], name);
             }
             if (aspectCapSpinners != null) {
                 for (com.zodiacomputing.ourania.astro.Aspects.Type t
@@ -1468,12 +1699,23 @@ public class SettingsPanel extends JPanel {
         return p;
     }
 
-    /** Bold while a point is not at its built-in width, so a changed set is readable at a glance. */
-    private void markChanged(JLabel label, String name) {
+    /**
+     * Bold while a point is not at its built-in width, so a changed set is readable at a glance.
+     *
+     * <b>On the spinner rather than on a label.</b> There is no label any more - the checkbox
+     * carries the name - and bolding that would read as "selected" beside a tick that means
+     * exactly that. The mark belongs on the control it describes, as it does for the aspects.
+     */
+    private void markChanged(javax.swing.JSpinner spinner, String name) {
         boolean changed = Math.abs(Settings.bodyOrb(name)
-            - com.zodiacomputing.ourania.astro.Aspects.defaultBodyOrb(name)) > 1e-9;
-        label.setFont(label.getFont().deriveFont(changed ? java.awt.Font.BOLD
-            : java.awt.Font.PLAIN));
+            - Aspects.defaultBodyOrb(name)) > 1e-9;
+        java.awt.Component editor = spinner.getEditor();
+        if (editor instanceof javax.swing.JSpinner.DefaultEditor) {
+            javax.swing.JTextField field =
+                ((javax.swing.JSpinner.DefaultEditor) editor).getTextField();
+            field.setFont(field.getFont().deriveFont(changed ? java.awt.Font.BOLD
+                : java.awt.Font.PLAIN));
+        }
     }
 
     private JLabel heading(String text) {
