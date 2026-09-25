@@ -122,13 +122,23 @@ public class SettingsPanel extends JPanel {
     private final java.util.List<JLabel> orbColumnHeaders = new java.util.ArrayList<>();
     private final java.util.List<JLabel> capColumnHeaders = new java.util.ArrayList<>();
 
-    /** The sentence under the Orbs heading, and the button that puts one profile back. */
+    /** The sentence under the Orbs heading. */
     private JLabel orbProfileNote;
-    private javax.swing.JButton orbResetButton;
 
-    /** The four tabs, and the preset bar that sits above them. Held so the bar can be hidden. */
+    /**
+     * Every preset bar and every Reset button on the screen.
+     *
+     * <b>There are two of each, one on Aspects & Orbs and one on Bodies & Points</b>, because a
+     * Swing component cannot be in two containers and the presets belong on both tabs that have
+     * orb controls. Two controls over one setting is this project's most logged defect, so they
+     * are built by one method, held here, and moved together in {@link #showProfile}.
+     */
+    private final java.util.List<javax.swing.JToggleButton> orbToggles =
+        new java.util.ArrayList<>();
+    private final java.util.List<javax.swing.JButton> orbResetButtons =
+        new java.util.ArrayList<>();
+
     private javax.swing.JTabbedPane tabs;
-    private JPanel orbBar;
     private final JLabel status = new JLabel(" ");
     /** Settings > Calculation Variants: the one transit orb. */
     javax.swing.JSpinner transitOrb;
@@ -212,13 +222,14 @@ public class SettingsPanel extends JPanel {
         }
 
         body = aspects;
+        body.add(presetRow());
         body.add(heading("Aspects Shown"));
         body.add(note("Every aspect ticked here is drawn on the wheel and listed in the "
             + "aspect grid. Unticking one removes it from both - they read the same gate, so "
             + "they cannot disagree about which aspects exist."));
         body.add(aspectBulkButtons());
         body.add(Box.createRigidArea(new Dimension(0, 6)));
-        body.add(aspectBoxes());
+        body.add(fixed(aspectBoxes()));
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
         body = display;
@@ -544,6 +555,7 @@ public class SettingsPanel extends JPanel {
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
         body = points;
+        body.add(presetRow());
         body.add(heading("Chart Points"));
         body.add(note("Everything ticked here is drawn on the wheel, listed in the "
             + "placements panel and included in the aspect grid. Everything unticked is "
@@ -561,7 +573,7 @@ public class SettingsPanel extends JPanel {
             groups.add(groupPanel(group, enabled));
         }
         groups.setAlignmentX(Component.LEFT_ALIGNMENT);
-        body.add(groups);
+        body.add(fixed(groups));
 
         body.add(Box.createRigidArea(new Dimension(0, 16)));
         body = engine;
@@ -583,16 +595,11 @@ public class SettingsPanel extends JPanel {
         // widths and ceilings together. On a tab, either would be a control silently reaching
         // into another one. A single instance up here also means there is no second copy of the
         // bar to keep in step, which is the defect this project logs most.
-        JPanel above = new JPanel();
-        above.setLayout(new BoxLayout(above, BoxLayout.Y_AXIS));
-        above.setBackground(Color.BLACK);
-        above.setBorder(BorderFactory.createEmptyBorder(0, 30, 6, 30));
-        above.add(savedSetsRow());
-        above.add(this.orbBar = profileBar());
-
+        // <b>Nothing sits above the tab strip.</b> The preset bar did, hidden on the two tabs
+        // it governs nothing on, which made the strip jump as you moved between them; and Saved
+        // Settings did, pushing the tabs down for the least used thing on the screen. The presets
+        // are on their own tabs now and Saved Settings folds out of the bottom - David, 25 Sep.
         this.tabs = new javax.swing.JTabbedPane();
-        this.tabs.setBackground(Color.BLACK);
-        this.tabs.setForeground(TEXT);
         this.tabs.setFont(Theme.font("Arial", Font.PLAIN, 13));
         this.tabs.addTab("Globe & Display", tabScroll(display));
         this.tabs.addTab("Aspects & Orbs", tabScroll(aspects));
@@ -607,25 +614,42 @@ public class SettingsPanel extends JPanel {
         this.tabs.setToolTipTextAt(3, "<html>What the engine computes rather than how it is"
             + "<br>drawn: house system, harmonic, zodiac, transit orb and the variants.</html>");
 
-        // <b>The bar is hidden where it governs nothing.</b> Leaving "Orbs shown for:" over the
-        // globe's colours would claim it applies to them.
-        this.tabs.addChangeListener(e -> syncOrbBar());
-        syncOrbBar();
+        // <b>Painted here, not by the platform.</b> Windows draws a selected tab almost white,
+        // which against this screen's light text makes the tab you are on the one you cannot read.
+        Widgets.styleTabs(this.tabs);
 
         JPanel centre = new JPanel(new BorderLayout());
         centre.setBackground(Color.BLACK);
-        centre.add(above, BorderLayout.NORTH);
         centre.add(this.tabs, BorderLayout.CENTER);
 
-        JPanel foot = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 4));
+        JPanel foot = new JPanel();
+        foot.setLayout(new BoxLayout(foot, BoxLayout.Y_AXIS));
         foot.setBackground(Color.BLACK);
-        foot.setBorder(BorderFactory.createEmptyBorder(0, 30, 6, 30));
+        foot.setBorder(BorderFactory.createEmptyBorder(4, 30, 6, 30));
+        foot.add(savedSetsFold());
+        status.setAlignmentX(Component.LEFT_ALIGNMENT);
+        foot.add(Box.createRigidArea(new Dimension(0, 4)));
         foot.add(status);
         centre.add(foot, BorderLayout.SOUTH);
         add(centre, BorderLayout.CENTER);
 
         refreshStatus();
         constructing = false;
+    }
+
+    /**
+     * A panel that is its own size and no larger.
+     *
+     * <b>BoxLayout shares spare height among everything with an unbounded maximum</b>, and both
+     * the aspect grid and the body groups have one - so on a tab with room to spare they took a
+     * share of it and centred their contents in the middle of the result. A glue alone only ever
+     * got a fraction of the slack. Width too: a GridBagLayout centres its contents in whatever
+     * width it is handed, which is why the aspect list sat in the middle of the screen.
+     */
+    private static JPanel fixed(JPanel p) {
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.setMaximumSize(p.getPreferredSize());
+        return p;
     }
 
     /** One tab's column, laid out exactly as the single column was. */
@@ -638,17 +662,77 @@ public class SettingsPanel extends JPanel {
         return p;
     }
 
-    /** Which tabs the orb preset actually governs: the two with orb controls on them. */
-    private void syncOrbBar() {
-        if (this.orbBar == null || this.tabs == null) {
-            return;
-        }
-        int i = this.tabs.getSelectedIndex();
-        this.orbBar.setVisible(i == 1 || i == 2);
+    /**
+     * Saved Settings, folded shut at the foot of the screen.
+     *
+     * <b>It was the first thing on the screen and is the least used thing on it</b>, costing a
+     * heading and two lines of explanation before a reader reached anything they had come for.
+     * Shut it costs one row.
+     *
+     * <p>A button rather than a styled label, because it is a control: it takes focus, it works
+     * from the keyboard, and it says which way it will go.
+     */
+    private JPanel savedSetsFold() {
+        final JPanel body = savedSetsRow();
+        body.setVisible(false);
+        body.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        final javax.swing.JButton toggle = new javax.swing.JButton();
+        toggle.setFocusPainted(false);
+        toggle.setContentAreaFilled(false);
+        toggle.setBorderPainted(false);
+        toggle.setForeground(TEXT);
+        toggle.setFont(Theme.font("Arial", Font.BOLD, 13));
+        toggle.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        toggle.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        toggle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        toggle.setToolTipText("<html>Store everything on this screen under a name of your own,"
+            + "<br>and put it back later. Your chart, your saved places and your window"
+            + "<br>are never part of a set.</html>");
+        toggle.setText("\u25B8  Saved Settings");
+        toggle.addActionListener(e -> {
+            boolean open = !body.isVisible();
+            body.setVisible(open);
+            toggle.setText((open ? "\u25BE" : "\u25B8") + "  Saved Settings");
+            revalidate();
+            repaint();
+        });
+
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(Color.BLACK);
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(toggle);
+        p.add(body);
+        return p;
     }
 
+    /** One tab's preset bar and its Reset, with a little room under the tab strip. */
+    private JPanel presetRow() {
+        JPanel p = profileBar();
+        p.add(Box.createRigidArea(new Dimension(12, 0)));
+        p.add(orbReset());
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.setMaximumSize(p.getPreferredSize());
+        return p;
+    }
+
+    /**
+     * One tab's column in a scroller.
+     *
+     * <b>The column goes at NORTH, which is what stops everything on it being stretched.</b>
+     * BoxLayout hands spare height to every component whose maximum allows it, and on this screen
+     * that is nearly all of them - so on a tab with room to spare the aspect grid floated in the
+     * middle of an enormous box and the body groups had a hole through them. At NORTH the column
+     * gets exactly its preferred height, so there is no spare height to hand out. Fixing it here
+     * rather than capping panels one at a time also means a section added later arrives right
+     * without anyone remembering this.
+     */
     private JScrollPane tabScroll(JPanel body) {
-        JScrollPane scroll = new JScrollPane(body);
+        JPanel hold = new JPanel(new BorderLayout());
+        hold.setBackground(Color.BLACK);
+        hold.add(body, BorderLayout.NORTH);
+        JScrollPane scroll = new JScrollPane(hold);
         scroll.setBorder(null);
         // Three separate surfaces paint here: the scroll pane, its viewport, and the panel
         // inside. Colouring only the viewport left the pane's own white showing as a border
@@ -775,7 +859,11 @@ public class SettingsPanel extends JPanel {
             gc.weightx = 1.0;
             rows.add(Box.createHorizontalGlue(), gc);
         }
-        panel.add(rows);
+        // <b>Its own height, not a share of the box's.</b> The groups sit in a GridLayout,
+        // which gives every box the height of the tallest, and a GridBagLayout centres its
+        // rows in whatever height it is handed - so a short group had its points floating in
+        // the middle with a hole above them. Pre-dates the tabs; visible on any of them.
+        panel.add(fixed(rows));
         return panel;
     }
 
@@ -798,7 +886,6 @@ public class SettingsPanel extends JPanel {
         p.setBackground(Color.BLACK);
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        p.add(heading("Saved Settings"));
         p.add(note("Store everything on this screen under a name of your own, and put it back "
             + "later - useful before trying a different set of orbs, or when an update changes "
             + "something. Your chart, your saved places and your window are never part of a set."));
@@ -937,12 +1024,12 @@ public class SettingsPanel extends JPanel {
             b.setFocusPainted(false);
             b.setToolTipText(profileTip(profile));
             b.setSelected(profile == shownProfile);
+            b.setActionCommand(profile.name());
             b.addActionListener(e -> showProfile(profile));
             group.add(b);
             p.add(b);
+            this.orbToggles.add(b);
         }
-        p.add(Box.createRigidArea(new Dimension(12, 0)));
-        p.add(orbReset());
         return p;
     }
 
@@ -1072,12 +1159,16 @@ public class SettingsPanel extends JPanel {
             orbProfileNote.setText("<html><body style='width:600px'>" + profileSentence()
                 + "</body></html>");
         }
-        if (orbResetButton != null) {
-            String name = profileLabel(shownProfile);
-            orbResetButton.setText("Reset " + name + " to defaults");
-            orbResetButton.setToolTipText("Forget every width and ceiling you have set under "
-                + name + ", and go back to what it starts at. The other three presets are left"
-                + " alone.");
+        String name = profileLabel(shownProfile);
+        for (javax.swing.JButton b : this.orbResetButtons) {
+            b.setText("Reset " + name + " to defaults");
+            b.setToolTipText("Forget every width and ceiling you have set under " + name
+                + ", and go back to what it starts at. The other three presets are left alone.");
+        }
+        // <b>Every bar shows the same preset.</b> Two bars with different toggles lit would be
+        // two answers to one question, which is the whole risk of having two of them.
+        for (javax.swing.JToggleButton b : this.orbToggles) {
+            b.setSelected(shownProfile.name().equals(b.getActionCommand()));
         }
     }
 
@@ -2032,7 +2123,9 @@ public class SettingsPanel extends JPanel {
 
     /** The button that puts one preset back, built where it belongs: beside the preset bar. */
     private javax.swing.JButton orbReset() {
-        orbResetButton = new javax.swing.JButton("Reset Natal to defaults");
+        final javax.swing.JButton orbResetButton =
+            new javax.swing.JButton("Reset Natal to defaults");
+        this.orbResetButtons.add(orbResetButton);
         orbResetButton.addActionListener(e -> {
             Settings.resetBodyOrbs(shownProfile);
             Settings.resetAspectCaps(shownProfile);

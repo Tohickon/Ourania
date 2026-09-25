@@ -237,27 +237,61 @@ public final class PresetBarCheck {
             tabOf(pane, orbSpinner(p, NARROW)) == 2);
         ok("an aspect's ceiling is on Aspects & Orbs",
             tabOf(pane, capSpinner(p, Aspects.Type.values()[0])) == 1);
+        ok("the flat transit orb is on Engine Rules", tabOf(pane, p.transitOrb) == 3);
 
-        javax.swing.JSpinner transit = p.transitOrb;
-        ok("the flat transit orb is on Engine Rules", tabOf(pane, transit) == 3);
-
-        // <b>The bar is above the tabs, not on one.</b> It says which preset the orbs on two tabs
-        // are showing, and Reset puts that whole preset back - widths and ceilings together.
-        javax.swing.JPanel bar = (javax.swing.JPanel) CheckReflect.get(p, "orbBar");
-        ok("the preset bar exists", bar != null);
-        ok("and is on none of the tabs", bar != null && tabOf(pane, bar) < 0);
-        javax.swing.JButton resetButton =
-            (javax.swing.JButton) CheckReflect.get(p, "orbResetButton");
-        ok("Reset is not on a tab either", resetButton == null || tabOf(pane, resetButton) < 0);
-
-        // And it is hidden where it governs nothing.
-        for (int i = 0; i < pane.getTabCount(); i++) {
-            final int which = i;
-            javax.swing.SwingUtilities.invokeAndWait(() -> pane.setSelectedIndex(which));
-            boolean shouldShow = i == 1 || i == 2;
-            ok("the preset bar is " + (shouldShow ? "shown" : "hidden") + " on " + TABS[i],
-                bar != null && bar.isVisible() == shouldShow);
+        // <b>The presets sit on the tabs they govern.</b> They were above the strip, hidden on
+        // the two tabs they govern nothing on - which made the strip move as you changed tab.
+        java.util.List<javax.swing.JToggleButton> bars = toggles(p);
+        ok("there are preset toggles", !bars.isEmpty());
+        java.util.Set<Integer> onTabs = new java.util.TreeSet<>();
+        for (javax.swing.JToggleButton b : bars) {
+            onTabs.add(Integer.valueOf(tabOf(pane, b)));
         }
+        ok("every preset toggle is on Aspects & Orbs or Bodies & Points",
+            onTabs.equals(new java.util.TreeSet<>(
+                java.util.Arrays.asList(Integer.valueOf(1), Integer.valueOf(2)))));
+
+        java.util.List<javax.swing.JButton> resets = resetButtons(p);
+        ok("there is a Reset beside each bar", resets.size() == 2);
+        for (javax.swing.JButton b : resets) {
+            int where = tabOf(pane, b);
+            ok("Reset is on a tab with orb controls", where == 1 || where == 2);
+        }
+
+        // <b>Two bars, one answer.</b> A component cannot be in two containers, so there are two
+        // of these; two controls over one setting is the defect this project logs most often.
+        click(p, Aspects.Profile.SYNASTRY);
+        int lit = 0;
+        for (javax.swing.JToggleButton b : bars) {
+            if (b.isSelected()) {
+                lit++;
+                ok("every lit toggle says Synastry",
+                    Aspects.Profile.SYNASTRY.name().equals(b.getActionCommand()));
+            }
+        }
+        ok("one toggle is lit on each bar", lit == 2);
+        for (javax.swing.JButton b : resets) {
+            ok("and every Reset names Synastry", b.getText().contains("Synastry"));
+        }
+        click(p, Aspects.Profile.NATAL);
+        ok("and back again", countLit(bars, Aspects.Profile.NATAL) == 2);
+    }
+
+    private static int countLit(java.util.List<javax.swing.JToggleButton> bars,
+                                Aspects.Profile want) {
+        int n = 0;
+        for (javax.swing.JToggleButton b : bars) {
+            if (b.isSelected() && want.name().equals(b.getActionCommand())) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static java.util.List<javax.swing.JButton> resetButtons(SettingsPanel p)
+            throws Exception {
+        return (java.util.List<javax.swing.JButton>) CheckReflect.get(p, "orbResetButtons");
     }
 
     /** Which tab a component sits under, or -1 when it is not under any of them. */
@@ -318,7 +352,9 @@ public final class PresetBarCheck {
     }
 
     private static void press(SettingsPanel p) throws Exception {
-        final javax.swing.JButton b = (javax.swing.JButton) CheckReflect.get(p, "orbResetButton");
+        // Either Reset acts on the shown preset; the first is as good as the second, and
+        // Part F is what asserts the two agree.
+        final javax.swing.JButton b = resetButtons(p).get(0);
         javax.swing.SwingUtilities.invokeAndWait(() -> b.doClick());
     }
 
@@ -352,17 +388,19 @@ public final class PresetBarCheck {
         return Settings.get(key, "").trim();
     }
 
-    /** Every JToggleButton under a container, in the order they were added. */
-    private static List<JToggleButton> toggles(Container c) {
-        List<JToggleButton> out = new ArrayList<>();
-        for (Component child : c.getComponents()) {
-            if (child instanceof JToggleButton) {
-                out.add((JToggleButton) child);
-            } else if (child instanceof Container) {
-                out.addAll(toggles((Container) child));
-            }
-        }
-        return out;
+    /**
+     * The preset toggles, as the panel itself knows them.
+     *
+     * <b>Not a walk of the component tree.</b> {@code JCheckBox} extends {@code JToggleButton},
+     * so collecting toggles from the tree collects every checkbox on the screen - every aspect,
+     * every point, every globe option - and Part F then reported a "preset toggle" on the Globe &
+     * Display tab and a lit one that did not say Synastry. Both were true of a checkbox and
+     * neither was about a preset. Asking the panel for its own list means the suite and the screen
+     * cannot disagree about what a preset toggle is.
+     */
+    @SuppressWarnings("unchecked")
+    private static List<JToggleButton> toggles(SettingsPanel p) throws Exception {
+        return (List<JToggleButton>) CheckReflect.get(p, "orbToggles");
     }
 
     // ------------------------------------------------------------------ harness

@@ -188,6 +188,71 @@ public final class Widgets {
     }
 
     /** The same treatment for a bar that is not inside a scroll pane. */
+    /**
+     * A tab strip that can be read on a dark screen.
+     *
+     * <b>The look and feel paints a selected tab almost white.</b> Against the light grey a dark
+     * screen needs for its text, the tab you are actually on becomes the one you cannot read -
+     * which is what happened when the settings screen took four of them, with every assertion
+     * about those tabs passing. So the strip is painted here rather than left to the platform.
+     */
+    public static void styleTabs(javax.swing.JTabbedPane tabs) {
+        tabs.setOpaque(true);
+        tabs.setBackground(PANEL);
+        tabs.setForeground(TEXT);
+        tabs.setFocusable(false);
+        tabs.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        tabs.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
+            @Override
+            protected void installDefaults() {
+                super.installDefaults();
+                // The bevel the platform draws round each tab is four shades of grey meant for a
+                // light window; one rule colour reads as a divider instead of as damage.
+                this.lightHighlight = RULE;
+                this.highlight = RULE;
+                this.shadow = RULE;
+                this.darkShadow = RULE;
+                this.focus = RULE;
+                this.tabInsets = new java.awt.Insets(7, 16, 7, 16);
+                this.selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
+                this.tabAreaInsets = new java.awt.Insets(0, 0, 0, 0);
+                this.contentBorderInsets = new java.awt.Insets(1, 0, 0, 0);
+            }
+
+            @Override
+            protected void paintTabBackground(java.awt.Graphics g, int placement, int index,
+                                              int x, int y, int w, int h, boolean selected) {
+                g.setColor(selected ? ACCENT_OFF : PANEL);
+                g.fillRect(x, y, w, h);
+                if (selected) {
+                    // A lit edge along the top, so the selected tab reads as selected without
+                    // depending on the fill alone.
+                    g.setColor(ACCENT);
+                    g.fillRect(x, y, w, 2);
+                }
+            }
+
+            @Override
+            protected void paintFocusIndicator(java.awt.Graphics g, int placement,
+                                               java.awt.Rectangle[] rects, int index,
+                                               java.awt.Rectangle iconRect,
+                                               java.awt.Rectangle textRect, boolean selected) {
+                // Nothing: the platform's dotted rectangle is drawn in a colour for light windows.
+            }
+
+            @Override
+            protected void paintContentBorder(java.awt.Graphics g, int placement, int index) {
+                g.setColor(RULE);
+                g.fillRect(0, this.rects[0].y + this.rects[0].height,
+                    tabs.getWidth(), 1);
+            }
+        });
+        for (int i = 0; i < tabs.getTabCount(); i++) {
+            tabs.setBackgroundAt(i, PANEL);
+            tabs.setForegroundAt(i, TEXT);
+        }
+    }
+
     public static void styleScrollBar(JScrollBar bar) {
         if (bar == null) {
             return;

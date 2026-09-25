@@ -34,6 +34,24 @@ param(
     [string[]] $Only = @(),
     [string[]] $KnownRed = @("known-red.txt"),
     [int]    $SuiteTimeoutMinutes = 45,
+    # <b>How many astro suites run at once, and it defaults to one on purpose.</b> The gui block
+    # is always one at a time in any case - it opens real windows, and three suites have already
+    # had to be rewritten after flaking under load.
+    #
+    # Four lanes were built expecting the astro block to fall from 30 minutes to 8. Measured, reg19
+    # took 1428s against reg18's 768s for the same suites - nearly twice as long. The cause is not
+    # the lanes: this is a 1.4 GHz laptop part, and a SEQUENTIAL run of the fourteen slowest astro
+    # suites shows the same decay within itself, the first three matching reg18 and the later ones
+    # running three to four times slower as the machine heats. Four lanes reach that state sooner
+    # and sit in it longer.
+    #
+    # <b>The reason to default to 1 is measurement, not speed.</b> Every duration in SUMMARY.txt is
+    # evidence - a suite's time is how Part P's flake was found - and under lanes those numbers
+    # swing three to six times with whatever happened to share the CPU. A regression that is quick
+    # on a cold machine and slow on a warm one cannot tell a real change from a thermal one.
+    #
+    # Raise it deliberately when you want a fast answer and are willing to give that up.
+    [int]    $Parallel = 1,
     [switch] $Jar,
     [switch] $Package,
     [ValidateSet("app-image", "exe", "msi")] [string] $PackageType = "app-image",
@@ -214,28 +232,97 @@ if ($All) {
     $logs = "$Out-logs"
     if (Test-Path $logs) { Remove-Item -Recurse -Force $logs }
     New-Item -ItemType Directory -Path $logs | Out-Null
+    # <b>What the suites took last time, so "time left" is measured rather than guessed.</b>
+    # The spread is too wide for a running average to mean anything - CalCheck is 333 seconds and
+    # DignityCheck is 1 - so the estimate is the recorded cost of the suites still to run.
+    $past = @{}
+    # <b>Newest is not good enough.</b> A four-suite -Only run writes a SUMMARY too, and being the
+    # newest it became the baseline for the next full run - seventy suites falling back to an
+    # average taken from four, and the whole regression estimated at five minutes. A baseline has
+    # to carry at least as many suites as the run about to use it.
+    $baseline = $null
+    $candidates = @(Get-ChildItem -Path "*-logs\SUMMARY.txt" -ErrorAction SilentlyContinue |
+        Where-Object { $_.FullName -ne (Join-Path (Resolve-Path ".").Path "$logs\SUMMARY.txt") } |
+        Sort-Object LastWriteTime -Descending)
+    foreach ($c in $candidates) {
+        $seen = @{}
+        foreach ($line in Get-Content $c.FullName) {
+            # Out-File -Encoding utf8 writes a BOM in 5.1, so the first line of every summary
+            # starts with an invisible character and its suite name never matched.
+            $clean = $line.TrimStart([char] 0xFEFF)
+            if ($clean -match '^\s*(\S+)\s+.*?(\d+)s\s*$') {
+                $seen[$Matches[1]] = [int] $Matches[2]
+            }
+        }
+        if ($seen.Count -ge $suites.Count) {
+            $baseline = $c
+            $past = $seen
+            break
+        }
+    }
+    $typical = 30
+    if ($past.Count -gt 0) {
+        $typical = [int] (($past.Values | Measure-Object -Average).Average)
+    }
+
+    # Seconds still to come, following the lanes: the astro block runs several at a time.
+    $remaining = {
+        $a = 0
+        $g = 0
+        foreach ($s in $suites) {
+            if ($script:doneNames.Contains($s[1])) { continue }
+            $cost = $typical
+            if ($past.ContainsKey($s[1])) { $cost = $past[$s[1]] }
+            if ($s[0] -eq "astro") { $a += $cost } else { $g += $cost }
+        }
+        return [int] (($a / [Math]::Max(1, $Parallel)) + $g)
+    }
+    $doneNames = New-Object 'System.Collections.Generic.HashSet[string]'
+
     Write-Host ""
     Write-Host "Running $($suites.Count) suites from $Out (logs in $logs, $SuiteTimeoutMinutes min each at most)"
+    if ($baseline) {
+        $firstGuess = [int] ((& $remaining) / 60)
+        Write-Host "Timings from $($baseline.FullName) - about $firstGuess min at -Parallel $Parallel"
+    } else {
+        Write-Host "No previous SUMMARY.txt to time against, so no estimate this run."
+    }
     Write-Host ""
 
     $rows = @()
     $newRed = @()
     $nowGreen = @()
     $unguarded = @()
-    foreach ($s in $suites) {
-        $name = $s[1]
-        $fq = "com.zodiacomputing.ourania.$($s[0]).$name"
+
+    # Starting a suite is just launching its process; nothing waits here.
+    $startSuite = {
+        param($pkg, $name)
+        $fq = "com.zodiacomputing.ourania.$pkg.$name"
         $log = Join-Path $logs "$name.txt"
-        $started = Get-Date
         $p = Start-Process -FilePath $JAVA -ArgumentList @("-cp", "`"$Out;lib\*`"", $fq) `
             -NoNewWindow -PassThru -RedirectStandardOutput $log -RedirectStandardError "$log.err"
         $null = $p.Handle   # without this, ExitCode reads as null once the process has gone
-        $timedOut = -not $p.WaitForExit($SuiteTimeoutMinutes * 60 * 1000)
-        if ($timedOut) { try { $p.Kill() } catch { } }
+        return @{ name = $name; log = $log; proc = $p; started = Get-Date }
+    }
+
+    # Reading one finished suite: its log, its verdict, and what the gate makes of it. Everything
+    # that used to be the body of the loop, so one lane and four lanes judge identically.
+    $harvest = {
+        param($a)
+        $name = $a.name
+        $log = $a.log
+        $p = $a.proc
+        $timedOut = $false
+        $left = ($a.started.AddMinutes($SuiteTimeoutMinutes) - (Get-Date)).TotalMilliseconds
+        if ($left -lt 0) { $left = 0 }
+        if (-not $p.HasExited) {
+            $timedOut = -not $p.WaitForExit([int] $left)
+            if ($timedOut) { try { $p.Kill() } catch { } }
+        }
         # And once more with no timeout: after a timed wait on a process whose output is
         # redirected, ExitCode stays empty until this is called - and every clear suite read red.
-        else { $p.WaitForExit() }
-        $secs = [int] ((Get-Date) - $started).TotalSeconds
+        if (-not $timedOut) { $p.WaitForExit() }
+        $secs = [int] ((Get-Date) - $a.started).TotalSeconds
         $text = ""
         if (Test-Path $log) { $text = Get-Content $log -Raw }
         if (Test-Path "$log.err") { $text += (Get-Content "$log.err" -Raw) }
@@ -289,12 +376,61 @@ if ($All) {
             $nowGreen += $name
         }
         $row = "{0,-26} {1,-26} {2,-34} {3,5}s" -f $name, $status, $verdict, $secs
-        $rows += $row
-        Write-Host "  $row"
+        $script:rows += $row
+
+        $null = $script:doneNames.Add($name)
+        $done = $script:doneNames.Count
+        $total = $suites.Count
+        $pct = [int] (100 * $done / $total)
+        $left = & $remaining
+        $note = ""
+        if ($baseline) {
+            $note = "  ~{0} min left" -f [Math]::Ceiling($left / 60.0)
+        }
+        # The console's own bar. It goes to the progress stream, so a redirected log never
+        # sees it - which is why the line below goes to stdout as well.
+        Write-Progress -Id 1 -Activity "Suites" `
+            -Status "$done of $total ($pct%)" -PercentComplete $pct -SecondsRemaining $left
+        Write-Host ("  {0}  [{1}/{2}] {3}%{4}" -f $row, $done, $total, $pct, $note)
     }
 
+    # <b>The astro block, several at a time.</b> Each is its own process with its own temp
+    # settings file, so there is nothing to share and nothing to collide over.
+    $lanes = [Math]::Max(1, $Parallel)
+    $astro = @($suites | Where-Object { $_[0] -eq "astro" })
+    $gui = @($suites | Where-Object { $_[0] -eq "gui" })
+    $active = @()
+    $next = 0
+    while ($next -lt $astro.Count -or $active.Count -gt 0) {
+        while ($active.Count -lt $lanes -and $next -lt $astro.Count) {
+            $active += (& $startSuite $astro[$next][0] $astro[$next][1])
+            $next++
+        }
+        Start-Sleep -Milliseconds 150
+        $stillRunning = @()
+        foreach ($a in $active) {
+            if ($a.proc.HasExited -or
+                    ((Get-Date) -gt $a.started.AddMinutes($SuiteTimeoutMinutes))) {
+                . $harvest $a
+            } else {
+                $stillRunning += $a
+            }
+        }
+        $active = $stillRunning
+    }
+
+    # <b>The gui block, one at a time, deliberately.</b> These open real windows, and this project
+    # has already had to rewrite three suites that flaked under regression load. Eighteen minutes
+    # is not worth buying that back.
+    foreach ($s in $gui) {
+        . $harvest (& $startSuite $s[0] $s[1])
+    }
+
+    # <b>Sorted, not in completion order.</b> These files get compared between runs to see
+    # what moved; an order that depended on which suite finished first would make that useless.
+    Write-Progress -Id 1 -Activity "Suites" -Completed
     $summary = Join-Path $logs "SUMMARY.txt"
-    $rows | Out-File -Encoding utf8 $summary
+    $rows | Sort-Object | Out-File -Encoding utf8 $summary
     Write-Host ""
     Write-Host "Summary: $summary"
     $valid = Test-TreeUnchanged
