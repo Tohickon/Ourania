@@ -34,24 +34,29 @@ param(
     [string[]] $Only = @(),
     [string[]] $KnownRed = @("known-red.txt"),
     [int]    $SuiteTimeoutMinutes = 45,
-    # <b>How many astro suites run at once, and it defaults to one on purpose.</b> The gui block
-    # is always one at a time in any case - it opens real windows, and three suites have already
-    # had to be rewritten after flaking under load.
+    # <b>How many astro suites run at once.</b> The gui block is always one at a time whatever
+    # this says - it opens real windows, and three suites have already had to be rewritten after
+    # flaking under load. 1 here reproduces the old behaviour exactly.
     #
-    # Four lanes were built expecting the astro block to fall from 30 minutes to 8. Measured, reg19
-    # took 1428s against reg18's 768s for the same suites - nearly twice as long. The cause is not
-    # the lanes: this is a 1.4 GHz laptop part, and a SEQUENTIAL run of the fourteen slowest astro
-    # suites shows the same decay within itself, the first three matching reg18 and the later ones
-    # running three to four times slower as the machine heats. Four lanes reach that state sooner
-    # and sit in it longer.
+    # <b>Four, measured twice in both orders.</b> The fourteen slowest astro suites, back to back
+    # on one machine state: sequential 1135s against 378s in four lanes, and again with the order
+    # reversed so the lanes could not borrow the sequential half's warm page cache, 4160s against
+    # 2211s. 0.33x and 0.53x. Both favour lanes.
     #
-    # <b>The reason to default to 1 is measurement, not speed.</b> Every duration in SUMMARY.txt is
-    # evidence - a suite's time is how Part P's flake was found - and under lanes those numbers
-    # swing three to six times with whatever happened to share the CPU. A regression that is quick
-    # on a cold machine and slow on a warm one cannot tell a real change from a thermal one.
+    # <b>The first answer was the opposite, and was wrong.</b> reg19 at four lanes took 1428s where
+    # reg18 sequential took 768s, and that was read as lanes costing nearly twice the wall clock.
+    # The two runs were ninety minutes apart. They were not measuring the same machine.
     #
-    # Raise it deliberately when you want a fast answer and are willing to give that up.
-    [int]    $Parallel = 1,
+    # <b>What actually dominates every number here is the machine, and by a lot.</b> CalCheck, same
+    # suite and same code: 165s in reg18 at 01:07, 182s at 03:40, and 1149s at 05:00 - seven times,
+    # in one night, sequential each time. A thin 1.4 GHz laptop chassis sheds clock the longer it is
+    # worked, and that swamps anything the lane count does.
+    #
+    # <b>So do not read a duration in SUMMARY.txt as evidence about the code.</b> Not in lanes and
+    # not sequentially. If a suite's time looks meaningful, measure it again in the same session
+    # against a control before believing it - the way a red suite is measured against the previous
+    # commit. Failure SETS are what survive between runs; the clock does not.
+    [int]    $Parallel = 4,
     [switch] $Jar,
     [switch] $Package,
     [ValidateSet("app-image", "exe", "msi")] [string] $PackageType = "app-image",
