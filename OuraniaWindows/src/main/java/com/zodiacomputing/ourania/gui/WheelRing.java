@@ -45,17 +45,17 @@ public final class WheelRing {
      */
     public enum Kind {
         /** The chart being read: the inner wheel, and the thing everything else is read against. */
-        CHART_A("Chart A", null, false),
+        CHART_A("Chart A", null, false, null),
         /** One chart made out of two. Still the inner wheel, but it belongs to nobody. */
-        COMPOSITE("the composite", null, false),
+        COMPOSITE("the composite", null, false, null),
         /** A second person, in a synastry. Their placements are their NATAL placements. */
-        CHART_B("Chart B", "Chart B", true),
+        CHART_B("Chart B", "Chart B", true, new float[] {9.0f, 4.0f}),
         /** The same person, moved on. A placement, not a passing event. */
-        PROGRESSED("progressed", "progressed", false),
+        PROGRESSED("progressed", "progressed", false, new float[] {2.0f, 3.0f}),
         /** The sky at a chosen moment, laid over the chart. */
-        TRANSIT("transiting", "transiting", false),
+        TRANSIT("transiting", "transiting", false, new float[] {5.0f, 5.0f}),
         /** The sky now, wrapped around everything else. */
-        SKY("sky", SkymapPanel.SKY_RING_WORD, false);
+        SKY("sky", SkymapPanel.SKY_RING_WORD, false, new float[] {1.0f, 4.0f});
 
         /** How a reader refers to this ring in running prose. */
         public final String label;
@@ -67,10 +67,33 @@ public final class WheelRing {
         /** True when this ring is a person rather than a moment, so prose is read as theirs. */
         public final boolean isPerson;
 
+        /**
+         * How an aspect line from this ring is dashed, or null for a solid line.
+         *
+         * <b>Dashing tells a reader WHICH CHART a line belongs to</b>, which is a different
+         * question from what aspect it is - that is what colour says. Before 25 Sep the rule was
+         * a boolean, {@code wheel != WHEEL_NATAL}, so a partner's line, a transit and the sky
+         * were all dashed 5/5 and looked identical. The same shape as every other defect this
+         * enum was created to end.
+         *
+         * <p>TRANSIT keeps 5/5 so that the commonest chart looks as it always has.
+         */
+        public final float[] dash;
+
         Kind(String label, String ringWord, boolean isPerson) {
+            this(label, ringWord, isPerson, null);
+        }
+
+        Kind(String label, String ringWord, boolean isPerson, float[] dash) {
             this.label = label;
             this.ringWord = ringWord;
             this.isPerson = isPerson;
+            this.dash = dash;
+        }
+
+        /** A copy, because a caller handing this to BasicStroke must not be able to edit it. */
+        public float[] dashPattern() {
+            return this.dash == null ? null : this.dash.clone();
         }
 
         /**

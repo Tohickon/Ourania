@@ -463,6 +463,26 @@ public final class Settings {
         set(GLOBE_PLANETS_ALL_KEY, on ? "true" : "false");
     }
 
+    /** Settings key for where an aspect line's ends sit. */
+    public static final String ASPECT_LINES_TO_BODIES_KEY = "chart.aspectLinesToBodies";
+
+    /**
+     * Whether an aspect line reaches the two bodies, or spans an inner disc.
+     *
+     * <b>Off by default, which is what the wheel has always drawn.</b> The three rings' aspects
+     * occupy three separate discs so their networks do not run through one another, and
+     * {@code aspectDisc}'s javadoc makes the trade plain: the endpoints keep each body's own
+     * longitude, so an opposition is still a diameter and a sextile still a sixth of the way
+     * round, but the line stops short of the glyph. What it gives up is "the leg out to the
+     * glyph, which is the part that was doing the tangling".
+     *
+     * <b>On, a line touches the two bodies it joins</b> - which is easier to follow on a chart
+     * with few aspects drawn, and is what a reader means by point to point. David, 25 Sep.
+     */
+    public static boolean aspectLinesToBodies() {
+        return "true".equalsIgnoreCase(get(ASPECT_LINES_TO_BODIES_KEY, "false"));
+    }
+
     /** Settings keys for how heavily an aspect line is inked. */
     public static final String ASPECT_WEIGHT_MIN_KEY = "chart.aspectWeightMin";
     public static final String ASPECT_WEIGHT_MAX_KEY = "chart.aspectWeightMax";

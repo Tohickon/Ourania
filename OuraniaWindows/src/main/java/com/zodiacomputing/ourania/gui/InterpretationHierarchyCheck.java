@@ -216,6 +216,37 @@ public final class InterpretationHierarchyCheck {
             !WheelRing.Kind.CHART_A.takesTransitPrefix()
                 && !WheelRing.Kind.COMPOSITE.takesTransitPrefix());
 
+        // <b>Dashing says which chart, colour says which aspect.</b> This was a boolean - not
+        // the natal ring - so a partner's line, a transit and the sky were all dashed 5/5 and
+        // read identically. Each kind needs its own hand or the setting says nothing.
+        ok("the inner wheel draws solid", WheelRing.Kind.CHART_A.dashPattern() == null
+            && WheelRing.Kind.COMPOSITE.dashPattern() == null);
+        java.util.List<String> seen = new java.util.ArrayList<>();
+        for (WheelRing.Kind k : new WheelRing.Kind[] {WheelRing.Kind.CHART_B,
+                WheelRing.Kind.PROGRESSED, WheelRing.Kind.TRANSIT, WheelRing.Kind.SKY}) {
+            float[] d = k.dashPattern();
+            ok(k + " is dashed", d != null && d.length >= 2);
+            if (d == null) {
+                continue;
+            }
+            ok(k + " has real lengths", d[0] > 0f && d[1] > 0f);
+            String key = java.util.Arrays.toString(d);
+            ok(k + " is told apart from the others by its dash (" + key + ")",
+                !seen.contains(key));
+            seen.add(key);
+        }
+        // A transit is the commonest outer wheel, and it keeps exactly what it had, so the
+        // ordinary chart looks as it always has.
+        ok("a transit keeps its 5/5",
+            java.util.Arrays.equals(WheelRing.Kind.TRANSIT.dashPattern(),
+                new float[] {5.0f, 5.0f}));
+        // Handed out as a copy: BasicStroke takes the array, and a caller that edited it would
+        // change every line drawn afterwards.
+        float[] once = WheelRing.Kind.SKY.dashPattern();
+        once[0] = 99f;
+        ok("the pattern cannot be edited from outside",
+            WheelRing.Kind.SKY.dashPattern()[0] == 1.0f);
+
         // The ring word, which was implemented six times over before this.
         ok("the inner wheel takes no ring word",
             WheelRing.Kind.CHART_A.ringWord == null

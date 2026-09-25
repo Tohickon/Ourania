@@ -1103,6 +1103,36 @@ extends JPanel {
         }
     }
 
+    /**
+     * How far out an aspect line's end sits for one body.
+     *
+     * <b>The disc it was given, or the body's own radius.</b> In disc mode every line of a ring
+     * spans the same circle, so the three networks stay in three bands and a reader can follow
+     * one without the other two crossing it. Point to point, the line reaches the glyph, which
+     * is easier to trace when few aspects are drawn and is what tangles when many are.
+     *
+     * <p>Falls back to the disc whenever the per-body radii are not available - a body index out
+     * of range, or a ring whose radii have not been laid out yet. A line drawn at the wrong
+     * radius is a line pointing at nothing.
+     */
+    int endpointRadius(int wheel, int bodyIndex, int discRadius) {
+        if (!Settings.aspectLinesToBodies()) {
+            return discRadius;
+        }
+        int[] radii;
+        if (wheel == WHEEL_SKY) {
+            radii = this.geometry().triRadii();
+        } else if (wheel == WHEEL_OUTER) {
+            radii = this.geometry().transitRadii();
+        } else {
+            radii = this.geometry().natalRadii();
+        }
+        if (radii == null || bodyIndex < 0 || bodyIndex >= radii.length || radii[bodyIndex] <= 0) {
+            return discRadius;
+        }
+        return radii[bodyIndex];
+    }
+
     /** Repaints just the wheel, for a bloom frame. */
     private void repaintWheel() {
         if (this.chartPanel != null) {
@@ -9574,10 +9604,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     : (float)(lo + (hi - lo) * f * amplitude);
                 double d8 = Math.toRadians(180.0 + d3 - d);
                 double d9 = Math.toRadians(180.0 + d3 - d2);
-                int n8 = n + (int)((double)n3 * Math.cos(d8));
-                int n9 = n2 + (int)((double)n3 * Math.sin(d8));
-                int n10 = n + (int)((double)n4 * Math.cos(d9));
-                int n11 = n2 + (int)((double)n4 * Math.sin(d9));
+                // <b>Where the ends sit, decided in one place.</b> Six call sites pass these
+                // radii and deciding it at each of them would be six chances to disagree - the
+                // defect this file has supplied all day. The first body is on `wheel`; the
+                // second is always on the natal ring, which is what every call site does.
+                int ra = SkymapPanel.this.endpointRadius(wheel, n5, n3);
+                int rb = SkymapPanel.this.endpointRadius(WHEEL_NATAL, n6, n4);
+                int n8 = n + (int)((double)ra * Math.cos(d8));
+                int n9 = n2 + (int)((double)ra * Math.sin(d8));
+                int n10 = n + (int)((double)rb * Math.cos(d9));
+                int n11 = n2 + (int)((double)rb * Math.sin(d9));
                 Stroke stroke = graphics2D.getStroke();
                 if (highlighted) {
                     // White halo underneath, so the line reads against whichever aspect colour
@@ -9609,8 +9645,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 }
 
                 graphics2D.setColor(color);
-                if (bl) {
-                    graphics2D.setStroke(new BasicStroke(f2, 0, 0, 10.0f, new float[]{5.0f, 5.0f}, 0.0f));
+                // <b>Which chart this line belongs to, from the ring itself.</b> This was
+                // `if (bl)` - not the natal ring - so a partner's line, a transit and the sky
+                // were dashed identically and a reader could not tell them apart. The ring knows
+                // what it is since 383408c8; the pattern is its own.
+                float[] dash = SkymapPanel.this.ringAt(wheel).kind.dashPattern();
+                if (dash != null) {
+                    graphics2D.setStroke(new BasicStroke(f2, 0, 0, 10.0f, dash, 0.0f));
                 } else {
                     // Thinner core than before (was f2 alone at up to 1.0). A strand reads as
                     // light when the bright part is narrow and the spill is wide; a thick core
