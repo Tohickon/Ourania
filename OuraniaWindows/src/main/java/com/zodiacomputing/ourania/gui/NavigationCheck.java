@@ -36,7 +36,7 @@ public final class NavigationCheck {
      */
     private static final String[] SCREENS = {
         "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH", "RETURNS", "TRANSIT_CALENDAR",
-        "DIAL", "SKY_VIEW", "HORARY", "ELECTIONAL", "SETTINGS",
+        "DIAL", "SKY_VIEW", "HORARY", "ELECTIONAL", "HELIOCENTRIC", "SETTINGS",
     };
 
     private static final List<String> failures = new ArrayList<>();
@@ -546,6 +546,23 @@ public final class NavigationCheck {
      */
     private static void everyEngineHasADoor() {
         java.util.Set<String> exempt = new java.util.HashSet<>();
+
+        // <b>ZoneCorpus (D5, 25 Sep).</b> Named here deliberately, which this part's javadoc
+        // asks for rather than forbids - what it forbids is adding a name silently to go green.
+        //
+        // It is a corpus of historically attested time zone offsets plus a query over them, and
+        // it has no screen because it is not a feature: it is the evidence that this Java
+        // runtime's zone database disagrees with the historical record. Europe/Amsterdam's rules
+        // here are Europe/Brussels', so a Dutch birth between 1892 and 1940 is cast about twenty
+        // minutes out.
+        //
+        // <b>Its output does reach a reader</b>, which is the thing this part actually cares
+        // about: Moments.resolve consults it for every moment, and a doubt travels through
+        // ChartSubject's time note into the setup form's clock notice - the same warning strip
+        // an ambiguous hour uses. The sweep tests for the class being NAMED in gui source, and
+        // cannot see reachability through another engine, so a transitively reachable corpus
+        // looks identical to an orphan. That is the limit being recorded here, not a waiver.
+        exempt.add("ZoneCorpus");
 
         java.io.File astro = new java.io.File("src/main/java/com/zodiacomputing/ourania/astro");
         java.io.File guiDir = new java.io.File("src/main/java/com/zodiacomputing/ourania/gui");

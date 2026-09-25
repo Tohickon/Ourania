@@ -78,6 +78,10 @@ public final class SidePanel extends JPanel {
         {"Electional", "ELECTIONAL",
             "A moment weighed for what it is shaped to carry: the planetary day and hour with "
             + "what each favours, what raises and lowers it, and the whole day's unequal hours"},
+        {"Heliocentric", "HELIOCENTRIC",
+            "The solar system from its centre: the planets and the Earth by longitude and "
+            + "distance, with no houses, no angles and no Sun or Moon - there is no observer "
+            + "on the Sun"},
         {"Settings", "SETTINGS",
             "Which points the chart shows, house system defaults and the rest"},
     };
