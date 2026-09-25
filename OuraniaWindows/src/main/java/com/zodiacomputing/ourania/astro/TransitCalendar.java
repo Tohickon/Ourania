@@ -139,12 +139,40 @@ public final class TransitCalendar {
         return Math.abs(sep - p.type.exactAngle);
     }
 
+    /**
+     * A month at <b>the reader's own transit widths</b>, which is what the screen wants.
+     *
+     * <p>{@link Month#orb} carries {@link Transits#orb} - the Transits preset's default, and the
+     * width the calendar names - while each pair is judged at its own width from that preset.
+     */
+    public static Month month(SwissEph sw, ChartFrame natal, YearMonth ym, ZoneId zone) {
+        return build(sw, natal, ym, zone, Double.NaN);
+    }
+
+    /** A month at one flat width, named by the caller. */
     public static Month month(SwissEph sw, ChartFrame natal, YearMonth ym, ZoneId zone, double orb) {
-        Month m = new Month(ym, zone, orb);
+        return build(sw, natal, ym, zone, orb);
+    }
+
+    /**
+     * One implementation; NaN means the Transits preset, and never leaves this class.
+     *
+     * <b>The day scores use the pair's own width too.</b> Closeness is 1 - off/width, so leaving
+     * the flat orb in that line would score a contact judged at six degrees as though it had been
+     * judged at one, and a Pluto contact the reader had deliberately widened would light up the
+     * calendar as if it were exact.
+     */
+    private static Month build(SwissEph sw, ChartFrame natal, YearMonth ym, ZoneId zone,
+                               double flat) {
+        boolean byProfile = Double.isNaN(flat);
+        Month m = new Month(ym, zone, byProfile ? Transits.orb : flat);
         double from = jdOf(ym.atDay(1), zone);
         double to = jdOf(ym.plusMonths(1).atDay(1), zone);
-        m.passages.addAll(TransitSearch.search(sw, natal, TRANSITING, NATAL,
-            Arrays.asList(TransitSearch.MAJOR), orb, from, to));
+        m.passages.addAll(byProfile
+            ? TransitSearch.searchAtReaderWidths(sw, natal, TRANSITING, NATAL,
+                Arrays.asList(TransitSearch.MAJOR), from, to)
+            : TransitSearch.search(sw, natal, TRANSITING, NATAL,
+                Arrays.asList(TransitSearch.MAJOR), flat, from, to));
         for (int d = 1; d <= ym.lengthOfMonth(); d++) {
             LocalDate date = ym.atDay(d);
             Day day = new Day(date, jdOf(date, zone), jdOf(date.plusDays(1), zone));
@@ -163,7 +191,9 @@ public final class TransitCalendar {
                     }
                 }
                 double off = offExact(sw, p, noon);
-                double closeness = Math.max(0.0, 1.0 - off / orb);
+                double width = byProfile
+                    ? Aspects.orbFor(p.transiting, p.natal, Aspects.Profile.TRANSIT) : flat;
+                double closeness = Math.max(0.0, 1.0 - off / width);
                 double score = weight(p) * closeness + (Double.isNaN(exact) ? 0.0 : weight(p));
                 if (score <= 0.0) {
                     continue;

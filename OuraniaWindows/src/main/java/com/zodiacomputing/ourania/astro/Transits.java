@@ -443,16 +443,23 @@ public final class Transits {
         return c;
     }
 
-    /** The transit half: one flat orb, {@link #orb}, not the natal table. */
+    /**
+     * The transit half: the Transits preset's widths, whose default for every point is {@link #orb}.
+     *
+     * <b>The width is asked of the profile, not taken from {@link #orb} directly.</b> Until stage 3
+     * this passed the flat static, so the preset's per-point widths were stored, displayed, and
+     * never consulted - a reader could widen Pluto on the Transits preset and the list went on
+     * judging at one degree. Nothing moves at defaults, because with no point overridden
+     * {@code orbFor} returns {@code max(orb, orb)}, which is the number that used to be passed.
+     *
+     * <p>The wheel is not this: its sky-to-person aspects ask for NATAL, because the sky is not a
+     * person and a one-degree wheel would hide a Pluto contact for years at a time.
+     */
     static Contact transitContact(String movingName, double movingLon,
                                   String natalName, double natalLon) {
         double sep = Aspects.separation(movingLon, natalLon);
-        // <b>Judged in the transit profile.</b> Its widths default to this same flat orb for
-        // every point, so nothing moves on a fresh install - F3's measurement stands - but a
-        // reader who widens Pluto on the Transits preset widens it here and nowhere else. The
-        // wheel is not this: its sky-to-person aspects ask for NATAL, because the sky is not a
-        // person and a one-degree wheel would hide a Pluto contact for years at a time.
-        Aspects.Type type = Aspects.typeWithin(sep, movingName, natalName, orb,
+        double width = Aspects.orbFor(movingName, natalName, Aspects.Profile.TRANSIT);
+        Aspects.Type type = Aspects.typeWithin(sep, movingName, natalName, width,
             Aspects.Profile.TRANSIT);
         if (type == null) {
             return null;
@@ -461,7 +468,7 @@ public final class Transits {
         c.type = type;
         c.separation = sep;
         c.offBy = Math.abs(sep - type.exactAngle);
-        c.orbUsed = Math.min(orb, Aspects.capOf(type, Aspects.Profile.TRANSIT));
+        c.orbUsed = Math.min(width, Aspects.capOf(type, Aspects.Profile.TRANSIT));
         c.tightness = c.orbUsed <= 0 ? 0.0 : Math.max(0.0, 1.0 - c.offBy / c.orbUsed);
         return c;
     }

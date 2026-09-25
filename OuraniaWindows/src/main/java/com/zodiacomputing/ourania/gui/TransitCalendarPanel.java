@@ -255,7 +255,10 @@ public final class TransitCalendarPanel extends JPanel {
      */
     TransitCalendar.Month compute(ChartFrame natal, YearMonth ym, ZoneId z, double o) {
         synchronized (sw) {
-            return TransitCalendar.month(sw, natal, ym, z, o);
+            // The calendar has no per-search orb box, so it always reads the Transits preset.
+            // `o` is the default in force and is what Month.orb reports; individual pairs may be
+            // wider where the reader has set them.
+            return TransitCalendar.month(sw, natal, ym, z);
         }
     }
 

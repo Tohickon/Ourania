@@ -287,10 +287,13 @@ public final class Aspects {
      *     people's midpoints, not a comparison between two charts - David, 2026-09-24.
      * <li><b>SYNASTRY</b> takes it halved, which is the {@code o * 0.5} that lived in
      *     {@code orbFor} until stage 1.
-     * <li><b>TRANSIT</b> takes one flat width for every point: {@link Transits#DEFAULT_ORB}.
-     *     That is F3's measurement, not a shortcut - the natal table gave 21.6 transits in orb at
-     *     any moment and a Pluto conjunction to the natal Sun lasting 14.6 years. A reader may
-     *     widen a point from here; the default cannot drift back on its own.
+     * <li><b>TRANSIT</b> takes one flat width for every point: <b>{@link Transits#orb}, the
+     *     reader's own transit orb</b>, and not the built-in constant. That one number is the
+     *     Transits preset's default, and a per-point width set on that preset overrides it for
+     *     that point alone - the same shape natal has, except natal's defaults come from a table
+     *     and this one is a number the reader picks. A flat width at all is F3's measurement and
+     *     not a shortcut: the natal table gave 21.6 transits in orb at any moment and a Pluto
+     *     conjunction to the natal Sun lasting 14.6 years.
      * </ul>
      */
     public static double defaultBodyOrb(String name, Profile profile) {
@@ -299,7 +302,10 @@ public final class Aspects {
             return defaultBodyOrb(name);
         }
         if (p == Profile.TRANSIT) {
-            return Transits.DEFAULT_ORB;
+            // <b>The setting in force, not the constant.</b> Reading DEFAULT_ORB here would mean
+            // a reader who set 2 degrees saw every unset point on the Transits preset claiming 1,
+            // and the preset and the engine would disagree about the same number.
+            return Transits.orb;
         }
         // <b>Derived from the natal width IN FORCE, not from the built-in table.</b> This is
         // the difference between "a synastry is half of natal" and "a synastry is half of the

@@ -240,8 +240,17 @@ public final class TransitSearchPanel extends JPanel {
                 for (int i = 0; i < bodies.size() && !isCancelled(); i++) {
                     publish("Searching " + bodies.get(i) + " (" + (i + 1) + " of "
                         + bodies.size() + "), " + span + "...");
-                    all.addAll(TransitSearch.search(sw, natal, List.of(bodies.get(i)), points,
-                        types, orbDeg, jdFrom, jdTo));
+                    // <b>An orb typed for one search wins; an untouched box follows the
+                    // Transits preset.</b> The box opens at the setting, so equality with it is
+                    // exactly "the reader has not overridden this", and the per-point widths they
+                    // set under Orbs reach the Search as they reach the reading lists.
+                    boolean typed = Math.abs(orbDeg
+                        - com.zodiacomputing.ourania.astro.Transits.orb) > 1e-9;
+                    all.addAll(typed
+                        ? TransitSearch.search(sw, natal, List.of(bodies.get(i)), points,
+                            types, orbDeg, jdFrom, jdTo)
+                        : TransitSearch.searchAtReaderWidths(sw, natal, List.of(bodies.get(i)),
+                            points, types, jdFrom, jdTo));
                 }
                 all = TransitSearch.perfectingIn(all, jdFrom, jdTo);
                 all.sort(java.util.Comparator.comparingDouble(TransitSearch.Passage::firstMoment));

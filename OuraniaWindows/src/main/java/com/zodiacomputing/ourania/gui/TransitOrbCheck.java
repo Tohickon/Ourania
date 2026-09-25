@@ -34,6 +34,12 @@ import java.util.TreeSet;
  *     Search's orb box and the Calendar.</li>
  * <li>D - what the old rule got wrong no longer happens: a Pluto conjunction to the natal Sun is a
  *     season in the transit list, not a decade.</li>
+ * <li>E - <b>the Transits preset's per-point widths reach the list, and the flat orb is their
+ *     default.</b> Stage 2b let a reader set a transit width per point and the engine went on
+ *     passing the flat static, so the setting was stored, displayed and never consulted. Every
+ *     assertion in parts A to D stayed green throughout, because they are all about the flat orb
+ *     and the flat orb still worked - which is exactly how a suite misses a second way of saying
+ *     the same thing.</li>
  * </ul>
  */
 public final class TransitOrbCheck {
@@ -50,6 +56,7 @@ public final class TransitOrbCheck {
             part("B: the transit list and the Transit Search agree", () -> agree(sw));
             part("C: the setting", TransitOrbCheck::setting);
             part("D: a transit is a season, not a decade", () -> season(sw));
+            part("E: a per-point transit width reaches the list", () -> perPoint(sw));
         } finally {
             Transits.orb = Transits.DEFAULT_ORB;
         }
@@ -262,6 +269,159 @@ public final class TransitOrbCheck {
         Settings.setTransitOrb(Transits.DEFAULT_ORB);
     }
 
+    // ------------------------------------------------------------------ E
+
+    /**
+     * Widening one point on the Transits preset widens that point's transits and nothing else.
+     *
+     * <b>The contact is found, not chosen.</b> A hand-picked pair would date this test to one
+     * ephemeris; instead the list is taken once at a wide orb and the first Ptolemaic contact
+     * sitting between the two widths is used. Ptolemaic because a minor aspect carries its own
+     * narrow ceiling, and {@code typeWithin} takes the smaller of the two - so a minor aspect
+     * would stay out at any width and the test would pass without testing anything.
+     */
+    private static void perPoint(SwissEph sw) {
+        Settings.resetBodyOrbs(Aspects.Profile.TRANSIT);
+        Transits.orb = Transits.DEFAULT_ORB;
+
+        ChartFrame natal = cast(sw, SweDate.getJulDay(1982, 8, 10, 19.0 + 1.0 / 60.0),
+            39.9526, -75.1652);
+        ChartFrame tr = cast(sw, SweDate.getJulDay(2026, 3, 1, 12.0), 39.9526, -75.1652);
+
+        final double wide = 6.0;
+        Transits.orb = wide;
+        String moving = null;
+        String target = null;
+        Aspects.Type type = null;
+        // <b>A slow body, so the Search cross-check below cannot be misread.</b> Anything
+        // from Jupiter outward moves under a quarter degree a day, so across the four-day window
+        // used there it travels at most half a degree - and a contact already 1.5 degrees off
+        // exact can never come inside one degree. At six it is in orb the whole time. That makes
+        // "how many passages" a question with one answer instead of an argument about bounds.
+        Set<String> slow = new TreeSet<>(Arrays.asList(
+            "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Chiron"));
+        for (Transits.Hit h : Transits.toNatal(natal, tr, null, null, 0, false)) {
+            if (h.offBy > 1.5 && h.offBy < wide - 0.5 && !h.type.isMinor()
+                    && slow.contains(h.transiting)) {
+                moving = h.transiting;
+                target = h.natal;
+                type = h.type;
+                break;
+            }
+        }
+        Transits.orb = Transits.DEFAULT_ORB;
+        ok("a contact between the two widths exists to test with", moving != null);
+        if (moving == null) {
+            return;
+        }
+        String wanted = key(moving, target, type);
+
+        ok("at the default width it is not in the list", !listed(natal, tr, wanted));
+        near("and the point's transit width is the flat orb", Transits.orb,
+            Aspects.orbFor(moving, target, Aspects.Profile.TRANSIT));
+
+        // <b>The assertion stage 2b needed and did not have.</b>
+        Settings.setBodyOrb(moving, wide, Aspects.Profile.TRANSIT);
+        near("widening it on the Transits preset is stored", wide,
+            Settings.bodyOrb(moving, Aspects.Profile.TRANSIT));
+        ok("and the contact is now in the list", listed(natal, tr, wanted));
+
+        // Nothing else moved: a point nobody touched still judges at the flat orb.
+        String other = "Sun".equals(moving) ? "Saturn" : "Sun";
+        near("a point nobody widened is still at the flat orb", Transits.orb,
+            Aspects.orbFor(other, target, Aspects.Profile.TRANSIT));
+
+        // <b>The other transit surface has to see it too.</b> Part B asserts the list and the
+        // Search agree, and went on passing through stage 3's divergence because it compares them
+        // at the flat orb, where they never disagreed. Here the point is widened first, which is
+        // the only state in which the two could ever have parted.
+        // <b>The Search has to be judging at the same width.</b> Part B asserts the list and
+        // the Search agree and went on passing through stage 3's divergence, because it compares
+        // them at the flat orb - the one state in which they could never have parted.
+        double jd = tr.julianDayUt;
+        double[] flat = searchBounds(sw, natal, moving, target, type, jd, false);
+        double[] wideB = searchBounds(sw, natal, moving, target, type, jd, true);
+        ok("the Search reports a passage at each width", flat != null && wideB != null);
+        if (flat != null && wideB != null) {
+            ok("the widened point is entered no later at the reader's widths",
+                wideB[0] <= flat[0]);
+            ok("and left no earlier", wideB[1] >= flat[1]);
+            ok("and strictly wider on at least one side",
+                wideB[0] < flat[0] || wideB[1] > flat[1]);
+        }
+
+        Settings.resetBodyOrbs(Aspects.Profile.TRANSIT);
+        ok("and putting it back takes the contact out of the list again",
+            !listed(natal, tr, wanted));
+        double[] back = searchBounds(sw, natal, moving, target, type, jd, true);
+        ok("and the Search goes back to the flat width's passage",
+            back != null && flat != null && back[0] == flat[0] && back[1] == flat[1]);
+
+        // <b>The flat orb is the preset's default, not a separate number.</b> Before stage 3 this
+        // read the built-in constant, so a reader who set 2 degrees saw every unset point on the
+        // Transits preset claiming 1 while the engine judged at 2.
+        Transits.orb = 2.0;
+        near("every unset transit width follows the flat orb", 2.0,
+            Aspects.orbFor(moving, target, Aspects.Profile.TRANSIT));
+        near("and so does a point at the other end of the registry", 2.0,
+            Aspects.orbFor("Pluto", "Ascendant", Aspects.Profile.TRANSIT));
+        Transits.orb = Transits.DEFAULT_ORB;
+        Settings.resetBodyOrbs(Aspects.Profile.TRANSIT);
+    }
+
+    /**
+     * How long the Transit Search keeps this pair in orb around this moment, in days.
+     *
+     * <b>The span, not a count and not a coverage test.</b> Two earlier versions of this asked the
+     * wrong question. Coverage treated a NaN bound as infinite, so every passage covered
+     * everything. Counting assumed a contact 1.5 degrees off exact could not be inside a
+     * one-degree orb - but <b>a passage is a season</b>: the probe found Neptune trine natal
+     * Ascendant reported as one passage of 661 days with three exact hits, because Neptune enters
+     * orb, retrogrades out past 1.5 degrees and comes back. This class says so itself, that a
+     * retrograde season is one passage.
+     *
+     * <p>So the count is identical at both widths, correctly. What a wider orb changes is that the
+     * pair is entered earlier and left later, which is exactly the width showing through.
+     *
+     * <p><b>An open bound is the widest answer, not a missing one.</b> NaN on {@code enters}
+     * means the pair was already in orb when the scan began; on {@code leaves}, that it still was
+     * when the scan ended. Read as minus and plus infinity they order correctly against real
+     * bounds, which is what lets this compare a passage that fits inside the scan with one that
+     * runs past it.
+     *
+     * @return {@code {enters, leaves}} of the widest passage, or null when none is reported
+     */
+    private static double[] searchBounds(SwissEph sw, ChartFrame natal, String moving,
+                                         String target, Aspects.Type type, double jd,
+                                         boolean readerWidths) {
+        java.util.List<TransitSearch.Passage> ps = readerWidths
+            ? TransitSearch.searchAtReaderWidths(sw, natal, java.util.List.of(moving),
+                java.util.List.of(target), java.util.List.of(type), jd - 2.0, jd + 2.0)
+            : TransitSearch.search(sw, natal, java.util.List.of(moving),
+                java.util.List.of(target), java.util.List.of(type), Transits.DEFAULT_ORB,
+                jd - 2.0, jd + 2.0);
+        double[] out = null;
+        for (TransitSearch.Passage p : ps) {
+            double enters = Double.isNaN(p.enters) ? Double.NEGATIVE_INFINITY : p.enters;
+            double leaves = Double.isNaN(p.leaves) ? Double.POSITIVE_INFINITY : p.leaves;
+            if (out == null || enters < out[0] || leaves > out[1]) {
+                out = new double[]{
+                    out == null ? enters : Math.min(out[0], enters),
+                    out == null ? leaves : Math.max(out[1], leaves)};
+            }
+        }
+        return out;
+    }
+
+    private static boolean listed(ChartFrame natal, ChartFrame tr, String wanted) {
+        for (Transits.Hit h : Transits.toNatal(natal, tr, null, null, 0, false)) {
+            if (key(h.transiting, h.natal, h.type).equals(wanted)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ------------------------------------------------------------------ D
 
     private static void season(SwissEph sw) {
@@ -309,6 +469,14 @@ public final class TransitOrbCheck {
         checks++;
         if (!condition) {
             failures.add(label);
+        }
+    }
+
+    /** As ok, but says what it got - a width that is merely "wrong" is not a useful report. */
+    private static void near(String label, double expect, double got) {
+        checks++;
+        if (Math.abs(expect - got) > 1e-9) {
+            failures.add(label + " (expected " + expect + ", got " + got + ")");
         }
     }
 }

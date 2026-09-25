@@ -172,6 +172,50 @@ public final class TransitSearch {
         if (orb <= 0.0 || jdTo <= jdFrom) {
             throw new IllegalArgumentException("need a positive orb and a window that runs forward");
         }
+        return run(sw, natal, transiting, natalPoints, types, orb, jdFrom, jdTo);
+    }
+
+    /**
+     * The same search at <b>the reader's own transit widths</b>, one per pair.
+     *
+     * <p>Stage 3 made the Transits preset's per-point widths real for the reading lists. Left
+     * alone, this class would have gone on judging every pair at the flat orb, so a reader who
+     * widened Pluto would have seen a contact in the Report and Synthesis lists that the Transit
+     * Search could not find - F3's guarantee broken by the commit meant to tidy it up.
+     *
+     * <p><b>This is an override beside a rule, not the rule written twice.</b> The preset is the
+     * rule; {@link #search(SwissEph, ChartFrame, Collection, Collection, Collection, double,
+     * double, double)} is the explicit flat width a reader types for one search, and what the
+     * suites use when they want to name the number themselves.
+     */
+    public static List<Passage> searchAtReaderWidths(SwissEph sw, ChartFrame natal,
+                                       Collection<String> transiting,
+                                       Collection<String> natalPoints,
+                                       Collection<Aspects.Type> types,
+                                       double jdFrom, double jdTo) {
+        if (jdTo <= jdFrom) {
+            throw new IllegalArgumentException("need a window that runs forward");
+        }
+        return run(sw, natal, transiting, natalPoints, types, Double.NaN, jdFrom, jdTo);
+    }
+
+    /**
+     * One pair's width: the flat one when a caller named it, the Transits preset's otherwise.
+     *
+     * <b>NaN is the sentinel and never leaves this class</b> - the two public faces decide which
+     * they mean, so no caller can pass it by accident.
+     */
+    private static double widthFor(String body, String target, double flat) {
+        return Double.isNaN(flat)
+            ? Aspects.orbFor(body, target, Aspects.Profile.TRANSIT)
+            : flat;
+    }
+
+    private static List<Passage> run(SwissEph sw, ChartFrame natal,
+                                     Collection<String> transiting,
+                                     Collection<String> natalPoints,
+                                     Collection<Aspects.Type> types,
+                                     double flat, double jdFrom, double jdTo) {
         List<Passage> out = new ArrayList<>();
         for (String body : transiting) {
             if (Almanac.iplOf(body) < 0) {
@@ -179,10 +223,27 @@ public final class TransitSearch {
             }
             double lo = jdFrom - reach(body);
             double hi = jdTo + reach(body);
+            // <b>The step comes from the NARROWEST width this body will be judged at.</b> Once
+            // widths differ per pair, taking the first or the widest would sample too coarsely
+            // for the tightest of them, and a passage could open and close between two samples
+            // unseen. Narrower is always safe; wider is not.
+            double narrowest = Double.MAX_VALUE;
+            for (ChartFrame.Body target : natal.bodies) {
+                if (target == null || !target.ok) {
+                    continue;
+                }
+                if (natalPoints != null && !natalPoints.contains(target.name)) {
+                    continue;
+                }
+                narrowest = Math.min(narrowest, widthFor(body, target.name, flat));
+            }
+            if (narrowest == Double.MAX_VALUE) {
+                continue;               // nothing in this chart to search this body against
+            }
             // Under half the time the fastest motion takes to cross the whole orb, capped: at
             // least two samples always land inside any passage, so none can open and close
             // between them unseen.
-            double step = Math.min(4.0, 0.9 * orb / maxSpeed(body));
+            double step = Math.min(4.0, 0.9 * narrowest / maxSpeed(body));
             // Longitudes along the scan are shared by every target and aspect for this body.
             double[] grid = sampleGrid(sw, body, lo, hi, step);
             List<Station> stations = stationsOnGrid(sw, body, grid, lo, step);
@@ -197,7 +258,8 @@ public final class TransitSearch {
                 // A body aspecting its own natal place is kept: Saturn conjunct natal Saturn is
                 // the Saturn return, which is among the first things anyone searches for.
                 for (Aspects.Type type : types) {
-                    out.addAll(passages(sw, body, target.name, target.lon, type, orb,
+                    out.addAll(passages(sw, body, target.name, target.lon, type,
+                        widthFor(body, target.name, flat),
                         lo, hi, step, grid, stations, jdFrom, jdTo));
                 }
             }

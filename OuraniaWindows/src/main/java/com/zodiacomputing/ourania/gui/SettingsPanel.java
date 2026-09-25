@@ -1850,20 +1850,26 @@ public class SettingsPanel extends JPanel {
         row.add(lZodiac);
         row.add(zodiacCombo);
 
-        // The one transit orb: the readings' transit lists, the Transit Search and the Transit
-        // Calendar all judge "in orb" by it. Saved and applied at once, like the zodiac.
+        // <b>The Transits preset's default width</b>, and the only control the Transit Search
+        // and Calendar read. Stage 3: the per-point spinners on the Transits preset override it
+        // one point at a time, so this is a default with exceptions and not a second control over
+        // the same number. Saved and applied at once, like the zodiac.
         transitOrb = new javax.swing.JSpinner(new javax.swing.SpinnerNumberModel(
             Settings.transitOrb(), Settings.TRANSIT_ORB_MIN, Settings.TRANSIT_ORB_MAX, 0.25));
         transitOrb.setToolTipText("<html>How close a transit must be to exact to count, in degrees "
-            + "either side.<br>One width for every transit: the Report and Synthesis lists, the "
-            + "Transit Search and the Transit Calendar.<br>Default 1&deg;. A convention, not a "
-            + "measured value: see the note on Transits.orb.</html>");
+            + "either side.<br>The width <b>every</b> transiting point uses: the Report and "
+            + "Synthesis lists,<br>the Transit Search and the Transit Calendar."
+            + "<br><br>To give one point a wider transit orb than the rest, set it on the"
+            + "<br><b>Transits</b> preset under Orbs; this stays the default for everything"
+            + "<br>you have not set there."
+            + "<br><br>Default 1&deg;. A convention, not a measured value: see the note on "
+            + "Transits.orb.</html>");
         transitOrb.addChangeListener(e -> {
             Settings.setTransitOrb(((Number) transitOrb.getValue()).doubleValue());
             status.setText("Saved");
             if (window != null) window.applyBodySelection();
         });
-        JLabel lOrb = new JLabel("Transit orb (°): ");
+        JLabel lOrb = new JLabel("Transit orb, all points (°): ");
         lOrb.setForeground(TEXT);
         row.add(lOrb);
         row.add(transitOrb);
