@@ -26,6 +26,7 @@ public class OuraniaWindow extends JFrame {
     private DrawerRail chartRail;
     private javax.swing.JEditorPane natalPane;
     private javax.swing.JEditorPane transitPane;
+    private javax.swing.JEditorPane synastryPane;
     private javax.swing.JEditorPane selectionPane;
     /** The right rail: what the app can do, and the grid that is read against the wheel. */
     private DrawerRail menuRail;
@@ -38,6 +39,15 @@ public class OuraniaWindow extends JFrame {
     /** Left-rail page names, shared with the wheel and with NavigationCheck. */
     public static final String CHART_PAGE = "Chart";
     public static final String TRANSITS_PAGE = "Transits";
+    /**
+     * What Chart A and Chart B do to each other.
+     *
+     * <b>Its own page since 26 Sep.</b> The cross-chart contacts and house overlays used to sit
+     * at the foot of the Transits panel, which is a panel about the outer ring - so the one
+     * thing that belongs to neither chart alone was filed under one of them. David asked for
+     * the tab; the astrology was already there.
+     */
+    public static final String SYNASTRY_PAGE = "Synastry";
     public static final String SELECTION_PAGE = "Selection";
     public static final String READING_PAGE = "Interpretation";
 
@@ -164,10 +174,12 @@ public class OuraniaWindow extends JFrame {
         // exactly as the right-hand drawer behaves.
         natalPane = HtmlPanes.chartPane(this);
         transitPane = HtmlPanes.chartPane(this);
+        synastryPane = HtmlPanes.chartPane(this);
         selectionPane = HtmlPanes.chartPane(this);
         chartRail = new DrawerRail(Drawer.Side.LEFT, 340);
         chartRail.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
         chartRail.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
+        chartRail.addPage(SYNASTRY_PAGE, HtmlPanes.scroller(synastryPane));
         // <b>Selection and the reading join the chart's own side.</b> All four answer "what
         // am I looking at" - the chart, the sky over it, the body just clicked, and what that
         // means - so they belong on one edge, leaving the right for what the app can do.
@@ -567,7 +579,21 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /** Kept so anything still calling the three-part form goes on working. */
     public void updateChartSections(String natalHtml, String transitHtml, String gridHtml) {
+        updateChartSections(natalHtml, transitHtml, gridHtml, "");
+    }
+
+    public void updateChartSections(String natalHtml, String transitHtml, String gridHtml,
+            String synastryHtml) {
+        if (synastryPane != null) {
+            HtmlPanes.setHtml(synastryPane, synastryHtml);
+        }
+        if (chartRail != null) {
+            // Greyed unless there are two people, for the reason the Transits page is greyed
+            // without transits: a tab that opens onto nothing reads as broken rather than empty.
+            chartRail.setPageEnabled(SYNASTRY_PAGE, hasContent(synastryHtml));
+        }
         if (natalPane != null) {
             HtmlPanes.setHtml(natalPane, natalHtml);
         }

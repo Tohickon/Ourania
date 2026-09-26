@@ -8104,7 +8104,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.window.updateChartSections(
                 this.generatePlanetPlacementsHtml(PlacementPart.NATAL),
                 this.generatePlanetPlacementsHtml(PlacementPart.TRANSITS),
-                this.generatePlanetPlacementsHtml(PlacementPart.GRID));
+                this.generatePlanetPlacementsHtml(PlacementPart.GRID),
+                this.generatePlanetPlacementsHtml(PlacementPart.SYNASTRY));
         }
         this.refreshTimeReadout();
         this.refreshReadingIfShown();
@@ -8335,8 +8336,23 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         ALL,
         /** Chart header, aspect patterns, and the base chart's placements. */
         NATAL,
-        /** Transit or Chart B placements, the sky ring, and synastry cross-contacts. */
+        /**
+         * The outer ring's placements, and the sky ring's.
+         *
+         * <b>No longer "or Chart B, and the cross-contacts".</b> This part used to hold three
+         * different things under one name, which is why a reader who opened a tab called
+         * Transits found Chart B in it. The cross-contacts have their own part now.
+         */
         TRANSITS,
+        /**
+         * What Chart A and Chart B do to each other: the cross-chart placements and house
+         * overlays.
+         *
+         * <b>Its own page because it is its own question.</b> "Where is their Venus in my
+         * houses" is not a fact about either chart alone, and it was buried at the foot of a
+         * panel about the outer ring - David, 26 Sep, asked for it to have a tab.
+         */
+        SYNASTRY,
         /** The aspect grid and its legend. */
         GRID
     }
@@ -8389,6 +8405,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         final boolean wantNatal = part == PlacementPart.ALL || part == PlacementPart.NATAL;
         final boolean wantTransits = part == PlacementPart.ALL || part == PlacementPart.TRANSITS;
         final boolean wantGrid = part == PlacementPart.ALL || part == PlacementPart.GRID;
+        final boolean wantSynastry = part == PlacementPart.ALL || part == PlacementPart.SYNASTRY;
         int n;
         int n2;
         String stringArray;
@@ -8515,11 +8532,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // Cross-chart placement, above the grid because it outranks it: a body on the
         // other person's Ascendant is a larger fact than any single cell of the
         // matrix, and house overlays are invisible to that matrix altogether.
-        if (wantTransits && this.chartMode == ChartMode.SYNASTRY) {
+        if (wantSynastry && this.chartMode == ChartMode.SYNASTRY) {
             stringBuilder.append(this.generateSynastryCrossHtml());
         }
         // A drawer that asked only for placements stops here; the grid part, or the whole
         // document, goes on to build the table.
+        if (part == PlacementPart.SYNASTRY) {
+            stringBuilder.append("</body></html>");
+            return stringBuilder.toString();
+        }
         if (!wantGrid) {
             stringBuilder.append("</body></html>");
             return stringBuilder.toString();

@@ -284,6 +284,7 @@ public final class NavigationCheck {
             ok("the rail has a page for the reading " + r[0], pages.contains(r[0]));
         }
         for (String p : new String[] {OuraniaWindow.CHART_PAGE, OuraniaWindow.TRANSITS_PAGE,
+                                      OuraniaWindow.SYNASTRY_PAGE,
                                       OuraniaWindow.SELECTION_PAGE,
                                       OuraniaWindow.READING_PAGE}) {
             ok("the rail has a page for " + p, pages.contains(p));
