@@ -1609,7 +1609,45 @@ public class ChartSetupPanel extends JPanel {
         return field;
     }
     
-    private void generateChart() {
+    /**
+     * The six form values, so a caller that borrows this screen can put it back (B8).
+     *
+     * <b>Restored by replaying, not by a second route.</b> A batch leaves the form showing the
+     * last chart it generated; putting the reader's own chart back means writing these six values
+     * and calling {@link #generateChart} again, which is the same door the reader uses. Re-casting
+     * from stored subjects instead would be a second way to reach a drawn chart, and the two
+     * would disagree the first time either changed.
+     */
+    String[] formSnapshot() {
+        return new String[] {
+            baseDateField.getText(), baseTimeField.getText(), baseLocationField.getText(),
+            transitDateField.getText(), transitTimeField.getText(), transitLocationField.getText(),
+        };
+    }
+
+    void formRestore(String[] values) {
+        if (values == null || values.length < 6) {
+            return;
+        }
+        baseDateField.setText(values[0]);
+        baseTimeField.setText(values[1]);
+        baseLocationField.setText(values[2]);
+        transitDateField.setText(values[3]);
+        transitTimeField.setText(values[4]);
+        transitLocationField.setText(values[5]);
+    }
+
+    /**
+     * Package-private since B8: a batch loads each chart the way a reader does.
+     *
+     * <b>Not made public, and not copied.</b> This method is where eight form fields become a
+     * drawn chart, including the geocoding of a place name; a batch that built subjects of its
+     * own would be a second route to a cast chart, and the two would drift the first time either
+     * changed. It is asynchronous - there is a SwingWorker in here - which is why
+     * {@link BatchReports} waits on the wheel showing the chart it asked for rather than
+     * assuming this call finished the job.
+     */
+    void generateChart() {
         String bDate = baseDateField.getText().trim();
         String bTime = baseTimeField.getText().trim();
         String bLoc = baseLocationField.getText().trim();

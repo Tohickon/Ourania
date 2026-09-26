@@ -21,6 +21,22 @@ public class OuraniaWindow extends JFrame {
     private HeliocentricPanel heliocentricPanel;
 
     private ChartSetupPanel chartSetupPanel;
+
+    // <b>Package-private, for B8 and for the suites.</b> A batch has to load a chart through the
+    // setup panel, cast it through the wheel and read the result out of the interpretation pane -
+    // the same three it would if a reader were clicking. Exposed by accessor rather than by
+    // loosening the fields, so nothing outside this package can reach them.
+    SkymapPanel skymap() {
+        return this.skymapPanel;
+    }
+
+    InterpretationPanel interpretation() {
+        return this.interpretationPanel;
+    }
+
+    ChartSetupPanel chartSetup() {
+        return this.chartSetupPanel;
+    }
     private SidePanel sidePanel;
     /** The left rail: what this chart is, opposite the menu that says what the app does. */
     private DrawerRail chartRail;
@@ -916,6 +932,7 @@ public class OuraniaWindow extends JFrame {
             case "SAVE_GRID":          exportAspectGrid(); break;
             case "SAVE_READING_PDF":   exportReadingPdf(); break;
             case "PRINT_READING":      printReading(); break;
+            case "BATCH_REPORTS":      BatchReportDialog.open(this); break;
             case "SAVE_READING":       exportReadingHtml(); break;
             case "SAVE_READING_TEXT":  exportReadingText(); break;
             case "COPY_READING":       copyReading(); break;

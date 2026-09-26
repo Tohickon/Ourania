@@ -4553,7 +4553,8 @@ extends JPanel {
         }.execute();
     }
 
-    private void showReading(final ReadingTier readingTier) {
+    /** Package-private since B8, so a batch can ask for the same reading a reader would. */
+    void showReading(final ReadingTier readingTier) {
         if (this.sw == null || this.natalRing.sd == null || this.window == null || readingTier == ReadingTier.NONE) {
             return;
         }
@@ -8818,7 +8819,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         SIGN_NAMES = new String[]{"Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"};
     }
 
-    private static enum ReadingTier {
+    static enum ReadingTier {
         NONE,
         PARAGRAPH,
         REPORT,

@@ -171,6 +171,10 @@ public final class SidePanel extends JPanel {
             "The reading on screen, as plain text"));
         export.add(exportButton("Copy Reading", "COPY_READING",
             "The reading on screen to the clipboard, as plain text"));
+        // B8. Below the single-chart exports because it does the same thing many times, and a
+        // reader looking for it will look here rather than under the chart book.
+        export.add(exportButton("Reports for Many Charts…", "BATCH_REPORTS",
+            "A PDF report for every chart you choose, into a folder of your choosing"));
         accordion.addSection(EXPORT, export);
 
         JLabel heading = new JLabel("Ourania+", SwingConstants.CENTER);
