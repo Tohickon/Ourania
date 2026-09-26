@@ -154,6 +154,25 @@ public class SettingsPanel extends JPanel {
      */
     private boolean bulkUpdate;
 
+    /**
+     * The search box, its results, and what it found last.
+     *
+     * <b>The index is built once the whole screen exists and read off the screen</b>, not listed
+     * here - see {@link SettingsSearch}. A control added to this file next year is searchable the
+     * day it is added, which a hand-kept list would not be.
+     */
+    private javax.swing.JTextField searchField;
+    private javax.swing.JPopupMenu searchPopup;
+    private javax.swing.JList<Object> searchList;
+    private javax.swing.JScrollPane searchScroll;
+    private javax.swing.DefaultListModel<Object> searchModel;
+    private java.util.List<SettingsSearch.Hit> searchIndex = java.util.Collections.emptyList();
+
+    /** What is currently ringed, and the border it had before it was. */
+    private Component flashed;
+    private javax.swing.border.Border flashedBorder;
+    private javax.swing.Timer flashTimer;
+
     public SettingsPanel(OuraniaWindow window) {
         this.window = window;
         setLayout(new BorderLayout());
@@ -184,6 +203,14 @@ public class SettingsPanel extends JPanel {
         backRow.add(back);
         header.add(backRow, BorderLayout.WEST);
         header.add(title, BorderLayout.CENTER);
+        // <b>The one thing that may sit above the tab strip, and the rule says why.</b> 819b2e4a
+        // put the presets and Saved Settings inside the tabs because the strip JUMPED - the
+        // preset bar was hidden on the two tabs it governs nothing on - and because the tabs were
+        // being pushed down for the least used thing on the screen. Neither is true here: a
+        // search governs all four tabs and is never hidden, so nothing moves; and it is the one
+        // control a reader reaches for when they do not know which tab to open. A search that
+        // lived on a tab could not reach the other three, which is the whole point of it.
+        header.add(searchRow(), BorderLayout.EAST);
         add(header, BorderLayout.NORTH);
 
         // <b>One column per tab, and `body` points at whichever is being filled.</b> Every
@@ -679,6 +706,274 @@ public class SettingsPanel extends JPanel {
 
         refreshStatus();
         constructing = false;
+
+        // Last, because it walks the finished screen. See SettingsSearch for why it is read off
+        // the tabs rather than written down.
+        this.searchIndex = SettingsSearch.index(this.tabs);
+    }
+
+    /** What the search box can find, for the suite that holds it. */
+    java.util.List<SettingsSearch.Hit> searchHits() {
+        return this.searchIndex;
+    }
+
+    // ------------------------------------------------------------------ H4b, the search
+
+    /**
+     * Find a setting.
+     *
+     * <b>216 controls across four tabs</b> - counted, not estimated; the Bodies &amp; Points tab
+     * alone carries 126 of them, one colour, one tick and one width for each of 32 points. That
+     * is well past what anyone can scan, and until now the only way to find a setting you had not
+     * used recently was to open all four tabs and read.
+     *
+     * <b>It reveals rather than filters.</b> Hiding the controls that do not match would leave a
+     * reader looking at a screen whose shape changes as they type, and would have to be undone
+     * before anything could be changed. Choosing a result switches to the tab that holds the
+     * control, scrolls it into view and rings it for two seconds, which answers the question the
+     * reader actually asked - <i>where is it</i> - and leaves the screen alone.
+     */
+    private JPanel searchRow() {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        row.setBackground(Theme.BG);
+
+        JLabel caption = new JLabel("Find a setting:");
+        caption.setForeground(DIM);
+        caption.setFont(Theme.font("Arial", Font.PLAIN, 12));
+
+        searchField = new javax.swing.JTextField(20);
+        searchField.setFont(Theme.font("Arial", Font.PLAIN, 13));
+        searchField.setForeground(TEXT);
+        searchField.setCaretColor(TEXT);
+        searchField.setBackground(new Color(28, 28, 28));
+        searchField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(70, 70, 70), 1),
+            BorderFactory.createEmptyBorder(4, 7, 4, 7)));
+        searchField.setToolTipText("<html>Type part of a setting's name, or a word from its "
+            + "hover.<br>Choosing a result opens the tab it is on and rings it. "
+            + "<b>Every word has to match</b>, so \"sun orb\" finds the Sun's width rather than "
+            + "everything on the screen with the word orb in it.</html>");
+
+        searchModel = new javax.swing.DefaultListModel<>();
+        searchList = new javax.swing.JList<>(searchModel);
+        searchList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        searchList.setBackground(new Color(28, 28, 28));
+        searchList.setCellRenderer(searchCell());
+        searchList.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                revealSetting(searchList.getSelectedValue());
+            }
+        });
+
+        searchScroll = new javax.swing.JScrollPane(searchList);
+        searchScroll.setBorder(null);
+        searchScroll.getViewport().setBackground(new Color(28, 28, 28));
+        // <b>No sideways scrollbar.</b> With one, a result list four rows deep spent one of the
+        // four rows on the bar and clipped the last result out of sight - measured on a
+        // photograph of it. The rows are given the width they need instead, up to a limit, and
+        // anything past that is clipped rather than scrolled to.
+        searchScroll.setHorizontalScrollBarPolicy(
+            javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        searchPopup = new javax.swing.JPopupMenu();
+        searchPopup.setBorder(BorderFactory.createLineBorder(new Color(70, 70, 70), 1));
+        // <b>The popup must not take the focus</b>, or the first keystroke after it opens goes to
+        // the list and the reader is typing into nothing.
+        searchPopup.setFocusable(false);
+        searchPopup.add(searchScroll);
+
+        searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                refreshSearch();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                refreshSearch();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                refreshSearch();
+            }
+        });
+        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                int code = e.getKeyCode();
+                if (code == java.awt.event.KeyEvent.VK_DOWN) {
+                    moveSearch(1);
+                    e.consume();
+                } else if (code == java.awt.event.KeyEvent.VK_UP) {
+                    moveSearch(-1);
+                    e.consume();
+                } else if (code == java.awt.event.KeyEvent.VK_ENTER) {
+                    revealSetting(searchList.getSelectedValue());
+                    e.consume();
+                } else if (code == java.awt.event.KeyEvent.VK_ESCAPE) {
+                    searchPopup.setVisible(false);
+                    e.consume();
+                }
+            }
+        });
+
+        row.add(caption);
+        row.add(searchField);
+        return row;
+    }
+
+    /** A result reads as what it is, then where it is. */
+    private javax.swing.ListCellRenderer<Object> searchCell() {
+        return (list, value, index, selected, focus) -> {
+            JLabel cell = new JLabel();
+            cell.setOpaque(true);
+            cell.setBorder(BorderFactory.createEmptyBorder(5, 9, 5, 9));
+            cell.setFont(Theme.font("Arial", Font.PLAIN, 13));
+            cell.setBackground(selected ? ACCENT : new Color(28, 28, 28));
+            if (value instanceof SettingsSearch.Hit) {
+                SettingsSearch.Hit hit = (SettingsSearch.Hit) value;
+                cell.setForeground(TEXT);
+                String dim = selected ? "#D8E6FF" : "#8C8C8C";
+                cell.setText("<html><b>" + forHtml(hit.label()) + "</b>&#160;&#160;<font "
+                    + "color='" + dim + "'>" + forHtml(hit.kind())
+                    + "</font>&#160;&#160;&#160;<font color='" + dim + "'>"
+                    + forHtml(hit.where()) + "</font></html>");
+            } else {
+                cell.setForeground(DIM);
+                cell.setText(String.valueOf(value));
+            }
+            return cell;
+        };
+    }
+
+    /**
+     * Text going into a label that is being rendered as HTML.
+     *
+     * <b>Several sections have an ampersand in the name</b> - "Luminaries &amp; Personal
+     * Planets", "Aspects &amp; Orbs" - and an unescaped one makes Swing's HTML renderer eat the
+     * rest of the entity it thinks has started.
+     */
+    private static String forHtml(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    private void moveSearch(int by) {
+        if (searchModel.isEmpty()) {
+            return;
+        }
+        int at = searchList.getSelectedIndex() + by;
+        if (at < 0) {
+            at = searchModel.getSize() - 1;
+        }
+        if (at >= searchModel.getSize()) {
+            at = 0;
+        }
+        searchList.setSelectedIndex(at);
+        searchList.ensureIndexIsVisible(at);
+    }
+
+    private void refreshSearch() {
+        if (searchField == null) {
+            return;
+        }
+        String typed = searchField.getText();
+        java.util.List<SettingsSearch.Hit> hits = SettingsSearch.find(searchIndex, typed);
+        searchModel.clear();
+        if (typed.trim().isEmpty()) {
+            searchPopup.setVisible(false);
+            return;
+        }
+        if (hits.isEmpty()) {
+            // <b>Said, not left blank.</b> An empty popup and no popup at all look the same, and
+            // the reader cannot tell "no such setting" from "the search is broken".
+            searchModel.addElement("Nothing on this screen matches \u201c" + typed.trim() + "\u201d");
+        } else {
+            // Thirty is past the point where a reader is reading rather than refining.
+            for (int i = 0; i < Math.min(hits.size(), 30); i++) {
+                searchModel.addElement(hits.get(i));
+            }
+            searchList.setSelectedIndex(0);
+        }
+        // <b>As tall as what is in it.</b> A fixed height left one result sitting at the top
+        // of an otherwise empty box two hundred pixels deep, which reads as a list still
+        // loading rather than as the one answer.
+        Dimension want = searchList.getPreferredSize();
+        searchScroll.setPreferredSize(new Dimension(
+            Math.max(430, Math.min(want.width + 26, 720)),
+            Math.max(30, Math.min(want.height + 6, 264))));
+        if (!searchPopup.isVisible() && searchField.isShowing()) {
+            searchPopup.show(searchField, 0, searchField.getHeight() + 2);
+            // Showing a popup takes the keyboard focus back to the window; the reader is still
+            // typing.
+            searchField.requestFocusInWindow();
+        }
+        searchPopup.pack();
+    }
+
+    /**
+     * Open the tab it is on, bring it into view, and ring it.
+     *
+     * <b>Package-private so the suite can press it.</b> Everything else about the search can be
+     * asserted from the index, which is exactly the trap this project keeps walking into: an
+     * index full of correct answers that no control is wired to. See SettingsSearchCheck Part G.
+     */
+    void revealSetting(Object value) {
+        if (!(value instanceof SettingsSearch.Hit)) {
+            return;
+        }
+        final SettingsSearch.Hit hit = (SettingsSearch.Hit) value;
+        searchPopup.setVisible(false);
+        if (tabs != null && hit.tab >= 0 && hit.tab < tabs.getTabCount()) {
+            tabs.setSelectedIndex(hit.tab);
+        }
+        // After the tab has been laid out, or the scroll is computed against the old one.
+        SwingUtilities.invokeLater(() -> {
+            Component c = hit.control;
+            if (c instanceof JComponent) {
+                // <b>Room above and below.</b> Scrolling exactly to the control lands it hard
+                // against the top edge, where it reads as the first thing on the tab rather than
+                // the thing that was found.
+                ((JComponent) c).scrollRectToVisible(
+                    new Rectangle(0, -70, c.getWidth(), c.getHeight() + 140));
+            }
+            flash(c);
+        });
+    }
+
+    /**
+     * Ring a control for two seconds.
+     *
+     * <b>It costs two pixels while it is on</b>, because the ring is compounded outside whatever
+     * border the control already had rather than replacing it - a spinner or a combo that lost
+     * its own border for two seconds would look broken rather than found. The row it is in grows
+     * by four pixels and shrinks back.
+     */
+    private void flash(Component c) {
+        if (!(c instanceof JComponent)) {
+            return;
+        }
+        if (flashTimer != null && flashTimer.isRunning()) {
+            flashTimer.stop();
+            unflash();
+        }
+        JComponent target = (JComponent) c;
+        flashed = target;
+        flashedBorder = target.getBorder();
+        target.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(ACCENT, 2), flashedBorder));
+        flashTimer = new javax.swing.Timer(2200, e -> unflash());
+        flashTimer.setRepeats(false);
+        flashTimer.start();
+    }
+
+    private void unflash() {
+        if (flashed instanceof JComponent) {
+            ((JComponent) flashed).setBorder(flashedBorder);
+        }
+        flashed = null;
+        flashedBorder = null;
     }
 
     /**
@@ -891,6 +1186,8 @@ public class SettingsPanel extends JPanel {
         JLabel name = new JLabel(group.title);
         name.setForeground(new Color(173, 216, 230));
         name.setFont(Theme.font("Arial", Font.BOLD, 14));
+        // A group box's title is the heading for everything in the box - see heading().
+        name.putClientProperty(SettingsSearch.HEADING, Boolean.TRUE);
         name.setAlignmentX(Component.LEFT_ALIGNMENT);
         name.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 12));
         panel.add(name);
@@ -2359,6 +2656,12 @@ public class SettingsPanel extends JPanel {
         JLabel l = new JLabel(text);
         l.setForeground(TEXT);
         l.setFont(Theme.font("Arial", Font.BOLD, 17));
+        // <b>Marked, so the search does not have to guess from a font.</b> The first version of
+        // SettingsSearch took any bold label for a heading, and Swing's default JLabel font IS
+        // bold - so every row label on the Engine Rules tab became a section title and each
+        // control was filed under the setting above it. Marking it here means a heading written
+        // later is marked by construction.
+        l.putClientProperty(SettingsSearch.HEADING, Boolean.TRUE);
         l.setAlignmentX(Component.LEFT_ALIGNMENT);
         // Two pixels of slack on the right. A JLabel gets exactly its preferred width in a
         // BoxLayout, and a one-pixel disagreement between the metrics that computed it and
