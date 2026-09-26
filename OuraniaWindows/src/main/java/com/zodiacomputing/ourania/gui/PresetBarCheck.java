@@ -208,9 +208,16 @@ public final class PresetBarCheck {
 
     // ------------------------------------------------------------------ F
 
-    /** The four tabs David named, in his order. Spelled here so a rename has to be deliberate. */
+    /**
+     * The tabs David named, in his order. Spelled here so a rename has to be deliberate.
+     *
+     * <b>Report was added for B7 on 26 Sep, and this list had to be edited by hand for that
+     * commit to go green</b> - which is the point of writing it out rather than reading the
+     * count off the pane. A fifth tab appearing because a section boundary moved, rather than
+     * because somebody meant it, is exactly what this catches.
+     */
     private static final String[] TABS = {
-        "Globe & Display", "Aspects & Orbs", "Bodies & Points", "Engine Rules",
+        "Globe & Display", "Aspects & Orbs", "Bodies & Points", "Engine Rules", "Report",
     };
 
     /**
@@ -229,7 +236,7 @@ public final class PresetBarCheck {
         if (pane == null) {
             return;
         }
-        ok("four of them", pane.getTabCount() == TABS.length);
+        ok("five of them (" + pane.getTabCount() + ")", pane.getTabCount() == TABS.length);
         for (int i = 0; i < Math.min(TABS.length, pane.getTabCount()); i++) {
             ok("tab " + i + " is " + TABS[i], TABS[i].equals(pane.getTitleAt(i)));
             ok("and says what it holds", pane.getToolTipTextAt(i) != null

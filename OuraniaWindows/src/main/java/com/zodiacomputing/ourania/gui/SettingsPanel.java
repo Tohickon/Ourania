@@ -168,6 +168,10 @@ public class SettingsPanel extends JPanel {
     private javax.swing.DefaultListModel<Object> searchModel;
     private java.util.List<SettingsSearch.Hit> searchIndex = java.util.Collections.emptyList();
 
+    /** B7's logo path box and the note under it saying why a logo is not being used. */
+    private javax.swing.JTextField logoField;
+    private JLabel logoNote;
+
     /** What is currently ringed, and the border it had before it was. */
     private Component flashed;
     private javax.swing.border.Border flashedBorder;
@@ -222,6 +226,7 @@ public class SettingsPanel extends JPanel {
         JPanel aspects = column();
         JPanel points = column();
         JPanel engine = column();
+        JPanel report = column();
 
         // Chart Settings first, and it is an engine rule: harmonic, house system, what the
         // animation moves.
@@ -647,6 +652,20 @@ public class SettingsPanel extends JPanel {
         body.add(fixed(bodyGroupColumns(enabled)));
 
         body.add(Box.createRigidArea(new Dimension(0, 16)));
+        body = report;
+        body.add(heading("Your Name on the Report"));
+        body.add(note("A reading you give a client carries your name, not this app's. "
+            + "Everything here is optional, and with all of it blank a report comes out "
+            + "exactly as it did before - no cover page, no footer, no logo."));
+        body.add(Box.createRigidArea(new Dimension(0, 12)));
+        body.add(fixed(reportIdentity()));
+        body.add(Box.createRigidArea(new Dimension(0, 18)));
+        body.add(heading("What the Report Includes"));
+        body.add(note("Both apply only once there is a name, a contact line or a logo to put "
+            + "on them, so a cover page can never come out carrying nothing but a date."));
+        body.add(Box.createRigidArea(new Dimension(0, 8)));
+        body.add(fixed(reportParts()));
+
         body = engine;
         body.add(variantToggles());
         body = aspects;
@@ -676,6 +695,7 @@ public class SettingsPanel extends JPanel {
         this.tabs.addTab("Aspects & Orbs", tabScroll(aspects));
         this.tabs.addTab("Bodies & Points", tabScroll(points));
         this.tabs.addTab("Engine Rules", tabScroll(engine));
+        this.tabs.addTab("Report", tabScroll(report));
         this.tabs.setToolTipTextAt(0, "<html>What the wheel and the globe look like:"
             + "<br>colours, rings, markers and the globe's own layers.</html>");
         this.tabs.setToolTipTextAt(1, "<html>Which aspects are drawn, and how wide each may be"
@@ -684,6 +704,8 @@ public class SettingsPanel extends JPanel {
             + "<br>how wide an aspect to each may be. The preset above applies here too.</html>");
         this.tabs.setToolTipTextAt(3, "<html>What the engine computes rather than how it is"
             + "<br>drawn: house system, harmonic, zodiac, transit orb and the variants.</html>");
+        this.tabs.setToolTipTextAt(4, "<html>Whose report it is: the name, contact line and logo"
+            + "<br>that go on a reading you give somebody else.</html>");
 
         // <b>Painted here, not by the platform.</b> Windows draws a selected tab almost white,
         // which against this screen's light text makes the tab you are on the one you cannot read.
@@ -985,7 +1007,219 @@ public class SettingsPanel extends JPanel {
      * got a fraction of the slack. Width too: a GridBagLayout centres its contents in whatever
      * width it is handed, which is why the aspect list sat in the middle of the screen.
      */
-    private static JPanel fixed(JPanel p) {
+    /**
+     * Who prepared the report (B7).
+     *
+     * <b>Saved as it is typed, like everything else on this screen.</b> There is no Apply button
+     * anywhere here, and adding one for two text fields would be the state where the box and the
+     * file disagree - see this class's own opening comment about the checkbox and the wheel.
+     */
+    private JPanel reportIdentity() {
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setBackground(Color.BLACK);
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(4, 0, 4, 8);
+        gc.anchor = GridBagConstraints.WEST;
+
+        gc.gridy = 0;
+        gc.gridx = 0;
+        p.add(fieldLabel("Prepared by:"), gc);
+        gc.gridx = 1;
+        p.add(settingField(ReportTemplate.PRACTITIONER_KEY, 26,
+            "<html>The name at the top of the cover page and in the footer of every page."
+                + "<br>Your name, or your practice's.</html>"), gc);
+
+        gc.gridy = 1;
+        gc.gridx = 0;
+        p.add(fieldLabel("Contact line:"), gc);
+        gc.gridx = 1;
+        p.add(settingField(ReportTemplate.CONTACT_KEY, 26,
+            "<html>One line under your name on the cover - an email address, a website,"
+                + "<br>a phone number, or all three. It is printed exactly as typed.</html>"), gc);
+
+        gc.gridy = 2;
+        gc.gridx = 0;
+        p.add(fieldLabel("Logo:"), gc);
+        gc.gridx = 1;
+        p.add(logoRow(), gc);
+
+        gc.gridy = 3;
+        gc.gridx = 1;
+        logoNote = new JLabel(" ");
+        logoNote.setFont(Theme.font("Arial", Font.ITALIC, 11));
+        logoNote.setForeground(new Color(230, 150, 130));
+        p.add(logoNote, gc);
+        refreshLogoNote();
+        return p;
+    }
+
+    /**
+     * The logo picker.
+     *
+     * <b>The path is shown and not editable.</b> A reader typing a path by hand gets it wrong in
+     * ways this screen would then have to explain; Choose gives a file that exists by
+     * construction, and the note under it covers the one case that still goes wrong - a file
+     * that was there when it was chosen and is not there now.
+     */
+    private JPanel logoRow() {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        row.setBackground(Color.BLACK);
+
+        logoField = new javax.swing.JTextField(20);
+        logoField.setEditable(false);
+        logoField.setFont(Theme.font("Arial", Font.PLAIN, 12));
+        logoField.setForeground(DIM);
+        logoField.setBackground(new Color(24, 24, 24));
+        logoField.setBorder(BorderFactory.createLineBorder(new Color(70, 70, 70), 1));
+        logoField.setText(shortPath(ReportTemplate.logoPath()));
+        logoField.setToolTipText("<html>A PNG, JPEG or GIF printed at the top of the cover page,"
+            + "<br>scaled to fit and never enlarged past its own size.</html>");
+
+        JButton choose = new JButton("Choose…");
+        Widgets.styleButton(choose, Widgets.Role.TRANSPORT);
+        choose.setToolTipText("Pick an image file to print on the cover page.");
+        choose.addActionListener(e -> {
+            javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+            fc.setDialogTitle("Choose a logo");
+            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
+                "Images (PNG, JPEG, GIF)", "png", "jpg", "jpeg", "gif"));
+            String now = ReportTemplate.logoPath();
+            if (!now.isEmpty()) {
+                java.io.File at = new java.io.File(now);
+                if (at.getParentFile() != null && at.getParentFile().isDirectory()) {
+                    fc.setCurrentDirectory(at.getParentFile());
+                }
+            }
+            if (fc.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+                Settings.set(ReportTemplate.LOGO_KEY, fc.getSelectedFile().getAbsolutePath());
+                logoField.setText(shortPath(ReportTemplate.logoPath()));
+                refreshLogoNote();
+                refreshStatus();
+                status.setText("Saved");
+            }
+        });
+
+        JButton clear = new JButton("Clear");
+        Widgets.styleButton(clear, Widgets.Role.TRANSPORT);
+        clear.setToolTipText("Print no logo on the cover page.");
+        clear.addActionListener(e -> {
+            Settings.set(ReportTemplate.LOGO_KEY, "");
+            logoField.setText("");
+            refreshLogoNote();
+            status.setText("Saved");
+        });
+
+        row.add(logoField);
+        row.add(choose);
+        row.add(clear);
+        return row;
+    }
+
+    /** Says why a chosen logo is not going to appear, where it was chosen. */
+    private void refreshLogoNote() {
+        if (logoNote == null) {
+            return;
+        }
+        String problem = ReportTemplate.logoProblem();
+        logoNote.setText(problem == null ? " " : problem);
+    }
+
+    /** The tail of a long path, because the whole of one pushes the buttons off the screen. */
+    private static String shortPath(String path) {
+        if (path == null || path.isEmpty()) {
+            return "";
+        }
+        return path.length() <= 46 ? path : "…" + path.substring(path.length() - 45);
+    }
+
+    private JPanel reportParts() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(Color.BLACK);
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JCheckBox cover = new JCheckBox("A cover page before the wheel",
+            ReportTemplate.cover());
+        style(cover);
+        cover.setToolTipText("<html>A page of its own carrying the logo, your name and contact"
+            + "<br>line, then whose chart it is and when it was cast.</html>");
+        cover.addItemListener(e -> {
+            ReportTemplate.setCover(cover.isSelected());
+            status.setText("Saved");
+        });
+
+        JCheckBox foot = new JCheckBox("Your name and a page number at the foot of every page",
+            ReportTemplate.footer());
+        style(foot);
+        foot.setToolTipText("<html>A hairline, your name on the left and the page number on the"
+            + "<br>right. The page is made shorter to make room, so a long reading"
+            + "<br>may run to one more page than it does without this.</html>");
+        foot.addItemListener(e -> {
+            ReportTemplate.setFooter(foot.isSelected());
+            status.setText("Saved");
+        });
+
+        p.add(cover);
+        p.add(foot);
+        return p;
+    }
+
+    private void style(JCheckBox box) {
+        box.setForeground(TEXT);
+        box.setBackground(Color.BLACK);
+        box.setFont(Theme.font("Arial", Font.PLAIN, 13));
+        box.setFocusPainted(false);
+        box.setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+
+    private JLabel fieldLabel(String text) {
+        JLabel l = new JLabel(text);
+        l.setForeground(TEXT);
+        l.setFont(Theme.font("Arial", Font.PLAIN, 13));
+        return l;
+    }
+
+    /** A text box that writes its key as it is typed. */
+    private javax.swing.JTextField settingField(String key, int columns, String tip) {
+        final javax.swing.JTextField f = new javax.swing.JTextField(
+            Settings.get(key, ""), columns);
+        f.setFont(Theme.font("Arial", Font.PLAIN, 13));
+        f.setForeground(TEXT);
+        f.setCaretColor(TEXT);
+        f.setBackground(new Color(28, 28, 28));
+        f.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(70, 70, 70), 1),
+            BorderFactory.createEmptyBorder(3, 6, 3, 6)));
+        f.setToolTipText(tip);
+        f.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            private void save() {
+                if (constructing || seeding) {
+                    return;
+                }
+                Settings.set(key, f.getText());
+                status.setText("Saved");
+            }
+
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                save();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                save();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                save();
+            }
+        });
+        return f;
+    }
+
+        private static JPanel fixed(JPanel p) {
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.setMaximumSize(p.getPreferredSize());
         return p;

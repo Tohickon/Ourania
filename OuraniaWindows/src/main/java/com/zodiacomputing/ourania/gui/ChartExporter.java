@@ -241,14 +241,34 @@ public final class ChartExporter {
     private static class ReportPrintable implements Printable {
         private final Component chart;
         private final Printable textPrintable;
+        private final String chartName;
+        private final String castLine;
+        /** 1 when a cover is being drawn, and the offset every later page is shifted by. */
+        private final int coverPages;
 
         ReportPrintable(Component chart, JEditorPane editorPane) {
+            this(chart, editorPane, "", "");
+        }
+
+        ReportPrintable(Component chart, JEditorPane editorPane, String chartName,
+                        String castLine) {
             this.chart = chart;
             this.textPrintable = editorPane.getPrintable(null, null);
+            this.chartName = chartName == null ? "" : chartName;
+            this.castLine = castLine == null ? "" : castLine;
+            // <b>Decided once, here.</b> Asking ReportTemplate on every page would let the answer
+            // change half way through an export if the settings file were edited underneath it,
+            // and every page after that would be numbered against a different offset.
+            this.coverPages = ReportTemplate.wantsCover() ? 1 : 0;
         }
 
         @Override
         public int print(java.awt.Graphics g, PageFormat page, int index) throws PrinterException {
+            if (this.coverPages > 0 && index == 0) {
+                ReportTemplate.drawCover((Graphics2D) g, page, this.chartName, this.castLine);
+                return Printable.PAGE_EXISTS;
+            }
+            index -= this.coverPages;
             if (index == 0) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.translate(page.getImageableX(), page.getImageableY());
@@ -265,6 +285,8 @@ public final class ChartExporter {
             } else {
                 return textPrintable.print(g, page, index - 1);
             }
+            // index was decremented by coverPages above, so the reading still starts at its own
+            // page 0 whether or not there is a cover in front of it.
         }
     }
 
@@ -353,6 +375,12 @@ public final class ChartExporter {
 
     /** B3. Saves the chart wheel and the reading as a PDF, through a save dialog. */
     static void saveReadingPdf(Component parent, Component chart, JEditorPane editorPane) {
+        saveReadingPdf(parent, chart, editorPane, "", "");
+    }
+
+    /** The same, told whose chart it is (B7). */
+    static void saveReadingPdf(Component parent, Component chart, JEditorPane editorPane,
+                               String chartName, String castLine) {
         if (!hasReading(editorPane)) {
             warn(parent, "There is no reading to save.");
             return;
@@ -371,7 +399,7 @@ public final class ChartExporter {
             return;
         }
         try {
-            writeReadingPdf(chart, editorPane, file);
+            writeReadingPdf(chart, editorPane, file, chartName, castLine);
         } catch (Exception | LinkageError e) {
             // A PDF that failed half way is not a shorter PDF, it is a broken file under the name
             // the reader chose; leaving it behind would look like success.
@@ -395,13 +423,30 @@ public final class ChartExporter {
      */
     static void writeReadingPdf(Component chart, JEditorPane editorPane, File file)
             throws Exception {
-        ReportPrintable printable = new ReportPrintable(chart, editorPane);
+        writeReadingPdf(chart, editorPane, file, "", "");
+    }
+
+    /**
+     * The same, told whose chart it is, so the cover page can say (B7).
+     *
+     * <b>The three-argument form is kept</b> rather than every caller being changed in the same
+     * commit as the behaviour - the rule this project has followed since updateChartSections.
+     */
+    static void writeReadingPdf(Component chart, JEditorPane editorPane, File file,
+                                String chartName, String castLine)
+            throws Exception {
+        ReportPrintable printable = new ReportPrintable(chart, editorPane, chartName, castLine);
         PageFormat pf = new PageFormat();
         java.awt.print.Paper paper = new java.awt.print.Paper();
         paper.setSize(PDF_PAGE_W, PDF_PAGE_H);
+        // <b>The footer's band comes out of the imageable area, not over it.</b> The reading is
+        // laid out against whatever height it is given, so drawing a footer into that height puts
+        // it through the last line of text on every page. See ReportTemplate.FOOTER_BAND.
+        double band = ReportTemplate.footerBand();
         paper.setImageableArea(PDF_MARGIN, PDF_MARGIN,
-            PDF_PAGE_W - 2 * PDF_MARGIN, PDF_PAGE_H - 2 * PDF_MARGIN);
+            PDF_PAGE_W - 2 * PDF_MARGIN, PDF_PAGE_H - 2 * PDF_MARGIN - band);
         pf.setPaper(paper);
+        final int coverPages = ReportTemplate.wantsCover() ? 1 : 0;
 
         Document document = new Document(new com.lowagie.text.Rectangle(PDF_PAGE_W, PDF_PAGE_H));
         try (java.io.OutputStream out = new java.io.FileOutputStream(file)) {
@@ -416,6 +461,13 @@ public final class ChartExporter {
                 int drawn;
                 try {
                     drawn = printable.print(g2, pf, page);
+                    // Drawn here rather than after the dispose, and never on the cover: a cover
+                    // page carrying "Page 1" would number the report from the wrong sheet.
+                    int number = ReportTemplate.footerNumber(page, coverPages);
+                    if (drawn != Printable.NO_SUCH_PAGE && ReportTemplate.wantsFooter()
+                        && number > 0) {
+                        ReportTemplate.drawFooter(g2, pf, number);
+                    }
                 } finally {
                     g2.dispose();
                 }

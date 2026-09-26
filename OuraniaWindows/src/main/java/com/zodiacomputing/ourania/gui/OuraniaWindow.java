@@ -877,7 +877,15 @@ public class OuraniaWindow extends JFrame {
     /** B3. The reading on screen with the chart wheel, as a PDF document. */
     public void exportReadingPdf() {
         if (interpretationPanel != null && skymapPanel != null) {
-            ChartExporter.saveReadingPdf(this, skymapPanel.chartComponent(), interpretationPanel.getEditorPane());
+            // <b>Asked of the subject, which is the one thing that knows.</b> label is what
+            // the reader called this chart and summary() is the line a control uses to say what
+            // it will draw - writing either out again here would be a second copy of a rule this
+            // project has already had six copies of once.
+            com.zodiacomputing.ourania.astro.ChartSubject who = skymapPanel.chartASubject();
+            ChartExporter.saveReadingPdf(this, skymapPanel.chartComponent(),
+                interpretationPanel.getEditorPane(),
+                who == null ? "" : who.label,
+                who == null ? "" : who.summary());
         }
     }
 
