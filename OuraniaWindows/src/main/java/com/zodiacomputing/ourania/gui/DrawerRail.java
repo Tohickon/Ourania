@@ -180,6 +180,37 @@ public final class DrawerRail extends JPanel {
         repaintTabs();
     }
 
+    /**
+     * Change what a page is called, without changing what it is.
+     *
+     * <b>Because a page's contents can be one of several things.</b> The wheel's outer ring
+     * holds Chart B in a synastry, the sky in a transit chart and this person moved on when
+     * progressed, and one fixed tab name cannot be honest about all three - which is what sent
+     * David's Chart B into a panel headed "Transits". The name comes from
+     * {@code WheelRing.Kind.label}, so the tab says what the ring says.
+     *
+     * <p>A page with no label of its own shows its identity, which is what every page did before
+     * this existed.
+     */
+    public void setPageLabel(String page, String shown) {
+        for (Tab t : tabs) {
+            if (t.label.equals(page)) {
+                t.rename(shown == null || shown.trim().isEmpty() ? page : shown.trim());
+                return;
+            }
+        }
+    }
+
+    /** What a page is currently called. */
+    public String pageLabel(String page) {
+        for (Tab t : tabs) {
+            if (t.label.equals(page)) {
+                return t.shown;
+            }
+        }
+        return page;
+    }
+
     /** Whether a page can currently be opened. */
     public boolean isPageEnabled(String label) {
         return !disabled.contains(label);
@@ -280,13 +311,37 @@ public final class DrawerRail extends JPanel {
     /** One tab: the page name turned on its side, sized to the words it holds. */
     private final class Tab extends JComponent {
 
+        /** What identifies this page. Never changes; the rail and the card layout key on it. */
         private final String label;
+        /**
+         * What the reader sees, which is not always the same thing.
+         *
+         * <b>The outer wheel is a second person in a synastry, a later moment in a transit chart
+         * and the same person moved on when progressed</b> - so a tab called "Transits" was
+         * telling two readers in three the wrong thing. The page keeps one identity and shows
+         * whichever name is true now; see {@link DrawerRail#setPageLabel}.
+         */
+        private String shown;
         private boolean hover;
+
+        /** Take a new name, and re-measure: a longer word needs a taller tab. */
+        void rename(String name) {
+            if (name.equals(this.shown)) {
+                return;
+            }
+            this.shown = name;
+            setToolTipText(name + " - click to open or close this panel");
+            revalidate();
+            rail.revalidate();
+            rail.repaint();
+        }
 
         Tab(String label) {
             this.label = label;
+            this.shown = label;
             setCursor(new Cursor(Cursor.HAND_CURSOR));
             setToolTipText(label + " - click to open or close this panel");
+            setName(label);
             setAlignmentY(0.0f);
             setAlignmentX(0.5f);
             addMouseListener(new MouseAdapter() {
@@ -318,7 +373,7 @@ public final class DrawerRail extends JPanel {
         @Override
         public Dimension getPreferredSize() {
             FontMetrics fm = getFontMetrics(Theme.HEADING);
-            return new Dimension(RAIL_WIDTH, fm.stringWidth(label) + 46);
+            return new Dimension(RAIL_WIDTH, fm.stringWidth(shown) + 46);
         }
 
         @Override
@@ -345,7 +400,7 @@ public final class DrawerRail extends JPanel {
             FontMetrics fm = g2.getFontMetrics();
             // Triangles, as on Drawer's handle; see Theme.font for why they were once "<".
             String arrow = side == Drawer.Side.LEFT ? (on ? "\u25C2" : "\u25B8") : (on ? "\u25B8" : "\u25C2");
-            String text = arrow + "  " + label;
+            String text = arrow + "  " + shown;
             g2.rotate(-Math.PI / 2.0);
             int textX = -(getHeight() + fm.stringWidth(text)) / 2;
             int textY = (getWidth() + fm.getAscent()) / 2 - 2;

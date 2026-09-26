@@ -528,6 +528,45 @@ public class OuraniaWindow extends JFrame {
      * Natal and transits to the left rail, the grid to the top drawer, and the right-hand
      * drawer told only that the chart changed so it can refresh its saved-chart list.
      */
+    /**
+     * Give the two chart panels the names of the rings they are actually showing.
+     *
+     * <b>"Transits" was telling two readers in three the wrong thing.</b> The outer wheel is a
+     * second person in a synastry and this person moved on when progressed, and a fixed tab name
+     * cannot be honest about all three - so David opened a panel headed Transits and found Chart
+     * B in it, 26 Sep. The inner wheel has the same problem in a composite, where it belongs to
+     * nobody.
+     *
+     * <b>The names come from {@code WheelRing.Kind}</b>, which is the one place that already
+     * knows what each ring holds. A seventh copy of that rule, written out here as a ternary on
+     * the chart mode, is exactly how the previous six got out of step.
+     */
+    private void nameTheChartPages() {
+        if (chartRail == null || skymapPanel == null) {
+            return;
+        }
+        chartRail.setPageLabel(CHART_PAGE, title(skymapPanel.natalRing.kind));
+        chartRail.setPageLabel(TRANSITS_PAGE, skymapPanel.outerRingDrawn()
+            ? title(skymapPanel.outerRing.kind)
+            : (skymapPanel.triRingDrawn() ? title(skymapPanel.skyRing.kind) : TRANSITS_PAGE));
+    }
+
+    /** A ring's own word, as a tab heading rather than as running prose. */
+    private static String title(WheelRing.Kind kind) {
+        if (kind == null) {
+            return CHART_PAGE;
+        }
+        switch (kind) {
+            case CHART_A:    return "Chart A";
+            case COMPOSITE:  return "Composite";
+            case CHART_B:    return "Chart B";
+            case PROGRESSED: return "Progressed";
+            case TRANSIT:    return "Transits";
+            case SKY:        return "Sky";
+            default:         return CHART_PAGE;
+        }
+    }
+
     public void updateChartSections(String natalHtml, String transitHtml, String gridHtml) {
         if (natalPane != null) {
             HtmlPanes.setHtml(natalPane, natalHtml);
@@ -542,6 +581,7 @@ public class OuraniaWindow extends JFrame {
         // that sees the section and it already has it in hand.
         if (chartRail != null) {
             chartRail.setPageEnabled(TRANSITS_PAGE, hasContent(transitHtml));
+            nameTheChartPages();
         }
         if (gridPane != null) {
             HtmlPanes.setHtml(gridPane, gridHtml);

@@ -8467,7 +8467,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 stringBuilder.append(this.formatPlanetPlacement(n2, this.outerRing.lon[n2], this.outerRing.speed[n2], "transit_"));
             }
         }
-        if (wantTransits && this.showTriWheel) {
+        // <b>Whether the sky ring is DRAWN, not whether it is wrapped around two people.</b>
+        // This asked showTriWheel, whose own javadoc says it means "the sky is wrapped around
+        // the synastry bi-wheel" - so a chart of Chart A and the sky, with no Chart B, emitted
+        // no sky placements at all and the reader saw only Chart A. David, 26 Sep. The same
+        // method already asks triRingDrawn() a hundred lines further down, which is the
+        // question both places wanted.
+        if (wantTransits && this.triRingDrawn()) {
             stringBuilder.append("<br><h2 style='color:#a0d2ff; margin-bottom: 2px;'>Sky (Transiting)</h2>");
             String stringSkyTime = this.skyRing.time != null ? this.skyRing.time.format(dateTimeFormatter) : "";
             // Its own coordinates. This printed Chart B's, which is the same borrowing the
