@@ -7813,8 +7813,25 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             && (s.placeName == null || s.placeName.trim().isEmpty()));
     }
 
-    /** Set once the sky's place has been settled, so a missing home is not looked up every frame. */
+    /**
+     * Set once the sky's place has been settled, so a missing home is not looked up every frame.
+     *
+     * <b>Set on success only.</b> It used to be set on entry, before anything had been found -
+     * so an app opened with no home location and no Chart A gave up on the first frame and never
+     * tried again, and the sky went on being cast at 0,0 in the Atlantic off Africa however many
+     * charts were entered afterwards. That is the defect c2a0f803 closed on 20 Sep, reopened by
+     * its own guard. David, 26 Sep: "the location is off for chart The Sky Now ... 0.00, 0.00".
+     */
     private boolean skyPlaceSettled;
+
+    /**
+     * The home location already looked up and not found, so the network is not asked twice.
+     *
+     * <b>Separate from {@link #skyPlaceSettled}, which is the point.</b> Not finding a place is
+     * a reason to stop asking the geocoder about THAT string; it is not a reason to stop wanting
+     * a place. Conflating the two is what made the sky permanently homeless.
+     */
+    private String skyPlaceTried;
 
     /**
      * <b>The sky is read from where the reader is, and had no place at all.</b>
@@ -7840,10 +7857,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.skyPlaceSettled || !placeless(this.subjectSky)) {
             return;
         }
-        this.skyPlaceSettled = true;
         String home = Settings.get("home.location",
             Settings.get("default.transit.location", "")).trim();
-        Geocoder.Result there = home.isEmpty() ? null : this.syncGeocode(home);
+        // Asked once per home string, not once per session: a lookup that failed tells us
+        // nothing about a Chart A entered five minutes later.
+        Geocoder.Result there = null;
+        if (!home.isEmpty() && !home.equals(this.skyPlaceTried)) {
+            this.skyPlaceTried = home;
+            there = this.syncGeocode(home);
+        }
         if (there != null) {
             this.subjectSky = this.subjectSky.movedTo(there.name, there.lat, there.lon,
                 there.tzId == null || there.tzId.isEmpty() ? this.skyTimeZoneId : there.tzId);
@@ -7851,8 +7873,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.subjectSky = this.subjectSky.movedTo(this.subjectA.placeName,
                 this.subjectA.latitude, this.subjectA.longitude, this.subjectA.zoneId);
         } else {
+            // <b>Nothing to place it with YET.</b> Returning without settling is the whole fix:
+            // the next call, once a home is saved or a Chart A is entered, tries again.
             return;
         }
+        this.skyPlaceSettled = true;
         this.castRoles();
     }
 

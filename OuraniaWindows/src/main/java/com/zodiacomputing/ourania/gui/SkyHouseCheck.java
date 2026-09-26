@@ -93,6 +93,50 @@ public final class SkyHouseCheck {
         ok("an empty place is ignored rather than moving the sky to 0,0",
             Math.abs(p.skyRing.latitude - 51.5) < 0.01);
 
+        // ---- <b>The guard, which is how this defect came back.</b> Everything above runs with
+        // home.location already saved, so ensureSkyPlace succeeded on its first try and the
+        // one-shot flag was never the thing under test. A reader who has never saved a home and
+        // has not yet entered a chart takes the other path: the sky is placeless, nothing is
+        // available to place it with, and the flag said "settled" anyway - so it stayed at 0,0
+        // for the rest of the session however many charts arrived afterwards.
+        Settings.set("home.location", "");
+        Settings.set("default.transit.location", "");
+        OuraniaWindow[] bare = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> bare[0] = new OuraniaWindow());
+        Thread.sleep(2500);
+        SkymapPanel q = (SkymapPanel) fs.get(bare[0]);
+
+        SwingUtilities.invokeAndWait(() -> {
+            q.setComposition(false, false);
+            q.updateChartData();
+        });
+        Thread.sleep(800);
+        // It may well be at 0,0 here, and that is honest - there is nothing to place it with.
+        boolean nowhereYet = Math.abs(q.skyRing.latitude) < 0.01
+            && Math.abs(q.skyRing.longitude) < 0.01;
+
+        // <b>Now a chart with a real place arrives.</b> Turning Chart A on is not enough - a
+        // fresh install has no chart data either, and then 0,0 is the honest answer rather than
+        // the defect. The first version of this assertion missed that and failed against a
+        // correct fix, which is its own small lesson about asserting the scenario you meant.
+        com.zodiacomputing.ourania.astro.ChartSubject a =
+            com.zodiacomputing.ourania.astro.ChartSubject.of("Chart A",
+                java.time.ZonedDateTime.now(java.time.ZoneId.of("America/New_York")),
+                "Philadelphia", HOME_LAT, HOME_LON, "America/New_York", false);
+        SwingUtilities.invokeAndWait(() -> {
+            q.installSubjects(a, null, q.skySubject());
+            q.setComposition(true, false);
+            q.updateChartData();
+        });
+        Thread.sleep(800);
+        ok("with no home saved, the sky is placed once a chart is entered - it was "
+            + (nowhereYet ? "at 0,0" : "already placed") + " and is now "
+            + String.format("%.2f, %.2f", q.skyRing.latitude, q.skyRing.longitude),
+            Math.abs(q.skyRing.latitude) > 0.01 || Math.abs(q.skyRing.longitude) > 0.01);
+        ok("and it is Chart A's place, which is the only place there is",
+            Math.abs(q.skyRing.latitude - q.natalRing.latitude) < 0.01
+                && Math.abs(q.skyRing.longitude - q.natalRing.longitude) < 0.01);
+
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
