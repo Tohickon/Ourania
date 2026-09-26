@@ -617,14 +617,7 @@ public class SettingsPanel extends JPanel {
 
         boolean[] enabled = Settings.loadBodySelection();
 
-        JPanel groups = new JPanel(new GridLayout(0, 2, 24, 14));
-        groups.setBackground(Color.BLACK);
-        groups.setAlignmentX(Component.LEFT_ALIGNMENT);
-        for (Bodies.Group group : Bodies.Group.values()) {
-            groups.add(groupPanel(group, enabled));
-        }
-        groups.setAlignmentX(Component.LEFT_ALIGNMENT);
-        body.add(fixed(groups));
+        body.add(fixed(bodyGroupColumns(enabled)));
 
         body.add(Box.createRigidArea(new Dimension(0, 16)));
         body = engine;
@@ -841,6 +834,52 @@ public class SettingsPanel extends JPanel {
         return scroll;
     }
 
+    /**
+     * The body groups, in two columns, each box the height of what is in it.
+     *
+     * <b>They were in a {@code GridLayout}, which gives every cell the height of the tallest.</b>
+     * Calculated Points has fourteen rows and The Lunar Nodes has two, so every box on the tab
+     * was 530 pixels tall: 1059 pixels of void across the five, and the worst of it 306 pixels
+     * inside the first box a reader sees. Worse than empty space, the space was in the middle -
+     * BoxLayout hands spare height to any child whose maximum allows it, and inside a box the
+     * only such child was the All/None row, so that row floated in the hole and the points were
+     * pushed to the bottom of the box. David, 26 Sep: "a huge upper margin gap that should be
+     * closed."
+     *
+     * <b>The guarantee is that every box has a finite maximum height</b> - see the cap on the
+     * All/None row in {@link #groupPanel}, which was the one child whose maximum did not, and so
+     * the one BoxLayout could give the slack to. With that, a column can be handed more height
+     * than it needs and nothing inside it grows: BoxLayout tiles from the start of its axis and
+     * leaves the leftover at the end, which here is black space under the shorter column where
+     * nobody can see it. A first draft also pinned each stack at NORTH, the trick
+     * {@link #tabScroll} uses on a whole tab; it is not here because mutating it away changed
+     * nothing measurable, and a guard no failure can reach is not a guard.
+     *
+     * <p>The two columns keep equal widths through a one-row {@code GridLayout}, and the groups
+     * are dealt left, right, left so the pairing reads down the screen as it did across it.
+     */
+    private JPanel bodyGroupColumns(boolean[] enabled) {
+        JPanel[] stacks = new JPanel[2];
+        JPanel columns = new JPanel(new GridLayout(1, stacks.length, 24, 0));
+        columns.setBackground(Color.BLACK);
+        columns.setAlignmentX(Component.LEFT_ALIGNMENT);
+        for (int i = 0; i < stacks.length; i++) {
+            stacks[i] = new JPanel();
+            stacks[i].setLayout(new BoxLayout(stacks[i], BoxLayout.Y_AXIS));
+            stacks[i].setBackground(Color.BLACK);
+            columns.add(stacks[i]);
+        }
+        int dealt = 0;
+        for (Bodies.Group group : Bodies.Group.values()) {
+            JPanel stack = stacks[dealt++ % stacks.length];
+            if (stack.getComponentCount() > 0) {
+                stack.add(Box.createRigidArea(new Dimension(0, 14)));
+            }
+            stack.add(groupPanel(group, enabled));
+        }
+        return columns;
+    }
+
     private JPanel groupPanel(Bodies.Group group, boolean[] enabled) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -877,7 +916,12 @@ public class SettingsPanel extends JPanel {
         bulk.setAlignmentX(Component.LEFT_ALIGNMENT);
         bulk.add(groupButton("All", group, true));
         bulk.add(groupButton("None", group, false));
-        panel.add(bulk);
+        // <b>Capped, so a box handed spare height puts it at the bottom.</b> This row was the
+        // only child of the box whose maximum would take slack, so it was where BoxLayout put
+        // all of it - the two buttons floating in the middle of a 306 pixel hole with the points
+        // pushed below it. bodyGroupColumns means there is no slack to hand out any more; this
+        // keeps the hole from coming back through the middle if there ever is.
+        panel.add(fixed(bulk));
 
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
 

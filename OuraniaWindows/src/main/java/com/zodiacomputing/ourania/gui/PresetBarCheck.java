@@ -36,6 +36,10 @@ import java.util.List;
  *     {@code Settings.setAspectCap} then silently clamps: the screen and the file disagreeing.</li>
  * <li><b>E</b> - Reset touches only what is on screen. The no-argument {@code resetBodyOrbs}
  *     clears all four profiles, so the button must not call it.</li>
+ * <li><b>G</b> - <b>geometry, which is the half of this screen no other suite looks at.</b>
+ *     Every assertion above would pass against a tab where the points had been pushed 300 pixels
+ *     down inside their own box, because a spinner reads and writes the same value wherever it
+ *     is drawn. This part measures the boxes after a real layout pass.</li>
  * </ul>
  */
 public final class PresetBarCheck {
@@ -58,6 +62,7 @@ public final class PresetBarCheck {
         part("D: a ceiling's bound moves with the profile", PresetBarCheck::bound);
         part("E: Reset touches only what is on screen", PresetBarCheck::reset);
         part("F: the four tabs, and what is on each", PresetBarCheck::tabs);
+        part("G: no group box is bigger than what is in it", PresetBarCheck::noVoid);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -305,6 +310,174 @@ public final class PresetBarCheck {
             }
         }
         return -1;
+    }
+
+    // ------------------------------------------------------------------ G
+
+    /**
+     * The five body group boxes, each the height of its own contents.
+     *
+     * <b>Measured after a layout pass, because a preferred size is not what a reader sees.</b>
+     * Until 26 Sep the boxes sat in a {@code GridLayout}, which gives every cell the height of
+     * the tallest: Calculated Points has fourteen rows and The Lunar Nodes has two, so all five
+     * were 530 pixels tall against preferred heights of 247, 260, 157, 397 and 530 - and
+     * BoxLayout handed the 283 spare pixels in the first box to the one child that would take
+     * them, the All/None row, which then floated in the middle of the hole with the points
+     * beneath it. David, 26 Sep: "a huge upper margin gap that should be closed."
+     *
+     * <b>Five claims, because each catches a different way back.</b> A box no taller than its
+     * contents catches the grid; a box that will not accept more height than it needs catches
+     * the cap on the All/None row coming off; nothing inside a box stretched past its own
+     * preferred height catches the hole moving to some other child; a column starting at the top
+     * of its half catches the hole reopening one level up, above the first box instead of inside
+     * it; and the whole block being shorter than the boxes laid end to end catches a single
+     * column, which would have no void in it and still be twice as long as the screen.
+     */
+    private static void noVoid() throws Exception {
+        SettingsPanel p = laidOut();
+        javax.swing.JCheckBox[] all = (javax.swing.JCheckBox[]) CheckReflect.get(p, "boxes");
+        int tallest = 0;
+        int wanted = 0;
+        int width = -1;
+        Container block = null;
+        java.util.List<Container> columns = new ArrayList<>();
+        for (Bodies.Group group : Bodies.Group.values()) {
+            Container box = groupBox(all, group);
+            if (box == null) {
+                fail("no box on the screen is headed " + group.title);
+                continue;
+            }
+            int want = box.getPreferredSize().height;
+            wanted += want;
+            tallest = Math.max(tallest, box.getHeight());
+            ok(group.title + " is the height of what is in it (" + box.getHeight()
+                + " drawn, " + want + " wanted)", box.getHeight() <= want + 1);
+
+            for (Component kid : box.getComponents()) {
+                ok(group.title + ": " + describe(kid) + " is not stretched to fill a hole ("
+                    + kid.getHeight() + " drawn, " + kid.getPreferredSize().height + " wanted)",
+                    kid.getHeight() <= kid.getPreferredSize().height + 1);
+            }
+
+            // <b>And it will not accept more, wherever it is put next.</b> The box's own
+            // maximum was unbounded because the All/None row's was, which is what let BoxLayout
+            // put 283 pixels through the middle of it. Asserted rather than left to the parent,
+            // because the parent is what changed last time.
+            ok(group.title + " will not take more height than it needs ("
+                + box.getMaximumSize().height + " allowed, " + want + " wanted)",
+                box.getMaximumSize().height <= want + 1);
+
+            if (width < 0) {
+                width = box.getWidth();
+            }
+            ok(group.title + " is the same width as the others (" + box.getWidth()
+                + " against " + width + ")", Math.abs(box.getWidth() - width) <= 1);
+            block = box.getParent() == null ? null : box.getParent().getParent();
+            if (box.getParent() != null && !columns.contains(box.getParent())) {
+                columns.add(box.getParent());
+            }
+        }
+
+        // <b>And the boxes start at the top of the column.</b> Without this the hole comes
+        // back one level up and every assertion above still passes: a stack of correctly sized
+        // boxes handed a column taller than itself is centred in it by BoxLayout, which puts
+        // half the slack above the first box - the reported defect exactly, with the boxes now
+        // innocent. It is the NORTH in bodyGroupColumns that stops it.
+        ok("the boxes sit in " + columns.size() + " columns", columns.size() == 2);
+        for (int i = 0; i < columns.size(); i++) {
+            Container column = columns.get(i);
+            ok("column " + (i + 1) + " starts at the top of its half (" + column.getY() + ")",
+                column.getY() == 0);
+            ok("column " + (i + 1) + "'s first box starts at the top of it ("
+                + (column.getComponentCount() == 0 ? -1 : column.getComponent(0).getY()) + ")",
+                column.getComponentCount() > 0 && column.getComponent(0).getY() == 0);
+        }
+
+        // Two columns, not one: the block has to be shorter than the boxes end to end, or the
+        // whole tab is a single strip twice the height of the screen.
+        ok("the five boxes share two columns (" + (block == null ? -1 : block.getHeight())
+            + " tall, " + wanted + " laid end to end)",
+            block != null && block.getHeight() < wanted && block.getHeight() >= tallest);
+    }
+
+    /** What a child of a group box is, for the failure line. */
+    private static String describe(Component c) {
+        if (c instanceof javax.swing.JLabel) {
+            String t = ((javax.swing.JLabel) c).getText();
+            return "the label " + (t.length() > 30 ? t.substring(0, 30) : t);
+        }
+        return c.getClass().getSimpleName();
+    }
+
+    /**
+     * The box headed with this group's title.
+     *
+     * <b>Found by walking up from one of the group's own checkboxes</b> until an ancestor is
+     * holding a heading that reads the group's name, rather than by counting containers down
+     * from the tab. The tab's nesting is exactly what changed to close the gap, so a suite that
+     * knew the nesting would have needed editing to keep passing - and an assertion you have to
+     * edit to keep green is not one.
+     */
+    private static Container groupBox(javax.swing.JCheckBox[] all, Bodies.Group group) {
+        javax.swing.JCheckBox mine = null;
+        for (int i = 0; i < Bodies.count() && mine == null; i++) {
+            if (Bodies.at(i).group == group) {
+                mine = all[i];
+            }
+        }
+        for (Container c = mine; c != null; c = c.getParent()) {
+            for (Component kid : c.getComponents()) {
+                if (kid instanceof javax.swing.JLabel
+                    && group.title.equals(((javax.swing.JLabel) kid).getText())) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * A settings panel that has actually been laid out, on the Bodies and Points tab.
+     *
+     * <b>A panel nobody has sized has every component at 0x0</b>, so the measurements in Part G
+     * would all pass against anything. The window size is a wide one on purpose: a hole that only
+     * appears when there is spare height is not going to appear on a cramped screen.
+     */
+    private static SettingsPanel laidOut() throws Exception {
+        final SettingsPanel p = panel();
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            javax.swing.JFrame frame = new javax.swing.JFrame();
+            frame.setContentPane(p);
+            frame.setSize(1500, 950);
+            javax.swing.JTabbedPane pane = null;
+            try {
+                pane = (javax.swing.JTabbedPane) CheckReflect.get(p, "tabs");
+            } catch (Exception noTabs) {
+                fail("the settings panel has no tabs: " + noTabs);
+            }
+            if (pane != null) {
+                for (int i = 0; i < pane.getTabCount(); i++) {
+                    if (pane.getTitleAt(i).startsWith("Bodies")) {
+                        pane.setSelectedIndex(i);
+                    }
+                }
+            }
+            frame.validate();
+            p.setSize(1460, 900);
+            relayout(p);
+            frame.dispose();
+        });
+        return p;
+    }
+
+    /** Swing lays out lazily; this forces the whole tree so the bounds are the real ones. */
+    private static void relayout(Container c) {
+        c.doLayout();
+        for (Component kid : c.getComponents()) {
+            if (kid instanceof Container) {
+                relayout((Container) kid);
+            }
+        }
     }
 
     // ------------------------------------------------------------------ driving the panel
