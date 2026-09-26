@@ -88,6 +88,7 @@ final class HtmlPanes {
         pane.setBackground(Theme.SURFACE);
         pane.setForeground(Color.WHITE);
         pane.setOpaque(true);
+        dressForADarkScreen(pane);
         pane.addHyperlinkListener(e -> {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED && window != null) {
                 // E.g. href="base_0" for base sun, "transit_1" for transit moon
@@ -138,6 +139,47 @@ final class HtmlPanes {
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         Widgets.styleScrollPane(scroll);
         return scroll;
+    }
+
+    /**
+     * Give an HTML pane the theme's colours, once, for every pane in the app.
+     *
+     * <b>setForeground does not reach HTML text.</b> Swing's default HTML stylesheet paints body
+     * text black, and it wins over the component's foreground - so a pane on a background of
+     * RGB(16,21,33) renders black on near-black. David, 26 Sep: the Horary, Electional and
+     * Heliocentric screens were illegible.
+     *
+     * <b>Three screens forgot, and the reason is that there was nothing to forget to use.</b>
+     * Every screen was inlining its own colours - {@code InterpretationPanel} carries 203 of
+     * them - so the theme existed 203 times in one file and zero times in three others. This is
+     * the one copy. Inline styles still win where a screen wants something particular, which is
+     * why the existing screens are unaffected.
+     */
+    private static void dressForADarkScreen(JEditorPane pane) {
+        if (!(pane.getEditorKit() instanceof javax.swing.text.html.HTMLEditorKit)) {
+            return;
+        }
+        javax.swing.text.html.HTMLEditorKit kit =
+            (javax.swing.text.html.HTMLEditorKit) pane.getEditorKit();
+        javax.swing.text.html.StyleSheet css = kit.getStyleSheet();
+        String text = hex(Theme.TEXT);
+        String dim = hex(Theme.TEXT_DIM);
+        String rule = hex(Theme.EDGE);
+        css.addRule("body { color: " + text + "; font-family: Arial, sans-serif; font-size: 12px;"
+            + " margin: 12px; }");
+        css.addRule("p, li, td, div, span { color: " + text + "; }");
+        css.addRule("h1, h2, h3, h4, b, strong { color: #FFFFFF; }");
+        css.addRule("i, em, .dim { color: " + dim + "; }");
+        css.addRule("th { color: " + dim + "; text-align: left; border-bottom: 1px solid "
+            + rule + "; }");
+        css.addRule("td, th { padding: 2px 10px 2px 0; }");
+        css.addRule("a { color: " + hex(Theme.ACCENT) + "; }");
+        css.addRule("hr { color: " + rule + "; }");
+    }
+
+    /** A colour as CSS wants it. */
+    private static String hex(Color c) {
+        return String.format("#%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
     }
 
     static void setHtml(JEditorPane pane, String html) {

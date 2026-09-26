@@ -1276,6 +1276,44 @@ public final class Settings {
         return true;
     }
 
+    /**
+     * Put every setting on the configuration screen back to what it ships as (H4a).
+     *
+     * <b>The same boundary a saved set uses, deliberately.</b> "Everything on this screen" is a
+     * definition this file already holds - {@link #isPersonal} - and inventing a second list of
+     * what to clear would be this project's most logged defect: one rule written twice, the
+     * copies diverging the day one of them is edited. So this is exactly {@link #restoreSet}
+     * with nothing written back.
+     *
+     * <b>The reader's own keys are untouched.</b> Their chart, their saved places, their window
+     * and their home location are not configuration, and a Reset that lost a birth chart would
+     * be a far worse bug than the one it fixed. {@code SettingsSetCheck}'s fifty checks are
+     * deliberately negative about exactly this boundary, and they hold it for this too.
+     *
+     * <p>Defaults are what the code falls back to when a key is absent, so clearing IS
+     * restoring: there is no table of default values to keep in step with the accessors, and
+     * therefore no way for one to drift from the other.
+     *
+     * @return how many keys were cleared.
+     */
+    public static synchronized int resetAll() {
+        final int[] cleared = {0};
+        // Through update, for the reasons restoreSet gives: it is the one path that sets a
+        // corrupt file aside rather than overwriting it, drops the cache either side, and
+        // re-stamps the schema.
+        update(p -> {
+            for (String key : new java.util.ArrayList<>(p.stringPropertyNames())) {
+                if (!isPersonal(key)) {
+                    p.remove(key);
+                    cleared[0]++;
+                }
+            }
+        });
+        applyBodyOrbs();
+        applyAspectCaps();
+        return cleared[0];
+    }
+
     /** Forget a saved set. Returns false if it was not there. */
     public static synchronized boolean deleteSet(String name) {
         String fileName = setFileName(name);

@@ -318,6 +318,57 @@ public class SettingsPanel extends JPanel {
         });
         body.add(arcs);
 
+        // <b>H3's four settings, which had no control at all until now.</b> They were readable
+        // and had defaults and refused nonsense, and nothing on this screen showed them - which
+        // is the built-but-unreachable defect this project has closed three times this week, so
+        // it does not get to be opened a fourth.
+        body.add(heading("Aspect Lines"));
+        body.add(note("How the lines across the wheel are drawn. Colour says which aspect; "
+            + "these say how strong it is and which chart it belongs to."));
+
+        JCheckBox toBodies = new JCheckBox("Draw aspect lines out to the bodies",
+            Settings.aspectLinesToBodies());
+        styleCheck(toBodies);
+        toBodies.setToolTipText("<html><b>On:</b> a line touches the two bodies it joins."
+            + "<br><b>Off:</b> it spans an inner disc, keeping each body's longitude but stopping"
+            + "<br>short of the glyph - so the three rings' networks stay in three bands"
+            + "<br>instead of running through one another."
+            + "<br><br><i>Off reads better the more aspects are drawn; on is easier to follow"
+            + "<br>when there are few.</i></html>");
+        toBodies.addItemListener(e -> {
+            Settings.set(Settings.ASPECT_LINES_TO_BODIES_KEY,
+                toBodies.isSelected() ? "true" : "false");
+            status.setText("Saved");
+            applyPalette();
+        });
+        body.add(toBodies);
+
+        JCheckBox absolute = new JCheckBox("Measure strength in degrees, not as a share of the orb",
+            Settings.aspectWeightAbsolute());
+        styleCheck(absolute);
+        absolute.setToolTipText("<html><b>Off (the usual):</b> an aspect's strength is how much of"
+            + "<br>its allowed orb it uses. A 3&deg; conjunction reads tighter under a 10&deg;"
+            + "<br>orb than under a 5&deg; one - so widening your orbs makes every line"
+            + "<br>already drawn heavier."
+            + "<br><b>On:</b> strength is degrees from exact, so the picture holds still"
+            + "<br>while you are tuning orbs."
+            + "<br><br><i>Off keeps the minor aspects visible at their own scale.</i></html>");
+        absolute.addItemListener(e -> {
+            Settings.set(Settings.ASPECT_WEIGHT_ABSOLUTE_KEY,
+                absolute.isSelected() ? "true" : "false");
+            status.setText("Saved");
+            applyPalette();
+        });
+        body.add(absolute);
+
+        body.add(weightRow("Thinnest line", Settings.ASPECT_WEIGHT_MIN_KEY,
+            Settings.aspectWeightMin(),
+            "The width of the faintest aspect drawn - a loose minor one."));
+        body.add(weightRow("Thickest line", Settings.ASPECT_WEIGHT_MAX_KEY,
+            Settings.aspectWeightMax(),
+            "The width of an exact conjunction or opposition. Everything else falls between "
+                + "the two by how close it is and how much force the aspect carries."));
+
         JCheckBox signPlane = new JCheckBox("On the globe, fill the signs as a coloured shell",
             Settings.globeSignPlane());
         signPlane.setForeground(TEXT);
@@ -704,7 +755,52 @@ public class SettingsPanel extends JPanel {
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.add(toggle);
         p.add(body);
+        p.add(resetAllRow());
         return p;
+    }
+
+    /**
+     * Put every setting on this screen back to what it ships as (H4a).
+     *
+     * <b>It asks first, and says what it will not touch.</b> There is no undo on this screen, and
+     * a reader who has spent an evening on their orbs should not lose it to a stray click. The
+     * dialog names the boundary rather than leaving it to be discovered: their chart, their saved
+     * places and their window are not configuration and are never cleared.
+     *
+     * <p>Beside Saved Settings on purpose. A reader about to reset is a reader who might rather
+     * save first, and the two controls together say so.
+     */
+    private JPanel resetAllRow() {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        row.setBackground(Color.BLACK);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JButton b = bulkButton("Reset everything on this screen", () -> {
+            int answer = javax.swing.JOptionPane.showConfirmDialog(this,
+                "<html><b>Put every setting on this screen back to its default?</b><br><br>"
+                    + "That is the orbs and their presets, the aspects shown, the points, the"
+                    + "<br>palette, the house system and the engine rules.<br><br>"
+                    + "<b>Not touched:</b> your chart, your saved places, your home location"
+                    + "<br>and your window. Saved settings sets are kept too.<br><br>"
+                    + "There is no undo - save a set first if you might want this back.</html>",
+                "Reset settings", javax.swing.JOptionPane.OK_CANCEL_OPTION,
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            if (answer != javax.swing.JOptionPane.OK_OPTION) {
+                status.setText("Left alone");
+                return;
+            }
+            int cleared = Settings.resetAll();
+            status.setText("Reset " + cleared + (cleared == 1 ? " setting" : " settings"));
+            if (window != null) {
+                window.applyBodySelection();
+            }
+            applyPalette();
+        });
+        b.setToolTipText("<html>Every setting on this screen back to its default."
+            + "<br>Your chart, your places and your window are not settings"
+            + "<br>and are left alone. Asks before it does anything.</html>");
+        row.add(b);
+        row.setMaximumSize(row.getPreferredSize());
+        return row;
     }
 
     /** One tab's preset bar and its Reset, with a little room under the tab strip. */
@@ -1843,6 +1939,37 @@ public class SettingsPanel extends JPanel {
         if (window != null) {
             window.applyAspectSelection();
         }
+    }
+
+    /** A labelled width spinner for one of the aspect-line weights. */
+    private JPanel weightRow(String label, String key, double now, String hover) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        row.setBackground(Color.BLACK);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel l = new JLabel(label);
+        l.setForeground(TEXT);
+        l.setFont(Theme.BODY);
+        final javax.swing.JSpinner s = new javax.swing.JSpinner(
+            new javax.swing.SpinnerNumberModel(now, 0.1, 8.0, 0.1));
+        s.setToolTipText("<html>" + hover + "<br><i>In pixels.</i></html>");
+        s.addChangeListener(e -> {
+            Settings.set(key, String.valueOf(((Number) s.getValue()).doubleValue()));
+            status.setText("Saved");
+            applyPalette();
+        });
+        row.add(l);
+        row.add(s);
+        row.setMaximumSize(row.getPreferredSize());
+        return row;
+    }
+
+    /** The one place a checkbox on this screen is dressed. */
+    private void styleCheck(JCheckBox b) {
+        b.setForeground(TEXT);
+        b.setBackground(Color.BLACK);
+        b.setFont(Theme.BODY);
+        b.setFocusPainted(false);
+        b.setAlignmentX(Component.LEFT_ALIGNMENT);
     }
 
     private JPanel bulkButtons() {
