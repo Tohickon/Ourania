@@ -85,8 +85,72 @@ public final class ScrubCheck {
         });
     }
 
+    /**
+     * A ring's moment, read <b>on the event thread</b>.
+     *
+     * <p><b>CI went red on a torn read, not on a slow one.</b> {@code scrubTo} resets all three
+     * rings to their scrub bases and only then steps the target, so a reader on any other thread
+     * can sample the instant in between - where the sky is back at its base and the knob has not
+     * been applied yet. That is what "+0h" was in CI on 27 Sep, against a knob sitting at +60h.
+     *
+     * <p>Measured before it was fixed: sampling this field from the check's own thread for 600ms
+     * while a bar was held, <b>97,955 of 3,813,516 reads</b> caught the panel mid-scrub, on a
+     * 22-core laptop. CI needed one. The panel is not at fault - {@code scrubTo} is called on the
+     * event thread and repaints from it, so no reader ever sees the gap. The <i>check</i> was
+     * reaching in from outside, and every other read in this suite went the same way.
+     *
+     * <p><b>The mutation for this one is probabilistic, and is named as such.</b> Reverting it
+     * leaves a race that passes most of the time, so no single run proves anything. Part I samples
+     * both ways over the same window and asserts that the read on the event thread never catches the
+     * panel mid-scrub, while printing how often the read off it does - so a revert turns the
+     * assertion red on any machine where the tear is reachable at all, and says by how much.
+     */
     private static ZonedDateTime time(SkymapPanel sky, String name) throws Exception {
+        if (SwingUtilities.isEventDispatchThread()) {
+            return (ZonedDateTime) field(sky, name);
+        }
+        final ZonedDateTime[] out = new ZonedDateTime[1];
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                out[0] = (ZonedDateTime) field(sky, name);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return out[0];
+    }
+
+    /** The same moment read from here, off the event thread - only to measure the difference. */
+    private static ZonedDateTime timeUnsynchronised(SkymapPanel sky, String name) throws Exception {
         return (ZonedDateTime) field(sky, name);
+    }
+
+    /** Hours from the anchor to a ring's moment, read on the event thread. */
+    private static long hours(SkymapPanel sky, String name) throws Exception {
+        return java.time.Duration.between(ANCHOR, time(sky, name)).toHours();
+    }
+
+    /**
+     * Waits for a condition, up to a limit, and answers whether it came true.
+     *
+     * <b>The rule from {@code ec44b792}, for the third time</b> - two suites on 20 Sep,
+     * {@code NavigationCheck} Part P on 25 Sep, here on 27 Sep. A fixed sleep encodes how fast the
+     * machine is; a deadline encodes what is being waited for. The assertion is whether the deadline
+     * was met, which is not vacuous: it fails when the thing never happens.
+     */
+    private static boolean waitFor(Condition c, long limitMs) throws Exception {
+        long end = System.nanoTime() + limitMs * 1000000L;
+        while (System.nanoTime() < end) {
+            if (c.met()) {
+                return true;
+            }
+            Thread.sleep(10);
+        }
+        return c.met();
+    }
+
+    private interface Condition {
+        boolean met() throws Exception;
     }
 
     private static void drag(OuraniaWindow w, SkymapPanel sky, Component chart) throws Exception {
@@ -422,12 +486,52 @@ public final class ScrubCheck {
         javax.swing.JSlider bar = sky.scrubSliders.get(SkymapPanel.ScrubTarget.SKY);
         final int reach = SkymapPanel.SCRUB_SLIDER_REACH;
 
+        final long held = System.nanoTime();
         SwingUtilities.invokeAndWait(() -> {
             bar.setValueIsAdjusting(true);
             bar.setValue(reach);
         });
-        Thread.sleep(600);
-        ZonedDateTime early = time(sky, "skyRing.time");
+        // Waited for, not slept through. This was Thread.sleep(600), which said how fast this laptop
+        // is rather than what was being waited for.
+        boolean ranOn = waitFor(() -> hours(sky, "skyRing.time") > reach, 4000);
+        long earlyHours = hours(sky, "skyRing.time");
+        ok("held all the way forward, the sky runs on past where the knob sits: +" + earlyHours
+            + "h within 4 s", ranOn);
+
+        // How often the same read taken from HERE instead catches the panel mid-scrub, where all
+        // three rings are back at their bases and the target has not been stepped yet. Reported
+        // rather than asserted: zero on a quiet machine is not a failure, and asserting a race would
+        // trade one flake for another. In CI on 27 Sep a single such read was the whole red.
+        int caught = 0;
+        int samples = 0;
+        long window = System.nanoTime() + 200L * 1000000L;
+        while (System.nanoTime() < window) {
+            samples++;
+            if (java.time.Duration.between(ANCHOR, timeUnsynchronised(sky, "skyRing.time"))
+                .toHours() <= reach) {
+                caught++;
+            }
+        }
+        // And the same window again, read the way the suite now reads it. Zero is an invariant here
+        // rather than a hope - scrubTo runs on the event thread and finishes there, so a reader on it
+        // cannot land inside. Asserting it is also the nearest thing to a mutation for the fix above:
+        // revert time() to an unsynchronised read and this loop starts catching the panel mid-scrub,
+        // which is how the CI red happened. Probabilistic, so it is named as such rather than
+        // presented as a mutation caught.
+        int caughtOnEdt = 0;
+        int onEdtSamples = 0;
+        long edtWindow = System.nanoTime() + 200L * 1000000L;
+        while (System.nanoTime() < edtWindow) {
+            onEdtSamples++;
+            if (hours(sky, "skyRing.time") <= reach) {
+                caughtOnEdt++;
+            }
+        }
+        System.out.println("    (off the event thread, " + caught + " of " + samples
+            + " reads caught the panel mid-scrub)");
+        ok("read on the event thread, no read catches the panel mid-scrub: " + caughtOnEdt + " of "
+            + onEdtSamples + ", against " + caught + " of " + samples + " off it", caughtOnEdt == 0);
+
         // Then a busy event thread, as a slow redraw makes it: three quarter-second stalls, which
         // Swing's timer answers by coalescing the ticks it could not deliver.
         for (int i = 0; i < 3; i++) {
@@ -440,19 +544,20 @@ public final class ScrubCheck {
             });
             Thread.sleep(50);
         }
-        ZonedDateTime later = time(sky, "skyRing.time");
-        long earlyHours = java.time.Duration.between(ANCHOR, early).toHours();
-        long laterHours = java.time.Duration.between(ANCHOR, later).toHours();
-        ok("held all the way forward, the sky runs on past where the knob sits: +" + earlyHours + "h",
-            earlyHours > reach);
+        long laterHours = hours(sky, "skyRing.time");
+        // The run is by the clock, so the bounds are the time that actually passed rather than the
+        // 1.5 s this sequence takes when nothing gets in its way.
+        double seconds = (System.nanoTime() - held) / 1.0e9;
         ok("and keeps going while it is held: +" + earlyHours + "h then +" + laterHours + "h",
             laterHours > earlyHours + 5);
-        ok("at about the top rate, not faster: +" + laterHours + "h in 1.5 s",
-            laterHours <= reach + Math.ceil(SkymapPanel.SHUTTLE_MAX_RATE * 3.0));
-        // Not slower either: the run is by the clock, so a busy event thread that coalesces the
-        // timer's ticks cannot shorten it. Six tenths of the nominal distance, for scheduling slack.
-        ok("and not far under it, however busy the redraw: +" + laterHours + "h in 1.5 s",
-            laterHours >= reach + SkymapPanel.SHUTTLE_MAX_RATE * 1.5 * 0.6);
+        ok("at about the top rate, not faster: +" + laterHours + "h in "
+            + String.format("%.1f", seconds) + " s",
+            laterHours <= reach + Math.ceil(SkymapPanel.SHUTTLE_MAX_RATE * (seconds + 1.5)));
+        // Not slower either: a busy event thread that coalesces the timer's ticks cannot shorten it.
+        // Six tenths of the distance the clock allows, for scheduling slack.
+        ok("and not far under it, however busy the redraw: +" + laterHours + "h in "
+            + String.format("%.1f", seconds) + " s",
+            laterHours >= reach + SkymapPanel.SHUTTLE_MAX_RATE * seconds * 0.6);
 
         SwingUtilities.invokeAndWait(() -> bar.setValueIsAdjusting(false));
         ZonedDateTime released = time(sky, "skyRing.time");
