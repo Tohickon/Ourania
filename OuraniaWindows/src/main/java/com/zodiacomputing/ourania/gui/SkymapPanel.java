@@ -4364,22 +4364,87 @@ extends JPanel {
      * drawing.
      */
     public String positionsText() {
-        StringBuilder sb = new StringBuilder("Body\tLongitude\tSign\tDegree\tHouse\tRetrograde\n");
+        // G10: declination and dignity are columns here because both engines already answer them -
+        // Declinations since D4 and Dignity since F12 - and until 27 Sep neither reached the one
+        // export a reader can open in a spreadsheet. Nothing new is computed; two doors are opened.
+        // The row also said there was no midpoint table, and ChartTables.midpoints has been one
+        // since A1.
+        ChartFrame f = this.radixChart();
+        java.util.Map<String, com.zodiacomputing.ourania.astro.Declinations.Entry> decs =
+            new java.util.HashMap<>();
+        if (f != null) {
+            for (com.zodiacomputing.ourania.astro.Declinations.Entry e
+                    : com.zodiacomputing.ourania.astro.Declinations.of(f).entries) {
+                decs.put(e.name, e);
+            }
+        }
+        StringBuilder sb = new StringBuilder("Body\tLongitude\tSign\tDegree\tHouse\tRetrograde"
+            + "\tDeclination\tOut of bounds\tDignity\tDignity score\n");
         for (int i = 0; i < BODY_COUNT; i++) {
             if (!this.natalRing.valid[i]) {
                 continue;
             }
             double lon = this.natalRing.lon[i];
             int house = Zodiac.houseOf(lon, this.activeCusps);
+            com.zodiacomputing.ourania.astro.Declinations.Entry dec = decs.get(BODY_NAMES[i]);
             sb.append(BODY_NAMES[i]).append('\t')
               .append(String.format("%.4f", lon)).append('\t')
               .append(SkymapPanel.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)])).append('\t')
               .append(String.format("%.2f", Zodiac.degreeInSign(lon))).append('\t')
               .append(house > 0 ? String.valueOf(house) : "").append('\t')
               .append(SkymapPanel.showsDirection(i) && this.natalRing.speed[i] < 0.0 ? "R" : "")
+              .append('\t')
+              // The declination table's own formatter, so the column and the table cannot disagree.
+              .append(dec == null ? "" : ChartTables.declination(dec.declination)).append('\t')
+              .append(dec != null && dec.outOfBounds
+                  ? String.format("%.2f past", dec.beyond) : "").append('\t')
+              .append(dignityWords(f, BODY_NAMES[i], lon)).append('\t')
+              .append(dignityScore(f, BODY_NAMES[i], lon))
               .append('\n');
         }
         return sb.toString();
+    }
+
+    /**
+     * Whether essential dignity is a question that can be asked about this body.
+     *
+     * <b>Asked of {@code Dignity.TRADITIONAL} rather than of a list written here</b>, whose comment
+     * already says it is "the seven traditional bodies, the only ones essential dignity applies
+     * to". A second copy of those seven exists in {@code BodyScore} and is exactly the defect this
+     * project logs most; it is not going to acquire a third here.
+     */
+    private static boolean hasDignity(String body) {
+        for (String b : com.zodiacomputing.ourania.astro.Dignity.TRADITIONAL) {
+            if (b.equals(body)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The dignity column: the reasons {@code Dignity} already gives, not a shorter phrase.
+     *
+     * <b>The sentence is the engine's.</b> Inventing a compact summary here would be a second
+     * account of the same planet, and the table and the reading would describe it differently -
+     * which is how {@code ringWord} came to be written six times.
+     */
+    private String dignityWords(ChartFrame f, String body, double lon) {
+        if (f == null || !hasDignity(body)) {
+            return "";
+        }
+        com.zodiacomputing.ourania.astro.Dignity.Result r =
+            com.zodiacomputing.ourania.astro.Dignity.evaluate(body, lon, f.diurnal);
+        return r.reasons.isEmpty() ? "no essential dignity" : String.join("; ", r.reasons);
+    }
+
+    /** The score beside the words, because a spreadsheet can sort a number and not a sentence. */
+    private String dignityScore(ChartFrame f, String body, double lon) {
+        if (f == null || !hasDignity(body)) {
+            return "";
+        }
+        return String.valueOf(com.zodiacomputing.ourania.astro.Dignity
+            .evaluate(body, lon, f.diurnal).score);
     }
 
     /**

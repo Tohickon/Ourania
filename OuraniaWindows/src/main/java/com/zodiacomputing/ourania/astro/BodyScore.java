@@ -1006,9 +1006,16 @@ public final class BodyScore {
         }
     }
 
-    /** The seven a classical chart is judged unaspected against. */
-    private static final List<String> TRADITIONAL_SEVEN = java.util.Arrays.asList(
-        "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn");
+    /**
+     * The seven a classical chart is judged unaspected against.
+     *
+     * <b>Dignity's list, not a second copy of it.</b> Until 27 Sep this was seven names written out
+     * here, identical to {@code Dignity.TRADITIONAL} and free to drift from it - the same defect as
+     * the six copies of {@code ringWord} and the four lists of house systems. Found while G10 needed
+     * the same seven for the positions export and deliberately did not make a third copy.
+     */
+    private static final List<String> TRADITIONAL_SEVEN =
+        java.util.Arrays.asList(Dignity.TRADITIONAL);
 
     /**
      * Splits the chart-wide aspect lists onto one body, tightest first.
