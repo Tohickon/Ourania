@@ -468,13 +468,26 @@ if ($Jar -or $Package) {
     if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
     New-Item -ItemType Directory -Path "$dist\lib" | Out-Null
 
+    # J6: the version stamp, into the jar. OuraniaWindows\VERSION is the ONE place the number is
+    # written; the commit comes from git. Version.java reads this and says "development build" when
+    # it is absent, which is what running from classes is. Written into $Out rather than into src, so
+    # it never shows up as a modified source file and never churns the tree.
+    $version = "0.0.0"
+    if (Test-Path "VERSION") { $version = (Get-Content "VERSION" -TotalCount 1).Trim() }
+    $commit = ""
+    try { $commit = (git rev-parse --short HEAD).Trim() } catch { $commit = "" }
+    [System.IO.File]::WriteAllText((Join-Path $Out "ourania-version.properties"),
+        "version=$version`r`ncommit=$commit`r`n", (New-Object System.Text.UTF8Encoding $false))
+    Write-Host "Version: $version $commit"
+
     $libJars = @(Get-ChildItem "lib\*.jar")
     $libJars | Copy-Item -Destination "$dist\lib"
     $classPath = ($libJars | ForEach-Object { "lib/" + $_.Name }) -join " "
     $manifest = Join-Path (Resolve-Path $Out).Path "MANIFEST.MF"
     [System.IO.File]::WriteAllText($manifest,
         "Main-Class: com.zodiacomputing.ourania.gui.OuraniaWindow`r`nClass-Path: $classPath`r`n")
-    & $JAR_EXE --create --file "$dist\Ourania.jar" --manifest $manifest -C $Out com -C $Out de
+    & $JAR_EXE --create --file "$dist\Ourania.jar" --manifest $manifest -C $Out com -C $Out de `
+        -C $Out ourania-version.properties
     if ($LASTEXITCODE -ne 0) { Write-Host "JAR FAILED - jar exit $LASTEXITCODE"; exit 1 }
 
     Copy-Item -Recurse "src\main\resources\data" "$dist\data"

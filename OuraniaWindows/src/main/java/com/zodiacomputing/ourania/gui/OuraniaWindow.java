@@ -143,7 +143,9 @@ public class OuraniaWindow extends JFrame {
         Settings.applyAspectCaps();
         // And the rule that progresses the angles.
         com.zodiacomputing.ourania.astro.ProgressedAngles.method = Settings.progressedAngleMethod();
-        setTitle("Ourania+ (Windows Edition)");
+        // J6: what version this is, so a bug report can name it. "development build" when running
+        // from classes, because a made-up number looks like information.
+        setTitle("Ourania+ (Windows Edition) - " + Version.display());
         // A size for a window nobody restores - a check suite's. The application's window is put
         // where the last session left it by main, through WindowPlacement.restore.
         setSize(1024, 768);
