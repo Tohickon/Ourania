@@ -113,8 +113,70 @@ final class Theme {
      * back out; new Font(font.getAttributes()) would lose the fallback, measured.
      */
     static Font font(String family, int style, int size) {
+        int scaled = scaled(size);
         return javax.swing.text.StyleContext.getDefaultStyleContext()
-            .getFont(family, style, size).deriveFont(style, (float) size);
+            .getFont(family, style, scaled).deriveFont(style, (float) scaled);
+    }
+
+    // ---- type scale (G14) --------------------------------------------------------------
+
+    /** The setting a reader turns up; outside {@code isPersonal}, so it travels in a saved set. */
+    static final String SCALE_KEY = "ui.font.scale";
+
+    /** Smallest and largest multiplier the app will act on. */
+    static final double SCALE_MIN = 1.0;
+    static final double SCALE_MAX = 2.0;
+
+    /** No font is allowed below this, whatever arithmetic says. */
+    static final int MIN_SIZE = 8;
+
+    /**
+     * Every font in the app, multiplied - which is possible because there is only one place.
+     *
+     * <p><b>One multiplier, because E11 already did the hard part.</b> Every font a component is set
+     * in comes from {@link #font(String, int, int)}, and {@code GlyphCheck} Part C holds the gui
+     * package to that: "no physical face is constructed outside Theme.font". So scaling here provably
+     * reaches every font in the app, and G14's first commit is arithmetic rather than a sweep through
+     * a hundred call sites. The accessibility row is expensive; this part of it is not, and that is
+     * only true because a previous commit refused to let fonts be made in two places.
+     *
+     * <p><b>Out of range is refused, not clamped</b> - H1's rule for orbs, for the same reason: a
+     * settings file asking for 40 gets the default back, because quietly making it 2.0 would say the
+     * number was accepted. The screen clamps what a reader can choose; the file does not get to lie.
+     *
+     * <p><b>Resolved once per run.</b> Fonts are built as components are built, so a scale changed
+     * mid-session would apply to whatever is constructed afterwards and not to what is already on
+     * screen - a half-scaled window. The setting takes effect on restart and the control says so.
+     */
+    static int scaled(int size) {
+        double s = scale();
+        return s == 1.0 ? size : Math.max(MIN_SIZE, (int) Math.round(size * s));
+    }
+
+    /** The multiplier in force, or 1.0 when the setting is absent, unreadable or out of range. */
+    static double scale() {
+        Double cached = scale;
+        if (cached != null) {
+            return cached;
+        }
+        double s = 1.0;
+        try {
+            double asked = Double.parseDouble(Settings.get(SCALE_KEY, "1.0").trim());
+            if (asked >= SCALE_MIN && asked <= SCALE_MAX) {
+                s = asked;
+            }
+        } catch (RuntimeException notANumber) {
+            // A hand-edited file saying "big" gets the default, like any other unreadable value.
+        }
+        return scale = s;
+    }
+
+    /** Asked for on every font, so worked out once per run - and forgotten when a suite sets it. */
+    private static volatile Double scale;
+
+    /** Drops the cached multiplier. For the suite, and for a settings reload. */
+    static void forgetScale() {
+        scale = null;
     }
 
     // ---- spacing ----------------------------------------------------------------------

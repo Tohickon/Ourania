@@ -265,6 +265,14 @@ public class SettingsPanel extends JPanel {
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
         body = display;
+        body.add(heading("Text Size"));
+        body.add(note("Makes every piece of text in the app larger - menus, tables, readings and "
+            + "the wheel's own labels. There is one place fonts are made, so one setting reaches "
+            + "all of them. It applies when the app is next started, because text already on "
+            + "screen was measured at the old size."));
+        body.add(textScaleRow());
+        body.add(Box.createRigidArea(new Dimension(0, 18)));
+
         body.add(heading("Colour Template"));
         body.add(note("A template sets the whole chart at once - every aspect, the four "
             + "elements, the mansion ring and the wheel's own background. Choosing one clears "
@@ -2345,6 +2353,54 @@ public class SettingsPanel extends JPanel {
             if (!constructing && !seeding && picked != null) {
                 save.accept(String.valueOf(picked));
                 applyPalette();
+            }
+        });
+        row.add(text);
+        row.add(combo);
+        return row;
+    }
+
+    /**
+     * The text size picker (G14).
+     *
+     * <b>A door, in the A-section sense.</b> {@code Theme.scaled} would otherwise be a setting only
+     * a hand-edited file could reach, which is this project's most logged defect and what
+     * {@code NavigationCheck} exists to catch.
+     *
+     * <p><b>The screen offers five choices where the code accepts a range</b> - H1's split: out of
+     * range is refused by the code, and what a reader can pick is clamped by the screen, so a
+     * spinner cannot produce 4.0 and a hand-edited 40 still gets the default back.
+     *
+     * <p>The label ends in a colon on purpose: that is the convention H4b's search reads to name a
+     * control after the label in front of it rather than after the next setting's.
+     */
+    private JPanel textScaleRow() {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        row.setBackground(Color.BLACK);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel text = new JLabel("Text size:");
+        text.setForeground(TEXT);
+        text.setFont(Theme.BODY);
+        final String[] choices = {"Normal (100%)", "Larger (125%)", "Large (150%)",
+            "Larger still (175%)", "Largest (200%)"};
+        final double[] values = {1.0, 1.25, 1.5, 1.75, 2.0};
+        final JComboBox<String> combo = new JComboBox<>(choices);
+        double now = Theme.scale();
+        seeding = true;
+        for (int i = 0; i < values.length; i++) {
+            if (Math.abs(values[i] - now) < 0.001) {
+                combo.setSelectedIndex(i);
+            }
+        }
+        seeding = false;
+        Widgets.styleCombo(combo);
+        combo.setToolTipText("<html>How large every piece of text in the app is drawn.<br>"
+            + "Takes effect when the app is next started.</html>");
+        combo.addActionListener(e -> {
+            int i = combo.getSelectedIndex();
+            if (!constructing && !seeding && i >= 0) {
+                Settings.set(Theme.SCALE_KEY, String.valueOf(values[i]));
+                Theme.forgetScale();
             }
         });
         row.add(text);
