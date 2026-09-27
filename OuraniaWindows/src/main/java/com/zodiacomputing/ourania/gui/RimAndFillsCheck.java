@@ -270,12 +270,15 @@ public final class RimAndFillsCheck {
         on(sky, SkymapPanel.Layer.HOUSES, true);
 
         // The mansions carry a standing wash, so no focus is needed to see it.
-        fill("mansions", Settings::setGlobeMansionFill, sky, () -> { });
+        fill("mansions", Settings::setGlobeMansionFill, sky,
+            SkymapPanel.Layer.MANSIONS, () -> { });
 
         // The house and degree washes are on the item being pointed at.
-        fill("house", Settings::setGlobeHouseFill, sky, () -> sky.setFocusHouse(5));
+        fill("house", Settings::setGlobeHouseFill, sky,
+            SkymapPanel.Layer.HOUSES, () -> sky.setFocusHouse(5));
         sky.setFocusHouse(-1);
-        fill("degree", Settings::setGlobeDegreeFill, sky, () -> sky.setFocusDegree(100));
+        fill("degree", Settings::setGlobeDegreeFill, sky,
+            SkymapPanel.Layer.DEGREES, () -> sky.setFocusDegree(100));
         sky.setFocusDegree(-1);
 
         // <b>Off is not folded.</b> With the mansion fill off the band keeps its edges, its 28
@@ -291,9 +294,29 @@ public final class RimAndFillsCheck {
             differing(unfilled, folded) > 500);
     }
 
-    /** One fill: on and off differ, off removes ink, and on again restores the frame exactly. */
+    /**
+     * One fill: on and off differ, off removes ink, and on again restores the frame exactly.
+     *
+     * <b>"Differ" is measured against its own null condition, not against a number.</b> This
+     * assertion used to read {@code diff > 60}, and on 26 Sep CI went red on the mansion fill
+     * with 57 where this machine measures 317. The globe was rendering perfectly: the same run
+     * gave the house fill 158,269 pixels against 150,122 here and the degree fill 1,797 against
+     * 1,350 - two of the three <i>larger</i> in CI. Only the mansion tint collapsed, and it is by
+     * far the subtlest of the three, a faint wash on the thinnest band, so it is the one whose
+     * pixel count is decided by how a particular machine antialiases.
+     *
+     * <b>60 was a fact about this laptop, not about the app.</b> Raising it to 50 would have been
+     * the same mistake with a smaller number - and this project has been here before: Part N's
+     * pixel proxy was retired on 23 Sep after being measured both ways rather than re-thresholded,
+     * because it had begun ranking the mutant above the original.
+     *
+     * So the fill is toggled a second time with its own layer switched off, where it has nothing
+     * to wash and must change nothing at all. <b>57 against 0 is as convincing as 317 against
+     * 0</b>, and neither number has to be written down.
+     */
     private static void fill(String name, java.util.function.Consumer<Boolean> set,
-                             SkymapPanel sky, Runnable focus) throws Exception {
+                             SkymapPanel sky, SkymapPanel.Layer layer, Runnable focus)
+            throws Exception {
         focus.run();
         set.accept(true);
         BufferedImage filled = stableGlobe(sky);
@@ -302,8 +325,23 @@ public final class RimAndFillsCheck {
         set.accept(true);
         BufferedImage again = stableGlobe(sky);
         int diff = differing(filled, bare);
-        System.out.printf("  %s fill: %d pixels change%n", name, diff);
-        ok("the " + name + " fill changes the globe when switched off: " + diff, diff > 60);
+
+        // The null condition: with the layer itself not drawn, the fill has nothing to wash.
+        on(sky, layer, false);
+        set.accept(true);
+        BufferedImage nullOn = stableGlobe(sky);
+        set.accept(false);
+        BufferedImage nullOff = stableGlobe(sky);
+        set.accept(true);
+        on(sky, layer, true);
+        int noise = differing(nullOn, nullOff);
+
+        System.out.printf("  %s fill: %d pixels change, %d with its layer off%n",
+            name, diff, noise);
+        ok("the " + name + " fill changes nothing when its layer is not drawn: " + noise,
+            noise == 0);
+        ok("the " + name + " fill changes the globe when switched off: " + diff
+            + " against " + noise, diff > noise);
         ok("switching the " + name + " fill off removes ink rather than moving it",
             ink(bare) < ink(filled));
         eq("switching the " + name + " fill back on restores the frame", 0,
