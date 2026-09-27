@@ -649,7 +649,10 @@ public class SettingsPanel extends JPanel {
 
         boolean[] enabled = Settings.loadBodySelection();
 
-        body.add(fixed(bodyGroupColumns(enabled)));
+        // <b>Not through fixed().</b> That snapshots a maximum at construction, and this block
+        // has to be free to reflow when the window is resized - the panel below caps itself
+        // against its current width instead.
+        body.add(bodyGroupColumns(enabled));
 
         body.add(Box.createRigidArea(new Dimension(0, 16)));
         body = report;
@@ -1388,23 +1391,26 @@ public class SettingsPanel extends JPanel {
      * are dealt left, right, left so the pairing reads down the screen as it did across it.
      */
     private JPanel bodyGroupColumns(boolean[] enabled) {
-        JPanel[] stacks = new JPanel[2];
-        JPanel columns = new JPanel(new GridLayout(1, stacks.length, 24, 0));
+        // <b>Its maximum is whatever it currently wants, not what it wanted once.</b> BoxLayout
+        // hands spare height to any child whose maximum allows it, so this has to cap itself -
+        // and it has to do so against the width it has now, because the number of columns, and
+        // therefore the height, changes with the window.
+        JPanel columns = new JPanel(new ColumnFlowLayout(24, 14)) {
+            @Override
+            public Dimension getMaximumSize() {
+                // <b>Unbounded across, capped down.</b> Returning the preferred size for both
+                // was a chicken and egg: the preferred WIDTH is computed from however many
+                // columns currently fit, so capping the width at it froze the block at the two
+                // columns it assumed before it had ever been given a width, and it never saw
+                // the wider container. Height is still capped, which is the thing BoxLayout
+                // would otherwise stretch.
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
         columns.setBackground(Color.BLACK);
         columns.setAlignmentX(Component.LEFT_ALIGNMENT);
-        for (int i = 0; i < stacks.length; i++) {
-            stacks[i] = new JPanel();
-            stacks[i].setLayout(new BoxLayout(stacks[i], BoxLayout.Y_AXIS));
-            stacks[i].setBackground(Color.BLACK);
-            columns.add(stacks[i]);
-        }
-        int dealt = 0;
         for (Bodies.Group group : Bodies.Group.values()) {
-            JPanel stack = stacks[dealt++ % stacks.length];
-            if (stack.getComponentCount() > 0) {
-                stack.add(Box.createRigidArea(new Dimension(0, 14)));
-            }
-            stack.add(groupPanel(group, enabled));
+            columns.add(groupPanel(group, enabled));
         }
         return columns;
     }

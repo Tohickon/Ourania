@@ -347,7 +347,8 @@ public final class PresetBarCheck {
         int wanted = 0;
         int width = -1;
         Container block = null;
-        java.util.List<Container> columns = new ArrayList<>();
+        java.util.Map<Integer, java.util.List<Component>> columns =
+            new java.util.TreeMap<>();
         for (Bodies.Group group : Bodies.Group.values()) {
             Container box = groupBox(all, group);
             if (box == null) {
@@ -379,32 +380,77 @@ public final class PresetBarCheck {
             }
             ok(group.title + " is the same width as the others (" + box.getWidth()
                 + " against " + width + ")", Math.abs(box.getWidth() - width) <= 1);
-            block = box.getParent() == null ? null : box.getParent().getParent();
-            if (box.getParent() != null && !columns.contains(box.getParent())) {
-                columns.add(box.getParent());
+            // Since 27 Sep every box is a child of one reflowing block; a column is a set of
+            // boxes sharing an x, not a panel of its own.
+            block = box.getParent();
+        }
+
+        // <b>The gap beside the boxes, which the 26 Sep fix left behind.</b> Closing the void
+        // INSIDE them still used 752 pixels of 1460 and scrolled; two fixed columns encoded a
+        // window size the same way RimAndFillsCheck's pixel threshold encoded a machine. These
+        // assertions are about the block filling what it is given, so they hold at any width.
+        if (block != null) {
+            for (Component box : block.getComponents()) {
+                columns.computeIfAbsent(box.getX(), k -> new ArrayList<>()).add(box);
             }
         }
+        ok("a wide tab takes more than one column (" + columns.size() + ")", columns.size() > 1);
 
-        // <b>And the boxes start at the top of the column.</b> Without this the hole comes
-        // back one level up and every assertion above still passes: a stack of correctly sized
-        // boxes handed a column taller than itself is centred in it by BoxLayout, which puts
-        // half the slack above the first box - the reported defect exactly, with the boxes now
-        // innocent. It is the NORTH in bodyGroupColumns that stops it.
-        ok("the boxes sit in " + columns.size() + " columns", columns.size() == 2);
-        for (int i = 0; i < columns.size(); i++) {
-            Container column = columns.get(i);
-            ok("column " + (i + 1) + " starts at the top of its half (" + column.getY() + ")",
-                column.getY() == 0);
-            ok("column " + (i + 1) + "'s first box starts at the top of it ("
-                + (column.getComponentCount() == 0 ? -1 : column.getComponent(0).getY()) + ")",
-                column.getComponentCount() > 0 && column.getComponent(0).getY() == 0);
+        int rightmost = 0;
+        int deepest = 0;
+        int shallowest = Integer.MAX_VALUE;
+        for (java.util.Map.Entry<Integer, java.util.List<Component>> e : columns.entrySet()) {
+            int top = Integer.MAX_VALUE;
+            int bottom = 0;
+            for (Component box : e.getValue()) {
+                top = Math.min(top, box.getY());
+                bottom = Math.max(bottom, box.getY() + box.getHeight());
+                rightmost = Math.max(rightmost, box.getX() + box.getWidth());
+            }
+            ok("the column at x=" + e.getKey() + " starts at the top (" + top + ")", top == 0);
+            deepest = Math.max(deepest, bottom);
+            shallowest = Math.min(shallowest, bottom);
         }
 
-        // Two columns, not one: the block has to be shorter than the boxes end to end, or the
-        // whole tab is a single strip twice the height of the screen.
-        ok("the five boxes share two columns (" + (block == null ? -1 : block.getHeight())
+        // <b>The width is used.</b> This is the defect itself, stated as a measurement: a block
+        // that stops well short of its container is the gap David reported.
+        ok("the boxes reach the width they are given (" + rightmost + " of "
+            + (block == null ? -1 : block.getWidth()) + ")",
+            block != null && rightmost >= block.getWidth() - 40);
+
+        // <b>Reaching the width is not enough on its own, measured.</b> Pinning the count back
+        // at two passed everything above: two columns still fill the width, they just get fat -
+        // boxes stretched to about 700 pixels for content that wants 364, with every control
+        // bunched at the left edge of a mostly empty box. The claim that separates them is that
+        // a wide tab gets ANOTHER column rather than wider ones.
+        for (Component box : columns.values().stream().flatMap(java.util.List::stream)
+                .collect(java.util.stream.Collectors.toList())) {
+            int natural = box.getPreferredSize().width;
+            ok("a box is not stretched far past what it wants (" + box.getWidth() + " against "
+                + natural + ")", natural <= 0 || box.getWidth() < natural * 3 / 2);
+        }
+
+        // <b>And one column is not left nearly empty.</b> Two earlier fills were measured and
+        // rejected on exactly this: dealing round-robin gave 658, 804 and 157, and breaking the
+        // moment a box passed its share gave 521, 157 and 941.
+        ok("no column is left far shorter than the deepest (" + shallowest + " against "
+            + deepest + ")", shallowest * 2 >= deepest);
+
+        // <b>And it reflows, rather than being a different fixed number.</b> Everything above
+        // passes just as well with the count pinned at three; what says the layout is reading
+        // the width is that a narrow window gets fewer columns and still does not clip.
+        int wide = columns.size();
+        int narrow = columnsAt(p, 520);
+        int wider = columnsAt(p, 1900);
+        ok("a narrow window uses fewer columns than a wide one (" + narrow + " at 520, "
+            + wide + " at 1460)", narrow < wide && narrow >= 1);
+        ok("a wider window uses at least as many (" + wider + " at 1900)", wider >= wide);
+        relayout(p);
+
+        // The block has to be shorter than the boxes end to end, or they are in one strip.
+        ok("the boxes share the columns (" + (block == null ? -1 : block.getHeight())
             + " tall, " + wanted + " laid end to end)",
-            block != null && block.getHeight() < wanted && block.getHeight() >= tallest);
+            block != null && block.getHeight() < wanted);
     }
 
     /** What a child of a group box is, for the failure line. */
@@ -475,6 +521,40 @@ public final class PresetBarCheck {
             frame.dispose();
         });
         return p;
+    }
+
+    /**
+     * How many columns the body groups fall into when the panel is this wide.
+     *
+     * <b>Laid out twice at each width.</b> The block reports a preferred height for the width it
+     * currently has, so the first pass gives it the new width and the second sizes to it - the
+     * same two passes the running app gets from any revalidate.
+     */
+    private static int columnsAt(SettingsPanel p, int width) {
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                p.setSize(width, 900);
+                relayout(p);
+                relayout(p);
+            });
+        } catch (Exception e) {
+            fail("could not lay the panel out at " + width + ": " + e);
+            return -1;
+        }
+        javax.swing.JCheckBox[] all;
+        try {
+            all = (javax.swing.JCheckBox[]) CheckReflect.get(p, "boxes");
+        } catch (Exception e) {
+            return -1;
+        }
+        java.util.Set<Integer> xs = new java.util.TreeSet<>();
+        for (Bodies.Group group : Bodies.Group.values()) {
+            Container box = groupBox(all, group);
+            if (box != null) {
+                xs.add(box.getX());
+            }
+        }
+        return xs.size();
     }
 
     /** Swing lays out lazily; this forces the whole tree so the bounds are the real ones. */
