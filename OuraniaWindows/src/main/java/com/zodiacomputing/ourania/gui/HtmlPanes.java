@@ -155,6 +155,26 @@ final class HtmlPanes {
      * the one copy. Inline styles still win where a screen wants something particular, which is
      * why the existing screens are unaffected.
      */
+    /**
+     * A pane dressed for this app, with no behaviour attached.
+     *
+     * <b>Here rather than at each call site, for H4a's reason.</b> Three screens were black on
+     * near-black because {@code HtmlPanes} was the only place that installed a stylesheet and they
+     * had not come through it. A caller that sets its own content type and colours is the fourth
+     * copy of the theme waiting to happen, so a caller that needs its own link handling takes a pane
+     * from here and adds a listener to it. {@link IndexPanel} is the first such caller.
+     */
+    static JEditorPane darkPane() {
+        JEditorPane pane = new JEditorPane();
+        pane.setContentType("text/html");
+        pane.setEditable(false);
+        pane.setOpaque(true);
+        pane.setBackground(Theme.SURFACE);
+        pane.setForeground(Color.WHITE);
+        dressForADarkScreen(pane);
+        return pane;
+    }
+
     private static void dressForADarkScreen(JEditorPane pane) {
         if (!(pane.getEditorKit() instanceof javax.swing.text.html.HTMLEditorKit)) {
             return;

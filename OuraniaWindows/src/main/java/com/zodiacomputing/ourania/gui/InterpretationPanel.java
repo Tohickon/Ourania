@@ -1827,6 +1827,23 @@ public class InterpretationPanel extends JPanel {
      * is registered, which is the only arrangement that stays true.
      */
     public void showIndex(String category) {
+        setHtml(indexHtml(category), false);
+    }
+
+    /**
+     * The index as HTML, so it can be shown in more than one place without being built twice.
+     *
+     * <b>Split out on 27 Sep, when the index got its own tab on the right rail.</b> Until then it
+     * had no door at all: the only way in was a link inside a reading a reader was already looking
+     * at, which is the defect {@code ChartTables}' own header names - "the browsable index whose only
+     * entry points sat inside a panel that had to be open first". The index was the last thing still
+     * shaped that way.
+     *
+     * <p><b>One builder, two surfaces.</b> The obvious alternative - a second index page written for
+     * the tab - is this project's signature defect, and {@code IndexPageCheck} asserts the two are
+     * the same string for every category so they cannot drift.
+     */
+    String indexHtml(String category) {
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
         if (category == null || category.isEmpty()) {
@@ -1871,7 +1888,7 @@ public class InterpretationPanel extends JPanel {
         }
         appendBack(html);
         html.append("</body></html>");
-        setHtml(html.toString(), false);
+        return html.toString();
     }
 
     private static void indexRow(StringBuilder html, String key, String title, String blurb) {

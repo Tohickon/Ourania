@@ -46,11 +46,21 @@ public class OuraniaWindow extends JFrame {
     private javax.swing.JEditorPane selectionPane;
     /** The right rail: what the app can do, and the grid that is read against the wheel. */
     private DrawerRail menuRail;
+    /** The Index tab's content (G11). Package-private so the check can ask what it is showing. */
+    IndexPanel indexPanel;
     private javax.swing.JEditorPane gridPane;
 
     /** Right-rail page names. Two tabs on one strip, not two strips. */
     public static final String MENU_PAGE = "Menu";
     public static final String GRID_PAGE = "Aspect Grids";
+    /**
+     * The reference index, on the right rail (G11).
+     *
+     * <b>The tab and the page it opens say the same word.</b> David, asked whether the tab should be
+     * called Glossary while the page heading said Index: "they can bith say index". Two names for one
+     * thing is how a label comes to claim something the code does not do.
+     */
+    public static final String INDEX_PAGE = "Index";
 
     /** Left-rail page names, shared with the wheel and with NavigationCheck. */
     public static final String CHART_PAGE = "Chart";
@@ -271,6 +281,12 @@ public class OuraniaWindow extends JFrame {
         menuRail = new DrawerRail(Drawer.Side.RIGHT, SidePanel.MENU_WIDTH);
         menuRail.addPage(MENU_PAGE, sidePanel, SidePanel.MENU_WIDTH);
         menuRail.addPage(GRID_PAGE, HtmlPanes.scroller(gridPane), 430);
+        // G11: the index's door. It had none - nine sections of reference material reachable only
+        // from a link inside a reading a reader was already looking at, which is the shape
+        // ChartTables' header calls this project's signature defect. Same width as the grid: both
+        // are reference tables rather than a column of prose.
+        indexPanel = new IndexPanel(this, interpretationPanel);
+        menuRail.addPage(INDEX_PAGE, indexPanel, 430);
         // Open on Menu at launch and without animating, which is what the drawer it replaced
         // did: an app that slides its own panel out on every start is animating at the one
         // moment nobody asked it to.
