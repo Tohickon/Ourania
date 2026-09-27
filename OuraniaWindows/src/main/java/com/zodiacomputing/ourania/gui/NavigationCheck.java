@@ -622,56 +622,32 @@ public final class NavigationCheck {
     }
 
     /** The gui sources on disk, or null where the working directory is not the app's. */
+    /**
+     * Every {@code .java} file in the gui package.
+     *
+     * <b>Kept as a name here because two suites call it</b>, and moved to {@link JavaSource} with
+     * the scanner it goes with on 27 Sep, when the absolute-path sweep became its second caller.
+     */
     static java.io.File[] guiSources() {
-        return new java.io.File("src/main/java/com/zodiacomputing/ourania/gui")
-            .listFiles((d, n) -> n.endsWith(".java"));
+        return JavaSource.guiSources();
     }
 
     /**
      * A source file with its string literals, character literals and comments removed.
      *
-     * <b>Because a word inside a sentence is not a door.</b> The sweep below asks whether the
-     * interface names each engine, and it used to ask with a bare {@code contains} over the raw
-     * text. {@code Electional} passed that for a whole day while having no way in at all, because
+     * <b>Because a word inside a sentence is not a door.</b> This sweep asks whether the interface
+     * names each engine, and it used to ask with a bare {@code contains} over the raw text.
+     * {@code Electional} passed that for a whole day while having no way in at all, because
      * {@code InterpretationPanel}'s lunar-mansion note contains the phrase "Electional and horary
      * machinery" - the check was most wrong about exactly the class it existed to catch.
      *
-     * <p>Deliberately a small scanner rather than a regex: a regex over Java string literals has
-     * to get escapes right to avoid running off the end of one, and getting that subtly wrong
-     * would make this weaker again without anyone noticing.
+     * <p>The scanner itself lives in {@link JavaSource} since 27 Sep, because
+     * {@code ErrorLogCheck} needs the same walk with the opposite half collected - the literals
+     * rather than the code. Two scanners would have drifted, and a drifting sweep gets weaker
+     * rather than noisier, which is the direction nobody notices.
      */
     static String codeOnly(String src) {
-        StringBuilder out = new StringBuilder(src.length());
-        int i = 0;
-        int n = src.length();
-        while (i < n) {
-            char c = src.charAt(i);
-            if (c == '/' && i + 1 < n && src.charAt(i + 1) == '/') {
-                while (i < n && src.charAt(i) != '\n') {
-                    i++;
-                }
-            } else if (c == '/' && i + 1 < n && src.charAt(i + 1) == '*') {
-                i += 2;
-                while (i + 1 < n && !(src.charAt(i) == '*' && src.charAt(i + 1) == '/')) {
-                    i++;
-                }
-                i = Math.min(n, i + 2);
-            } else if (c == '"' || c == '\'') {
-                char quote = c;
-                i++;
-                while (i < n && src.charAt(i) != quote) {
-                    // An escaped quote does not end the literal; skipping the pair is what keeps
-                    // this from running off the end of one and eating the code after it.
-                    i += src.charAt(i) == '\\' ? 2 : 1;
-                }
-                i++;
-                out.append(' ');
-            } else {
-                out.append(c);
-                i++;
-            }
-        }
-        return out.toString();
+        return JavaSource.codeOnly(src);
     }
 
     private static void collectButtons(Container c, List<JButton> out) {
