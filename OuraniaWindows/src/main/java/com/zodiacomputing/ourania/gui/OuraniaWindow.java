@@ -1352,6 +1352,10 @@ public class OuraniaWindow extends JFrame {
 
 
     public static void main(String[] args) {
+        // <b>First, so that anything below it is written down.</b> An exception escaping
+        // a listener used to print to a console a packaged app does not have, and then
+        // vanish. J8.
+        ErrorLog.install();
         // Run the GUI creation on the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {
             try {

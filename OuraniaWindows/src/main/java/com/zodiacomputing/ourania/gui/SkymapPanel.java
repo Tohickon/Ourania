@@ -3451,11 +3451,7 @@ extends JPanel {
             this.sw = new SwissEph(EPHE_PATH);
         }
         catch (Exception exception) {
-            try {
-                java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter("C:\\Users\\daver\\Desktop\\Ourania\\OuraniaWindows\\error_log.txt"));
-                exception.printStackTrace(pw);
-                pw.close();
-            } catch (Exception ex) {}
+            ErrorLog.record("loading the ephemeris", exception);
             exception.printStackTrace();
         }
         try {
@@ -3483,11 +3479,7 @@ extends JPanel {
             catch (Exception exception) {}
         }
         catch (Exception exception) {
-            try {
-                java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter("C:\\Users\\daver\\Desktop\\Ourania\\OuraniaWindows\\error_log.txt"));
-                exception.printStackTrace(pw);
-                pw.close();
-            } catch (Exception ex) {}
+            ErrorLog.record("casting the chart", exception);
             exception.printStackTrace();
         }
         this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
@@ -7043,11 +7035,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.window.showInterpretationForPlanet(string4, SIGN_NAMES[n2], n4, n3, n5, arrayList);
         }
         catch (Exception exception) {
-            try {
-                java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter("C:\\Users\\daver\\Desktop\\Ourania\\OuraniaWindows\\error_log.txt"));
-                exception.printStackTrace(pw);
-                pw.close();
-            } catch (Exception ex) {}
+            ErrorLog.record("opening a placement reading", exception);
             exception.printStackTrace();
         }
     }

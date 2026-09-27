@@ -55,12 +55,19 @@ final class JavaSource {
     }
 
     /**
-     * The contents of every string literal in a source file, one per entry.
+     * The <b>value</b> of every string literal in a source file, one per entry, with its escape
+     * sequences resolved.
      *
-     * <p>Character literals are left out: a single character cannot be a path, and including them
-     * would mean deciding what an escape sequence stands for. Comments are left out too, which
-     * matters for the absolute-path sweep - {@code Ephemeris}' own comment quotes the bad path it
-     * is explaining, and a sweep that flagged the explanation would be teaching people to delete
+     * <p><b>Resolved, because the raw text is not the string.</b> The first version of the
+     * absolute-path sweep tested the literal as it appears in the source and immediately reported
+     * four UNC paths in {@code InterpretationService}, which carries {@code "\\\""} - two escapes
+     * that happen to begin with backslashes. What a path is, is the string's <i>value</i>, so that
+     * is what this returns. The sweep caught its own defect before it shipped, which is the argument
+     * for Part E holding this method with planted examples.
+     *
+     * <p>Character literals are left out: a single character cannot be a path. Comments are left out
+     * too, which matters for the sweep - {@code Ephemeris}' own comment quotes the bad path it is
+     * explaining, and a sweep that flagged the explanation would teach people to delete
      * documentation.
      */
     static java.util.List<String> literals(String src) {
@@ -111,12 +118,58 @@ final class JavaSource {
                 }
                 i++;
                 if (wantLiterals && isString) {
-                    literals.add(body.toString());
+                    literals.add(unescape(body.toString()));
                 }
                 out.append(' ');
             } else {
                 out.append(c);
                 i++;
+            }
+        }
+        return out.toString();
+    }
+
+    /**
+     * A literal's escape sequences resolved into the characters they stand for.
+     *
+     * An unknown escape keeps the character after the backslash, which is what a compiler would
+     * reject rather than interpret - this is reading source that already compiles, so the lenient
+     * reading is the safe one.
+     */
+    private static String unescape(String raw) {
+        StringBuilder out = new StringBuilder(raw.length());
+        int i = 0;
+        int n = raw.length();
+        while (i < n) {
+            char c = raw.charAt(i);
+            if (c != '\\' || i + 1 >= n) {
+                out.append(c);
+                i++;
+                continue;
+            }
+            char e = raw.charAt(i + 1);
+            i += 2;
+            switch (e) {
+                case 'n': out.append('\n'); break;
+                case 'r': out.append('\r'); break;
+                case 't': out.append('\t'); break;
+                case 'b': out.append('\b'); break;
+                case 'f': out.append('\f'); break;
+                case 's': out.append(' '); break;
+                case '0': out.append('\0'); break;
+                case 'u':
+                    int end = i;
+                    while (end < n && end < i + 4) {
+                        end++;
+                    }
+                    try {
+                        out.append((char) Integer.parseInt(raw.substring(i, end), 16));
+                        i = end;
+                    } catch (RuntimeException bad) {
+                        out.append('u');
+                    }
+                    break;
+                default: out.append(e); break;
             }
         }
         return out.toString();
