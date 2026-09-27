@@ -209,25 +209,16 @@ final class WindowPlacement {
         }
     }
 
-    /** F11 toggles full screen; Esc leaves it. On the window's root pane, so any focus hears them. */
+    /**
+     * F11 toggles full screen; Esc leaves it.
+     *
+     * <b>The keys themselves moved to {@link Shortcuts} on 27 Sep (G13).</b> They were declared here
+     * and nowhere else, so nothing could list the app's shortcuts and no label could be sure it named
+     * a key that was really bound - the smallest form of this project's signature defect. This method
+     * keeps its name because {@code WindowPlacementCheck} installs keys on a bare frame to assert
+     * exactly these two, and delegates so there is still only one installer.
+     */
     static void installKeys(JFrame frame) {
-        javax.swing.InputMap in = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        javax.swing.ActionMap act = frame.getRootPane().getActionMap();
-        in.put(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), "ourania.toggleFullScreen");
-        act.put("ourania.toggleFullScreen", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleFullScreen(frame);
-            }
-        });
-        in.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ourania.leaveFullScreen");
-        act.put("ourania.leaveFullScreen", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isFullScreen(frame)) {
-                    toggleFullScreen(frame);
-                }
-            }
-        });
+        Shortcuts.install(frame, Shortcuts.windowOnly(frame));
     }
 }

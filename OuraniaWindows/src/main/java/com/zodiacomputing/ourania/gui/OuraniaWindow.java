@@ -159,7 +159,43 @@ public class OuraniaWindow extends JFrame {
         // A size for a window nobody restores - a check suite's. The application's window is put
         // where the last session left it by main, through WindowPlacement.restore.
         setSize(1024, 768);
-        WindowPlacement.installKeys(this);
+        // G13: every shortcut in the app, from the one table that declares them. The window rows
+        // behave as they did; the transport rows reach the wheel, which is why this is installed here
+        // rather than in WindowPlacement - that class knows about frames, not about charts.
+        Shortcuts.install(this, new Shortcuts.Actions() {
+            @Override
+            public void fullScreen() {
+                WindowPlacement.toggleFullScreen(OuraniaWindow.this);
+            }
+
+            @Override
+            public void leaveFullScreen() {
+                if (WindowPlacement.isFullScreen(OuraniaWindow.this)) {
+                    WindowPlacement.toggleFullScreen(OuraniaWindow.this);
+                }
+            }
+
+            @Override
+            public void playPause() {
+                if (skymapPanel != null) {
+                    skymapPanel.playPause();
+                }
+            }
+
+            @Override
+            public void run(int direction) {
+                if (skymapPanel != null) {
+                    skymapPanel.runTime(direction, SkymapPanel.SLOW_DELAY_MS);
+                }
+            }
+
+            @Override
+            public void now() {
+                if (skymapPanel != null) {
+                    skymapPanel.jumpToNow();
+                }
+            }
+        });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the window
         setLayout(new BorderLayout());

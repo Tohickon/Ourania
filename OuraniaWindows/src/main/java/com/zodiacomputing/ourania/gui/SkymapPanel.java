@@ -4866,43 +4866,22 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         JButton jButton4 = new JButton("Slow >");
         JButton jButton5 = new JButton("Fast >>");
         JButton jButton6 = new JButton("Now");
-        jButton.addActionListener(actionEvent -> {
-            this.animationDirection = -1;
-            this.animationTimer.setDelay(50);
-            this.isPlaying = true;
-        });
-        jButton2.addActionListener(actionEvent -> {
-            this.animationDirection = -1;
-            this.animationTimer.setDelay(500);
-            this.isPlaying = true;
-        });
-        jButton4.addActionListener(actionEvent -> {
-            this.animationDirection = 1;
-            this.animationTimer.setDelay(500);
-            this.isPlaying = true;
-        });
-        jButton5.addActionListener(actionEvent -> {
-            this.animationDirection = 1;
-            this.animationTimer.setDelay(50);
-            this.isPlaying = true;
-        });
-        jButton3.addActionListener(actionEvent -> {
-            this.isPlaying = !this.isPlaying;
-        });
-        jButton6.addActionListener(actionEvent -> {
-            boolean bl;
-            this.isPlaying = false;
-            boolean bl2 = this.animateTarget.equals("Natal") || this.animateTarget.equals("Both") || !this.showTransitChart;
-            boolean bl3 = bl = (this.animateTarget.equals("Transit") || this.animateTarget.equals("Both")) && this.showTransitChart;
-            if (bl2) {
-                this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
-            }
-            if (bl) {
-                this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
-            }
-            this.updateChartData();
-            this.chartPanel.repaint();
-        });
+        // G13: each button calls the same method its keyboard shortcut calls. They were five
+        // inline listeners, so a shortcut could only have been a sixth copy of the same two lines -
+        // and a second copy is how every rule in this project has drifted.
+        jButton.addActionListener(actionEvent -> runTime(-1, FAST_DELAY_MS));
+        jButton2.addActionListener(actionEvent -> runTime(-1, SLOW_DELAY_MS));
+        jButton4.addActionListener(actionEvent -> runTime(1, SLOW_DELAY_MS));
+        jButton5.addActionListener(actionEvent -> runTime(1, FAST_DELAY_MS));
+        jButton3.addActionListener(actionEvent -> playPause());
+        // <b>The key text comes from the table, not from a string typed here.</b> A tooltip that
+        // named its own key could claim one that is not bound, which is the defect this table exists
+        // to make impossible - so these buttons do not know their keys except through Shortcuts.
+        jButton2.setToolTipText("Run time backwards" + Shortcuts.hint(Shortcuts.Key.STEP_BACK));
+        jButton3.setToolTipText("Start or stop time" + Shortcuts.hint(Shortcuts.Key.PLAY_PAUSE));
+        jButton4.setToolTipText("Run time forwards" + Shortcuts.hint(Shortcuts.Key.STEP_FORWARD));
+        jButton6.setToolTipText("Move the chart to this moment" + Shortcuts.hint(Shortcuts.Key.NOW));
+        jButton6.addActionListener(actionEvent -> jumpToNow());
         JButton jButton7 = new JButton("Snapshot");
         jButton7.setToolTipText("Read the natal chart as it currently stands");
         jButton7.addActionListener(actionEvent -> this.showReading(ReadingTier.PARAGRAPH));
@@ -7784,6 +7763,59 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
         });
         return slider;
+    }
+
+    // ---- the transport, as methods (G13) ------------------------------------------------
+    // Named so a keyboard shortcut and a button can call the same thing. Before 27 Sep these were
+    // five inline listeners inside a nine-thousand-line method, which meant a shortcut had nothing
+    // to call - and the delays were two magic numbers repeated twice each.
+
+    /** The fast rate's redraw interval, in milliseconds. */
+    static final int FAST_DELAY_MS = 50;
+
+    /** The slow rate's. */
+    static final int SLOW_DELAY_MS = 500;
+
+    /** Starts time running one way at one rate. */
+    void runTime(int direction, int delayMs) {
+        this.animationDirection = direction;
+        this.animationTimer.setDelay(delayMs);
+        this.isPlaying = true;
+    }
+
+    /** Starts or stops time, leaving the direction and rate alone. */
+    void playPause() {
+        this.isPlaying = !this.isPlaying;
+    }
+
+    /** True while time is running, so a check can see what the control did. */
+    boolean isPlaying() {
+        return this.isPlaying;
+    }
+
+    /**
+     * Stops, and moves whatever is being animated to this moment.
+     *
+     * Which rings move follows {@code animateTarget}, unchanged from the button this came from: the
+     * natal ring unless only the transit is being animated, and the sky ring when the transit chart
+     * is shown and included.
+     */
+    void jumpToNow() {
+        this.isPlaying = false;
+        boolean movesNatal = this.animateTarget.equals("Natal") || this.animateTarget.equals("Both")
+            || !this.showTransitChart;
+        boolean movesSky = (this.animateTarget.equals("Transit")
+            || this.animateTarget.equals("Both")) && this.showTransitChart;
+        if (movesNatal) {
+            this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
+        }
+        if (movesSky) {
+            this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+        }
+        this.updateChartData();
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
     }
 
     /** How often a held bar redraws while it runs on, in milliseconds; the distance is by the clock. */
