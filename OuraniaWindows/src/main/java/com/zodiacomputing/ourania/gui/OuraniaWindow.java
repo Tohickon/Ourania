@@ -421,6 +421,24 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /**
+     * What the middle ring carries: the sky, the same person moved on, or the chart directed.
+     *
+     * <b>A door onto something that was already built.</b> Progressions have ridden the outer
+     * ring since the setting existed, and the only way to ask for them was a dropdown three
+     * tabs into the Settings screen - so the capability was complete, checked, and invisible
+     * from the wheel a reader was looking at. That is this project's most-logged defect, and
+     * this is the door for it.
+     */
+    public void setOuterWheel(String which) {
+        Settings.setOuterWheel(which);
+        if (skymapPanel != null) {
+            skymapPanel.reloadAspectSelection();
+            skymapPanel.updateChartData();
+            skymapPanel.repaint();
+        }
+    }
+
     /** Lets the wheel's chips show what is actually drawn rather than what was last clicked. */
     public void syncRingBar(RingBar bar) {
         if (bar == null) {
@@ -690,20 +708,15 @@ public class OuraniaWindow extends JFrame {
         return held.length() == 0 ? TRANSITS_PAGE : held.toString();
     }
 
-    /** A ring's own word, as a tab heading rather than as running prose. */
+    /**
+     * A ring's own word, as a tab heading rather than as running prose.
+     *
+     * <b>The kind knows this now.</b> This was a switch with a default, which is a place where
+     * a ring kind added later is silently called "Chart" - and one was added the very next day.
+     * {@code WheelRing.Kind.heading} is a constructor argument, so the compiler asks.
+     */
     static String pageTitleOf(WheelRing.Kind kind) {
-        if (kind == null) {
-            return CHART_PAGE;
-        }
-        switch (kind) {
-            case CHART_A:    return "Chart A";
-            case COMPOSITE:  return "Composite";
-            case CHART_B:    return "Chart B";
-            case PROGRESSED: return "Progressed";
-            case TRANSIT:    return "Transits";
-            case SKY:        return "Sky";
-            default:         return CHART_PAGE;
-        }
+        return kind == null ? CHART_PAGE : kind.heading;
     }
 
     /** Kept so anything still calling the three-part form goes on working. */

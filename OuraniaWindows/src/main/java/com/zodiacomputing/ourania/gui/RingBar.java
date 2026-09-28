@@ -40,6 +40,8 @@ public final class RingBar extends JPanel {
     private final OuraniaWindow window;
     private final Chip partner;
     private final Chip sky;
+    private final Chip progressed;
+    private final Chip directed;
     private final Chip globe;
     private final java.util.List<Chip> layerChips = new java.util.ArrayList<>();
     private final java.util.Map<Chip, SkymapPanel.Layer> layerOf =
@@ -95,6 +97,41 @@ public final class RingBar extends JPanel {
             + "<i>Always this moment, at the sky's own location - it has its own row on the "
             + "setup screen and borrows nobody's birth data.</i></html>");
         add(sky);
+
+        // <b>Two chips for one ring, because they are two things it can carry.</b> The middle
+        // ring is the sky by default; these say "carry the same person moved on" and "carry the
+        // chart moved by one arc" instead. They are mutually exclusive because there is one
+        // ring - pressing either turns the other off, and pressing the lit one returns the ring
+        // to the sky. Neither is available in a synastry, where that ring is a second person
+        // and not a moment at all.
+        progressed = new Chip("Progressed", () -> {
+            if (window != null) {
+                window.setOuterWheel(Settings.OUTER_PROGRESSED.equals(Settings.outerWheel())
+                    ? Settings.OUTER_TRANSITS : Settings.OUTER_PROGRESSED);
+            }
+            apply();
+        });
+        progressed.openState = () -> Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+        progressed.setToolTipText("<html><b>The same person, moved on.</b><br>"
+            + "A day of ephemeris for a year of life, drawn round the birth chart. The houses "
+            + "stay natal, because a progressed wheel is progressed bodies in the birth "
+            + "frame.<br><i>Takes the middle ring, so it replaces the sky there.</i></html>");
+        add(progressed);
+
+        directed = new Chip("Solar Arc", () -> {
+            if (window != null) {
+                window.setOuterWheel(Settings.OUTER_SOLAR_ARC.equals(Settings.outerWheel())
+                    ? Settings.OUTER_TRANSITS : Settings.OUTER_SOLAR_ARC);
+            }
+            apply();
+        });
+        directed.openState = () -> Settings.OUTER_SOLAR_ARC.equals(Settings.outerWheel());
+        directed.setToolTipText("<html><b>Every point moved by one arc.</b><br>"
+            + "The distance the progressed Sun has travelled since birth, added to every body "
+            + "and angle alike. Nothing in a directed chart moves under its own power, so "
+            + "nothing in it is retrograde.<br><i>Takes the middle ring, so it replaces the "
+            + "sky there.</i></html>");
+        add(directed);
 
         // <b>A view, not a ring - which is why it is last and reads differently.</b> The three
         // chips before it say what is in the chart; this one says how the chart is drawn, and
@@ -197,6 +234,12 @@ public final class RingBar extends JPanel {
             || (transits && (mode == ChartMode.SYNASTRY
                 || mode == ChartMode.COMPOSITE_MIDPOINT
                 || mode == ChartMode.COMPOSITE_DAVISON));
+        // <b>Not in a synastry.</b> There the middle ring is a second person, so neither of
+        // these has a ring to take - and a chip that looks pressable and changes nothing is the
+        // defect this bar already carries two comments about.
+        boolean middleRingIsAMoment = mode != ChartMode.SYNASTRY;
+        progressed.available = middleRingIsAMoment;
+        directed.available = middleRingIsAMoment;
         partner.available = hasPartnerData;
         // <b>A chip for a chart nobody has entered does nothing, so it says so.</b> David:
         // "If Chart A has no info loaded into it from Chart setup then the button shouldn't
@@ -245,6 +288,8 @@ public final class RingBar extends JPanel {
         chartA.repaint();
         partner.repaint();
         sky.repaint();
+        progressed.repaint();
+        directed.repaint();
         globe.repaint();
         for (Chip c : layerChips) {
             c.repaint();
@@ -267,6 +312,8 @@ public final class RingBar extends JPanel {
          * reader deserves the right one - "not here" rather than "not now".
          */
         boolean available = true;
+        /** How this chip knows it is lit, when it is not one of the four the chain names. */
+        java.util.function.BooleanSupplier openState;
         /** Set on a chip that folds a drawn layer rather than opening a ring. */
         SkymapPanel.Layer layer;
         Runnable onLayerClick;
@@ -326,6 +373,12 @@ public final class RingBar extends JPanel {
         }
 
         private boolean open() {
+            // <b>A chip that knows its own state says so.</b> The chain below asks "am I the
+            // partner chip, am I the chartA chip" by identity, which grows a branch for every
+            // chip added; a chip carrying its own answer does not.
+            if (openState != null) {
+                return openState.getAsBoolean();
+            }
             if (layer != null) {
                 return window == null || window.isLayerOpen(layer);
             }

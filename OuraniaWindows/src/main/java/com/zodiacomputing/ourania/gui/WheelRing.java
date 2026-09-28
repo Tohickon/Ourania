@@ -45,17 +45,27 @@ public final class WheelRing {
      */
     public enum Kind {
         /** The chart being read: the inner wheel, and the thing everything else is read against. */
-        CHART_A("Chart A", null, false, null),
+        CHART_A("Chart A", null, false, null, "Chart A"),
         /** One chart made out of two. Still the inner wheel, but it belongs to nobody. */
-        COMPOSITE("the composite", null, false, null),
+        COMPOSITE("the composite", null, false, null, "Composite"),
         /** A second person, in a synastry. Their placements are their NATAL placements. */
-        CHART_B("Chart B", "Chart B", true, new float[] {9.0f, 4.0f}),
+        CHART_B("Chart B", "Chart B", true, new float[] {9.0f, 4.0f}, "Chart B"),
         /** The same person, moved on. A placement, not a passing event. */
-        PROGRESSED("progressed", "progressed", false, new float[] {2.0f, 3.0f}),
+        PROGRESSED("progressed", "progressed", false, new float[] {2.0f, 3.0f}, "Progressed"),
         /** The sky at a chosen moment, laid over the chart. */
-        TRANSIT("transiting", "transiting", false, new float[] {5.0f, 5.0f}),
+        TRANSIT("transiting", "transiting", false, new float[] {5.0f, 5.0f}, "Transits"),
         /** The sky now, wrapped around everything else. */
-        SKY("sky", SkymapPanel.SKY_RING_WORD, false, new float[] {1.0f, 4.0f});
+        SKY("sky", SkymapPanel.SKY_RING_WORD, false, new float[] {1.0f, 4.0f}, "Sky"),
+        /**
+         * Every natal point moved forward by one arc - the distance the progressed Sun has
+         * travelled since birth.
+         *
+         * <b>Not a moment, and that is what makes it different from every other ring here.</b>
+         * A progressed ring is the chart cast at another instant; a directed ring is the birth
+         * chart itself with one number added to every position. Nothing in it moves at its own
+         * speed, so a directed body has no speed and is never retrograde.
+         */
+        SOLAR_ARC("directed", "directed", false, new float[] {7.0f, 3.0f}, "Solar Arc");
 
         /** How a reader refers to this ring in running prose. */
         public final String label;
@@ -80,14 +90,24 @@ public final class WheelRing {
          */
         public final float[] dash;
 
-        Kind(String label, String ringWord, boolean isPerson) {
-            this(label, ringWord, isPerson, null);
-        }
+        /**
+         * What a TAB or a heading calls this ring, which is not what prose calls it.
+         *
+         * <b>"transiting" in a sentence, "Transits" over a page.</b> These were two mappings -
+         * this enum held the prose and {@code OuraniaWindow} held a switch for the headings -
+         * and a switch with a default is a place where a new ring gets silently called "Chart".
+         * On 27 Sep a naming rule that could only name one of two rings sent David looking for
+         * a tab that had been renamed; adding a seventh kind the next day with the headings
+         * still in a switch would have been the same defect volunteering for a repeat. It is a
+         * constructor argument, so a kind cannot be added without saying what to call it.
+         */
+        public final String heading;
 
-        Kind(String label, String ringWord, boolean isPerson, float[] dash) {
+        Kind(String label, String ringWord, boolean isPerson, float[] dash, String heading) {
             this.label = label;
             this.ringWord = ringWord;
             this.isPerson = isPerson;
+            this.heading = heading;
             this.dash = dash;
         }
 

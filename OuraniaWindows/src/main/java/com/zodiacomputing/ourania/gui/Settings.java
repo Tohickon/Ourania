@@ -768,7 +768,11 @@ public final class Settings {
     /** The chart advanced a day per year of life, drawn round the natal frame. */
     public static final String OUTER_PROGRESSED = "Progressions";
 
-    public static final String[] OUTER_WHEELS = {OUTER_TRANSITS, OUTER_PROGRESSED};
+    /** Every natal point moved by one arc, the progressed Sun's travel since birth. */
+    public static final String OUTER_SOLAR_ARC = "Solar Arc";
+
+    public static final String[] OUTER_WHEELS =
+        {OUTER_TRANSITS, OUTER_PROGRESSED, OUTER_SOLAR_ARC};
 
     public static String outerWheel() {
         String v = get(OUTER_WHEEL_KEY, OUTER_TRANSITS);

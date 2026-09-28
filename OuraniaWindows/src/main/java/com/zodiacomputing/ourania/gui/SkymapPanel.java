@@ -122,6 +122,17 @@ extends JPanel {
     boolean showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
 
     /**
+     * Whether the middle ring carries the directed chart rather than a moment.
+     *
+     * <b>Directed is not progressed, and the difference is where the work happens.</b> A
+     * progressed ring is this chart cast at another instant, so it is computed the ordinary way
+     * with the moment moved. A directed ring is the birth chart with ONE NUMBER added to every
+     * position - no second cast, no ephemeris call per body, and no speeds, because nothing in
+     * it is moving under its own power.
+     */
+    boolean showSolarArc = Settings.OUTER_SOLAR_ARC.equals(Settings.outerWheel());
+
+    /**
      * What to call a body when opening a full reading for it, given the ring it was clicked on.
      *
      * <b>The outer ring is not always a transit.</b> In SYNASTRY it is a second person and in
@@ -5927,6 +5938,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // none, because the suite goes green either way. This is the hook SettingsPanel calls
         // when anything it owns changes, which is exactly when this needs re-reading.
         this.showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+        this.showSolarArc = Settings.OUTER_SOLAR_ARC.equals(Settings.outerWheel());
         // And the rings that follow from it. Without this, choosing Progressions here changed
         // what the middle ring carried and not whether the sky had anywhere to go.
         this.applyRingFlags();
@@ -7864,6 +7876,52 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
+    /**
+     * Fill the middle ring with every natal point moved by one arc.
+     *
+     * <b>One number, added to everything.</b> That is the whole of a solar arc direction: the
+     * distance the progressed Sun has travelled since birth, applied to every body and to the
+     * angles alike. So this copies the natal ring and adds - it does not cast a second chart,
+     * and it makes no ephemeris call per body. {@code SolarArc.arcAt} computes the arc, which
+     * is the one place that knows what "the progressed Sun's travel" means.
+     *
+     * <p><b>No speeds, and so nothing retrograde.</b> A directed point is not moving under its
+     * own power; it is being carried. Leaving the natal speeds in place would have the wheel
+     * draw retrograde marks on points that are not moving at all, which is a confident wrong
+     * answer of exactly the kind this project keeps finding.
+     *
+     * <p>The houses stay natal, the same choice the progressed ring makes: a directed chart is
+     * read in the birth frame.
+     */
+    private void directRing(SweDate at) {
+        double natalSunLon = Double.NaN;
+        int sunIndex = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Sun");
+        if (sunIndex >= 0 && this.natalRing.valid[sunIndex]) {
+            natalSunLon = this.natalRing.lon[sunIndex];
+        }
+        double arc = Double.NaN;
+        if (!Double.isNaN(natalSunLon)) {
+            arc = com.zodiacomputing.ourania.astro.SolarArc.arcAt(
+                this.sw, this.natalRing.sd.getJulDay(), natalSunLon, at.getJulDay());
+        }
+        if (Double.isNaN(arc)) {
+            // <b>No arc means no directed ring, and an empty ring says so.</b> Filling it with
+            // the natal positions unmoved would draw a directed chart identical to the birth
+            // chart, which reads as "nothing has happened yet" rather than as "this could not
+            // be computed".
+            Arrays.fill(this.outerRing.valid, false);
+            Arrays.fill(this.outerRing.ok, false);
+            return;
+        }
+        for (int i = 0; i < this.outerRing.lon.length; i++) {
+            this.outerRing.valid[i] = this.natalRing.valid[i];
+            this.outerRing.ok[i] = this.natalRing.ok[i];
+            this.outerRing.lon[i] = com.zodiacomputing.ourania.astro.Zodiac.normalise(
+                this.natalRing.lon[i] + arc);
+            this.outerRing.speed[i] = 0.0;
+        }
+    }
+
     /** How often a held bar redraws while it runs on, in milliseconds; the distance is by the clock. */
     static final int SHUTTLE_TICK_MS = 50;
     /** Steps a second with the knob pulled all the way. */
@@ -8064,6 +8122,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // on; then the sky over the chart.
         this.outerRing.kind = this.isSynastryChart() ? WheelRing.Kind.CHART_B
             : this.showProgressed ? WheelRing.Kind.PROGRESSED
+            : this.showSolarArc ? WheelRing.Kind.SOLAR_ARC
             : WheelRing.Kind.TRANSIT;
 
         // The third ring is only ever the sky - which is why it was the one name that never
@@ -8156,7 +8215,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.natalRing.sd != null && !relationship) {
             this.computeBodies(this.natalRing.sd, this.natalRing.cusps, this.natalRing.lon, this.natalRing.speed, this.natalRing.ok, this.natalRing.valid);
         }
-        if (this.showTransitChart && outerSd != null) {
+        boolean directedRing = this.showSolarArc && !relationship
+            && this.natalRing.sd != null && outerSd != null;
+        if (directedRing) {
+            directRing(outerSd);
+        } else if (this.showTransitChart && outerSd != null) {
             this.computeBodies(outerSd, this.outerRing.cusps, this.outerRing.lon, this.outerRing.speed, this.outerRing.ok, this.outerRing.valid);
         } else {
             Arrays.fill(this.outerRing.valid, false);
