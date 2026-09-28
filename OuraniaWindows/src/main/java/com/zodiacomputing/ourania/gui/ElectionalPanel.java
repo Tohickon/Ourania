@@ -200,14 +200,12 @@ public final class ElectionalPanel extends JPanel {
      * only shows two zones give two instants would pass whatever this method returned.
      */
     static ZoneId zoneOf(Geocoder.Result where) {
-        if (where != null && where.tzId != null && !where.tzId.trim().isEmpty()) {
-            try {
-                return ZoneId.of(where.tzId.trim());
-            } catch (Exception ignored) {
-                // An unknown zone id is not worth refusing the election over.
-            }
-        }
-        return ZoneId.systemDefault();
+        // <b>Delegated since 28 September</b> (G7). The chart book's placement search needs the
+        // same rule, and this was the second place it would have lived; the reasoning that earned
+        // it - a moment is local to the PLACE, not to this computer - is on Moments.zoneOf now.
+        // Kept as a method here because ElectionalPanelCheck asserts it by name, and that
+        // assertion is about this screen's behaviour whichever class does the work.
+        return Moments.zoneOf(where);
     }
 
     /** A typed moment, or null. Lenient about the minute so "2026-09-25 14" is not a refusal. */

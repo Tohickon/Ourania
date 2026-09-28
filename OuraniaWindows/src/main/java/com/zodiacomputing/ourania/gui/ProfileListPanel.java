@@ -61,7 +61,10 @@ public final class ProfileListPanel extends JPanel {
         search.setForeground(Color.WHITE);
         search.setCaretColor(Color.WHITE);
         search.setBorder(Theme.card(CARD_EDGE, Theme.GAP_S));
-        search.setToolTipText("Filter the saved charts by name");
+        search.setToolTipText("<html>Find a saved chart by <b>name, note, place or tag</b> "
+            + "&mdash; or by a placement:<br><b>Moon in Scorpio</b>, <b>Mars in 7</b>, "
+            + "<b>Mercury retrograde</b>.<br>A placement search casts each saved chart, so it "
+            + "takes a moment the first time.</html>");
         search.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 rebuild();
@@ -95,17 +98,41 @@ public final class ProfileListPanel extends JPanel {
         rebuild();
     }
 
+    /**
+     * The charts a search box's text selects (G7).
+     *
+     * <b>A placement question is answered first, and only when the text is one.</b> Parsing
+     * decides: anything that is not a placement is a text search, which is what nearly every
+     * keystroke is. A parser that guessed would turn a search for a client called Mars into a
+     * sweep of the ephemeris, and a search box that sometimes takes seconds for no visible reason
+     * is worse than one that cannot answer the question at all.
+     *
+     * <b>Package-private so the check can ask it without a window.</b> Asserting through the built
+     * panel would be asserting Swing.
+     */
+    java.util.List<String> matching(String filter) {
+        if (filter == null || filter.trim().isEmpty()) {
+            return SavedCharts.names();
+        }
+        PlacementQuery q = PlacementQuery.parse(filter);
+        if (q != null) {
+            return Moments.matching(q, new int[1]);
+        }
+        // <b>SavedCharts.search, which matches the name, the notes, the place AND the tags.</b>
+        // It has existed since the book grew up and this panel matched the name only, so three
+        // of the four things it can find were unreachable - the thing exists and has no door,
+        // for the third time this month.
+        return SavedCharts.search(filter, null);
+    }
+
     /** Re-reads the store. Called on construction, on every keystroke, and after a save. */
     public void rebuild() {
         list.removeAll();
-        String filter = search == null ? "" : search.getText().trim().toLowerCase();
+        String filter = search == null ? "" : search.getText().trim();
 
-        List<String> names = SavedCharts.names();
+        List<String> names = matching(filter);
         int shown = 0;
         for (String name : names) {
-            if (!filter.isEmpty() && !name.toLowerCase().contains(filter)) {
-                continue;
-            }
             SavedCharts.Entry entry = SavedCharts.get(name);
             if (entry == null) {
                 continue;
