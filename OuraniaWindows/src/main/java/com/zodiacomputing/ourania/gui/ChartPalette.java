@@ -51,10 +51,12 @@ public final class ChartPalette {
     public static final String WARM = "Warm";
     public static final String MONO_DARK = "Black & White";  // black ink, white ground
     public static final String MONO_LIGHT = "White & Black";  // white ink, black ground
+    /** G14: every colour above WCAG AAA against the ground, and the check measures it. */
+    public static final String HIGH_CONTRAST = "High Contrast";
 
     /** The templates on offer, in the order the chooser lists them. */
     public static final String[] TEMPLATES = {
-        CLASSIC, COSMIC, COOL, WARM, MONO_DARK, MONO_LIGHT};
+        CLASSIC, COSMIC, COOL, WARM, MONO_DARK, MONO_LIGHT, HIGH_CONTRAST};
 
     /**
      * A whole palette: every aspect, the four elements, the mansion ring and the wheel ground.
@@ -136,6 +138,30 @@ public final class ChartPalette {
                 "#7E7E7E", "#969696"},
             new String[] {"#E8E8E8", "#BEBEBE", "#D2D2D2", "#A0A0A0"},
             "#9A9A9A", "#000000", "#C8C8C8");
+    }
+
+    static {
+        // <b>High Contrast is a measurement, not a taste (G14).</b> Every colour in it clears
+        // WCAG AAA - a contrast ratio of 7 to 1 - against the black ground, and
+        // AccessibilityCheck computes that rather than trusting this paragraph. The two mono
+        // templates are the closest thing the app had and neither qualifies: "White & Black"
+        // runs down to #7E7E7E, which is 4.6 to 1.
+        //
+        // <b>The minor aspects deliberately reuse the majors' hues.</b> Fifteen colours that are
+        // all above 7 to 1 AND all tellable apart from one another do not exist - past about
+        // eight, distinguishing them is harder than reading them. Aspect type carries its own
+        // dash pattern, so a reader who cannot separate two hues can still separate two lines,
+        // and a palette that pretended otherwise would be fifteen near-identical pale colours.
+        define(HIGH_CONTRAST,
+            new String[] {
+                // The five Ptolemaic aspects first, and these five are chosen to be as far
+                // apart in hue as they are high in luminance.
+                "#FFFFFF", "#00FFFF", "#FF5F5F", "#5FFF5F", "#FFFF00",
+                // The minors, reusing those hues in order.
+                "#FFB3FF", "#87CEFA", "#FFC04D", "#B0FFB0", "#FFFFB0",
+                "#FFD9B3", "#C8B3FF", "#A0FFFF", "#D0FFD0", "#FFE680"},
+            new String[] {"#FF5F5F", "#5FFF5F", "#FFFF00", "#00FFFF"},
+            "#FFB3FF", "#000000", "#FFFFFF");
     }
 
     private static void define(String name, String[] aspects, String[] elements,
@@ -307,6 +333,33 @@ public final class ChartPalette {
 
     private static Map<String, String> templateMap(String name) {
         return palette(name).aspects;
+    }
+
+    /**
+     * Every colour a template defines, by what it colours (G14).
+     *
+     * <b>Exists so a check can measure a template rather than read it.</b> The per-colour getters
+     * above all answer for the template <i>in force</i> plus the reader's overrides, which is
+     * right for drawing and useless for asking "does High Contrast actually clear AAA" - the
+     * answer would depend on whose settings the suite ran under, which is what J14 closed.
+     *
+     * The wheel is included, because what every other colour is measured against is the ground.
+     */
+    static Map<String, String> everyColourOf(String template) {
+        Palette p = palette(template);
+        Map<String, String> out = new LinkedHashMap<>(p.aspects);
+        for (int i = 0; i < p.elements.length; i++) {
+            out.put("element " + i, p.elements[i]);
+        }
+        out.put("mansion", p.mansion);
+        out.put("ink", p.ink);
+        out.put("wheel", p.wheel);
+        return out;
+    }
+
+    /** The ground a template draws on, which every other colour is measured against. */
+    static String groundOf(String template) {
+        return palette(template).wheel;
     }
 
     /** The reader's per-aspect colours. Empty when nothing has been overridden. */

@@ -262,6 +262,14 @@ public class OuraniaWindow extends JFrame {
         
         // Add our newly ported Skymap Rendering Panel!
         skymapPanel = new SkymapPanel(this);
+        // <b>The one component outside Settings a reader cannot do without a name for</b> (G14).
+        // The wheel is the app: to a screen reader it is an unnamed drawing surface, and every
+        // placement it shows is reachable in words through the Placements page beside it, which
+        // is what the description says. Named here rather than in the panel's constructor because
+        // four check suites build that panel to inspect it and none of them is a reader.
+        Accessibility.name(skymapPanel, "Chart wheel",
+            "The chart, drawn. Every position it shows is also listed in words on the "
+            + "Placements page of the left rail.");
         contentPanel.add(skymapPanel, "SKYMAP");
 
         nameListPanel = new NameListPanel(skymapPanel, this);

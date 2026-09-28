@@ -776,6 +776,13 @@ public class SettingsPanel extends JPanel {
         // which against this screen's light text makes the tab you are on the one you cannot read.
         Widgets.styleTabs(this.tabs);
 
+        // <b>What a screen reader is told, from the same place the search gets its names</b>
+        // (G14). Here rather than beside each control, because a control's name comes from the
+        // label next to it and is not knowable until the layout exists - the same reason the
+        // search index is built from the finished tree rather than listed. A control added later
+        // is named by this without being told about.
+        Accessibility.nameSettings(this.tabs);
+
         JPanel centre = new JPanel(new BorderLayout());
         centre.setBackground(Color.BLACK);
         centre.add(this.tabs, BorderLayout.CENTER);
