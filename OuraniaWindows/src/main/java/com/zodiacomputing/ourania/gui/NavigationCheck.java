@@ -1486,6 +1486,34 @@ public final class NavigationCheck {
         ok("a composite is left alone",
             !SkymapPanel.triWheelShown(ChartMode.COMPOSITE_MIDPOINT, true, true));
 
+        // <b>And the tab over the second page names every ring that page holds.</b> David,
+        // 27 Sep: "where did the transit tab go in a synastry transits chart" - it had been
+        // renamed Chart B, because the naming rule named the outer ring and stopped. Nothing
+        // asserted the rule at all when it was written, which is how the one chart that draws
+        // two second rings shipped with one of them unnamed. Measured on the rule rather than
+        // on the built rail, because the rule is a static that takes its rings.
+        eq("a synastry with transits names both rings", "Chart B · Sky",
+            OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, true, WheelRing.Kind.SKY, true));
+        eq("a progressed tri-wheel names both rings", "Progressed · Sky",
+            OuraniaWindow.secondPageTitle(WheelRing.Kind.PROGRESSED, true, WheelRing.Kind.SKY, true));
+        eq("a plain transit chart still says Transits", "Transits",
+            OuraniaWindow.secondPageTitle(WheelRing.Kind.TRANSIT, true, WheelRing.Kind.SKY, false));
+        eq("a synastry without transits still says Chart B", "Chart B",
+            OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, true, WheelRing.Kind.SKY, false));
+        eq("the sky alone is named for itself", "Sky",
+            OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, false, WheelRing.Kind.SKY, true));
+        eq("with no second ring the page wears its own identity", "Transits",
+            OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, false, WheelRing.Kind.SKY, false));
+        // The rule rather than the six strings: a ring that is drawn is a ring that is named.
+        for (WheelRing.Kind outer : new WheelRing.Kind[] {WheelRing.Kind.CHART_B,
+                WheelRing.Kind.TRANSIT, WheelRing.Kind.PROGRESSED}) {
+            String both = OuraniaWindow.secondPageTitle(outer, true, WheelRing.Kind.SKY, true);
+            ok("a drawn " + outer + " is named in " + both,
+                both.contains(OuraniaWindow.pageTitleOf(outer)));
+            ok("the drawn sky is named in " + both,
+                both.contains(OuraniaWindow.pageTitleOf(WheelRing.Kind.SKY)));
+        }
+
         final OuraniaWindow[] hold = new OuraniaWindow[1];
         javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
         try {

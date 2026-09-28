@@ -627,14 +627,52 @@ public class OuraniaWindow extends JFrame {
         if (chartRail == null || skymapPanel == null) {
             return;
         }
-        chartRail.setPageLabel(CHART_PAGE, title(skymapPanel.natalRing.kind));
-        chartRail.setPageLabel(TRANSITS_PAGE, skymapPanel.outerRingDrawn()
-            ? title(skymapPanel.outerRing.kind)
-            : (skymapPanel.triRingDrawn() ? title(skymapPanel.skyRing.kind) : TRANSITS_PAGE));
+        chartRail.setPageLabel(CHART_PAGE, pageTitleOf(skymapPanel.natalRing.kind));
+        chartRail.setPageLabel(TRANSITS_PAGE, secondPageTitle(
+            skymapPanel.outerRing.kind, skymapPanel.outerRingDrawn(),
+            skymapPanel.skyRing.kind, skymapPanel.triRingDrawn()));
+    }
+
+    /**
+     * What to call the second chart page, which can hold two rings at once.
+     *
+     * <b>A tri-wheel puts two rings behind one tab, and the name could only hold one.</b>
+     * David, 27 Sep: "where did the transit tab go in a synastry transits chart". Nowhere - it
+     * had been renamed Chart B. The rule named the outer ring and looked at the sky ring only
+     * when there was no outer ring, so on the one chart that draws both, the ring the reader
+     * had gone looking for was the one left out of the name. That is the 26 Sep mislabelling
+     * again, one case along: the fix replaced a fixed wrong name with a derived one, and the
+     * page it renames can hold more rings than the rule could name.
+     *
+     * <b>The page prints a heading for each ring it holds</b> - Chart B's placements and then
+     * "Sky (Transiting)" - so the tab names each ring it holds, for the same reason and out of
+     * the same {@code WheelRing.Kind} words.
+     *
+     * <p>Static, and given its rings rather than reading the panel, so the naming can be
+     * measured without building a window - the shape {@code SkymapPanel.triWheelShown} already
+     * uses for the neighbouring rule about which of these rings are drawn at all. Nothing
+     * asserted this rule when it was written, which is why the missing case shipped; Part P of
+     * {@link NavigationCheck} asserts it now.
+     */
+    static String secondPageTitle(WheelRing.Kind outer, boolean outerDrawn,
+                                  WheelRing.Kind sky, boolean skyDrawn) {
+        StringBuilder held = new StringBuilder();
+        if (outerDrawn) {
+            held.append(pageTitleOf(outer));
+        }
+        if (skyDrawn) {
+            if (held.length() > 0) {
+                held.append(" · ");
+            }
+            held.append(pageTitleOf(sky));
+        }
+        // No second ring drawn at all: the page is greyed out, and the name it wears while
+        // unavailable is its own identity rather than whatever was last on the wheel.
+        return held.length() == 0 ? TRANSITS_PAGE : held.toString();
     }
 
     /** A ring's own word, as a tab heading rather than as running prose. */
-    private static String title(WheelRing.Kind kind) {
+    static String pageTitleOf(WheelRing.Kind kind) {
         if (kind == null) {
             return CHART_PAGE;
         }
