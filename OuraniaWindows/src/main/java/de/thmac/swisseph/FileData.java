@@ -777,16 +777,47 @@ class FileData implements java.io.Serializable {
 			}
 			return SweConst.OK;
 		} catch (java.io.IOException e) {
-			PrintWriter prErr = new PrintWriter(new StringWriter());
-			e.printStackTrace(prErr);
-			serr.append("file error in swisseph.FileData: " + prErr.toString());
-			throw new SwissephException(tfstart, SwissephException.DAMAGED_FILE_ERROR, SweConst.ERR, serr);
+			throw damaged(tfstart, e, serr);
 		} catch (Exception e) {
-			PrintWriter prErr = new PrintWriter(new StringWriter());
-			e.printStackTrace(prErr);
-			serr.append("file error in swisseph.FileData: " + prErr.toString());
-			throw new SwissephException(tfstart, SwissephException.DAMAGED_FILE_ERROR, SweConst.ERR, serr);
+			throw damaged(tfstart, e, serr);
 		}
+	}
+
+	/**
+	 * The one way this class reports a file it could not read.
+	 *
+	 * <b>It used to crash instead of reporting, whenever nobody wanted the text.</b> The two
+	 * catch blocks above appended to serr without asking whether there was one - and this
+	 * package's own callers pass null whenever they do not want it. SweDate.setGlobalTidalAcc
+	 * probes the Moon with a null serr and ignores what comes back, because the lines directly
+	 * after the probe already handle a Moon file that will not read, by defaulting to the
+	 * Moshier ephemeris. So a read error during that probe raised a NullPointerException out of
+	 * a method documented to return ERR, past every catch (SwissephException) between here and
+	 * the caller, and took the application down on a chart this library was ready to compute -
+	 * on this machine, any chart at all outside the range of the files that are present, from
+	 * every call path at once, because the probe runs inside swe_calc_ut before the body the
+	 * caller actually asked for. Guarding serr is what the other hundred-odd places in this
+	 * package already do; these two were the exception.
+	 *
+	 * <b>And the message it built was a writer's identity hash.</b> The stack trace was printed
+	 * into a StringWriter which was then dropped on the floor, and prErr.toString() - a
+	 * PrintWriter's own toString - was appended in its place. Every "file error in
+	 * swisseph.FileData" this library has ever reported ended in something like
+	 * java.io.PrintWriter@1f2a3b. The error path discarded its own diagnosis and crashed when
+	 * nobody asked for one. The trace is read off the StringWriter now, and when there is no
+	 * serr it goes onto the exception rather than nowhere.
+	 */
+	private SwissephException damaged(double tfstart, Exception cause, StringBuffer serr) {
+		StringWriter trace = new StringWriter();
+		cause.printStackTrace(new PrintWriter(trace));
+		String message = "file error in swisseph.FileData: " + trace;
+		if (serr == null) {
+			return new SwissephException(tfstart, SwissephException.DAMAGED_FILE_ERROR,
+				SweConst.ERR, message);
+		}
+		serr.append(message);
+		return new SwissephException(tfstart, SwissephException.DAMAGED_FILE_ERROR,
+			SweConst.ERR, serr);
 	}
 
 	double[] getDatafileTimerange(SwissEph sw, String fname, String ephepath) throws SwissephException {
