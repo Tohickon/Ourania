@@ -41,6 +41,8 @@ public final class NavigationCheck {
         // line takes this suite red on "SidePanel.SCREENS matches", which is the pairing working
         // exactly as the comment above says it does.
         "HELP",
+        // G8, same day: the rectification screen.
+        "RECTIFY",
     };
 
     private static final List<String> failures = new ArrayList<>();

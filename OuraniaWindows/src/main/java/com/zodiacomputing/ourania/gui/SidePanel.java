@@ -88,6 +88,10 @@ public final class SidePanel extends JPanel {
         // Construction)", with the note that it would come back when there was something behind
         // it. There is: a page generated from these three arrays and the shortcut table, so it
         // cannot describe a menu the app does not have.
+        // G8, 28 Sep. The scrub bar and the Rodden rating were the raw material; this is the
+        // method - dated events, scored against every birth time in a window.
+        {"Rectify", "RECTIFY",
+            "Work out a birth time from dated life events, scored against the directed angles"},
         {"Help", "HELP",
             "What each screen does, every keyboard shortcut, and the words this app uses in a "
             + "particular way"},

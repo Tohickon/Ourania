@@ -406,6 +406,8 @@ public class OuraniaWindow extends JFrame {
         //
         // Share, Sync and Connect are still gone. SidePanel.SCREENS is the list, and
         // NavigationCheck asserts the two agree.
+        contentPanel.add(new RectifyPanel(this), "RECTIFY");
+
         javax.swing.JEditorPane helpPane = HtmlPanes.darkPane();
         HtmlPanes.setHtml(helpPane, Help.html());
         helpPane.setCaretPosition(0);
@@ -573,6 +575,17 @@ public class OuraniaWindow extends JFrame {
             skymapPanel.setGlobeMode(globe);
             syncRingBar(skymapPanel.ringBarComponent());
         }
+    }
+
+    /**
+     * The chart currently drawn, for a screen that reads it rather than casts its own (G8).
+     *
+     * <b>Through the window rather than by handing a panel the wheel.</b> SkymapPanel already
+     * answers this; what a second panel must not have is a reference to the wheel, which is how
+     * two screens end up disagreeing about which chart is showing.
+     */
+    public com.zodiacomputing.ourania.astro.ChartFrame currentChartFrame() {
+        return skymapPanel == null ? null : skymapPanel.getCurrentChart();
     }
 
     /** The wheel's chart-setting dropdowns, for the Settings screen to host. */
