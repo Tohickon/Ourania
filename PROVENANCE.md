@@ -8,6 +8,12 @@ where any of it came from.
 This is a record of what is *established*, what is *inferred*, and what is
 *unknown*. It deliberately keeps those three apart.
 
+
+> **Since 2026-09-28 the record is kept per file, and enforced.** `OuraniaWindows/src/main/resources/data/provenance.tsv`
+> gives every file the app opens a writer (david, agent, external, unknown), a shape (written or
+> composed) and how that is known. `CorpusCheck` fails on a file with no row, and *measures* the
+> shape rather than trusting it. This document stays the reasoning; the manifest is the record.
+
 ---
 
 ## What is established by measurement
