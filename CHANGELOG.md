@@ -5,8 +5,9 @@ repository's commit subjects - do not edit it by hand, edit the commit messages.
 The current version is in `OuraniaWindows/VERSION` (**0.9.0**), which is the one
 place the number is written; the app reads it from a stamp the build makes.
 
-## Unreleased
+## v0.9.0 - 2026-09-28
 
+- `4e3e45d3` 2026-09-28 - Section J: what the app checks before it opens, and what it can say went wrong
 - `b929af35` 2026-09-28 - The silent wrong Sun, narrowed to three lines and two dead guards
 - `28ccc03e` 2026-09-28 - A house says what is standing in it
 - `0803c648` 2026-09-28 - The wheel and the readings cast their houses at the same place
