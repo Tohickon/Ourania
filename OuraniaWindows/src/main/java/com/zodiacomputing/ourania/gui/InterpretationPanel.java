@@ -1653,8 +1653,48 @@ public class InterpretationPanel extends JPanel {
             }
         }
         html.append("<p>").append(InterpretationService.getInstance().getHouse(houseNum)).append("</p>");
+        html.append(houseOccupantsHtml(houseNum));
         html.append("</body></html>");
         setHtml(html.toString(), false);
+    }
+
+    /**
+     * Who is standing in this house.
+     *
+     * <p><b>The house page was the only one of these that did not say.</b> David, 27 Sep: a selected
+     * house "doesnt let me know what bodies or points are inside of it". A sign, a decan, a Sabian
+     * degree and an Egyptian bound have all listed their occupants since {@code Occupants} was written -
+     * and its own header says why: whether anything of yours is actually standing there is "the first
+     * thing a reader wants to know and the one thing the panel could not say". The house page had been
+     * left out, so the one slice a reader is most likely to click was the one that answered in the
+     * abstract.
+     *
+     * <p><b>Cusps, not thirty degrees.</b> {@code occupantsHtml} takes a sign and an offset, which
+     * cannot describe a house: houses come from their own cusps, are unequal in most systems, and one
+     * of them crosses 0 degrees of Aries in most charts. {@code Occupants.inSpan} normalises the start
+     * and is half-open, so a cusp span goes straight in - and the span itself comes from
+     * {@code SkymapPanel.houseSpan}, which the globe's focus wedge now shares.
+     */
+    private String houseOccupantsHtml(int houseNum) {
+        if (skymapPanel == null || houseNum < 1 || houseNum > 12) {
+            return "";
+        }
+        double[] cusps = skymapPanel.activeCusps;
+        if (cusps == null || cusps.length < 13) {
+            return "";
+        }
+        try {
+            double from = SkymapPanel.houseStart(cusps, houseNum);
+            double span = SkymapPanel.houseSpan(cusps, houseNum);
+            return Occupants.html(
+                Occupants.inSpan(skymapPanel.getCurrentChart(), from, span),
+                skymapPanel.transitOccupants(from, span),
+                "house");
+        } catch (Exception e) {
+            // Same reason as occupantsHtml: a panel that cannot show its extras is worth far more
+            // than one that throws out of a click handler and leaves the reading blank.
+            return "";
+        }
     }
     
     /** "fire 8.0, air 6.0, ..." - the weighted balance, largest first. */
