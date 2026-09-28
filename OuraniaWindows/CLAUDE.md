@@ -4,6 +4,17 @@
 vault and does not auto-load when a session starts in this directory. Read it first.
 
 Vault root: `C:\Users\daver\Documents\BRAIN\Brain`
+(`Documents\BRAIN` is a junction to `Projects\BRAIN` - one vault, two valid paths.)
+
+**The vault has a private remote as of 2026-09-28: `Tohickon/brain-vault`.** Commit vault
+changes as before and push them; it is private, and David's decision, taken knowing it carries
+personal material. **It is private and must stay private** - it holds birth data for David and
+for three other named people, and that is not yours to expose. Do not make it public, do not
+copy its contents into the public `Tohickon/Ourania` repo, and do not add collaborators.
+
+Until this date the standing rule was *commit the vault, never push it*, and that rule lived
+in no file at all - it was carried from session to session in handovers. Which is why it is
+written here now.
 
 | Read this | Path in vault |
 |---|---|
