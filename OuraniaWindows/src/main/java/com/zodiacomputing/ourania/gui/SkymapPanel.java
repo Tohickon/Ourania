@@ -4585,6 +4585,15 @@ extends JPanel {
                 if ("SOLARARC".equals(kind)) {
                     return ChartTables.solarArc(f, SkymapPanel.this.sw, jd, now);
                 }
+                // The firdaria need the birth moment and the moment being asked about, and
+                // nothing else - no ephemeris call, because the periods are arithmetic on a
+                // life rather than a position in the sky.
+                if ("FIRDARIA".equals(kind)) {
+                    return ChartTables.firdaria(f, jd, now);
+                }
+                if ("PRIMARY_DIRECTIONS".equals(kind)) {
+                    return ChartTables.primaryDirections(f, SkymapPanel.this.sw, jd, now);
+                }
                 // A year either side of the clock: enough for one solar return, the lunar
                 // returns inside it, and the annual three. Cast for the chart's own place -
                 // relocation is a claim the user has to make, and there is no field for it

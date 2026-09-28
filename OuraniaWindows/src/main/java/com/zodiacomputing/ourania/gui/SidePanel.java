@@ -141,6 +141,10 @@ public final class SidePanel extends JPanel {
             "Every point moved forward by the arc the progressed Sun has travelled"));
         tables.add(tableButton("Draconic", "DRACONIC",
             "The same sky measured from the Moon's node, beside the tropical chart"));
+        tables.add(tableButton("Directions", "PRIMARY_DIRECTIONS",
+            "Primary directions: the chart turned on its axis, a degree of the equator for a year of life"));
+        tables.add(tableButton("Firdaria", "FIRDARIA",
+            "The Persian time lords: seventy-five years in nine periods, and the sevenths inside them"));
         tables.add(tableButton("Returns", "RETURNS",
             "The year's returns: solar and lunar as charts, the annual three as triggers"));
         accordion.addSection(TABLES, tables);

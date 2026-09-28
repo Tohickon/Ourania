@@ -784,6 +784,44 @@ public final class Settings {
         set(OUTER_WHEEL_KEY, which);
     }
 
+    public static final String DIRECTION_KEY_KEY = "chart.directionKey";
+
+    /**
+     * Which key turns an arc of primary direction into years of life (F9).
+     *
+     * <b>A setting rather than a constant, and that was David's call, 2026-09-27.</b> The three
+     * keys in use disagree by most of a year over a lifetime and by more than three years for a
+     * chart born near an equinox, and each carries a different tradition behind it. Fixing one
+     * in code would be this project choosing a school on the reader's behalf - the same argument
+     * that made house systems and orbs settings. Naibod is the default because it is what
+     * traditional practice expects; the names are the reader's words, so the stored value is
+     * readable in the settings file.
+     */
+    /**
+     * <b>"Placidian", not "Placidus".</b> Placidus gave his name to a house system AND to
+     * this key, and a reader who types "placidus" into the settings search wants the house
+     * system - it is the far commoner meaning. reg36 caught the collision: the search
+     * stopped finding Houses and started finding this. Naming the key for the method rather
+     * than the man removes the ambiguity at the source instead of teaching the search to
+     * rank one above the other, which would have been a rule about two settings living
+     * inside a third.
+     */
+    public static final String[] DIRECTION_KEYS = {"Naibod", "Ptolemy", "Placidian"};
+
+    public static String directionKey() {
+        String v = get(DIRECTION_KEY_KEY, DIRECTION_KEYS[0]);
+        for (String k : DIRECTION_KEYS) {
+            if (k.equals(v)) {
+                return k;
+            }
+        }
+        return DIRECTION_KEYS[0];
+    }
+
+    public static void setDirectionKey(String which) {
+        set(DIRECTION_KEY_KEY, which);
+    }
+
     /**
      * How much of the aspect geometry the wheel draws. Settled 2026-09-03; DECISIONS.md, K5.
      *

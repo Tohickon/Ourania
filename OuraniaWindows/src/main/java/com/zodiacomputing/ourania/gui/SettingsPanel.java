@@ -679,6 +679,42 @@ public class SettingsPanel extends JPanel {
 
         body = engine;
         body.add(variantToggles());
+        // <b>F9's key belongs here, not on Globe & Display where it was first put.</b> It
+        // changes the DATES the engine computes, not how anything is drawn, which is the
+        // distinction this tab exists to hold. reg36 is what said so: searching "placidus"
+        // stopped finding the house system and started finding this, and the tab it pointed at
+        // changed with it - the search was reporting a misfiling rather than a naming clash
+        // alone.
+        JPanel keyRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        keyRow.setBackground(Color.BLACK);
+        keyRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel keyLabel = new JLabel("Direction key:");
+        keyLabel.setForeground(TEXT);
+        keyLabel.setFont(Theme.BODY);
+        final JComboBox<String> keyCombo = new JComboBox<>(Settings.DIRECTION_KEYS);
+        seeding = true;
+        keyCombo.setSelectedItem(Settings.directionKey());
+        seeding = false;
+        Widgets.styleCombo(keyCombo);
+        keyCombo.setToolTipText("<html>How an arc of primary direction becomes years of life. "
+            + "<b>Naibod</b> is the Sun's mean daily motion, 0&deg;59'08\", and what traditional "
+            + "practice expects. <b>Ptolemy</b> is one degree for one year - simplest to explain, "
+            + "and roughly a year ahead of Naibod by age sixty. <b>Placidian</b> measures the arc "
+            + "this chart's own Sun actually travelled - Placidus's own method, named for the "
+            + "method rather than the man so it cannot be mistaken for the house system - and it "
+            + "varies with the season of birth: near an equinox it runs several years slower than "
+            + "the mean.</html>");
+        keyCombo.addActionListener(e -> {
+            Object picked = keyCombo.getSelectedItem();
+            if (!constructing && !seeding && picked != null) {
+                Settings.setDirectionKey(String.valueOf(picked));
+            }
+        });
+        keyRow.add(keyLabel);
+        keyRow.add(keyCombo);
+        body.add(keyRow);
+        body.add(Box.createRigidArea(new Dimension(0, 10)));
+
         body = aspects;
         body.add(natalOrbs());
         body.add(Box.createRigidArea(new Dimension(0, 8)));

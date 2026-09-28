@@ -837,6 +837,137 @@ public final class ChartTables {
     }
 
     /** Calendar date of a Julian day, in UT - the same form the report prints. */
+    /**
+     * F8: the firdaria, the Persian time lords.
+     *
+     * <b>Nine periods and seventy-five years</b>, opening with the Sun for a day nativity and
+     * the Moon for a night one. The running period is marked rather than shown alone, because
+     * which lord is in office matters most when a reader can see what it followed and what it
+     * hands over to.
+     */
+    public static String firdaria(ChartFrame natal, double natalJd, double nowJd) {
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Firdaria</h1>");
+        ChartFrame.Body sun = natal.body("Sun");
+        if (sun == null || !sun.ok) {
+            // The sect decides which lord opens the sequence, so without the Sun there is no
+            // sequence to show. Saying so beats printing a day nativity's periods and hoping.
+            h.append("<p><i>The Sun's position is not available for this chart, so its sect ")
+             .append("cannot be decided - and the sect is what says which lord begins.</i></p>");
+            return h.toString();
+        }
+        boolean diurnal = com.zodiacomputing.ourania.astro.Sect.isDiurnal(sun.lon, natal.asc);
+        h.append("<p>Life divided into nine periods, each with a lord, in a fixed order that ")
+         .append("begins with the Sun in a day chart and the Moon in a night one. This is a ")
+         .append(diurnal ? "day" : "night").append(" chart. The seven planetary periods divide ")
+         .append("again into sevenths; the two nodes are left undivided, which is how Bonatti ")
+         .append("gives them.</p>");
+
+        com.zodiacomputing.ourania.astro.Firdaria.Period running =
+            com.zodiacomputing.ourania.astro.Firdaria.majorAt(natalJd, diurnal, nowJd);
+
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Lord", "From", "To", "Age"));
+        for (com.zodiacomputing.ourania.astro.Firdaria.Period p
+                : com.zodiacomputing.ourania.astro.Firdaria.majors(natalJd, diurnal, 2)) {
+            boolean now = running != null && p.startAge == running.startAge;
+            String lord = now ? "<font color='#E2B258'>" + p.lord + " &mdash; now</font>" : p.lord;
+            h.append(row4("td", lord, dateOf(p.startJd), dateOf(p.endJd),
+                String.format("%.0f&ndash;%.0f", p.startAge, p.endAge)));
+        }
+        h.append("</table>");
+
+        if (running == null) {
+            return h.toString();
+        }
+        java.util.List<com.zodiacomputing.ourania.astro.Firdaria.Period> subs =
+            com.zodiacomputing.ourania.astro.Firdaria.subPeriods(running, natalJd);
+        h.append("<h2>Inside the ").append(running.lord).append(" period</h2>");
+        if (subs.isEmpty()) {
+            h.append("<p><i>A node's period is not subdivided, so the ").append(running.lord)
+             .append(" rules it throughout.</i></p>");
+            return h.toString();
+        }
+        com.zodiacomputing.ourania.astro.Firdaria.Period sub =
+            com.zodiacomputing.ourania.astro.Firdaria.subAt(natalJd, diurnal, nowJd);
+        h.append("<p>A seventh of the period each, beginning with ").append(running.lord)
+         .append(" itself.</p>");
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Sub-period", "From", "To", ""));
+        for (com.zodiacomputing.ourania.astro.Firdaria.Period s : subs) {
+            boolean now = sub != null && s.startAge == sub.startAge;
+            String name = running.lord + " / " + s.sublord;
+            h.append(row4("td", now ? "<font color='#E2B258'>" + name + " &mdash; now</font>" : name,
+                dateOf(s.startJd), dateOf(s.endJd), ""));
+        }
+        h.append("</table>");
+        return h.toString();
+    }
+
+    /**
+     * F9: primary directions, both forms, under the reader's own key.
+     *
+     * <b>The two forms are listed apart.</b> They answer different questions and give different
+     * dates for the same pair, so one merged list would be a confident answer assembled out of
+     * two - which is the shape this project treats as its worst defect.
+     */
+    public static String primaryDirections(ChartFrame natal, SwissEph sw,
+                                           double natalJd, double nowJd) {
+        com.zodiacomputing.ourania.astro.PrimaryDirections.Key key =
+            com.zodiacomputing.ourania.astro.PrimaryDirections.Key.named(Settings.directionKey());
+        StringBuilder h = new StringBuilder();
+        h.append("<h1>Primary directions</h1>");
+        h.append("<p>The chart turned on the earth's own axis: the arc a promissor must travel, ")
+         .append("measured on the celestial equator, to arrive where a significator stands. ")
+         .append("Proportional semi-arc, the Placidian method. The key in force is <b>")
+         .append(key.label).append("</b>, which can be changed on the Settings screen.</p>");
+
+        double age = (nowJd - natalJd) / com.zodiacomputing.ourania.astro.SolarArc.DAYS_PER_YEAR;
+        java.util.List<com.zodiacomputing.ourania.astro.PrimaryDirections.Direction> all =
+            com.zodiacomputing.ourania.astro.PrimaryDirections.of(sw, natal, natalJd, 95.0, key);
+        if (all.isEmpty()) {
+            h.append("<p><i>No directions could be computed for this chart. A body that never ")
+             .append("rises at this latitude has no semi-arc, and so cannot be directed.</i></p>");
+            return h.toString();
+        }
+
+        for (com.zodiacomputing.ourania.astro.PrimaryDirections.Form form
+                : com.zodiacomputing.ourania.astro.PrimaryDirections.Form.values()) {
+            boolean mundane =
+                form == com.zodiacomputing.ourania.astro.PrimaryDirections.Form.MUNDANE;
+            h.append("<h2>").append(mundane ? "In mundo" : "Zodiacal").append("</h2>");
+            h.append("<p>").append(mundane
+                ? "The promissor as a body, carrying its own declination, arriving at the "
+                    + "significator's place in the houses."
+                : "A degree of the ecliptic taken without latitude, so aspects to the promissor "
+                    + "can be directed as well as the promissor itself.").append("</p>");
+            h.append("<table cellpadding=\"4\">");
+            h.append(row4("th", "Age", "Date", "Direction", "Arc"));
+            int shown = 0;
+            for (com.zodiacomputing.ourania.astro.PrimaryDirections.Direction d : all) {
+                if (d.form != form) {
+                    continue;
+                }
+                shown++;
+                String what = d.promissor + " " + d.aspect + " " + d.significator;
+                // The one already past is greyed rather than dropped: a reader wants to see
+                // what a direction has already delivered as much as what is coming.
+                boolean past = d.years < age;
+                h.append(row4("td",
+                    (past ? "<font color='#7A8496'>" : "") + String.format("%.1f", d.years)
+                        + (past ? "</font>" : ""),
+                    dateOf(d.jd), what, String.format("%.2f&deg;", d.arc)));
+            }
+            h.append("</table>");
+            if (shown == 0) {
+                h.append("<p><i>None in the first ninety-five years.</i></p>");
+            }
+        }
+        h.append("<p><i>Converse directions - the chart turned backwards - are not computed. ")
+         .append("Mundane aspects are not either: the in-mundo list is conjunctions.</i></p>");
+        return h.toString();
+    }
+
     private static String dateOf(double jd) {
         de.thmac.swisseph.SweDate sd = new de.thmac.swisseph.SweDate();
         sd.setJulDay(jd);
