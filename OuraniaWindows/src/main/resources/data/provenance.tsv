@@ -1,0 +1,60 @@
+# Where each reading file came from (C7). CorpusCheck fails on a file the app opens with no row here.
+# file<TAB>writer<TAB>shape<TAB>how this is known
+# writer: david | agent | external | unknown     shape: written (each entry its own text) | composed (built from shared sentences)
+# The shape is MEASURED by CorpusCheck Part B and must match; the writer is declared, so say how it is known.
+# Add the row when you add the file - it is the only moment the answer is cheap.
+
+interpretations.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+degree_interpretations.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+Sabian_interpretations.json	unknown	written	the symbol lines are the Jones/Wheeler symbols of 1925 (public domain); who wrote the summary keynotes is NOT known, and they read like Rudhyar 1973 - PROVENANCE.md item 2, the highest-risk question in the corpus
+modern_sabians.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+Ascendent.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+Descendant.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+ic.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+mc.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+aspect_prose_v2.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+spirit_prose.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspect_prose.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspect_prose_b.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+semisquare_prose.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+pattern_detail.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+aspect_general.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+quincunx_gap.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+extra_bodies.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_placements.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+macro_dynamics.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+relationship_prose.json	unknown	written	project notes call it 'sourced', which implies an outside origin nobody named - PROVENANCE.md item 4
+synastry_interaspects.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_placements.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_aspect_frames_v3.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_aspects.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_aspect_pairs.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_signs.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_placements_b.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_minor_aspects.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+synastry_overlays.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+synastry_angle_contacts.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_angles.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_sabian.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transits_ptolemaic_t.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transit_angles.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_minor_aspects_classical.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transit_everything_else.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transit_minor_aspects_asteroids_angles.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transit_ptolemaic_asteroids_angles_classical.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_aspects_expanded.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_asteroid_pairs.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspects_natal.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspects_composite.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspects_synastry.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspects_transit.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+aspect_frames_v2.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transits_new_aspects.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transits_new_aspects_b.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+tarot_bodies.json	agent	written	written by an agent; each entry marks itself attested in a deck, attested by myth, or inferred (InterpretationService.tarotBodies)
+d10_point_prose.json	david	composed	David's 336 paragraphs for the Vertex, East Point and five lots, 16 Sep (C9); composed because each point's paragraphs share their framing sentences
+d10_point_transits.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_decans.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_mansions.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_technical_degrees.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_degree_factors.json	agent	written	written by an agent from David's two transposition documents of 2026-08-31; the fourteen bodies those did not cover are standard meanings (InterpretationService.LAZY_FILES)
