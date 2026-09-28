@@ -824,6 +824,19 @@ public class InterpretationService {
         return m != null && m.containsKey(key);
     }
 
+    /**
+     * What a section actually serves - every key and the text a reader is shown for it - or
+     * null when this build knows no such section.
+     *
+     * Exists for CorpusCheck. A file on disk is not what a reader sees: under putIfAbsent an
+     * earlier file can shadow a later one's text for the same key, so a measurement of reading
+     * quality has to be taken here, after the merge, and not from the files. Returns a copy.
+     */
+    public Map<String, String> servedSection(String section) {
+        Map<String, String> m = sectionFor("\"" + section + "\"");
+        return m == null ? null : new java.util.TreeMap<>(m);
+    }
+
     public String getMacroDynamic(String key) {
         return macroDynamics.getOrDefault(key, "");
     }
