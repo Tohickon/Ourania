@@ -41,11 +41,9 @@ import java.util.Set;
  * {@code known-red.txt}; the fix is prose, which this app does not write (DECISIONS.md, the C7
  * reason), so the count comes down as replacement readings arrive.
  */
-// DRAFT, 28 Sep: named so build.ps1 does not yet run it as a suite (it needs data/provenance.tsv,
-// and Part E is red by design until its count is in known-red.txt). Rename to CorpusCheck when done.
-public final class CorpusCheckDraft {
+public final class CorpusCheck {
 
-    private CorpusCheckDraft() { }
+    private CorpusCheck() { }
 
     /** The manifest, beside the files it describes so a packaged app carries it too. */
     static final String MANIFEST = InterpretationService.DATA_DIR + "provenance.tsv";
@@ -76,10 +74,10 @@ public final class CorpusCheckDraft {
         Map<String, String[]> rows = manifest();
         part("A: every file the app opens says where it came from", () -> declared(rows));
         part("B: a file's declared shape is the shape it measures", () -> shapes(rows));
-        part("C: the measure can tell the two shapes apart", CorpusCheckDraft::measureWorks);
-        part("D: the similarity measure can tell two texts apart", CorpusCheckDraft::similarityWorks);
+        part("C: the measure can tell the two shapes apart", CorpusCheck::measureWorks);
+        part("D: the similarity measure can tell two texts apart", CorpusCheck::similarityWorks);
         part("E: a square and a trine of the same pair read differently (C5)",
-            CorpusCheckDraft::squareTrine);
+            CorpusCheck::squareTrine);
         System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
