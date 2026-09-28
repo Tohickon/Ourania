@@ -584,6 +584,54 @@ public final class Topics {
      * derived-house statements read as noise, which is why nothing in {@link #analyse} calls
      * this.
      */
+    /**
+     * Which of the chart's signatures this topic is a witness to (F14).
+     *
+     * <b>The other direction, and it is a lookup rather than a second computation.</b> L7 decides
+     * what a signature is; this asks which of them this topic's bodies helped make, by the same
+     * provenance the independence rule uses. Computing it here would be a second opinion about
+     * something L7 already settled.
+     *
+     * Returns the theme names, in L7's own order, or an empty list. Never null.
+     */
+    public static List<String> themesOf(Topic t, Themes.Result themes) {
+        List<String> out = new ArrayList<>();
+        if (t == null || themes == null) {
+            return out;
+        }
+        java.util.Set<String> mine = new java.util.LinkedHashSet<>();
+        for (BodyScore.Vector v : t.occupants) {
+            mine.add(v.body);
+        }
+        for (BodyScore.Vector v : t.significators) {
+            mine.add(v.body);
+        }
+        if (t.ruler != null) {
+            mine.add(t.ruler.body);
+        }
+        for (Themes.Signature s : themes.signatures) {
+            for (List<Themes.Candidate> component : s.components) {
+                boolean shares = false;
+                for (Themes.Candidate c : component) {
+                    for (String p : c.provenance) {
+                        if (mine.contains(p)) {
+                            shares = true;
+                            break;
+                        }
+                    }
+                    if (shares) {
+                        break;
+                    }
+                }
+                if (shares && !out.contains(s.theme)) {
+                    out.add(s.theme);
+                    break;
+                }
+            }
+        }
+        return out;
+    }
+
     public static int derived(int nth, int from) {
         return Zodiac.derivedHouse(nth, from);
     }

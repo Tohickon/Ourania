@@ -44,7 +44,12 @@ public final class Themes {
      * divided, and saying so is the single biggest quality difference in a generated
      * reading. These are never averaged.
      */
-    private static final String[][] OPPOSITES = {
+    /**
+     * Package-private since 28 Sep so a check can sweep it (F14): every word declared as one half
+     * of a contradiction has to be a word some layer actually emits, or the pair is a rule no
+     * failure can reach.
+     */
+    static final String[][] OPPOSITES = {
         {"fiery", "watery"},
         {"airy", "earthy"},
         {"initiating", "consolidating"},
@@ -55,7 +60,26 @@ public final class Themes {
         {"resourced", "strained"},
         {"constrained", "expansive"},
         {"public", "private"},
-        {"self-directed", "other-directed"}
+        {"self-directed", "other-directed"},
+        // <b>The pair no other layer can produce (F14).</b> Whether a life area is ACTED IN and
+        // whether it CONSOLIDATES are different questions, and only L6 asks the second: it is the
+        // judgement across a topic's three witnesses - occupancy, ruler, significators - and no
+        // single body carries it. Until L7 read L6 this axis could not appear in a reading at all.
+        {"consolidated", "unconsolidated"}
+    };
+
+    /**
+     * What each house is about, as a theme word (F14).
+     *
+     * <b>Twelve words rather than reusing the existing vocabulary.</b> A topic's theme is what the
+     * area of life IS, and the words already here say what a placement is LIKE - a fiery seventh
+     * house and a relational seventh house are two different statements and folding them together
+     * loses the one L6 exists to make. They form signatures among themselves, which is correct:
+     * three independent witnesses that a person's vocation matters is a chart signature.
+     */
+    static final String[] TOPIC_THEME = {
+        "self-defining", "resourcing", "communicative", "rooted", "creative", "labouring",
+        "relational", "shared", "believing", "vocational", "communal", "withdrawn"
     };
 
     private static final String[] ELEMENT_THEME = {"fiery", "earthy", "airy", "watery"};
@@ -144,13 +168,88 @@ public final class Themes {
     // ------------------------------------------------------------------ extraction
 
     public static Result extract(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked) {
+        return extract(f, g, ranked, null);
+    }
+
+    /**
+     * The same, with L6's topic standings among the witnesses (F14).
+     *
+     * <b>The three-argument form above is kept and delegates here</b>, so the six existing callers
+     * are unchanged and a reading that never computed topics reads exactly as it did. What the
+     * fourth argument adds is the only judgement L6 makes that no body carries: whether a house
+     * holds together across its three witnesses.
+     *
+     * @param topics L6's output, or null when it was not computed
+     */
+    public static Result extract(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked,
+                                 List<Topics.Topic> topics) {
         Result r = new Result();
         gatherFromBodies(r, ranked);
         gatherFromGestalt(r, g);
+        gatherFromTopics(r, topics);
         countSignatures(r);
         findContradictions(r);
         rankAndDeduplicate(r);
         return r;
+    }
+
+    /**
+     * A candidate per reported topic, carrying the bodies its standing was made from.
+     *
+     * <b>The provenance is the whole design.</b> A topic's witnesses ARE bodies that already
+     * produced candidates of their own, so naming them here is what stops the seventh house
+     * becoming a second independent witness for the same Venus that made it strong. The
+     * independence rule then does the work it was written for, and a topic only raises a theme's
+     * witness count when it rests on bodies nothing else has spoken for.
+     *
+     * <b>Only topics the layer itself decided were worth reporting.</b> L6 already makes that
+     * judgement and remakes it here it would be a second copy of the rule, free to drift.
+     */
+    private static void gatherFromTopics(Result r, List<Topics.Topic> topics) {
+        if (topics == null) {
+            return;
+        }
+        for (Topics.Topic t : topics) {
+            if (!t.worthReporting || t.house < 1 || t.house > 12) {
+                continue;
+            }
+            Candidate c = new Candidate(Topics.describe(t), Math.max(0.0, t.strength), "L6");
+            c.theme(TOPIC_THEME[t.house - 1]);
+
+            // What the three witnesses did together, which is the thing only this layer knows.
+            switch (t.agreement) {
+                case QUIET_COMPETENCE:
+                case ALL_STRONG:
+                    c.theme("consolidated");
+                    break;
+                case ACTIVITY_WITHOUT_FOLLOW_THROUGH:
+                case RULER_AND_SIGNIFICATOR_DISAGREE:
+                case ALL_WEAK:
+                    c.theme("unconsolidated");
+                    break;
+                default:
+                    break;
+            }
+
+            for (BodyScore.Vector v : t.occupants) {
+                c.from(v.body);
+            }
+            for (BodyScore.Vector v : t.significators) {
+                c.from(v.body);
+            }
+            if (t.ruler != null) {
+                c.from(t.ruler.body);
+            } else if (!t.rulerName.isEmpty()) {
+                c.from(t.rulerName);
+            }
+            // A topic with no bodies at all still stands on its own house; without this it would
+            // have an empty provenance set, and two empty sets are disjoint, so every such topic
+            // would count as independent of every other one.
+            if (c.provenance.isEmpty()) {
+                c.from("house-" + t.house);
+            }
+            r.candidates.add(c);
+        }
     }
 
     private static void gatherFromBodies(Result r, List<BodyScore.Vector> ranked) {

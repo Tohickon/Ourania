@@ -4705,7 +4705,14 @@ extends JPanel {
                 ChartFrame chartFrame = SkymapPanel.this.frameForReading();
                 Gestalt.Result result = Gestalt.compute(chartFrame);
                 List<BodyScore.Vector> list = BodyScore.rank(chartFrame, result);
-                Themes.Result result2 = Themes.extract(chartFrame, result, list);
+                // <b>The topics are computed once and handed to both layers (F14).</b> They were
+                // already being computed here, a fifty lines further down and inside the report
+                // branch, and thrown straight into topicLayer - so L7 extracted its themes with
+                // no knowledge of L6's standings while L6's output sat in the same method. Two
+                // callers, one computation, and the themes now include what only L6 knows:
+                // whether a house holds together across its three witnesses.
+                List<Topics.Topic> topics = Topics.analyse(chartFrame, list);
+                Themes.Result result2 = Themes.extract(chartFrame, result, list, topics);
                 ChartFrame chartFrame2 = null;
                 Profection profection = null;
                 List<Transits.Hit> list2 = null;
@@ -4757,7 +4764,8 @@ extends JPanel {
                     }
                 }
                 if (readingTier == ReadingTier.REPORT) {
-                    object = Snapshot.report(chartFrame, result, list, result2) + Snapshot.topicLayer(Topics.analyse(chartFrame, list));
+                    object = Snapshot.report(chartFrame, result, list, result2)
+                        + Snapshot.topicLayer(topics);
                     if (bl) {
                         // The frame and the moment carry the releasing section, which was
                         // computed to four levels and appeared in no reading until 2026-09-02.
