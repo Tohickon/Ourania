@@ -13,6 +13,7 @@
 #   .\build.ps1 -Package                          # -Jar, then a self-contained app with its own
 #                                                 # Java runtime (needs jpackage: a full JDK)
 #   .\build.ps1 -PurgeSrcClasses                  # also delete stale .class from the source tree
+#   .\build.ps1 -Changelog                        # regenerate ..\CHANGELOG.md from git history
 #
 # WHY -Out EXISTS. This script deletes its output directory before building. Two agents
 # sharing the default "out" therefore delete each other's classes mid-run: on 2026-08-28 a
@@ -60,7 +61,13 @@ param(
     [switch] $Jar,
     [switch] $Package,
     [ValidateSet("app-image", "exe", "msi")] [string] $PackageType = "app-image",
-    [string] $Version = "0.1.0",
+    # <b>Empty means "read VERSION", and it used to mean 0.1.0</b> (J6). The jar stamp has read
+    # the VERSION file since 27 Sep and jpackage kept a literal default of its own, so a packaged
+    # installer would have said 0.1.0 about an app that says 0.9.0 - one rule in two places, and
+    # already eight minor versions apart before anyone ran it. Still overridable, because
+    # jpackage rejects version strings the VERSION file is free to carry.
+    [string] $Version = "",
+    [switch] $Changelog,
     [string] $Ephe = ""
 )
 
@@ -70,6 +77,75 @@ $MIN_JDK = 21
 if (-not (Test-Path $SRC)) {
     Write-Host "ERROR: $SRC not found. Run this from the OuraniaWindows\ directory."
     exit 1
+}
+
+# -- the changelog (J6) ------------------------------------------------------------------------
+#
+# GENERATED, NOT WRITTEN. A hand-kept changelog is a second record of what changed, and this
+# project's most logged defect is one thing recorded in two places that then disagree. Every line
+# here comes from a commit subject, so the changelog cannot say something the history does not.
+#
+# FROM COMMIT SUBJECTS, NOT FROM THE SESSION NOTES. The notes in the vault carry the reasoning and
+# are the better prose - and the vault is private and holds birth data for four people, while this
+# repository is public. Generating a public file from a private one is a leak waiting for the first
+# person who does it without thinking. The subjects are already public, and in this project they
+# are written as sentences rather than as "fix stuff", which is what makes this readable at all.
+#
+# UNRELEASED IS A SECTION, NOT AN OMISSION. Commits after the newest tag are listed under their own
+# heading rather than left out, because "not in the changelog" and "not released" look identical
+# otherwise and one of them is a mistake.
+if ($Changelog) {
+    $repoRoot = (Resolve-Path "..").Path
+    $outFile = Join-Path $repoRoot "CHANGELOG.md"
+    $version = "0.0.0"
+    if (Test-Path "VERSION") { $version = (Get-Content "VERSION" -TotalCount 1).Trim() }
+
+    $tags = @(git tag --list --sort=-creatordate)
+    $lines = New-Object System.Collections.Generic.List[string]
+    $lines.Add("# Changelog")
+    $lines.Add("")
+    $lines.Add("Ourania+ (Windows Edition). **Generated** by ``build.ps1 -Changelog`` from this")
+    $lines.Add("repository's commit subjects - do not edit it by hand, edit the commit messages.")
+    $lines.Add("The current version is in ``OuraniaWindows/VERSION`` (**$version**), which is the one")
+    $lines.Add("place the number is written; the app reads it from a stamp the build makes.")
+    $lines.Add("")
+
+    function Add-Range($heading, $range) {
+        $subjects = @(git log $range --no-merges --pretty=format:"%h%x09%ad%x09%s" --date=short)
+        if ($subjects.Count -eq 0) { return }
+        $lines.Add("## $heading")
+        $lines.Add("")
+        foreach ($s in $subjects) {
+            $bits = $s -split "`t", 3
+            if ($bits.Count -lt 3) { continue }
+            $lines.Add("- ``$($bits[0])`` $($bits[1]) - $($bits[2])")
+        }
+        $lines.Add("")
+    }
+
+    if ($tags.Count -eq 0) {
+        # No tag yet: everything is unreleased, and saying so is more honest than inventing a
+        # heading for a release that has not happened.
+        Add-Range "Unreleased" "HEAD"
+    } else {
+        Add-Range "Unreleased" "$($tags[0])..HEAD"
+        for ($i = 0; $i -lt $tags.Count; $i++) {
+            $tag = $tags[$i]
+            $when = (git log -1 --pretty=format:"%ad" --date=short $tag)
+            if ($i + 1 -lt $tags.Count) {
+                Add-Range "$tag - $when" "$($tags[$i + 1])..$tag"
+            } else {
+                Add-Range "$tag - $when" $tag
+            }
+        }
+    }
+
+    # A full path for the same reason as the version stamp below; see there.
+    $outFile = (Join-Path (Resolve-Path $repoRoot).Path "CHANGELOG.md")
+    [System.IO.File]::WriteAllText($outFile, ($lines -join "`r`n") + "`r`n",
+        (New-Object System.Text.UTF8Encoding $false))
+    Write-Host "Changelog -> $outFile  ($($lines.Count) lines, $($tags.Count) tags)"
+    exit 0
 }
 
 # -- find a JDK ------------------------------------------------------------------------------
@@ -476,14 +552,20 @@ if ($Jar -or $Package) {
     if (Test-Path "VERSION") { $version = (Get-Content "VERSION" -TotalCount 1).Trim() }
     $commit = ""
     try { $commit = (git rev-parse --short HEAD).Trim() } catch { $commit = "" }
-    [System.IO.File]::WriteAllText((Join-Path $Out "ourania-version.properties"),
+    # <b>Full paths, because .NET does not share PowerShell's idea of where it is.</b>
+    # [System.IO.File] resolves a relative path against the PROCESS working directory, which is
+    # wherever the shell was started, not wherever Set-Location has since moved to. Run this
+    # script from a shell that began one directory up and the version stamp was written into
+    # the parent, the jar then failed to find it, and the message named a path nobody had typed.
+    $OutFull = (Resolve-Path $Out).Path
+    [System.IO.File]::WriteAllText((Join-Path $OutFull "ourania-version.properties"),
         "version=$version`r`ncommit=$commit`r`n", (New-Object System.Text.UTF8Encoding $false))
     Write-Host "Version: $version $commit"
 
     $libJars = @(Get-ChildItem "lib\*.jar")
     $libJars | Copy-Item -Destination "$dist\lib"
     $classPath = ($libJars | ForEach-Object { "lib/" + $_.Name }) -join " "
-    $manifest = Join-Path (Resolve-Path $Out).Path "MANIFEST.MF"
+    $manifest = Join-Path $OutFull "MANIFEST.MF"
     [System.IO.File]::WriteAllText($manifest,
         "Main-Class: com.zodiacomputing.ourania.gui.OuraniaWindow`r`nClass-Path: $classPath`r`n")
     & $JAR_EXE --create --file "$dist\Ourania.jar" --manifest $manifest -C $Out com -C $Out de `
@@ -533,7 +615,50 @@ if ($Jar -or $Package) {
             Write-Host "  set JAVA_HOME to it, and run again. CI does this."
             exit 1
         }
-        & $JPACKAGE --type $PackageType --name Ourania --app-version $Version `
+        # J4: an MSI is built by jpackage through WiX, which is a separate install and is not
+        # part of any JDK. jpackage's own message when it is missing names a tool nobody has
+        # heard of, so the condition is checked here and said plainly - a failed release build
+        # that does not say what to install is a release build somebody gives up on.
+        if ($PackageType -eq "msi") {
+            $wix = Get-Command "candle.exe" -ErrorAction SilentlyContinue
+            if (-not $wix) {
+                foreach ($guess in @(
+                        "${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin",
+                        "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin",
+                        "${env:ProgramFiles}\WiX Toolset v3.14\bin",
+                        "${env:ProgramFiles}\WiX Toolset v3.11\bin")) {
+                    if (Test-Path (Join-Path $guess "candle.exe")) {
+                        $env:PATH = "$guess;$env:PATH"
+                        $wix = $true
+                        Write-Host "WiX: $guess"
+                        break
+                    }
+                }
+            }
+            if (-not $wix) {
+                Write-Host ""
+                Write-Host "PACKAGE FAILED - an MSI needs the WiX Toolset v3 and it is not installed."
+                Write-Host "  Get it from https://github.com/wixtoolset/wix3/releases (v3.11 or v3.14),"
+                Write-Host "  or build the folder form instead: .\build.ps1 -Package"
+                Write-Host "  An MSI is also NOT signed by this script; see PROVENANCE.md."
+                exit 1
+            }
+        }
+
+        # One version, from the file the jar stamp reads. See the -Version parameter.
+        $appVersion = $Version
+        if (-not $appVersion) { $appVersion = $version }
+        # jpackage will not take a version that is not three numbers, and VERSION is free to
+        # carry a suffix one day, so the suffix is dropped here rather than the build failing
+        # at the last step with a message about a format nobody chose.
+        if ($appVersion -notmatch "^\d+\.\d+\.\d+$") {
+            $trimmed = ($appVersion -replace "[^0-9.].*$", "")
+            if ($trimmed -match "^\d+\.\d+\.\d+$") {
+                Write-Host "Version for the installer: $trimmed (from $appVersion)"
+                $appVersion = $trimmed
+            }
+        }
+        & $JPACKAGE --type $PackageType --name Ourania --app-version $appVersion `
             --vendor "Ourania" --input $dist --main-jar Ourania.jar `
             --main-class com.zodiacomputing.ourania.gui.OuraniaWindow --dest "dist\package"
         if ($LASTEXITCODE -ne 0) { Write-Host "PACKAGE FAILED - jpackage exit $LASTEXITCODE"; exit 1 }

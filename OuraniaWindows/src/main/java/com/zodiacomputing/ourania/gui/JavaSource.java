@@ -76,15 +76,34 @@ final class JavaSource {
         return out;
     }
 
+    /**
+     * A source file with its comments removed and its string literals left where they are (J9).
+     *
+     * <b>The third thing a sweep can want, and the one {@code codeOnly} cannot give it.</b>
+     * {@code StartupCheck} Part E looks for {@code DATA_DIR + "name"} in the loader, which needs
+     * the code <i>and</i> the literal - and the first version scanned the raw text and reported a
+     * failure against the sentence in this paragraph. A comment that talks about the pattern it is
+     * documenting is not a defect; a sweep that cannot tell them apart is.
+     */
+    static String withoutComments(String src) {
+        return scan(src, false, true, new java.util.ArrayList<>());
+    }
+
     private static String scan(String src, boolean wantLiterals) {
         return scan(src, wantLiterals, new java.util.ArrayList<>());
+    }
+
+    private static String scan(String src, boolean wantLiterals,
+            java.util.List<String> literals) {
+        return scan(src, wantLiterals, false, literals);
     }
 
     /**
      * The one pass. {@code wantLiterals} chooses which half is collected; the walk is identical,
      * which is the whole point of having one method.
      */
-    private static String scan(String src, boolean wantLiterals, java.util.List<String> literals) {
+    private static String scan(String src, boolean wantLiterals, boolean keepLiterals,
+            java.util.List<String> literals) {
         StringBuilder out = new StringBuilder(src.length());
         int i = 0;
         int n = src.length();
@@ -120,7 +139,14 @@ final class JavaSource {
                 if (wantLiterals && isString) {
                     literals.add(unescape(body.toString()));
                 }
-                out.append(' ');
+                // Put it back as it was written, quotes included, so a caller looking for
+                // `X + "y"` still sees the y. Raw rather than unescaped: this is being handed
+                // back as source, and re-escaping it would be a second escaping rule.
+                if (keepLiterals) {
+                    out.append(quote).append(body).append(quote);
+                } else {
+                    out.append(' ');
+                }
             } else {
                 out.append(c);
                 i++;

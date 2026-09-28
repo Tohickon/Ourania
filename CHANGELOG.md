@@ -1,0 +1,234 @@
+# Changelog
+
+Ourania+ (Windows Edition). **Generated** by `build.ps1 -Changelog` from this
+repository's commit subjects - do not edit it by hand, edit the commit messages.
+The current version is in `OuraniaWindows/VERSION` (**0.9.0**), which is the one
+place the number is written; the app reads it from a stamp the build makes.
+
+## Unreleased
+
+- `b929af35` 2026-09-28 - The silent wrong Sun, narrowed to three lines and two dead guards
+- `28ccc03e` 2026-09-28 - A house says what is standing in it
+- `0803c648` 2026-09-28 - The wheel and the readings cast their houses at the same place
+- `4fb1e209` 2026-09-28 - The vault has a private remote, and this pointer says so
+- `c511fe5e` 2026-09-28 - The middle ring can carry a directed chart, and progressions get a door
+- `af1d16ad` 2026-09-27 - F8 and F9: the firdaria, and the chart turned on its axis
+- `9ea3f22b` 2026-09-27 - An Overview page, and there is no 30th degree of any sign
+- `ee89d18f` 2026-09-27 - The light engine returns findings, and the sentence is built from them
+- `5344ad68` 2026-09-27 - The Now key moves the ring the reader is looking at, and a renamed action fails by name
+- `55105f7a` 2026-09-27 - A file that will not read stops taking the app down, and says why
+- `391945b4` 2026-09-27 - The second chart tab names every ring it holds (G13 follow-on)
+- `442ee856` 2026-09-27 - One table of shortcuts, where there were two keys and no list (G13)
+- `924d0068` 2026-09-27 - The Index gets a tab, and there is still one index (G11)
+- `79856ded` 2026-09-27 - The app can say which build it is (J6)
+- `0a31091e` 2026-09-27 - Every font in the app can be made larger, from one place (G14)
+- `47e2bf29` 2026-09-27 - Declination and dignity reach the one export a spreadsheet opens (G10)
+- `5ed2461c` 2026-09-27 - A problem is written down in one place, and it stays there (J8)
+- `7d495c52` 2026-09-27 - One source scanner, before there are two of them
+- `ec42035a` 2026-09-27 - A ring's moment is read on the event thread, not from outside it
+- `a0b22853` 2026-09-27 - The body groups take as many columns as the width allows (H4a)
+- `ec249050` 2026-09-27 - A fill is measured against its own null condition, not a number
+- `9b2dd7c0` 2026-09-26 - A report for every chart you choose (B8 closed)
+- `87ad8295` 2026-09-26 - The report carries the practitioner's name (B7 closed)
+- `0516eaf0` 2026-09-26 - Find a setting, on a screen with 221 of them (H4b, section H closed)
+- `d5aeeb57` 2026-09-26 - Every body group box is the size of what is in it (H4a)
+- `4f36594a` 2026-09-26 - Synastry gets its own page (H, side panel)
+- `b7d06bff` 2026-09-26 - The sky keeps looking for a place until it finds one
+- `72d37af1` 2026-09-26 - The side panel says which chart it is showing
+- `bb94c1db` 2026-09-26 - Text you can read, a Reset that asks first, and doors for H3 (H4a)
+- `2db3632f` 2026-09-25 - A line says which chart it belongs to, and can reach the bodies (H3b, H3c)
+- `60d397c9` 2026-09-25 - An aspect line weighs what the aspect weighs (H3a)
+- `e31d2afc` 2026-09-25 - Eight more house systems, six to fourteen (H2b)
+- `5801995b` 2026-09-25 - One list of house systems, where there were four (H2a)
+- `39e3d213` 2026-09-25 - Before standard time, the place is the authority (D5 closed)
+- `383408c8` 2026-09-25 - A ring says what it is
+- `7b353849` 2026-09-25 - A birth in the Netherlands stops being twenty minutes wrong (D5, partly)
+- `071b98af` 2026-09-25 - The chart from the Sun (D12 closed)
+- `f45bccf0` 2026-09-25 - Four lanes after all, and the timing verdict that was wrong
+- `84dce5a6` 2026-09-25 - The screen gets looked at, and four lanes get measured
+- `819b2e4a` 2026-09-25 - The gate counts, Part P waits, and the settings screen takes four tabs
+- `09b34586` 2026-09-25 - A moment weighed, and a word in a sentence stops counting as a door (F10 closed)
+- `67036600` 2026-09-24 - The transit widths become real, everywhere a transit is judged
+- `604f89cd` 2026-09-24 - The preset bar, and a mutation that corrected me (presets, stage 2b)
+- `998e2478` 2026-09-24 - Each profile keeps its own orbs, derived from natal (presets, stage 2a)
+- `3490027b` 2026-09-24 - The cross-chart boolean becomes a named profile (presets, stage 1)
+- `f2a96dfc` 2026-09-24 - A label names the ring it came from, and says whose natal
+- `63cb4614` 2026-09-24 - Every orb beside its own thing, headed, and settings you can keep
+- `1f499003` 2026-09-24 - The two electional measures (F10)
+- `6b156624` 2026-09-24 - Every aspect carries its own orb, beside the aspect
+- `3678a363` 2026-09-24 - The considerations before judgement (F10, radicality caveats)
+- `97ea9038` 2026-09-24 - The aspect ceilings become the reader's too (H1, finished)
+- `3c7ca7c5` 2026-09-24 - The natal orbs become the reader's (H1, per point)
+- `e00f2e7e` 2026-09-24 - The month and the day are profections too (F6)
+- `6b3f623c` 2026-09-24 - A question, judged, where a reader can see it (K13, stage 4)
+- `1e607e94` 2026-09-24 - A profection is not a transit
+- `aa84aba9` 2026-09-23 - Two readings that never reached the reader
+- `2b83aa7a` 2026-09-23 - The chart stands upright, and the camera gains weight (globe, stage 3)
+- `a7d0369c` 2026-09-22 - The ribbons light at the edge (globe, stage 2)
+- `7272bc91` 2026-09-21 - Three ribbons on one sphere, at the obliquity
+- `263e2634` 2026-09-21 - Perfection, and the dynamics of light (K13, stage 3)
+- `eef2f9aa` 2026-09-21 - Significators and radicality (K13, stage 2)
+- `1a1dba36` 2026-09-21 - Planetary days and hours (K13, stage 1)
+- `ec44b792` 2026-09-20 - Suites that wait properly, and say why they failed
+- `7d034614` 2026-09-20 - The wheel's zoom and pan become an object (J13, step 2)
+- `cea6b411` 2026-09-20 - Mars and the Sun date a converged theme (K12, stage 3) - K12 finished
+- `f2c39623` 2026-09-20 - The globe's houses take the sphere, and the tilt comes back
+- `60ca0119` 2026-09-20 - Progressed to progressed, and K12's stage 2 closed
+- `6ac70b1d` 2026-09-20 - The progressed Moon as the mid-term clock (K12, stage 2)
+- `c2a0f803` 2026-09-20 - The sky is read from where the reader is, not from 0,0
+- `a93ce9d4` 2026-09-19 - DECISIONS: K12 activation filter built
+- `de9972a5` 2026-09-19 - The activation filter: a transit counts only where the year has woken a point (K12, stages 1-3)
+- `1b1d52ab` 2026-09-19 - The year by theme, and the Rule of Three (K12, stage 4)
+- `d6177d35` 2026-09-19 - DECISIONS: K11 built
+- `045495f5` 2026-09-19 - The Interpretation tab reads a placement in the interpretive hierarchy (K11)
+- `36c1d11b` 2026-09-19 - DECISIONS: K13 momentary horoscopy - horary and electional (F10)
+- `6762ffca` 2026-09-19 - DECISIONS: K11 the interpretive hierarchy, K12 the predictive pipeline
+- `5faa9e55` 2026-09-19 - SkymapPanel's ring data becomes three WheelRing objects (J13, step 1)
+- `741e9e5d` 2026-09-19 - A portable build, a runnable jar, and CI (J5, J4, J7)
+- `a43e2605` 2026-09-19 - Synthesize with nothing selected explains itself; AspectGridCheck no longer empties the chart
+- `52fa36c7` 2026-09-19 - The check suites start from a fresh install and leave the reader's files alone (J14)
+- `c53499e4` 2026-09-19 - CLAUDE.md: other Claude sessions, not another agent
+- `0739c9e5` 2026-09-19 - The launcher carries lib\*, and the repository's HANDOVER points at the vault
+- `bb8df17f` 2026-09-18 - The globe's camera stays above the chart, where the houses read the right way
+- `5fc1a8a6` 2026-09-18 - The PDF report: Antigravity's export, with its glyphs, pages and classpath fixed
+- `f02aa563` 2026-09-18 - The lunar mansions get a ring of their own, and the globe's fills get switches
+- `56c26ce6` 2026-09-16 - Prose for the seven points D10 shipped, and the keys it took to reach them
+- `b2df9a4e` 2026-09-15 - On the globe: leader lines to the degree, and the sign shell as a setting
+- `1af047fc` 2026-09-15 - Parse the settings file once per change, not once per question
+- `5189fc13` 2026-09-15 - Returns as a chart: relocated, precessed, and drawn on the wheel
+- `dd7ecd77` 2026-09-15 - The progressed Ascendant and MC, under three named rules
+- `ef736b28` 2026-09-15 - The Sky View shows every point the reader has selected
+- `be238c35` 2026-09-15 - The scrub bars keep time going while they are held
+- `938ca035` 2026-09-15 - One transit orb, 1 degree, for every transit surface
+- `4c2cbd04` 2026-09-15 - The Transit Calendar: Chart A's month, each day shaded by its transits
+- `8cc188d2` 2026-09-15 - The Sky View: the real sky over the chart's place, as a dome and a horizon
+- `9541634c` 2026-09-15 - Sharp on a 3x screen: the graph and exported images at the screen's own scale
+- `f6fd8bd4` 2026-09-15 - The window opens where it closed, and F11 takes it full screen
+- `87e93ea2` 2026-09-15 - The 90, 45 and 22.5 degree dials, with a pointer and planetary pictures
+- `6a1af16d` 2026-09-15 - A scrub bar for each chart: Chart A, Chart B and the sky
+- `1935dfb3` 2026-09-15 - The declination graph: parallels drawn, out of bounds shaded
+- `f3ac9bc5` 2026-09-15 - Scrubbing through time, and a Play button that did nothing on the cold open
+- `35cd6899` 2026-09-15 - Zoom and pan on the flat wheel, with clicks that still land where things are drawn
+- `5ef0bb78` 2026-09-15 - Every clicked reading opens on Selection; Interpretation stays the whole chart
+- `b794a5b3` 2026-09-15 - Glyphs that were boxes, pattern entries that open on Selection, one rail page at a time
+- `6bf09395` 2026-09-14 - The Vertex, the East Point and five Hermetic lots, as points to switch on
+- `2c068752` 2026-09-14 - A sidereal chart says so, on the readout and on the wheel
+- `7af5244d` 2026-09-14 - Clicks land where they can be seen, on the whole of each item, and show before
+- `8b3e9255` 2026-09-14 - Fixed stars: the traditional stars, and which chart points stand on them
+- `fb1ca169` 2026-09-14 - Modern Sabians: David's second four-tier set replaces the first
+- `500c600a` 2026-09-14 - Sidereal zodiac: one switch, read by every position the app computes
+- `89856796` 2026-09-14 - Modern Sabians: a modern image, an archetype and a meaning under every degree
+- `9034f41d` 2026-09-14 - Antiscia: each degree's two mirrors, and who stands on them
+- `1023109f` 2026-09-14 - Declinations: the planets out of bounds, and the parallels
+- `f8b3cb8c` 2026-09-14 - Transit search: when a planet aspects a point in the chart, as seasons
+- `4c2f7a00` 2026-09-13 - A chart the ephemeris had to change now says what it changed
+- `944cb97b` 2026-09-12 - Aspects that arc over the middle, rings that keep their deck, and a card that opens
+- `091777ea` 2026-09-09 - Natal inside, progressed in the middle, the sky outside
+- `9fce650d` 2026-09-09 - A birth time in an hour the clocks changed now says so
+- `0e585dee` 2026-09-09 - An atlas on disk, so a birth place resolves without the internet
+- `559ae59c` 2026-09-09 - Chords that recede, and three rings that stop answering to one name
+- `26b55e18` 2026-09-08 - A band you can see the plane of, and a chart that is whoever is still selected
+- `673caaa4` 2026-09-08 - Each chart's ring becomes a ribbon lying in its own plane
+- `c3d5ce48` 2026-09-08 - An empty Chart A behaves exactly like an empty Chart B
+- `968a92fd` 2026-09-08 - The ring chips name the chart they would draw
+- `e8d6bf40` 2026-09-08 - ChartSubject: a chart is a function of subjects, not a mode that reinterprets fields
+- `9794ef7a` 2026-09-08 - Chart A, Chart B and Sky - the same three names everywhere, and the saved chart actually drawn
+- `e216b1ae` 2026-09-08 - The sky gets a row of its own, and stops borrowing Chart B's
+- `de674f61` 2026-09-07 - A Mansions chip, folding one ring in two views
+- `92d4f957` 2026-09-07 - The globe gets its lunar mansions
+- `96d0fba3` 2026-09-07 - Every drawn ring answers a click, and every chord a hover
+- `c0634c00` 2026-09-07 - Three rings, and each one lights only its own line
+- `c96bd615` 2026-09-07 - A sphere with no seam torn down its crown
+- `2d94c6c0` 2026-09-07 - A sphere with curved edges, a named planet, and an app that opens onto its chart
+- `e4983550` 2026-09-07 - A sphere that reads as one, and the planets drawn as themselves
+- `61c28b24` 2026-09-06 - A house number you can point at, and the house it carves
+- `5f9068bc` 2026-09-06 - Edge-on, and a degree lights the sphere it cuts through
+- `65268419` 2026-09-06 - The sphere wedge is what lights, not just the disc under it
+- `06b643a7` 2026-09-06 - Every degree on the scale is a thing you can point at
+- `09aa33ca` 2026-09-06 - Layer chips reach the flat wheel, and the globe stops being a wireframe
+- `b581f446` 2026-09-06 - Layers you fold, and a globe that says where a body is
+- `7dffc1de` 2026-09-06 - Boundaries as lines, and the degree scale on the rim
+- `55accb4f` 2026-09-06 - Close the sphere, and put the house numbers where the wedges converge
+- `286cf4a1` 2026-09-06 - Houses back to wedges, numbered at both poles, and a flat degree scale
+- `e0985933` 2026-09-06 - Every glyph a node, the aspects held between frames, the zodiac a plane
+- `1dc386fe` 2026-09-06 - Three rings on three planes, chords for all of them, houses across the signs
+- `85d7f4ae` 2026-09-06 - Bounds and decans on the shells, and houses a sign colour shows through
+- `be52a3d9` 2026-09-06 - The globe: the same chart, from inside it
+- `9624a043` 2026-09-06 - The celestial globe, stage one: the arithmetic
+- `dffb1f86` 2026-09-06 - Signs between their subdivisions, and a degree scale the bodies can reach
+- `3fbdf129` 2026-09-06 - The terms ring: an engine that had been scored and never drawn
+- `ed7a3abe` 2026-09-06 - A circle where the lines stop, and a colour per ring
+- `e572d6f8` 2026-09-06 - The natal wheel is a band too, and a check that was never called
+- `f9202639` 2026-09-06 - The zodiac outside, the bodies nested under it, the lines in three fields
+- `136a199b` 2026-09-06 - Rings unfurl, and can be clicked half-way out
+- `2df0fdbf` 2026-09-06 - Rings you open, not a mode you pick
+- `4038598b` 2026-09-06 - Loading Chart B leaves the mode alone and warns instead
+- `be731678` 2026-09-06 - Loading a chart fills the form; Generate draws it
+- `aa37f5eb` 2026-09-06 - Section 1: a zone you can override, a settings file that survives, relocation  and draconic charts
+- `1efa7d00` 2026-09-06 - Section 1: how good a birth time is, and a chart book that can lose one
+- `7985141b` 2026-09-06 - K7: an angle card says whose angle it is
+- `19c25d69` 2026-09-04 - One rail per edge, and a shape that says whose chart a body is
+- `aa56d043` 2026-09-04 - Transits: rank by what is arriving, not by how close it happens to be
+- `164a0f65` 2026-09-03 - One rule decides what counts as background, on every surface
+- `634ce8e6` 2026-09-03 - Returns: order contacts by what they are worth, not by how tight they are
+- `a72e0c21` 2026-09-03 - K1: read each return to the depth its period earns, and thin the stations
+- `9ac79797` 2026-09-03 - K4: state a minor contact's weight instead of deleting its prose
+- `c27fbf64` 2026-09-03 - K5: a calculated point cannot cast an aspect, and the wheel draws what you ask for
+- `6a1f463c` 2026-09-03 - K6: a third of the chart is allowed to be at rest, and says so
+- `a7ee5410` 2026-09-03 - K8 finished: releasing gates the ranking, and so finally reaches a reading
+- `ce568556` 2026-09-03 - K8: weight the witnesses, so more voters stop making the ranking worse
+- `17d09e1e` 2026-09-03 - K3: the anaretic degree, at exactly 29 and with nothing either side
+- `7be278a5` 2026-09-03 - Record the nine settled decisions, with sources and measured status
+- `4fd0d513` 2026-09-03 - Transits: say when the text on screen is the natal meaning, not the transit
+- `4ad08082` 2026-09-03 - Transits: one contact per axis, instead of the same event told twice
+- `76d55e86` 2026-09-03 - Convergence reads as a share of the loudest; T-squares stop multiplying
+- `18fa9b6f` 2026-09-03 - Synthesis: the elemental balance was reading keys the engine never writes
+- `61ef04fe` 2026-09-03 - Section B: the app can put something down
+- `06db488c` 2026-09-03 - A1: the midpoint tree, and the drift the progressed wheel let back in
+- `6f35a56f` 2026-09-03 - The progressed wheel: the outer ring, moved to a day per year of life
+- `ef2a8d31` 2026-09-03 - E10: one geometry, so the painter and the hit tests cannot disagree again
+- `8966b61e` 2026-09-03 - Selection card: the house sits beside the sign
+- `072f775e` 2026-09-03 - Selection card: tarot and the mansion fold into Correspondences
+- `32f913ff` 2026-09-03 - Selection card: the Sabian and the degree fold into one heading
+- `4286c32d` 2026-09-03 - Selection card: the aspects are one section, not one per aspect
+- `c0aa4899` 2026-09-03 - Selection card: the reading itself, cut into layers, in one column
+- `da0435e1` 2026-09-03 - Selection card: sign, house and aspects open in place
+- `3976c920` 2026-09-03 - Wheel: clicking a body opens its reading, not only its card
+- `f29299ec` 2026-09-03 - Wheel: the painter must ask bodyBaseRadius too, and it never did
+- `ccd96a7d` 2026-09-03 - Wheel: the hover card is asked for, not pushed - which is why it never appeared
+- `ca585cb5` 2026-09-03 - Wheel: clicking a body selects the body, not the house under it
+- `6a152360` 2026-09-02 - Decans: name both schemes in the placements list, and let the ring choose one
+- `f86d027f` 2026-09-02 - Hover card: name both decan schemes instead of one unlabelled sub-ruler
+- `4ceaf659` 2026-09-02 - Section A closed: contacts for both directions, and DecanSystem deleted
+- `5018f1fc` 2026-09-02 - Section A: the progressed chart, the solar arc, and releasing in the reading
+- `d81b1cab` 2026-09-02 - AspectGridCheck: pin the aspect selection, so the suite reads code not preferences
+- `15a98921` 2026-09-02 - Section A: build the doors, then make the missing ones impossible to miss
+- `3b39673c` 2026-09-02 - GenerateExtraBodiesCheck: hold the four protections that replaced the flag
+- `5dd40f55` 2026-09-02 - GenerateExtraBodies: make the data loss impossible, not merely gated
+- `c3c9a8bc` 2026-09-02 - Licensing and provenance: write down what the repo could not tell us
+- `60cf923d` 2026-09-02 - Wheel: click a body to pin its focus and open its detail in the drawer
+- `4f17e573` 2026-09-02 - Wheel: hover a body to light its web and let the rest recede
+- `cc6d2554` 2026-09-02 - GUI: one drawer, one theme, and a palette the reader can change
+- `594a2343` 2026-09-02 - Harmonic resonance: rank the five tightest contacts, do not alert on them
+- `7ef8cbfc` 2026-09-01 - The 58 factor paragraphs the composer was waiting for
+- `46047754` 2026-09-01 - Synastry: prefer the exact direction, keep the mirror as a fallback
+- `ca0c1477` 2026-09-01 - Stop the composer repeating the degree text on the body page
+- `5dc6441e` 2026-09-01 - Deepen five composite aspect frames from the transposition document
+- `f354b3aa` 2026-09-01 - Checker: catch coverage without discrimination
+- `b7993ae1` 2026-09-01 - Compose Sabian degree readings; delete 20,880 built on invented symbols
+- `5c2d8834` 2026-09-01 - Replace the composite Sabian prose with a version that varies
+- `44be7a44` 2026-09-01 - Technical degree notes for every body on every degree
+- `e6bc6e82` 2026-09-01 - A Sabian reading for every body on every degree
+- `eef624ab` 2026-09-01 - Four new aspects, decan and mansion readings, and a lazy loader
+- `49a00dd4` 2026-08-31 - Frame borrowed natal wording in composite reports
+- `19a86ce1` 2026-08-31 - Composite aspect prose for every asteroid, lot and node
+- `1dd94ffb` 2026-08-31 - Remove two real names from synastry interaspect prose
+- `c1c21a41` 2026-08-31 - Read the second person as a person in synastry, not as a transit
+- `b1124a87` 2026-08-31 - Anchor spacing: put the comma inside the link
+- `b66f39a7` 2026-08-31 - Chrome, type scale, and chart terms that link where they point
+- `80a097a5` 2026-08-31 - Untrack 25.7 MB of external tooling
+- `f946794f` 2026-08-31 - Composite readings: fix Synthesize, speak the relationship's voice, add 11k prose entries
+- `88e4459d` 2026-08-30 - Part E: restore the Venus/fixed T-square by picking a better pair
+- `1af8f5d1` 2026-08-30 - Untrack IDE state and a build artifact
+- `7a227621` 2026-08-30 - Ourania
+

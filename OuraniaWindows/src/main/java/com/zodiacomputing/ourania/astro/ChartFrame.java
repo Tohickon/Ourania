@@ -40,6 +40,22 @@ public final class ChartFrame {
         public boolean outOfBounds;
 
         /**
+         * What the ephemeris call returned, which says where the answer came from (J15).
+         *
+         * <b>Not the same as {@link #ok}, and that is the whole reason it is here.</b> A body can
+         * come back fine and have been computed by the built-in approximation rather than from the
+         * data files - which is what the North Node has done on every chart this project has ever
+         * cast, because the Moon's file is not on this machine. The flags in the return code are
+         * the only signal that happened, and until 28 Sep nothing kept them.
+         *
+         * <b>It is a claim, not a proof.</b> Measured the same day: with the Moon's file missing
+         * the Moon still returns SEFLG_SWIEPH. So a change in this value is worth catching and an
+         * unchanged value is not evidence the file was read. Zero when the body was never asked
+         * for; negative on a failure.
+         */
+        public int returnCode;
+
+        /**
          * True when this position is a midpoint of two sources that are nearly opposite, and
          * is therefore not a settled number.
          *
@@ -643,7 +659,8 @@ public final class ChartFrame {
 
         double[] xx = new double[6];
         StringBuffer serr = new StringBuffer();
-        if (sw.swe_calc_ut(tjdUt, ipl, baseFlags, xx, serr) < 0) {
+        b.returnCode = sw.swe_calc_ut(tjdUt, ipl, baseFlags, xx, serr);
+        if (b.returnCode < 0) {
             b.ok = false;
             b.error = serr.toString();
             return b;

@@ -139,6 +139,12 @@ public class SettingsPanel extends JPanel {
         new java.util.ArrayList<>();
 
     private javax.swing.JTabbedPane tabs;
+
+    /** The tab J8 and J9 open on. Named once so two callers cannot spell it differently. */
+    static final String DIAGNOSTICS = "Diagnostics";
+
+    /** Held so the tab can re-measure when it is opened rather than show what it found once. */
+    private DiagnosticsPanel diagnostics;
     private final JLabel status = new JLabel(" ");
     /** Settings > Calculation Variants: the one transit orb. */
     javax.swing.JSpinner transitOrb;
@@ -227,6 +233,10 @@ public class SettingsPanel extends JPanel {
         JPanel points = column();
         JPanel engine = column();
         JPanel report = column();
+        // Not a column(): the Diagnostics tab brings its own layout with it, because it is the
+        // one tab whose contents are measured at the moment it is shown rather than seeded from
+        // settings. See DiagnosticsPanel.
+        DiagnosticsPanel diagnostics = new DiagnosticsPanel();
 
         // Chart Settings first, and it is an engine rule: harmonic, house system, what the
         // animation moves.
@@ -743,6 +753,12 @@ public class SettingsPanel extends JPanel {
         this.tabs.addTab("Bodies & Points", tabScroll(points));
         this.tabs.addTab("Engine Rules", tabScroll(engine));
         this.tabs.addTab("Report", tabScroll(report));
+        // <b>Last, because it is not a setting.</b> Nothing on this tab changes what the app
+        // computes - it says what the app found when it started and hands a reader a file to
+        // send on. It is here because this is the screen a reader already opens when something
+        // looks wrong, and a diagnostics window of its own would be a second place to look.
+        this.tabs.addTab(DIAGNOSTICS, tabScroll(diagnostics));
+        this.diagnostics = diagnostics;
         this.tabs.setToolTipTextAt(0, "<html>What the wheel and the globe look like:"
             + "<br>colours, rings, markers and the globe's own layers.</html>");
         this.tabs.setToolTipTextAt(1, "<html>Which aspects are drawn, and how wide each may be"
@@ -753,6 +769,8 @@ public class SettingsPanel extends JPanel {
             + "<br>drawn: house system, harmonic, zodiac, transit orb and the variants.</html>");
         this.tabs.setToolTipTextAt(4, "<html>Whose report it is: the name, contact line and logo"
             + "<br>that go on a reading you give somebody else.</html>");
+        this.tabs.setToolTipTextAt(5, "<html>What this build is, what it found when it started,"
+            + "<br>and a problem report to send on when something goes wrong.</html>");
 
         // <b>Painted here, not by the platform.</b> Windows draws a selected tab almost white,
         // which against this screen's light text makes the tab you are on the one you cannot read.
@@ -1273,6 +1291,29 @@ public class SettingsPanel extends JPanel {
     }
 
     /** One tab's column, laid out exactly as the single column was. */
+    /**
+     * Shows the Diagnostics tab, with its findings taken again first.
+     *
+     * <b>Re-measured on the way in.</b> A reader sent here by the start-up notice is about to act
+     * on what it says, and the list they act on should be the one that is true now - not least
+     * because the reader most likely to open it twice is one who has just gone and fixed
+     * something.
+     */
+    void showDiagnostics() {
+        if (tabs == null) {
+            return;
+        }
+        for (int i = 0; i < tabs.getTabCount(); i++) {
+            if (DIAGNOSTICS.equals(tabs.getTitleAt(i))) {
+                if (diagnostics != null) {
+                    diagnostics.refresh();
+                }
+                tabs.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
     private JPanel column() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));

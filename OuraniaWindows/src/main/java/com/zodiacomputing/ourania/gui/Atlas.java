@@ -80,7 +80,16 @@ public final class Atlas {
 
     private Atlas() { }
 
-    private static final String FILE = InterpretationService.DATA_DIR + "atlas.tsv.gz";
+    /**
+     * The atlas's own filename, so start-up can look for it without writing it down twice (J9).
+     *
+     * The gazetteer is not part of the interpretation corpus and is not in
+     * {@link InterpretationService#everyFileName}, so without this the one file whose absence
+     * makes every place search silently return nothing was the one file nothing checked for.
+     */
+    static final String FILE_NAME = "atlas.tsv.gz";
+
+    private static final String FILE = InterpretationService.DATA_DIR + FILE_NAME;
 
     // Parallel arrays rather than 168,549 objects: a Place is built only for the handful a
     // search actually returns. The strings that repeat - zones, countries, regions - are shared

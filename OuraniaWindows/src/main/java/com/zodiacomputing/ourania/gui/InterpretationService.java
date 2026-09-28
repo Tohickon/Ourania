@@ -64,35 +64,80 @@ public class InterpretationService {
     private static final String[] MODERN_SABIAN_FIELDS =
         {"title", "classic", "modern", "archetype", "meaning", "classicDiffers"};
 
+    // ------------------------------------------------------------- reading the corpus (J12)
+
+    /**
+     * The three shapes every loader below needs from a parsed document.
+     *
+     * <b>One set of accessors rather than a cast at each of forty call sites.</b> Each returns
+     * null for the wrong shape instead of throwing: a corpus file with a number where prose
+     * belongs is a data problem, and the loader's job is to leave that entry out and carry on -
+     * which is what the line reader did too, only without knowing it.
+     */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> sub(Map<String, Object> doc, String key) {
+        Object v = doc == null ? null : doc.get(key);
+        return v instanceof Map ? (Map<String, Object>) v : null;
+    }
+
+    private static String text(Map<String, Object> m, String key) {
+        Object v = m == null ? null : m.get(key);
+        return v instanceof String ? (String) v : null;
+    }
+
+    /**
+     * A list of strings as one comma-separated line.
+     *
+     * The Sabian keywords are an array in the file and a single line on screen. The reader this
+     * replaced stripped every quote out of the raw text between the brackets, which worked
+     * because no keyword has ever contained one.
+     */
+    private static String joined(Map<String, Object> m, String key) {
+        Object v = m == null ? null : m.get(key);
+        if (!(v instanceof java.util.List)) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Object o : (java.util.List<?>) v) {
+            if (o instanceof String) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append((String) o);
+            }
+        }
+        return sb.length() == 0 ? null : sb.toString();
+    }
+
+    /** Says a corpus file will not parse, in the one voice every loader uses. */
+    private static void willNotParse(File file, Exception bad) {
+        System.err.println(file.getName() + " is not valid JSON: " + bad.getMessage()
+            + " - NOTHING from this file was loaded.");
+        ErrorLog.record("corpus file " + file.getName() + " will not parse", bad);
+    }
+
+    /** The modern Sabian tiers. Read as JSON since 28 Sep (J12). */
     private void loadModernSabians() {
         File file = new File(DATA_DIR + "modern_sabians.json");
         if (!file.exists()) {
             return;
         }
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-            String line;
-            String key = null;
-            String[] fields = null;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("\"") && line.endsWith("{")) {
-                    key = line.substring(1, line.indexOf('"', 1)).toLowerCase();
-                    fields = new String[MODERN_SABIAN_FIELDS.length];
-                    modernSabians.put(key, fields);
+        try {
+            Map<String, Object> doc = Json.object(Json.parse(file));
+            for (String raw : doc.keySet()) {
+                Map<String, Object> entry = sub(doc, raw);
+                if (entry == null) {
                     continue;
                 }
-                if (fields == null) {
-                    continue;
-                }
+                String[] fields = new String[MODERN_SABIAN_FIELDS.length];
                 for (int i = 0; i < MODERN_SABIAN_FIELDS.length; i++) {
-                    String name = "\"" + MODERN_SABIAN_FIELDS[i] + "\":";
-                    if (line.startsWith(name)) {
-                        fields[i] = extractQuotedValue(line, name.length());
-                    }
+                    fields[i] = text(entry, MODERN_SABIAN_FIELDS[i]);
                 }
+                modernSabians.put(raw.toLowerCase(), fields);
             }
             System.out.println("Loaded modern Sabians: " + modernSabians.size() + " degrees.");
+        } catch (Json.Malformed bad) {
+            willNotParse(file, bad);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -405,7 +450,16 @@ public class InterpretationService {
         }
     }
 
-    /** Every data file this build reads, eager first then lazy - the order keys resolve in. */
+    /**
+     * Every <i>supplementary</i> data file this build reads, eager first then lazy - the order
+     * keys resolve in.
+     *
+     * <b>Not every file this class opens</b>, and the name said otherwise until 28 Sep. The eight
+     * core files below are loaded by named methods of their own and are absent from here, so a
+     * caller asking "is the corpus complete" got yes with {@code interpretations.json} missing.
+     * {@link #everyFileName} is the list for that question; this one stays exactly what DataCheck
+     * validates, which is the supplementary set.
+     */
     public static String[] allFileNames() {
         // <b>Two sections can live in one file</b> - body_degree_factors.json holds both
         // factor sets - so the same name would appear twice here and DataCheck would
@@ -417,6 +471,39 @@ public class InterpretationService {
         for (String[] row : LAZY_FILES) {
             if (!names.contains(row[1])) {
                 names.add(row[1]);
+            }
+        }
+        return names.toArray(new String[0]);
+    }
+
+    /**
+     * The files loaded by a named method rather than from a list (J9).
+     *
+     * <b>A second list is a thing that drifts, so it is swept rather than trusted.</b>
+     * {@code StartupCheck} Part E reads this source file for every {@code DATA_DIR + "..."}
+     * literal and fails if one of them is in neither this array nor {@link #allFileNames} - the
+     * same scanner {@code ErrorLogCheck} uses for absolute paths, pointed at a different question.
+     * Without that, adding a ninth core loader would leave start-up reporting a complete corpus
+     * while the file it needs is absent, which is the exact failure this row exists to end.
+     */
+    private static final String[] CORE_FILES = {
+        "interpretations.json",
+        "degree_interpretations.json",
+        "Sabian_interpretations.json",
+        "modern_sabians.json",
+        "Ascendent.json",
+        "Descendant.json",
+        "ic.json",
+        "mc.json",
+    };
+
+    /** Every data file this class will open: the core set first, then the supplementary one. */
+    public static String[] everyFileName() {
+        java.util.List<String> names = new java.util.ArrayList<>(java.util.Arrays.asList(
+            CORE_FILES));
+        for (String n : allFileNames()) {
+            if (!names.contains(n)) {
+                names.add(n);
             }
         }
         return names.toArray(new String[0]);
@@ -439,24 +526,95 @@ public class InterpretationService {
             return;
         }
         int added = 0;
+        int skipped = 0;
+        try {
+            for (Map.Entry<String, Map<String, String>> section
+                    : readJson(file).entrySet()) {
+                Map<String, String> target = sectionFor("\"" + section.getKey() + "\"");
+                if (target == null) {
+                    // A section this build does not know about. Skipped rather than filed under
+                    // whichever section preceded it, which is what the line reader did before
+                    // 2026-08: `transits` was unhandled, so its entries were served as natal
+                    // aspects.
+                    skipped += section.getValue().size();
+                    System.out.println("  (unknown section in " + file.getName() + ": "
+                        + section.getKey() + " - " + section.getValue().size()
+                        + " entries skipped)");
+                    continue;
+                }
+                for (Map.Entry<String, String> e : section.getValue().entrySet()) {
+                    if (target.putIfAbsent(e.getKey(), e.getValue()) == null) {
+                        added++;
+                    }
+                }
+            }
+            System.out.println("Loaded " + file.getName() + ": " + added + " entries."
+                + (skipped > 0 ? "  (" + skipped + " in sections this build does not know)" : ""));
+        } catch (Json.Malformed bad) {
+            // <b>Named, not swallowed.</b> The reader this replaced could not tell a broken file
+            // from a short one - it read what it recognised and said how many entries it got,
+            // and a file that lost half its entries to a stray newline printed a smaller number
+            // and nothing else. DataCheck exists because of that silence.
+            System.err.println(file.getName() + " is not valid JSON: " + bad.getMessage()
+                + " - NOTHING from this file was loaded.");
+            ErrorLog.record("corpus file " + file.getName() + " will not parse", bad);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * A corpus file as sections of key to prose, read as JSON (J12).
+     *
+     * <b>The reader the app uses.</b> Every value is a string here: the corpus is prose, and a
+     * section whose values are objects or numbers is not something any consumer of this class
+     * knows what to do with, so it is skipped with its name said out loud rather than coerced.
+     */
+    static Map<String, Map<String, String>> readJson(File file) throws java.io.IOException {
+        Map<String, Map<String, String>> out = new java.util.LinkedHashMap<>();
+        Map<String, Object> doc = Json.object(Json.parse(file));
+        for (Map.Entry<String, Object> section : doc.entrySet()) {
+            if (!(section.getValue() instanceof Map)) {
+                continue;
+            }
+            Map<String, String> entries = new java.util.LinkedHashMap<>();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> raw = (Map<String, Object>) section.getValue();
+            for (Map.Entry<String, Object> e : raw.entrySet()) {
+                if (e.getValue() instanceof String) {
+                    entries.put(e.getKey(), (String) e.getValue());
+                }
+            }
+            out.put(section.getKey(), entries);
+        }
+        return out;
+    }
+
+    /**
+     * The same file as the line reader saw it, kept so the switch to JSON stays provable (J12).
+     *
+     * <b>This is the old {@code loadExtraFile} body, unchanged, and it is dead to the app.</b> It
+     * exists because "the new reader loses nothing" is a claim, and a claim about 55 files and
+     * roughly forty thousand entries is not something to take on inspection. {@code JsonCheck}
+     * Part C runs both over every file in the corpus and names every entry they disagree about.
+     *
+     * <b>Do not fix anything in here.</b> A control that has been improved is not a control. What
+     * it gets wrong is the point: it takes the text between the first quote after a colon and the
+     * last quote on the same line, so a value carrying a newline loses its entry, two entries on
+     * one line loses one, and an escaped quote keeps its backslash.
+     */
+    static Map<String, Map<String, String>> readLineOriented(File file) throws Exception {
+        Map<String, Map<String, String>> out = new java.util.LinkedHashMap<>();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
             String line;
             Map<String, String> currentMap = null;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                Map<String, String> section = sectionFor(line);
-                if (section != null) {
-                    currentMap = section;
-                } else if (isSectionHeader(line)) {
-                    // A section this build does not know about. Target null rather than
-                    // leaving the previous section in place, because otherwise every entry
-                    // of an unrecognised section is filed silently under whichever section
-                    // happened to precede it. That is not hypothetical: `transits` was
-                    // unhandled here, so its entries were being served as natal aspects.
-                    currentMap = null;
-                    System.out.println("  (unknown section in " + file.getName() + ": "
-                        + line + " - entries skipped)");
+                if (isSectionHeader(line)) {
+                    String name = line.substring(1, Math.max(1, line.indexOf('"', 1)));
+                    currentMap = new java.util.LinkedHashMap<>();
+                    out.put(name, currentMap);
                 } else if (line.startsWith("\"") && currentMap != null) {
                     int colonIdx = line.indexOf("\":");
                     if (colonIdx == -1) {
@@ -467,16 +625,12 @@ public class InterpretationService {
                     int valEnd = line.lastIndexOf("\"");
                     if (valStart != -1 && valEnd > valStart) {
                         String value = unescapeUnicode(line.substring(valStart + 1, valEnd));
-                        if (currentMap.putIfAbsent(key, value) == null) {
-                            added++;
-                        }
+                        currentMap.putIfAbsent(key, value);
                     }
                 }
             }
-            System.out.println("Loaded " + file.getName() + ": " + added + " entries.");
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        return out;
     }
 
     /**
@@ -696,216 +850,176 @@ public class InterpretationService {
         return instance;
     }
 
+    /**
+     * The core dataset: twelve sections of key to prose, in one file.
+     *
+     * <b>Read as JSON since 28 Sep (J12).</b> What was here read one entry per line and took the
+     * text between the first quote after the colon and the last quote on the line - so a value
+     * carrying an escaped quote kept its backslash, two entries on one line lost one, and a
+     * section name was matched by {@code startsWith} against the raw line, which is why
+     * {@code "aspects"} appeared in the chain twice and nobody noticed.
+     */
     private void loadData() {
+        File file = new File(DATA_DIR + "interpretations.json");
+        if (!file.exists()) {
+            System.err.println("Interpretations JSON not found!");
+            return;
+        }
+        // The section name in the file, and the map it fills. One list, so an unknown
+        // section can be named rather than filed under whichever one preceded it.
+        Map<String, Map<String, String>> into = new java.util.LinkedHashMap<>();
+        into.put("planet_sign", planetSigns);
+        into.put("planet_house", planetHouses);
+        into.put("aspects", aspects);
+        into.put("transits", transits);
+        into.put("signs", signs);
+        into.put("houses", houses);
+        into.put("decans", decans);
+        into.put("sabian", sabian);
+        into.put("tarot_planets", tarotPlanets);
+        into.put("tarot_signs", tarotSigns);
+        into.put("tarot_decans", tarotDecans);
+        into.put("transit_house", transitHouses);
         try {
-            File file = new File(DATA_DIR + "interpretations.json");
-            if (!file.exists()) {
-                System.err.println("Interpretations JSON not found!");
-                return;
-            }
-            
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-            String line;
-            Map<String, String> currentMap = null;
-            
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("\"planet_sign\"")) {
-                    currentMap = planetSigns;
-                } else if (line.startsWith("\"planet_house\"")) {
-                    currentMap = planetHouses;
-                } else if (line.startsWith("\"aspects\"")) {
-                    currentMap = aspects;
-                } else if (line.startsWith("\"aspects\"")) {
-                    currentMap = aspects;
-                } else if (line.startsWith("\"transits\"")) {
-                    currentMap = transits;
-                } else if (line.startsWith("\"signs\"")) {
-                    currentMap = signs;
-                } else if (line.startsWith("\"houses\"")) {
-                    currentMap = houses;
-                } else if (line.startsWith("\"decans\"")) {
-                    currentMap = decans;
-                } else if (line.startsWith("\"sabian\"")) {
-                    currentMap = sabian;
-                } else if (line.startsWith("\"tarot_planets\"")) {
-                    currentMap = tarotPlanets;
-                } else if (line.startsWith("\"tarot_signs\"")) {
-                    currentMap = tarotSigns;
-                } else if (line.startsWith("\"tarot_decans\"")) {
-                    currentMap = tarotDecans;
-                } else if (line.startsWith("\"transit_house\"")) {
-                    currentMap = transitHouses;
-                } else if (line.startsWith("\"") && currentMap != null) {
-                    int colonIdx = line.indexOf("\":");
-                    if (colonIdx != -1) {
-                        String key = line.substring(1, colonIdx);
-                        int valStart = line.indexOf("\"", colonIdx + 1);
-                        int valEnd = line.lastIndexOf("\"");
-                        if (valStart != -1 && valEnd > valStart) {
-                            String value = unescapeUnicode(line.substring(valStart + 1, valEnd));
-                            currentMap.put(key, value);
-                        }
+            Map<String, Object> doc = Json.object(Json.parse(file));
+            for (Map.Entry<String, Map<String, String>> e : into.entrySet()) {
+                Map<String, Object> section = sub(doc, e.getKey());
+                if (section == null) {
+                    continue;
+                }
+                for (Map.Entry<String, Object> entry : section.entrySet()) {
+                    String value = text(section, entry.getKey());
+                    if (value != null) {
+                        // put, not putIfAbsent: this file loads first and is authoritative,
+                        // and the supplementary files defer to it. Unchanged from before.
+                        e.getValue().put(entry.getKey(), value);
                     }
                 }
             }
-            reader.close();
-            System.out.println("Loaded interpretations: " + planetSigns.size() + " signs, " + planetHouses.size() + " houses, " + aspects.size() + " aspects.");
+            for (String name : doc.keySet()) {
+                if (!into.containsKey(name)) {
+                    System.out.println("  (unknown section in " + file.getName() + ": "
+                        + name + " - entries skipped)");
+                }
+            }
+            System.out.println("Loaded interpretations: " + planetSigns.size() + " signs, "
+                + planetHouses.size() + " houses, " + aspects.size() + " aspects.");
+        } catch (Json.Malformed bad) {
+            willNotParse(file, bad);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /** The 360 degree summaries and their long forms. Read as JSON since 28 Sep (J12). */
     private void loadDegreesData() {
+        File file = new File(DATA_DIR + "degree_interpretations.json");
+        if (!file.exists()) {
+            System.err.println("Degree Interpretations JSON not found!");
+            return;
+        }
         try {
-            File file = new File(DATA_DIR + "degree_interpretations.json");
-            if (!file.exists()) {
-                System.err.println("Degree Interpretations JSON not found!");
-                return;
-            }
-            
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-            String line;
-            String currentDegree = null;
-            
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("\"") && (line.endsWith(":{") || line.endsWith(": {"))) {
-                    int quoteEnd = line.indexOf("\"", 1);
-                    if (quoteEnd != -1) {
-                        currentDegree = line.substring(1, quoteEnd);
-                    }
-                } else if (currentDegree != null) {
-                    if (line.startsWith("\"summary\":")) {
-                        int start = line.indexOf("\"", 10) + 1;
-                        int end = line.lastIndexOf("\"");
-                        if (start > 0 && end > start) {
-                            degreeSummaries.put(currentDegree, line.substring(start, end).replace("\\\"", "\""));
-                        }
-                    } else if (line.startsWith("\"fullText\":")) {
-                        int start = line.indexOf("\"", 11) + 1;
-                        int end = line.lastIndexOf("\"");
-                        if (start > 0 && end > start) {
-                            degreeFullTexts.put(currentDegree, line.substring(start, end).replace("\\\"", "\""));
-                        }
-                    }
+            Map<String, Object> doc = Json.object(Json.parse(file));
+            for (String degree : doc.keySet()) {
+                Map<String, Object> entry = sub(doc, degree);
+                String summary = text(entry, "summary");
+                String full = text(entry, "fullText");
+                if (summary != null) {
+                    degreeSummaries.put(degree, summary);
+                }
+                if (full != null) {
+                    degreeFullTexts.put(degree, full);
                 }
             }
-            reader.close();
-            System.out.println("Loaded degree interpretations: " + degreeSummaries.size() + " summaries.");
+            System.out.println("Loaded degree interpretations: " + degreeSummaries.size()
+                + " summaries.");
+        } catch (Json.Malformed bad) {
+            willNotParse(file, bad);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /** The four angles' prose, one file each. Read as JSON since 28 Sep (J12). */
     private void loadAnglesData() {
-        try {
-            File[] files = {new File(DATA_DIR + "Ascendent.json"),
-                            new File(DATA_DIR + "ic.json"),
-                            new File(DATA_DIR + "mc.json"),
-                            new File(DATA_DIR + "Descendant.json")};
-            for (File file : files) {
-                if (!file.exists()) continue;
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-                String line;
-                String currentKey = null;
-                while ((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    if (line.startsWith("\"") && (line.endsWith(":{") || line.endsWith(": {"))) {
-                        int quoteEnd = line.indexOf("\"", 1);
-                        if (quoteEnd != -1) {
-                            currentKey = line.substring(1, quoteEnd).toLowerCase();
-                        }
-                    } else if (currentKey != null) {
-                        if (line.startsWith("\"fullText\":")) {
-                            int start = line.indexOf("\"", 11) + 1;
-                            int end = line.lastIndexOf("\"");
-                            if (start > 0 && end > start) {
-                                String text = line.substring(start, end).replace("\\\"", "\"");
-                                // Descendant FIRST, and that order is load-bearing: it is the
-                                // only key here that contains another angle's name as a
-                                // substring, so a looser test above it would swallow it.
-                                if (currentKey.startsWith("descendant") || currentKey.endsWith("descendant")) {
-                                    descendantData.put(currentKey, text);
-                                } else if (currentKey.startsWith("ascendant") || currentKey.endsWith("ascendant")) {
-                                    ascendantData.put(currentKey, text);
-                                } else if (currentKey.startsWith("mc") || currentKey.endsWith("mc")) {
-                                    mcData.put(currentKey, text);
-                                } else if (currentKey.startsWith("ic") || currentKey.endsWith("ic")) {
-                                    icData.put(currentKey, text);
-                                }
-                            }
-                        }
+        File[] files = {new File(DATA_DIR + "Ascendent.json"),
+                        new File(DATA_DIR + "ic.json"),
+                        new File(DATA_DIR + "mc.json"),
+                        new File(DATA_DIR + "Descendant.json")};
+        for (File file : files) {
+            if (!file.exists()) {
+                continue;
+            }
+            try {
+                Map<String, Object> doc = Json.object(Json.parse(file));
+                for (String raw : doc.keySet()) {
+                    String key = raw.toLowerCase();
+                    String value = text(sub(doc, raw), "fullText");
+                    if (value == null) {
+                        continue;
+                    }
+                    // Descendant FIRST, and that order is load-bearing: it is the only key here
+                    // that contains another angle's name as a substring, so a looser test above
+                    // it would swallow it.
+                    if (key.startsWith("descendant") || key.endsWith("descendant")) {
+                        descendantData.put(key, value);
+                    } else if (key.startsWith("ascendant") || key.endsWith("ascendant")) {
+                        ascendantData.put(key, value);
+                    } else if (key.startsWith("mc") || key.endsWith("mc")) {
+                        mcData.put(key, value);
+                    } else if (key.startsWith("ic") || key.endsWith("ic")) {
+                        icData.put(key, value);
                     }
                 }
-                reader.close();
+            } catch (Json.Malformed bad) {
+                willNotParse(file, bad);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            System.out.println("Loaded angles: " + ascendantData.size() + " Ascendant, "
-                + icData.size() + " IC, " + mcData.size() + " MC.");
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        System.out.println("Loaded angles: " + ascendantData.size() + " Ascendant, "
+            + icData.size() + " IC, " + mcData.size() + " MC.");
     }
 
     /**
-     * Loads the expanded Sabian data (fullText, shadow, keywords). The file is written
-     * with one field per line and arrays inline so this line-oriented reader can parse it.
-     * Absence of the file is non-fatal: the getters simply return empty strings.
+     * The expanded Sabian data: fullText, shadow and a keyword array per degree.
+     *
+     * <b>Read as JSON since 28 Sep (J12), and this is the file that most needed it.</b> Its
+     * comment used to say it was "written with one field per line and arrays inline so this
+     * line-oriented reader can parse it" - a data file shaped around a reader's limits, which is
+     * the limitation admitting what it is. Absence of the file is still non-fatal.
      */
     private void loadSabianDetailData() {
+        File file = new File(DATA_DIR + "Sabian_interpretations.json");
+        if (!file.exists()) {
+            System.err.println("Sabian detail JSON not found - shadow/keywords unavailable.");
+            return;
+        }
         try {
-            File file = new File(DATA_DIR + "Sabian_interpretations.json");
-            if (!file.exists()) {
-                System.err.println("Sabian detail JSON not found - shadow/keywords unavailable.");
-                return;
-            }
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-            String line;
-            String currentKey = null;
-
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("\"") && (line.endsWith(":{") || line.endsWith(": {"))) {
-                    int quoteEnd = line.indexOf("\"", 1);
-                    if (quoteEnd != -1) {
-                        currentKey = line.substring(1, quoteEnd).toLowerCase();
-                    }
-                } else if (currentKey != null) {
-                    if (line.startsWith("\"fullText\":")) {
-                        String v = extractQuotedValue(line, 11);
-                        if (v != null) sabianFullTexts.put(currentKey, v);
-                    } else if (line.startsWith("\"shadow\":")) {
-                        String v = extractQuotedValue(line, 9);
-                        if (v != null) sabianShadows.put(currentKey, v);
-                    } else if (line.startsWith("\"keywords\":")) {
-                        int start = line.indexOf("[");
-                        int end = line.lastIndexOf("]");
-                        if (start != -1 && end > start) {
-                            String inner = line.substring(start + 1, end).replace("\"", "").trim();
-                            if (!inner.isEmpty()) {
-                                sabianKeywords.put(currentKey, inner.replaceAll("\\s*,\\s*", ", "));
-                            }
-                        }
-                    }
+            Map<String, Object> doc = Json.object(Json.parse(file));
+            for (String raw : doc.keySet()) {
+                Map<String, Object> entry = sub(doc, raw);
+                String key = raw.toLowerCase();
+                String full = text(entry, "fullText");
+                String shadow = text(entry, "shadow");
+                String keywords = joined(entry, "keywords");
+                if (full != null) {
+                    sabianFullTexts.put(key, full);
+                }
+                if (shadow != null) {
+                    sabianShadows.put(key, shadow);
+                }
+                if (keywords != null) {
+                    sabianKeywords.put(key, keywords);
                 }
             }
-            reader.close();
             System.out.println("Loaded Sabian detail: " + sabianFullTexts.size() + " fullText, "
                 + sabianShadows.size() + " shadow, " + sabianKeywords.size() + " keyword sets.");
+        } catch (Json.Malformed bad) {
+            willNotParse(file, bad);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /** Extracts a JSON string value beginning after fieldOffset, unescaping inner quotes. */
-    private String extractQuotedValue(String line, int fieldOffset) {
-        int start = line.indexOf("\"", fieldOffset) + 1;
-        int end = line.lastIndexOf("\"");
-        if (start > 0 && end > start) {
-            return line.substring(start, end).replace("\\\"", "\"");
-        }
-        return null;
     }
 
     /**

@@ -218,6 +218,8 @@ public final class PresetBarCheck {
      */
     private static final String[] TABS = {
         "Globe & Display", "Aspects & Orbs", "Bodies & Points", "Engine Rules", "Report",
+        // Diagnostics, 28 Sep: J8 and J9's door. Edited by hand for the same reason Report was.
+        "Diagnostics",
     };
 
     /**
@@ -236,7 +238,8 @@ public final class PresetBarCheck {
         if (pane == null) {
             return;
         }
-        ok("five of them (" + pane.getTabCount() + ")", pane.getTabCount() == TABS.length);
+        ok(TABS.length + " of them (" + pane.getTabCount() + ")",
+            pane.getTabCount() == TABS.length);
         for (int i = 0; i < Math.min(TABS.length, pane.getTabCount()); i++) {
             ok("tab " + i + " is " + TABS[i], TABS[i].equals(pane.getTitleAt(i)));
             ok("and says what it holds", pane.getToolTipTextAt(i) != null

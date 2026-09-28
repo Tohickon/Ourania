@@ -410,6 +410,60 @@ public class OuraniaWindow extends JFrame {
     }
 
     /**
+     * Opens the settings screen on Diagnostics (J8, J9).
+     *
+     * <b>The one door, used by both ways in.</b> The start-up notice sends a reader here and so
+     * does the side panel; a second route that selected the tab itself would be a second copy of
+     * which tab it is.
+     */
+    public void showDiagnostics() {
+        switchScreen("SETTINGS");
+        for (java.awt.Component c : contentPanel.getComponents()) {
+            if (c instanceof SettingsPanel) {
+                ((SettingsPanel) c).showDiagnostics();
+                return;
+            }
+        }
+    }
+
+    /**
+     * Tells the reader what start-up found, once (J9).
+     *
+     * <b>What the app can no longer answer properly, and where to look</b> - not a stack trace and
+     * not a list of filenames. Every one of these conditions has a working fallback, so the reader
+     * is being told their chart is quietly different from what it should be, which is a sentence
+     * rather than an error code. Modeless: it must not stand between a reader and the chart they
+     * opened the app for.
+     */
+    public void announce(java.util.List<Startup.Finding> found) {
+        StringBuilder sb = new StringBuilder("<html><body style='width:420px'>");
+        sb.append("<b>Ourania started with something missing.</b><br><br>");
+        for (Startup.Finding f : found) {
+            if (f.level != Startup.Level.DEGRADED) {
+                continue;
+            }
+            sb.append("&#9888; ").append(f.what).append("<br><span style='color:#999'>")
+                .append(f.detail).append("</span><br><br>");
+        }
+        sb.append("The app works. Settings &rarr; Diagnostics has the current list and can save "
+            + "a report.</body></html>");
+
+        final javax.swing.JOptionPane pane = new javax.swing.JOptionPane(new JLabel(sb.toString()),
+            javax.swing.JOptionPane.WARNING_MESSAGE, javax.swing.JOptionPane.DEFAULT_OPTION,
+            null, new Object[] {"Open Diagnostics", "Not now"}, "Not now");
+        final javax.swing.JDialog dialog = pane.createDialog(this, "Ourania");
+        dialog.setModal(false);
+        pane.addPropertyChangeListener(javax.swing.JOptionPane.VALUE_PROPERTY, e -> {
+            Object picked = pane.getValue();
+            dialog.dispose();
+            if ("Open Diagnostics".equals(picked)) {
+                showDiagnostics();
+            }
+        });
+        dialog.setVisible(true);
+    }
+
+    /**
      * Opens or folds a ring, from the wheel.
      *
      * Delegates to Chart Setup rather than touching the mode, so there is still exactly one
@@ -1485,6 +1539,13 @@ public class OuraniaWindow extends JFrame {
         // a listener used to print to a console a packaged app does not have, and then
         // vanish. J8.
         ErrorLog.install();
+        // <b>Then look at what this launch is actually equipped with.</b> Before this, nothing
+        // verified the ephemeris directory, the data files or the settings before the window
+        // opened - and the first thing it measured was that the Moon's ephemeris file has never
+        // been on this machine, with the North Node quietly approximated on every chart ever
+        // cast here. Off the event thread and before the window, because it reads files; it
+        // never throws and it never stops the app. J9.
+        final java.util.List<Startup.Finding> found = Startup.runAndRecord();
         // Run the GUI creation on the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {
             try {
@@ -1513,6 +1574,16 @@ public class OuraniaWindow extends JFrame {
             // constructor that generates a chart drags every one of them into casting an
             // ephemeris they never wanted. Starting the app is a thing main does.
             window.drawSavedChart();
+
+            // <b>Said once per set of findings, not once per launch.</b> A notice that returns
+            // every morning is one a reader learns to dismiss without reading, which would cost
+            // exactly the case it exists for. The signature is the degraded headlines, so the
+            // same problem tomorrow is silent and a new one is not; Diagnostics always has the
+            // current list. J9.
+            if (Startup.unannounced(found)) {
+                Startup.announced(found);
+                window.announce(found);
+            }
         });
     }
 }

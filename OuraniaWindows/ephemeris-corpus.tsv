@@ -1,0 +1,2425 @@
+# Ourania ephemeris corpus (J15) - GENERATED, and generated deliberately.
+#
+# WHAT THIS IS: the positions this build answers for a fixed set of charts,
+# so that a change to the ephemeris path shows up as a diff instead of as a
+# chart that is quietly a little different. 12 instants from 1500 to 2450 x 5 places from the equator to 78N.
+#
+# WHAT THIS IS NOT: an accuracy corpus. These numbers came from this build;
+# checking them against it proves only that nothing has moved. The assertions
+# that test whether the sky is RIGHT are in EphemerisCorpusCheck, and they are
+# invariants - the tropical year, the synodic month, the sidereal periods -
+# which are true of the sky rather than of this program.
+#
+# THE SOURCE COLUMN MATTERS AS MUCH AS THE LONGITUDE. 'files' is the Swiss
+# Ephemeris data; 'approximation' is the built-in Moshier fall back, which is
+# close enough that nobody notices it happening; 'error' is a point the chart
+# does not get at all. A row moving from files to approximation is the defect
+# this file exists to catch.
+# A derived point - an angle, a lot, the south node - is labelled
+# 'derived', because no ephemeris call answers it; 'houses' is the four
+# angles the house call returns.
+#
+# Regenerate with:
+#   java -cp "src\main\java;lib\*" com.zodiacomputing.ourania.astro.EphemerisCorpus --overwrite-the-expectations
+# Houses: P.  Zodiac: tropical.  Settings: a fresh install's defaults.
+era	place	point	longitude	source
+1500	greenwich	Sun	79.747999161	approximation
+1500	greenwich	Moon	128.763839139	files
+1500	greenwich	Mercury	104.139295397	approximation
+1500	greenwich	Venus	115.377578060	approximation
+1500	greenwich	Mars	114.969406814	approximation
+1500	greenwich	Jupiter	356.236455729	approximation
+1500	greenwich	Saturn	57.778524209	approximation
+1500	greenwich	Uranus	330.058496043	approximation
+1500	greenwich	Neptune	286.496576990	approximation
+1500	greenwich	Pluto	233.196218182	approximation
+1500	greenwich	North Node	67.677001306	approximation
+1500	greenwich	South Node	247.677001306	derived
+1500	greenwich	Chiron	nan	none
+1500	greenwich	Ceres	nan	none
+1500	greenwich	Pallas	nan	none
+1500	greenwich	Juno	nan	none
+1500	greenwich	Vesta	nan	none
+1500	greenwich	Eris	nan	none
+1500	greenwich	Eros	nan	none
+1500	greenwich	Hygiea	nan	none
+1500	greenwich	Nessus	nan	none
+1500	greenwich	Pholus	nan	none
+1500	greenwich	Ascendant	172.409841287	derived
+1500	greenwich	Descendant	352.409841287	derived
+1500	greenwich	MC	80.108479768	derived
+1500	greenwich	IC	260.108479768	derived
+1500	greenwich	Part of Fortune	nan	none
+1500	greenwich	Part of Spirit	nan	none
+1500	greenwich	Black Moon Lilith	nan	none
+1500	greenwich	Vertex	nan	none
+1500	greenwich	East Point	nan	none
+1500	greenwich	Lot of Eros	nan	none
+1500	greenwich	Lot of Necessity	nan	none
+1500	greenwich	Lot of Courage	nan	none
+1500	greenwich	Lot of Victory	nan	none
+1500	greenwich	Lot of Nemesis	nan	none
+1500	greenwich	houses:Ascendant	172.409841287	houses
+1500	greenwich	houses:Midheaven	80.108479768	houses
+1500	greenwich	houses:ARMC	79.233547985	houses
+1500	greenwich	houses:Vertex	342.244443857	houses
+1500	sydney	Sun	79.747999161	approximation
+1500	sydney	Moon	128.763839139	files
+1500	sydney	Mercury	104.139295397	approximation
+1500	sydney	Venus	115.377578060	approximation
+1500	sydney	Mars	114.969406814	approximation
+1500	sydney	Jupiter	356.236455729	approximation
+1500	sydney	Saturn	57.778524209	approximation
+1500	sydney	Uranus	330.058496043	approximation
+1500	sydney	Neptune	286.496576990	approximation
+1500	sydney	Pluto	233.196218182	approximation
+1500	sydney	North Node	67.677001306	approximation
+1500	sydney	South Node	247.677001306	derived
+1500	sydney	Chiron	nan	none
+1500	sydney	Ceres	nan	none
+1500	sydney	Pallas	nan	none
+1500	sydney	Juno	nan	none
+1500	sydney	Vesta	nan	none
+1500	sydney	Eris	nan	none
+1500	sydney	Eros	nan	none
+1500	sydney	Hygiea	nan	none
+1500	sydney	Nessus	nan	none
+1500	sydney	Pholus	nan	none
+1500	sydney	Ascendant	326.841638055	derived
+1500	sydney	Descendant	146.841638055	derived
+1500	sydney	MC	232.858468408	derived
+1500	sydney	IC	52.858468408	derived
+1500	sydney	Part of Fortune	nan	none
+1500	sydney	Part of Spirit	nan	none
+1500	sydney	Black Moon Lilith	nan	none
+1500	sydney	Vertex	nan	none
+1500	sydney	East Point	nan	none
+1500	sydney	Lot of Eros	nan	none
+1500	sydney	Lot of Necessity	nan	none
+1500	sydney	Lot of Courage	nan	none
+1500	sydney	Lot of Victory	nan	none
+1500	sydney	Lot of Nemesis	nan	none
+1500	sydney	houses:Ascendant	326.841638055	houses
+1500	sydney	houses:Midheaven	232.858468408	houses
+1500	sydney	houses:ARMC	230.444347985	houses
+1500	sydney	houses:Vertex	100.045524562	houses
+1500	equator	Sun	79.747999161	approximation
+1500	equator	Moon	128.763839139	files
+1500	equator	Mercury	104.139295397	approximation
+1500	equator	Venus	115.377578060	approximation
+1500	equator	Mars	114.969406814	approximation
+1500	equator	Jupiter	356.236455729	approximation
+1500	equator	Saturn	57.778524209	approximation
+1500	equator	Uranus	330.058496043	approximation
+1500	equator	Neptune	286.496576990	approximation
+1500	equator	Pluto	233.196218182	approximation
+1500	equator	North Node	67.677001306	approximation
+1500	equator	South Node	247.677001306	derived
+1500	equator	Chiron	nan	none
+1500	equator	Ceres	nan	none
+1500	equator	Pallas	nan	none
+1500	equator	Juno	nan	none
+1500	equator	Vesta	nan	none
+1500	equator	Eris	nan	none
+1500	equator	Eros	nan	none
+1500	equator	Hygiea	nan	none
+1500	equator	Nessus	nan	none
+1500	equator	Pholus	nan	none
+1500	equator	Ascendant	90.674063169	derived
+1500	equator	Descendant	270.674063169	derived
+1500	equator	MC	0.801548984	derived
+1500	equator	IC	180.801548984	derived
+1500	equator	Part of Fortune	nan	none
+1500	equator	Part of Spirit	nan	none
+1500	equator	Black Moon Lilith	nan	none
+1500	equator	Vertex	nan	none
+1500	equator	East Point	nan	none
+1500	equator	Lot of Eros	nan	none
+1500	equator	Lot of Necessity	nan	none
+1500	equator	Lot of Courage	nan	none
+1500	equator	Lot of Victory	nan	none
+1500	equator	Lot of Nemesis	nan	none
+1500	equator	houses:Ascendant	90.674063169	houses
+1500	equator	houses:Midheaven	0.801548984	houses
+1500	equator	houses:ARMC	0.735047985	houses
+1500	equator	houses:Vertex	0.000000000	houses
+1500	longyearbyen	Sun	79.747999161	approximation
+1500	longyearbyen	Moon	128.763839139	files
+1500	longyearbyen	Mercury	104.139295397	approximation
+1500	longyearbyen	Venus	115.377578060	approximation
+1500	longyearbyen	Mars	114.969406814	approximation
+1500	longyearbyen	Jupiter	356.236455729	approximation
+1500	longyearbyen	Saturn	57.778524209	approximation
+1500	longyearbyen	Uranus	330.058496043	approximation
+1500	longyearbyen	Neptune	286.496576990	approximation
+1500	longyearbyen	Pluto	233.196218182	approximation
+1500	longyearbyen	North Node	67.677001306	approximation
+1500	longyearbyen	South Node	247.677001306	derived
+1500	longyearbyen	Chiron	nan	none
+1500	longyearbyen	Ceres	nan	none
+1500	longyearbyen	Pallas	nan	none
+1500	longyearbyen	Juno	nan	none
+1500	longyearbyen	Vesta	nan	none
+1500	longyearbyen	Eris	nan	none
+1500	longyearbyen	Eros	nan	none
+1500	longyearbyen	Hygiea	nan	none
+1500	longyearbyen	Nessus	nan	none
+1500	longyearbyen	Pholus	nan	none
+1500	longyearbyen	Ascendant	181.717368324	derived
+1500	longyearbyen	Descendant	1.717368324	derived
+1500	longyearbyen	MC	94.460044589	derived
+1500	longyearbyen	IC	274.460044589	derived
+1500	longyearbyen	Part of Fortune	nan	none
+1500	longyearbyen	Part of Spirit	nan	none
+1500	longyearbyen	Black Moon Lilith	nan	none
+1500	longyearbyen	Vertex	nan	none
+1500	longyearbyen	East Point	nan	none
+1500	longyearbyen	Lot of Eros	nan	none
+1500	longyearbyen	Lot of Necessity	nan	none
+1500	longyearbyen	Lot of Courage	nan	none
+1500	longyearbyen	Lot of Victory	nan	none
+1500	longyearbyen	Lot of Nemesis	nan	none
+1500	longyearbyen	houses:Ascendant	181.717368324	houses
+1500	longyearbyen	houses:Midheaven	94.460044589	houses
+1500	longyearbyen	houses:ARMC	94.861747985	houses
+1500	longyearbyen	houses:Vertex	5.826291539	houses
+1500	ushuaia	Sun	79.747999161	approximation
+1500	ushuaia	Moon	128.763839139	files
+1500	ushuaia	Mercury	104.139295397	approximation
+1500	ushuaia	Venus	115.377578060	approximation
+1500	ushuaia	Mars	114.969406814	approximation
+1500	ushuaia	Jupiter	356.236455729	approximation
+1500	ushuaia	Saturn	57.778524209	approximation
+1500	ushuaia	Uranus	330.058496043	approximation
+1500	ushuaia	Neptune	286.496576990	approximation
+1500	ushuaia	Pluto	233.196218182	approximation
+1500	ushuaia	North Node	67.677001306	approximation
+1500	ushuaia	South Node	247.677001306	derived
+1500	ushuaia	Chiron	nan	none
+1500	ushuaia	Ceres	nan	none
+1500	ushuaia	Pallas	nan	none
+1500	ushuaia	Juno	nan	none
+1500	ushuaia	Vesta	nan	none
+1500	ushuaia	Eris	nan	none
+1500	ushuaia	Eros	nan	none
+1500	ushuaia	Hygiea	nan	none
+1500	ushuaia	Nessus	nan	none
+1500	ushuaia	Pholus	nan	none
+1500	ushuaia	Ascendant	68.260696996	derived
+1500	ushuaia	Descendant	248.260696996	derived
+1500	ushuaia	MC	11.894266046	derived
+1500	ushuaia	IC	191.894266046	derived
+1500	ushuaia	Part of Fortune	nan	none
+1500	ushuaia	Part of Spirit	nan	none
+1500	ushuaia	Black Moon Lilith	nan	none
+1500	ushuaia	Vertex	nan	none
+1500	ushuaia	East Point	nan	none
+1500	ushuaia	Lot of Eros	nan	none
+1500	ushuaia	Lot of Necessity	nan	none
+1500	ushuaia	Lot of Courage	nan	none
+1500	ushuaia	Lot of Victory	nan	none
+1500	ushuaia	Lot of Nemesis	nan	none
+1500	ushuaia	houses:Ascendant	68.260696996	houses
+1500	ushuaia	houses:Midheaven	11.894266046	houses
+1500	ushuaia	houses:ARMC	10.932147985	houses
+1500	ushuaia	houses:Vertex	294.874718768	houses
+1800	greenwich	Sun	280.429292509	approximation
+1800	greenwich	Moon	348.466606109	files
+1800	greenwich	Mercury	268.343608194	approximation
+1800	greenwich	Venus	233.627206934	approximation
+1800	greenwich	Mars	244.335788939	approximation
+1800	greenwich	Jupiter	84.527007522	approximation
+1800	greenwich	Saturn	128.799193590	approximation
+1800	greenwich	Uranus	177.126573904	approximation
+1800	greenwich	Neptune	226.621781567	approximation
+1800	greenwich	Pluto	331.410402568	approximation
+1800	greenwich	North Node	34.181523326	approximation
+1800	greenwich	South Node	214.181523326	derived
+1800	greenwich	Chiron	nan	none
+1800	greenwich	Ceres	nan	none
+1800	greenwich	Pallas	nan	none
+1800	greenwich	Juno	nan	none
+1800	greenwich	Vesta	nan	none
+1800	greenwich	Eris	nan	none
+1800	greenwich	Eros	nan	none
+1800	greenwich	Hygiea	nan	none
+1800	greenwich	Nessus	nan	none
+1800	greenwich	Pholus	nan	none
+1800	greenwich	Ascendant	187.320178937	derived
+1800	greenwich	Descendant	7.320178937	derived
+1800	greenwich	MC	99.537534432	derived
+1800	greenwich	IC	279.537534432	derived
+1800	greenwich	Part of Fortune	nan	none
+1800	greenwich	Part of Spirit	nan	none
+1800	greenwich	Black Moon Lilith	nan	none
+1800	greenwich	Vertex	nan	none
+1800	greenwich	East Point	nan	none
+1800	greenwich	Lot of Eros	nan	none
+1800	greenwich	Lot of Necessity	nan	none
+1800	greenwich	Lot of Courage	nan	none
+1800	greenwich	Lot of Victory	nan	none
+1800	greenwich	Lot of Nemesis	nan	none
+1800	greenwich	houses:Ascendant	187.320178937	houses
+1800	greenwich	houses:Midheaven	99.537534432	houses
+1800	greenwich	houses:ARMC	100.379596842	houses
+1800	greenwich	houses:Vertex	17.110599045	houses
+1800	sydney	Sun	280.429292509	approximation
+1800	sydney	Moon	348.466606109	files
+1800	sydney	Mercury	268.343608194	approximation
+1800	sydney	Venus	233.627206934	approximation
+1800	sydney	Mars	244.335788939	approximation
+1800	sydney	Jupiter	84.527007522	approximation
+1800	sydney	Saturn	128.799193590	approximation
+1800	sydney	Uranus	177.126573904	approximation
+1800	sydney	Neptune	226.621781567	approximation
+1800	sydney	Pluto	331.410402568	approximation
+1800	sydney	North Node	34.181523326	approximation
+1800	sydney	South Node	214.181523326	derived
+1800	sydney	Chiron	nan	none
+1800	sydney	Ceres	nan	none
+1800	sydney	Pallas	nan	none
+1800	sydney	Juno	nan	none
+1800	sydney	Vesta	nan	none
+1800	sydney	Eris	nan	none
+1800	sydney	Eros	nan	none
+1800	sydney	Hygiea	nan	none
+1800	sydney	Nessus	nan	none
+1800	sydney	Pholus	nan	none
+1800	sydney	Ascendant	344.485193673	derived
+1800	sydney	Descendant	164.485193673	derived
+1800	sydney	MC	253.021956495	derived
+1800	sydney	IC	73.021956495	derived
+1800	sydney	Part of Fortune	nan	none
+1800	sydney	Part of Spirit	nan	none
+1800	sydney	Black Moon Lilith	nan	none
+1800	sydney	Vertex	nan	none
+1800	sydney	East Point	nan	none
+1800	sydney	Lot of Eros	nan	none
+1800	sydney	Lot of Necessity	nan	none
+1800	sydney	Lot of Courage	nan	none
+1800	sydney	Lot of Victory	nan	none
+1800	sydney	Lot of Nemesis	nan	none
+1800	sydney	houses:Ascendant	344.485193673	houses
+1800	sydney	houses:Midheaven	253.021956495	houses
+1800	sydney	houses:ARMC	251.590396842	houses
+1800	sydney	houses:Vertex	131.256905651	houses
+1800	equator	Sun	280.429292509	approximation
+1800	equator	Moon	348.466606109	files
+1800	equator	Mercury	268.343608194	approximation
+1800	equator	Venus	233.627206934	approximation
+1800	equator	Mars	244.335788939	approximation
+1800	equator	Jupiter	84.527007522	approximation
+1800	equator	Saturn	128.799193590	approximation
+1800	equator	Uranus	177.126573904	approximation
+1800	equator	Neptune	226.621781567	approximation
+1800	equator	Pluto	331.410402568	approximation
+1800	equator	North Node	34.181523326	approximation
+1800	equator	South Node	214.181523326	derived
+1800	equator	Chiron	nan	none
+1800	equator	Ceres	nan	none
+1800	equator	Pallas	nan	none
+1800	equator	Juno	nan	none
+1800	equator	Vesta	nan	none
+1800	equator	Eris	nan	none
+1800	equator	Eros	nan	none
+1800	equator	Hygiea	nan	none
+1800	equator	Nessus	nan	none
+1800	equator	Pholus	nan	none
+1800	equator	Ascendant	110.223580938	derived
+1800	equator	Descendant	290.223580938	derived
+1800	equator	MC	23.645154426	derived
+1800	equator	IC	203.645154426	derived
+1800	equator	Part of Fortune	nan	none
+1800	equator	Part of Spirit	nan	none
+1800	equator	Black Moon Lilith	nan	none
+1800	equator	Vertex	nan	none
+1800	equator	East Point	nan	none
+1800	equator	Lot of Eros	nan	none
+1800	equator	Lot of Necessity	nan	none
+1800	equator	Lot of Courage	nan	none
+1800	equator	Lot of Victory	nan	none
+1800	equator	Lot of Nemesis	nan	none
+1800	equator	houses:Ascendant	110.223580938	houses
+1800	equator	houses:Midheaven	23.645154426	houses
+1800	equator	houses:ARMC	21.881096842	houses
+1800	equator	houses:Vertex	0.000000000	houses
+1800	longyearbyen	Sun	280.429292509	approximation
+1800	longyearbyen	Moon	348.466606109	files
+1800	longyearbyen	Mercury	268.343608194	approximation
+1800	longyearbyen	Venus	233.627206934	approximation
+1800	longyearbyen	Mars	244.335788939	approximation
+1800	longyearbyen	Jupiter	84.527007522	approximation
+1800	longyearbyen	Saturn	128.799193590	approximation
+1800	longyearbyen	Uranus	177.126573904	approximation
+1800	longyearbyen	Neptune	226.621781567	approximation
+1800	longyearbyen	Pluto	331.410402568	approximation
+1800	longyearbyen	North Node	34.181523326	approximation
+1800	longyearbyen	South Node	214.181523326	derived
+1800	longyearbyen	Chiron	nan	none
+1800	longyearbyen	Ceres	nan	none
+1800	longyearbyen	Pallas	nan	none
+1800	longyearbyen	Juno	nan	none
+1800	longyearbyen	Vesta	nan	none
+1800	longyearbyen	Eris	nan	none
+1800	longyearbyen	Eros	nan	none
+1800	longyearbyen	Hygiea	nan	none
+1800	longyearbyen	Nessus	nan	none
+1800	longyearbyen	Pholus	nan	none
+1800	longyearbyen	Ascendant	189.110294720	derived
+1800	longyearbyen	Descendant	9.110294720	derived
+1800	longyearbyen	MC	114.110689151	derived
+1800	longyearbyen	IC	294.110689151	derived
+1800	longyearbyen	Part of Fortune	nan	none
+1800	longyearbyen	Part of Spirit	nan	none
+1800	longyearbyen	Black Moon Lilith	nan	none
+1800	longyearbyen	Vertex	nan	none
+1800	longyearbyen	East Point	nan	none
+1800	longyearbyen	Lot of Eros	nan	none
+1800	longyearbyen	Lot of Necessity	nan	none
+1800	longyearbyen	Lot of Courage	nan	none
+1800	longyearbyen	Lot of Victory	nan	none
+1800	longyearbyen	Lot of Nemesis	nan	none
+1800	longyearbyen	houses:Ascendant	189.110294720	houses
+1800	longyearbyen	houses:Midheaven	114.110689151	houses
+1800	longyearbyen	houses:ARMC	116.007796842	houses
+1800	longyearbyen	houses:Vertex	30.602693198	houses
+1800	ushuaia	Sun	280.429292509	approximation
+1800	ushuaia	Moon	348.466606109	files
+1800	ushuaia	Mercury	268.343608194	approximation
+1800	ushuaia	Venus	233.627206934	approximation
+1800	ushuaia	Mars	244.335788939	approximation
+1800	ushuaia	Jupiter	84.527007522	approximation
+1800	ushuaia	Saturn	128.799193590	approximation
+1800	ushuaia	Uranus	177.126573904	approximation
+1800	ushuaia	Neptune	226.621781567	approximation
+1800	ushuaia	Pluto	331.410402568	approximation
+1800	ushuaia	North Node	34.181523326	approximation
+1800	ushuaia	South Node	214.181523326	derived
+1800	ushuaia	Chiron	nan	none
+1800	ushuaia	Ceres	nan	none
+1800	ushuaia	Pallas	nan	none
+1800	ushuaia	Juno	nan	none
+1800	ushuaia	Vesta	nan	none
+1800	ushuaia	Eris	nan	none
+1800	ushuaia	Eros	nan	none
+1800	ushuaia	Hygiea	nan	none
+1800	ushuaia	Nessus	nan	none
+1800	ushuaia	Pholus	nan	none
+1800	ushuaia	Ascendant	84.779979279	derived
+1800	ushuaia	Descendant	264.779979279	derived
+1800	ushuaia	MC	34.344204763	derived
+1800	ushuaia	IC	214.344204763	derived
+1800	ushuaia	Part of Fortune	nan	none
+1800	ushuaia	Part of Spirit	nan	none
+1800	ushuaia	Black Moon Lilith	nan	none
+1800	ushuaia	Vertex	nan	none
+1800	ushuaia	East Point	nan	none
+1800	ushuaia	Lot of Eros	nan	none
+1800	ushuaia	Lot of Necessity	nan	none
+1800	ushuaia	Lot of Courage	nan	none
+1800	ushuaia	Lot of Victory	nan	none
+1800	ushuaia	Lot of Nemesis	nan	none
+1800	ushuaia	houses:Ascendant	84.779979279	houses
+1800	ushuaia	houses:Midheaven	34.344204763	houses
+1800	ushuaia	houses:ARMC	32.078196842	houses
+1800	ushuaia	houses:Vertex	312.190368706	houses
+1850	greenwich	Sun	0.288097838	files
+1850	greenwich	Moon	91.397431224	files
+1850	greenwich	Mercury	337.296386690	files
+1850	greenwich	Venus	4.819327096	files
+1850	greenwich	Mars	92.421044340	files
+1850	greenwich	Jupiter	166.590374280	files
+1850	greenwich	Saturn	9.514655308	files
+1850	greenwich	Uranus	24.765441462	files
+1850	greenwich	Neptune	335.452335872	files
+1850	greenwich	Pluto	27.710909258	files
+1850	greenwich	North Node	143.133339255	approximation
+1850	greenwich	South Node	323.133339255	derived
+1850	greenwich	Chiron	250.849840874	files
+1850	greenwich	Ceres	nan	none
+1850	greenwich	Pallas	nan	none
+1850	greenwich	Juno	nan	none
+1850	greenwich	Vesta	nan	none
+1850	greenwich	Eris	nan	none
+1850	greenwich	Eros	nan	none
+1850	greenwich	Hygiea	nan	none
+1850	greenwich	Nessus	nan	none
+1850	greenwich	Pholus	nan	none
+1850	greenwich	Ascendant	356.170214596	derived
+1850	greenwich	Descendant	176.170214596	derived
+1850	greenwich	MC	268.532626318	derived
+1850	greenwich	IC	88.532626318	derived
+1850	greenwich	Part of Fortune	nan	none
+1850	greenwich	Part of Spirit	nan	none
+1850	greenwich	Black Moon Lilith	nan	none
+1850	greenwich	Vertex	nan	none
+1850	greenwich	East Point	nan	none
+1850	greenwich	Lot of Eros	nan	none
+1850	greenwich	Lot of Necessity	nan	none
+1850	greenwich	Lot of Courage	nan	none
+1850	greenwich	Lot of Victory	nan	none
+1850	greenwich	Lot of Nemesis	nan	none
+1850	greenwich	houses:Ascendant	356.170214596	houses
+1850	greenwich	houses:Midheaven	268.532626318	houses
+1850	greenwich	houses:ARMC	268.400504220	houses
+1850	greenwich	houses:Vertex	178.704079185	houses
+1850	sydney	Sun	0.288097838	files
+1850	sydney	Moon	91.397431224	files
+1850	sydney	Mercury	337.296386690	files
+1850	sydney	Venus	4.819327096	files
+1850	sydney	Mars	92.421044340	files
+1850	sydney	Jupiter	166.590374280	files
+1850	sydney	Saturn	9.514655308	files
+1850	sydney	Uranus	24.765441462	files
+1850	sydney	Neptune	335.452335872	files
+1850	sydney	Pluto	27.710909258	files
+1850	sydney	North Node	143.133339255	approximation
+1850	sydney	South Node	323.133339255	derived
+1850	sydney	Chiron	250.849840874	files
+1850	sydney	Ceres	nan	none
+1850	sydney	Pallas	nan	none
+1850	sydney	Juno	nan	none
+1850	sydney	Vesta	nan	none
+1850	sydney	Eris	nan	none
+1850	sydney	Eros	nan	none
+1850	sydney	Hygiea	nan	none
+1850	sydney	Nessus	nan	none
+1850	sydney	Pholus	nan	none
+1850	sydney	Ascendant	136.017487232	derived
+1850	sydney	Descendant	316.017487232	derived
+1850	sydney	MC	61.721144018	derived
+1850	sydney	IC	241.721144018	derived
+1850	sydney	Part of Fortune	nan	none
+1850	sydney	Part of Spirit	nan	none
+1850	sydney	Black Moon Lilith	nan	none
+1850	sydney	Vertex	nan	none
+1850	sydney	East Point	nan	none
+1850	sydney	Lot of Eros	nan	none
+1850	sydney	Lot of Necessity	nan	none
+1850	sydney	Lot of Courage	nan	none
+1850	sydney	Lot of Victory	nan	none
+1850	sydney	Lot of Nemesis	nan	none
+1850	sydney	houses:Ascendant	136.017487232	houses
+1850	sydney	houses:Midheaven	61.721144018	houses
+1850	sydney	houses:ARMC	59.611304220	houses
+1850	sydney	houses:Vertex	339.927535335	houses
+1850	equator	Sun	0.288097838	files
+1850	equator	Moon	91.397431224	files
+1850	equator	Mercury	337.296386690	files
+1850	equator	Venus	4.819327096	files
+1850	equator	Mars	92.421044340	files
+1850	equator	Jupiter	166.590374280	files
+1850	equator	Saturn	9.514655308	files
+1850	equator	Uranus	24.765441462	files
+1850	equator	Neptune	335.452335872	files
+1850	equator	Pluto	27.710909258	files
+1850	equator	North Node	143.133339255	approximation
+1850	equator	South Node	323.133339255	derived
+1850	equator	Chiron	250.849840874	files
+1850	equator	Ceres	nan	none
+1850	equator	Pallas	nan	none
+1850	equator	Juno	nan	none
+1850	equator	Vesta	nan	none
+1850	equator	Eris	nan	none
+1850	equator	Eros	nan	none
+1850	equator	Hygiea	nan	none
+1850	equator	Nessus	nan	none
+1850	equator	Pholus	nan	none
+1850	equator	Ascendant	279.097986201	derived
+1850	equator	Descendant	99.097986201	derived
+1850	equator	MC	190.773977122	derived
+1850	equator	IC	10.773977122	derived
+1850	equator	Part of Fortune	nan	none
+1850	equator	Part of Spirit	nan	none
+1850	equator	Black Moon Lilith	nan	none
+1850	equator	Vertex	nan	none
+1850	equator	East Point	nan	none
+1850	equator	Lot of Eros	nan	none
+1850	equator	Lot of Necessity	nan	none
+1850	equator	Lot of Courage	nan	none
+1850	equator	Lot of Victory	nan	none
+1850	equator	Lot of Nemesis	nan	none
+1850	equator	houses:Ascendant	279.097986201	houses
+1850	equator	houses:Midheaven	190.773977122	houses
+1850	equator	houses:ARMC	189.902004220	houses
+1850	equator	houses:Vertex	180.000000000	houses
+1850	longyearbyen	Sun	0.288097838	files
+1850	longyearbyen	Moon	91.397431224	files
+1850	longyearbyen	Mercury	337.296386690	files
+1850	longyearbyen	Venus	4.819327096	files
+1850	longyearbyen	Mars	92.421044340	files
+1850	longyearbyen	Jupiter	166.590374280	files
+1850	longyearbyen	Saturn	9.514655308	files
+1850	longyearbyen	Uranus	24.765441462	files
+1850	longyearbyen	Neptune	335.452335872	files
+1850	longyearbyen	Pluto	27.710909258	files
+1850	longyearbyen	North Node	143.133339255	approximation
+1850	longyearbyen	South Node	323.133339255	derived
+1850	longyearbyen	Chiron	250.849840874	files
+1850	longyearbyen	Ceres	nan	none
+1850	longyearbyen	Pallas	nan	none
+1850	longyearbyen	Juno	nan	none
+1850	longyearbyen	Vesta	nan	none
+1850	longyearbyen	Eris	nan	none
+1850	longyearbyen	Eros	nan	none
+1850	longyearbyen	Hygiea	nan	none
+1850	longyearbyen	Nessus	nan	none
+1850	longyearbyen	Pholus	nan	none
+1850	longyearbyen	Ascendant	346.622059305	derived
+1850	longyearbyen	Descendant	166.622059305	derived
+1850	longyearbyen	MC	282.909861456	derived
+1850	longyearbyen	IC	102.909861456	derived
+1850	longyearbyen	Part of Fortune	nan	none
+1850	longyearbyen	Part of Spirit	nan	none
+1850	longyearbyen	Black Moon Lilith	nan	none
+1850	longyearbyen	Vertex	nan	none
+1850	longyearbyen	East Point	nan	none
+1850	longyearbyen	Lot of Eros	nan	none
+1850	longyearbyen	Lot of Necessity	nan	none
+1850	longyearbyen	Lot of Courage	nan	none
+1850	longyearbyen	Lot of Victory	nan	none
+1850	longyearbyen	Lot of Nemesis	nan	none
+1850	longyearbyen	houses:Ascendant	346.622059305	houses
+1850	longyearbyen	houses:Midheaven	282.909861456	houses
+1850	longyearbyen	houses:ARMC	284.028704220	houses
+1850	longyearbyen	houses:Vertex	193.989709066	houses
+1850	ushuaia	Sun	0.288097838	files
+1850	ushuaia	Moon	91.397431224	files
+1850	ushuaia	Mercury	337.296386690	files
+1850	ushuaia	Venus	4.819327096	files
+1850	ushuaia	Mars	92.421044340	files
+1850	ushuaia	Jupiter	166.590374280	files
+1850	ushuaia	Saturn	9.514655308	files
+1850	ushuaia	Uranus	24.765441462	files
+1850	ushuaia	Neptune	335.452335872	files
+1850	ushuaia	Pluto	27.710909258	files
+1850	ushuaia	North Node	143.133339255	approximation
+1850	ushuaia	South Node	323.133339255	derived
+1850	ushuaia	Chiron	250.849840874	files
+1850	ushuaia	Ceres	nan	none
+1850	ushuaia	Pallas	nan	none
+1850	ushuaia	Juno	nan	none
+1850	ushuaia	Vesta	nan	none
+1850	ushuaia	Eris	nan	none
+1850	ushuaia	Eros	nan	none
+1850	ushuaia	Hygiea	nan	none
+1850	ushuaia	Nessus	nan	none
+1850	ushuaia	Pholus	nan	none
+1850	ushuaia	Ascendant	313.125241425	derived
+1850	ushuaia	Descendant	133.125241425	derived
+1850	ushuaia	MC	201.746811021	derived
+1850	ushuaia	IC	21.746811021	derived
+1850	ushuaia	Part of Fortune	nan	none
+1850	ushuaia	Part of Spirit	nan	none
+1850	ushuaia	Black Moon Lilith	nan	none
+1850	ushuaia	Vertex	nan	none
+1850	ushuaia	East Point	nan	none
+1850	ushuaia	Lot of Eros	nan	none
+1850	ushuaia	Lot of Necessity	nan	none
+1850	ushuaia	Lot of Courage	nan	none
+1850	ushuaia	Lot of Victory	nan	none
+1850	ushuaia	Lot of Nemesis	nan	none
+1850	ushuaia	houses:Ascendant	313.125241425	houses
+1850	ushuaia	houses:Midheaven	201.746811021	houses
+1850	ushuaia	houses:ARMC	200.099104220	houses
+1850	ushuaia	houses:Vertex	92.101895198	houses
+1900	greenwich	Sun	273.538314042	files
+1900	greenwich	Moon	320.278062702	files
+1900	greenwich	Mercury	258.286409190	files
+1900	greenwich	Venus	243.002486434	files
+1900	greenwich	Mars	160.559680927	files
+1900	greenwich	Jupiter	264.546726674	files
+1900	greenwich	Saturn	276.964626267	files
+1900	greenwich	Uranus	253.947116640	files
+1900	greenwich	Neptune	87.693780460	files
+1900	greenwich	Pluto	76.375161804	files
+1900	greenwich	North Node	241.389869635	approximation
+1900	greenwich	South Node	61.389869635	derived
+1900	greenwich	Chiron	268.046327283	files
+1900	greenwich	Ceres	nan	none
+1900	greenwich	Pallas	nan	none
+1900	greenwich	Juno	nan	none
+1900	greenwich	Vesta	nan	none
+1900	greenwich	Eris	nan	none
+1900	greenwich	Eros	nan	none
+1900	greenwich	Hygiea	nan	none
+1900	greenwich	Nessus	nan	none
+1900	greenwich	Pholus	nan	none
+1900	greenwich	Ascendant	119.324329690	derived
+1900	greenwich	Descendant	299.324329690	derived
+1900	greenwich	MC	4.127117746	derived
+1900	greenwich	IC	184.127117746	derived
+1900	greenwich	Part of Fortune	nan	none
+1900	greenwich	Part of Spirit	nan	none
+1900	greenwich	Black Moon Lilith	nan	none
+1900	greenwich	Vertex	nan	none
+1900	greenwich	East Point	nan	none
+1900	greenwich	Lot of Eros	nan	none
+1900	greenwich	Lot of Necessity	nan	none
+1900	greenwich	Lot of Courage	nan	none
+1900	greenwich	Lot of Victory	nan	none
+1900	greenwich	Lot of Nemesis	nan	none
+1900	greenwich	houses:Ascendant	119.324329690	houses
+1900	greenwich	houses:Midheaven	4.127117746	houses
+1900	greenwich	houses:ARMC	3.787264557	houses
+1900	greenwich	houses:Vertex	255.599413207	houses
+1900	sydney	Sun	273.538314042	files
+1900	sydney	Moon	320.278062702	files
+1900	sydney	Mercury	258.286409190	files
+1900	sydney	Venus	243.002486434	files
+1900	sydney	Mars	160.559680927	files
+1900	sydney	Jupiter	264.546726674	files
+1900	sydney	Saturn	276.964626267	files
+1900	sydney	Uranus	253.947116640	files
+1900	sydney	Neptune	87.693780460	files
+1900	sydney	Pluto	76.375161804	files
+1900	sydney	North Node	241.389869635	approximation
+1900	sydney	South Node	61.389869635	derived
+1900	sydney	Chiron	268.046327283	files
+1900	sydney	Ceres	nan	none
+1900	sydney	Pallas	nan	none
+1900	sydney	Juno	nan	none
+1900	sydney	Vesta	nan	none
+1900	sydney	Eris	nan	none
+1900	sydney	Eros	nan	none
+1900	sydney	Hygiea	nan	none
+1900	sydney	Nessus	nan	none
+1900	sydney	Pholus	nan	none
+1900	sydney	Ascendant	262.418031029	derived
+1900	sydney	Descendant	82.418031029	derived
+1900	sydney	MC	153.054126236	derived
+1900	sydney	IC	333.054126236	derived
+1900	sydney	Part of Fortune	nan	none
+1900	sydney	Part of Spirit	nan	none
+1900	sydney	Black Moon Lilith	nan	none
+1900	sydney	Vertex	nan	none
+1900	sydney	East Point	nan	none
+1900	sydney	Lot of Eros	nan	none
+1900	sydney	Lot of Necessity	nan	none
+1900	sydney	Lot of Courage	nan	none
+1900	sydney	Lot of Victory	nan	none
+1900	sydney	Lot of Nemesis	nan	none
+1900	sydney	houses:Ascendant	262.418031029	houses
+1900	sydney	houses:Midheaven	153.054126236	houses
+1900	sydney	houses:ARMC	154.998064557	houses
+1900	sydney	houses:Vertex	42.742966598	houses
+1900	equator	Sun	273.538314042	files
+1900	equator	Moon	320.278062702	files
+1900	equator	Mercury	258.286409190	files
+1900	equator	Venus	243.002486434	files
+1900	equator	Mars	160.559680927	files
+1900	equator	Jupiter	264.546726674	files
+1900	equator	Saturn	276.964626267	files
+1900	equator	Uranus	253.947116640	files
+1900	equator	Neptune	87.693780460	files
+1900	equator	Pluto	76.375161804	files
+1900	equator	North Node	241.389869635	approximation
+1900	equator	South Node	61.389869635	derived
+1900	equator	Chiron	268.046327283	files
+1900	equator	Ceres	nan	none
+1900	equator	Pallas	nan	none
+1900	equator	Juno	nan	none
+1900	equator	Vesta	nan	none
+1900	equator	Eris	nan	none
+1900	equator	Eros	nan	none
+1900	equator	Hygiea	nan	none
+1900	equator	Nessus	nan	none
+1900	equator	Pholus	nan	none
+1900	equator	Ascendant	16.592470285	derived
+1900	equator	Descendant	196.592470285	derived
+1900	equator	MC	284.078274172	derived
+1900	equator	IC	104.078274172	derived
+1900	equator	Part of Fortune	nan	none
+1900	equator	Part of Spirit	nan	none
+1900	equator	Black Moon Lilith	nan	none
+1900	equator	Vertex	nan	none
+1900	equator	East Point	nan	none
+1900	equator	Lot of Eros	nan	none
+1900	equator	Lot of Necessity	nan	none
+1900	equator	Lot of Courage	nan	none
+1900	equator	Lot of Victory	nan	none
+1900	equator	Lot of Nemesis	nan	none
+1900	equator	houses:Ascendant	16.592470285	houses
+1900	equator	houses:Midheaven	284.078274172	houses
+1900	equator	houses:ARMC	285.288764557	houses
+1900	equator	houses:Vertex	180.000000000	houses
+1900	longyearbyen	Sun	273.538314042	files
+1900	longyearbyen	Moon	320.278062702	files
+1900	longyearbyen	Mercury	258.286409190	files
+1900	longyearbyen	Venus	243.002486434	files
+1900	longyearbyen	Mars	160.559680927	files
+1900	longyearbyen	Jupiter	264.546726674	files
+1900	longyearbyen	Saturn	276.964626267	files
+1900	longyearbyen	Uranus	253.947116640	files
+1900	longyearbyen	Neptune	87.693780460	files
+1900	longyearbyen	Pluto	76.375161804	files
+1900	longyearbyen	North Node	241.389869635	approximation
+1900	longyearbyen	South Node	61.389869635	derived
+1900	longyearbyen	Chiron	268.046327283	files
+1900	longyearbyen	Ceres	nan	none
+1900	longyearbyen	Pallas	nan	none
+1900	longyearbyen	Juno	nan	none
+1900	longyearbyen	Vesta	nan	none
+1900	longyearbyen	Eris	nan	none
+1900	longyearbyen	Eros	nan	none
+1900	longyearbyen	Hygiea	nan	none
+1900	longyearbyen	Nessus	nan	none
+1900	longyearbyen	Pholus	nan	none
+1900	longyearbyen	Ascendant	156.924343067	derived
+1900	longyearbyen	Descendant	336.924343067	derived
+1900	longyearbyen	MC	21.016392626	derived
+1900	longyearbyen	IC	201.016392626	derived
+1900	longyearbyen	Part of Fortune	nan	none
+1900	longyearbyen	Part of Spirit	nan	none
+1900	longyearbyen	Black Moon Lilith	nan	none
+1900	longyearbyen	Vertex	nan	none
+1900	longyearbyen	East Point	nan	none
+1900	longyearbyen	Lot of Eros	nan	none
+1900	longyearbyen	Lot of Necessity	nan	none
+1900	longyearbyen	Lot of Courage	nan	none
+1900	longyearbyen	Lot of Victory	nan	none
+1900	longyearbyen	Lot of Nemesis	nan	none
+1900	longyearbyen	houses:Ascendant	156.924343067	houses
+1900	longyearbyen	houses:Midheaven	21.016392626	houses
+1900	longyearbyen	houses:ARMC	19.415464557	houses
+1900	longyearbyen	houses:Vertex	283.244848123	houses
+1900	ushuaia	Sun	273.538314042	files
+1900	ushuaia	Moon	320.278062702	files
+1900	ushuaia	Mercury	258.286409190	files
+1900	ushuaia	Venus	243.002486434	files
+1900	ushuaia	Mars	160.559680927	files
+1900	ushuaia	Jupiter	264.546726674	files
+1900	ushuaia	Saturn	276.964626267	files
+1900	ushuaia	Uranus	253.947116640	files
+1900	ushuaia	Neptune	87.693780460	files
+1900	ushuaia	Pluto	76.375161804	files
+1900	ushuaia	North Node	241.389869635	approximation
+1900	ushuaia	South Node	61.389869635	derived
+1900	ushuaia	Chiron	268.046327283	files
+1900	ushuaia	Ceres	nan	none
+1900	ushuaia	Pallas	nan	none
+1900	ushuaia	Juno	nan	none
+1900	ushuaia	Vesta	nan	none
+1900	ushuaia	Eris	nan	none
+1900	ushuaia	Eros	nan	none
+1900	ushuaia	Hygiea	nan	none
+1900	ushuaia	Nessus	nan	none
+1900	ushuaia	Pholus	nan	none
+1900	ushuaia	Ascendant	17.173502898	derived
+1900	ushuaia	Descendant	197.173502898	derived
+1900	ushuaia	MC	293.619794579	derived
+1900	ushuaia	IC	113.619794579	derived
+1900	ushuaia	Part of Fortune	nan	none
+1900	ushuaia	Part of Spirit	nan	none
+1900	ushuaia	Black Moon Lilith	nan	none
+1900	ushuaia	Vertex	nan	none
+1900	ushuaia	East Point	nan	none
+1900	ushuaia	Lot of Eros	nan	none
+1900	ushuaia	Lot of Necessity	nan	none
+1900	ushuaia	Lot of Courage	nan	none
+1900	ushuaia	Lot of Victory	nan	none
+1900	ushuaia	Lot of Nemesis	nan	none
+1900	ushuaia	houses:Ascendant	17.173502898	houses
+1900	ushuaia	houses:Midheaven	293.619794579	houses
+1900	ushuaia	houses:ARMC	295.485864557	houses
+1900	ushuaia	houses:Vertex	218.168360993	houses
+1950	greenwich	Sun	101.833560281	files
+1950	greenwich	Moon	340.668329908	files
+1950	greenwich	Mercury	93.704324785	files
+1950	greenwich	Venus	68.181907305	files
+1950	greenwich	Mars	189.635133013	files
+1950	greenwich	Jupiter	337.364400580	files
+1950	greenwich	Saturn	164.636870237	files
+1950	greenwich	Uranus	95.610995279	files
+1950	greenwich	Neptune	194.593567493	files
+1950	greenwich	Pluto	136.726349285	files
+1950	greenwich	North Node	1.788830453	approximation
+1950	greenwich	South Node	181.788830453	derived
+1950	greenwich	Chiron	257.063576263	files
+1950	greenwich	Ceres	nan	none
+1950	greenwich	Pallas	nan	none
+1950	greenwich	Juno	nan	none
+1950	greenwich	Vesta	nan	none
+1950	greenwich	Eris	nan	none
+1950	greenwich	Eros	nan	none
+1950	greenwich	Hygiea	nan	none
+1950	greenwich	Nessus	nan	none
+1950	greenwich	Pholus	nan	none
+1950	greenwich	Ascendant	161.913220871	derived
+1950	greenwich	Descendant	341.913220871	derived
+1950	greenwich	MC	66.199593655	derived
+1950	greenwich	IC	246.199593655	derived
+1950	greenwich	Part of Fortune	nan	none
+1950	greenwich	Part of Spirit	nan	none
+1950	greenwich	Black Moon Lilith	nan	none
+1950	greenwich	Vertex	nan	none
+1950	greenwich	East Point	nan	none
+1950	greenwich	Lot of Eros	nan	none
+1950	greenwich	Lot of Necessity	nan	none
+1950	greenwich	Lot of Courage	nan	none
+1950	greenwich	Lot of Victory	nan	none
+1950	greenwich	Lot of Nemesis	nan	none
+1950	greenwich	houses:Ascendant	161.913220871	houses
+1950	greenwich	houses:Midheaven	66.199593655	houses
+1950	greenwich	houses:ARMC	64.323519831	houses
+1950	greenwich	houses:Vertex	319.652568711	houses
+1950	sydney	Sun	101.833560281	files
+1950	sydney	Moon	340.668329908	files
+1950	sydney	Mercury	93.704324785	files
+1950	sydney	Venus	68.181907305	files
+1950	sydney	Mars	189.635133013	files
+1950	sydney	Jupiter	337.364400580	files
+1950	sydney	Saturn	164.636870237	files
+1950	sydney	Uranus	95.610995279	files
+1950	sydney	Neptune	194.593567493	files
+1950	sydney	Pluto	136.726349285	files
+1950	sydney	North Node	1.788830453	approximation
+1950	sydney	South Node	181.788830453	derived
+1950	sydney	Chiron	257.063576263	files
+1950	sydney	Ceres	nan	none
+1950	sydney	Pallas	nan	none
+1950	sydney	Juno	nan	none
+1950	sydney	Vesta	nan	none
+1950	sydney	Eris	nan	none
+1950	sydney	Eros	nan	none
+1950	sydney	Hygiea	nan	none
+1950	sydney	Nessus	nan	none
+1950	sydney	Pholus	nan	none
+1950	sydney	Ascendant	314.520943096	derived
+1950	sydney	Descendant	134.520943096	derived
+1950	sydney	MC	217.900182396	derived
+1950	sydney	IC	37.900182396	derived
+1950	sydney	Part of Fortune	nan	none
+1950	sydney	Part of Spirit	nan	none
+1950	sydney	Black Moon Lilith	nan	none
+1950	sydney	Vertex	nan	none
+1950	sydney	East Point	nan	none
+1950	sydney	Lot of Eros	nan	none
+1950	sydney	Lot of Necessity	nan	none
+1950	sydney	Lot of Courage	nan	none
+1950	sydney	Lot of Victory	nan	none
+1950	sydney	Lot of Nemesis	nan	none
+1950	sydney	houses:Ascendant	314.520943096	houses
+1950	sydney	houses:Midheaven	217.900182396	houses
+1950	sydney	houses:ARMC	215.534319831	houses
+1950	sydney	houses:Vertex	85.806508573	houses
+1950	equator	Sun	101.833560281	files
+1950	equator	Moon	340.668329908	files
+1950	equator	Mercury	93.704324785	files
+1950	equator	Venus	68.181907305	files
+1950	equator	Mars	189.635133013	files
+1950	equator	Jupiter	337.364400580	files
+1950	equator	Saturn	164.636870237	files
+1950	equator	Uranus	95.610995279	files
+1950	equator	Neptune	194.593567493	files
+1950	equator	Pluto	136.726349285	files
+1950	equator	North Node	1.788830453	approximation
+1950	equator	South Node	181.788830453	derived
+1950	equator	Chiron	257.063576263	files
+1950	equator	Ceres	nan	none
+1950	equator	Pallas	nan	none
+1950	equator	Juno	nan	none
+1950	equator	Vesta	nan	none
+1950	equator	Eris	nan	none
+1950	equator	Eros	nan	none
+1950	equator	Hygiea	nan	none
+1950	equator	Nessus	nan	none
+1950	equator	Pholus	nan	none
+1950	equator	Ascendant	76.953841836	derived
+1950	equator	Descendant	256.953841836	derived
+1950	equator	MC	344.607282158	derived
+1950	equator	IC	164.607282158	derived
+1950	equator	Part of Fortune	nan	none
+1950	equator	Part of Spirit	nan	none
+1950	equator	Black Moon Lilith	nan	none
+1950	equator	Vertex	nan	none
+1950	equator	East Point	nan	none
+1950	equator	Lot of Eros	nan	none
+1950	equator	Lot of Necessity	nan	none
+1950	equator	Lot of Courage	nan	none
+1950	equator	Lot of Victory	nan	none
+1950	equator	Lot of Nemesis	nan	none
+1950	equator	houses:Ascendant	76.953841836	houses
+1950	equator	houses:Midheaven	344.607282158	houses
+1950	equator	houses:ARMC	345.825019831	houses
+1950	equator	houses:Vertex	180.000000000	houses
+1950	longyearbyen	Sun	101.833560281	files
+1950	longyearbyen	Moon	340.668329908	files
+1950	longyearbyen	Mercury	93.704324785	files
+1950	longyearbyen	Venus	68.181907305	files
+1950	longyearbyen	Mars	189.635133013	files
+1950	longyearbyen	Jupiter	337.364400580	files
+1950	longyearbyen	Saturn	164.636870237	files
+1950	longyearbyen	Uranus	95.610995279	files
+1950	longyearbyen	Neptune	194.593567493	files
+1950	longyearbyen	Pluto	136.726349285	files
+1950	longyearbyen	North Node	1.788830453	approximation
+1950	longyearbyen	South Node	181.788830453	derived
+1950	longyearbyen	Chiron	257.063576263	files
+1950	longyearbyen	Ceres	nan	none
+1950	longyearbyen	Pallas	nan	none
+1950	longyearbyen	Juno	nan	none
+1950	longyearbyen	Vesta	nan	none
+1950	longyearbyen	Eris	nan	none
+1950	longyearbyen	Eros	nan	none
+1950	longyearbyen	Hygiea	nan	none
+1950	longyearbyen	Nessus	nan	none
+1950	longyearbyen	Pholus	nan	none
+1950	longyearbyen	Ascendant	176.449406001	derived
+1950	longyearbyen	Descendant	356.449406001	derived
+1950	longyearbyen	MC	80.766583831	derived
+1950	longyearbyen	IC	260.766583831	derived
+1950	longyearbyen	Part of Fortune	nan	none
+1950	longyearbyen	Part of Spirit	nan	none
+1950	longyearbyen	Black Moon Lilith	nan	none
+1950	longyearbyen	Vertex	nan	none
+1950	longyearbyen	East Point	nan	none
+1950	longyearbyen	Lot of Eros	nan	none
+1950	longyearbyen	Lot of Necessity	nan	none
+1950	longyearbyen	Lot of Courage	nan	none
+1950	longyearbyen	Lot of Victory	nan	none
+1950	longyearbyen	Lot of Nemesis	nan	none
+1950	longyearbyen	houses:Ascendant	176.449406001	houses
+1950	longyearbyen	houses:Midheaven	80.766583831	houses
+1950	longyearbyen	houses:ARMC	79.951719831	houses
+1950	longyearbyen	houses:Vertex	347.993363912	houses
+1950	ushuaia	Sun	101.833560281	files
+1950	ushuaia	Moon	340.668329908	files
+1950	ushuaia	Mercury	93.704324785	files
+1950	ushuaia	Venus	68.181907305	files
+1950	ushuaia	Mars	189.635133013	files
+1950	ushuaia	Jupiter	337.364400580	files
+1950	ushuaia	Saturn	164.636870237	files
+1950	ushuaia	Uranus	95.610995279	files
+1950	ushuaia	Neptune	194.593567493	files
+1950	ushuaia	Pluto	136.726349285	files
+1950	ushuaia	North Node	1.788830453	approximation
+1950	ushuaia	South Node	181.788830453	derived
+1950	ushuaia	Chiron	257.063576263	files
+1950	ushuaia	Ceres	nan	none
+1950	ushuaia	Pallas	nan	none
+1950	ushuaia	Juno	nan	none
+1950	ushuaia	Vesta	nan	none
+1950	ushuaia	Eris	nan	none
+1950	ushuaia	Eros	nan	none
+1950	ushuaia	Hygiea	nan	none
+1950	ushuaia	Nessus	nan	none
+1950	ushuaia	Pholus	nan	none
+1950	ushuaia	Ascendant	57.818444180	derived
+1950	ushuaia	Descendant	237.818444180	derived
+1950	ushuaia	MC	355.665369591	derived
+1950	ushuaia	IC	175.665369591	derived
+1950	ushuaia	Part of Fortune	nan	none
+1950	ushuaia	Part of Spirit	nan	none
+1950	ushuaia	Black Moon Lilith	nan	none
+1950	ushuaia	Vertex	nan	none
+1950	ushuaia	East Point	nan	none
+1950	ushuaia	Lot of Eros	nan	none
+1950	ushuaia	Lot of Necessity	nan	none
+1950	ushuaia	Lot of Courage	nan	none
+1950	ushuaia	Lot of Victory	nan	none
+1950	ushuaia	Lot of Nemesis	nan	none
+1950	ushuaia	houses:Ascendant	57.818444180	houses
+1950	ushuaia	houses:Midheaven	355.665369591	houses
+1950	ushuaia	houses:ARMC	356.022119831	houses
+1950	ushuaia	houses:Vertex	282.274135089	houses
+1975	greenwich	Sun	101.592980907	files
+1975	greenwich	Moon	39.447238375	files
+1975	greenwich	Mercury	80.239557062	files
+1975	greenwich	Venus	145.929504437	files
+1975	greenwich	Mars	32.142143170	files
+1975	greenwich	Jupiter	22.003540508	files
+1975	greenwich	Saturn	111.022325141	files
+1975	greenwich	Uranus	208.361852380	files
+1975	greenwich	Neptune	249.598141774	files
+1975	greenwich	Pluto	186.560999161	files
+1975	greenwich	North Node	240.235019225	approximation
+1975	greenwich	South Node	60.235019225	derived
+1975	greenwich	Chiron	27.809562066	files
+1975	greenwich	Ceres	nan	none
+1975	greenwich	Pallas	nan	none
+1975	greenwich	Juno	nan	none
+1975	greenwich	Vesta	nan	none
+1975	greenwich	Eris	nan	none
+1975	greenwich	Eros	nan	none
+1975	greenwich	Hygiea	nan	none
+1975	greenwich	Nessus	nan	none
+1975	greenwich	Pholus	nan	none
+1975	greenwich	Ascendant	105.431852209	derived
+1975	greenwich	Descendant	285.431852209	derived
+1975	greenwich	MC	344.050786863	derived
+1975	greenwich	IC	164.050786863	derived
+1975	greenwich	Part of Fortune	nan	none
+1975	greenwich	Part of Spirit	nan	none
+1975	greenwich	Black Moon Lilith	nan	none
+1975	greenwich	Vertex	nan	none
+1975	greenwich	East Point	nan	none
+1975	greenwich	Lot of Eros	nan	none
+1975	greenwich	Lot of Necessity	nan	none
+1975	greenwich	Lot of Courage	nan	none
+1975	greenwich	Lot of Victory	nan	none
+1975	greenwich	Lot of Nemesis	nan	none
+1975	greenwich	houses:Ascendant	105.431852209	houses
+1975	greenwich	houses:Midheaven	344.050786863	houses
+1975	greenwich	houses:ARMC	345.307754370	houses
+1975	greenwich	houses:Vertex	240.405827070	houses
+1975	sydney	Sun	101.592980907	files
+1975	sydney	Moon	39.447238375	files
+1975	sydney	Mercury	80.239557062	files
+1975	sydney	Venus	145.929504437	files
+1975	sydney	Mars	32.142143170	files
+1975	sydney	Jupiter	22.003540508	files
+1975	sydney	Saturn	111.022325141	files
+1975	sydney	Uranus	208.361852380	files
+1975	sydney	Neptune	249.598141774	files
+1975	sydney	Pluto	186.560999161	files
+1975	sydney	North Node	240.235019225	approximation
+1975	sydney	South Node	60.235019225	derived
+1975	sydney	Chiron	27.809562066	files
+1975	sydney	Ceres	nan	none
+1975	sydney	Pallas	nan	none
+1975	sydney	Juno	nan	none
+1975	sydney	Vesta	nan	none
+1975	sydney	Eris	nan	none
+1975	sydney	Eros	nan	none
+1975	sydney	Hygiea	nan	none
+1975	sydney	Nessus	nan	none
+1975	sydney	Pholus	nan	none
+1975	sydney	Ascendant	243.338298651	derived
+1975	sydney	Descendant	63.338298651	derived
+1975	sydney	MC	134.051845986	derived
+1975	sydney	IC	314.051845986	derived
+1975	sydney	Part of Fortune	nan	none
+1975	sydney	Part of Spirit	nan	none
+1975	sydney	Black Moon Lilith	nan	none
+1975	sydney	Vertex	nan	none
+1975	sydney	East Point	nan	none
+1975	sydney	Lot of Eros	nan	none
+1975	sydney	Lot of Necessity	nan	none
+1975	sydney	Lot of Courage	nan	none
+1975	sydney	Lot of Victory	nan	none
+1975	sydney	Lot of Nemesis	nan	none
+1975	sydney	houses:Ascendant	243.338298651	houses
+1975	sydney	houses:Midheaven	134.051845986	houses
+1975	sydney	houses:ARMC	136.518554370	houses
+1975	sydney	houses:Vertex	30.659359823	houses
+1975	equator	Sun	101.592980907	files
+1975	equator	Moon	39.447238375	files
+1975	equator	Mercury	80.239557062	files
+1975	equator	Venus	145.929504437	files
+1975	equator	Mars	32.142143170	files
+1975	equator	Jupiter	22.003540508	files
+1975	equator	Saturn	111.022325141	files
+1975	equator	Uranus	208.361852380	files
+1975	equator	Neptune	249.598141774	files
+1975	equator	Pluto	186.560999161	files
+1975	equator	North Node	240.235019225	approximation
+1975	equator	South Node	60.235019225	derived
+1975	equator	Chiron	27.809562066	files
+1975	equator	Ceres	nan	none
+1975	equator	Pallas	nan	none
+1975	equator	Juno	nan	none
+1975	equator	Vesta	nan	none
+1975	equator	Eris	nan	none
+1975	equator	Eros	nan	none
+1975	equator	Hygiea	nan	none
+1975	equator	Nessus	nan	none
+1975	equator	Pholus	nan	none
+1975	equator	Ascendant	356.522910113	derived
+1975	equator	Descendant	176.522910113	derived
+1975	equator	MC	267.072107438	derived
+1975	equator	IC	87.072107438	derived
+1975	equator	Part of Fortune	nan	none
+1975	equator	Part of Spirit	nan	none
+1975	equator	Black Moon Lilith	nan	none
+1975	equator	Vertex	nan	none
+1975	equator	East Point	nan	none
+1975	equator	Lot of Eros	nan	none
+1975	equator	Lot of Necessity	nan	none
+1975	equator	Lot of Courage	nan	none
+1975	equator	Lot of Victory	nan	none
+1975	equator	Lot of Nemesis	nan	none
+1975	equator	houses:Ascendant	356.522910113	houses
+1975	equator	houses:Midheaven	267.072107438	houses
+1975	equator	houses:ARMC	266.809254370	houses
+1975	equator	houses:Vertex	180.000000000	houses
+1975	longyearbyen	Sun	101.592980907	files
+1975	longyearbyen	Moon	39.447238375	files
+1975	longyearbyen	Mercury	80.239557062	files
+1975	longyearbyen	Venus	145.929504437	files
+1975	longyearbyen	Mars	32.142143170	files
+1975	longyearbyen	Jupiter	22.003540508	files
+1975	longyearbyen	Saturn	111.022325141	files
+1975	longyearbyen	Uranus	208.361852380	files
+1975	longyearbyen	Neptune	249.598141774	files
+1975	longyearbyen	Pluto	186.560999161	files
+1975	longyearbyen	North Node	240.235019225	approximation
+1975	longyearbyen	South Node	60.235019225	derived
+1975	longyearbyen	Chiron	27.809562066	files
+1975	longyearbyen	Ceres	nan	none
+1975	longyearbyen	Pallas	nan	none
+1975	longyearbyen	Juno	nan	none
+1975	longyearbyen	Vesta	nan	none
+1975	longyearbyen	Eris	nan	none
+1975	longyearbyen	Eros	nan	none
+1975	longyearbyen	Hygiea	nan	none
+1975	longyearbyen	Nessus	nan	none
+1975	longyearbyen	Pholus	nan	none
+1975	longyearbyen	Ascendant	152.528119020	derived
+1975	longyearbyen	Descendant	332.528119020	derived
+1975	longyearbyen	MC	1.020129904	derived
+1975	longyearbyen	IC	181.020129904	derived
+1975	longyearbyen	Part of Fortune	nan	none
+1975	longyearbyen	Part of Spirit	nan	none
+1975	longyearbyen	Black Moon Lilith	nan	none
+1975	longyearbyen	Vertex	nan	none
+1975	longyearbyen	East Point	nan	none
+1975	longyearbyen	Lot of Eros	nan	none
+1975	longyearbyen	Lot of Necessity	nan	none
+1975	longyearbyen	Lot of Courage	nan	none
+1975	longyearbyen	Lot of Victory	nan	none
+1975	longyearbyen	Lot of Nemesis	nan	none
+1975	longyearbyen	houses:Ascendant	152.528119020	houses
+1975	longyearbyen	houses:Midheaven	1.020129904	houses
+1975	longyearbyen	houses:ARMC	0.935954370	houses
+1975	longyearbyen	houses:Vertex	266.112154310	houses
+1975	ushuaia	Sun	101.592980907	files
+1975	ushuaia	Moon	39.447238375	files
+1975	ushuaia	Mercury	80.239557062	files
+1975	ushuaia	Venus	145.929504437	files
+1975	ushuaia	Mars	32.142143170	files
+1975	ushuaia	Jupiter	22.003540508	files
+1975	ushuaia	Saturn	111.022325141	files
+1975	ushuaia	Uranus	208.361852380	files
+1975	ushuaia	Neptune	249.598141774	files
+1975	ushuaia	Pluto	186.560999161	files
+1975	ushuaia	North Node	240.235019225	approximation
+1975	ushuaia	South Node	60.235019225	derived
+1975	ushuaia	Chiron	27.809562066	files
+1975	ushuaia	Ceres	nan	none
+1975	ushuaia	Pallas	nan	none
+1975	ushuaia	Juno	nan	none
+1975	ushuaia	Vesta	nan	none
+1975	ushuaia	Eris	nan	none
+1975	ushuaia	Eros	nan	none
+1975	ushuaia	Hygiea	nan	none
+1975	ushuaia	Nessus	nan	none
+1975	ushuaia	Pholus	nan	none
+1975	ushuaia	Ascendant	4.728815368	derived
+1975	ushuaia	Descendant	184.728815368	derived
+1975	ushuaia	MC	276.433183293	derived
+1975	ushuaia	IC	96.433183293	derived
+1975	ushuaia	Part of Fortune	nan	none
+1975	ushuaia	Part of Spirit	nan	none
+1975	ushuaia	Black Moon Lilith	nan	none
+1975	ushuaia	Vertex	nan	none
+1975	ushuaia	East Point	nan	none
+1975	ushuaia	Lot of Eros	nan	none
+1975	ushuaia	Lot of Necessity	nan	none
+1975	ushuaia	Lot of Courage	nan	none
+1975	ushuaia	Lot of Victory	nan	none
+1975	ushuaia	Lot of Nemesis	nan	none
+1975	ushuaia	houses:Ascendant	4.728815368	houses
+1975	ushuaia	houses:Midheaven	276.433183293	houses
+1975	ushuaia	houses:ARMC	277.006354370	houses
+1975	ushuaia	houses:Vertex	190.957600572	houses
+2000	greenwich	Sun	280.368918815	files
+2000	greenwich	Moon	223.323775589	files
+2000	greenwich	Mercury	271.889277159	files
+2000	greenwich	Venus	241.565788486	files
+2000	greenwich	Mars	327.963302584	files
+2000	greenwich	Jupiter	25.253087173	files
+2000	greenwich	Saturn	40.395663488	files
+2000	greenwich	Uranus	314.809187728	files
+2000	greenwich	Neptune	303.193013230	files
+2000	greenwich	Pluto	251.454779299	files
+2000	greenwich	North Node	123.952895437	approximation
+2000	greenwich	South Node	303.952895437	derived
+2000	greenwich	Chiron	251.617654456	files
+2000	greenwich	Ceres	nan	none
+2000	greenwich	Pallas	nan	none
+2000	greenwich	Juno	nan	none
+2000	greenwich	Vesta	nan	none
+2000	greenwich	Eris	nan	none
+2000	greenwich	Eros	nan	none
+2000	greenwich	Hygiea	nan	none
+2000	greenwich	Nessus	nan	none
+2000	greenwich	Pholus	nan	none
+2000	greenwich	Ascendant	24.262910437	derived
+2000	greenwich	Descendant	204.262910437	derived
+2000	greenwich	MC	279.609703812	derived
+2000	greenwich	IC	99.609703812	derived
+2000	greenwich	Part of Fortune	nan	none
+2000	greenwich	Part of Spirit	nan	none
+2000	greenwich	Black Moon Lilith	nan	none
+2000	greenwich	Vertex	nan	none
+2000	greenwich	East Point	nan	none
+2000	greenwich	Lot of Eros	nan	none
+2000	greenwich	Lot of Necessity	nan	none
+2000	greenwich	Lot of Courage	nan	none
+2000	greenwich	Lot of Victory	nan	none
+2000	greenwich	Lot of Nemesis	nan	none
+2000	greenwich	houses:Ascendant	24.262910437	houses
+2000	greenwich	houses:Midheaven	279.609703812	houses
+2000	greenwich	houses:ARMC	280.455571853	houses
+2000	greenwich	houses:Vertex	188.468175185	houses
+2000	sydney	Sun	280.368918815	files
+2000	sydney	Moon	223.323775589	files
+2000	sydney	Mercury	271.889277159	files
+2000	sydney	Venus	241.565788486	files
+2000	sydney	Mars	327.963302584	files
+2000	sydney	Jupiter	25.253087173	files
+2000	sydney	Saturn	40.395663488	files
+2000	sydney	Uranus	314.809187728	files
+2000	sydney	Neptune	303.193013230	files
+2000	sydney	Pluto	251.454779299	files
+2000	sydney	North Node	123.952895437	approximation
+2000	sydney	South Node	303.952895437	derived
+2000	sydney	Chiron	251.617654456	files
+2000	sydney	Ceres	nan	none
+2000	sydney	Pallas	nan	none
+2000	sydney	Juno	nan	none
+2000	sydney	Vesta	nan	none
+2000	sydney	Eris	nan	none
+2000	sydney	Eros	nan	none
+2000	sydney	Hygiea	nan	none
+2000	sydney	Nessus	nan	none
+2000	sydney	Pholus	nan	none
+2000	sydney	Ascendant	152.488908301	derived
+2000	sydney	Descendant	332.488908301	derived
+2000	sydney	MC	73.089186278	derived
+2000	sydney	IC	253.089186278	derived
+2000	sydney	Part of Fortune	nan	none
+2000	sydney	Part of Spirit	nan	none
+2000	sydney	Black Moon Lilith	nan	none
+2000	sydney	Vertex	nan	none
+2000	sydney	East Point	nan	none
+2000	sydney	Lot of Eros	nan	none
+2000	sydney	Lot of Necessity	nan	none
+2000	sydney	Lot of Courage	nan	none
+2000	sydney	Lot of Victory	nan	none
+2000	sydney	Lot of Nemesis	nan	none
+2000	sydney	houses:Ascendant	152.488908301	houses
+2000	sydney	houses:Midheaven	73.089186278	houses
+2000	sydney	houses:ARMC	71.666371853	houses
+2000	sydney	houses:Vertex	347.870254119	houses
+2000	equator	Sun	280.368918815	files
+2000	equator	Moon	223.323775589	files
+2000	equator	Mercury	271.889277159	files
+2000	equator	Venus	241.565788486	files
+2000	equator	Mars	327.963302584	files
+2000	equator	Jupiter	25.253087173	files
+2000	equator	Saturn	40.395663488	files
+2000	equator	Uranus	314.809187728	files
+2000	equator	Neptune	303.193013230	files
+2000	equator	Pluto	251.454779299	files
+2000	equator	North Node	123.952895437	approximation
+2000	equator	South Node	303.952895437	derived
+2000	equator	Chiron	251.617654456	files
+2000	equator	Ceres	nan	none
+2000	equator	Pallas	nan	none
+2000	equator	Juno	nan	none
+2000	equator	Vesta	nan	none
+2000	equator	Eris	nan	none
+2000	equator	Eros	nan	none
+2000	equator	Hygiea	nan	none
+2000	equator	Nessus	nan	none
+2000	equator	Pholus	nan	none
+2000	equator	Ascendant	290.299028271	derived
+2000	equator	Descendant	110.299028271	derived
+2000	equator	MC	203.721126603	derived
+2000	equator	IC	23.721126603	derived
+2000	equator	Part of Fortune	nan	none
+2000	equator	Part of Spirit	nan	none
+2000	equator	Black Moon Lilith	nan	none
+2000	equator	Vertex	nan	none
+2000	equator	East Point	nan	none
+2000	equator	Lot of Eros	nan	none
+2000	equator	Lot of Necessity	nan	none
+2000	equator	Lot of Courage	nan	none
+2000	equator	Lot of Victory	nan	none
+2000	equator	Lot of Nemesis	nan	none
+2000	equator	houses:Ascendant	290.299028271	houses
+2000	equator	houses:Midheaven	203.721126603	houses
+2000	equator	houses:ARMC	201.957071853	houses
+2000	equator	houses:Vertex	180.000000000	houses
+2000	longyearbyen	Sun	280.368918815	files
+2000	longyearbyen	Moon	223.323775589	files
+2000	longyearbyen	Mercury	271.889277159	files
+2000	longyearbyen	Venus	241.565788486	files
+2000	longyearbyen	Mars	327.963302584	files
+2000	longyearbyen	Jupiter	25.253087173	files
+2000	longyearbyen	Saturn	40.395663488	files
+2000	longyearbyen	Uranus	314.809187728	files
+2000	longyearbyen	Neptune	303.193013230	files
+2000	longyearbyen	Pluto	251.454779299	files
+2000	longyearbyen	North Node	123.952895437	approximation
+2000	longyearbyen	South Node	303.952895437	derived
+2000	longyearbyen	Chiron	251.617654456	files
+2000	longyearbyen	Ceres	nan	none
+2000	longyearbyen	Pallas	nan	none
+2000	longyearbyen	Juno	nan	none
+2000	longyearbyen	Vesta	nan	none
+2000	longyearbyen	Eris	nan	none
+2000	longyearbyen	Eros	nan	none
+2000	longyearbyen	Hygiea	nan	none
+2000	longyearbyen	Nessus	nan	none
+2000	longyearbyen	Pholus	nan	none
+2000	longyearbyen	Ascendant	337.917053537	derived
+2000	longyearbyen	Descendant	157.917053537	derived
+2000	longyearbyen	MC	294.187381377	derived
+2000	longyearbyen	IC	114.187381377	derived
+2000	longyearbyen	Part of Fortune	nan	none
+2000	longyearbyen	Part of Spirit	nan	none
+2000	longyearbyen	Black Moon Lilith	nan	none
+2000	longyearbyen	Vertex	nan	none
+2000	longyearbyen	East Point	nan	none
+2000	longyearbyen	Lot of Eros	nan	none
+2000	longyearbyen	Lot of Necessity	nan	none
+2000	longyearbyen	Lot of Courage	nan	none
+2000	longyearbyen	Lot of Victory	nan	none
+2000	longyearbyen	Lot of Nemesis	nan	none
+2000	longyearbyen	houses:Ascendant	337.917053537	houses
+2000	longyearbyen	houses:Midheaven	294.187381377	houses
+2000	longyearbyen	houses:ARMC	296.083771853	houses
+2000	longyearbyen	houses:Vertex	205.863252954	houses
+2000	ushuaia	Sun	280.368918815	files
+2000	ushuaia	Moon	223.323775589	files
+2000	ushuaia	Mercury	271.889277159	files
+2000	ushuaia	Venus	241.565788486	files
+2000	ushuaia	Mars	327.963302584	files
+2000	ushuaia	Jupiter	25.253087173	files
+2000	ushuaia	Saturn	40.395663488	files
+2000	ushuaia	Uranus	314.809187728	files
+2000	ushuaia	Neptune	303.193013230	files
+2000	ushuaia	Pluto	251.454779299	files
+2000	ushuaia	North Node	123.952895437	approximation
+2000	ushuaia	South Node	303.952895437	derived
+2000	ushuaia	Chiron	251.617654456	files
+2000	ushuaia	Ceres	nan	none
+2000	ushuaia	Pallas	nan	none
+2000	ushuaia	Juno	nan	none
+2000	ushuaia	Vesta	nan	none
+2000	ushuaia	Eris	nan	none
+2000	ushuaia	Eros	nan	none
+2000	ushuaia	Hygiea	nan	none
+2000	ushuaia	Nessus	nan	none
+2000	ushuaia	Pholus	nan	none
+2000	ushuaia	Ascendant	321.178614456	derived
+2000	ushuaia	Descendant	141.178614456	derived
+2000	ushuaia	MC	214.416848586	derived
+2000	ushuaia	IC	34.416848586	derived
+2000	ushuaia	Part of Fortune	nan	none
+2000	ushuaia	Part of Spirit	nan	none
+2000	ushuaia	Black Moon Lilith	nan	none
+2000	ushuaia	Vertex	nan	none
+2000	ushuaia	East Point	nan	none
+2000	ushuaia	Lot of Eros	nan	none
+2000	ushuaia	Lot of Necessity	nan	none
+2000	ushuaia	Lot of Courage	nan	none
+2000	ushuaia	Lot of Victory	nan	none
+2000	ushuaia	Lot of Nemesis	nan	none
+2000	ushuaia	houses:Ascendant	321.178614456	houses
+2000	ushuaia	houses:Midheaven	214.416848586	houses
+2000	ushuaia	houses:ARMC	212.154171853	houses
+2000	ushuaia	houses:Vertex	103.785748641	houses
+2026	greenwich	Sun	184.893748533	files
+2026	greenwich	Moon	21.464285216	files
+2026	greenwich	Mercury	206.615528658	files
+2026	greenwich	Venus	217.963167844	files
+2026	greenwich	Mars	119.931071045	files
+2026	greenwich	Jupiter	139.047957642	files
+2026	greenwich	Saturn	11.812579498	files
+2026	greenwich	Uranus	65.572323712	files
+2026	greenwich	Neptune	2.945052944	files
+2026	greenwich	Pluto	303.145367671	files
+2026	greenwich	North Node	329.420960695	approximation
+2026	greenwich	South Node	149.420960695	derived
+2026	greenwich	Chiron	29.615444989	files
+2026	greenwich	Ceres	nan	none
+2026	greenwich	Pallas	nan	none
+2026	greenwich	Juno	nan	none
+2026	greenwich	Vesta	nan	none
+2026	greenwich	Eris	nan	none
+2026	greenwich	Eros	nan	none
+2026	greenwich	Hygiea	nan	none
+2026	greenwich	Nessus	nan	none
+2026	greenwich	Pholus	nan	none
+2026	greenwich	Ascendant	121.481701629	derived
+2026	greenwich	Descendant	301.481701629	derived
+2026	greenwich	MC	7.390070568	derived
+2026	greenwich	IC	187.390070568	derived
+2026	greenwich	Part of Fortune	nan	none
+2026	greenwich	Part of Spirit	nan	none
+2026	greenwich	Black Moon Lilith	nan	none
+2026	greenwich	Vertex	nan	none
+2026	greenwich	East Point	nan	none
+2026	greenwich	Lot of Eros	nan	none
+2026	greenwich	Lot of Necessity	nan	none
+2026	greenwich	Lot of Courage	nan	none
+2026	greenwich	Lot of Victory	nan	none
+2026	greenwich	Lot of Nemesis	nan	none
+2026	greenwich	houses:Ascendant	121.481701629	houses
+2026	greenwich	houses:Midheaven	7.390070568	houses
+2026	greenwich	houses:ARMC	6.786254855	houses
+2026	greenwich	houses:Vertex	258.156942844	houses
+2026	sydney	Sun	184.893748533	files
+2026	sydney	Moon	21.464285216	files
+2026	sydney	Mercury	206.615528658	files
+2026	sydney	Venus	217.963167844	files
+2026	sydney	Mars	119.931071045	files
+2026	sydney	Jupiter	139.047957642	files
+2026	sydney	Saturn	11.812579498	files
+2026	sydney	Uranus	65.572323712	files
+2026	sydney	Neptune	2.945052944	files
+2026	sydney	Pluto	303.145367671	files
+2026	sydney	North Node	329.420960695	approximation
+2026	sydney	South Node	149.420960695	derived
+2026	sydney	Chiron	29.615444989	files
+2026	sydney	Ceres	nan	none
+2026	sydney	Pallas	nan	none
+2026	sydney	Juno	nan	none
+2026	sydney	Vesta	nan	none
+2026	sydney	Eris	nan	none
+2026	sydney	Eros	nan	none
+2026	sydney	Hygiea	nan	none
+2026	sydney	Nessus	nan	none
+2026	sydney	Pholus	nan	none
+2026	sydney	Ascendant	265.266465248	derived
+2026	sydney	Descendant	85.266465248	derived
+2026	sydney	MC	156.230084551	derived
+2026	sydney	IC	336.230084551	derived
+2026	sydney	Part of Fortune	nan	none
+2026	sydney	Part of Spirit	nan	none
+2026	sydney	Black Moon Lilith	nan	none
+2026	sydney	Vertex	nan	none
+2026	sydney	East Point	nan	none
+2026	sydney	Lot of Eros	nan	none
+2026	sydney	Lot of Necessity	nan	none
+2026	sydney	Lot of Courage	nan	none
+2026	sydney	Lot of Victory	nan	none
+2026	sydney	Lot of Nemesis	nan	none
+2026	sydney	houses:Ascendant	265.266465248	houses
+2026	sydney	houses:Midheaven	156.230084551	houses
+2026	sydney	houses:ARMC	157.997054855	houses
+2026	sydney	houses:Vertex	44.717107980	houses
+2026	equator	Sun	184.893748533	files
+2026	equator	Moon	21.464285216	files
+2026	equator	Mercury	206.615528658	files
+2026	equator	Venus	217.963167844	files
+2026	equator	Mars	119.931071045	files
+2026	equator	Jupiter	139.047957642	files
+2026	equator	Saturn	11.812579498	files
+2026	equator	Uranus	65.572323712	files
+2026	equator	Neptune	2.945052944	files
+2026	equator	Pluto	303.145367671	files
+2026	equator	North Node	329.420960695	approximation
+2026	equator	South Node	149.420960695	derived
+2026	equator	Chiron	29.615444989	files
+2026	equator	Ceres	nan	none
+2026	equator	Pallas	nan	none
+2026	equator	Juno	nan	none
+2026	equator	Vesta	nan	none
+2026	equator	Eris	nan	none
+2026	equator	Eros	nan	none
+2026	equator	Hygiea	nan	none
+2026	equator	Nessus	nan	none
+2026	equator	Pholus	nan	none
+2026	equator	Ascendant	19.809095769	derived
+2026	equator	Descendant	199.809095769	derived
+2026	equator	MC	286.868002730	derived
+2026	equator	IC	106.868002730	derived
+2026	equator	Part of Fortune	nan	none
+2026	equator	Part of Spirit	nan	none
+2026	equator	Black Moon Lilith	nan	none
+2026	equator	Vertex	nan	none
+2026	equator	East Point	nan	none
+2026	equator	Lot of Eros	nan	none
+2026	equator	Lot of Necessity	nan	none
+2026	equator	Lot of Courage	nan	none
+2026	equator	Lot of Victory	nan	none
+2026	equator	Lot of Nemesis	nan	none
+2026	equator	houses:Ascendant	19.809095769	houses
+2026	equator	houses:Midheaven	286.868002730	houses
+2026	equator	houses:ARMC	288.287754855	houses
+2026	equator	houses:Vertex	180.000000000	houses
+2026	longyearbyen	Sun	184.893748533	files
+2026	longyearbyen	Moon	21.464285216	files
+2026	longyearbyen	Mercury	206.615528658	files
+2026	longyearbyen	Venus	217.963167844	files
+2026	longyearbyen	Mars	119.931071045	files
+2026	longyearbyen	Jupiter	139.047957642	files
+2026	longyearbyen	Saturn	11.812579498	files
+2026	longyearbyen	Uranus	65.572323712	files
+2026	longyearbyen	Neptune	2.945052944	files
+2026	longyearbyen	Pluto	303.145367671	files
+2026	longyearbyen	North Node	329.420960695	approximation
+2026	longyearbyen	South Node	149.420960695	derived
+2026	longyearbyen	Chiron	29.615444989	files
+2026	longyearbyen	Ceres	nan	none
+2026	longyearbyen	Pallas	nan	none
+2026	longyearbyen	Juno	nan	none
+2026	longyearbyen	Vesta	nan	none
+2026	longyearbyen	Eris	nan	none
+2026	longyearbyen	Eros	nan	none
+2026	longyearbyen	Hygiea	nan	none
+2026	longyearbyen	Nessus	nan	none
+2026	longyearbyen	Pholus	nan	none
+2026	longyearbyen	Ascendant	157.732283191	derived
+2026	longyearbyen	Descendant	337.732283191	derived
+2026	longyearbyen	MC	24.206703369	derived
+2026	longyearbyen	IC	204.206703369	derived
+2026	longyearbyen	Part of Fortune	nan	none
+2026	longyearbyen	Part of Spirit	nan	none
+2026	longyearbyen	Black Moon Lilith	nan	none
+2026	longyearbyen	Vertex	nan	none
+2026	longyearbyen	East Point	nan	none
+2026	longyearbyen	Lot of Eros	nan	none
+2026	longyearbyen	Lot of Necessity	nan	none
+2026	longyearbyen	Lot of Courage	nan	none
+2026	longyearbyen	Lot of Victory	nan	none
+2026	longyearbyen	Lot of Nemesis	nan	none
+2026	longyearbyen	houses:Ascendant	157.732283191	houses
+2026	longyearbyen	houses:Midheaven	24.206703369	houses
+2026	longyearbyen	houses:ARMC	22.414454855	houses
+2026	longyearbyen	houses:Vertex	286.104892639	houses
+2026	ushuaia	Sun	184.893748533	files
+2026	ushuaia	Moon	21.464285216	files
+2026	ushuaia	Mercury	206.615528658	files
+2026	ushuaia	Venus	217.963167844	files
+2026	ushuaia	Mars	119.931071045	files
+2026	ushuaia	Jupiter	139.047957642	files
+2026	ushuaia	Saturn	11.812579498	files
+2026	ushuaia	Uranus	65.572323712	files
+2026	ushuaia	Neptune	2.945052944	files
+2026	ushuaia	Pluto	303.145367671	files
+2026	ushuaia	North Node	329.420960695	approximation
+2026	ushuaia	South Node	149.420960695	derived
+2026	ushuaia	Chiron	29.615444989	files
+2026	ushuaia	Ceres	nan	none
+2026	ushuaia	Pallas	nan	none
+2026	ushuaia	Juno	nan	none
+2026	ushuaia	Vesta	nan	none
+2026	ushuaia	Eris	nan	none
+2026	ushuaia	Eros	nan	none
+2026	ushuaia	Hygiea	nan	none
+2026	ushuaia	Nessus	nan	none
+2026	ushuaia	Pholus	nan	none
+2026	ushuaia	Ascendant	19.189948783	derived
+2026	ushuaia	Descendant	199.189948783	derived
+2026	ushuaia	MC	296.466073694	derived
+2026	ushuaia	IC	116.466073694	derived
+2026	ushuaia	Part of Fortune	nan	none
+2026	ushuaia	Part of Spirit	nan	none
+2026	ushuaia	Black Moon Lilith	nan	none
+2026	ushuaia	Vertex	nan	none
+2026	ushuaia	East Point	nan	none
+2026	ushuaia	Lot of Eros	nan	none
+2026	ushuaia	Lot of Necessity	nan	none
+2026	ushuaia	Lot of Courage	nan	none
+2026	ushuaia	Lot of Victory	nan	none
+2026	ushuaia	Lot of Nemesis	nan	none
+2026	ushuaia	houses:Ascendant	19.189948783	houses
+2026	ushuaia	houses:Midheaven	296.466073694	houses
+2026	ushuaia	houses:ARMC	298.484854855	houses
+2026	ushuaia	houses:Vertex	222.206666372	houses
+2100	greenwich	Sun	340.459852971	files
+2100	greenwich	Moon	220.845854656	files
+2100	greenwich	Mercury	313.884676705	files
+2100	greenwich	Venus	26.899683039	files
+2100	greenwich	Mars	59.530835471	files
+2100	greenwich	Jupiter	202.438854955	files
+2100	greenwich	Saturn	206.115705350	files
+2100	greenwich	Uranus	19.389806961	files
+2100	greenwich	Neptune	166.118608922	files
+2100	greenwich	Pluto	32.712437920	files
+2100	greenwich	North Node	347.394627238	approximation
+2100	greenwich	South Node	167.394627238	derived
+2100	greenwich	Chiron	246.402218257	files
+2100	greenwich	Ceres	nan	none
+2100	greenwich	Pallas	nan	none
+2100	greenwich	Juno	nan	none
+2100	greenwich	Vesta	nan	none
+2100	greenwich	Eris	nan	none
+2100	greenwich	Eros	nan	none
+2100	greenwich	Hygiea	nan	none
+2100	greenwich	Nessus	nan	none
+2100	greenwich	Pholus	nan	none
+2100	greenwich	Ascendant	228.206879252	derived
+2100	greenwich	Descendant	48.206879252	derived
+2100	greenwich	MC	156.975722304	derived
+2100	greenwich	IC	336.975722304	derived
+2100	greenwich	Part of Fortune	nan	none
+2100	greenwich	Part of Spirit	nan	none
+2100	greenwich	Black Moon Lilith	nan	none
+2100	greenwich	Vertex	nan	none
+2100	greenwich	East Point	nan	none
+2100	greenwich	Lot of Eros	nan	none
+2100	greenwich	Lot of Necessity	nan	none
+2100	greenwich	Lot of Courage	nan	none
+2100	greenwich	Lot of Victory	nan	none
+2100	greenwich	Lot of Nemesis	nan	none
+2100	greenwich	houses:Ascendant	228.206879252	houses
+2100	greenwich	houses:Midheaven	156.975722304	houses
+2100	greenwich	houses:ARMC	158.697314390	houses
+2100	greenwich	houses:Vertex	88.965776791	houses
+2100	sydney	Sun	340.459852971	files
+2100	sydney	Moon	220.845854656	files
+2100	sydney	Mercury	313.884676705	files
+2100	sydney	Venus	26.899683039	files
+2100	sydney	Mars	59.530835471	files
+2100	sydney	Jupiter	202.438854955	files
+2100	sydney	Saturn	206.115705350	files
+2100	sydney	Uranus	19.389806961	files
+2100	sydney	Neptune	166.118608922	files
+2100	sydney	Pluto	32.712437920	files
+2100	sydney	North Node	347.394627238	approximation
+2100	sydney	South Node	167.394627238	derived
+2100	sydney	Chiron	246.402218257	files
+2100	sydney	Ceres	nan	none
+2100	sydney	Pallas	nan	none
+2100	sydney	Juno	nan	none
+2100	sydney	Vesta	nan	none
+2100	sydney	Eris	nan	none
+2100	sydney	Eros	nan	none
+2100	sydney	Hygiea	nan	none
+2100	sydney	Nessus	nan	none
+2100	sydney	Pholus	nan	none
+2100	sydney	Ascendant	33.461614704	derived
+2100	sydney	Descendant	213.461614704	derived
+2100	sydney	MC	307.503190770	derived
+2100	sydney	IC	127.503190770	derived
+2100	sydney	Part of Fortune	nan	none
+2100	sydney	Part of Spirit	nan	none
+2100	sydney	Black Moon Lilith	nan	none
+2100	sydney	Vertex	nan	none
+2100	sydney	East Point	nan	none
+2100	sydney	Lot of Eros	nan	none
+2100	sydney	Lot of Necessity	nan	none
+2100	sydney	Lot of Courage	nan	none
+2100	sydney	Lot of Victory	nan	none
+2100	sydney	Lot of Nemesis	nan	none
+2100	sydney	houses:Ascendant	33.461614704	houses
+2100	sydney	houses:Midheaven	307.503190770	houses
+2100	sydney	houses:ARMC	309.908114390	houses
+2100	sydney	houses:Vertex	260.146813073	houses
+2100	equator	Sun	340.459852971	files
+2100	equator	Moon	220.845854656	files
+2100	equator	Mercury	313.884676705	files
+2100	equator	Venus	26.899683039	files
+2100	equator	Mars	59.530835471	files
+2100	equator	Jupiter	202.438854955	files
+2100	equator	Saturn	206.115705350	files
+2100	equator	Uranus	19.389806961	files
+2100	equator	Neptune	166.118608922	files
+2100	equator	Pluto	32.712437920	files
+2100	equator	North Node	347.394627238	approximation
+2100	equator	South Node	167.394627238	derived
+2100	equator	Chiron	246.402218257	files
+2100	equator	Ceres	nan	none
+2100	equator	Pallas	nan	none
+2100	equator	Juno	nan	none
+2100	equator	Vesta	nan	none
+2100	equator	Eris	nan	none
+2100	equator	Eros	nan	none
+2100	equator	Hygiea	nan	none
+2100	equator	Nessus	nan	none
+2100	equator	Pholus	nan	none
+2100	equator	Ascendant	169.337531289	derived
+2100	equator	Descendant	349.337531289	derived
+2100	equator	MC	80.993052757	derived
+2100	equator	IC	260.993052757	derived
+2100	equator	Part of Fortune	nan	none
+2100	equator	Part of Spirit	nan	none
+2100	equator	Black Moon Lilith	nan	none
+2100	equator	Vertex	nan	none
+2100	equator	East Point	nan	none
+2100	equator	Lot of Eros	nan	none
+2100	equator	Lot of Necessity	nan	none
+2100	equator	Lot of Courage	nan	none
+2100	equator	Lot of Victory	nan	none
+2100	equator	Lot of Nemesis	nan	none
+2100	equator	houses:Ascendant	169.337531289	houses
+2100	equator	houses:Midheaven	80.993052757	houses
+2100	equator	houses:ARMC	80.198814390	houses
+2100	equator	houses:Vertex	0.000000000	houses
+2100	longyearbyen	Sun	340.459852971	files
+2100	longyearbyen	Moon	220.845854656	files
+2100	longyearbyen	Mercury	313.884676705	files
+2100	longyearbyen	Venus	26.899683039	files
+2100	longyearbyen	Mars	59.530835471	files
+2100	longyearbyen	Jupiter	202.438854955	files
+2100	longyearbyen	Saturn	206.115705350	files
+2100	longyearbyen	Uranus	19.389806961	files
+2100	longyearbyen	Neptune	166.118608922	files
+2100	longyearbyen	Pluto	32.712437920	files
+2100	longyearbyen	North Node	347.394627238	approximation
+2100	longyearbyen	South Node	167.394627238	derived
+2100	longyearbyen	Chiron	246.402218257	files
+2100	longyearbyen	Ceres	nan	none
+2100	longyearbyen	Pallas	nan	none
+2100	longyearbyen	Juno	nan	none
+2100	longyearbyen	Vesta	nan	none
+2100	longyearbyen	Eris	nan	none
+2100	longyearbyen	Eros	nan	none
+2100	longyearbyen	Hygiea	nan	none
+2100	longyearbyen	Nessus	nan	none
+2100	longyearbyen	Pholus	nan	none
+2100	longyearbyen	Ascendant	206.477404310	derived
+2100	longyearbyen	Descendant	26.477404310	derived
+2100	longyearbyen	MC	173.819427254	derived
+2100	longyearbyen	IC	353.819427254	derived
+2100	longyearbyen	Part of Fortune	nan	none
+2100	longyearbyen	Part of Spirit	nan	none
+2100	longyearbyen	Black Moon Lilith	nan	none
+2100	longyearbyen	Vertex	nan	none
+2100	longyearbyen	East Point	nan	none
+2100	longyearbyen	Lot of Eros	nan	none
+2100	longyearbyen	Lot of Necessity	nan	none
+2100	longyearbyen	Lot of Courage	nan	none
+2100	longyearbyen	Lot of Victory	nan	none
+2100	longyearbyen	Lot of Nemesis	nan	none
+2100	longyearbyen	houses:Ascendant	206.477404310	houses
+2100	longyearbyen	houses:Midheaven	173.819427254	houses
+2100	longyearbyen	houses:ARMC	174.325514390	houses
+2100	longyearbyen	houses:Vertex	89.549309445	houses
+2100	ushuaia	Sun	340.459852971	files
+2100	ushuaia	Moon	220.845854656	files
+2100	ushuaia	Mercury	313.884676705	files
+2100	ushuaia	Venus	26.899683039	files
+2100	ushuaia	Mars	59.530835471	files
+2100	ushuaia	Jupiter	202.438854955	files
+2100	ushuaia	Saturn	206.115705350	files
+2100	ushuaia	Uranus	19.389806961	files
+2100	ushuaia	Neptune	166.118608922	files
+2100	ushuaia	Pluto	32.712437920	files
+2100	ushuaia	North Node	347.394627238	approximation
+2100	ushuaia	South Node	167.394627238	derived
+2100	ushuaia	Chiron	246.402218257	files
+2100	ushuaia	Ceres	nan	none
+2100	ushuaia	Pallas	nan	none
+2100	ushuaia	Juno	nan	none
+2100	ushuaia	Vesta	nan	none
+2100	ushuaia	Eris	nan	none
+2100	ushuaia	Eros	nan	none
+2100	ushuaia	Hygiea	nan	none
+2100	ushuaia	Nessus	nan	none
+2100	ushuaia	Pholus	nan	none
+2100	ushuaia	Ascendant	181.118741720	derived
+2100	ushuaia	Descendant	1.118741720	derived
+2100	ushuaia	MC	90.363273947	derived
+2100	ushuaia	IC	270.363273947	derived
+2100	ushuaia	Part of Fortune	nan	none
+2100	ushuaia	Part of Spirit	nan	none
+2100	ushuaia	Black Moon Lilith	nan	none
+2100	ushuaia	Vertex	nan	none
+2100	ushuaia	East Point	nan	none
+2100	ushuaia	Lot of Eros	nan	none
+2100	ushuaia	Lot of Necessity	nan	none
+2100	ushuaia	Lot of Courage	nan	none
+2100	ushuaia	Lot of Victory	nan	none
+2100	ushuaia	Lot of Nemesis	nan	none
+2100	ushuaia	houses:Ascendant	181.118741720	houses
+2100	ushuaia	houses:Midheaven	90.363273947	houses
+2100	ushuaia	houses:ARMC	90.395914390	houses
+2100	ushuaia	houses:Vertex	0.330474303	houses
+2200	greenwich	Sun	228.884941226	files
+2200	greenwich	Moon	273.638464713	files
+2200	greenwich	Mercury	234.733777319	files
+2200	greenwich	Venus	275.761060780	files
+2200	greenwich	Mars	255.519271822	files
+2200	greenwich	Jupiter	4.126916518	files
+2200	greenwich	Saturn	336.778059604	files
+2200	greenwich	Uranus	93.516916890	files
+2200	greenwich	Neptune	25.316606338	files
+2200	greenwich	Pluto	146.691901732	files
+2200	greenwich	North Node	201.448802210	approximation
+2200	greenwich	South Node	21.448802210	derived
+2200	greenwich	Chiron	262.958761510	files
+2200	greenwich	Ceres	nan	none
+2200	greenwich	Pallas	nan	none
+2200	greenwich	Juno	nan	none
+2200	greenwich	Vesta	nan	none
+2200	greenwich	Eris	nan	none
+2200	greenwich	Eros	nan	none
+2200	greenwich	Hygiea	nan	none
+2200	greenwich	Nessus	nan	none
+2200	greenwich	Pholus	nan	none
+2200	greenwich	Ascendant	275.055277104	derived
+2200	greenwich	Descendant	95.055277104	derived
+2200	greenwich	MC	220.697593335	derived
+2200	greenwich	IC	40.697593335	derived
+2200	greenwich	Part of Fortune	nan	none
+2200	greenwich	Part of Spirit	nan	none
+2200	greenwich	Black Moon Lilith	nan	none
+2200	greenwich	Vertex	nan	none
+2200	greenwich	East Point	nan	none
+2200	greenwich	Lot of Eros	nan	none
+2200	greenwich	Lot of Necessity	nan	none
+2200	greenwich	Lot of Courage	nan	none
+2200	greenwich	Lot of Victory	nan	none
+2200	greenwich	Lot of Nemesis	nan	none
+2200	greenwich	houses:Ascendant	275.055277104	houses
+2200	greenwich	houses:Midheaven	220.697593335	houses
+2200	greenwich	houses:ARMC	218.282715578	houses
+2200	greenwich	houses:Vertex	138.422788614	houses
+2200	sydney	Sun	228.884941226	files
+2200	sydney	Moon	273.638464713	files
+2200	sydney	Mercury	234.733777319	files
+2200	sydney	Venus	275.761060780	files
+2200	sydney	Mars	255.519271822	files
+2200	sydney	Jupiter	4.126916518	files
+2200	sydney	Saturn	336.778059604	files
+2200	sydney	Uranus	93.516916890	files
+2200	sydney	Neptune	25.316606338	files
+2200	sydney	Pluto	146.691901732	files
+2200	sydney	North Node	201.448802210	approximation
+2200	sydney	South Node	21.448802210	derived
+2200	sydney	Chiron	262.958761510	files
+2200	sydney	Ceres	nan	none
+2200	sydney	Pallas	nan	none
+2200	sydney	Juno	nan	none
+2200	sydney	Vesta	nan	none
+2200	sydney	Eris	nan	none
+2200	sydney	Eros	nan	none
+2200	sydney	Hygiea	nan	none
+2200	sydney	Nessus	nan	none
+2200	sydney	Pholus	nan	none
+2200	sydney	Ascendant	83.331473709	derived
+2200	sydney	Descendant	263.331473709	derived
+2200	sydney	MC	10.327524905	derived
+2200	sydney	IC	190.327524905	derived
+2200	sydney	Part of Fortune	nan	none
+2200	sydney	Part of Spirit	nan	none
+2200	sydney	Black Moon Lilith	nan	none
+2200	sydney	Vertex	nan	none
+2200	sydney	East Point	nan	none
+2200	sydney	Lot of Eros	nan	none
+2200	sydney	Lot of Necessity	nan	none
+2200	sydney	Lot of Courage	nan	none
+2200	sydney	Lot of Victory	nan	none
+2200	sydney	Lot of Nemesis	nan	none
+2200	sydney	houses:Ascendant	83.331473709	houses
+2200	sydney	houses:Midheaven	10.327524905	houses
+2200	sydney	houses:ARMC	9.493515578	houses
+2200	sydney	houses:Vertex	307.003491397	houses
+2200	equator	Sun	228.884941226	files
+2200	equator	Moon	273.638464713	files
+2200	equator	Mercury	234.733777319	files
+2200	equator	Venus	275.761060780	files
+2200	equator	Mars	255.519271822	files
+2200	equator	Jupiter	4.126916518	files
+2200	equator	Saturn	336.778059604	files
+2200	equator	Uranus	93.516916890	files
+2200	equator	Neptune	25.316606338	files
+2200	equator	Pluto	146.691901732	files
+2200	equator	North Node	201.448802210	approximation
+2200	equator	South Node	21.448802210	derived
+2200	equator	Chiron	262.958761510	files
+2200	equator	Ceres	nan	none
+2200	equator	Pallas	nan	none
+2200	equator	Juno	nan	none
+2200	equator	Vesta	nan	none
+2200	equator	Eris	nan	none
+2200	equator	Eros	nan	none
+2200	equator	Hygiea	nan	none
+2200	equator	Nessus	nan	none
+2200	equator	Pholus	nan	none
+2200	equator	Ascendant	232.190911210	derived
+2200	equator	Descendant	52.190911210	derived
+2200	equator	MC	137.342968750	derived
+2200	equator	IC	317.342968750	derived
+2200	equator	Part of Fortune	nan	none
+2200	equator	Part of Spirit	nan	none
+2200	equator	Black Moon Lilith	nan	none
+2200	equator	Vertex	nan	none
+2200	equator	East Point	nan	none
+2200	equator	Lot of Eros	nan	none
+2200	equator	Lot of Necessity	nan	none
+2200	equator	Lot of Courage	nan	none
+2200	equator	Lot of Victory	nan	none
+2200	equator	Lot of Nemesis	nan	none
+2200	equator	houses:Ascendant	232.190911210	houses
+2200	equator	houses:Midheaven	137.342968750	houses
+2200	equator	houses:ARMC	139.784215578	houses
+2200	equator	houses:Vertex	0.000000000	houses
+2200	longyearbyen	Sun	228.884941226	files
+2200	longyearbyen	Moon	273.638464713	files
+2200	longyearbyen	Mercury	234.733777319	files
+2200	longyearbyen	Venus	275.761060780	files
+2200	longyearbyen	Mars	255.519271822	files
+2200	longyearbyen	Jupiter	4.126916518	files
+2200	longyearbyen	Saturn	336.778059604	files
+2200	longyearbyen	Uranus	93.516916890	files
+2200	longyearbyen	Neptune	25.316606338	files
+2200	longyearbyen	Pluto	146.691901732	files
+2200	longyearbyen	North Node	201.448802210	approximation
+2200	longyearbyen	South Node	21.448802210	derived
+2200	longyearbyen	Chiron	262.958761510	files
+2200	longyearbyen	Ceres	nan	none
+2200	longyearbyen	Pallas	nan	none
+2200	longyearbyen	Juno	nan	none
+2200	longyearbyen	Vesta	nan	none
+2200	longyearbyen	Eris	nan	none
+2200	longyearbyen	Eros	nan	none
+2200	longyearbyen	Hygiea	nan	none
+2200	longyearbyen	Nessus	nan	none
+2200	longyearbyen	Pholus	nan	none
+2200	longyearbyen	Ascendant	26.839036180	derived
+2200	longyearbyen	Descendant	206.839036180	derived
+2200	longyearbyen	MC	236.220787194	derived
+2200	longyearbyen	IC	56.220787194	derived
+2200	longyearbyen	Part of Fortune	nan	none
+2200	longyearbyen	Part of Spirit	nan	none
+2200	longyearbyen	Black Moon Lilith	nan	none
+2200	longyearbyen	Vertex	nan	none
+2200	longyearbyen	East Point	nan	none
+2200	longyearbyen	Lot of Eros	nan	none
+2200	longyearbyen	Lot of Necessity	nan	none
+2200	longyearbyen	Lot of Courage	nan	none
+2200	longyearbyen	Lot of Victory	nan	none
+2200	longyearbyen	Lot of Nemesis	nan	none
+2200	longyearbyen	houses:Ascendant	26.839036180	houses
+2200	longyearbyen	houses:Midheaven	236.220787194	houses
+2200	longyearbyen	houses:ARMC	233.910915578	houses
+2200	longyearbyen	houses:Vertex	144.454321747	houses
+2200	ushuaia	Sun	228.884941226	files
+2200	ushuaia	Moon	273.638464713	files
+2200	ushuaia	Mercury	234.733777319	files
+2200	ushuaia	Venus	275.761060780	files
+2200	ushuaia	Mars	255.519271822	files
+2200	ushuaia	Jupiter	4.126916518	files
+2200	ushuaia	Saturn	336.778059604	files
+2200	ushuaia	Uranus	93.516916890	files
+2200	ushuaia	Neptune	25.316606338	files
+2200	ushuaia	Pluto	146.691901732	files
+2200	ushuaia	North Node	201.448802210	approximation
+2200	ushuaia	South Node	21.448802210	derived
+2200	ushuaia	Chiron	262.958761510	files
+2200	ushuaia	Ceres	nan	none
+2200	ushuaia	Pallas	nan	none
+2200	ushuaia	Juno	nan	none
+2200	ushuaia	Vesta	nan	none
+2200	ushuaia	Eris	nan	none
+2200	ushuaia	Eros	nan	none
+2200	ushuaia	Hygiea	nan	none
+2200	ushuaia	Nessus	nan	none
+2200	ushuaia	Pholus	nan	none
+2200	ushuaia	Ascendant	276.860549822	derived
+2200	ushuaia	Descendant	96.860549822	derived
+2200	ushuaia	MC	147.804877937	derived
+2200	ushuaia	IC	327.804877937	derived
+2200	ushuaia	Part of Fortune	nan	none
+2200	ushuaia	Part of Spirit	nan	none
+2200	ushuaia	Black Moon Lilith	nan	none
+2200	ushuaia	Vertex	nan	none
+2200	ushuaia	East Point	nan	none
+2200	ushuaia	Lot of Eros	nan	none
+2200	ushuaia	Lot of Necessity	nan	none
+2200	ushuaia	Lot of Courage	nan	none
+2200	ushuaia	Lot of Victory	nan	none
+2200	ushuaia	Lot of Nemesis	nan	none
+2200	ushuaia	houses:Ascendant	276.860549822	houses
+2200	ushuaia	houses:Midheaven	147.804877937	houses
+2200	ushuaia	houses:ARMC	149.981315578	houses
+2200	ushuaia	houses:Vertex	49.506076683	houses
+2399	greenwich	Sun	279.276864705	files
+2399	greenwich	Moon	318.807520207	files
+2399	greenwich	Mercury	258.113481455	files
+2399	greenwich	Venus	268.212382555	files
+2399	greenwich	Mars	248.638309162	files
+2399	greenwich	Jupiter	291.276797791	files
+2399	greenwich	Saturn	267.208395836	files
+2399	greenwich	Uranus	239.716715621	files
+2399	greenwich	Neptune	105.239147919	files
+2399	greenwich	Pluto	86.335786183	files
+2399	greenwich	North Node	307.443317950	approximation
+2399	greenwich	South Node	127.443317950	derived
+2399	greenwich	Chiron	317.594653788	files
+2399	greenwich	Ceres	nan	none
+2399	greenwich	Pallas	nan	none
+2399	greenwich	Juno	nan	none
+2399	greenwich	Vesta	nan	none
+2399	greenwich	Eris	nan	none
+2399	greenwich	Eros	nan	none
+2399	greenwich	Hygiea	nan	none
+2399	greenwich	Nessus	nan	none
+2399	greenwich	Pholus	nan	none
+2399	greenwich	Ascendant	22.402118687	derived
+2399	greenwich	Descendant	202.402118687	derived
+2399	greenwich	MC	278.860444489	derived
+2399	greenwich	IC	98.860444489	derived
+2399	greenwich	Part of Fortune	nan	none
+2399	greenwich	Part of Spirit	nan	none
+2399	greenwich	Black Moon Lilith	nan	none
+2399	greenwich	Vertex	nan	none
+2399	greenwich	East Point	nan	none
+2399	greenwich	Lot of Eros	nan	none
+2399	greenwich	Lot of Necessity	nan	none
+2399	greenwich	Lot of Courage	nan	none
+2399	greenwich	Lot of Victory	nan	none
+2399	greenwich	Lot of Nemesis	nan	none
+2399	greenwich	houses:Ascendant	22.402118687	houses
+2399	greenwich	houses:Midheaven	278.860444489	houses
+2399	greenwich	houses:ARMC	279.639371382	houses
+2399	greenwich	houses:Vertex	187.809472262	houses
+2399	sydney	Sun	279.276864705	files
+2399	sydney	Moon	318.807520207	files
+2399	sydney	Mercury	258.113481455	files
+2399	sydney	Venus	268.212382555	files
+2399	sydney	Mars	248.638309162	files
+2399	sydney	Jupiter	291.276797791	files
+2399	sydney	Saturn	267.208395836	files
+2399	sydney	Uranus	239.716715621	files
+2399	sydney	Neptune	105.239147919	files
+2399	sydney	Pluto	86.335786183	files
+2399	sydney	North Node	307.443317950	approximation
+2399	sydney	South Node	127.443317950	derived
+2399	sydney	Chiron	317.594653788	files
+2399	sydney	Ceres	nan	none
+2399	sydney	Pallas	nan	none
+2399	sydney	Juno	nan	none
+2399	sydney	Vesta	nan	none
+2399	sydney	Eris	nan	none
+2399	sydney	Eros	nan	none
+2399	sydney	Hygiea	nan	none
+2399	sydney	Nessus	nan	none
+2399	sydney	Pholus	nan	none
+2399	sydney	Ascendant	151.357474920	derived
+2399	sydney	Descendant	331.357474920	derived
+2399	sydney	MC	72.321761836	derived
+2399	sydney	IC	252.321761836	derived
+2399	sydney	Part of Fortune	nan	none
+2399	sydney	Part of Spirit	nan	none
+2399	sydney	Black Moon Lilith	nan	none
+2399	sydney	Vertex	nan	none
+2399	sydney	East Point	nan	none
+2399	sydney	Lot of Eros	nan	none
+2399	sydney	Lot of Necessity	nan	none
+2399	sydney	Lot of Courage	nan	none
+2399	sydney	Lot of Victory	nan	none
+2399	sydney	Lot of Nemesis	nan	none
+2399	sydney	houses:Ascendant	151.357474920	houses
+2399	sydney	houses:Midheaven	72.321761836	houses
+2399	sydney	houses:ARMC	70.850171382	houses
+2399	sydney	houses:Vertex	347.324119194	houses
+2399	equator	Sun	279.276864705	files
+2399	equator	Moon	318.807520207	files
+2399	equator	Mercury	258.113481455	files
+2399	equator	Venus	268.212382555	files
+2399	equator	Mars	248.638309162	files
+2399	equator	Jupiter	291.276797791	files
+2399	equator	Saturn	267.208395836	files
+2399	equator	Uranus	239.716715621	files
+2399	equator	Neptune	105.239147919	files
+2399	equator	Pluto	86.335786183	files
+2399	equator	North Node	307.443317950	approximation
+2399	equator	South Node	127.443317950	derived
+2399	equator	Chiron	317.594653788	files
+2399	equator	Ceres	nan	none
+2399	equator	Pallas	nan	none
+2399	equator	Juno	nan	none
+2399	equator	Vesta	nan	none
+2399	equator	Eris	nan	none
+2399	equator	Eros	nan	none
+2399	equator	Hygiea	nan	none
+2399	equator	Nessus	nan	none
+2399	equator	Pholus	nan	none
+2399	equator	Ascendant	289.540515482	derived
+2399	equator	Descendant	109.540515482	derived
+2399	equator	MC	202.845944129	derived
+2399	equator	IC	22.845944129	derived
+2399	equator	Part of Fortune	nan	none
+2399	equator	Part of Spirit	nan	none
+2399	equator	Black Moon Lilith	nan	none
+2399	equator	Vertex	nan	none
+2399	equator	East Point	nan	none
+2399	equator	Lot of Eros	nan	none
+2399	equator	Lot of Necessity	nan	none
+2399	equator	Lot of Courage	nan	none
+2399	equator	Lot of Victory	nan	none
+2399	equator	Lot of Nemesis	nan	none
+2399	equator	houses:Ascendant	289.540515482	houses
+2399	equator	houses:Midheaven	202.845944129	houses
+2399	equator	houses:ARMC	201.140871382	houses
+2399	equator	houses:Vertex	180.000000000	houses
+2399	longyearbyen	Sun	279.276864705	files
+2399	longyearbyen	Moon	318.807520207	files
+2399	longyearbyen	Mercury	258.113481455	files
+2399	longyearbyen	Venus	268.212382555	files
+2399	longyearbyen	Mars	248.638309162	files
+2399	longyearbyen	Jupiter	291.276797791	files
+2399	longyearbyen	Saturn	267.208395836	files
+2399	longyearbyen	Uranus	239.716715621	files
+2399	longyearbyen	Neptune	105.239147919	files
+2399	longyearbyen	Pluto	86.335786183	files
+2399	longyearbyen	North Node	307.443317950	approximation
+2399	longyearbyen	South Node	127.443317950	derived
+2399	longyearbyen	Chiron	317.594653788	files
+2399	longyearbyen	Ceres	nan	none
+2399	longyearbyen	Pallas	nan	none
+2399	longyearbyen	Juno	nan	none
+2399	longyearbyen	Vesta	nan	none
+2399	longyearbyen	Eris	nan	none
+2399	longyearbyen	Eros	nan	none
+2399	longyearbyen	Hygiea	nan	none
+2399	longyearbyen	Nessus	nan	none
+2399	longyearbyen	Pholus	nan	none
+2399	longyearbyen	Ascendant	338.325516577	derived
+2399	longyearbyen	Descendant	158.325516577	derived
+2399	longyearbyen	MC	293.423328606	derived
+2399	longyearbyen	IC	113.423328606	derived
+2399	longyearbyen	Part of Fortune	nan	none
+2399	longyearbyen	Part of Spirit	nan	none
+2399	longyearbyen	Black Moon Lilith	nan	none
+2399	longyearbyen	Vertex	nan	none
+2399	longyearbyen	East Point	nan	none
+2399	longyearbyen	Lot of Eros	nan	none
+2399	longyearbyen	Lot of Necessity	nan	none
+2399	longyearbyen	Lot of Courage	nan	none
+2399	longyearbyen	Lot of Victory	nan	none
+2399	longyearbyen	Lot of Nemesis	nan	none
+2399	longyearbyen	houses:Ascendant	338.325516577	houses
+2399	longyearbyen	houses:Midheaven	293.423328606	houses
+2399	longyearbyen	houses:ARMC	295.267571382	houses
+2399	longyearbyen	houses:Vertex	205.062309218	houses
+2399	ushuaia	Sun	279.276864705	files
+2399	ushuaia	Moon	318.807520207	files
+2399	ushuaia	Mercury	258.113481455	files
+2399	ushuaia	Venus	268.212382555	files
+2399	ushuaia	Mars	248.638309162	files
+2399	ushuaia	Jupiter	291.276797791	files
+2399	ushuaia	Saturn	267.208395836	files
+2399	ushuaia	Uranus	239.716715621	files
+2399	ushuaia	Neptune	105.239147919	files
+2399	ushuaia	Pluto	86.335786183	files
+2399	ushuaia	North Node	307.443317950	approximation
+2399	ushuaia	South Node	127.443317950	derived
+2399	ushuaia	Chiron	317.594653788	files
+2399	ushuaia	Ceres	nan	none
+2399	ushuaia	Pallas	nan	none
+2399	ushuaia	Juno	nan	none
+2399	ushuaia	Vesta	nan	none
+2399	ushuaia	Eris	nan	none
+2399	ushuaia	Eros	nan	none
+2399	ushuaia	Hygiea	nan	none
+2399	ushuaia	Nessus	nan	none
+2399	ushuaia	Pholus	nan	none
+2399	ushuaia	Ascendant	320.608439310	derived
+2399	ushuaia	Descendant	140.608439310	derived
+2399	ushuaia	MC	213.561483901	derived
+2399	ushuaia	IC	33.561483901	derived
+2399	ushuaia	Part of Fortune	nan	none
+2399	ushuaia	Part of Spirit	nan	none
+2399	ushuaia	Black Moon Lilith	nan	none
+2399	ushuaia	Vertex	nan	none
+2399	ushuaia	East Point	nan	none
+2399	ushuaia	Lot of Eros	nan	none
+2399	ushuaia	Lot of Necessity	nan	none
+2399	ushuaia	Lot of Courage	nan	none
+2399	ushuaia	Lot of Victory	nan	none
+2399	ushuaia	Lot of Nemesis	nan	none
+2399	ushuaia	houses:Ascendant	320.608439310	houses
+2399	ushuaia	houses:Midheaven	213.561483901	houses
+2399	ushuaia	houses:ARMC	211.337971382	houses
+2399	ushuaia	houses:Vertex	103.009768608	houses
+2450	greenwich	Sun	281.162353205	approximation
+2450	greenwich	Moon	136.883821615	files
+2450	greenwich	Mercury	300.864072535	approximation
+2450	greenwich	Venus	311.232494484	approximation
+2450	greenwich	Mars	102.350908601	approximation
+2450	greenwich	Jupiter	5.696931203	approximation
+2450	greenwich	Saturn	166.718713484	approximation
+2450	greenwich	Uranus	81.499421449	approximation
+2450	greenwich	Neptune	216.024176666	approximation
+2450	greenwich	Pluto	151.590463589	approximation
+2450	greenwich	North Node	62.996627009	approximation
+2450	greenwich	South Node	242.996627009	derived
+2450	greenwich	Chiron	nan	none
+2450	greenwich	Ceres	nan	none
+2450	greenwich	Pallas	nan	none
+2450	greenwich	Juno	nan	none
+2450	greenwich	Vesta	nan	none
+2450	greenwich	Eris	nan	none
+2450	greenwich	Eros	nan	none
+2450	greenwich	Hygiea	nan	none
+2450	greenwich	Nessus	nan	none
+2450	greenwich	Pholus	nan	none
+2450	greenwich	Ascendant	26.620956564	derived
+2450	greenwich	Descendant	206.620956564	derived
+2450	greenwich	MC	280.656186871	derived
+2450	greenwich	IC	100.656186871	derived
+2450	greenwich	Part of Fortune	nan	none
+2450	greenwich	Part of Spirit	nan	none
+2450	greenwich	Black Moon Lilith	nan	none
+2450	greenwich	Vertex	nan	none
+2450	greenwich	East Point	nan	none
+2450	greenwich	Lot of Eros	nan	none
+2450	greenwich	Lot of Necessity	nan	none
+2450	greenwich	Lot of Courage	nan	none
+2450	greenwich	Lot of Victory	nan	none
+2450	greenwich	Lot of Nemesis	nan	none
+2450	greenwich	houses:Ascendant	26.620956564	houses
+2450	greenwich	houses:Midheaven	280.656186871	houses
+2450	greenwich	houses:ARMC	281.584804711	houses
+2450	greenwich	houses:Vertex	189.384329411	houses
+2450	sydney	Sun	281.162353205	approximation
+2450	sydney	Moon	136.883821615	files
+2450	sydney	Mercury	300.864072535	approximation
+2450	sydney	Venus	311.232494484	approximation
+2450	sydney	Mars	102.350908601	approximation
+2450	sydney	Jupiter	5.696931203	approximation
+2450	sydney	Saturn	166.718713484	approximation
+2450	sydney	Uranus	81.499421449	approximation
+2450	sydney	Neptune	216.024176666	approximation
+2450	sydney	Pluto	151.590463589	approximation
+2450	sydney	North Node	62.996627009	approximation
+2450	sydney	South Node	242.996627009	derived
+2450	sydney	Chiron	nan	none
+2450	sydney	Ceres	nan	none
+2450	sydney	Pallas	nan	none
+2450	sydney	Juno	nan	none
+2450	sydney	Vesta	nan	none
+2450	sydney	Eris	nan	none
+2450	sydney	Eros	nan	none
+2450	sydney	Hygiea	nan	none
+2450	sydney	Nessus	nan	none
+2450	sydney	Pholus	nan	none
+2450	sydney	Ascendant	154.148303443	derived
+2450	sydney	Descendant	334.148303443	derived
+2450	sydney	MC	74.134395767	derived
+2450	sydney	IC	254.134395767	derived
+2450	sydney	Part of Fortune	nan	none
+2450	sydney	Part of Spirit	nan	none
+2450	sydney	Black Moon Lilith	nan	none
+2450	sydney	Vertex	nan	none
+2450	sydney	East Point	nan	none
+2450	sydney	Lot of Eros	nan	none
+2450	sydney	Lot of Necessity	nan	none
+2450	sydney	Lot of Courage	nan	none
+2450	sydney	Lot of Victory	nan	none
+2450	sydney	Lot of Nemesis	nan	none
+2450	sydney	houses:Ascendant	154.148303443	houses
+2450	sydney	houses:Midheaven	74.134395767	houses
+2450	sydney	houses:ARMC	72.795604711	houses
+2450	sydney	houses:Vertex	348.608921489	houses
+2450	equator	Sun	281.162353205	approximation
+2450	equator	Moon	136.883821615	files
+2450	equator	Mercury	300.864072535	approximation
+2450	equator	Venus	311.232494484	approximation
+2450	equator	Mars	102.350908601	approximation
+2450	equator	Jupiter	5.696931203	approximation
+2450	equator	Saturn	166.718713484	approximation
+2450	equator	Uranus	81.499421449	approximation
+2450	equator	Neptune	216.024176666	approximation
+2450	equator	Pluto	151.590463589	approximation
+2450	equator	North Node	62.996627009	approximation
+2450	equator	South Node	242.996627009	derived
+2450	equator	Chiron	nan	none
+2450	equator	Ceres	nan	none
+2450	equator	Pallas	nan	none
+2450	equator	Juno	nan	none
+2450	equator	Vesta	nan	none
+2450	equator	Eris	nan	none
+2450	equator	Eros	nan	none
+2450	equator	Hygiea	nan	none
+2450	equator	Nessus	nan	none
+2450	equator	Pholus	nan	none
+2450	equator	Ascendant	291.367913382	derived
+2450	equator	Descendant	111.367913382	derived
+2450	equator	MC	204.909644856	derived
+2450	equator	IC	24.909644856	derived
+2450	equator	Part of Fortune	nan	none
+2450	equator	Part of Spirit	nan	none
+2450	equator	Black Moon Lilith	nan	none
+2450	equator	Vertex	nan	none
+2450	equator	East Point	nan	none
+2450	equator	Lot of Eros	nan	none
+2450	equator	Lot of Necessity	nan	none
+2450	equator	Lot of Courage	nan	none
+2450	equator	Lot of Victory	nan	none
+2450	equator	Lot of Nemesis	nan	none
+2450	equator	houses:Ascendant	291.367913382	houses
+2450	equator	houses:Midheaven	204.909644856	houses
+2450	equator	houses:ARMC	203.086304711	houses
+2450	equator	houses:Vertex	180.000000000	houses
+2450	longyearbyen	Sun	281.162353205	approximation
+2450	longyearbyen	Moon	136.883821615	files
+2450	longyearbyen	Mercury	300.864072535	approximation
+2450	longyearbyen	Venus	311.232494484	approximation
+2450	longyearbyen	Mars	102.350908601	approximation
+2450	longyearbyen	Jupiter	5.696931203	approximation
+2450	longyearbyen	Saturn	166.718713484	approximation
+2450	longyearbyen	Uranus	81.499421449	approximation
+2450	longyearbyen	Neptune	216.024176666	approximation
+2450	longyearbyen	Pluto	151.590463589	approximation
+2450	longyearbyen	North Node	62.996627009	approximation
+2450	longyearbyen	South Node	242.996627009	derived
+2450	longyearbyen	Chiron	nan	none
+2450	longyearbyen	Ceres	nan	none
+2450	longyearbyen	Pallas	nan	none
+2450	longyearbyen	Juno	nan	none
+2450	longyearbyen	Vesta	nan	none
+2450	longyearbyen	Eris	nan	none
+2450	longyearbyen	Eros	nan	none
+2450	longyearbyen	Hygiea	nan	none
+2450	longyearbyen	Nessus	nan	none
+2450	longyearbyen	Pholus	nan	none
+2450	longyearbyen	Ascendant	337.187642585	derived
+2450	longyearbyen	Descendant	157.187642585	derived
+2450	longyearbyen	MC	295.266831780	derived
+2450	longyearbyen	IC	115.266831780	derived
+2450	longyearbyen	Part of Fortune	nan	none
+2450	longyearbyen	Part of Spirit	nan	none
+2450	longyearbyen	Black Moon Lilith	nan	none
+2450	longyearbyen	Vertex	nan	none
+2450	longyearbyen	East Point	nan	none
+2450	longyearbyen	Lot of Eros	nan	none
+2450	longyearbyen	Lot of Necessity	nan	none
+2450	longyearbyen	Lot of Courage	nan	none
+2450	longyearbyen	Lot of Victory	nan	none
+2450	longyearbyen	Lot of Nemesis	nan	none
+2450	longyearbyen	houses:Ascendant	337.187642585	houses
+2450	longyearbyen	houses:Midheaven	295.266831780	houses
+2450	longyearbyen	houses:ARMC	297.213004711	houses
+2450	longyearbyen	houses:Vertex	206.960768448	houses
+2450	ushuaia	Sun	281.162353205	approximation
+2450	ushuaia	Moon	136.883821615	files
+2450	ushuaia	Mercury	300.864072535	approximation
+2450	ushuaia	Venus	311.232494484	approximation
+2450	ushuaia	Mars	102.350908601	approximation
+2450	ushuaia	Jupiter	5.696931203	approximation
+2450	ushuaia	Saturn	166.718713484	approximation
+2450	ushuaia	Uranus	81.499421449	approximation
+2450	ushuaia	Neptune	216.024176666	approximation
+2450	ushuaia	Pluto	151.590463589	approximation
+2450	ushuaia	North Node	62.996627009	approximation
+2450	ushuaia	South Node	242.996627009	derived
+2450	ushuaia	Chiron	nan	none
+2450	ushuaia	Ceres	nan	none
+2450	ushuaia	Pallas	nan	none
+2450	ushuaia	Juno	nan	none
+2450	ushuaia	Vesta	nan	none
+2450	ushuaia	Eris	nan	none
+2450	ushuaia	Eros	nan	none
+2450	ushuaia	Hygiea	nan	none
+2450	ushuaia	Nessus	nan	none
+2450	ushuaia	Pholus	nan	none
+2450	ushuaia	Ascendant	321.904915889	derived
+2450	ushuaia	Descendant	141.904915889	derived
+2450	ushuaia	MC	215.572131194	derived
+2450	ushuaia	IC	35.572131194	derived
+2450	ushuaia	Part of Fortune	nan	none
+2450	ushuaia	Part of Spirit	nan	none
+2450	ushuaia	Black Moon Lilith	nan	none
+2450	ushuaia	Vertex	nan	none
+2450	ushuaia	East Point	nan	none
+2450	ushuaia	Lot of Eros	nan	none
+2450	ushuaia	Lot of Necessity	nan	none
+2450	ushuaia	Lot of Courage	nan	none
+2450	ushuaia	Lot of Victory	nan	none
+2450	ushuaia	Lot of Nemesis	nan	none
+2450	ushuaia	houses:Ascendant	321.904915889	houses
+2450	ushuaia	houses:Midheaven	215.572131194	houses
+2450	ushuaia	houses:ARMC	213.283404711	houses
+2450	ushuaia	houses:Vertex	104.986321173	houses

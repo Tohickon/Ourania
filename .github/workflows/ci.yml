@@ -91,3 +91,24 @@ jobs:
           name: Ourania-windows
           path: OuraniaWindows/dist/package
           retention-days: 14
+
+      # J4: an actual installer, not a folder. jpackage builds an MSI through the WiX Toolset,
+      # which the GitHub Windows image happens to ship and is under no obligation to keep -
+      # so this step is allowed to fail without failing the build, and the folder form above
+      # stays the artefact the release is made of. If it starts failing, read the log before
+      # assuming the build broke: the likeliest cause is the image dropping WiX.
+      #
+      # NOT SIGNED. An unsigned MSI raises SmartScreen on any machine that did not build it,
+      # and signing needs a certificate that has to be bought and kept secret. That is the last
+      # thing standing between this row and closed, and it is not a code problem.
+      - name: Build an installer
+        continue-on-error: true
+        run: .\build.ps1 -Out out-msi -Package -PackageType msi
+
+      - name: Keep the installer
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ourania-installer
+          path: OuraniaWindows/dist/package/*.msi
+          retention-days: 14

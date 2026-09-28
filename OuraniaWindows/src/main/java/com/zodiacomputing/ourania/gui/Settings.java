@@ -44,7 +44,11 @@ public final class Settings {
      */
     static final String FILE_PROPERTY = "ourania.settings";
 
-    private static String file() {
+    /**
+     * Where the settings file is. Package-private since 28 Sep so start-up can name it (J9):
+     * a reader told their preferences could not be read needs to be told which file.
+     */
+    static String file() {
         String override = System.getProperty(FILE_PROPERTY);
         // AppPaths.userDir() is "" from classes - the working directory, as always - and the
         // reader's own folder when packaged, where the working directory is Program Files.
@@ -1201,6 +1205,11 @@ public final class Settings {
         "default.base.location",
         "default.transit.location",
         "window.",
+        // <b>Which start-up findings this reader has already been shown</b> (J9). It belongs
+        // to the machine, not to the configuration: a settings set carried to another install
+        // would arrive saying its missing ephemeris file had already been mentioned, and a
+        // Reset would start the notice again for a reader who only wanted their colours back.
+        "diagnostics.",
     };
 
     /** True for a key that belongs to the reader rather than to their configuration. */
