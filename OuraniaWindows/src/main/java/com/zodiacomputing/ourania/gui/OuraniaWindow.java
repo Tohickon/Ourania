@@ -40,6 +40,7 @@ public class OuraniaWindow extends JFrame {
     private SidePanel sidePanel;
     /** The left rail: what this chart is, opposite the menu that says what the app does. */
     private DrawerRail chartRail;
+    private OverviewPanel overviewPanel;
     private javax.swing.JEditorPane natalPane;
     private javax.swing.JEditorPane transitPane;
     private javax.swing.JEditorPane synastryPane;
@@ -75,6 +76,8 @@ public class OuraniaWindow extends JFrame {
      */
     public static final String SYNASTRY_PAGE = "Synastry";
     public static final String SELECTION_PAGE = "Selection";
+    /** What kind of chart this is, before any of the detail. */
+    public static final String OVERVIEW_PAGE = "Overview";
     public static final String READING_PAGE = "Interpretation";
 
     /**
@@ -264,6 +267,14 @@ public class OuraniaWindow extends JFrame {
         nameListPanel = new NameListPanel(skymapPanel, this);
         contentPanel.add(nameListPanel, "NAME_LIST");
         
+        // <b>Before the reading, not inside it.</b> Sect, the chart's shape, the prominence
+        // ranking and the transfers of light were all computed for Synthesize and appeared
+        // only there - a reader who wanted to know what kind of chart this is had to open a
+        // long document to find out. Added here rather than beside the other rail pages above
+        // because it reads the wheel, and the wheel is built two lines up.
+        overviewPanel = new OverviewPanel(skymapPanel, this);
+        chartRail.addPage(OVERVIEW_PAGE, overviewPanel);
+
         interpretationPanel = new InterpretationPanel(skymapPanel, this);
         // <b>The rail owns this panel's visibility, and nothing else may touch it.</b> The rail
         // is a CardLayout, which shows a page by hiding every other card. Fourteen calls to
@@ -285,6 +296,14 @@ public class OuraniaWindow extends JFrame {
         // written to, so five of them opened onto blank panels and Interpretation opened onto
         // an empty one. A card swap is not a door - the thing behind the door has to be made.
         chartRail.setOnSelect(page -> {
+            // The same rule as the readings below: a card swap is not a door, and a page built
+            // once would go on describing a chart the transport buttons have already left.
+            if (OVERVIEW_PAGE.equals(page)) {
+                if (overviewPanel != null) {
+                    overviewPanel.refresh();
+                }
+                return;
+            }
             if (READING_PAGE.equals(page)) {
                 if (interpretationPanel != null) {
                     interpretationPanel.updateInterpretations();
@@ -758,6 +777,11 @@ public class OuraniaWindow extends JFrame {
     }
 
     /** The left rail, for a check that needs to walk its pages. */
+    /** The Overview page, for the check. */
+    OverviewPanel overviewPanel() {
+        return overviewPanel;
+    }
+
     DrawerRail chartRail() {
         return chartRail;
     }

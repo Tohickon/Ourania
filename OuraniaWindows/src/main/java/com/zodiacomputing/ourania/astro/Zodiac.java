@@ -123,6 +123,48 @@ public final class Zodiac {
     }
 
     /**
+     * A longitude as a reader reads it: which sign, which degree, which minute.
+     *
+     * <b>Rounded to the minute BEFORE the sign is decided, which is the whole point.</b>
+     * Rounding the degrees afterwards and carrying 60 minutes into the degree produces a
+     * 30th degree - and there is no 30th degree of any sign. ChartTables printed
+     * "30&deg;00' cancer" for anything within half a minute of Leo, and the Overview page
+     * repeated the fault the day it was written, because the same six lines were written out
+     * a second time. A body that has effectively reached the boundary is in the next sign, and
+     * asking here means one answer instead of two.
+     */
+    public static final class Position {
+        /** Lowercase sign name, as {@link #signName} gives it. */
+        public final String sign;
+        /** 0 to 29. Never 30. */
+        public final int degree;
+        /** 0 to 59. */
+        public final int minute;
+
+        private Position(String sign, int degree, int minute) {
+            this.sign = sign;
+            this.degree = degree;
+            this.minute = minute;
+        }
+
+        /** The sign with its first letter capitalised, for anywhere a reader sees it. */
+        public String signTitled() {
+            return sign.isEmpty() ? sign
+                : Character.toUpperCase(sign.charAt(0)) + sign.substring(1);
+        }
+    }
+
+    /** Where this longitude falls, to the nearest arcminute. */
+    public static Position position(double longitude) {
+        double minutes = Math.round(normalise(longitude) * 60.0);
+        double rounded = normalise(minutes / 60.0);
+        double within = rounded % 30.0;
+        int degree = (int) within;
+        int minute = (int) Math.round((within - degree) * 60.0);
+        return new Position(signName(rounded), degree, minute);
+    }
+
+    /**
      * Where a degree sits in its sign's arc of development.
      *
      * Two conditions, and they are opposite ones rather than two names for a boundary. Settled

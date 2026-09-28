@@ -752,17 +752,25 @@ public final class ChartTables {
         return h.toString();
     }
 
-    /** Sign and degree, the way the rest of the app writes a position. */
+    /**
+     * Sign and degree, the way the rest of the app writes a position.
+     *
+     * <b>The arithmetic is Zodiac's, because this copy of it was wrong.</b> It rounded the
+     * minutes, carried a rounded 60 of them into the degree, and then asked for the sign name
+     * of the UNROUNDED longitude - so a body within half a minute of a boundary printed as the
+     * 30th degree of the sign it had just left, and there is no 30th degree of any sign. Found
+     * on 2026-09-27 when the Overview page was written and reproduced the same six lines, which
+     * is this project's signature defect from both ends at once: a second copy, of a copy that
+     * was already wrong.
+     *
+     * <p>{@link #declination} keeps its own carry on purpose - a declination has no boundary at
+     * 30 degrees, so 29 degrees 60 minutes really is 30 degrees there. Same six lines, different
+     * rule.
+     */
     private static String position(double lon) {
-        double d = com.zodiacomputing.ourania.astro.Zodiac.degreeInSign(lon);
-        int deg = (int) d;
-        int min = (int) Math.round((d - deg) * 60.0);
-        if (min == 60) {
-            deg++;
-            min = 0;
-        }
-        return String.format("%d&deg;%02d' %s", deg, min,
-                com.zodiacomputing.ourania.astro.Zodiac.signName(lon));
+        com.zodiacomputing.ourania.astro.Zodiac.Position p =
+            com.zodiacomputing.ourania.astro.Zodiac.position(lon);
+        return String.format("%d&deg;%02d' %s", p.degree, p.minute, p.sign);
     }
 
     /**
