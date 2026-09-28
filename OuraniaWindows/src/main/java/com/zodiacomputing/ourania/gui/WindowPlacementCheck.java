@@ -149,9 +149,21 @@ public final class WindowPlacementCheck {
                 ok("Esc leaves full screen", !WindowPlacement.isFullScreen(f[0]));
                 ok("the title bar is back", !f[0].isUndecorated());
                 eq("at the size and place it had before", before[0], f[0].getBounds());
-                javax.swing.Action leave = f[0].getRootPane().getActionMap().get("ourania.leaveFullScreen");
-                leave.actionPerformed(null);
-                ok("Esc when not full screen does nothing", !f[0].isUndecorated() && before[0].equals(f[0].getBounds()));
+                // <b>The name comes from the table, not from here.</b> This read
+                // "ourania.leaveFullScreen", which was the name WindowPlacement bound under
+                // before Shortcuts took the keys over in 442ee856. The lookup then returned
+                // null and the next line CRASHED the suite - so reg32 reported no verdict at
+                // all rather than one named failure, which is HouseSystemsCheck's 26 Sep
+                // lesson met again, this time in my own commit. Asking Shortcuts for the key
+                // means a future rename moves both ends at once.
+                javax.swing.Action leave = f[0].getRootPane().getActionMap()
+                    .get(Shortcuts.Key.LEAVE_FULL_SCREEN.actionKey());
+                ok("the leave-full-screen action is bound under the table's own name", leave != null);
+                if (leave != null) {
+                    leave.actionPerformed(null);
+                    ok("Esc when not full screen does nothing",
+                        !f[0].isUndecorated() && before[0].equals(f[0].getBounds()));
+                }
                 // Saved while full screen, the ordinary bounds are what is kept.
                 WindowPlacement.toggleFullScreen(f[0]);
             });

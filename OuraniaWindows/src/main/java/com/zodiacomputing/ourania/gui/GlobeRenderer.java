@@ -667,8 +667,10 @@ final class GlobeRenderer {
         int house = Zodiac.houseOf(lon, cusps);
         if (house >= 1 && house <= 12 && this.shown(SkymapPanel.Layer.HOUSES)
                 && Settings.globeHouseFill()) {
-            double from = cusps[house];
-            double span = arc(from, cusps[house == 12 ? 1 : house + 1]);
+            // Through SkymapPanel since 27 Sep, so the wedge the globe lights and the occupants the
+            // house reading lists cannot disagree about where a house starts and ends.
+            double from = SkymapPanel.houseStart(cusps, house);
+            double span = SkymapPanel.houseSpan(cusps, house);
             // The house stays flat because the houses are: they are spokes in the plane, and
             // a house wedge standing up out of it would be claiming a shape nothing else in
             // the view gives them.

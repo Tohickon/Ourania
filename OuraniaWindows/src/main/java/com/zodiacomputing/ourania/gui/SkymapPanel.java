@@ -7765,6 +7765,31 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return slider;
     }
 
+    /**
+     * Where a house begins, from a cusp array.
+     *
+     * <b>Here rather than at each caller, because houses are not thirty degrees.</b> A sign's span is
+     * a multiplication; a house's comes from its own two cusps and can be any width, can cross 0
+     * degrees of Aries, and in most house systems is not the same width as its opposite. The globe's
+     * focus wedge worked this out inline, and the house reading needed the same arithmetic on 27 Sep -
+     * so it is one method now rather than the second copy.
+     *
+     * <p>Cusps are 1-based with index 0 unused, which is the shape {@code activeCusps} has always had.
+     */
+    static double houseStart(double[] cusps, int house) {
+        return cusps[house];
+    }
+
+    /** How wide a house is, in degrees, from its cusp to the next one round. */
+    static double houseSpan(double[] cusps, int house) {
+        double to = cusps[house == 12 ? 1 : house + 1];
+        double span = ((to - cusps[house]) % 360.0 + 360.0) % 360.0;
+        // A zero span would report nothing in the house at all rather than saying something is wrong;
+        // it can only happen from a degenerate cusp array, and the whole circle is the honest answer
+        // to "which bodies are in this house" when the cusps cannot say.
+        return span == 0.0 ? 360.0 : span;
+    }
+
     // ---- the transport, as methods (G13) ------------------------------------------------
     // Named so a keyboard shortcut and a button can call the same thing. Before 27 Sep these were
     // five inline listeners inside a nine-thousand-line method, which meant a shortcut had nothing
@@ -7802,15 +7827,27 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      */
     void jumpToNow() {
         this.isPlaying = false;
-        boolean movesNatal = this.animateTarget.equals("Natal") || this.animateTarget.equals("Both")
-            || !this.showTransitChart;
-        boolean movesSky = (this.animateTarget.equals("Transit")
-            || this.animateTarget.equals("Both")) && this.showTransitChart;
-        if (movesNatal) {
-            this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
-        }
-        if (movesSky) {
+        // <b>With no Chart A the inner wheel is the sky, so the sky is what moves.</b>
+        // updateChartData copies skyRing.time over natalRing.time whenever the inner wheel is
+        // the sky, so a write to natalRing.time here is undone by the recompute four lines
+        // down, and the button does nothing on the chart the app opens onto. That is exactly
+        // the defect ScrubCheck found in stepTime on 2026-09-15 - see the same branch there -
+        // and it came back when this was lifted out of the Now button's listener in 442ee856,
+        // because the listener was the half of the rule that got copied. reg32 caught it.
+        // A third place needing this sentence is the point at which it should become one call.
+        if (!this.innerIsBirthChart) {
             this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+        } else {
+            boolean movesNatal = this.animateTarget.equals("Natal")
+                || this.animateTarget.equals("Both") || !this.showTransitChart;
+            boolean movesSky = (this.animateTarget.equals("Transit")
+                || this.animateTarget.equals("Both")) && this.showTransitChart;
+            if (movesNatal) {
+                this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
+            }
+            if (movesSky) {
+                this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+            }
         }
         this.updateChartData();
         if (this.chartPanel != null) {
