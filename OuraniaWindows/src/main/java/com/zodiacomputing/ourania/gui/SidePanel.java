@@ -84,6 +84,13 @@ public final class SidePanel extends JPanel {
             + "on the Sun"},
         {"Settings", "SETTINGS",
             "Which points the chart shows, house system defaults and the rest"},
+        // G11, 28 Sep. Help was removed on 2 September as a placeholder card reading "(Under
+        // Construction)", with the note that it would come back when there was something behind
+        // it. There is: a page generated from these three arrays and the shortcut table, so it
+        // cannot describe a menu the app does not have.
+        {"Help", "HELP",
+            "What each screen does, every keyboard shortcut, and the words this app uses in a "
+            + "particular way"},
     };
 
     /**
@@ -95,6 +102,72 @@ public final class SidePanel extends JPanel {
      * opened.
      */
     static final int MENU_WIDTH = 196;
+
+    /**
+     * The chart tables the menu offers, paired label to kind.
+     *
+     * <b>A list since 28 September, for the reason SCREENS already gave: so a check can
+     * read it rather than infer it from the buttons.</b> Help is generated from these three
+     * arrays, which is what stops a help page drifting from the app it describes - a page
+     * written by hand is a second description of the same thing, and this project has
+     * watched four of those come apart.
+     */
+    static final String[][] TABLE_ROWS = {
+        {"Midpoints", "MIDPOINTS",
+            "Bodies sitting on the midpoints of the Sun, Moon, Ascendant and Midheaven"},
+        {"Dispositors", "DISPOSITORS",
+            "Which planet rules each house, where it sits, and any receptions between them"},
+        {"Resonance", "RESONANCE",
+            "The tightest harmonic contacts the classical aspects do not show"},
+        {"Declinations", "DECLINATIONS",
+            "North and south of the equator: planets out of bounds, parallels and contraparallels"},
+        {"Antiscia", "ANTISCIA",
+            "Each point mirrored across the solstice and equinox axes, and who stands on the mirrors"},
+        {"Fixed Stars", "FIXED_STARS",
+            "The Behenian, royal and bright stars, and which chart points stand on them"},
+        {"Progressed", "PROGRESSED",
+            "The secondary progressed chart: a day of ephemeris for a year of life"},
+        {"Solar Arc", "SOLARARC",
+            "Every point moved forward by the arc the progressed Sun has travelled"},
+        {"Draconic", "DRACONIC",
+            "The same sky measured from the Moon's node, beside the tropical chart"},
+        {"Directions", "PRIMARY_DIRECTIONS",
+            "Primary directions: the chart turned on its axis, a degree of the equator for a year of life"},
+        {"Firdaria", "FIRDARIA",
+            "The Persian time lords: seventy-five years in nine periods, and the sevenths inside them"},
+        {"Returns", "RETURNS",
+            "The year's returns: solar and lunar as charts, the annual three as triggers"},
+    };
+
+    /**
+     * What the app can send out, paired label to action. See TABLE_ROWS.
+     */
+    static final String[][] EXPORT_ROWS = {
+        {"Save Chart Image", "SAVE_IMAGE",
+            "The wheel as a PNG, at screen, 2x or 4x resolution"},
+        {"Print Chart", "PRINT",
+            "Print the wheel, fitted to the page"},
+        {"Copy Chart", "COPY_IMAGE",
+            "The wheel to the clipboard as an image"},
+        {"Copy Positions", "COPY_POSITIONS",
+            "Every drawn position to the clipboard, tab separated for a spreadsheet"},
+        {"Save Positions", "SAVE_POSITIONS",
+            "The same positions as a .tsv file"},
+        {"Save Aspect Grid", "SAVE_GRID",
+            "The aspect grid as an HTML table"},
+        {"Save Reading as PDF", "SAVE_READING_PDF",
+            "The reading on screen with the chart wheel, as a PDF document"},
+        {"Print Reading", "PRINT_READING",
+            "Print the reading on screen with the chart wheel"},
+        {"Save Reading", "SAVE_READING",
+            "The reading on screen, as an HTML document"},
+        {"Save Reading as Text", "SAVE_READING_TEXT",
+            "The reading on screen, as plain text"},
+        {"Copy Reading", "COPY_READING",
+            "The reading on screen to the clipboard, as plain text"},
+        {"Reports for Many Charts…", "BATCH_REPORTS",
+            "A PDF report for every chart you choose, into a folder of your choosing"},
+    };
 
     private final OuraniaWindow window;
     private final Accordion accordion;
@@ -123,62 +196,18 @@ public final class SidePanel extends JPanel {
         // capability with no door is invisible in exactly the way a missing one is not: the
         // suites stay green, so nothing reports it. See ChartTables.
         JPanel tables = column();
-        tables.add(tableButton("Midpoints", "MIDPOINTS",
-            "Bodies sitting on the midpoints of the Sun, Moon, Ascendant and Midheaven"));
-        tables.add(tableButton("Dispositors", "DISPOSITORS",
-            "Which planet rules each house, where it sits, and any receptions between them"));
-        tables.add(tableButton("Resonance", "RESONANCE",
-            "The tightest harmonic contacts the classical aspects do not show"));
-        tables.add(tableButton("Declinations", "DECLINATIONS",
-            "North and south of the equator: planets out of bounds, parallels and contraparallels"));
-        tables.add(tableButton("Antiscia", "ANTISCIA",
-            "Each point mirrored across the solstice and equinox axes, and who stands on the mirrors"));
-        tables.add(tableButton("Fixed Stars", "FIXED_STARS",
-            "The Behenian, royal and bright stars, and which chart points stand on them"));
-        tables.add(tableButton("Progressed", "PROGRESSED",
-            "The secondary progressed chart: a day of ephemeris for a year of life"));
-        tables.add(tableButton("Solar Arc", "SOLARARC",
-            "Every point moved forward by the arc the progressed Sun has travelled"));
-        tables.add(tableButton("Draconic", "DRACONIC",
-            "The same sky measured from the Moon's node, beside the tropical chart"));
-        tables.add(tableButton("Directions", "PRIMARY_DIRECTIONS",
-            "Primary directions: the chart turned on its axis, a degree of the equator for a year of life"));
-        tables.add(tableButton("Firdaria", "FIRDARIA",
-            "The Persian time lords: seventy-five years in nine periods, and the sevenths inside them"));
-        tables.add(tableButton("Returns", "RETURNS",
-            "The year's returns: solar and lunar as charts, the annual three as triggers"));
+        for (String[] row : TABLE_ROWS) {
+            tables.add(tableButton(row[0], row[1], row[2]));
+        }
         accordion.addSection(TABLES, tables);
 
         // Section B. Until 3 Sep 2026 nothing could leave this application at all - no image,
         // no print, no clipboard, no file - which caps what it is for however good the engine
         // behind it is.
         JPanel export = column();
-        export.add(exportButton("Save Chart Image", "SAVE_IMAGE",
-            "The wheel as a PNG, at screen, 2x or 4x resolution"));
-        export.add(exportButton("Print Chart", "PRINT",
-            "Print the wheel, fitted to the page"));
-        export.add(exportButton("Copy Chart", "COPY_IMAGE",
-            "The wheel to the clipboard as an image"));
-        export.add(exportButton("Copy Positions", "COPY_POSITIONS",
-            "Every drawn position to the clipboard, tab separated for a spreadsheet"));
-        export.add(exportButton("Save Positions", "SAVE_POSITIONS",
-            "The same positions as a .tsv file"));
-        export.add(exportButton("Save Aspect Grid", "SAVE_GRID",
-            "The aspect grid as an HTML table"));
-        export.add(exportButton("Save Reading as PDF", "SAVE_READING_PDF",
-            "The reading on screen with the chart wheel, as a PDF document"));
-        export.add(exportButton("Print Reading", "PRINT_READING",
-            "Print the reading on screen with the chart wheel"));
-        export.add(exportButton("Save Reading", "SAVE_READING",
-            "The reading on screen, as an HTML document"));
-        export.add(exportButton("Save Reading as Text", "SAVE_READING_TEXT",
-            "The reading on screen, as plain text"));
-        export.add(exportButton("Copy Reading", "COPY_READING",
-            "The reading on screen to the clipboard, as plain text"));
-        // B8. Below the single-chart exports because it does the same thing many times, and a
-        // reader looking for it will look here rather than under the chart book.
-        export.add(exportButton("Reports for Many Charts…", "BATCH_REPORTS",
-            "A PDF report for every chart you choose, into a folder of your choosing"));
+        for (String[] row : EXPORT_ROWS) {
+            export.add(exportButton(row[0], row[1], row[2]));
+        }
         accordion.addSection(EXPORT, export);
 
         JLabel heading = new JLabel("Ourania+", SwingConstants.CENTER);

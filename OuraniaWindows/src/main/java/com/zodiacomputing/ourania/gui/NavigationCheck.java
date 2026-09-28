@@ -37,6 +37,10 @@ public final class NavigationCheck {
     private static final String[] SCREENS = {
         "SEARCH", "SKYMAP", "NAME_LIST", "INTERPRETATION", "RELEASING", "TRANSIT_SEARCH", "RETURNS", "TRANSIT_CALENDAR",
         "DIAL", "SKY_VIEW", "HORARY", "ELECTIONAL", "HELIOCENTRIC", "SETTINGS",
+        // G11, 28 Sep. Help came back with a page behind it. Adding the menu row without this
+        // line takes this suite red on "SidePanel.SCREENS matches", which is the pairing working
+        // exactly as the comment above says it does.
+        "HELP",
     };
 
     private static final List<String> failures = new ArrayList<>();

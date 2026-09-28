@@ -397,11 +397,21 @@ public class OuraniaWindow extends JFrame {
         heliocentricPanel = new HeliocentricPanel(this);
         contentPanel.add(heliocentricPanel, "HELIOCENTRIC");
         
-        // <b>Share, Sync, Connect and Help are gone.</b> All four were placeholder cards
-        // reading "(Under Construction)" behind live menu entries. A menu that offers ten
-        // destinations and delivers six teaches a reader that the menu cannot be trusted,
-        // which costs more than the missing features do. They come back with something behind
-        // them; SidePanel.SCREENS is the list, and NavigationCheck asserts the two agree.
+        // <b>Help is back, with something behind it</b> (G11). It and three others were
+        // placeholder cards reading "(Under Construction)" behind live menu entries, pulled on
+        // 2 September because a menu that offers ten destinations and delivers six teaches a
+        // reader that the menu cannot be trusted. The note then said they come back when there
+        // is something behind them, and this is that: a page generated from SidePanel's own
+        // arrays and the shortcut table rather than written about them.
+        //
+        // Share, Sync and Connect are still gone. SidePanel.SCREENS is the list, and
+        // NavigationCheck asserts the two agree.
+        javax.swing.JEditorPane helpPane = HtmlPanes.darkPane();
+        HtmlPanes.setHtml(helpPane, Help.html());
+        helpPane.setCaretPosition(0);
+        Accessibility.name(helpPane, "Help",
+            "What each screen does, every keyboard shortcut, and a glossary.");
+        contentPanel.add(HtmlPanes.scroller(helpPane), "HELP");
 
         // After skymapPanel, because applying a selection calls straight into it.
         contentPanel.add(new SettingsPanel(this), "SETTINGS");
