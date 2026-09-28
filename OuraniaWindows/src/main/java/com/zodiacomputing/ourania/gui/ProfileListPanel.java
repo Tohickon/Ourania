@@ -87,6 +87,7 @@ public final class ProfileListPanel extends JPanel {
         searchLabel.setFont(Theme.SMALL);
         top.add(searchLabel, BorderLayout.NORTH);
         top.add(search, BorderLayout.CENTER);
+        top.add(bookButtons(), BorderLayout.SOUTH);
 
         list = new JPanel();
         list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
@@ -96,6 +97,105 @@ public final class ProfileListPanel extends JPanel {
         add(top, BorderLayout.NORTH);
         add(list, BorderLayout.CENTER);
         rebuild();
+    }
+
+    /**
+     * Bringing charts in, and sending the book out (G1).
+     *
+     * <b>Two of these three already existed and had no way in.</b>
+     * {@code SavedCharts.importBook} and {@code exportBook} have been in the store since the book
+     * grew up, and nothing in the app called either - the fourth capability found this month that
+     * was built, checked and unreachable. Import from other software is the new one.
+     */
+    private JPanel bookButtons() {
+        JPanel row = new JPanel();
+        row.setLayout(new javax.swing.BoxLayout(row, javax.swing.BoxLayout.X_AXIS));
+        row.setBackground(Theme.SURFACE);
+        row.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
+
+        javax.swing.JButton importCsv = new javax.swing.JButton("Import\u2026");
+        importCsv.setToolTipText("<html>Bring charts in from another program, as a "
+            + "<b>CSV</b> file.<br>The first line must name the columns; a name and a date are "
+            + "required,<br>and a time, place, Rodden rating, notes and tags are used if they "
+            + "are there.<br><b>A date that could be read two ways is left out rather than "
+            + "guessed.</b></html>");
+        Widgets.styleButton(importCsv, Widgets.Role.TRANSPORT);
+        importCsv.addActionListener(e -> importCharts());
+
+        javax.swing.JButton backup = new javax.swing.JButton("Back up");
+        backup.setToolTipText("Write the whole chart book to one file, to keep or to move to "
+            + "another machine.");
+        Widgets.styleButton(backup, Widgets.Role.TRANSPORT);
+        backup.addActionListener(e -> backupBook());
+
+        row.add(importCsv);
+        row.add(javax.swing.Box.createRigidArea(new Dimension(6, 0)));
+        row.add(backup);
+        row.add(javax.swing.Box.createHorizontalGlue());
+        return row;
+    }
+
+    /** Reads a file, says what it found, and only then writes anything. */
+    private void importCharts() {
+        javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
+        chooser.setDialogTitle("Import charts from a CSV file");
+        if (chooser.showOpenDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        ChartImport.Result r = ChartImport.read(chooser.getSelectedFile());
+        StringBuilder say = new StringBuilder();
+        say.append(r.charts.size()).append(r.charts.size() == 1 ? " chart" : " charts")
+            .append(" found");
+        if (!"none".equals(r.dateOrder) && !r.dateOrder.startsWith("none")) {
+            say.append(", dates read ").append(r.dateOrder);
+        }
+        say.append('.');
+        if (!r.problems.isEmpty()) {
+            say.append('\n').append(r.problems.size()).append(" could not be read:\n");
+            for (int i = 0; i < Math.min(8, r.problems.size()); i++) {
+                say.append("  ").append(r.problems.get(i)).append('\n');
+            }
+            if (r.problems.size() > 8) {
+                say.append("  ...and ").append(r.problems.size() - 8).append(" more.");
+            }
+        }
+        if (r.charts.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, say.toString(), "Import",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        say.append("\n\nAdd them to your chart book?");
+        if (javax.swing.JOptionPane.showConfirmDialog(this, say.toString(), "Import",
+                javax.swing.JOptionPane.OK_CANCEL_OPTION) != javax.swing.JOptionPane.OK_OPTION) {
+            return;
+        }
+        java.util.List<String> renamed = new java.util.ArrayList<>();
+        int added = ChartImport.add(r, renamed);
+        rebuild();
+        String done = added + (added == 1 ? " chart added." : " charts added.");
+        if (!renamed.isEmpty()) {
+            done += "\n" + renamed.size() + " had a name already in your book and came in "
+                + "beside it:\n  " + String.join("\n  ",
+                    renamed.subList(0, Math.min(6, renamed.size())));
+        }
+        javax.swing.JOptionPane.showMessageDialog(this, done, "Import",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /** The whole book to one file - the export that had no door. */
+    private void backupBook() {
+        javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
+        chooser.setDialogTitle("Back up the chart book");
+        chooser.setSelectedFile(new java.io.File("ourania-chart-book.properties"));
+        if (chooser.showSaveDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        boolean ok = SavedCharts.exportBook(chooser.getSelectedFile());
+        javax.swing.JOptionPane.showMessageDialog(this,
+            ok ? "Saved " + chooser.getSelectedFile().getPath()
+               : "The book could not be written there.",
+            "Back up", ok ? javax.swing.JOptionPane.INFORMATION_MESSAGE
+                          : javax.swing.JOptionPane.WARNING_MESSAGE);
     }
 
     /**
