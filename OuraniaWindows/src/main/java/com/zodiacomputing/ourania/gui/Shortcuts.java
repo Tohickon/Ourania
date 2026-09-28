@@ -35,17 +35,62 @@ final class Shortcuts {
     /** The one table. A row is a key, what it is called, and what it does. */
     enum Key {
         FULL_SCREEN("Full screen", KeyEvent.VK_F11, 0,
-            "Fills the screen, and back again"),
+            "Fills the screen, and back again") {
+            @Override
+            void fire(Actions a) {
+                a.fullScreen();
+            }
+        },
         LEAVE_FULL_SCREEN("Leave full screen", KeyEvent.VK_ESCAPE, 0,
-            "Leaves full screen, when it is on"),
+            "Leaves full screen, when it is on") {
+            @Override
+            void fire(Actions a) {
+                a.leaveFullScreen();
+            }
+        },
         PLAY_PAUSE("Play / Pause", KeyEvent.VK_SPACE, java.awt.event.InputEvent.CTRL_DOWN_MASK,
-            "Starts and stops the chart moving through time"),
+            "Starts and stops the chart moving through time") {
+            @Override
+            void fire(Actions a) {
+                a.playPause();
+            }
+        },
         STEP_BACK("Step back", KeyEvent.VK_LEFT, java.awt.event.InputEvent.CTRL_DOWN_MASK,
-            "Runs the chart backwards at the slow rate"),
+            "Runs the chart backwards at the slow rate") {
+            @Override
+            void fire(Actions a) {
+                a.run(-1);
+            }
+        },
         STEP_FORWARD("Step forward", KeyEvent.VK_RIGHT, java.awt.event.InputEvent.CTRL_DOWN_MASK,
-            "Runs the chart forwards at the slow rate"),
+            "Runs the chart forwards at the slow rate") {
+            @Override
+            void fire(Actions a) {
+                a.run(1);
+            }
+        },
         NOW("Now", KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_DOWN_MASK,
-            "Stops, and moves the chart to this moment");
+            "Stops, and moves the chart to this moment") {
+            @Override
+            void fire(Actions a) {
+                a.now();
+            }
+        },
+        UNDO("Undo", KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_DOWN_MASK,
+            "Takes back the last chart you generated. While you are typing in a field it "
+            + "takes back what you typed instead") {
+            @Override
+            void fire(Actions a) {
+                a.undo();
+            }
+        },
+        REDO("Redo", KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_DOWN_MASK,
+            "Puts back what Undo took away") {
+            @Override
+            void fire(Actions a) {
+                a.redo();
+            }
+        };
 
         /** What a reader calls it - the same words as the button it mirrors, where there is one. */
         final String label;
@@ -53,6 +98,17 @@ final class Shortcuts {
         final int modifiers;
         /** One sentence, for a help page and for a tooltip. */
         final String about;
+
+        /**
+         * What this key does, on the row itself (G13).
+         *
+         * <b>It was a switch with a default, and that is where a key added later goes to die.</b>
+         * The identical shape cost this project a whole morning on 27 September, when a seventh
+         * ring kind would have been silently called "Chart" by a switch exactly like it - and the
+         * fix was the same one: put the behaviour on the enum, so a row cannot be added without
+         * saying what it is for. Two rows were added here in the same commit that removed it.
+         */
+        abstract void fire(Actions a);
 
         Key(String label, int code, int modifiers, String about) {
             this.label = label;
@@ -120,6 +176,16 @@ final class Shortcuts {
             public void now() {
                 // As above.
             }
+
+            @Override
+            public void undo() {
+                // No chart form on a bare frame.
+            }
+
+            @Override
+            public void redo() {
+                // As above.
+            }
         };
     }
 
@@ -134,6 +200,12 @@ final class Shortcuts {
         void run(int direction);
 
         void now();
+
+        /** Take back the last generated chart. G13. */
+        void undo();
+
+        /** Put back what undo took away. G13. */
+        void redo();
     }
 
     /**
@@ -151,21 +223,11 @@ final class Shortcuts {
             act.put(k.actionKey(), new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    fire(k, actions);
+                    k.fire(actions);
                 }
             });
         }
     }
 
-    private static void fire(Key k, Actions a) {
-        switch (k) {
-            case FULL_SCREEN: a.fullScreen(); break;
-            case LEAVE_FULL_SCREEN: a.leaveFullScreen(); break;
-            case PLAY_PAUSE: a.playPause(); break;
-            case STEP_BACK: a.run(-1); break;
-            case STEP_FORWARD: a.run(1); break;
-            case NOW: a.now(); break;
-            default: break;
-        }
-    }
+
 }

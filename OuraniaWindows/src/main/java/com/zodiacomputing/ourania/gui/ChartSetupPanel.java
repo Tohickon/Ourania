@@ -561,6 +561,12 @@ public class ChartSetupPanel extends JPanel {
         south.add(notices, BorderLayout.NORTH);
         south.add(buttonPanel, BorderLayout.CENTER);
         add(south, BorderLayout.SOUTH);
+
+        // <b>Last, over the finished screen</b> (G13). Every text field here can take back what
+        // was typed in it. A sweep rather than a call beside each field: createField makes eight
+        // of the eleven and the three sky fields are built directly, so the per-field version
+        // silently left those three without undo - which is how the check found it.
+        Undo.installAll(this);
     }
 
     /** The clock-change notice, and the button that takes the other reading. */
@@ -1625,6 +1631,110 @@ public class ChartSetupPanel extends JPanel {
         };
     }
 
+    /**
+     * Where the form has been, for Ctrl+Z (G13).
+     *
+     * <b>The panel owns it, not the window.</b> A history that lived on the frame would have to
+     * read these fields from outside, and this class is the one place that knows what they are.
+     */
+    private final Undo.History history = new Undo.History();
+
+    /**
+     * What is on screen now, as an undoable state.
+     *
+     * <b>Built from {@link #formSnapshot}, not from the fields again.</b> Those six names are
+     * written down once; a second list here is the defect this project logs most, and it would
+     * drift the first time a field was added to one and not the other. The mode and the transits
+     * switch are added because a chart is not only its dates - generating the same six values as
+     * a synastry and as a natal gives two different charts.
+     */
+    Undo.State undoState() {
+        java.util.Map<String, String> m = new java.util.LinkedHashMap<>();
+        String[] six = formSnapshot();
+        for (int i = 0; i < six.length; i++) {
+            m.put("field" + i, six[i] == null ? "" : six[i]);
+        }
+        m.put("mode", String.valueOf(selectedMode));
+        m.put("transits", String.valueOf(transitsCheck != null && transitsCheck.isSelected()));
+        return new Undo.State(m);
+    }
+
+    /** Puts a stored state back on screen and draws it, the way a reader would. */
+    private void applyUndoState(Undo.State s) {
+        if (s == null) {
+            return;
+        }
+        String[] six = new String[6];
+        for (int i = 0; i < six.length; i++) {
+            six[i] = s.fields.getOrDefault("field" + i, "");
+        }
+        formRestore(six);
+        // <b>The mode, which was stored and never put back.</b> Found while working out why the
+        // replaying guard could not be reached: a state carries the mode because the same six
+        // values generate two different charts under two of them, and restoring everything except
+        // the mode meant undoing a synastry left a synastry showing the previous person's dates.
+        // It also broke the round trip this class now depends on - the state pushed after a
+        // restore differed from the one restored, so the history grew instead of shrinking.
+        String mode = s.fields.get("mode");
+        if (mode != null) {
+            for (ChartMode m : ChartMode.values()) {
+                if (String.valueOf(m).equals(mode)) {
+                    setMode(m);
+                    break;
+                }
+            }
+        }
+        if (transitsCheck != null) {
+            transitsCheck.setSelected(Boolean.parseBoolean(
+                s.fields.getOrDefault("transits", "false")));
+        }
+        // Redrawn through generateChart, which is the one door from these fields to a cast
+        // chart. Setting the text and stopping would leave the form saying one thing and the
+        // wheel showing another - the exact pair of screens David reported on 26 September.
+        generateChart();
+    }
+
+    /** Takes the form back to the chart before this one. True when there was one. */
+    boolean undo() {
+        Undo.State was = history.undo();
+        if (was == null) {
+            return false;
+        }
+        applyUndoState(was);
+        return true;
+    }
+
+    /** Puts back what {@link #undo} took away. True when there was something. */
+    boolean redo() {
+        Undo.State next = history.redo();
+        if (next == null) {
+            return false;
+        }
+        applyUndoState(next);
+        return true;
+    }
+
+    /** The history, for the check and for anything that wants to know whether undo is live. */
+    Undo.History history() {
+        return history;
+    }
+
+    /**
+     * The chart mode, and a way to set it, for UndoCheck.
+     *
+     * <b>Named for what they are.</b> setMode is private and does a great deal besides storing a
+     * value - it toggles the transit fields and syncs the transits box - so the check drives it
+     * rather than writing the field, which is the same reason B8's batch calls generateChart
+     * instead of building subjects of its own.
+     */
+    ChartMode modeForCheck() {
+        return selectedMode;
+    }
+
+    void setModeForCheck(ChartMode m) {
+        setMode(m);
+    }
+
     void formRestore(String[] values) {
         if (values == null || values.length < 6) {
             return;
@@ -1648,6 +1758,12 @@ public class ChartSetupPanel extends JPanel {
      * assuming this call finished the job.
      */
     void generateChart() {
+        // <b>The chart being generated</b> (G13). Recorded here rather than at each of the
+        // eleven things that can call it. A generate caused by an undo records the state the undo
+        // restored, which is already on top of the stack - so Undo.History.push discards it, and
+        // that one rule is what keeps a replay from refilling the history. See its javadoc: a
+        // flag written for this job was measured as unreachable and removed.
+        history.push(undoState());
         String bDate = baseDateField.getText().trim();
         String bTime = baseTimeField.getText().trim();
         String bLoc = baseLocationField.getText().trim();

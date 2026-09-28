@@ -57,6 +57,11 @@ public final class ShortcutCheck {
         {"STEP_BACK", "Step back", "Ctrl+Left"},
         {"STEP_FORWARD", "Step forward", "Ctrl+Right"},
         {"NOW", "Now", "Ctrl+T"},
+        // G13, 28 Sep. Added by hand for the same reason the rest are written out: a row
+        // appearing because somebody edited an enum, rather than because they meant to add a
+        // shortcut, is exactly what this table catches.
+        {"UNDO", "Undo", "Ctrl+Z"},
+        {"REDO", "Redo", "Ctrl+Y"},
     };
 
     private static void table() {

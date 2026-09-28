@@ -198,6 +198,24 @@ public class OuraniaWindow extends JFrame {
                     skymapPanel.jumpToNow();
                 }
             }
+
+            // <b>The window's Ctrl+Z, which is not the one a text field gets.</b> A focused
+            // component is offered its keys first, so typing in a date field undoes the typing
+            // and this fires everywhere else - the behaviour every other application has, and it
+            // falls out of the binding order rather than being arranged. G13.
+            @Override
+            public void undo() {
+                if (chartSetupPanel != null) {
+                    chartSetupPanel.undo();
+                }
+            }
+
+            @Override
+            public void redo() {
+                if (chartSetupPanel != null) {
+                    chartSetupPanel.redo();
+                }
+            }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the window
