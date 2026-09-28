@@ -176,6 +176,37 @@ extends JPanel {
         return this.showProgressed;
     }
 
+    /**
+     * Where the inner wheel is cast - the place, not the moment.
+     *
+     * <b>The wheel and every reading disagreed about the angles for want of these two
+     * methods.</b> With no Chart A the inner wheel is the sky, and updateChartData handled that
+     * by copying skyRing's MOMENT into natalRing and casting the wheel's houses at
+     * {@code skyRing}'s place - while {@code radixChart} went on handing
+     * {@code natalRing.latitude/longitude} to the reading frame, which by then held whatever
+     * place the last chart had. Same instant, two places.
+     *
+     * <p>Measured 2026-09-28 at open: the wheel cast at 51.478, 0.000 and the frame at 34.052,
+     * -118.244, and the Ascendants stood <b>94 degrees apart</b> while every planet agreed to
+     * the decimal - which is the signature, because planets do not depend on place and angles
+     * depend on nothing else. Every reading, every dignity, every lot and every house a
+     * placement was reported in came from the frame, so all of them were answering about
+     * somewhere the reader was not looking at.
+     *
+     * <p>The copy could have been completed instead - handing natalRing the sky's place along
+     * with its moment - and that was not taken. It writes a place into a ring that does not own
+     * it, and the next reader of {@code natalRing.latitude} has no way to know whether it means
+     * Chart A's birthplace or the sky's. Asking is cheaper than remembering.
+     */
+    double innerLat() {
+        return this.innerIsBirthChart ? this.natalRing.latitude : this.skyRing.latitude;
+    }
+
+    /** @see #innerLat */
+    double innerLon() {
+        return this.innerIsBirthChart ? this.natalRing.longitude : this.skyRing.longitude;
+    }
+
     /** What the outer ring's bodies are, for any label that has to name them. */
     private String outerRingWord() {
         this.assignRingKinds();
@@ -4108,7 +4139,7 @@ extends JPanel {
             return null;
         }
         ChartFrame host = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
-            this.natalRing.latitude, this.natalRing.longitude, this.houseSystem);
+            this.innerLat(), this.innerLon(), this.houseSystem);
         ChartFrame visitor = this.synastryChartB();
         if (host == null || visitor == null) {
             return null;
@@ -4512,8 +4543,10 @@ extends JPanel {
         // changed it served the old chart - harmless while only the wheel called this, and not
         // harmless now that readings do.
         if (this.natalRing.sd != null) {
-            return this.frameForCurrentChart(this.natalRing.sd.getJulDay(), this.natalRing.latitude,
-                this.natalRing.longitude, this.houseSystem);
+            // The same place the wheel draws - see innerLat. Passing natalRing's own is what
+            // put the readings 94 degrees away from the chart on screen.
+            return this.frameForCurrentChart(this.natalRing.sd.getJulDay(), this.innerLat(),
+                this.innerLon(), this.houseSystem);
         }
         return this.cachedFrame;
     }
@@ -8171,9 +8204,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         double[] dArray = new double[10];
         if (this.natalRing.sd != null && !relationship) {
-            double innerLat = this.innerIsBirthChart ? this.natalRing.latitude : this.skyRing.latitude;
-            double innerLon = this.innerIsBirthChart ? this.natalRing.longitude : this.skyRing.longitude;
-            this.sw.swe_houses(this.natalRing.sd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), innerLat, innerLon, this.houseSystem, this.natalRing.cusps, dArray);
+            this.sw.swe_houses(this.natalRing.sd.getJulDay(), com.zodiacomputing.ourania.astro.Ephemeris.flags(this.sw, 2), this.innerLat(), this.innerLon(), this.houseSystem, this.natalRing.cusps, dArray);
             this.natalRing.ascendant = dArray[0];
             System.arraycopy(dArray, 0, this.baseAscmc, 0, this.baseAscmc.length);
         }
