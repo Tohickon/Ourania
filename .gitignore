@@ -43,6 +43,28 @@ saved_transits.properties
 
 # --- backups ---
 *.orig
+# Windows Explorer's own duplicates. Ctrl-C Ctrl-V in a folder makes "X - Copy.java", and on
+# 2026-09-29 six of them reached a commit - copies of CLAUDE.md, HANDOVER.md, error_log.txt,
+# handover-stamp.sh and two generators. A stale copy of a document is the defect this project
+# logs more than any other; a stale copy that git is tracking is that defect with a ratchet.
+*- Copy.*
+* - Copy
+# Hand-made backups, taken before an edit and named after the day. The one that matters is
+# settings.properties.backup-*: settings.properties is untracked because it holds a real birth
+# date, time and birthplace and this repo is PUBLIC - and a dated copy of it holds the same
+# data under a name no rule covered. Two of them were committed on 2026-09-29 and the branch
+# was rewritten to take them out.
+*.bak-*
+*.backup-*
+*.clobbered-*
+# Windows folder metadata. Describes an icon and a view state, means nothing to anyone else.
+desktop.ini
+
+# --- run output kept beside the source ---
+# Diagnostics writes a dated problem report; the regression harness writes its console to a
+# file. Both are a record of one run on one machine and neither is repo content.
+ourania-report-*.txt
+out-reg*-console.txt
 
 # --- external tooling, kept locally, never committed ---
 # apktool.jar alone was 23.3 MB of a 27 MB repository. Ignore rules do not untrack
