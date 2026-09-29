@@ -1,0 +1,309 @@
+Ourania+ — Complete Functionality Checklist
+Every item the application needs to be fully functional and finished — drawn from the source tree, Obsidian vault WORK-PLAN, HANDOVER, and comparison against shipping astrology apps (Astro.com, Solar Fire, Astrodienst, Kepler, Time Passages, Co-Star). Organised by functional domain. Current build: 170,648 checks, 0 failures (as of 2026-08-28).
+
+Legend:
+✓ Done / built
+○ Open / not yet implemented
+✗ Blocked (dependency missing)
+◆ Requires David's decision
+△ Present but incomplete / thin
+1. DATA ENTRY & CHART SETUP
+1.1 Birth Data Input
+Name, birth date, birth time, birth location text fields — all present in ChartSetupPanel
+Geocoder integration (city-name to lat/lon lookup) — Geocoder.java wired in
+"The Sky Now" quick-fill button (current date/time/location)
+Home location memory and "Set Home" button
+Birth time accuracy flag / Rodden rating — distinguish rectified, approximate, or unknown times from exact ones OPEN
+Place-name autocomplete / typeahead dropdown — current field is plain text requiring exact spelling OPEN
+Timezone disambiguation UI — the geocoder may return a wrong TZ for ambiguous city names; no user confirmation step exists OPEN
+Default placeholder chart (Greenwich Noon 2000) — present but indistinguishable from a chart with a real time; affects progressed angles, solar arc precision INCOMPLETE
+1.2 Chart Modes
+Natal / Single chart mode
+Natal + Transit bi-wheel mode
+Synastry bi-wheel mode
+Composite (Midpoint) chart mode
+Composite (Davison) chart mode
+Synastry + Current Sky tri-wheel mode (Chart A inner, Chart B middle, sky outer)
+Progressed chart tri-wheel — natal inner, secondary progressions middle, transits outer (engine data exists; GUI not yet drawn) OPEN
+1.3 Chart Persistence
+Save / Load natal charts by name (saved_charts.properties)
+Saved charts directory in side panel (ProfileListPanel)
+Load saved chart as Chart A or Chart B for synastry
+Chart export — print or PDF / image of the wheel and interpretation text OPEN
+Import from standard formats (AAF / ADB / Astrodienst .dat) — no import path exists OPEN
+2. ASTRONOMICAL CALCULATION ENGINE (L0–L2)
+2.1 Ephemeris & Core Computation
+Swiss Ephemeris integration (de.thmac.swisseph) — swe_calc_ut for all 10 planets + Chiron + 4 major asteroids
+Moshier fallback when SE data files absent
+Tropical zodiac longitude calculation for all 23 selectable points
+Retrograde detection (speed sign)
+House cusp calculation — Placidus, Whole Sign, Equal, Porphyry, Koch available via Settings
+Ascendant, Descendant, MC, IC derived angles
+Part of Fortune (sect-reversed lot)
+Part of Spirit (lot of Spirit) — registered 2026-08-23 with glyph, aspects and prose
+North Node / South Node (true and mean variants selectable in Settings)
+Black Moon Lilith (true osculating and mean variants selectable in Settings)
+Asteroid 16 Psyche — ephemeris file se00016s.se1 missing from shipped data; registry entry reverted BLOCKED
+Extended asteroid set (Pholus, Sedna, Varuna, Makemake, Haumea, etc.) — ephemeris files not included OPEN
+Sidereal / Vedic zodiac option (ayanamsha selector) — not implemented OPEN
+Declination display — out-of-bounds planets, parallel / contraparallel aspects not computed OPEN
+2.2 Positional Derivation
+House placement (quadrant and whole-sign) for all bodies
+Sign assignment, degree, minute display
+Decan assignment (Egyptian / Chaldean / triplicity)
+28 Lunar Mansions computation (tropical, equal, al-Biruni)
+Sabian symbol degree-to-symbol mapping
+Antiscia and contra-antiscia longitudes computed but not displayed on the wheel OPEN
+Arabic lots beyond Fortune and Spirit (Lord of the Ascendant lot, Lot of Eros, etc.) OPEN
+3. CHART WHEEL DISPLAY (GUI)
+3.1 Wheel Rendering
+Full circular wheel with sign band, house divisions, degree ticks (SkymapPanel)
+Planetary glyphs on sphere beads with element colouring
+Glyph spreading / collision avoidance for crowded zones
+Degree leader lines from glyph to exact position (toggleable)
+Aspect lines between bodies (Ptolemaic + quincunx + minor aspects)
+Decan ring with 36 sectors (outer)
+Lunar mansion ring (28 sectors, clickable)
+Bi-wheel (natal inner, transit or partner outer) rendering
+Tri-wheel (natal inner, Chart B middle, current sky outer) rendering
+Harmonic chart rendering (H1–H12 selector)
+Animation / step control (step forward/back through time)
+Pin-to-body option (wheel rotates to keep a body at ASC)
+Tri-wheel aspect lines — sky ring glyphs drawn but no aspect lines yet to Chart A or B INCOMPLETE
+Tri-wheel side-panel placements listing — sky bodies not yet listed in placements panel INCOMPLETE
+Declination graph / declination wheel (90°-dial) — parallel aspects invisible without it OPEN
+Modulo-22.5° dial (16th harmonic) for semi-square / sesquiquadrate family contacts OPEN
+Chart print / export to PNG or PDF from the wheel view OPEN
+Resize / full-screen mode — window fixed at 1024×768 OPEN
+3.2 Wheel Interactivity
+Click body glyph → open interpretation panel for that body
+Click angle label (ASC, MC, etc.) → show angle interpretation + aspects
+Click house slice → show house interpretation
+Click sign → show sign interpretation
+Click mansion ring → show mansion detail
+Click decan ring → show decan interpretation
+Click Sabian degree → show Sabian symbol interpretation
+Hover over aspect line → tooltip with orb and aspect name
+Pattern highlight — clicking a pattern banner lights its legs on the wheel
+Aspect grid cell hover → corresponding line lights on the wheel
+Synastry angle-click asymmetry — Chart A angle → natal reading, Chart B angle → cross-chart reading; inconsistent but deliberate pending David's call DAVID'S CALL
+showAngleAt Chart A pass still uses literal false to getAspectType (should call isSynastryPair) — pending David's call alongside angle-click asymmetry DAVID'S CALL
+3.3 Settings & Customisation
+Per-body toggle (23 selectable points with All/None/Defaults buttons)
+Per-aspect toggle with colour picker for every aspect type
+Element colour overrides (Fire/Earth/Air/Water chips)
+Per-body colour override
+Lunar mansion ring colour, line colour, page background, wheel disc colour
+Colour template presets (Classic, Cool, Black & White) + save/delete user templates
+Planet-sphere vs bare-glyph toggle
+Degree leader line toggle + colour
+Body ring position (outside sign ring vs centre)
+House system selector (Placidus, Whole Sign, Equal, Porphyry, Koch)
+Node variant (True / Mean) selector
+Lilith variant (True Osculating / Mean) selector
+Aspect line weight / style (thin / thick / dashed) per aspect OPEN
+Font size scaling for high-DPI / accessibility OPEN
+4. ASPECT SYSTEM (L4)
+4.1 Major (Ptolemaic) Aspects
+Conjunction (0°), Opposition (180°), Trine (120°), Square (90°), Sextile (60°)
+Quincunx (150°) — 49 classical pairs with rulership/antiscia/averse classification
+Body-specific orbs keyed from Bodies registry (not parallel arrays)
+Synastry halved-orb rule (isSynastryPair)
+4.2 Minor Aspects
+Semisextile (30°) — machinery shipped; prose 0 of 300 cells PROSE MISSING
+Semisquare (45°) — machinery shipped; prose 0 of 300 cells PROSE MISSING
+Quintile (72°) — 273 of 300 cells written INCOMPLETE
+Sesquiquintile (108°) — 273 of 300 cells written INCOMPLETE
+Sesquiquadrate (135°) — 273 of 300 cells written INCOMPLETE
+~600 prose entries needed: semisextile (300 cells) + semisquare (300 cells) OPEN
+~27 remaining cells across quintile, sesquiquintile, sesquiquadrate OPEN
+6 cells: three harmonic-aspect pairs among North Node, South Node, Part of Fortune (one is arguably the nodal axis — judgement call) DAVID'S CALL
+Quincunx orb cap: currently uncapped at 10° (15.4 hits/chart); recommend 1.0° for all 6 minor aspects together — needs named source or David's authorisation DAVID'S CALL
+4.3 Aspect Prose Coverage (overall)
+Classical bodies aspect grid: 270 of 330 cells — quincunx 6 of 55 cells written INCOMPLETE
+60 asteroid-to-asteroid cells absent across all asteroid pairs DAVID'S CALL
+Transit hover labels read "Transiting X Conjunct Natal Y" (label, not a finding) — same defect removed from aspects on 2026-08-22, not yet fixed for transits BUG
+655 aspect readings contain two both-decent texts (one per direction key) — editorial pick needed, not a blocker EDITORIAL
+4.4 Aspect Patterns
+T-Square, Grand Cross, Grand Trine, Kite, Yod, Mystic Rectangle, Cradle, Boomerang, Grand Sextile
+Pattern highlight on wheel (lit legs, white halo)
+Pattern detail view with mechanics and the 6.3 release line
+Tension & Release: outlet, mediator, empty leg for every stressed configuration
+Tension body restriction: currently 29 points, 9 lines in 10 not between planets — restrict to TENSION_BODIES list or rank rather than filter? DAVID'S CALL
+5. DIGNITY & CONDITION SCORING (L3)
+Domicile, Exaltation, Detriment, Fall (essential dignity)
+Egyptian term / bound dignity
+Triplicity dignity (day/night/participatory)
+Face / decan dignity
+Sect (day/night chart, benefic/malefic classification)
+Planetary joys (houses of joy)
+Oriental / occidental phase from the Sun
+Combustion / cazimi detection
+Besiegement (enclosed between Mars/Saturn or Venus/Jupiter)
+Angularity scoring (angular/succedent/cadent)
+Rulership web — dispositor chain and mutual reception detection
+Reception (classical and modern) with direction guard
+29° anaretic / crisis degree flag — not computed; needed for Phase 1 of master checklist OPEN
+0° degree flag (ingress-point / fresh-start energy) — companion to anaretic, equally unimplemented OPEN
+Critical degrees (0°, 13°, 26° of cardinal; 8–9°, 21–22° of fixed; 4°, 17° of mutable) — no computation OPEN
+Peregrine status (no essential dignity in current sign) — not flagged explicitly OPEN
+Engine (L3–L9) still uses only 12 ChartFrame bodies; asteroids, South Node, Lilith, Part of Fortune visible on wheel but not scored DIVERGENCE
+6. RELATIONAL & WHOLE-CHART STRUCTURE (L4–L5)
+Midpoints (Sun/Moon, Sun/ASC, Moon/ASC, Sun/MC, etc.)
+Transfer of Light
+Jones patterns (Splash, Bundle, Locomotive, Bowl, Bucket, See-Saw, Splay, Fan)
+Gestalt: element balance, modality balance, hemisphere emphasis, quadrant emphasis
+Signature sign and modality (most prominent element/modality combination)
+Stelliums (3+ bodies in one sign or house)
+Singleton detection
+Triangles of Life (natal chart shape reading)
+Macro-dynamics / global chart dynamics prose (Antigravity, 2026-08-22)
+Modulo-22.5° dial / harmonic machinery — Phase 5 checklist item; finds sesquiquadrate family contacts invisible to classical aspects OPEN
+Antiscia display on wheel — computed for quincunx classification but not shown as a wheel ring or list OPEN
+7. HOUSE & TOPIC ANALYSIS (L6)
+Three-witness method per house (occupants, ruler, ruler's condition)
+12 life-topic readings wired into the Report
+Strong / middling / weak topic standings
+House interpretation prose (all 12 houses)
+Topic reporting cut: 11 of 12 qualify as strong/weak (only ~4.5% "unremarkable" at current 0.06 margin) — threshold is David's product call DAVID'S CALL
+Strong/weak 2:1 skew due to traditional rulers only in witness selection — outer planets can occupy but never rule, dragging body median down KNOWN BIAS
+L7 theme extraction does not yet read L6 topic standings — themes and topics are not cross-wired OPEN
+8. THEME EXTRACTION (L7)
+Multi-witness theme detection (Rule of Three — 3 independent witnesses)
+Contradiction detection (conflicting signatures)
+Repeating theme weighting and ranking
+Themes wired into Snapshot, Report, and Synthesis outputs
+L7 does not read L6 topic standings — the two layers produce independent outputs with no cross-reference OPEN
+9. TIME TECHNIQUES (L8)
+9.1 Transits
+Transit positions computed and drawn on bi-wheel
+Transit perfection dates (exact hit scanning) with memoised longitude cache
+Transit-to-natal aspect prose (all 5 Ptolemaic aspects × 23 transiting bodies)
+Transit filtered by annual profection (lord of the year prioritised)
+Eclipse-to-natal contacts
+Station-to-natal contacts
+Transits.orbScale = 1.0 — no calibrated tight orb for transits yet; acknowledged seam UNCALIBRATED
+9.2 Progressions & Directions
+Secondary progressions: progressed Sun, Moon, Mercury, Venus, Mars
+Progressed lunation phase (8-phase cycle)
+Solar arc directions (all natal bodies)
+Progressed angles (unblocked — excluded only until real-time charts are distinguishable from placeholder) OPEN
+Primary directions — not implemented; separate from secondaries OPEN
+Progressed chart drawn as a wheel / tri-wheel ring — data exists, GUI not wired OPEN
+9.3 Returns
+Solar return chart computation
+Lunar return chart computation
+Return chart-to-natal contacts wired into Convergence
+Return reading scope: whole return chart vs angles only? — family readmits fast-body noise through back door; both options measured DAVID'S CALL
+9.4 Profections
+Annual profections (one sign per year, lord-of-the-year)
+Profection year lord used as transit filter multiplier (×3.5 softmax weight)
+Monthly profections — annual is only the top level; monthly sub-periods not computed OPEN
+9.5 Zodiacal Releasing
+Fortune and Spirit releasing chains computed (211-year circuit)
+ReleasingPanel UI with period table and date range display
+Interpretation prose for all 12 signs in releasing context
+Releasing section missing from L9 Report / Snapshot output — computed but not surfaced in any reading OPEN
+Releasing not wired into Convergence ranking — deliberately withheld (would worsen discrimination); needs Convergence weighting decision first OPEN
+9.6 Convergence & Timing Quality
+Convergence ranking: 7 technique families with echo guard and softmax weighting
+Lord-of-the-year ×3.5 multiplier in Convergence
+Threshold form (atLeast(n)) meaningless — all targets score 3+; only loudest() accessor is useful LIMITATION
+Convergence weighting refinement — adding more voters worsened discrimination; needs weighting redesign or a fundamentally different model DAVID'S CALL
+10. INTERPRETATION PANEL & READING OUTPUTS (L9)
+10.1 Single-Body Interpretations
+19 of 19 non-angle chart points: core paragraph + 12 signs + 12 houses each
+4 angles (ASC, DSC, MC, IC): 12-sign interpretations each
+Decan interpretations (all 36 decans for each body)
+Degree interpretations (360 Sabian symbols, 360 degree meanings)
+Technical degree interpretations (special critical degrees)
+10.2 Aspect Interpretations
+Natal aspect prose — ~270 of 330 Ptolemaic cells written
+Transit aspect prose — 5 aspects × all transiting bodies × all natal bodies
+Synastry inter-aspect prose (relationship framing)
+Composite aspect prose
+Minor aspect prose (quintile, sesquiquintile, sesquiquadrate at ~273/300 cells each)
+~600 cells: semisextile + semisquare prose (0 of 300 each) OPEN
+10.3 Relationship / Synastry Interpretations
+Synastry house overlays (A bodies in B houses)
+Synastry angle contacts
+Composite placement prose (composite planet in sign + house)
+Relationship prose narrative (sourced, 900+ entries)
+10.4 Aggregated Reading Outputs
+Snapshot — brief overview paragraph (L9)
+Report — full multi-section reading: shape, weights, themes, tensions, L8 time section, convergence, topics
+Synthesize — NarrativeSynthesizer narrative paragraph
+Calendar — annual almanac of ingresses, stations, lunations, aspect events
+Predict (Timeline) — convergence-driven upcoming dates
+Releasing section in Report — ZodiacalReleasing is computed but no prose section appears in the output OPEN
+Progressed chart report section — progressions feed Convergence but no standalone progressed chart reading OPEN
+Composite / Davison reading output — composite mode exists; aggregated relationship report not yet surfaced OPEN
+10.5 Browsable Index & Navigation
+Interpretation panel index (browse by category)
+Pattern detail view (mechanics + tension release)
+Mansion detail view (all 28 mansions browsable)
+Quincunx classification in aspect detail view
+Aspect interpretation index — no dedicated "browse all aspects" view; must click each from the wheel or grid OPEN
+11. CHART DATA VIEW (NameListPanel)
+Longitude table (degrees/minutes/seconds, sign, retrograde flag)
+House cusp table
+Aspect list table
+Declination column — visible on Astro.com; absent here OPEN
+Speed column (degrees/day) — useful for retrogrades; not displayed OPEN
+Essential dignity summary table per body OPEN
+Midpoint table — midpoints computed but not displayed in chart data view OPEN
+Copy to clipboard / export as text button OPEN
+12. ZODIACAL RELEASING PANEL
+Fortune chain with period table and date ranges
+Spirit chain with period table
+Sub-period breakdown (Level 2)
+Bond periods highlighted / flagged in the table OPEN
+Current active period highlighted automatically (today's date pre-selected) OPEN
+Level 3 sub-sub-periods — not computed; shown in Hellenistic software (Morinus, Delphic Oracle) OPEN
+Period interpretation prose surfaced inline in the releasing panel (not just the index) OPEN
+13. ELECTIONAL & HORARY FEATURES
+Lunar mansion electional clauses computed (LunarMansions.java — framed electional/horary)
+Electional chart scoring — no tool to rate a prospective chart for a given purpose OPEN
+Lunar return + mansion overlay — Returns.java exists; mansion wiring not yet built OPEN
+Horary chart mode — a specialised rulership-and-dignity assessment for question charts; not present OPEN
+Void of course Moon detection and annotation OPEN
+14. MUNDANE & WORLD ASTROLOGY
+Annual calendar: Sun/Moon ingresses, planetary stations, lunations, conjunctions
+Eclipse search (Almanac.eclipses via Swiss Ephemeris eclipse functions)
+Ingress charts (Aries ingress / seasonal quarter charts) — not computed as a chartable mode OPEN
+Outer-planet cycle tracking (Saturn/Uranus/Neptune/Pluto cycle degrees annotated) OPEN
+Eclipse path / saros series annotation OPEN
+15. INFRASTRUCTURE & ENGINEERING
+15.1 Build System
+build.ps1 compiles to out/ (wiping first), runs suites from out/, prints fingerprint
+22 test suites — 170,648 checks, 0 failures (as of 2026-08-28)
+Mutation testing on key assertions (AspectGridCheck Part J, TensionReleaseCheck)
+No JDK on PATH; depends on Android Studio JBR — fragile on a clean machine DEPENDENCY
+Gradle / Maven build file — no standard build descriptor; javac command is hand-assembled OPEN
+Packaged installer / runnable JAR / .exe wrapper for end users OPEN
+15.2 Known Bugs & UI Gaps
+Search Transit button magnifier glyph renders as empty box — font fallback issue, unresolved BUG
+Window fixed at 1024×768 — no resize; cramped on small screens, wastes space on large ones OPEN
+No keyboard navigation — all interaction is mouse-only OPEN
+No screen-reader / accessibility support OPEN
+Share / Sync / Connect / Help screens — placeholder stubs removed from menu; features not yet built OPEN
+Undo / redo for chart data entry OPEN
+15.3 Data Pipeline
+InterpretationService.EXTRA_FILES registry — new prose files registered, not grown into shared files
+DataCheck suite (82,479 checks) guards all prose coverage and format invariants
+Two-agent protocol: HANDOVER.md, shared data file splice rule, run-checks-before-commit rule
+GenerateExtraBodies.java truncates extra_bodies.json — running it destroys Antigravity's prose; documented but dangerous HAZARD
+Prose for 600 semisextile / semisquare cells — largest remaining content gap in the app OPEN
+Asteroid-to-asteroid aspect prose (60 cells) — David's call whether to write them DAVID'S CALL
+16. PENDING DESIGN DECISIONS (David's Calls)
+These items cannot be built without a named decision. Each one changes what a user reads.
+Returns scope: read whole chart or only angles? (Mercury-stations inconsistency is the same question — settle both together)
+Quincunx orb cap: cap at 1.0° for all 6 minor aspects, or choose differently? Needs a named source for any value taken.
+Asteroid-to-asteroid aspect prose: write 60 cells, or leave empty? Decision was planets-only for patterns; same logic applies here.
+Tension body restriction: restrict TensionRelease to planets + Chiron (TENSION_BODIES), or rank, or leave all 29 points? Currently 9 lines in 10 are not between planets.
+Synastry angle-click direction: clicking Chart A's angle vs Chart B's angle currently means different things (natal vs cross-chart). Make consistent, or document intentional asymmetry?
+Topics reporting cut: what fraction of topics should read as "unremarkable"? Currently ~4.5% (margin 0.06). Ranges from 4.5% to 44.3% — a product question.
+Anaretic degree definition: exactly 29°00'–29°59', or tolerance either side of the cusp? Does 0° count as the same condition or a different one? Cite a source.
+Solar return reading: companion to returns-scope above — already outstanding.
+Convergence weighting redesign: atLeast(n) form is meaningless (all targets score 3+). Needs weighting redesign or a different model before releasing can be wired in.
+Tri-wheel aspect lines: sky ring draws glyphs; does David want aspect lines drawn to Chart A and B? Plumbing is in place.

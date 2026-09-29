@@ -2239,11 +2239,22 @@ public final class AspectGridCheck {
 
                         int[] got = SkymapPanel.ringRadii(w, h, partner, sky);
                         // Ten since 2026-09-16, when the lunar mansions were given a band of
-                        // their own at the rim. The new radius is appended, and equals RING_OUTER
-                        // for every caller of this arity - the mansions are folded as far as
-                        // this overload is concerned - so every figure asserted below is the
-                        // formula this suite has always asserted.
-                        ok("ring chain returns ten radii" + tag, got.length == 10);
+                        // their own at the rim, and ELEVEN since 2026-09-29, when the directed
+                        // chart was given one between the sky and the middle ring. Both are
+                        // appended rather than inserted, and both collapse onto a radius that
+                        // already existed for every caller of this arity - the mansions onto
+                        // RING_OUTER, the directed band onto RING_TRANSIT - so every figure
+                        // asserted below is the formula this suite has always asserted.
+                        //
+                        // <b>The count is not the point; the collapse is.</b> Asserting the
+                        // length alone would pass on an appended band that quietly took depth
+                        // from the wheel, which is the thing that would actually move the
+                        // bodies - so both appended radii are pinned to what they must equal.
+                        ok("ring chain returns eleven radii" + tag, got.length == 11);
+                        ok("a folded mansion band leaves the rim where it was" + tag,
+                            got[SkymapPanel.RING_MANSION_INNER] == got[SkymapPanel.RING_OUTER]);
+                        ok("a shut directed band takes no room" + tag,
+                            got[SkymapPanel.RING_ARC_INNER] == got[SkymapPanel.RING_TRANSIT]);
                         ok("the mansion band is closed for a caller that does not open it" + tag,
                             got[SkymapPanel.RING_MANSION_INNER] == outer);
                         ok("outer matches" + tag, got[SkymapPanel.RING_OUTER] == outer);
