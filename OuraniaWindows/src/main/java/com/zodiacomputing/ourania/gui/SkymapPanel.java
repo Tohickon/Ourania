@@ -3166,8 +3166,39 @@ extends JPanel {
      * closes the sub-rings up to match.
      */
     static int outerBandDepth(int outer) {
+        return SkymapPanel.outerBandDepth(outer, 2);
+    }
+
+    /**
+     * The same depth, shared out when more than two bands are open (G17).
+     *
+     * <p><b>The cap was never about one band, it was about the budget.</b> Two bands at
+     * {@code outer / 6} each is a third of the radius spent on context, leaving two thirds for
+     * the chart being read - and that ratio is the judgement in the sixth, not the six. So the
+     * budget is stated as the third it has always been and divided among however many bands are
+     * open, which is why this returns {@code outer / 6} unchanged at two bands. That is exact
+     * rather than approximate: {@code (outer / 3) / 2} and {@code outer / 6} are the same
+     * integer for every {@code outer}, so {@code AspectGridCheck} goes on asserting the formula
+     * it has always asserted.
+     *
+     * <p><b>{@link #MIN_BAND_DEPTH} can still win, and then the bands overrun their budget.</b>
+     * A band shallower than 22 pixels cannot hold a glyph, so the floor is right - but six
+     * bands at the floor need 132 pixels of a wheel that may be 150 across, and the natal wheel
+     * is what pays. The geometry cannot fix that, because the answer is not a smaller band: it
+     * is fewer bands. {@link WheelStack#fits} is where that is decided, and it is decided
+     * before a ring is opened rather than discovered when one is drawn over the other.
+     *
+     * <p>Note that {@code RING_COUNT} above is <i>not</i> this count. It is the three sub-rings
+     * <i>within</i> one band - inner planets, outer planets, asteroids - and the collision of
+     * names is old; it is what {@code ideal} is derived from and has nothing to do with how
+     * many bands the wheel carries.
+     *
+     * @param bands how many body bands are open; fewer than two is treated as two, because the
+     *     budget is not handed to a single band merely because it is alone
+     */
+    static int outerBandDepth(int outer, int bands) {
         int ideal = (RING_COUNT - 1) * (int) TRANSIT_RING_GAP + 2 * BAND_EDGE;
-        return Math.max(MIN_BAND_DEPTH, Math.min(ideal, outer / 6));
+        return Math.max(MIN_BAND_DEPTH, Math.min(ideal, (outer / 3) / Math.max(2, bands)));
     }
 
     /**
@@ -3179,6 +3210,79 @@ extends JPanel {
     static final int NATAL_EDGE = 15;
     private static final int NATAL_SUB_RING_GAP = 24;
     private static final double NATAL_SPACING = 32.0;
+
+    /**
+     * The least radius the natal wheel can be drawn in, derived the way a band's depth is.
+     *
+     * <p><b>Derived from what it has to hold.</b> The natal wheel lays its bodies out on
+     * {@code RING_COUNT} sub-rings {@link #NATAL_SUB_RING_GAP} apart with {@link #NATAL_EDGE}
+     * of clearance at each end - exactly as an outer band does with its own two numbers - so
+     * the floor is that same sum and moves if either number does. A round number chosen here
+     * instead would be a second statement of the layout that nothing keeps in step with the
+     * first, which is this project's most-found defect.
+     */
+    static int minNatalRadius() {
+        return (RING_COUNT - 1) * NATAL_SUB_RING_GAP + 2 * NATAL_EDGE;
+    }
+
+    /**
+     * How deep the zodiac and its scales are, from the rim down to where the bodies may start.
+     *
+     * <p>Read outward-in: the rim, the decans, the signs, the Egyptian bounds and the inner
+     * degree scale - the chain {@link #ringRadii} subtracts with every band fully open, which
+     * is the worst case and therefore the one a fit has to survive.
+     */
+    static int zodiacDepth() {
+        return 20 + 20 + 35 + TERM_BAND_DEPTH + DEGREE_RING_DEPTH;
+    }
+
+    /**
+     * How many body bands fit on a wheel of this radius (G17).
+     *
+     * <p><b>Asked before a ring is opened, not discovered when one is drawn.</b>
+     * {@link #MIN_BAND_DEPTH} is a floor a band cannot go below and still hold a glyph, so on a
+     * small window the bands stop sharing the budget and start taking whatever they need - and
+     * what pays is the natal wheel, silently, by being drawn underneath them. The failure mode
+     * is a chart that looks fine and is unreadable at the centre, which is the worst kind:
+     * nothing reports it.
+     *
+     * <p>So the question is turned round. Rather than letting any number of bands open and
+     * hoping, this says how many the wheel can carry and {@link WheelStack} refuses the rest. A
+     * reader who asks for six wheels on a small window is told they have four - a true answer
+     * they can act on, by making the window bigger - instead of a drawing that lies.
+     *
+     * <p><b>Zero is a real answer, and finding that out was the point of asking.</b> The first
+     * version of this floored at one, on the reasoning that a wheel too small for a single band
+     * is too small for the chart and that is not this method's argument to make. The check
+     * disagreed, and it was right: below about a 470-pixel window there is genuinely no room
+     * for a band, and the wheel has been drawing one anyway. At 300 pixels the zodiac and its
+     * scales take the radius down to 31, one band takes 23 more, and the natal wheel is left
+     * with <b>-15</b> - a negative radius, drawn every time, reported by nothing.
+     *
+     * <p>That is older than any of this and is not a regression; it is what the assertion found
+     * when the layout was finally asked whether it fits instead of told to lay out. Returning
+     * zero is what lets the caller say "this window is too small for an outer wheel" rather
+     * than draw one on top of the chart.
+     */
+    static int maxBodyBands(int outer) {
+        int room = outer - SkymapPanel.zodiacDepth() - SkymapPanel.minNatalRadius();
+        int most = 0;
+        for (int n = 1; n <= WheelStack.MOST_BANDS; n++) {
+            // <b>Stops at the first count that does not fit rather than taking the largest
+            // that does</b>, and the difference is not pedantry. Band depth is integer
+            // division, which throws away up to n-1 pixels per band, and MIN_BAND_DEPTH
+            // clamps it from below - so the total is NOT monotonic in the count. At an outer
+            // radius of 275 there is room for 88: two bands want 45 each and cost 90, four
+            // want 22 each and cost 88. Scanning for the largest that fits therefore answered
+            // FOUR bands on a wheel that cannot carry two. "How many fit" has to mean they can
+            // be added one at a time.
+            if ((long) n * SkymapPanel.outerBandDepth(outer, n) > room) {
+                break;
+            }
+            most = n;
+        }
+        return most;
+    }
 
     /**
      * How deep a band the natal wheel gets.
@@ -6436,15 +6540,55 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int signInner = (int) Math.round(signOuter - 35 * sg);
         int termInner = (int) Math.round(signInner - TERM_BAND_DEPTH * bd);
         int degreeInner = (int) Math.round(termInner - DEGREE_RING_DEPTH * dg);
-        // The body bands hang below the inner degree scale, each opening downward.
-        int tri     = degreeInner;
-        int transit = (int) Math.round((double) tri - (double) depth * t);
-        int bodyTop = (int) Math.round((double) transit - (double) depth * o);
+        // The body bands hang below the inner degree scale, each opening downward. Two of
+        // them here; bodyBands is the same arithmetic for any number - see G17.
+        int[] body = SkymapPanel.bodyBands(degreeInner, depth, new double[] {t, o});
+        int tri     = body[0];
+        int transit = body[1];
+        int bodyTop = body[2];
         double mn = Math.max(0.0, Math.min(1.0, mansionOpen));
         int mansionInner = (int) Math.round(outer - MANSION_BAND_DEPTH * mn);
         return new int[] {
             outer, tri, transit, decanOuter, signOuter, signInner, bodyTop,
             termInner, degreeInner, mansionInner };
+    }
+
+    /**
+     * Where each body band's edge falls, for any number of bands (G17).
+     *
+     * <p><b>This is the loop that was already here, unrolled.</b> The wheel has always laid its
+     * body bands out as a chain - each one hangs one {@code depth} below the edge of the band
+     * outside it, scaled by how far that band is open - but the chain was written as two
+     * statements, {@code transit = tri - depth*t} and {@code bodyTop = transit - depth*o}, which
+     * is the recurrence with the loop written out twice. Two statements is also two bands, and
+     * the whole of G17 is that four techniques - natal, progressed, directed and transiting -
+     * cannot be read together while the wheel has room for three.
+     *
+     * <p><b>The rounding is the part that has to be copied exactly.</b> Each edge is rounded to
+     * a whole pixel and the <i>next</i> one is measured from the rounded value, not from the
+     * exact one. Measuring every band from an unrounded running total would be the more obvious
+     * code and would move the wheel by a pixel at some sizes - which {@code AspectGridCheck}
+     * asserts against, and its Part J has already caught one restructuring of this that looked
+     * equivalent and was not.
+     *
+     * <p>A band whose open fraction is zero takes no room, so its two edges coincide. That is
+     * what lets a single wheel lay out exactly as it did before any of this existed, and it is
+     * why the returned array is always one longer than {@code opens} - the last entry is the
+     * ceiling of the natal wheel, which is what is left when every outer band has taken its.
+     *
+     * @param ceiling the inner edge of the zodiac, which the outermost body band hangs from
+     * @param depth how deep one fully-open band is, from {@link #outerBandDepth}
+     * @param opens how far each band is open, outermost first, each clamped to 0..1
+     * @return {@code opens.length + 1} edges, outermost first
+     */
+    static int[] bodyBands(int ceiling, int depth, double[] opens) {
+        int[] edges = new int[(opens == null ? 0 : opens.length) + 1];
+        edges[0] = ceiling;
+        for (int i = 0; opens != null && i < opens.length; i++) {
+            double open = Math.max(0.0, Math.min(1.0, opens[i]));
+            edges[i + 1] = (int) Math.round((double) edges[i] - (double) depth * open);
+        }
+        return edges;
     }
 
     /** Overload for callers that pre-date the tri-wheel; preserves the old contract. */
