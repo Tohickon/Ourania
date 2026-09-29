@@ -1,0 +1,514 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ourania+ — Complete Functionality Checklist</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    background: #ffffff;
+    color: #1f2328;
+    padding: 32px 24px 48px;
+  }
+  .page { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 700; color: #1f2328; margin-bottom: 4px; }
+  .subtitle { color: #57606a; font-size: 13px; margin-bottom: 28px; border-bottom: 1px solid #e5e7eb; padding-bottom: 14px; }
+  h2 { font-size: 15px; font-weight: 700; color: #1f2328; margin: 28px 0 10px; border-left: 3px solid #3b82d4; padding-left: 10px; }
+  h3 { font-size: 13px; font-weight: 700; color: #57606a; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 6px; }
+  ul { margin-left: 0; padding-left: 0; list-style: none; }
+  li { display: flex; gap: 10px; align-items: flex-start; padding: 3px 0; border-bottom: 1px solid #f3f4f6; }
+  li:last-child { border-bottom: none; }
+  .bullet { flex-shrink: 0; width: 18px; text-align: center; padding-top: 1px; }
+  .done   .bullet::before { content: "✓"; color: #22863a; font-weight: 700; }
+  .open   .bullet::before { content: "○"; color: #3b82d4; font-weight: 700; }
+  .block  .bullet::before { content: "✗"; color: #d73a49; font-weight: 700; }
+  .david  .bullet::before { content: "◆"; color: #7c5cd8; font-weight: 700; }
+  .warn   .bullet::before { content: "△"; color: #b08800; font-weight: 700; }
+  .text { flex: 1; }
+  .tag {
+    display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 5px;
+    border-radius: 3px; margin-left: 5px; vertical-align: middle;
+  }
+  .tag-open   { background: #dbeafe; color: #1e40af; }
+  .tag-done   { background: #dcfce7; color: #166534; }
+  .tag-block  { background: #fee2e2; color: #991b1b; }
+  .tag-david  { background: #ede9fe; color: #5b21b6; }
+  .tag-warn   { background: #fef3c7; color: #92400e; }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    background: #f7f8fa; border: 1px solid #e5e7eb;
+    border-radius: 6px; padding: 10px 14px;
+    font-size: 12px; margin-bottom: 24px;
+  }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .note {
+    background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 10px 14px; font-size: 12px; color: #57606a; margin-bottom: 20px;
+  }
+  .section { margin-bottom: 8px; }
+  footer {
+    margin-top: 40px; padding-top: 14px; border-top: 1px solid #e5e7eb;
+    text-align: center; font-size: 12px; color: #57606a;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>Ourania+ — Complete Functionality Checklist</h1>
+<p class="subtitle">Every item the application needs to be fully functional and finished — drawn from the source tree, Obsidian vault WORK-PLAN, HANDOVER, and comparison against shipping astrology apps (Astro.com, Solar Fire, Astrodienst, Kepler, Time Passages, Co-Star). Organised by functional domain. Current build: 170,648 checks, 0 failures (as of 2026-08-28).</p>
+
+<div class="legend">
+  <span><strong>Legend:</strong></span>
+  <span>✓ Done / built</span>
+  <span>○ Open / not yet implemented</span>
+  <span>✗ Blocked (dependency missing)</span>
+  <span>◆ Requires David's decision</span>
+  <span>△ Present but incomplete / thin</span>
+</div>
+
+
+<h2>1. DATA ENTRY &amp; CHART SETUP</h2>
+
+<h3>1.1 Birth Data Input</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Name, birth date, birth time, birth location text fields — all present in ChartSetupPanel</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Geocoder integration (city-name to lat/lon lookup) — Geocoder.java wired in</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">"The Sky Now" quick-fill button (current date/time/location)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Home location memory and "Set Home" button</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Birth time accuracy flag / Rodden rating — distinguish rectified, approximate, or unknown times from exact ones <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Place-name autocomplete / typeahead dropdown — current field is plain text requiring exact spelling <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Timezone disambiguation UI — the geocoder may return a wrong TZ for ambiguous city names; no user confirmation step exists <span class="tag tag-open">OPEN</span></span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Default placeholder chart (Greenwich Noon 2000) — present but indistinguishable from a chart with a real time; affects progressed angles, solar arc precision <span class="tag tag-warn">INCOMPLETE</span></span></li>
+</ul>
+
+<h3>1.2 Chart Modes</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Natal / Single chart mode</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Natal + Transit bi-wheel mode</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Synastry bi-wheel mode</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Composite (Midpoint) chart mode</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Composite (Davison) chart mode</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Synastry + Current Sky tri-wheel mode (Chart A inner, Chart B middle, sky outer)</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Progressed chart tri-wheel — natal inner, secondary progressions middle, transits outer (engine data exists; GUI not yet drawn) <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>1.3 Chart Persistence</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Save / Load natal charts by name (saved_charts.properties)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Saved charts directory in side panel (ProfileListPanel)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Load saved chart as Chart A or Chart B for synastry</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Chart export — print or PDF / image of the wheel and interpretation text <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Import from standard formats (AAF / ADB / Astrodienst .dat) — no import path exists <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>2. ASTRONOMICAL CALCULATION ENGINE (L0–L2)</h2>
+
+<h3>2.1 Ephemeris &amp; Core Computation</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Swiss Ephemeris integration (de.thmac.swisseph) — swe_calc_ut for all 10 planets + Chiron + 4 major asteroids</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Moshier fallback when SE data files absent</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Tropical zodiac longitude calculation for all 23 selectable points</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Retrograde detection (speed sign)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">House cusp calculation — Placidus, Whole Sign, Equal, Porphyry, Koch available via Settings</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Ascendant, Descendant, MC, IC derived angles</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Part of Fortune (sect-reversed lot)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Part of Spirit (lot of Spirit) — registered 2026-08-23 with glyph, aspects and prose</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">North Node / South Node (true and mean variants selectable in Settings)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Black Moon Lilith (true osculating and mean variants selectable in Settings)</span></li>
+  <li class="block"><span class="bullet"></span><span class="text">Asteroid 16 Psyche — ephemeris file se00016s.se1 missing from shipped data; registry entry reverted <span class="tag tag-block">BLOCKED</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Extended asteroid set (Pholus, Sedna, Varuna, Makemake, Haumea, etc.) — ephemeris files not included <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Sidereal / Vedic zodiac option (ayanamsha selector) — not implemented <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Declination display — out-of-bounds planets, parallel / contraparallel aspects not computed <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>2.2 Positional Derivation</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">House placement (quadrant and whole-sign) for all bodies</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Sign assignment, degree, minute display</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Decan assignment (Egyptian / Chaldean / triplicity)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">28 Lunar Mansions computation (tropical, equal, al-Biruni)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Sabian symbol degree-to-symbol mapping</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Antiscia and contra-antiscia longitudes computed but not displayed on the wheel <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Arabic lots beyond Fortune and Spirit (Lord of the Ascendant lot, Lot of Eros, etc.) <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>3. CHART WHEEL DISPLAY (GUI)</h2>
+
+<h3>3.1 Wheel Rendering</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Full circular wheel with sign band, house divisions, degree ticks (SkymapPanel)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Planetary glyphs on sphere beads with element colouring</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Glyph spreading / collision avoidance for crowded zones</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Degree leader lines from glyph to exact position (toggleable)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Aspect lines between bodies (Ptolemaic + quincunx + minor aspects)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Decan ring with 36 sectors (outer)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Lunar mansion ring (28 sectors, clickable)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Bi-wheel (natal inner, transit or partner outer) rendering</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Tri-wheel (natal inner, Chart B middle, current sky outer) rendering</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Harmonic chart rendering (H1–H12 selector)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Animation / step control (step forward/back through time)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Pin-to-body option (wheel rotates to keep a body at ASC)</span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Tri-wheel aspect lines — sky ring glyphs drawn but no aspect lines yet to Chart A or B <span class="tag tag-warn">INCOMPLETE</span></span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Tri-wheel side-panel placements listing — sky bodies not yet listed in placements panel <span class="tag tag-warn">INCOMPLETE</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Declination graph / declination wheel (90°-dial) — parallel aspects invisible without it <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Modulo-22.5° dial (16th harmonic) for semi-square / sesquiquadrate family contacts <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Chart print / export to PNG or PDF from the wheel view <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Resize / full-screen mode — window fixed at 1024×768 <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>3.2 Wheel Interactivity</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Click body glyph → open interpretation panel for that body</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Click angle label (ASC, MC, etc.) → show angle interpretation + aspects</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Click house slice → show house interpretation</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Click sign → show sign interpretation</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Click mansion ring → show mansion detail</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Click decan ring → show decan interpretation</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Click Sabian degree → show Sabian symbol interpretation</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Hover over aspect line → tooltip with orb and aspect name</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Pattern highlight — clicking a pattern banner lights its legs on the wheel</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Aspect grid cell hover → corresponding line lights on the wheel</span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Synastry angle-click asymmetry — Chart A angle → natal reading, Chart B angle → cross-chart reading; inconsistent but deliberate pending David's call <span class="tag tag-david">DAVID'S CALL</span></span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">showAngleAt Chart A pass still uses literal false to getAspectType (should call isSynastryPair) — pending David's call alongside angle-click asymmetry <span class="tag tag-david">DAVID'S CALL</span></span></li>
+</ul>
+
+<h3>3.3 Settings &amp; Customisation</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Per-body toggle (23 selectable points with All/None/Defaults buttons)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Per-aspect toggle with colour picker for every aspect type</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Element colour overrides (Fire/Earth/Air/Water chips)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Per-body colour override</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Lunar mansion ring colour, line colour, page background, wheel disc colour</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Colour template presets (Classic, Cool, Black &amp; White) + save/delete user templates</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Planet-sphere vs bare-glyph toggle</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Degree leader line toggle + colour</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Body ring position (outside sign ring vs centre)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">House system selector (Placidus, Whole Sign, Equal, Porphyry, Koch)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Node variant (True / Mean) selector</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Lilith variant (True Osculating / Mean) selector</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Aspect line weight / style (thin / thick / dashed) per aspect <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Font size scaling for high-DPI / accessibility <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>4. ASPECT SYSTEM (L4)</h2>
+
+<h3>4.1 Major (Ptolemaic) Aspects</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Conjunction (0°), Opposition (180°), Trine (120°), Square (90°), Sextile (60°)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Quincunx (150°) — 49 classical pairs with rulership/antiscia/averse classification</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Body-specific orbs keyed from Bodies registry (not parallel arrays)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Synastry halved-orb rule (isSynastryPair)</span></li>
+</ul>
+
+<h3>4.2 Minor Aspects</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Semisextile (30°) — machinery shipped; <strong>prose 0 of 300 cells</strong> <span class="tag tag-warn">PROSE MISSING</span></span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Semisquare (45°) — machinery shipped; <strong>prose 0 of 300 cells</strong> <span class="tag tag-warn">PROSE MISSING</span></span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Quintile (72°) — 273 of 300 cells written <span class="tag tag-warn">INCOMPLETE</span></span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Sesquiquintile (108°) — 273 of 300 cells written <span class="tag tag-warn">INCOMPLETE</span></span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Sesquiquadrate (135°) — 273 of 300 cells written <span class="tag tag-warn">INCOMPLETE</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">~600 prose entries needed: semisextile (300 cells) + semisquare (300 cells) <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">~27 remaining cells across quintile, sesquiquintile, sesquiquadrate <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">6 cells: three harmonic-aspect pairs among North Node, South Node, Part of Fortune (one is arguably the nodal axis — judgement call) <span class="tag tag-david">DAVID'S CALL</span></span></li>
+  <li class="david"><span class="bullet"></span><span class="text">Quincunx orb cap: currently uncapped at 10° (15.4 hits/chart); recommend 1.0° for all 6 minor aspects together — needs named source or David's authorisation <span class="tag tag-david">DAVID'S CALL</span></span></li>
+</ul>
+
+<h3>4.3 Aspect Prose Coverage (overall)</h3>
+<ul class="section">
+  <li class="warn"><span class="bullet"></span><span class="text">Classical bodies aspect grid: 270 of 330 cells — quincunx 6 of 55 cells written <span class="tag tag-warn">INCOMPLETE</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">60 asteroid-to-asteroid cells absent across all asteroid pairs <span class="tag tag-david">DAVID'S CALL</span></span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Transit hover labels read "Transiting X Conjunct Natal Y" (label, not a finding) — same defect removed from aspects on 2026-08-22, not yet fixed for transits <span class="tag tag-warn">BUG</span></span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">655 aspect readings contain two both-decent texts (one per direction key) — editorial pick needed, not a blocker <span class="tag tag-warn">EDITORIAL</span></span></li>
+</ul>
+
+<h3>4.4 Aspect Patterns</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">T-Square, Grand Cross, Grand Trine, Kite, Yod, Mystic Rectangle, Cradle, Boomerang, Grand Sextile</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Pattern highlight on wheel (lit legs, white halo)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Pattern detail view with mechanics and the 6.3 release line</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Tension &amp; Release: outlet, mediator, empty leg for every stressed configuration</span></li>
+  <li class="david"><span class="bullet"></span><span class="text">Tension body restriction: currently 29 points, 9 lines in 10 not between planets — restrict to TENSION_BODIES list or rank rather than filter? <span class="tag tag-david">DAVID'S CALL</span></span></li>
+</ul>
+
+
+<h2>5. DIGNITY &amp; CONDITION SCORING (L3)</h2>
+
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Domicile, Exaltation, Detriment, Fall (essential dignity)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Egyptian term / bound dignity</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Triplicity dignity (day/night/participatory)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Face / decan dignity</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Sect (day/night chart, benefic/malefic classification)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Planetary joys (houses of joy)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Oriental / occidental phase from the Sun</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Combustion / cazimi detection</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Besiegement (enclosed between Mars/Saturn or Venus/Jupiter)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Angularity scoring (angular/succedent/cadent)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Rulership web — dispositor chain and mutual reception detection</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Reception (classical and modern) with direction guard</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">29° anaretic / crisis degree flag — not computed; needed for Phase 1 of master checklist <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">0° degree flag (ingress-point / fresh-start energy) — companion to anaretic, equally unimplemented <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Critical degrees (0°, 13°, 26° of cardinal; 8–9°, 21–22° of fixed; 4°, 17° of mutable) — no computation <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Peregrine status (no essential dignity in current sign) — not flagged explicitly <span class="tag tag-open">OPEN</span></span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Engine (L3–L9) still uses only 12 ChartFrame bodies; asteroids, South Node, Lilith, Part of Fortune visible on wheel but not scored <span class="tag tag-warn">DIVERGENCE</span></span></li>
+</ul>
+
+
+<h2>6. RELATIONAL &amp; WHOLE-CHART STRUCTURE (L4–L5)</h2>
+
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Midpoints (Sun/Moon, Sun/ASC, Moon/ASC, Sun/MC, etc.)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Transfer of Light</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Jones patterns (Splash, Bundle, Locomotive, Bowl, Bucket, See-Saw, Splay, Fan)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Gestalt: element balance, modality balance, hemisphere emphasis, quadrant emphasis</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Signature sign and modality (most prominent element/modality combination)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Stelliums (3+ bodies in one sign or house)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Singleton detection</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Triangles of Life (natal chart shape reading)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Macro-dynamics / global chart dynamics prose (Antigravity, 2026-08-22)</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Modulo-22.5° dial / harmonic machinery — Phase 5 checklist item; finds sesquiquadrate family contacts invisible to classical aspects <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Antiscia display on wheel — computed for quincunx classification but not shown as a wheel ring or list <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>7. HOUSE &amp; TOPIC ANALYSIS (L6)</h2>
+
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Three-witness method per house (occupants, ruler, ruler's condition)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">12 life-topic readings wired into the Report</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Strong / middling / weak topic standings</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">House interpretation prose (all 12 houses)</span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Topic reporting cut: 11 of 12 qualify as strong/weak (only ~4.5% "unremarkable" at current 0.06 margin) — threshold is David's product call <span class="tag tag-david">DAVID'S CALL</span></span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Strong/weak 2:1 skew due to traditional rulers only in witness selection — outer planets can occupy but never rule, dragging body median down <span class="tag tag-warn">KNOWN BIAS</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">L7 theme extraction does not yet read L6 topic standings — themes and topics are not cross-wired <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>8. THEME EXTRACTION (L7)</h2>
+
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Multi-witness theme detection (Rule of Three — 3 independent witnesses)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Contradiction detection (conflicting signatures)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Repeating theme weighting and ranking</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Themes wired into Snapshot, Report, and Synthesis outputs</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">L7 does not read L6 topic standings — the two layers produce independent outputs with no cross-reference <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>9. TIME TECHNIQUES (L8)</h2>
+
+<h3>9.1 Transits</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Transit positions computed and drawn on bi-wheel</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Transit perfection dates (exact hit scanning) with memoised longitude cache</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Transit-to-natal aspect prose (all 5 Ptolemaic aspects × 23 transiting bodies)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Transit filtered by annual profection (lord of the year prioritised)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Eclipse-to-natal contacts</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Station-to-natal contacts</span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Transits.orbScale = 1.0 — no calibrated tight orb for transits yet; acknowledged seam <span class="tag tag-warn">UNCALIBRATED</span></span></li>
+</ul>
+
+<h3>9.2 Progressions &amp; Directions</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Secondary progressions: progressed Sun, Moon, Mercury, Venus, Mars</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Progressed lunation phase (8-phase cycle)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Solar arc directions (all natal bodies)</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Progressed angles (unblocked — excluded only until real-time charts are distinguishable from placeholder) <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Primary directions — not implemented; separate from secondaries <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Progressed chart drawn as a wheel / tri-wheel ring — data exists, GUI not wired <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>9.3 Returns</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Solar return chart computation</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Lunar return chart computation</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Return chart-to-natal contacts wired into Convergence</span></li>
+  <li class="david"><span class="bullet"></span><span class="text">Return reading scope: whole return chart vs angles only? — family readmits fast-body noise through back door; both options measured <span class="tag tag-david">DAVID'S CALL</span></span></li>
+</ul>
+
+<h3>9.4 Profections</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Annual profections (one sign per year, lord-of-the-year)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Profection year lord used as transit filter multiplier (×3.5 softmax weight)</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Monthly profections — annual is only the top level; monthly sub-periods not computed <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>9.5 Zodiacal Releasing</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Fortune and Spirit releasing chains computed (211-year circuit)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">ReleasingPanel UI with period table and date range display</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Interpretation prose for all 12 signs in releasing context</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Releasing section missing from L9 Report / Snapshot output — computed but not surfaced in any reading <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Releasing not wired into Convergence ranking — deliberately withheld (would worsen discrimination); needs Convergence weighting decision first <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>9.6 Convergence &amp; Timing Quality</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Convergence ranking: 7 technique families with echo guard and softmax weighting</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Lord-of-the-year ×3.5 multiplier in Convergence</span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">Threshold form (atLeast(n)) meaningless — all targets score 3+; only loudest() accessor is useful <span class="tag tag-warn">LIMITATION</span></span></li>
+  <li class="david"><span class="bullet"></span><span class="text">Convergence weighting refinement — adding more voters worsened discrimination; needs weighting redesign or a fundamentally different model <span class="tag tag-david">DAVID'S CALL</span></span></li>
+</ul>
+
+
+<h2>10. INTERPRETATION PANEL &amp; READING OUTPUTS (L9)</h2>
+
+<h3>10.1 Single-Body Interpretations</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">19 of 19 non-angle chart points: core paragraph + 12 signs + 12 houses each</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">4 angles (ASC, DSC, MC, IC): 12-sign interpretations each</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Decan interpretations (all 36 decans for each body)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Degree interpretations (360 Sabian symbols, 360 degree meanings)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Technical degree interpretations (special critical degrees)</span></li>
+</ul>
+
+<h3>10.2 Aspect Interpretations</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Natal aspect prose — ~270 of 330 Ptolemaic cells written</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Transit aspect prose — 5 aspects × all transiting bodies × all natal bodies</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Synastry inter-aspect prose (relationship framing)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Composite aspect prose</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Minor aspect prose (quintile, sesquiquintile, sesquiquadrate at ~273/300 cells each)</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">~600 cells: semisextile + semisquare prose (0 of 300 each) <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>10.3 Relationship / Synastry Interpretations</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Synastry house overlays (A bodies in B houses)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Synastry angle contacts</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Composite placement prose (composite planet in sign + house)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Relationship prose narrative (sourced, 900+ entries)</span></li>
+</ul>
+
+<h3>10.4 Aggregated Reading Outputs</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Snapshot — brief overview paragraph (L9)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Report — full multi-section reading: shape, weights, themes, tensions, L8 time section, convergence, topics</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Synthesize — NarrativeSynthesizer narrative paragraph</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Calendar — annual almanac of ingresses, stations, lunations, aspect events</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Predict (Timeline) — convergence-driven upcoming dates</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Releasing section in Report — ZodiacalReleasing is computed but no prose section appears in the output <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Progressed chart report section — progressions feed Convergence but no standalone progressed chart reading <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Composite / Davison reading output — composite mode exists; aggregated relationship report not yet surfaced <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>10.5 Browsable Index &amp; Navigation</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Interpretation panel index (browse by category)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Pattern detail view (mechanics + tension release)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Mansion detail view (all 28 mansions browsable)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Quincunx classification in aspect detail view</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Aspect interpretation index — no dedicated "browse all aspects" view; must click each from the wheel or grid <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>11. CHART DATA VIEW (NameListPanel)</h2>
+
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Longitude table (degrees/minutes/seconds, sign, retrograde flag)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">House cusp table</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Aspect list table</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Declination column — visible on Astro.com; absent here <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Speed column (degrees/day) — useful for retrogrades; not displayed <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Essential dignity summary table per body <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Midpoint table — midpoints computed but not displayed in chart data view <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Copy to clipboard / export as text button <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>12. ZODIACAL RELEASING PANEL</h2>
+
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Fortune chain with period table and date ranges</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Spirit chain with period table</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Sub-period breakdown (Level 2)</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Bond periods highlighted / flagged in the table <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Current active period highlighted automatically (today's date pre-selected) <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Level 3 sub-sub-periods — not computed; shown in Hellenistic software (Morinus, Delphic Oracle) <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Period interpretation prose surfaced inline in the releasing panel (not just the index) <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>13. ELECTIONAL &amp; HORARY FEATURES</h2>
+
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Lunar mansion electional clauses computed (LunarMansions.java — framed electional/horary)</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Electional chart scoring — no tool to rate a prospective chart for a given purpose <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Lunar return + mansion overlay — Returns.java exists; mansion wiring not yet built <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Horary chart mode — a specialised rulership-and-dignity assessment for question charts; not present <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Void of course Moon detection and annotation <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>14. MUNDANE &amp; WORLD ASTROLOGY</h2>
+
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">Annual calendar: Sun/Moon ingresses, planetary stations, lunations, conjunctions</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Eclipse search (Almanac.eclipses via Swiss Ephemeris eclipse functions)</span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Ingress charts (Aries ingress / seasonal quarter charts) — not computed as a chartable mode <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Outer-planet cycle tracking (Saturn/Uranus/Neptune/Pluto cycle degrees annotated) <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Eclipse path / saros series annotation <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+
+<h2>15. INFRASTRUCTURE &amp; ENGINEERING</h2>
+
+<h3>15.1 Build System</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">build.ps1 compiles to out/ (wiping first), runs suites from out/, prints fingerprint</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">22 test suites — 170,648 checks, 0 failures (as of 2026-08-28)</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Mutation testing on key assertions (AspectGridCheck Part J, TensionReleaseCheck)</span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">No JDK on PATH; depends on Android Studio JBR — fragile on a clean machine <span class="tag tag-warn">DEPENDENCY</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Gradle / Maven build file — no standard build descriptor; javac command is hand-assembled <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Packaged installer / runnable JAR / .exe wrapper for end users <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>15.2 Known Bugs &amp; UI Gaps</h3>
+<ul class="section">
+  <li class="warn"><span class="bullet"></span><span class="text">Search Transit button magnifier glyph renders as empty box — font fallback issue, unresolved <span class="tag tag-warn">BUG</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Window fixed at 1024×768 — no resize; cramped on small screens, wastes space on large ones <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">No keyboard navigation — all interaction is mouse-only <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">No screen-reader / accessibility support <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Share / Sync / Connect / Help screens — placeholder stubs removed from menu; features not yet built <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Undo / redo for chart data entry <span class="tag tag-open">OPEN</span></span></li>
+</ul>
+
+<h3>15.3 Data Pipeline</h3>
+<ul class="section">
+  <li class="done"><span class="bullet"></span><span class="text">InterpretationService.EXTRA_FILES registry — new prose files registered, not grown into shared files</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">DataCheck suite (82,479 checks) guards all prose coverage and format invariants</span></li>
+  <li class="done"><span class="bullet"></span><span class="text">Two-agent protocol: HANDOVER.md, shared data file splice rule, run-checks-before-commit rule</span></li>
+  <li class="warn"><span class="bullet"></span><span class="text">GenerateExtraBodies.java truncates extra_bodies.json — running it destroys Antigravity's prose; documented but dangerous <span class="tag tag-warn">HAZARD</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Prose for 600 semisextile / semisquare cells — largest remaining content gap in the app <span class="tag tag-open">OPEN</span></span></li>
+  <li class="open"><span class="bullet"></span><span class="text">Asteroid-to-asteroid aspect prose (60 cells) — David's call whether to write them <span class="tag tag-david">DAVID'S CALL</span></span></li>
+</ul>
+
+
+<h2>16. PENDING DESIGN DECISIONS (David's Calls)</h2>
+
+<div class="note">These items cannot be built without a named decision. Each one changes what a user reads.</div>
+<ul class="section">
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Returns scope</strong>: read whole chart or only angles? (Mercury-stations inconsistency is the same question — settle both together)</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Quincunx orb cap</strong>: cap at 1.0° for all 6 minor aspects, or choose differently? Needs a named source for any value taken.</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Asteroid-to-asteroid aspect prose</strong>: write 60 cells, or leave empty? Decision was planets-only for patterns; same logic applies here.</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Tension body restriction</strong>: restrict TensionRelease to planets + Chiron (TENSION_BODIES), or rank, or leave all 29 points? Currently 9 lines in 10 are not between planets.</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Synastry angle-click direction</strong>: clicking Chart A's angle vs Chart B's angle currently means different things (natal vs cross-chart). Make consistent, or document intentional asymmetry?</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Topics reporting cut</strong>: what fraction of topics should read as "unremarkable"? Currently ~4.5% (margin 0.06). Ranges from 4.5% to 44.3% — a product question.</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Anaretic degree definition</strong>: exactly 29°00'–29°59', or tolerance either side of the cusp? Does 0° count as the same condition or a different one? Cite a source.</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Solar return reading</strong>: companion to returns-scope above — already outstanding.</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Convergence weighting redesign</strong>: atLeast(n) form is meaningless (all targets score 3+). Needs weighting redesign or a different model before releasing can be wired in.</span></li>
+  <li class="david"><span class="bullet"></span><span class="text"><strong>Tri-wheel aspect lines</strong>: sky ring draws glyphs; does David want aspect lines drawn to Chart A and B? Plumbing is in place.</span></li>
+</ul>
+
+<footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>

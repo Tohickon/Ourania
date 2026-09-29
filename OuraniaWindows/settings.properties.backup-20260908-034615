@@ -1,0 +1,30 @@
+#Ourania Settings
+#Tue Sep 08 03:41:37 PDT 2026
+aspects.enabled=
+bodies.enabled=sun,moon,mercury,venus,mars,jupiter,saturn,uranus,neptune,pluto,north_node,south_node,chiron,ceres,pallas,juno,vesta,eris,eros,hygiea,nessus,pholus,ascendant,descendant,mc,ic,fortune,spirit,lilith
+chart.animateRings=true
+chart.aspectMode=Esoteric (all bodies)
+chart.bodyRing=Inside the sign ring
+chart.decanRing=Chaldean faces
+chart.degreeLines=true
+chart.outerWheel=Transits
+chart.palette=Cosmic
+chart.palette.background=\#000000
+chart.palette.bodies=
+chart.palette.custom=
+chart.palette.elements=
+chart.palette.ink=\#000000
+chart.palette.leader=\#99FF99
+chart.palette.mansion=
+chart.palette.wheel=
+chart.spheres=true
+default.base.location=Philadelphia, USA
+default.house.system=Placidus
+default.transit.location=Los Angeles, USA
+home.location=Los Angeles, USA
+lilith.variant=true
+natal.date=1982-08-10
+natal.location=Philadelphia, USA
+natal.time=15\:01
+node.variant=mean
+settings.version=1

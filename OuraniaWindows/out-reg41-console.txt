@@ -1,0 +1,140 @@
+﻿JDK: C:\Program Files\Android\Android Studio\jbr\bin (JDK 21)
+WARNING: 653 .class files are sitting in src\main\java.
+         This build ignores them, but 'java -cp src\main\java ...' loads them first.
+         Re-run with -PurgeSrcClasses to remove them (they regenerate).
+javac.exe : Note: Some input files use or override a deprecated API.
+At C:\Users\daver\Projects\Ourania\OuraniaWindows\build.ps1:228 char:1
++ & $JAVAC --release $MIN_JDK -encoding UTF-8 -nowarn -cp "lib\*" -d $O ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Note: Some inpu...deprecated API.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use or override a deprecated API that is marked for removal.
+Note: Recompile with -Xlint:removal for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+Build OK -> out-reg41
+  BUILD FINGERPRINT
+    sources       : 309
+    classes       : 643
+    newest source : 09/28/2026 11:12:29
+    built at      : 2026-09-28 11:13:54
+
+Running 105 suites from out-reg41 (logs in out-reg41-logs, 45 min each at most)
+No previous SUMMARY.txt to time against, so no estimate this run.
+
+  AspectWeightCheck          pass                       clear, 77 checks                       1s  [1/105] 1%
+  BodyCheck                  known red                  50 of 1209 failed                      7s  [2/105] 2%
+  AntisciaCheck              pass                       clear, 25 checks                       8s  [3/105] 3%
+  DatingCheck                pass                       clear, 32 checks                       3s  [4/105] 4%
+  CompositeCheck             known red                  2 of 377 failed                        7s  [5/105] 5%
+  DeclinationCheck           pass                       clear, 27 checks                       5s  [6/105] 6%
+  DignityCheck               pass                       clear, 4267 checks                     1s  [7/105] 7%
+  DraconicCheck              pass                       clear, 439 checks                      4s  [8/105] 8%
+  DerivedPointsCheck         pass                       clear, 70 checks                       7s  [9/105] 9%
+  EphemerisCorpusCheck       pass                       clear, 51 checks                      34s  [10/105] 10%
+  EphemerisFailureCheck      known red                  1 of 29 failed                         2s  [11/105] 10%
+  FirdariaCheck              pass                       clear, 263 checks                      1s  [12/105] 11%
+  ElectionalCheck            pass                       clear, 75 checks                      55s  [13/105] 12%
+  FixedStarCheck             pass                       clear, 22 checks                       2s  [14/105] 13%
+  HarmonicCheck              pass                       clear, 454 checks                      5s  [15/105] 14%
+  HarmonicResonanceCheck     pass                       clear, 58 checks                      42s  [16/105] 15%
+  HeliocentricCheck          pass                       clear, 429 checks                     12s  [17/105] 16%
+  AspectPatternCheck         pass                       clear, 1209 checks                   171s  [18/105] 17%
+  HouseSystemsCheck          pass                       clear, 558 checks                      1s  [19/105] 18%
+  FittingHarnessCheck        pass                       clear, 8 checks                      119s  [20/105] 19%
+  JoyCheck                   pass                       clear, 5573 checks                    79s  [21/105] 20%
+  MomentsCheck               pass                       clear, 55 checks                       1s  [22/105] 21%
+  MutualProgressionCheck     pass                       clear, 24 checks                       9s  [23/105] 22%
+  OrbCheck                   pass                       clear, 88 checks                       2s  [24/105] 23%
+  LunarMansionCheck          pass                       clear, 4759 checks                    90s  [25/105] 24%
+  PlanetaryHoursCheck        pass                       clear, 48 checks                       3s  [26/105] 25%
+  PrimaryDirectionsCheck     pass                       clear, 524 checks                      2s  [27/105] 26%
+  ProfectionCheck            pass                       clear, 17 checks                       1s  [28/105] 27%
+  ProgressedAngleCheck       pass                       clear, 78 checks                      25s  [29/105] 28%
+  ProgressedMoonCheck        pass                       clear, 26 checks                       2s  [30/105] 29%
+  PhaseCheck                 pass                       clear, 131 checks                     99s  [31/105] 30%
+  QuincunxCheck              pass                       clear, 947 checks                     63s  [32/105] 30%
+  RectifyCheck               pass                       clear, 25 checks                      37s  [33/105] 31%
+  SectCheck                  pass                       clear, 80 checks                       3s  [34/105] 32%
+  SiderealCheck              pass                       clear, 32 checks                       4s  [35/105] 33%
+  SnapshotCheck              pass                       clear, 276 checks                      2s  [36/105] 34%
+  SnapshotOutputCheck        pass                       clear, 607 checks                      3s  [37/105] 35%
+  SynastryCheck              known red                  112 of 76129 failed                   16s  [38/105] 36%
+  HoraryCheck                pass                       clear, 89 checks                     311s  [39/105] 37%
+  ThemeConvergenceCheck      pass                       clear, 24 checks                       1s  [40/105] 38%
+  ThemeTopicCheck            pass                       clear, 127 checks                      5s  [41/105] 39%
+  TopicCheck                 pass                       clear, 366 checks                      2s  [42/105] 40%
+  TransferOfLightCheck       pass                       clear, 424 checks                      2s  [43/105] 41%
+  ReturnsCheck               pass                       clear, 1122 checks                   125s  [44/105] 42%
+  TensionReleaseCheck        pass                       clear, 11258 checks                   66s  [45/105] 43%
+  ZodiacSelfTest             pass                       clear, 3838 checks                     1s  [46/105] 44%
+  ZoneCorpusCheck            pass                       clear, 241 checks                      2s  [47/105] 45%
+  CalCheck                   pass                       no verdict                           499s  [48/105] 46%
+  TransitCheck               pass                       clear, 2997 checks                   225s  [49/105] 47%
+  TransitSearchCheck         pass                       clear, 505 checks                    334s  [50/105] 48%
+  AccessibilityCheck         pass                       clear, 32 checks                       3s  [51/105] 49%
+  AspectGridCheck            pass                       clear, 32284 checks                   28s  [52/105] 50%
+  AtlasCheck                 pass                       clear, 93 checks                       7s  [53/105] 50%
+  BatchReportsCheck          pass                       clear, 40 checks                      23s  [54/105] 51%
+  BloomCheck                 pass                       clear, 1073 checks                     4s  [55/105] 52%
+  ChartBookCheck             pass                       clear, 75 checks                       0s  [56/105] 53%
+  ChartImportCheck           pass                       clear, 54 checks                       0s  [57/105] 54%
+  ChartSetupCheck            pass                       clear, 175 checks                     30s  [58/105] 55%
+  D10ProseCheck              pass                       clear, 3378 checks                    56s  [59/105] 56%
+  DataCheck                  pass                       clear, 616227 checks                   6s  [60/105] 57%
+  DeclinationGraphCheck      pass                       clear, 337 checks                     79s  [61/105] 58%
+  DialCheck                  pass                       clear, 42 checks                      33s  [62/105] 59%
+  DirectedRingCheck          pass                       clear, 67 checks                       8s  [63/105] 60%
+  ElectionalScreenCheck      pass                       clear, 55 checks                       1s  [64/105] 61%
+  ErrorLogCheck              pass                       clear, 28 checks                       1s  [65/105] 62%
+  FontScaleCheck             pass                       clear, 29 checks                       2s  [66/105] 63%
+  FrameAgreementCheck        pass                       clear, 74 checks                      14s  [67/105] 64%
+  GenerateExtraBodiesCheck   pass                       clear, 23 checks                       0s  [68/105] 65%
+  GlobeCheck                 pass                       clear, 11166 checks                   78s  [69/105] 66%
+  GlobeOptionsCheck          pass                       clear, 15 checks                      17s  [70/105] 67%
+  GlyphCheck                 pass                       clear, 30 checks                       7s  [71/105] 68%
+  HelpPageCheck              pass                       clear, 31 checks                      13s  [72/105] 69%
+  HiDpiCheck                 pass                       clear, 18 checks                      31s  [73/105] 70%
+  HoraryScreenCheck          pass                       clear, 22 checks                       1s  [74/105] 70%
+  HouseAlignCheck            pass                       clear, 18 checks                      35s  [75/105] 71%
+  IndexPageCheck             pass                       clear, 44 checks                      10s  [76/105] 72%
+  InterpretationHierarchyCheck pass                       clear, 114 checks                      5s  [77/105] 73%
+  JsonCheck                  pass                       clear, 45 checks                       2s  [78/105] 74%
+  MarkerShapeCheck           pass                       clear, 18 checks                       0s  [79/105] 75%
+  ModernSabianCheck          pass                       clear, 12 checks                       1s  [80/105] 76%
+  NavigationCheck            known red                  10 of 842 failed                     975s  [81/105] 77%
+  OverviewPageCheck          pass                       clear, 114 checks                      3s  [82/105] 78%
+  PlacementSearchCheck       pass                       clear, 56 checks                       4s  [83/105] 79%
+  PositionsExportCheck       pass                       clear, 25 checks                       3s  [84/105] 80%
+  PresetBarCheck             pass                       clear, 121 checks                      6s  [85/105] 81%
+  ReadingPdfCheck            pass                       clear, 19 checks                      11s  [86/105] 82%
+  RectifyScreenCheck         pass                       clear, 23 checks                       0s  [87/105] 83%
+  ReportTemplateCheck        pass                       clear, 43 checks                       6s  [88/105] 84%
+  ReturnsScreenCheck         pass                       clear, 65 checks                       8s  [89/105] 85%
+  RimAndFillsCheck           pass                       clear, 176 checks                     14s  [90/105] 86%
+  ScrubCheck                 pass                       clear, 82 checks                      14s  [91/105] 87%
+  SettingsCacheCheck         pass                       clear, 14 checks                       1s  [92/105] 88%
+  SettingsIsolationCheck     pass                       clear, 15 checks                       1s  [93/105] 89%
+  SettingsSearchCheck        pass                       clear, 1290 checks                     6s  [94/105] 90%
+  SettingsSetCheck           pass                       clear, 50 checks                       0s  [95/105] 90%
+  ShortcutCheck              pass                       clear, 55 checks                       5s  [96/105] 91%
+  SkyHouseCheck              pass                       clear, 9 checks                       16s  [97/105] 92%
+  SkyViewCheck               pass                       clear, 62 checks                       7s  [98/105] 93%
+  StartupCheck               pass                       clear, 72 checks                       1s  [99/105] 94%
+  TransitCalendarCheck       pass                       clear, 53 checks                      40s  [100/105] 95%
+  TransitOrbCheck            pass                       clear, 41 checks                     182s  [101/105] 96%
+  UndoCheck                  pass                       clear, 44 checks                       3s  [102/105] 97%
+  VersionCheck               pass                       clear, 29 checks                       1s  [103/105] 98%
+  WindowPlacementCheck       pass                       clear, 33 checks                       7s  [104/105] 99%
+  ZoomPanCheck               pass                       clear, 666 checks                      8s  [105/105] 100%
+
+Summary: out-reg41-logs\SUMMARY.txt
+
+  SOURCE MTIME BEFORE : 09/28/2026 11:12:29
+  SOURCE MTIME AFTER  : 09/28/2026 11:12:29
+  stamps match - measurement is valid.
+
+REGRESSION OK - every suite passed, or failed exactly as known-red.txt expects.

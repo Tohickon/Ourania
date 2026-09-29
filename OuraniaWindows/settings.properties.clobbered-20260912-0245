@@ -1,0 +1,12 @@
+#Ourania Settings
+#Sat Sep 12 02:45:48 PDT 2026
+aspects.enabled=Conjunction,Semisextile,Decile,Novile,Semisquare,Septile,Sextile,Quintile,Square,Sesquiquintile,Trine,Sesquiquadrate,Biquintile,Quincunx,Opposition
+bodies.enabled=sun,moon,mercury,venus,mars,jupiter,saturn,uranus,neptune,pluto,north_node,south_node,chiron,ceres,pallas,juno,vesta,eris,eros,hygiea,nessus,pholus,ascendant,descendant,mc,ic,fortune,spirit,lilith
+chart.bodyRing=Outside the sign ring
+chart.palette.leader=\#FFFF00
+default.base.location=Philadelphia, USA
+default.transit.location=Los Angeles, USA
+natal.date=1982-08-10
+natal.location=Philadelphia, USA
+natal.time=15\:01
+settings.version=1

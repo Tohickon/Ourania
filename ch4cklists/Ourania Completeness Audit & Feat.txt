@@ -1,0 +1,409 @@
+Ourania — Completeness Audit & Feature Gap Analysis
+Methodology: Every item below was derived by (1) reading the full Java source tree in OuraniaWindows/src/, (2) reading the HANDOVER.md in the repo and the vault wiki pages listed in the BRAIN Obsidian vault index, (3) examining the data files in src/main/resources/data/, (4) reviewing the decoded Android APK, and (5) comparing against the feature sets of Solar Fire, Astro Gold, TimePassages, Sirius/Kepler, Janus, and Astro.com.
+
+Status key: ✅ Done — ⚠️ Partial / In Progress — ❌ Missing — 🔧 Needs Fix
+
+1. COMPUTATIONAL ENGINE (astro/ package)
+1.1 Core Calculations
+#	Item	Status	Notes
+1.1.1	Swiss Ephemeris integration (Moshier fallback)	✅	Ephemeris.java; runs on Moshier; SE data file path splits on drive-letter colon (vault: ourania-ephemeris-fallback)
+1.1.2	Natal chart calculation (ecliptic longitudes)	✅	ChartFrame.java — 35 KB
+1.1.3	House cusp calculation	✅	Placidus default; house system selectable in Settings
+1.1.4	Multiple house system support (Placidus, Whole-Sign, Koch, Equal, Regiomontanus, Campanus, Porphyry, Morinus, Alcabitius, Topocentric)	⚠️	Settings persists house.system; audit which systems SwissEph actually offers vs. which the UI exposes
+1.1.5	Sidereal zodiac support (Lahiri, Fagan-Bradley, etc.)	❌	No ayanamsa setting found; all calculations are tropical only
+1.1.6	Heliocentric chart support	❌	No heliocentric flag anywhere in the engine
+1.1.7	Draconic chart support	❌	No node-based zero-point recalculation
+1.2 Celestial Bodies
+#	Item	Status	Notes
+1.2.1	Classical 7 planets (Sun–Saturn)	✅	Bodies.java registry, Kind.LUMINARY + Kind.PLANET
+1.2.2	Outer planets (Uranus, Neptune, Pluto)	✅	Registered as PLANET
+1.2.3	Lunar Nodes (True/Mean toggle)	✅	Settings.NODE_VARIANT_KEY; Source.SOUTH_NODE derives opposition
+1.2.4	Major asteroids (Ceres, Pallas, Juno, Vesta)	✅	Kind.ASTEROID
+1.2.5	Chiron	✅	Kind.ASTEROID
+1.2.6	Black Moon Lilith (True/Mean toggle)	✅	Settings.LILITH_VARIANT_KEY; Kind.POINT
+1.2.7	Part of Fortune (sect-aware)	✅	Source.FORTUNE; uses Sect.lotOfFortune
+1.2.8	Part of Spirit	✅	Source.SPIRIT; reflected across Ascendant
+1.2.9	Angles (ASC, DSC, MC, IC)	✅	Kind.ANGLE; sources from cusps
+1.2.10	Vertex / Anti-Vertex	❌	Not in Bodies registry
+1.2.11	East Point (Equatorial Ascendant)	❌	Not in registry
+1.2.12	Additional asteroids (Eris, Sedna, Orcus, etc.)	❌	No TNOs beyond Pluto
+1.2.13	Fixed stars (Regulus, Spica, Algol, etc.)	❌	No fixed star calculation or database
+1.2.14	Arabic Parts (beyond Fortune & Spirit)	❌	Only Fortune and Spirit
+1.2.15	Hypothetical planets (Uranian/TNP: Cupido, Hades, etc.)	❌	No Hamburg School support
+1.3 Aspects
+#	Item	Status	Notes
+1.3.1	Ptolemaic aspects (conjunction, opposition, square, trine, sextile)	✅	Aspects.java / Aspects.Type
+1.3.2	Minor aspects (semisextile, semisquare, sesquiquadrate, quincunx, quintile, biquintile, sesquiquintile)	✅	Added 2026-08-31; four more (septile, novile, biquintile, decile) have data but are not on Aspects.Type
+1.3.3	Parallel / contra-parallel (declination)	❌	No declination calculated; purely ecliptic longitude
+1.3.4	Body-class-scaled orbs	✅	Aspects.orbFor; larger body governs the pair (vault: aspect-orbs-graded)
+1.3.5	Applying vs. separating aspect marking	⚠️	Speed data (cSpeed) computed; unclear if applying/separating is surfaced in prose or grid
+1.3.6	Aspect patterns (Grand Trine, T-Square, Grand Cross, Yod, Kite, Mystic Rectangle, Stellium)	✅	AspectPatterns.java — 19 KB; pattern_detail.json prose; links from grid banner
+1.3.7	User-configurable orb overrides per aspect type	❌	Orbs are hard-coded in Aspects.orbFor; Settings has no orb editor
+1.4 Dignity & Condition System
+#	Item	Status	Notes
+1.4.1	Essential dignities (domicile, exaltation, detriment, fall)	✅	Dignity.java — 16 KB
+1.4.2	Triplicity rulers	⚠️	Confirm whether day/night triplicity is in Dignity or only in Sect
+1.4.3	Bound (term) rulers	❌	Not found in Dignity.java
+1.4.4	Decan/Face rulers	✅	DecanSystem.java + decan interpretations
+1.4.5	Peregrine detection	⚠️	Dignity.Result tracks conditions; verify peregrine is explicit
+1.4.6	Cazimi / Combustion / Under beams	⚠️	Vault doc cazimi-and-combustion exists; verify it is computed in engine
+1.4.7	Mutual reception	⚠️	Rulership.java has Reception inner class; verify full mutual reception detection
+1.5 Sect
+#	Item	Status	Notes
+1.5.1	Sect determination (day/night)	✅	Sect.java — 11 KB; Phase, Role, Valence, Membership
+1.5.2	Benefic/malefic of sect status	✅	Used in Snapshot for "hardest edge" phrasing
+1.5.3	Joy conditions	✅	JoyCheck.java — 5,610 checks
+2. CHART MODES & RELATIONSHIP ASTROLOGY
+2.1 Chart Modes
+#	Item	Status	Notes
+2.1.1	Single natal chart	✅	ChartMode.SINGLE
+2.1.2	Natal + Transits (bi-wheel)	✅	ChartMode.TRANSIT
+2.1.3	Synastry (bi-wheel)	✅	ChartMode.SYNASTRY
+2.1.4	Composite — Midpoint	✅	ChartMode.COMPOSITE_MIDPOINT
+2.1.5	Composite — Davison (time-space midpoint)	✅	ChartMode.COMPOSITE_DAVISON
+2.1.6	Tri-wheel (synastry + sky transits)	✅	showTriWheel flag; recent addition per HANDOVER
+2.1.7	Quad-wheel (natal + progressed + directed + transits)	❌	No fourth ring
+2.2 Synastry Features
+#	Item	Status	Notes
+2.2.1	Cross-chart aspects	✅	Synastry.java — 13 KB
+2.2.2	House overlays (A's planets in B's houses)	✅	synastry_overlays.json — 311 KB prose
+2.2.3	Angle contacts (A's planets on B's angles)	✅	synastry_angle_contacts.json — 110 KB
+2.2.4	Interaspect table	✅	synastry_interaspects.json — 728 KB
+2.2.5	Synastry grid display	✅	Aspect Grids section in SidePanel
+2.2.6	Composite transit forecasting	✅	Multiple composite_transit_*.json files totalling ~9 MB of prose
+2.2.7	Composite reference place override	✅	ChartSetupPanel.compositeRefField
+3. PREDICTIVE / TIMING TECHNIQUES
+3.1 Transits
+#	Item	Status	Notes
+3.1.1	Transit-to-natal aspects	✅	Transits.java — 32 KB
+3.1.2	Transit date picker	✅	ChartSetupPanel — date/time/location fields
+3.1.3	Transit hit list / timeline	⚠️	TimelinePredictor.java — 11 KB exists; verify it surfaces in the UI beyond the Report
+3.1.4	Ingress tracking (sign changes)	✅	Almanac.java — 27 KB; Event.Kind tracks ingresses
+3.1.5	Station tracking (retrograde/direct)	✅	Vault: stationarity-by-median-motion; Almanac handles
+3.1.6	Eclipse tracking (solar/lunar)	❌	Not in Almanac.Kind or anywhere in engine
+3.1.7	Lunar phases (New Moon, Full Moon, quarters)	⚠️	Almanac may track lunations; verify explicit Moon phase data
+3.1.8	Transit-to-transit aspects (mundane)	❌	Only transit-to-natal computed
+3.1.9	Transit significance filtering	✅	Vault: transit-significance-filter — filter goes on the natal end
+3.2 Secondary Progressions
+#	Item	Status	Notes
+3.2.1	Secondary progressions (day-for-year)	✅	Progressions.java — 14 KB; ProgressedLon, Contact, Change
+3.2.2	Progressed-to-natal aspects	✅	Progressions.Contact
+3.2.3	Progressed angles (MC/ASC)	⚠️	Verify if progressed MC/ASC are calculated (requires RAMC progression)
+3.2.4	Progressed lunar phases	❌	No progressed Moon phase detection
+3.2.5	Tertiary progressions	❌	Not implemented
+3.2.6	Converse progressions	❌	Not implemented
+3.3 Solar Arc Directions
+#	Item	Status	Notes
+3.3.1	Solar arc direction calculation	✅	SolarArc.java — 10 KB
+3.3.2	Solar arc contacts to natal	✅	SolarArc.Contact
+3.3.3	Other direction systems (primary, Naibod)	❌	Only solar arc
+3.4 Returns
+#	Item	Status	Notes
+3.4.1	Solar return chart calculation	✅	Returns.java — 19 KB
+3.4.2	Lunar return chart calculation	✅	Returns.Return supports lunar
+3.4.3	Planetary returns (Mercury–Saturn)	⚠️	Returns.java may support; verify completeness
+3.4.4	Solar return relocated chart	❌	No relocation option found
+3.4.5	Precessed solar return (sidereal)	❌	No precession option
+3.5 Profections
+#	Item	Status	Notes
+3.5.1	Annual profections (whole-sign advance)	✅	Profection.java — 6 KB; vault: annual-profections
+3.5.2	Profected time lord identification	✅	Time lord from profected sign
+3.5.3	Monthly / daily profections	❌	Only annual
+3.6 Zodiacal Releasing
+#	Item	Status	Notes
+3.6.1	Fortune / Spirit periods	✅	ZodiacalReleasing.java — 11 KB
+3.6.2	Releasing panel UI	✅	ReleasingPanel.java — 9 KB; registered as "RELEASING" screen
+3.6.3	Period highlighting of current level	⚠️	PeriodCellRenderer exists; verify it highlights the active period
+3.6.4	Loosing of the Bond detection	❌	No peak-period or LB detection found
+3.7 Almanac / Calendar
+#	Item	Status	Notes
+3.7.1	Annual almanac (transit calendar)	✅	Almanac.java; showCalendar() in OuraniaWindow
+3.7.2	Event scanning (root-finder over date range)	✅	Vault: ourania-almanac-scanner — one root-finder, all events
+3.7.3	Performance-optimized scan step	✅	Vault: annual-calendar-performance — 5.0-day step
+4. SCORING, ANALYSIS & SYNTHESIS
+4.1 Body Scoring & Prominence
+#	Item	Status	Notes
+4.1.1	Multi-axis body scoring (dignity, condition, valence, prominence)	✅	BodyScore.java — 57 KB; vault: l3-four-axis-scoring
+4.1.2	Prominence ranking and normalization	✅	Snapshot uses ranked bodies; dominanceMargin calibrated
+4.1.3	Convergence / multi-method agreement	✅	Convergence.java — 21 KB
+4.1.4	Calibration harness	✅	Calibration.java — 18 KB; FittingHarness.java — 28 KB
+4.1.5	Corpus builder for calibration	✅	CorpusBuilder.java — 15 KB
+4.2 Chart-Level Analysis
+#	Item	Status	Notes
+4.2.1	Gestalt / chart shape classification	✅	Gestalt.java — 41 KB; Gestalt.Shape enum
+4.2.2	Theme detection (repeated signatures)	✅	Themes.java — 17 KB
+4.2.3	Topic analysis (life area emphasis)	✅	Topics.java — 25 KB
+4.2.4	Tension/release pattern detection	✅	TensionRelease.java — 19 KB
+4.2.5	Aspect pattern detection and naming	✅	AspectPatterns.java
+4.2.6	Dispositor tree / mutual reception web	✅	Rulership.java — 10 KB
+4.2.7	Transfer of Light detection	✅	TransferOfLight.java — 3 KB
+4.2.8	Quincunx gap analysis	✅	Quincunx.java — 6 KB; quincunx_gap.json prose
+4.2.9	Midpoint calculation	✅	Midpoints.java — 3 KB
+4.2.10	Midpoint trees / sort strips	❌	Midpoints calculated but no 45°/90° sort strip or tree display
+4.2.11	Harmonic resonance ranking	✅	HarmonicResonance.java — 18 KB; top-K tightest contacts
+4.2.12	Harmonics calculation	✅	Harmonics.java — 9 KB
+4.3 Output Tiers
+#	Item	Status	Notes
+4.3.1	One-line snapshot	✅	Snapshot.java — tier 1
+4.3.2	Paragraph snapshot	✅	Tier 2; paragraphBodies = 3
+4.3.3	Full report	✅	Tier 3; NarrativeSynthesizer.generateReport
+4.3.4	Registers (Plain / Technical)	✅	Snapshot.Register — same facts, different vocabulary
+4.3.5	Narrative synthesis	✅	NarrativeSynthesizer.java — 24 KB
+5. INTERPRETATION DATA
+5.1 Natal Interpretations
+#	Item	Status	Notes
+5.1.1	Planet-in-sign (all 19 non-angle × 12 signs)	✅	body_placements.json — 182 KB; HANDOVER: "19/19 × 12/12"
+5.1.2	Planet-in-house (all 19 × 12 houses)	✅	Same file; "19/19 × 12/12"
+5.1.3	Aspect pair prose (330/330 grid cells)	✅	interpretations.json + aspect_prose_v2.json
+5.1.4	Angle interpretations (ASC/DSC/MC/IC × 12 signs)	✅	Ascendent.json, Descendant.json, mc.json, ic.json
+5.1.5	House meanings	✅	house_interpretations data
+5.1.6	Sign descriptions	✅	signs_interpretations.json
+5.1.7	Decan interpretations	✅	body_decans.json — 1.8 MB
+5.1.8	Degree interpretations (all 360°)	✅	degree_interpretations.json; body_degree_factors.json
+5.1.9	Sabian symbols (360°) with body readings	✅	Sabian_interpretations.json — 604 KB; body_technical_degrees.json — 13 MB
+5.1.10	Lunar Mansions	✅	LunarMansions.java — 11 KB; body_mansions.json — 1.4 MB
+5.1.11	Tarot correspondences	✅	tarot_bodies.json — 5 KB; tarot_interpretations.json
+5.2 Minor Aspect Interpretations
+#	Item	Status	Notes
+5.2.1	Minor aspect pair prose — natal	✅	minor_aspects_natal.json — 5.9 MB
+5.2.2	Minor aspect pair prose — composite	✅	minor_aspects_composite.json — 6.2 MB
+5.2.3	Minor aspect pair prose — synastry	✅	minor_aspects_synastry.json — 12 MB
+5.2.4	Minor aspect pair prose — transit	✅	minor_aspects_transit.json — 12 MB
+5.2.5	Aspect type framing sentences	✅	aspect_frames_v2.json, aspect_general.json
+5.3 Relationship Interpretations
+#	Item	Status	Notes
+5.3.1	Synastry interaspects	✅	synastry_interaspects.json — 728 KB
+5.3.2	Synastry overlays (planets in partner's houses)	✅	synastry_overlays.json — 311 KB
+5.3.3	Synastry angle contacts	✅	synastry_angle_contacts.json — 110 KB
+5.3.4	Composite placements	✅	composite_placements.json + _b.json
+5.3.5	Composite sign interpretations	✅	composite_signs.json — 280 KB
+5.3.6	Composite aspect pairs	✅	composite_aspect_pairs.json — 371 KB + composite_aspects_expanded.json — 1.4 MB
+5.3.7	Composite asteroid pairs	✅	composite_asteroid_pairs.json — 679 KB
+5.3.8	Composite angle interpretations	✅	composite_angles.json — 53 KB
+5.3.9	Composite Sabian symbols	✅	composite_sabian.json — 457 KB
+5.3.10	Composite transit interpretations	✅	composite_transit_*.json — ~8.9 MB combined
+5.3.11	Relationship prose (general)	✅	relationship_prose.json — 20 KB
+5.3.12	Macro dynamics	✅	macro_dynamics.json
+5.4 Interpretation Quality & Completeness
+#	Item	Status	Notes
+5.4.1	Data integrity checks	✅	DataCheck.java — 82,479 checks
+5.4.2	Key-to-query alignment (no orphan keys)	⚠️	Vault: keys-the-app-never-asks-for — 14% of five files had orphan keys
+5.4.3	Prose differentiation (unique per aspect type)	⚠️	HANDOVER notes 260 pairs with 66% overlap between square/trine; frames added but root issue remains
+5.4.4	Attribution scrubbed	✅	Vault: sabian-attribution-scrub — names stripped
+5.4.5	Fabrication audit for generated prose	⚠️	Vault: fluent-and-fabricated — issue identified but no automated guard
+6. GUI & USER EXPERIENCE
+6.1 Chart Wheel
+#	Item	Status	Notes
+6.1.1	Natal wheel rendering (signs, houses, bodies)	✅	SkymapPanel.java — 245 KB (!); custom Graphics2D rendering
+6.1.2	Bi-wheel rendering (natal + transits/synastry)	✅	Outer wheel ring
+6.1.3	Tri-wheel rendering (synastry + sky)	✅	Recent addition
+6.1.4	Aspect lines on wheel (with orb-based opacity fade)	✅	Vault: ourania-visual-language — fade curve documented
+6.1.5	Glyph rendering with astrological Unicode	✅	UTF-8 encoded; custom font handling
+6.1.6	Visual language (natal spheres vs. transit cubes vs. angle objects)	✅	Vault: ourania-visual-language
+6.1.7	Wheel rotation model (horizon or zodiac anchoring)	✅	Vault: ourania-wheel-rotation-model — 180 + pin − longitude
+6.1.8	Click-to-interpret (body, sign, house, aspect)	✅	Mouse adapter in SkymapPanel dispatches to InterpretationPanel
+6.1.9	Hover focus (highlight body web, fade others)	✅	Per git log: "hover a body to light its web and let the rest recede"
+6.1.10	Click-to-pin body focus	✅	Per git log: "click a body to pin its focus"
+6.1.11	Decan ring on wheel	✅	Decan rendering present
+6.1.12	Lunar Mansion ring on wheel	✅	showInterpretationForMansion wired
+6.1.13	Tri-wheel aspect lines	❌	HANDOVER open item 1: "plumbing is in place; wiring cLon is the next step"
+6.1.14	Tri-wheel side-panel listing	❌	HANDOVER open item 2: "sky bodies not yet listed in the planet-placements panel"
+6.1.15	Chart animation (time stepping)	❌	No animation controls; vault mentions sidereal-day-chart-animation as a concept
+6.1.16	Aspect grid overlay / popup on wheel	⚠️	Grid is in SidePanel; aspectHoverHtml provides hover cards
+6.1.17	Resizable / zoomable wheel	❌	Fixed within panel bounds; no zoom controls
+6.1.18	Anti-aliased high-DPI rendering	⚠️	RenderingHints present; verify HiDPI scaling on 4K displays
+6.2 Side Panel / Drawer
+#	Item	Status	Notes
+6.2.1	Accordion-based collapsible sections	✅	Accordion.java — 11 KB
+6.2.2	Menu section	✅	SidePanel.MENU
+6.2.3	Saved Charts / Profiles section	✅	ProfileListPanel.java; SavedCharts.java
+6.2.4	Natal Chart data section	✅	SidePanel.NATAL
+6.2.5	Transits data section	✅	SidePanel.TRANSITS
+6.2.6	Aspect Grids section	✅	SidePanel.GRIDS
+6.2.7	Readings section	✅	SidePanel.READINGS
+6.2.8	Selection section (clicked body detail)	✅	SidePanel.SELECTION
+6.2.9	Drawer handle animation (open/close)	✅	Drawer.java — 8 KB
+6.3 Chart Setup
+#	Item	Status	Notes
+6.3.1	Birth date/time/location entry	✅	ChartSetupPanel — three input fields
+6.3.2	Two-step subject chooser (Myself / Us / Sky Now)	✅	Subject enum; replaces flat ChartMode combo
+6.3.3	Engine selection per subject	✅	setMode single writer; ChartSetupCheck — 70 checks
+6.3.4	Partner (Chart B) input fields	✅	Second column for synastry/composite
+6.3.5	Transit date/time/location fields	✅	Shown when transit/composite mode
+6.3.6	Geocoding (city → lat/lon/timezone)	✅	Geocoder.java — Nominatim + timeapi.io
+6.3.7	Save / Load chart profiles	✅	SavedCharts.java — properties file persistence
+6.3.8	"Sky Now" preset (current moment)	✅	Subject.SKY_NOW
+6.3.9	Include transits checkbox (synastry → tri-wheel)	✅	syncTransitsCheck() per HANDOVER
+6.3.10	Birth time unknown / rectification mode	❌	No unknown-time flag; no rectification tools
+6.3.11	Date/time format validation	⚠️	Format strings defined; verify error handling on bad input
+6.3.12	Timezone override (manual)	❌	Auto-detected from location; no manual override
+6.4 Interpretation Panel
+#	Item	Status	Notes
+6.4.1	Planet interpretation view (sign, house, degree, decan, aspects)	✅	showPlanetInterpretation
+6.4.2	Angle interpretation view	✅	showAngleInterpretation
+6.4.3	Aspect interpretation view (natal, transit, synastry)	✅	Three distinct methods per type
+6.4.4	House interpretation view	✅	showHouseInterpretation
+6.4.5	Sign interpretation view	✅	showSignInterpretation
+6.4.6	Sabian symbol interpretation view	✅	showSabianInterpretation
+6.4.7	Decan interpretation view	✅	showDecanInterpretation
+6.4.8	Lunar Mansion detail view	✅	showMansionDetail
+6.4.9	Aspect pattern detail view	✅	showPatternDetail
+6.4.10	Snapshot view (one-line + paragraph)	✅	showSnapshot
+6.4.11	Full report view	✅	showReport
+6.4.12	Synthesis view	✅	showSynthesis
+6.4.13	Calendar / almanac view	✅	showCalendar
+6.4.14	Browsable index	✅	showIndex — OuraniaWindow.showIndexPanel provides entry
+6.4.15	Prose term decoration (color-coded terms)	✅	Prose.java — 15 KB; Prose.decorate
+6.4.16	Type scale / heading hierarchy	✅	InterpretationPanel style() method
+6.4.17	Clickable cross-references in prose	✅	Hyperlinks in generated HTML dispatch through handlePlacementClick
+6.5 Settings
+#	Item	Status	Notes
+6.5.1	Body selection (toggle each of 23 points)	✅	SettingsPanel generated from Bodies.ALL
+6.5.2	All / None / Defaults body buttons	✅	Bulk update with guard
+6.5.3	Aspect type selection (toggle each aspect drawn)	✅	aspectBoxRefs checkboxes
+6.5.4	House system selector	✅	Persisted in settings.properties
+6.5.5	Colour palette templates (Classic, Cosmic, Cool, Warm, B&W)	✅	ChartPalette.java — 29 KB; 6 templates
+6.5.6	Per-aspect colour overrides	✅	OVERRIDES_KEY — individual aspect recolouring
+6.5.7	Node variant toggle (True/Mean)	✅	Settings.NODE_VARIANT_KEY
+6.5.8	Lilith variant toggle (True/Mean)	✅	Settings.LILITH_VARIANT_KEY
+6.5.9	Orb configuration per aspect	❌	No orb editor in Settings
+6.5.10	Font size / display scaling	❌	No font size control
+6.5.11	Language / localization	❌	English only
+6.6 Theming & Visual Design
+#	Item	Status	Notes
+6.6.1	Dark theme (app-wide)	✅	Theme.java — 7 KB; Theme.BG dark background
+6.6.2	Light theme option	❌	Dark only
+6.6.3	Rounded widget styling	✅	Theme.RoundEdge
+6.6.4	Widget factory (consistent look)	✅	Widgets.java — 22 KB
+6.6.5	Element colours (fire/earth/air/water)	✅	ChartPalette.Palette includes element colours
+7. DATA MANAGEMENT & I/O
+7.1 Chart Data
+#	Item	Status	Notes
+7.1.1	Chart data table view (longitudes, cusps, aspects)	✅	NameListPanel.java — "NAME_LIST" screen
+7.1.2	Save chart data to file	⚠️	SavedCharts uses .properties; not an industry-standard format
+7.1.3	Chart data exchange format (AAF, QDF, or JSON export)	❌	No import/export of standard chart file formats
+7.1.4	Chart database / client database with search	❌	Simple properties file; no database, no search
+7.1.5	Chart sharing (export link, QR, copy-paste)	❌	"Share Skymap" was a placeholder and was removed
+7.2 Report Generation & Export
+#	Item	Status	Notes
+7.2.1	Print chart wheel	❌	No print function
+7.2.2	Export chart as image (PNG/SVG)	❌	No image export
+7.2.3	Export report as PDF	❌	No PDF generation
+7.2.4	Export report as HTML	⚠️	HTML is generated internally; no "Save As" button
+7.2.5	Branded / customizable report templates	❌	No template system
+7.2.6	Copy text to clipboard	❌	No clipboard integration
+8. NAVIGATION & APPLICATION FRAMEWORK
+8.1 Navigation
+#	Item	Status	Notes
+8.1.1	Screen navigation (CardLayout)	✅	6 registered screens in SidePanel.SCREENS
+8.1.2	Navigation check (menu ↔ screen consistency)	✅	NavigationCheck.java — 13 KB
+8.1.3	Back navigation / breadcrumbs	❌	No navigation stack or back button
+8.1.4	Keyboard shortcuts	❌	No keyboard shortcut system
+8.1.5	Help / tutorial / onboarding	❌	"Help" was a placeholder and was removed
+8.1.6	Undo / redo	❌	No undo system
+8.2 Build & Deployment
+#	Item	Status	Notes
+8.2.1	Build script	✅	build.ps1 — PowerShell; compiles to out/, runs suites
+8.2.2	Maven / Gradle build system	❌	No build file; swisseph-temp/pom.xml is for SwissEph dependency only
+8.2.3	Installer / packaged executable (MSI, exe, jar)	❌	Runs from source directory via java -cp
+8.2.4	Auto-update mechanism	❌	None
+8.2.5	Multi-agent build isolation	✅	build.ps1 -Out flag; HANDOVER warns about stale .class
+8.2.6	.gitignore covering .class files	✅	Checked
+8.3 Testing & Verification
+#	Item	Status	Notes
+8.3.1	Self-test / check suites	✅	22 suites, 170,648 checks, 0 failures
+8.3.2	Mutation testing (assertions verified)	✅	HANDOVER documents two mutation runs
+8.3.3	Automated CI/CD	❌	No CI pipeline; suites run manually via build.ps1
+8.3.4	Unit test framework (JUnit/TestNG)	❌	Custom check harnesses, not standard JUnit
+8.3.5	UI automated testing	❌	No UI test framework
+8.3.6	Calibration regression testing	✅	CalCheck prints step tables; calibration-corpus.tsv
+9. FEATURES PRESENT IN COMPETITORS BUT ABSENT IN OURANIA
+9.1 Missing Core Professional Features
+#	Feature	Present In	Priority
+9.1.1	Astrocartography / Astro-mapping — planetary lines on world map	Solar Fire, Astro Gold, Sirius	HIGH
+9.1.2	Rectification tools — event-based birth time correction	Solar Fire, Janus, Sirius	HIGH
+9.1.3	Horary chart module — specialized rules, Moon void-of-course, essential dignity table	Solar Fire, Janus	MEDIUM
+9.1.4	Electional chart module — find optimal timing for events	Solar Fire, Janus	MEDIUM
+9.1.5	Dynamic transit graph / timeline visualization — graphical transit hit list over a date range	Solar Fire, TimePassages	HIGH
+9.1.6	Ephemeris table view — tabular planetary positions for a date range	Astro.com, Solar Fire	MEDIUM
+9.1.7	Primary directions — Ptolemaic-era direction technique	Solar Fire, Janus	LOW
+9.1.8	Firdaria — Persian time-lord system	Janus, Solar Fire	LOW
+9.1.9	Declination graph / out-of-bounds detection	Solar Fire, Sirius	MEDIUM
+9.1.10	Vedic / Jyotish support (Rashi, Navamsa, Dasha systems)	Sirius/Kepler, Jagannatha Hora	LOW — niche
+9.2 Missing UX / Workflow Features
+#	Feature	Present In	Priority
+9.2.1	Multi-chart workspace — view multiple charts side-by-side	Solar Fire, Astro Gold	HIGH
+9.2.2	Chart comparison table — tabular synastry / interaspect grid	All competitors	MEDIUM
+9.2.3	Search across saved charts — find all charts with Moon in Scorpio, etc.	Solar Fire (Super Search), Sirius (AstroSignatures)	MEDIUM
+9.2.4	Client notes / annotations on saved charts	Solar Fire, Astro Gold	MEDIUM
+9.2.5	Batch report generation — generate reports for multiple charts	Solar Fire	LOW
+9.2.6	Chart rectification animation — slide birth time and watch chart move	Solar Fire, TimePassages	MEDIUM
+9.2.7	Mobile / responsive version	TimePassages, Astro Gold (iOS/Android)	HIGH
+9.2.8	Online / cloud sync	TimePassages, Astro Gold	MEDIUM
+9.2.9	Interpretation editor — user edits their own interpretations	Android APK has InterpretationEditorActivity; missing on Windows	MEDIUM
+10. KNOWN OPEN ITEMS FROM HANDOVER & VAULT
+#	Item	Source	Status
+10.1	Tri-wheel aspect lines not drawn	HANDOVER §1	❌
+10.2	Tri-wheel side-panel listing for sky bodies	HANDOVER §2	❌
+10.3	Convergence weighting (more voters ≠ better)	HANDOVER §3	❌
+10.4	Synastry angle click asymmetry (A=natal, B=cross-chart)	HANDOVER §8	🔧 David's call
+10.5	showAngleAt chart-A pass uses literal false for getAspectType	HANDOVER §9	🔧 David's call
+10.6	Four aspect types (septile, novile, biquintile, decile) have prose but not on Aspects.Type	InterpretationService comment	🔧 David's call
+10.7	Asteroid-to-asteroid aspect prose decision	HANDOVER §96	🔧 David's call
+10.8	Solar return reading: whole-chart or angles only	HANDOVER §96	🔧 David's call
+10.9	Harmonic resonance not wired into GUI	Vault HANDOVER	❌
+10.10	260 aspect pairs with 66% square/trine overlap	HANDOVER	⚠️ Frames added, root issue open
+10.11	Orphan keys in data files (14% of five files)	Vault: keys-the-app-never-asks-for	⚠️
+10.12	Vault HANDOVER lost section summaries (2026-09-02 damage)	Vault HANDOVER	🔧 Recovery exhausted
+11. ANDROID PARITY (from decoded APK)
+The original Ourania was an Android app (com.zodiacomputing.ourania, target SDK 32, Android 12). The Windows port has diverged significantly.
+
+#	Feature in Android APK	Windows Status
+11.1	GPS-based current location	❌ — Geocoder text lookup only
+11.2	InterpretationEditorActivity — user can edit interpretations	❌ — No editor on Windows
+11.3	DetailPagerActivity — swipeable detail pages	❌ — Different navigation model
+11.4	In-app billing (com.android.vending.BILLING)	N/A — Desktop app
+11.5	Push notifications / daily transit alerts	❌ — No notification system
+11.6	Share via Android Intent	❌ — No sharing mechanism
+11.7	Boot receiver (background service)	❌ — No background service
+11.8	TV / Leanback support	N/A
+12. INFRASTRUCTURE & ENGINEERING DEBT
+#	Item	Priority	Notes
+12.1	No build system (Maven/Gradle)	HIGH	Everything compiles via raw javac in a PowerShell script
+12.2	No dependency management	HIGH	SwissEph jar is manually managed
+12.3	No packaged distribution (jar/exe/installer)	HIGH	Must run from java -cp src\main\java or java -cp out\
+12.4	No CI/CD	MEDIUM	Manual test runs only
+12.5	245 KB single file (SkymapPanel.java)	HIGH	4,724 lines; should be decomposed
+12.6	185 KB single file (InterpretationPanel.java)	HIGH	3,406 lines
+12.7	72 KB single file (InterpretationService.java)	MEDIUM	1,379 lines
+12.8	.class files committed to source tree	⚠️	.gitignore added; stale classes still warned about
+12.9	Hand-rolled JSON parser (line-oriented, not standard JSON)	MEDIUM	Fragile; vault: llm-json-corruption-patterns
+12.10	Hand-rolled HTTP client for geocoding	LOW	Works; no retry logic
+12.11	No logging framework	MEDIUM	System.out / System.err only
+12.12	No error reporting / crash handler	MEDIUM	Exceptions printed to stderr
+12.13	No automated UI tests	LOW	GUI tested manually
+12.14	No accessibility (screen reader, keyboard navigation)	MEDIUM	Swing defaults only
+12.15	GitHub repo returns 404	⚠️	https://github.com/Tohickon/Ourania.git may be private or deleted
+SUMMARY STATISTICS
+Category	Done (✅)	Partial (⚠️)	Missing (❌)	Decision Needed (🔧)
+Engine & Calculations	~35	~8	~12	—
+Chart Modes & Relationships	~14	—	1	—
+Predictive Techniques	~16	~4	~10	—
+Scoring & Synthesis	~15	—	1	—
+Interpretation Data	~28	~3	—	—
+GUI & UX	~45	~6	~18	—
+Data Management & I/O	~2	~2	~8	—
+Navigation & Framework	~5	—	~7	—
+Competitor Features	—	—	~18	—
+Open Items	—	~3	~4	~6
+Android Parity	—	—	~6	—
+Engineering Debt	—	~2	~9	—
+TOTALS	~160	~28	~94	~6
+Bottom line: Ourania has an exceptionally deep computational engine (~35 astro classes), an enormous interpretation corpus (~75 MB of prose across 59 data files), and an impressively rigorous test suite (170K+ checks). Its core strengths — natal calculation, aspects (including minors), dignity/sect, synastry, composites, progressions, solar arcs, profections, zodiacal releasing, and narrative synthesis — put it in the same functional tier as TimePassages.
+
+The 94 missing items cluster around three themes:
+
+Professional workflow tools — export (PDF/image/print), chart database, rectification, astrocartography, multi-chart workspace
+Specialized techniques — eclipses, declinations, fixed stars, sidereal zodiac, horary/electional
+Engineering maturity — build system, installer, CI/CD, file decomposition, accessibility
+The app is roughly 60% complete for a consumer-grade astrology desktop application and 40% complete for a Solar Fire-class professional tool.

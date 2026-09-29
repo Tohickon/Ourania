@@ -1,3 +1,24 @@
+== Ourania+ problem report
+written:   2026-09-28T11:31:12.117508600-07:00[America/Los_Angeles]
+version:   development build
+
+java:      21.0.8  JetBrains s.r.o.
+os:        Windows 11 10.0 amd64
+packaged:  false
+ephemeris: C:/Users/daver/Desktop/Ourania/decoded_apk/assets
+data:      src/main/resources/data/
+log:       error_log.txt
+
+== What was happening
+Saved from Diagnostics.
+
+== Start-up inspection
+  DEGRADED: The ephemeris is missing one of its files - semo_18.se1 - named by Swiss Ephemeris itself while computing this moment, in C:\Users\daver\Desktop\Ourania\decoded_apk\assets. They can be downloaded from the Swiss Ephemeris distribution and dropped into that folder; nothing else has to change.
+  DEGRADED: 1 body is computed by approximation rather than from the files - Black Moon Lilith - measured at 2026-09-28. The answer is close, within an arcsecond or so, but it is arrived at by a different method from every other point in the same chart.
+  NOTE: The interpretation corpus is complete - 55 files in C:\Users\daver\Projects\Ourania\OuraniaWindows\src\main\resources\data.
+  NOTE: Problems have been written down - error_log.txt - last written 2026-09-28, 2261 bytes. Diagnostics can save it as a report.
+
+== Log, last 64 KB
 java.lang.NullPointerException: Cannot invoke "java.lang.StringBuffer.append(String)" because "<parameter5>" is null
 	at de.thmac.swisseph.FileData.get_new_segment(FileData.java:787)
 	at de.thmac.swisseph.SwissEph.sweph(SwissEph.java:4571)
@@ -21,10 +42,4 @@ java.lang.NullPointerException: Cannot invoke "java.lang.StringBuffer.append(Str
   DEGRADED: 1 body is computed by approximation rather than from the files - Black Moon Lilith - measured at 2026-09-28. The answer is close, within an arcsecond or so, but it is arrived at by a different method from every other point in the same chart.
   NOTE: The interpretation corpus is complete - 55 files in C:\Users\daver\Projects\Ourania\OuraniaWindows\src\main\resources\data.
   NOTE: Problems have been written down - error_log.txt - last written 2026-09-08, 1335 bytes. Diagnostics can save it as a report.
-
----- 2026-09-28T15:42:38.194969-07:00[America/Los_Angeles]  start-up inspection, development build
-  DEGRADED: The ephemeris is missing one of its files - semo_18.se1 - named by Swiss Ephemeris itself while computing this moment, in C:\Users\daver\Desktop\Ourania\decoded_apk\assets. They can be downloaded from the Swiss Ephemeris distribution and dropped into that folder; nothing else has to change.
-  DEGRADED: 1 body is computed by approximation rather than from the files - Black Moon Lilith - measured at 2026-09-28. The answer is close, within an arcsecond or so, but it is arrived at by a different method from every other point in the same chart.
-  NOTE: The interpretation corpus is complete - 55 files in C:\Users\daver\Projects\Ourania\OuraniaWindows\src\main\resources\data.
-  NOTE: Problems have been written down - error_log.txt - last written 2026-09-28, 2261 bytes. Diagnostics can save it as a report.
 
