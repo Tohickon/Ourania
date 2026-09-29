@@ -1502,6 +1502,32 @@ public final class Settings {
         com.zodiacomputing.ourania.astro.ProgressedAngles.method = use;
     }
 
+    /** Settings key for whether the synthesis carries its mechanics tier. */
+    public static final String READING_MECHANICS_KEY = "reading.mechanics";
+
+    /**
+     * Whether the synthesis prints tier 4 - the architecture, every placement, the patterns,
+     * the houses, the convergence rankings and the transits.
+     *
+     * <b>On by default, because that is the whole reading and turning a section off unasked
+     * would be the app deciding what a reader may see.</b> Off leaves tiers 1 to 3: the
+     * summary, the year's themes and the dates. On the 1984 fixture that is about five
+     * thousand characters against a hundred thousand.
+     *
+     * <b>Not an accordion, and it cannot be.</b> The reading renders in a JEditorPane, whose
+     * HTML is 3.2 - there is no {@code <details>} to collapse, and no script to collapse it
+     * with. So the choice is made before the page is built rather than after, which is also
+     * why it is a setting: the Synthesize tab regenerates on every open, and a state held only
+     * in the checkbox would be lost the moment the reader looked at another tab.
+     */
+    public static boolean readingMechanics() {
+        return !"false".equals(get(READING_MECHANICS_KEY, "true"));
+    }
+
+    public static void setReadingMechanics(boolean on) {
+        set(READING_MECHANICS_KEY, on ? "true" : "false");
+    }
+
     public static void setTrueNode(boolean useTrue) {
         set(NODE_VARIANT_KEY, useTrue ? "true" : "mean");
     }

@@ -1080,6 +1080,28 @@ public final class AspectGridCheck {
                     glance >= 0 && mech > glance
                         && html.substring(glance, mech).contains("The chart</b>"));
 
+                // <b>The mechanics tier is optional, and the choice must not reach the
+                // answers.</b> A reader turning the audit trail off is asking not to be handed
+                // the working; if that also changed a summary line or a date, the two settings
+                // would be two different readings of one chart. Asserted as the tiers being
+                // character-for-character identical, which is the only form of this that cannot
+                // pass by accident - four contains() would survive a reworded summary.
+                String lean = NarrativeSynthesizer.generateReport(
+                    f, g, ranked, themes, tf, prof, hits, null, null, withTime, rel, false);
+                int leanMech = lean.indexOf("4. The mechanics");
+                ok("Part Q: " + label + " names the mechanics tier even when it is withheld",
+                    leanMech >= 0);
+                ok("Part Q: " + label + " says where the mechanics went",
+                    lean.contains("Show the mechanics"));
+                ok("Part Q: " + label + " withholding the mechanics leaves tiers 1 to 3 untouched",
+                    mech >= 0 && leanMech >= 0
+                        && lean.substring(0, leanMech).equals(html.substring(0, mech)));
+                ok("Part Q: " + label + " without the mechanics is the shorter reading",
+                    lean.length() < html.length());
+                ok("Part Q: " + label + " without the mechanics drops the placements and transits",
+                    !lean.contains("4.2 Planetary Placements")
+                        && !lean.contains("4.10 Current Transits"));
+
                 // <b>A named pattern must carry its reading.</b> Section 5 used to print one
                 // bare line per pattern and no prose, so a T-square - the loudest thing in a
                 // chart - read as absent. pattern_detail.json had the text all along, plus

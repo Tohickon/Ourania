@@ -84,6 +84,30 @@ public class NarrativeSynthesizer {
      * composite are the standard timing technique for a relationship chart.
      */
     public static String generateReport(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked, Themes.Result t, ChartFrame tf, Profection prof, List<Transits.Hit> hits, YearScan scan, List<Convergence.Target> convergence, boolean withTime, boolean relationship) {
+        // The whole reading, which is what every caller before the mechanics toggle existed
+        // got and must keep getting. Only the reader's own choice can withhold a tier, so only
+        // the surface that has a reader passes it.
+        return generateReport(f, g, ranked, t, tf, prof, hits, scan, convergence, withTime,
+            relationship, true);
+    }
+
+    /**
+     * The same, with tier 4 - the mechanics - made optional.
+     *
+     * <b>The four tiers are progressive disclosure, and a Swing HTML pane cannot disclose
+     * progressively.</b> Its renderer is HTML 3.2: there is no {@code <details>} element to
+     * collapse the audit trail behind and no script to collapse it with. So the tier is chosen
+     * before the page is built rather than folded up after, and what would have been a
+     * disclosure triangle is a checkbox on the Synthesize page.
+     *
+     * <b>Tiers 1 to 3 are unaffected by this flag.</b> Whichever way it is set, the summary,
+     * the themes and the dates are computed from the same scan and say the same thing - the
+     * reader is choosing whether to be handed the working, not which answer they get.
+     *
+     * @param mechanics whether to print tier 4; false stops after the dates and says where the
+     *                  rest went
+     */
+    public static String generateReport(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked, Themes.Result t, ChartFrame tf, Profection prof, List<Transits.Hit> hits, YearScan scan, List<Convergence.Target> convergence, boolean withTime, boolean relationship, boolean mechanics) {
         // <b>Nothing selected is a state the reader can reach, and it has to be said, not thrown.</b>
         // Settings has a None for every section, and with every body off the ranking is empty:
         // the lead body below was ranked.get(0), so Synthesize threw IndexOutOfBounds, and
@@ -295,6 +319,19 @@ public class NarrativeSynthesizer {
         }
 
         // ------------------------------------------------------------------ Tier 4
+        //
+        // <b>Named even when it is withheld.</b> A reading that simply ended after the dates
+        // would look like a reading that had run out, and a reader who had forgotten the
+        // checkbox would have no way to tell the difference.
+        if (!mechanics) {
+            sb.append(tier("4. The mechanics"));
+            sb.append("<p style='color:#AAAAAA;'><i>Not shown. The architecture, every"
+                + " placement, the patterns, the houses, the full convergence rankings and the"
+                + " current transits are what the three tiers above are drawn from &mdash; tick"
+                + " <b>Show the mechanics</b> at the top of this page to read them.</i></p>");
+            sb.append("</body></html>");
+            return sb.toString();
+        }
         sb.append(tier("4. The mechanics"));
         sb.append("<p style='font-style: italic; color: #AAAAAA;'>Everything the three tiers"
             + " above are drawn from, in the engine's own order: the chart's architecture, every"
