@@ -778,18 +778,105 @@ public final class Settings {
     public static final String[] OUTER_WHEELS =
         {OUTER_TRANSITS, OUTER_PROGRESSED, OUTER_SOLAR_ARC};
 
-    public static String outerWheel() {
-        String v = get(OUTER_WHEEL_KEY, OUTER_TRANSITS);
+    /**
+     * Which techniques the outer bands carry - a set, not a choice (G17).
+     *
+     * <p><b>This was a radio button, and that was a statement about the wheel's plumbing
+     * rather than about astrology.</b> The three entries of {@link #OUTER_WHEELS} are not
+     * alternatives: the whole claim of
+     * {@link com.zodiacomputing.ourania.astro.Convergence} is that a period is worth believing
+     * in proportion to how many <i>independent</i> techniques name the same natal point, and
+     * transits, progressions and solar arc are three of the families it counts. Asking a
+     * reader to pick one is asking them to throw away the comparison the reading is built on.
+     *
+     * <p>Stored comma-separated under its own key so that an older {@code settings.properties}
+     * is not misread. A file written before this existed carries only
+     * {@link #OUTER_WHEEL_KEY}, and a single choice is a perfectly good set of one - so the old
+     * key is what seeds this when the new one is absent, and the reader's existing preference
+     * survives the upgrade rather than being silently reset to transits.
+     */
+    public static final String OUTER_WHEEL_SET_KEY = "chart.outerWheels";
+
+    /**
+     * The techniques currently switched on, in {@link #OUTER_WHEELS} order.
+     *
+     * <p>Order is imposed here rather than taken from the stored string, so that a file edited
+     * by hand cannot decide which ring is drawn inside which. Unknown words are dropped: a
+     * setting naming a technique this build does not have is a setting from a newer build, and
+     * ignoring it beats failing to open the wheel.
+     *
+     * <p>Never empty - a wheel asked to carry nothing carries the sky, which is what it did
+     * before any of this and what every mode that draws an outer ring assumes.
+     */
+    public static java.util.List<String> outerWheels() {
+        String raw = get(OUTER_WHEEL_SET_KEY, null);
+        if (raw == null || raw.trim().isEmpty()) {
+            // Seeded from the single-choice key an older file carries. See the javadoc above.
+            raw = get(OUTER_WHEEL_KEY, OUTER_TRANSITS);
+        }
+        java.util.List<String> asked = java.util.Arrays.asList(raw.split(","));
+        java.util.List<String> on = new java.util.ArrayList<>();
         for (String o : OUTER_WHEELS) {
-            if (o.equals(v)) {
-                return o;
+            for (String a : asked) {
+                if (o.equals(a.trim())) {
+                    on.add(o);
+                    break;
+                }
             }
         }
-        return OUTER_TRANSITS;
+        if (on.isEmpty()) {
+            on.add(OUTER_TRANSITS);
+        }
+        return on;
     }
 
+    /** Whether this technique is one of the ones the outer bands are carrying. */
+    public static boolean outerWheelOn(String which) {
+        return outerWheels().contains(which);
+    }
+
+    /** Switch one technique on or off without disturbing the others. */
+    public static void setOuterWheelOn(String which, boolean on) {
+        java.util.List<String> now = new java.util.ArrayList<>(outerWheels());
+        if (on && !now.contains(which)) {
+            now.add(which);
+        } else if (!on) {
+            now.remove(which);
+        }
+        setOuterWheels(now);
+    }
+
+    /** Replace the whole set. An empty set is stored as such and reads back as the sky. */
+    public static void setOuterWheels(java.util.Collection<String> which) {
+        StringBuilder sb = new StringBuilder();
+        for (String o : OUTER_WHEELS) {
+            if (which != null && which.contains(o)) {
+                sb.append(sb.length() == 0 ? "" : ",").append(o);
+            }
+        }
+        set(OUTER_WHEEL_SET_KEY, sb.toString());
+        // The old key is kept in step so that a downgrade, or a reader of the file, still
+        // finds a sensible single answer rather than a stale one from before the change.
+        set(OUTER_WHEEL_KEY, sb.length() == 0 ? OUTER_TRANSITS : outerWheels().get(0));
+    }
+
+    /**
+     * The first technique switched on, for the callers that predate the set.
+     *
+     * <p><b>This is no longer the whole answer and should not be treated as one.</b> It is
+     * what a reader would have picked when only one could be picked, and it is kept so that
+     * settings round-tripping and the older checks go on meaning what they meant. Anything
+     * deciding what to <i>draw</i> wants {@link #outerWheelOn} or {@link #outerWheels}, because
+     * asking this one whether the wheel shows progressions gets the answer "no" whenever
+     * transits are on as well.
+     */
+    public static String outerWheel() {
+        return outerWheels().get(0);
+    }
+
+    /** Choose exactly one, which is what the setting used to mean. */
     public static void setOuterWheel(String which) {
-        set(OUTER_WHEEL_KEY, which);
+        setOuterWheels(java.util.Collections.singletonList(which));
     }
 
     public static final String DIRECTION_KEY_KEY = "chart.directionKey";

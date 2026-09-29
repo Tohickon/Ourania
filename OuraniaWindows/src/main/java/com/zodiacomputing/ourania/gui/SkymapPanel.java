@@ -119,7 +119,7 @@ extends JPanel {
      */
     // Package-private, like chartMode beside it: assignRingKinds reads both to decide what
     // the outer ring holds, and a suite that cannot set both cannot walk the modes.
-    boolean showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+    boolean showProgressed = Settings.outerWheelOn(Settings.OUTER_PROGRESSED);
 
     /**
      * Whether the middle ring carries the directed chart rather than a moment.
@@ -130,7 +130,7 @@ extends JPanel {
      * position - no second cast, no ephemeris call per body, and no speeds, because nothing in
      * it is moving under its own power.
      */
-    boolean showSolarArc = Settings.OUTER_SOLAR_ARC.equals(Settings.outerWheel());
+    boolean showSolarArc = Settings.outerWheelOn(Settings.OUTER_SOLAR_ARC);
 
     /**
      * What to call a body when opening a full reading for it, given the ring it was clicked on.
@@ -6082,8 +6082,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // pin apparently in place - a guard that a later line quietly undoes is worse than
         // none, because the suite goes green either way. This is the hook SettingsPanel calls
         // when anything it owns changes, which is exactly when this needs re-reading.
-        this.showProgressed = Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
-        this.showSolarArc = Settings.OUTER_SOLAR_ARC.equals(Settings.outerWheel());
+        // <b>Two questions now, not one answer read twice.</b> These were both derived
+        // from a single stored choice, so they could never both be true - which is the
+        // whole of G17: Convergence ranks a period by how many independent techniques
+        // agree, and the wheel could show one of the three it counts.
+        this.showProgressed = Settings.outerWheelOn(Settings.OUTER_PROGRESSED);
+        this.showSolarArc = Settings.outerWheelOn(Settings.OUTER_SOLAR_ARC);
         // And the rings that follow from it. Without this, choosing Progressions here changed
         // what the middle ring carried and not whether the sky had anywhere to go.
         this.applyRingFlags();

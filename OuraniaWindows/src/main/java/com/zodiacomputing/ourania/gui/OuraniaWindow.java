@@ -514,16 +514,32 @@ public class OuraniaWindow extends JFrame {
     }
 
     /**
-     * What the middle ring carries: the sky, the same person moved on, or the chart directed.
+     * What the outer bands carry: the sky, the same person moved on, or the chart directed.
      *
      * <b>A door onto something that was already built.</b> Progressions have ridden the outer
      * ring since the setting existed, and the only way to ask for them was a dropdown three
      * tabs into the Settings screen - so the capability was complete, checked, and invisible
      * from the wheel a reader was looking at. That is this project's most-logged defect, and
      * this is the door for it.
+     *
+     * <b>And the door only opened one at a time until G17.</b> This method sets the whole set
+     * to the one technique named, which is what the setting used to mean and is still what the
+     * Settings screen's dropdown asks for. {@link #setOuterWheelOn} is the one to call to add
+     * a technique to the wheel rather than replace what is on it.
      */
     public void setOuterWheel(String which) {
         Settings.setOuterWheel(which);
+        this.redrawForOuterWheel();
+    }
+
+    /** Switch one technique on the outer bands without disturbing the others (G17). */
+    public void setOuterWheelOn(String which, boolean on) {
+        Settings.setOuterWheelOn(which, on);
+        this.redrawForOuterWheel();
+    }
+
+    /** The redraw both of the above need, written once rather than twice. */
+    private void redrawForOuterWheel() {
         if (skymapPanel != null) {
             skymapPanel.reloadAspectSelection();
             skymapPanel.updateChartData();

@@ -98,39 +98,46 @@ public final class RingBar extends JPanel {
             + "setup screen and borrows nobody's birth data.</i></html>");
         add(sky);
 
-        // <b>Two chips for one ring, because they are two things it can carry.</b> The middle
-        // ring is the sky by default; these say "carry the same person moved on" and "carry the
-        // chart moved by one arc" instead. They are mutually exclusive because there is one
-        // ring - pressing either turns the other off, and pressing the lit one returns the ring
-        // to the sky. Neither is available in a synastry, where that ring is a second person
-        // and not a moment at all.
+        // <b>A chip apiece, and each one only speaks for itself (G17).</b> These used to be
+        // mutually exclusive, because there was one middle ring and they were two things it
+        // could carry - pressing either turned the other off. That made the two chips a radio
+        // button wearing the clothes of two switches, and it put the app at odds with its own
+        // reading: Convergence ranks a period by how many INDEPENDENT techniques name the same
+        // natal point, and progressions and solar arc are two of the families it counts. A
+        // reader following that reading had to look at them one at a time.
+        //
+        // Each chip now adds or removes its own band and leaves the others alone. Neither is
+        // available in a synastry, where the partner's ring is a second person and not a
+        // moment at all.
         progressed = new Chip("Progressed", () -> {
             if (window != null) {
-                window.setOuterWheel(Settings.OUTER_PROGRESSED.equals(Settings.outerWheel())
-                    ? Settings.OUTER_TRANSITS : Settings.OUTER_PROGRESSED);
+                window.setOuterWheelOn(Settings.OUTER_PROGRESSED,
+                    !Settings.outerWheelOn(Settings.OUTER_PROGRESSED));
             }
             apply();
         });
-        progressed.openState = () -> Settings.OUTER_PROGRESSED.equals(Settings.outerWheel());
+        progressed.openState = () -> Settings.outerWheelOn(Settings.OUTER_PROGRESSED);
         progressed.setToolTipText("<html><b>The same person, moved on.</b><br>"
             + "A day of ephemeris for a year of life, drawn round the birth chart. The houses "
             + "stay natal, because a progressed wheel is progressed bodies in the birth "
-            + "frame.<br><i>Takes the middle ring, so it replaces the sky there.</i></html>");
+            + "frame.<br><i>Its own band, drawn just outside the birth chart - it can be up "
+            + "at the same time as the solar arc and the sky.</i></html>");
         add(progressed);
 
         directed = new Chip("Solar Arc", () -> {
             if (window != null) {
-                window.setOuterWheel(Settings.OUTER_SOLAR_ARC.equals(Settings.outerWheel())
-                    ? Settings.OUTER_TRANSITS : Settings.OUTER_SOLAR_ARC);
+                window.setOuterWheelOn(Settings.OUTER_SOLAR_ARC,
+                    !Settings.outerWheelOn(Settings.OUTER_SOLAR_ARC));
             }
             apply();
         });
-        directed.openState = () -> Settings.OUTER_SOLAR_ARC.equals(Settings.outerWheel());
+        directed.openState = () -> Settings.outerWheelOn(Settings.OUTER_SOLAR_ARC);
         directed.setToolTipText("<html><b>Every point moved by one arc.</b><br>"
             + "The distance the progressed Sun has travelled since birth, added to every body "
             + "and angle alike. Nothing in a directed chart moves under its own power, so "
-            + "nothing in it is retrograde.<br><i>Takes the middle ring, so it replaces the "
-            + "sky there.</i></html>");
+            + "nothing in it is retrograde.<br><i>Its own band, just outside the progressed "
+            + "one - the two are different techniques and are meant to be read together.</i>"
+            + "</html>");
         add(directed);
 
         // <b>A view, not a ring - which is why it is last and reads differently.</b> The three

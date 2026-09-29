@@ -595,33 +595,49 @@ public class SettingsPanel extends JPanel {
         body.add(decanRow);
         body.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // What the outer wheel carries when a chart has one.
+        // <b>What the outer bands carry - a checkbox each, not a dropdown (G17).</b> This was
+        // a JComboBox over the same three words, and a dropdown is a promise that the entries
+        // are alternatives. These are not: Convergence scores a period by how many INDEPENDENT
+        // techniques name the same natal point, and transits, progressions and solar arc are
+        // three of the families it counts. The control was telling the reader to throw away
+        // the comparison the reading is built on.
         JPanel outerRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         outerRow.setBackground(Color.BLACK);
         outerRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel outerLabel = new JLabel("Outer wheel shows:");
+        JLabel outerLabel = new JLabel("Outer wheels show:");
         outerLabel.setForeground(TEXT);
         outerLabel.setFont(Theme.BODY);
-        final JComboBox<String> outerCombo = new JComboBox<>(Settings.OUTER_WHEELS);
-        seeding = true;
-        outerCombo.setSelectedItem(Settings.outerWheel());
-        seeding = false;
-        Widgets.styleCombo(outerCombo);
-        outerCombo.setToolTipText("<html>What the outer ring carries when a chart has one. "
-            + "<b>Transits</b> is the sky at the transit moment. <b>Progressions</b> advances "
-            + "the chart one day for each year of life and draws it round the natal frame - "
-            + "the houses stay natal, because a progressed bi-wheel is progressed bodies in "
-            + "the birth frame. Progressed bodies are labelled and read as placements, never "
-            + "as transits.</html>");
-        outerCombo.addActionListener(e -> {
-            Object picked = outerCombo.getSelectedItem();
-            if (!constructing && !seeding && picked != null) {
-                Settings.setOuterWheel(String.valueOf(picked));
-                applyPalette();
-            }
-        });
         outerRow.add(outerLabel);
-        outerRow.add(outerCombo);
+        // Tooltips are per technique now, because a single tooltip on a dropdown could only
+        // describe the one thing it happened to mention - and it described two of three.
+        final String[] outerWhy = {
+            "<html><b>The sky at the transit moment.</b> The actual planets overhead, which is "
+                + "what the outer ring has always shown.</html>",
+            "<html><b>The same person, moved on.</b> A day of ephemeris for a year of life, "
+                + "drawn round the natal frame - the houses stay natal, because a progressed "
+                + "wheel is progressed bodies in the birth frame. They are labelled and read "
+                + "as placements, never as transits.</html>",
+            "<html><b>Every point moved by one arc.</b> The distance the progressed Sun has "
+                + "travelled since birth, added to every body and angle alike - so nothing in "
+                + "a directed chart moves under its own power, and nothing in it is "
+                + "retrograde.</html>",
+        };
+        for (int oi = 0; oi < Settings.OUTER_WHEELS.length; oi++) {
+            final String which = Settings.OUTER_WHEELS[oi];
+            JCheckBox box = new JCheckBox(which, Settings.outerWheelOn(which));
+            box.setForeground(TEXT);
+            box.setBackground(Color.BLACK);
+            box.setFont(Theme.BODY);
+            box.setFocusPainted(false);
+            box.setToolTipText(outerWhy[oi]);
+            box.addItemListener(e -> {
+                if (!constructing && !seeding) {
+                    Settings.setOuterWheelOn(which, box.isSelected());
+                    applyPalette();
+                }
+            });
+            outerRow.add(box);
+        }
         body.add(outerRow);
         body.add(Box.createRigidArea(new Dimension(0, 10)));
 

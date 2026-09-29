@@ -35,15 +35,38 @@ public final class DirectedRingCheck {
     private static final List<String> failures = new ArrayList<>();
     private static int checks;
 
+    private interface Body {
+        void run() throws Exception;
+    }
+
+    /**
+     * Run one part, and record a thrown exception as a failure rather than letting it out.
+     *
+     * <p><b>A crashed suite reports no failures at all</b>, which is one of this project's
+     * recurring findings and was demonstrated on this very file on 2026-09-29: a mutation that
+     * emptied the outer-wheel set made {@code outerWheel()} throw out of Part B, and the suite
+     * printed neither ALL CLEAR nor a FAILURES line - just a stack trace on the error stream.
+     * The exit code was still 1, so the build would have caught it, but a reader watching the
+     * output saw a suite that simply stopped halfway with no verdict, and a mutation harness
+     * scraping for the word FAIL scored the mutation as SURVIVING. The parts after the throw
+     * never ran either.
+     */
+    private static void part(String title, Body body) {
+        System.out.println();
+        System.out.println("=== " + title + " ===");
+        try {
+            body.run();
+        } catch (Throwable thrown) {
+            yes(title + " ran to the end (" + thrown + ")", false);
+            thrown.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         Settings.useScratchFile();
 
-        System.out.println("=== Part A: every kind names itself ===");
-        theKinds();
-
-        System.out.println();
-        System.out.println("=== Part B: the setting ===");
-        theSetting();
+        part("Part A: every kind names itself", DirectedRingCheck::theKinds);
+        part("Part B: the setting", DirectedRingCheck::theSetting);
 
         final OuraniaWindow[] hold = new OuraniaWindow[1];
         SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
@@ -52,17 +75,10 @@ public final class DirectedRingCheck {
             SkymapPanel sky = (SkymapPanel) CheckReflect.get(w, "skymapPanel");
             castAChart(sky);
 
-            System.out.println();
-            System.out.println("=== Part C: one arc, added to everything ===");
-            double arc = theDirectedRing(sky);
-
-            System.out.println();
-            System.out.println("=== Part D: progressions are not that ===");
-            theProgressedRing(sky, arc);
-
-            System.out.println();
-            System.out.println("=== Part E: the chips ===");
-            theChips(w);
+            final double[] arc = new double[1];
+            part("Part C: one arc, added to everything", () -> arc[0] = theDirectedRing(sky));
+            part("Part D: progressions are not that", () -> theProgressedRing(sky, arc[0]));
+            part("Part E: the chips", () -> theChips(w));
         } finally {
             Settings.setOuterWheel(Settings.OUTER_TRANSITS);
             SwingUtilities.invokeAndWait(w::dispose);
@@ -114,7 +130,7 @@ public final class DirectedRingCheck {
     // ---------------------------------------------------------------- part B
 
     private static void theSetting() {
-        eq("three things the middle ring can carry", 3, Settings.OUTER_WHEELS.length);
+        eq("three techniques the outer bands can carry", 3, Settings.OUTER_WHEELS.length);
         List<String> all = java.util.Arrays.asList(Settings.OUTER_WHEELS);
         yes("the sky is one of them", all.contains(Settings.OUTER_TRANSITS));
         yes("progressions another", all.contains(Settings.OUTER_PROGRESSED));
@@ -122,9 +138,77 @@ public final class DirectedRingCheck {
 
         Settings.setOuterWheel(Settings.OUTER_SOLAR_ARC);
         eq("what is chosen is what comes back", Settings.OUTER_SOLAR_ARC, Settings.outerWheel());
-        Settings.set(Settings.OUTER_WHEEL_KEY, "Regiomontanus");
+
+        // <b>They are no longer alternatives, which is G17.</b> This part asserted a radio
+        // button until 2026-09-29: one stored word, and two mutually exclusive booleans read
+        // off it. What made that wrong was not the wheel but the reading - Convergence scores
+        // a period by how many INDEPENDENT techniques name the same natal point, and these are
+        // three of the families it counts, so a reader following that reading had to look at
+        // them one at a time.
+        Settings.setOuterWheels(java.util.Arrays.asList(
+            Settings.OUTER_PROGRESSED, Settings.OUTER_SOLAR_ARC));
+        yes("progressions and the directed chart can both be up",
+            Settings.outerWheelOn(Settings.OUTER_PROGRESSED)
+                && Settings.outerWheelOn(Settings.OUTER_SOLAR_ARC));
+        yes("and what was not asked for is not up",
+            !Settings.outerWheelOn(Settings.OUTER_TRANSITS));
+        eq("two of them is two bands", 2, Settings.outerWheels().size());
+
+        // The stored order is not the drawn order. A hand-edited file must not be able to
+        // decide which ring is nested inside which.
+        Settings.set(Settings.OUTER_WHEEL_SET_KEY, "Solar Arc,Progressions");
+        eq("the order is imposed, not stored",
+            java.util.Arrays.asList(Settings.OUTER_WHEELS).indexOf(Settings.outerWheels().get(0)),
+            Math.min(all.indexOf(Settings.OUTER_PROGRESSED), all.indexOf(Settings.OUTER_SOLAR_ARC)));
+
+        Settings.setOuterWheelOn(Settings.OUTER_SOLAR_ARC, false);
+        yes("one can be switched off without disturbing the other",
+            Settings.outerWheelOn(Settings.OUTER_PROGRESSED)
+                && !Settings.outerWheelOn(Settings.OUTER_SOLAR_ARC));
+
+        // Nothing at all is the sky, which is what every mode that draws an outer ring assumes.
+        Settings.setOuterWheels(java.util.Collections.emptyList());
+        eq("a wheel asked to carry nothing carries the sky",
+            Settings.OUTER_TRANSITS, Settings.outerWheel());
+
+        Settings.set(Settings.OUTER_WHEEL_SET_KEY, "Regiomontanus");
         eq("and something that is not on the list falls back rather than sticking",
             Settings.OUTER_TRANSITS, Settings.outerWheel());
+
+        // <b>Both keys empty, which the assertion above does NOT reach.</b> setOuterWheels
+        // always writes a usable single key beside the set, so clearing the set through the
+        // app still leaves something to fall back to - and a mutation that deleted the
+        // empty-set guard survived because of it. A hand-edited file has no such manners.
+        Settings.set(Settings.OUTER_WHEEL_SET_KEY, "");
+        Settings.set(Settings.OUTER_WHEEL_KEY, "");
+        eq("a file with both keys blank still opens on the sky",
+            Settings.OUTER_TRANSITS, Settings.outerWheel());
+        eq("and that is one band, not none", 1, Settings.outerWheels().size());
+        Settings.set(Settings.OUTER_WHEEL_SET_KEY, ",  ,");
+        Settings.set(Settings.OUTER_WHEEL_KEY, "Placidus");
+        eq("and neither is a list of nothings", Settings.OUTER_TRANSITS, Settings.outerWheel());
+        Settings.set(Settings.OUTER_WHEEL_SET_KEY, "Progressions,Regiomontanus");
+        eq("a word this build does not know is dropped, not fatal",
+            1, Settings.outerWheels().size());
+        yes("and the ones it does know survive",
+            Settings.outerWheelOn(Settings.OUTER_PROGRESSED));
+
+        // <b>The upgrade path, and which key wins when they disagree.</b> A settings file
+        // written before G17 carries only the single-choice key, and a choice of one is a
+        // perfectly good set of one - so it seeds the set when the set is absent. Once the set
+        // exists it is the answer, and the old key is a leftover rather than a second opinion.
+        // Asserting that deliberately, because it was passing by accident: this part used to
+        // write garbage to the old key and watch it fall back, which now proves nothing.
+        Settings.set(Settings.OUTER_WHEEL_SET_KEY, "");
+        Settings.set(Settings.OUTER_WHEEL_KEY, Settings.OUTER_SOLAR_ARC);
+        eq("an older file's single choice is honoured",
+            Settings.OUTER_SOLAR_ARC, Settings.outerWheel());
+        Settings.set(Settings.OUTER_WHEEL_SET_KEY, Settings.OUTER_PROGRESSED);
+        Settings.set(Settings.OUTER_WHEEL_KEY, Settings.OUTER_SOLAR_ARC);
+        eq("and once the set exists the old key is a leftover, not a second opinion",
+            Settings.OUTER_PROGRESSED, Settings.outerWheel());
+
+        Settings.setOuterWheel(Settings.OUTER_TRANSITS);
     }
 
     // ---------------------------------------------------------------- the chart
