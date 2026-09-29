@@ -9,7 +9,9 @@ import com.zodiacomputing.ourania.astro.Convergence;
 import com.zodiacomputing.ourania.astro.Dignity;
 import com.zodiacomputing.ourania.astro.Gestalt;
 import com.zodiacomputing.ourania.astro.Profection;
+import com.zodiacomputing.ourania.astro.Progressions;
 import com.zodiacomputing.ourania.astro.Sect;
+import com.zodiacomputing.ourania.astro.ThemeConvergence;
 import com.zodiacomputing.ourania.astro.Themes;
 import com.zodiacomputing.ourania.astro.Topics;
 import de.thmac.swisseph.SweDate;
@@ -103,24 +105,215 @@ public class NarrativeSynthesizer {
         sb.append("<html><body style='font-family: sans-serif; font-size: 14px; margin: 15px; color: #E0E0E0; background-color: #000000;'>");
         sb.append("<h1 style='color: #FFFFFF; border-bottom: 1px solid #444; padding-bottom: 5px;'>Chart Synthesis</h1>");
         
-        sb.append("<p style='font-style: italic; color: #AAAAAA;'>Based on the principles and mechanics of scientific astrology, the data provided outlines a highly dynamic and structurally complex chart. Here is a mechanical and synthesized interpretation of the forces at work.</p>");
-
-        // 1. Core Architecture
-        sb.append("<h2 style='color: #FFD700;'>1. Core Architecture: The Chart's Signature</h2>");
+        // <b>The facts the summary and the mechanics both state, worked out once, here.</b>
+        // Tier 1 below is a precis of things stated in full further down, and every line of it
+        // reads the same variable its detailed section reads. That is what keeps it a second
+        // VIEW of one fact rather than a second computation of it - one rule in two places,
+        // drifting apart, is the defect this project logs more than any other.
         String sectName = isDiurnal ? "diurnal (day)" : "nocturnal (night)";
-        sb.append("<p>This is a <b>").append(sectName).append("</b> chart, meaning the <b>").append(g.sectLight).append("</b> is the master of the sect, <b>").append(Sect.beneficOfSect(isDiurnal)).append("</b> is " + (relationship ? "the relationship's" : "your") + " greatest ally (the benefic of sect), and <b>").append(g.outOfSectMalefic).append("</b> is " + (relationship ? "its" : "your") + " primary friction point (the malefic contrary to sect).</p>");
-        
+        // The enum constant is BOWL, and "shaped as a BOWL" reads as shouting. Named here once
+        // so the summary and 4.1 cannot end up calling the same shape two different things.
+        String shapeName = g.shape != null
+            ? g.shape.name().charAt(0) + g.shape.name().substring(1).toLowerCase()
+            : "Standard";
         String leadBody = (g.shapeHandle != null && !g.shapeHandle.isEmpty()) ? g.shapeHandle : ranked.get(0).body;
         ChartFrame.Body leadPlanet = f.body(leadBody);
         String leadSign = leadPlanet != null ? Zodiac.signName(leadPlanet.lon) : "";
-        sb.append("<p>The chart is shaped as a <b>").append(g.shape != null ? g.shape.name() : "Standard").append("</b>, led by <b>").append(leadBody).append(" in ").append(leadSign).append("</b>. This mechanical shape implies a personality that is highly driven and structured by this leading force.</p>");
-        
+
+        // The year's themes, read by tiers 1, 2 and 3. Computed here rather than where they
+        // are printed because three tiers now show different faces of one list, and computing
+        // it per tier would let the summary and the theme cards disagree about what reached
+        // three testimonies. Conditions are the ones section 4.9 used to carry: convergence is
+        // assembled from the profection year scan and the solar return, so a relationship
+        // chart - which has no birthday - gets none of it.
+        List<ThemeConvergence.Result> yearThemes = null;
+        if (!relationship && withTime && scan != null && convergence != null) {
+            yearThemes = ThemeConvergence.themes(f, prof, convergence, scan.moonClock,
+                scan.catalysts);
+        }
+        // K12 stage 2. The mid-term clock reads the same whether or not any theme reaches
+        // three, so it is stated whatever the themes do - and stated once, in the summary,
+        // because it is a headline-level fact and not a piece of machinery.
+        String clock = null;
+        if (!relationship && scan != null && scan.moonClock != null && !scan.moonClock.isEmpty()) {
+            StringBuilder cb = new StringBuilder();
+            for (Progressions.Tenancy ten : scan.moonClock) {
+                cb.append(cb.length() == 0 ? "" : "; ").append(ten);
+                if (ten.phase != null && !ten.phase.isEmpty()) {
+                    cb.append(", lunation ").append(ten.phase);
+                }
+            }
+            clock = cb.toString();
+        }
+
+        // ------------------------------------------------------------------ Tier 1
+        //
+        // <b>The reading used to open on its own machinery and close on its findings.</b> The
+        // sect was section 1, the profection year section 4, and the convergence rankings - the
+        // one part that answers "what is this year about" - sat at the very bottom, behind two
+        // hundred lines of individual triggers. Nothing was missing from the page; the order of
+        // it was upside down, and a reader met the engine before they met the reading.
+        sb.append(tier("1. At a glance"));
+        sb.append("<ul>");
+        sb.append("<li><b>The chart</b> &mdash; ").append(sectName).append(", shaped as a <b>")
+            .append(shapeName).append("</b> led by <b>").append(leadBody);
+        if (leadSign != null && !leadSign.isEmpty()) {
+            sb.append(" in ").append(Character.toUpperCase(leadSign.charAt(0)))
+                .append(leadSign.substring(1));
+        }
+        sb.append("</b>");
+        if (!g.dominantElements.isEmpty()) {
+            sb.append("; dominant element <b>").append(String.join(", ", g.dominantElements))
+                .append("</b>");
+        }
+        sb.append(".</li>");
+        if (!relationship && prof != null) {
+            sb.append("<li><b>The year</b> &mdash; age ").append(prof.age)
+                .append(", profected to the <b>").append(prof.house).append("th house</b> (")
+                .append(signName(prof.sign)).append("), lord of the year <b>")
+                .append(prof.lord).append("</b>.</li>");
+        }
+        if (clock != null) {
+            sb.append("<li><b>The mid-term clock</b> &mdash; ").append(clock).append(".</li>");
+        }
+        // The most activated points, which is what the intensity rankings say when they are
+        // read as an answer rather than as a list. Three, because a summary that names eight
+        // points has not summarised anything; the whole ranking is still in 4.9.
+        if (convergence != null && !convergence.isEmpty()) {
+            List<Convergence.Target> top = new ArrayList<>(convergence);
+            top.sort((x, y) -> Double.compare(y.score, x.score));
+            StringBuilder points = new StringBuilder();
+            int shown = 0;
+            for (Convergence.Target target : top) {
+                if (target.score <= 0.0 || shown >= SPARK.length) {
+                    continue;
+                }
+                points.append(shown == 0 ? "" : ", ")
+                    .append("<span style='color:").append(SPARK[shown]).append(";'>&#9679;</span> <b>")
+                    .append(target.natal).append("</b> ")
+                    .append(String.format("%.1f%%", target.score * 100));
+                shown++;
+            }
+            if (shown > 0) {
+                sb.append("<li><b>Most activated points</b> &mdash; ").append(points)
+                    .append(".</li>");
+            }
+        }
+        if (yearThemes != null) {
+            StringBuilder heads = new StringBuilder();
+            for (ThemeConvergence.Result th : yearThemes) {
+                if (th.headline()) {
+                    heads.append(heads.length() == 0 ? "" : ", ").append("<b>")
+                        .append(th.theme.label).append("</b> (").append(th.families.size())
+                        .append(")");
+                }
+            }
+            sb.append("<li><b>The year's themes</b> &mdash; ")
+                .append(heads.length() == 0
+                    ? "none reaches three independent testimonies"
+                    : heads.toString())
+                .append(".</li>");
+        }
+        sb.append("</ul>");
+
+        // ------------------------------------------------------------------ Tier 2
+        sb.append(tier("2. The year by theme (the Rule of Three)"));
+        if (relationship) {
+            sb.append("<p><i>Convergence is scanned across a profection year, which a composite"
+                + " does not have. See 4.4 below.</i></p>");
+        } else if (yearThemes == null) {
+            sb.append("<p><i>Transit data not enabled. Enable transits to scan the year by"
+                + " theme.</i></p>");
+        } else {
+            sb.append("<p style='color:#AAAAAA;'>A theme is a headline only where three"
+                + " <i>independent</i> techniques name it; the rest are background trends, and"
+                + " are listed as such rather than written up. One line per technique, because"
+                + " a technique agreeing with itself is one witness however many contacts it"
+                + " makes &mdash; <i>+n more</i> is how many of those there were, and every one"
+                + " of them is listed in full under 4.9.</p>");
+            boolean anyHeadline = false;
+            for (ThemeConvergence.Result th : yearThemes) {
+                if (!th.headline()) {
+                    continue;
+                }
+                anyHeadline = true;
+                sb.append("<h3 style='color:#FFD166;'>").append(th.theme.label)
+                    .append(" <span style='color:#888; font-weight:normal;'>&middot; ")
+                    .append(th.families.size()).append(" independent testimonies</span></h3>");
+                sb.append(testimonies(th));
+            }
+            if (!anyHeadline) {
+                sb.append("<p>No theme reaches three independent testimonies this year.</p>");
+            }
+            StringBuilder trends = new StringBuilder();
+            for (ThemeConvergence.Result th : yearThemes) {
+                if (!th.headline() && !th.families.isEmpty()) {
+                    trends.append(trends.length() == 0 ? "" : "; ").append(th.theme.label)
+                        .append(" (").append(th.families.size()).append(")");
+                }
+            }
+            if (trends.length() > 0) {
+                sb.append("<p style='color:#AAAAAA;'><i>Background trends:</i> ").append(trends)
+                    .append("</p>");
+            }
+        }
+
+        // ------------------------------------------------------------------ Tier 3
+        //
+        // <b>One timeline, not one per theme.</b> The dates were printed inside each theme's
+        // card, so a reader who wanted to know what was coming in October had to read three
+        // lists and merge them in their head - and a fortnight where two themes peak together
+        // looked like two unrelated entries. Merging them is also the honest shape: the Sun and
+        // Mars do not visit one theme at a time.
+        sb.append(tier("3. Dates to watch"));
+        if (yearThemes == null) {
+            sb.append("<p><i>").append(relationship
+                    ? "Dating follows the year scan, which a composite does not have."
+                    : "Transit data not enabled. Enable transits to date the year.")
+                .append("</i></p>");
+        } else {
+            List<Window> windows = windows(yearThemes);
+            if (windows.isEmpty()) {
+                sb.append("<p>No headline theme has a gathering of catalysts worth dating this"
+                    + " year.</p>");
+            } else {
+                sb.append("<p style='color:#AAAAAA;'>The year's fullest gatherings of Sun and"
+                    + " Mars on a headline theme's own points. The Sun reaches every point"
+                    + " monthly, so these are the strongest of a monthly beat rather than rare"
+                    + " events: they mark the day without making the case.</p><ul>");
+                for (Window w : windows) {
+                    String span = dayOf(w.from).equals(dayOf(w.to))
+                        ? dayOf(w.from)
+                        : dayOf(w.from) + " to " + dayOf(w.to);
+                    sb.append("<li><b>").append(span).append("</b> &mdash; <i>")
+                        .append(String.join(", ", w.themes)).append("</i><br>")
+                        .append("<span style='color:#AAAAAA;'>")
+                        .append(String.join(", ", w.hits)).append("</span></li>");
+                }
+                sb.append("</ul>");
+            }
+        }
+
+        // ------------------------------------------------------------------ Tier 4
+        sb.append(tier("4. The mechanics"));
+        sb.append("<p style='font-style: italic; color: #AAAAAA;'>Everything the three tiers"
+            + " above are drawn from, in the engine's own order: the chart's architecture, every"
+            + " placement ranked, the patterns, the houses, the full convergence rankings and"
+            + " the current transits. Nothing here is a summary &mdash; this is the audit"
+            + " trail.</p>");
+
+        // 4.1 Core Architecture
+        sb.append("<h2 style='color: #FFD700;'>4.1 Core Architecture: The Chart's Signature</h2>");
+        sb.append("<p>This is a <b>").append(sectName).append("</b> chart, meaning the <b>").append(g.sectLight).append("</b> is the master of the sect, <b>").append(Sect.beneficOfSect(isDiurnal)).append("</b> is " + (relationship ? "the relationship's" : "your") + " greatest ally (the benefic of sect), and <b>").append(g.outOfSectMalefic).append("</b> is " + (relationship ? "its" : "your") + " primary friction point (the malefic contrary to sect).</p>");
+
+        sb.append("<p>The chart is shaped as a <b>").append(shapeName).append("</b>, led by <b>").append(leadBody).append(" in ").append(leadSign).append("</b>. This mechanical shape implies a personality that is highly driven and structured by this leading force.</p>");
+
         if (!g.dominantElements.isEmpty()) {
             sb.append("<p>The dominant element is <b>").append(String.join(", ", g.dominantElements)).append("</b>, emphasizing that baseline operating system.</p>");
         }
 
-        // 2. Planetary Placements
-        sb.append("<h2 style='color: #FFD700;'>2. Planetary Placements (Ranked by Prominence)</h2>");
+        // 4.2 Planetary Placements
+        sb.append("<h2 style='color: #FFD700;'>4.2 Planetary Placements (Ranked by Prominence)</h2>");
         sb.append("<p>The following details the structural function and narrative interpretation of all placements in the chart, in order of their strength:</p>");
         for (BodyScore.Vector v : ranked) {
             ChartFrame.Body b = f.body(v.body);
@@ -259,8 +452,8 @@ public class NarrativeSynthesizer {
             sb.append("</div>");
         }
 
-        // 3. Structural Tensions
-        sb.append("<h2 style='color: #FFD700;'>3. Structural Tensions (The Unresolved Vectors)</h2>");
+        // 4.3 Structural Tensions
+        sb.append("<h2 style='color: #FFD700;'>4.3 Structural Tensions (The Unresolved Vectors)</h2>");
         sb.append("<ul>");
         for (Themes.Contradiction contradiction : t.contradictions) {
             sb.append("<li><b>Clash:</b> ").append(contradiction.themeA).append(" vs ").append(contradiction.themeB).append("</li>");
@@ -281,8 +474,8 @@ public class NarrativeSynthesizer {
         sb.append(".</li>");
         sb.append("</ul>");
 
-        // 4. Current Chronometry
-        sb.append("<h2 style='color: #FFD700;'>4. Current Chronometry</h2>");
+        // 4.4 Current Chronometry
+        sb.append("<h2 style='color: #FFD700;'>4.4 Current Chronometry</h2>");
         if (relationship) {
             sb.append("<p><i>A profection year and a solar return are keyed to a birthday - an age in years, and the Sun's return to its natal degree. A composite has no birthday: its moment is the midpoint of two births, so an &quot;age&quot; here would be the average of the partners' ages rather than the age of the relationship. Transits to the composite are shown below instead, which is the standard timing technique for a relationship chart.</i></p>");
         } else if (prof != null) {
@@ -325,8 +518,8 @@ public class NarrativeSynthesizer {
             sb.append("<p><i>No birth moment to count a profection from, so there is no age and no Lord of the Year.</i></p>");
         }
 
-        // 5. Complex Geometric Circuitry
-        sb.append("<h2 style='color: #FFD700;'>5. Complex Geometric Circuitry (Aspect Patterns)</h2>");
+        // 4.5 Complex Geometric Circuitry
+        sb.append("<h2 style='color: #FFD700;'>4.5 Complex Geometric Circuitry (Aspect Patterns)</h2>");
         List<Aspects.Hit> allAspects = new ArrayList<>();
         allAspects.addAll(Aspects.betweenBodies(f));
         allAspects.addAll(Aspects.toAngles(f));
@@ -372,7 +565,7 @@ public class NarrativeSynthesizer {
         // has no special part in either, and the heading "The Lunar Engine" promised one that
         // never appeared: on a real chart this section listed the Sun, Venus, Mars, Jupiter,
         // Uranus, Neptune, Pluto and Saturn, and not the Moon once.
-        sb.append("<h2 style='color: #FFD700;'>6. Translation and Collection of Light</h2>");
+        sb.append("<h2 style='color: #FFD700;'>4.6 Translation and Collection of Light</h2>");
         List<String> transfers = TransferOfLight.findTransfers(f, Aspects.betweenBodies(f));
         if (transfers.isEmpty()) {
             sb.append("<p>No active classical translations of light detected.</p>");
@@ -384,8 +577,8 @@ public class NarrativeSynthesizer {
             sb.append("</ul>");
         }
 
-        // 7. House Mechanics
-        sb.append("<h2 style='color: #FFD700;'>7. House Mechanics: Competence vs. Chaos</h2>");
+        // 4.7 House Mechanics
+        sb.append("<h2 style='color: #FFD700;'>4.7 House Mechanics: Competence vs. Chaos</h2>");
         List<Topics.Topic> topicsList = Topics.analyse(f, ranked);
         List<Integer> strongHouses = new ArrayList<>();
         List<Integer> weakHouses = new ArrayList<>();
@@ -416,8 +609,8 @@ public class NarrativeSynthesizer {
                   + "rather than a gap - most charts have several.</p>");
         }
 
-        // 8. Angles and Sabian Archetypes
-        sb.append("<h2 style='color: #FFD700;'>8. The Angles and their Sabian Archetypes</h2>");
+        // 4.8 Angles and Sabian Archetypes
+        sb.append("<h2 style='color: #FFD700;'>4.8 The Angles and their Sabian Archetypes</h2>");
         sb.append("<ul>");
         if (f.asc != 0.0) {
             String ascSign = Zodiac.signName(f.asc);
@@ -442,81 +635,19 @@ public class NarrativeSynthesizer {
         }
         sb.append("</ul>");
 
-        // 9. Specific Chronological Triggers
-        sb.append("<h2 style='color: #FFD700;'>9. Specific Chronological Triggers</h2>");
+        // 4.9 Convergence Intensity Rankings
+        //
+        // <b>What this section is, once the themes have been lifted out of it.</b> It ranked
+        // the natal points by how much of the year lands on them, and it answered a real
+        // question - which of my points is busy - underneath the one a reader asks first, which
+        // is what the year is about. That answer is tier 1 and tier 2 now; the ranking stays
+        // here, whole, as the working it was read off.
+        sb.append("<h2 style='color: #FFD700;'>4.9 Convergence Intensity Rankings</h2>");
         // Convergence is assembled from the profection year scan and the solar return, so it
-        // inherits the birthday problem described on section 4 and is suppressed with it.
+        // inherits the birthday problem described on 4.4 and is suppressed with it.
         if (relationship) {
             sb.append("<p><i>Convergence is scanned across a profection year, which a composite does not have. See the note above.</i></p>");
         } else if (withTime && scan != null && convergence != null) {
-            // K12, stage 4: the year by theme, and the Rule of Three. A theme is only a headline
-            // when three independent techniques name it; the rest are background trends. The
-            // testimonies are the witnesses' own details - named and listed, never written up.
-            List<com.zodiacomputing.ourania.astro.ThemeConvergence.Result> themes =
-                com.zodiacomputing.ourania.astro.ThemeConvergence.themes(f, prof, convergence,
-                    scan.moonClock, scan.catalysts);
-            // K12 stage 2. The mid-term clock reads the same whether or not any theme reaches
-            // three, so it is stated before them rather than only inside a headline.
-            if (scan.moonClock != null && !scan.moonClock.isEmpty()) {
-                StringBuilder clock = new StringBuilder();
-                for (com.zodiacomputing.ourania.astro.Progressions.Tenancy ten : scan.moonClock) {
-                    clock.append(clock.length() == 0 ? "" : "; ").append(ten);
-                    if (ten.phase != null && !ten.phase.isEmpty()) {
-                        clock.append(", lunation ").append(ten.phase);
-                    }
-                }
-                sb.append("<p><b style='color:#FFD166;'>The mid-term clock:</b> ")
-                    .append(clock).append(".</p>");
-            }
-            sb.append("<h3 style='color: #FFFFFF;'>The year by theme (the Rule of Three)</h3>");
-            boolean anyHeadline = false;
-            for (com.zodiacomputing.ourania.astro.ThemeConvergence.Result th : themes) {
-                if (!th.headline()) {
-                    continue;
-                }
-                anyHeadline = true;
-                sb.append("<p><b style='color:#FFD166;'>").append(th.theme.label)
-                    .append("</b> &middot; ").append(th.families.size())
-                    .append(" independent testimonies</p><ul>");
-                for (String line : th.testimonies) {
-                    sb.append("<li>").append(line).append("</li>");
-                }
-                sb.append("</ul>");
-                // K12 stage 3: the days, for a theme that has already been agreed. The Sun and
-                // Mars are kept out of the voting because they agree with everything, which is
-                // the same fact that makes them good clocks - so they say when and never
-                // whether, and the line says so.
-                if (!th.peaks.isEmpty()) {
-                    sb.append("<p style='color:#AAAAAA;'><i>Dates to watch</i> - the year's "
-                        + "fullest gatherings of Sun and Mars on this theme's own points. The "
-                        + "Sun reaches every point monthly, so these are the strongest of a "
-                        + "monthly beat rather than rare events, and they mark the day without "
-                        + "making the case.</p><ul style='color:#AAAAAA;'>");
-                    for (com.zodiacomputing.ourania.astro.ThemeConvergence.Peak peak
-                            : th.strongest(4)) {
-                        String span = dayOf(peak.from()).equals(dayOf(peak.to()))
-                            ? dayOf(peak.from())
-                            : dayOf(peak.from()) + " to " + dayOf(peak.to());
-                        sb.append("<li><b>").append(span).append("</b> - ")
-                            .append(peak).append("</li>");
-                    }
-                    sb.append("</ul>");
-                }
-            }
-            if (!anyHeadline) {
-                sb.append("<p>No theme reaches three independent testimonies this year.</p>");
-            }
-            StringBuilder trends = new StringBuilder();
-            for (com.zodiacomputing.ourania.astro.ThemeConvergence.Result th : themes) {
-                if (!th.headline() && !th.families.isEmpty()) {
-                    trends.append(trends.length() == 0 ? "" : "; ").append(th.theme.label)
-                        .append(" (").append(th.families.size()).append(")");
-                }
-            }
-            if (trends.length() > 0) {
-                sb.append("<p style='color:#AAAAAA;'><i>Background trends:</i> ").append(trends)
-                    .append("</p>");
-            }
             sb.append("<p>Upcoming significant convergence events across the current profection year:</p><ul>");
             for (Convergence.Target target : convergence) {
                 if (target.score > 0.0) {
@@ -539,8 +670,8 @@ public class NarrativeSynthesizer {
             sb.append("<p><i>Transit data not enabled. Enable transits to scan upcoming timeline events.</i></p>");
         }
 
-        // 10. Current Transits
-        sb.append("<h2 style='color: #FFD700;'>10. Current Transits</h2>");
+        // 4.10 Current Transits
+        sb.append("<h2 style='color: #FFD700;'>4.10 Current Transits</h2>");
         if (withTime && hits != null && !hits.isEmpty()) {
             // One contact per axis. A body conjunct the MC is opposite the IC at the same orb
             // in the same instant, and the page was reporting both as though they were two
@@ -586,5 +717,183 @@ public class NarrativeSynthesizer {
         de.thmac.swisseph.SweDate d = new de.thmac.swisseph.SweDate();
         d.setJulDay(jd);
         return String.format("%04d-%02d-%02d", d.getYear(), d.getMonth(), d.getDay());
+    }
+
+    /**
+     * A tier heading.
+     *
+     * <b>Swing's HTML renderer styles h1, h2 and h3 and stops there</b>, and the mechanics'
+     * own section headings already use h2 - so a tier cannot simply be an h4 and be seen. It
+     * is an h2 with the weight put back by hand: white, larger, and underlined, against the
+     * gold h2s of the sections beneath it. Written once here because four headings that must
+     * look alike, spelled out at four call sites, is the shape of thing that drifts.
+     */
+    private static String tier(String title) {
+        return "<h2 style='color:#FFFFFF; font-size:19px; margin-top:26px;"
+            + " border-bottom:1px solid #444; padding-bottom:3px;'>" + title + "</h2>";
+    }
+
+    /** The colours of the top activated points, strongest first. */
+    private static final String[] SPARK = {"#FF6B6B", "#FFA94D", "#FFD43B"};
+
+    /**
+     * A theme's testimonies, one line per technique that agreed.
+     *
+     * <p><b>The list was one line per witness, and a witness is not a technique.</b> Nine
+     * transits to the Moon are one testimony by the Rule of Three's own definition - "two
+     * transits to the same point are one witness, not two" - and all nine were printed, each
+     * ending "(same technique, counted once)". A theme headlined as seven testimonies arrived
+     * as thirty-one lines, twenty-four of which said they did not count. A reader cannot hold
+     * that, and the shape of it argues against the very rule the section exists to apply.
+     *
+     * <p>So one line per family - the first, which is the one that counted - and the echoes
+     * behind it as a number. <b>Nothing is dropped:</b> every contact is still listed verbatim
+     * under 4.9, witness by witness, which is where somebody checking the count goes.
+     */
+    private static String testimonies(ThemeConvergence.Result th) {
+        java.util.LinkedHashMap<String, List<String>> byFamily = new java.util.LinkedHashMap<>();
+        int background = 0;
+        for (String line : th.testimonies) {
+            // The engine marks a contact on a point the year has not woken as background and
+            // does not count it, so it is not a testimony and does not get a line of its own.
+            if (line.contains("(to a point not active this year")) {
+                background++;
+                continue;
+            }
+            int colon = line.indexOf(": ");
+            String head = colon > 0 ? line.substring(0, colon) : line;
+            byFamily.computeIfAbsent(head, k -> new ArrayList<>()).add(line);
+        }
+        StringBuilder sb = new StringBuilder("<ul>");
+        for (java.util.Map.Entry<String, List<String>> e : byFamily.entrySet()) {
+            List<String> lines = e.getValue();
+            sb.append("<li>").append(testimony(lines.get(0)));
+            // The rule is stated once, above the themes. Repeating it on forty lines would be
+            // the same crowding this method exists to undo.
+            if (lines.size() > 1) {
+                sb.append("<span style='color:#888;'> &middot; +").append(lines.size() - 1)
+                    .append(" more</span>");
+            }
+            sb.append("</li>");
+        }
+        if (background > 0) {
+            sb.append("<li style='color:#888;'>").append(background)
+                .append(background == 1 ? " further contact lands" : " further contacts land")
+                .append(" on a point the year has not woken, so ")
+                .append(background == 1 ? "it is" : "they are")
+                .append(" background and not counted.</li>");
+        }
+        return sb.append("</ul>").toString();
+    }
+
+    /**
+     * A testimony line in the reading's voice.
+     *
+     * <p><b>{@link ThemeConvergence} writes its testimonies for the audit, and it is right
+     * to.</b> The family is its enum constant in capitals, and a repeat carries "(same
+     * technique, counted once)" so that the headline count can be checked against the list it
+     * came from. Both of those are exactly what a check suite wants and neither is English, so
+     * the wording is changed here, on the page, and the engine keeps its record unaltered -
+     * which is also why this is a rewrite of the line rather than a second set of strings in
+     * ThemeConvergence.
+     */
+    private static String testimony(String line) {
+        String s = line;
+        int colon = s.indexOf(": ");
+        if (colon > 0) {
+            String head = s.substring(0, colon);
+            if (head.equals(head.toUpperCase()) && head.indexOf(' ') < 0) {
+                s = "<b>" + familyLabel(head) + "</b> &mdash; " + s.substring(colon + 2);
+            }
+        }
+        return s
+            .replace(" (same technique, counted once)",
+                "<span style='color:#888;'> (this technique again, counted once)</span>")
+            .replace(" (to a point not active this year: background, not counted)",
+                "<span style='color:#888;'> (background &mdash; the year has not woken this"
+                + " point, so it does not count as a testimony)</span>");
+    }
+
+    /** A technique family as a reader's name for it rather than as its enum constant. */
+    private static String familyLabel(String family) {
+        switch (family) {
+            case "PROFECTION": return "Profection";
+            case "TRANSIT": return "Transit";
+            case "ECLIPSE": return "Eclipse";
+            case "STATION": return "Station";
+            case "SOLAR_ARC": return "Solar arc";
+            case "PROGRESSION": return "Progression";
+            case "PROGRESSED_MOON": return "Progressed Moon";
+            case "RETURN": return "Return";
+            // A family added to Convergence.Family and not to this switch reads as its own
+            // constant - odd-looking, and never wrong about which technique spoke.
+            default: return family;
+        }
+    }
+
+    /** One occasion on the timeline: the themes peaking in it, and the touches that make it up. */
+    private static final class Window {
+        double from;
+        double to;
+        final java.util.LinkedHashSet<String> themes = new java.util.LinkedHashSet<>();
+        final List<String> hits = new ArrayList<>();
+    }
+
+    /**
+     * Every headline theme's strongest peaks, merged into one timeline.
+     *
+     * <p><b>Peaks were printed inside the theme that owned them, and a year does not arrive
+     * theme by theme.</b> A fortnight where career and health peak together is one occasion in
+     * a reader's life and was two entries in two lists here. So the peaks are pooled, sorted by
+     * date, and any two falling within {@link ThemeConvergence#PEAK_SPAN_DAYS} of each other
+     * become one window naming both themes - the same span the engine uses to decide that two
+     * catalyst touches are one occasion, applied once more, one level up.
+     *
+     * <p>Four per theme, as before: {@code strongest(4)} is where the choice of which peaks
+     * are worth naming is made, and merging must not quietly widen it.
+     */
+    private static List<Window> windows(List<ThemeConvergence.Result> themes) {
+        List<ThemeConvergence.Peak> peaks = new ArrayList<>();
+        List<String> owners = new ArrayList<>();
+        for (ThemeConvergence.Result th : themes) {
+            if (!th.headline()) {
+                continue;
+            }
+            for (ThemeConvergence.Peak p : th.strongest(4)) {
+                peaks.add(p);
+                owners.add(th.theme.label);
+            }
+        }
+        Integer[] order = new Integer[peaks.size()];
+        for (int i = 0; i < order.length; i++) {
+            order[i] = i;
+        }
+        java.util.Arrays.sort(order,
+            java.util.Comparator.comparingDouble(i -> peaks.get(i).from()));
+
+        List<Window> out = new ArrayList<>();
+        for (int i : order) {
+            ThemeConvergence.Peak p = peaks.get(i);
+            Window last = out.isEmpty() ? null : out.get(out.size() - 1);
+            if (last == null || p.from() > last.to + ThemeConvergence.PEAK_SPAN_DAYS) {
+                last = new Window();
+                last.from = p.from();
+                last.to = p.to();
+                out.add(last);
+            } else {
+                last.to = Math.max(last.to, p.to());
+            }
+            last.themes.add(owners.get(i));
+            for (ThemeConvergence.Dated d : p.hits) {
+                String s = d.toString();
+                // The same catalyst touch belongs to every theme whose points it lands on, so
+                // a merged window would otherwise print "Sun conjunct Moon" twice for a health
+                // and a home peak that share the Moon.
+                if (!last.hits.contains(s)) {
+                    last.hits.add(s);
+                }
+            }
+        }
+        return out;
     }
 }
