@@ -1376,7 +1376,7 @@ extends JPanel {
     private char houseSystem = (char)80;
     private String currentHouseSystemName = com.zodiacomputing.ourania.astro.HouseSystems.DEFAULT_NAME;
     public static final int BODY_COUNT = Bodies.count();
-    private static final String[] BODY_NAMES = new String[BODY_COUNT];
+    static final String[] BODY_NAMES = new String[BODY_COUNT];
     static final String[] BODY_GLYPHS = new String[BODY_COUNT];
     private static final int[] BODY_ELEMENTS = new int[BODY_COUNT];
     private static final int SUN = Bodies.indexOf("sun");
@@ -3419,9 +3419,9 @@ extends JPanel {
             this.getElementColor(BODY_ELEMENTS[bodyIndex]));
     }
 
-    String bodyColorHex(int bodyIndex) {
+    static String bodyColorHex(int bodyIndex) {
         String own = ChartPalette.bodyHex(Bodies.at(bodyIndex).id);
-        return own != null ? own : this.getElementColorHex(BODY_ELEMENTS[bodyIndex]);
+        return own != null ? own : SkymapPanel.getElementColorHex(BODY_ELEMENTS[bodyIndex]);
     }
 
     private Color getElementColor(int n, boolean lightBacking) {
@@ -4180,145 +4180,7 @@ extends JPanel {
         if (chartFrame == null || chartFrame2 == null) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<br><hr style='border-color:#444;'><br>");
-        stringBuilder.append(this.angleContactsHtml("Chart A on Chart B's angles",
-            chartFrame, chartFrame2));
-        stringBuilder.append(this.angleContactsHtml("Chart B on Chart A's angles",
-            chartFrame2, chartFrame));
-        stringBuilder.append(this.houseOverlayHtml("Chart A's placements in Chart B's houses",
-            chartFrame, chartFrame2));
-        stringBuilder.append(this.houseOverlayHtml("Chart B's placements in Chart A's houses",
-            chartFrame2, chartFrame));
-        return stringBuilder.toString();
-    }
-
-    /** One direction of angle contacts, tightest first. */
-    private String angleContactsHtml(String string, ChartFrame chartFrame, ChartFrame chartFrame2) {
-        List<Synastry.AngleContact> list = Synastry.angleContacts(chartFrame, chartFrame2);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<h3 style='color:#FFD166; margin:0 0 4px 0;'>Angle contacts &middot; ")
-            .append(string).append("</h3>");
-        if (list.isEmpty()) {
-            // Said out loud rather than left blank, on the same reasoning as the aspect
-            // pattern box: a section that vanishes cannot be told from a section that broke.
-            stringBuilder.append("<div style='color:#9AA5B1; font-size:11px; margin-bottom:10px;'>")
-                .append("Nothing sits on the Ascendant, Descendant, MC or IC within orb.</div>");
-            return stringBuilder.toString();
-        }
-        stringBuilder.append("<div style='border:1px solid #FFD166; padding:6px; margin-bottom:10px;'>");
-        for (Synastry.AngleContact angleContact : list) {
-            stringBuilder.append("<div style='margin-bottom:3px; color:#cccccc; font-size:12px;'>")
-                .append("<span style='font-size:15px;'>").append(SkymapPanel.namedGlyph(angleContact.bodyIndex))
-                .append("</span> ").append(angleContact.body).append(" ")
-                .append(Zodiac.format(angleContact.bodyLon))
-                .append(" <span style='color:#FFD166;'>on</span> ").append(angleContact.angle)
-                .append(" ").append(Zodiac.format(angleContact.angleLon))
-                .append(" <span style='color:#9AA5B1;'>&mdash; orb ")
-                .append(SkymapPanel.formatOrb(angleContact.orb)).append(" of ")
-                .append(SkymapPanel.formatOrb(angleContact.maxOrb)).append("</span></div>");
-        }
-        // What landing on that particular angle means, once per angle actually involved.
-        // Once, not once per row: two bodies on the same Ascendant is one fact about the
-        // Ascendant repeated, and printing the paragraph twice would say so twice.
-        java.util.Set<String> said = new java.util.LinkedHashSet<>();
-        for (Synastry.AngleContact angleContact : list) {
-            if (!said.add(angleContact.angle)) {
-                continue;
-            }
-            String prose = InterpretationService.getInstance()
-                .getAngleContact(angleContact.angle.toLowerCase());
-            if (prose != null) {
-                stringBuilder.append("<div style='color:#dddddd; font-size:11px; ")
-                    .append("margin-top:6px;'>").append(prose).append("</div>");
-            }
-        }
-        stringBuilder.append("</div>");
-        return stringBuilder.toString();
-    }
-
-    /**
-     * One direction of house overlays, grouped by the host's house.
-     *
-     * Grouped rather than listed body by body because the reading is about the house: six
-     * of A's bodies in B's 12th is one fact, not six. The houses nothing lands in are named
-     * on their own line for the same reason the empty case above is - so that an absent
-     * house reads as empty rather than as missing.
-     */
-    private String houseOverlayHtml(String string, ChartFrame chartFrame, ChartFrame chartFrame2) {
-        List<Synastry.Overlay> list = Synastry.houseOverlays(chartFrame, chartFrame2);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<h3 style='color:#add8e6; margin:0 0 4px 0;'>House overlays &middot; ")
-            .append(string).append("</h3>");
-        if (list.isEmpty()) {
-            stringBuilder.append("<div style='color:#9AA5B1; font-size:11px; margin-bottom:10px;'>")
-                .append("The visiting chart computed no bodies.</div>");
-            return stringBuilder.toString();
-        }
-        StringBuilder[] stringBuilderArray = new StringBuilder[13];
-        StringBuilder stringBuilder2 = new StringBuilder();
-        for (Synastry.Overlay overlay : list) {
-            StringBuilder stringBuilder3;
-            if (overlay.house < 1 || overlay.house > 12) {
-                stringBuilder3 = stringBuilder2;
-            } else {
-                if (stringBuilderArray[overlay.house] == null) {
-                    stringBuilderArray[overlay.house] = new StringBuilder();
-                }
-                stringBuilder3 = stringBuilderArray[overlay.house];
-            }
-            if (stringBuilder3.length() > 0) {
-                stringBuilder3.append(", ");
-            }
-            stringBuilder3.append("<span style='font-size:15px;'>")
-                .append(SkymapPanel.namedGlyph(overlay.bodyIndex)).append("</span> ").append(overlay.body);
-        }
-        stringBuilder.append("<div style='margin-bottom:10px;'>");
-        StringBuilder stringBuilder4 = new StringBuilder();
-        for (int i = 1; i <= 12; ++i) {
-            if (stringBuilderArray[i] == null) {
-                if (stringBuilder4.length() > 0) {
-                    stringBuilder4.append(", ");
-                }
-                stringBuilder4.append(PlacementText.romanNumeral(i));
-                continue;
-            }
-            boolean bl = i == 1 || i == 4 || i == 7 || i == 10;
-            stringBuilder.append("<div style='margin-bottom:3px; color:#cccccc; font-size:12px;'>")
-                .append("<span style='color:").append(bl ? "#FFD166" : "#add8e6").append(";'>House ")
-                .append(PlacementText.romanNumeral(i)).append(bl ? " (angular)" : "").append("</span> &nbsp;")
-                .append(stringBuilderArray[i]);
-            // The lead only. The full overlay paragraph is worth reading for one house and
-            // unreadable twelve times over, and the lead is the sentence the format exists to
-            // provide - see boldLead.
-            String lead = SkymapPanel.boldLead(
-                InterpretationService.getInstance().getOverlayHouse(i));
-            if (lead != null) {
-                stringBuilder.append("<div style='color:#9AA5B1; font-size:11px; ")
-                    .append("margin-left:14px;'>").append(lead).append("</div>");
-            }
-            stringBuilder.append("</div>");
-        }
-        if (stringBuilder4.length() > 0) {
-            stringBuilder.append("<div style='color:#9AA5B1; font-size:11px;'>Nothing of theirs in: ")
-                .append(stringBuilder4).append(".</div>");
-        }
-        if (stringBuilder2.length() > 0) {
-            // House 0 from Zodiac.houseOf means the receiving chart's cusp set is degenerate,
-            // which is a fact about that chart and not about these bodies.
-            stringBuilder.append("<div style='color:#ff8080; font-size:11px;'>No house could be "
-                + "determined for: ").append(stringBuilder2)
-                .append(" &mdash; the receiving chart's cusps are degenerate at its latitude.</div>");
-        }
-        stringBuilder.append("</div>");
-        return stringBuilder.toString();
-    }
-
-    /** Degrees and arcminutes, for an orb. Truncated to the minute, as Zodiac.format is. */
-    private static String formatOrb(double d) {
-        int n = (int)Math.floor(d);
-        int n2 = (int)Math.floor((d - (double)n) * 60.0);
-        return n + "&deg;" + String.format("%02d", n2) + "'";
+        return SynastryPage.crossContacts(chartFrame, chartFrame2);
     }
 
     /**
@@ -5729,7 +5591,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return Aspects.Profile.NATAL;
     }
 
-    private static String planetName(int n) {
+    static String planetName(int n) {
         return n >= 0 && n < BODY_NAMES.length ? BODY_NAMES[n] : null;
     }
 
@@ -5938,13 +5800,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * would have been invisible: both surfaces look entirely plausible on their own.
      */
     private Aspects.Type visibleAspect(double sep, int a, int b, Aspects.Profile profile) {
-        Aspects.Type type = Aspects.typeOf(sep, SkymapPanel.planetName(a),
-            SkymapPanel.planetName(b), profile);
-        if (type == null) {
-            return null;
-        }
-        return this.aspectShown == null || type.ordinal() >= this.aspectShown.length
-            || this.aspectShown[type.ordinal()] ? type : null;
+        return AspectGate.visible(sep, a, b, profile, this.aspectShown);
     }
 
     /**
@@ -6067,7 +5923,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     // ------------------------------------------------- aspect grid: click, hover, highlight
 
     /** Prefix the aspect grid puts on the row body when the row is a transiting point. */
-    private static final String TRANSIT_PREFIX = "transit_";
+    static final String TRANSIT_PREFIX = "transit_";
 
     /**
      * Which wheel an aspect line runs from.
@@ -8656,11 +8512,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return this.generatePlanetPlacementsHtml(PlacementPart.ALL);
     }
 
-    /** The width the aspect grid has to fit into: the drawer, less padding and scrollbar. */
-    private static final int GRID_FIT_WIDTH = 276;
-
-    /** Below this the glyphs stop being distinguishable, so the grid scrolls rather than lies. */
-    private static final int GRID_MIN_CELL = 11;
 
     private String generatePlanetPlacementsHtml(PlacementPart part) {
         final boolean wantNatal = part == PlacementPart.ALL || part == PlacementPart.NATAL;
@@ -8752,58 +8603,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             stringBuilder.append("<br><hr style='border-color:#444;'><br>");
         }
         int n4 = n3 = this.showTransitChart && (this.aspectFilter.equals("Transit-Natal") || this.aspectFilter.equals("Both")) ? 1 : 0;
+        String gridHeading;
         if (n3 != 0) {
-            if (this.chartMode == ChartMode.SYNASTRY) {
-                stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>Synastry Aspects Grid</h3>");
-            } else {
-                stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>Transit to Natal Grid</h3>");
-            }
+            gridHeading = this.chartMode == ChartMode.SYNASTRY
+                ? "Synastry Aspects Grid" : "Transit to Natal Grid";
         } else {
-            stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>")
-                .append(this.innerIsBirthChart ? "Natal Aspects Grid" : "Sky Aspects Grid")
-                .append("</h3>");
+            gridHeading = this.innerIsBirthChart ? "Natal Aspects Grid" : "Sky Aspects Grid";
         }
-        stringBuilder.append("<div style='font-size:10px; margin-bottom:10px;'>");
-        // Quincunx belongs here: the grid has always emitted quincunx cells, so leaving it out
-        // of the legend left a symbol on the table that nothing explained.
-        // Driven from Aspects.Type rather than a hand-written list, so an aspect the engine
-        // can emit cannot be missing from the legend. That is exactly how the quincunx came to
-        // be drawn on the grid with nothing explaining it.
-        for (Aspects.Type aspectType : Aspects.Type.values()) {
-            String string5 = aspectType.label;
-            stringBuilder.append("<span style='color:").append(this.getAspectColorHex(string5)).append("; font-size:14px;'>").append(this.getAspectSymbol(string5)).append("</span> <span style='color:#ccc;'>").append(string5).append("</span> &nbsp; ");
-        }
-        stringBuilder.append("</div>");
-        // <b>The grid sizes itself to the points that are switched on.</b> It was a fixed
-        // 22px cell at 14px type, which is a table as wide as the number of bodies enabled -
-        // with the asteroids and angles on that is far wider than any drawer, and the columns
-        // ran off the edge where they could not be read at all. Scaled to fit instead of
-        // scrolled: a triangular grid is read by scanning across a row, and a table you have
-        // to drag sideways to finish one row is worse than a small one you can take in whole.
-        int gridCols = 0;
-        for (n = 0; n < BODY_COUNT; ++n) {
-            if (SkymapPanel.aspecting(n, this.natalRing.valid)) {
-                gridCols++;
-            }
-        }
-        // The drawer's content width, less its padding and the vertical scrollbar.
-        int cell = gridCols > 0 ? (GRID_FIT_WIDTH / (gridCols + 1)) : 22;
-        cell = Math.max(GRID_MIN_CELL, Math.min(22, cell));
-        int glyph = Math.max(8, cell - 3);
-        stringBuilder.append("<table border='1' cellspacing='0' cellpadding='0' style='border-collapse: collapse; border-color: #555; text-align:center;'>");
-        stringBuilder.append("<tr><td style='width:").append(cell).append("px;'></td>");
-        for (n = 0; n < BODY_COUNT; ++n) {
-            if (!SkymapPanel.aspecting(n, this.natalRing.valid)) continue;
-            stringBuilder.append("<td style='color:").append(this.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
-        }
-        stringBuilder.append("</tr>");
+        java.util.List<AspectGrid.Band> bands = new java.util.ArrayList<>();
         // <b>And the block above the sky one had no band at all.</b> Its rows sat straight
         // under the heading, so in a synastry the grid never said "Chart B" anywhere - which is
         // what David asked about on 2026-09-24: where are chart A and chart B in any of it.
-        // A natal-only grid still gets none, because ringWord has no word for the inner wheel:
-        // rows that are simply the chart being read need no qualifier.
-        this.appendGridBand(stringBuilder, n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL, gridCols);
-        this.appendGridRows(stringBuilder, n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL, cell, glyph);
+        bands.add(this.gridBand(n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL));
         // <b>The sky ring had no rows here at all.</b> It is drawn, it is hovered, it has its
         // own field of chords - and the grid, which is where a reader goes to find an aspect
         // by name rather than by eye, stopped at the ring below it. So its lines could be seen
@@ -8813,89 +8624,24 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // reader's filter had cross-chart lines switched off would be naming pairs the wheel
         // deliberately does not draw.
         if (n3 != 0 && this.triRingDrawn()) {
-            this.appendGridBand(stringBuilder, WHEEL_SKY, gridCols);
-            this.appendGridRows(stringBuilder, WHEEL_SKY, cell, glyph);
+            bands.add(this.gridBand(WHEEL_SKY));
         }
-        stringBuilder.append("</table>");
+        stringBuilder.append(AspectGrid.table(gridHeading, this.natalRing, bands,
+            this.aspectShown));
         stringBuilder.append("</body></html>");
         return stringBuilder.toString();
     }
 
     /**
-     * One wheel's worth of rows in the aspect grid.
+     * One ring's rows for the aspect grid, with what only the panel knows about that ring:
+     * what it is called and which orb profile its pairs are judged at.
      *
-     * <b>Written once because there are three wheels now.</b> The rows used to be built inline
-     * with the wheel chosen by a boolean in three separate expressions, which is the shape the
-     * sky ring could not be added to without a fourth copy - and a fourth copy of a cell test
-     * is a fourth chance for the grid to disagree with the wheel about what is in aspect.
-     *
-     * Columns are always the natal points: every aspect on this grid is something aspecting
-     * the chart. The natal rows are the triangular half, since a natal pair appears once.
+     * <b>Only the partner ring is a synastry pair.</b> The sky ring is a moment and is judged at
+     * natal orbs - the same call the wheel and the hit test make.
      */
-    /**
-     * A band across the grid naming the ring whose rows follow it.
-     *
-     * <b>Through ringWord, not a literal.</b> The sky band used to be the string "sky" written
-     * here, which is a second copy of a rule that already had a home - and the copies on this
-     * particular question have drifted apart five times now, most recently leaving Chart B
-     * labelled "(transiting)" on the aspect card. One helper, one source, and the grid cannot
-     * disagree with the card about what a ring is called.
-     *
-     * <b>Silent for the inner wheel.</b> {@link #ringWord} returns null there: rows that are
-     * simply the chart being read need no qualifier, and a band saying "natal" over a natal-only
-     * grid would be noise.
-     */
-    private void appendGridBand(StringBuilder sb, int ring, int gridCols) {
-        String word = this.ringWord(ring);
-        if (word == null) {
-            return;
-        }
-        sb.append("<tr><td colspan='").append(gridCols + 1)
-          .append("' style='color:#8FD0FF; font-size:10px; text-align:left;"
-              + " padding:3px 0 1px 2px; background-color:#111;'>")
-          .append(word).append("</td></tr>");
-    }
-
-    private void appendGridRows(StringBuilder out, int wheel, int cell, int glyph) {
-        double[] lon = this.wheelLon(wheel);
-        boolean[] valid = this.wheelValid(wheel);
-        for (int n = 0; n < BODY_COUNT; ++n) {
-            if (!SkymapPanel.aspecting(n, valid)) continue;
-            out.append("<tr>");
-            out.append("<td style='color:").append(this.bodyColorHex(n))
-               .append("; font-size:").append(glyph).append("px; width:").append(cell)
-               .append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
-            for (int i = 0; i < BODY_COUNT; ++i) {
-                if (!SkymapPanel.aspecting(i, this.natalRing.valid)) continue;
-                if ((wheel == WHEEL_NATAL && i >= n) || Bodies.isOppositePair(n, i)) {
-                    out.append("<td style='background-color:#111;'></td>");
-                    continue;
-                }
-                double sep = Math.abs(lon[n] - this.natalRing.lon[i]);
-                if (sep > 180.0) {
-                    sep = 360.0 - sep;
-                }
-                // Only the partner ring is a synastry pair. The sky ring is a moment and is
-                // judged at natal orbs - the same call the wheel and the hit test make.
-                String type = this.getAspectType(sep, n, i,
-                    this.profileForPair(wheel == WHEEL_OUTER));
-                if (type == null) {
-                    out.append("<td style='background-color:#222;'></td>");
-                    continue;
-                }
-                String row = wheel == WHEEL_NATAL ? BODY_NAMES[n]
-                    : TRANSIT_PREFIX + BODY_NAMES[n].toLowerCase();
-                // Through aspectHref, never formatted inline: the parser is the only other
-                // place that knows this format and the two must not be able to drift.
-                String href = SkymapPanel.aspectHref(row, BODY_NAMES[i], type, wheel);
-                out.append("<td style='background-color:#222;'><a href='").append(href)
-                   .append("' style='text-decoration:none;'>").append("<span style='color:")
-                   .append(this.getAspectColorHex(type)).append("; font-size:").append(glyph)
-                   .append("px;'>").append(this.getAspectSymbol(type))
-                   .append("</span></a></td>");
-            }
-            out.append("</tr>");
-        }
+    private AspectGrid.Band gridBand(int wheel) {
+        return new AspectGrid.Band(this.ringWord(wheel), this.ringAt(wheel), wheel,
+            this.profileForPair(wheel == WHEEL_OUTER));
     }
 
     /**
@@ -8921,7 +8667,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return BODY_ELEMENTS[bodyIndex];
     }
 
-    private String getElementColorHex(int n) {
+    private static String getElementColorHex(int n) {
         if (n < 0 || n >= ELEMENT_TEXT_HEX.length) {
             return "#ffffff";
         }
