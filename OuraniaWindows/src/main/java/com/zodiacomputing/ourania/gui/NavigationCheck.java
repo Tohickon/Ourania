@@ -2302,7 +2302,7 @@ public final class NavigationCheck {
             final String[] html = new String[1];
             SwingUtilities.invokeAndWait(() -> html[0] = natal.getText());
             if (!html[0].contains("pattern|")) {
-                String banner = SkymapPanel.patternEntryHtml(figure("Grand trine",
+                String banner = PlacementText.patternEntryHtml(figure("Grand trine",
                     java.util.List.of("Moon", "Sun", "Venus"), null, "air", null));
                 SwingUtilities.invokeAndWait(() -> natal.setText(
                     html[0].replaceFirst("(?i)<body[^>]*>", "$0" + banner)));
@@ -2417,11 +2417,11 @@ public final class NavigationCheck {
             // which is what David was clicking. Three figures in the generator's own markup,
             // the same three his chart showed, and a click on each visible character.
             final String[] names = {"Grand trine", "Kite", "T-square"};
-            final String entries = SkymapPanel.patternEntryHtml(figure("Grand trine",
+            final String entries = PlacementText.patternEntryHtml(figure("Grand trine",
                     java.util.List.of("Mercury", "Pluto", "Uranus"), null, "air", null))
-                + SkymapPanel.patternEntryHtml(figure("Kite",
+                + PlacementText.patternEntryHtml(figure("Kite",
                     java.util.List.of("Mercury", "Neptune", "Pluto", "Uranus"), "Mercury", "air", null))
-                + SkymapPanel.patternEntryHtml(figure("T-square",
+                + PlacementText.patternEntryHtml(figure("T-square",
                     java.util.List.of("Chiron", "Pluto", "Venus"), "Pluto", null, "fixed"));
             final java.util.List<java.awt.Point> points = new java.util.ArrayList<>();
             final java.util.List<String> owners = new java.util.ArrayList<>();

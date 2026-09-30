@@ -1377,7 +1377,7 @@ extends JPanel {
     private String currentHouseSystemName = com.zodiacomputing.ourania.astro.HouseSystems.DEFAULT_NAME;
     public static final int BODY_COUNT = Bodies.count();
     private static final String[] BODY_NAMES = new String[BODY_COUNT];
-    private static final String[] BODY_GLYPHS = new String[BODY_COUNT];
+    static final String[] BODY_GLYPHS = new String[BODY_COUNT];
     private static final int[] BODY_ELEMENTS = new int[BODY_COUNT];
     private static final int SUN = Bodies.indexOf("sun");
     private static final int MOON = Bodies.indexOf("moon");
@@ -2946,102 +2946,15 @@ extends JPanel {
             this.selectionSpeed, this.selectionTransit));
     }
 
+    /**
+     * The hover card for a body on one of the rings. The words are {@link PlacementText}'s; what
+     * stays here is the one thing only the panel knows - which ring, so which cusps and name.
+     */
     private String hoverHtml(int n, double lon, double speed, int ring) {
         final boolean transit = ring != WHEEL_NATAL;
-        Bodies.Def def = Bodies.at(n);
-        int signIdx = Zodiac.signIndex(lon);
-        String sign = Zodiac.SIGNS[signIdx];
-        int degInSign = (int)(lon % 30.0);
-        int minInSign = (int)((lon % 30.0 - (double)degInSign) * 60.0);
-        int decan = Zodiac.decan(lon);
-
-        StringBuilder sb = new StringBuilder();
-        // <b>Its own background and its own ink, because this card lands in two places.</b>
-        // It is a tooltip over the wheel and it is also the top of the Selection drawer -
-        // selectionHtml builds on it - and it set neither colour, so it inherited whatever it
-        // landed on. Over a pale tooltip the default black read fine; in the dark drawer the
-        // point's name was black on near-black, which is what David saw. A fragment reused on
-        // two surfaces has to carry its own contrast rather than borrow one.
-        sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;"
-            + " background:#12151A; color:#E0E0E0;'>");
-        sb.append("<div style='font-size:13px;'><b>").append(def.name).append("</b>");
-        if (transit) {
-            sb.append(" <span style='color:#5A7FBF;'>(")
-                  .append(this.ringWord(ring)).append(")</span>");
-        }
-        if (!def.isAngle() && speed < 0.0) {
-            sb.append(" <span style='color:#B03030;'><b>R</b></span>");
-        }
-        sb.append("</div>");
-
-        sb.append("<div><b>").append(degInSign).append("&deg;")
-          .append(minInSign < 10 ? "0" : "").append(minInSign).append("'</b> ")
-          .append(SkymapPanel.capitalise(sign));
-        int house = Zodiac.houseOf(lon, transit ? this.outerRing.cusps : this.activeCusps);
-        if (house > 0) {
-            sb.append(" &nbsp;&middot;&nbsp; House ").append(house);
-        }
-        sb.append("</div>");
-
-        // <b>Both decan schemes, each named.</b> This line used to read "sub-ruler Mercury"
-        // without saying which of the two systems that was, which is the one thing a reader
-        // cannot afford not to know here: they disagree for 30 of the 36 decans, and the app
-        // uses both at once. The triplicity ruler is the one the decan prose is written to;
-        // the Chaldean face is the one the Golden Dawn tarot cards and the Sabian decan_ruler
-        // field encode. Naming them is what lets a practitioner reconcile the two surfaces
-        // instead of reading the difference as a fault. Zodiac's header carries the full note.
-        // <b>The degree's own condition, when it has one.</b> Open in the work plan since
-        // 21 Aug and settled 2026-09-03: anaretic is exactly 29d00'00" to 29d59'59" with no
-        // tolerance either side, and 0d is the opposite condition rather than the same one.
-        // See DECISIONS.md, K3.
-        Zodiac.DegreeStatus status = Zodiac.degreeStatus(lon);
-        if (status == Zodiac.DegreeStatus.ANARETIC) {
-            sb.append("<div style='color:#E8B24A;'><b>Anaretic</b> &middot; the 30th degree, ")
-              .append("completing this sign</div>");
-        } else if (status == Zodiac.DegreeStatus.INITIATION) {
-            sb.append("<div style='color:#7FB3FF;'><b>First degree</b> &middot; the sign just ")
-              .append("begun</div>");
-        }
-        String triplicity = Zodiac.triplicityDecanRuler(lon);
-        String face = Zodiac.chaldeanDecanRuler(lon);
-        int decanFrom = (decan - 1) * 10;
-        sb.append("<div style='color:#9FB4C7;'>Decan ").append(decan)
-          .append(" &middot; ").append(decanFrom).append("&deg;&ndash;").append(decanFrom + 10)
-          .append("&deg;</div>");
-        if ((triplicity != null && !triplicity.isEmpty()) || (face != null && !face.isEmpty())) {
-            sb.append("<div style='color:#9FB4C7; font-size:10px;'>");
-            if (triplicity != null && !triplicity.isEmpty()) {
-                sb.append("Triplicity <b>").append(triplicity).append("</b>");
-            }
-            if (face != null && !face.isEmpty()) {
-                if (triplicity != null && !triplicity.isEmpty()) {
-                    sb.append(" &nbsp;&middot;&nbsp; ");
-                }
-                sb.append("Chaldean face <b>").append(face).append("</b>");
-            }
-            sb.append("</div>");
-        }
-
-        try {
-            String sabian = InterpretationService.getInstance()
-                .getSabianSymbol(SkymapPanel.capitalise(sign), degInSign + 1);
-            if (sabian != null && !sabian.isEmpty() && !sabian.startsWith("Interpretation not found")) {
-                sb.append("<div style='margin-top:4px; color:#C9BFA0; font-style:italic;'>")
-                  .append(degInSign + 1).append("&deg; ").append(SkymapPanel.capitalise(sign))
-                  .append(": &ldquo;").append(sabian).append("&rdquo;</div>");
-            }
-        } catch (Exception e) {
-            // A tooltip is not worth throwing out of a mouse-moved handler for.
-        }
-        if (!def.meaning.isEmpty()) {
-            sb.append("<div style='margin-top:4px; color:#8FA98F;'>").append(def.meaning).append("</div>");
-        }
-        sb.append("</body></html>");
-        return sb.toString();
-    }
-
-    private static String capitalise(String s) {
-        return s == null || s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+        return PlacementText.hoverCard(n, lon, speed, transit,
+            transit ? this.ringWord(ring) : null,
+            transit ? this.outerRing.cusps : this.activeCusps);
     }
 
     // ---------------------------------------------------------------- glyph sizes
@@ -4367,13 +4280,13 @@ extends JPanel {
                 if (stringBuilder4.length() > 0) {
                     stringBuilder4.append(", ");
                 }
-                stringBuilder4.append(this.romanNumeral(i));
+                stringBuilder4.append(PlacementText.romanNumeral(i));
                 continue;
             }
             boolean bl = i == 1 || i == 4 || i == 7 || i == 10;
             stringBuilder.append("<div style='margin-bottom:3px; color:#cccccc; font-size:12px;'>")
                 .append("<span style='color:").append(bl ? "#FFD166" : "#add8e6").append(";'>House ")
-                .append(this.romanNumeral(i)).append(bl ? " (angular)" : "").append("</span> &nbsp;")
+                .append(PlacementText.romanNumeral(i)).append(bl ? " (angular)" : "").append("</span> &nbsp;")
                 .append(stringBuilderArray[i]);
             // The lead only. The full overlay paragraph is worth reading for one house and
             // unreadable twelve times over, and the lead is the sentence the format exists to
@@ -4535,10 +4448,10 @@ extends JPanel {
             com.zodiacomputing.ourania.astro.Declinations.Entry dec = decs.get(BODY_NAMES[i]);
             sb.append(BODY_NAMES[i]).append('\t')
               .append(String.format("%.4f", lon)).append('\t')
-              .append(SkymapPanel.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)])).append('\t')
+              .append(PlacementText.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)])).append('\t')
               .append(String.format("%.2f", Zodiac.degreeInSign(lon))).append('\t')
               .append(house > 0 ? String.valueOf(house) : "").append('\t')
-              .append(SkymapPanel.showsDirection(i) && this.natalRing.speed[i] < 0.0 ? "R" : "")
+              .append(PlacementText.showsDirection(i) && this.natalRing.speed[i] < 0.0 ? "R" : "")
               .append('\t')
               // The declination table's own formatter, so the column and the table cannot disagree.
               .append(dec == null ? "" : ChartTables.declination(dec.declination)).append('\t')
@@ -4976,7 +4889,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (when.isEmpty() && outer != null) {
                 when = outer.format(fmt);
             }
-            out.append("      ").append(capitalise(this.ringWord(WHEEL_OUTER)))
+            out.append("      ").append(PlacementText.capitalise(this.ringWord(WHEEL_OUTER)))
                .append(": ").append(when);
         }
         if (this.triRingDrawn() && this.skyRing.time != null) {
@@ -6795,7 +6708,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int deg = (int) (lon % 30.0);
         int min = (int) ((lon % 30.0 - deg) * 60.0);
         return deg + "&deg;" + (min < 10 ? "0" : "") + min + "' "
-            + SkymapPanel.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)]);
+            + PlacementText.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)]);
     }
 
     /**
@@ -8743,40 +8656,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return this.generatePlanetPlacementsHtml(PlacementPart.ALL);
     }
 
-    /**
-     * One figure in the pattern banner, every word of it a link to the figure's reading.
-     *
-     * <b>Only the bold name was a link.</b> The quality after it and the line of planets under
-     * it were plain text, so a reader clicking "Mercury, Pluto, Uranus" under a grand trine got
-     * nothing. David, 2026-09-14: "Grand trine (air) Mercury, Pluto, Uranus ... not letting me
-     * select them". Swing's HTML cannot wrap a block in one anchor, so each run carries the same
-     * href in its own colour. NavigationCheck Part Q clicks every character of this markup.
-     */
-    static String patternEntryHtml(com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p) {
-        String href = InterpretationPanel.patternHref(p.name, p.bodies);
-        StringBuilder sb = new StringBuilder("<div style='margin-bottom:3px;'>");
-        sb.append("<a href='").append(href)
-            .append("' style='color:#FFD166; text-decoration:none;'><b>").append(p.name).append("</b>");
-        String quality = p.modality != null
-            && (p.name.equals("T-square") || p.name.equals("Grand cross"))
-                ? p.modality
-                : p.element != null
-                    && (p.name.equals("Grand trine") || p.name.equals("Kite"))
-                        ? p.element : null;
-        if (quality != null) {
-            sb.append(" <span style='color:#dddddd;'>(").append(quality).append(")</span>");
-        }
-        sb.append("</a>");
-        sb.append("<div style='font-size:11px;'><a href='").append(href)
-            .append("' style='color:#dddddd; text-decoration:none;'>")
-            .append(String.join(", ", p.bodies));
-        if (p.apex != null) {
-            sb.append(" &nbsp;|&nbsp; apex ").append(p.apex);
-        }
-        sb.append("</a></div></div>");
-        return sb.toString();
-    }
-
     /** The width the aspect grid has to fit into: the drawer, less padding and scrollbar. */
     private static final int GRID_FIT_WIDTH = 276;
 
@@ -8860,7 +8739,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 .append(" &middot; lit on the wheel</h3>");
             for (com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p
                     : this.currentPatterns) {
-                stringBuilder.append(SkymapPanel.patternEntryHtml(p));
+                stringBuilder.append(PlacementText.patternEntryHtml(p));
             }
             stringBuilder.append("<div style='color:#9AA5B1; font-size:10px;'>Click a figure "
                 + "for the full reading.</div>");
@@ -8870,7 +8749,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         stringBuilder.append("<h3 style='color:#add8e6;'>Placements</h3>");
         for (n3 = 0; n3 < BODY_COUNT; ++n3) {
             if (!this.natalRing.valid[n3]) continue;
-            stringBuilder.append(this.formatPlanetPlacement(n3, this.natalRing.lon[n3], this.natalRing.speed[n3], BASE_PREFIX));
+            stringBuilder.append(PlacementText.placementRow(n3, this.natalRing.lon[n3], this.natalRing.speed[n3], BASE_PREFIX, this.activeCusps));
         }
         }
         if (wantTransits && this.showTransitChart) {
@@ -8888,7 +8767,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             stringBuilder.append("<h3 style='color:#ffa500;'>Placements</h3>");
             for (n2 = 0; n2 < BODY_COUNT; ++n2) {
                 if (!this.outerRing.valid[n2]) continue;
-                stringBuilder.append(this.formatPlanetPlacement(n2, this.outerRing.lon[n2], this.outerRing.speed[n2], "transit_"));
+                stringBuilder.append(PlacementText.placementRow(n2, this.outerRing.lon[n2], this.outerRing.speed[n2], "transit_", this.activeCusps));
             }
         }
         // <b>Whether the sky ring is DRAWN, not whether it is wrapped around two people.</b>
@@ -8908,7 +8787,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             stringBuilder.append("<h3 style='color:#a0d2ff;'>Placements</h3>");
             for (int k = 0; k < BODY_COUNT; ++k) {
                 if (!this.skyRing.valid[k]) continue;
-                stringBuilder.append(this.formatPlanetPlacement(k, this.skyRing.lon[k], this.skyRing.speed[k], "sky_"));
+                stringBuilder.append(PlacementText.placementRow(k, this.skyRing.lon[k], this.skyRing.speed[k], "sky_", this.activeCusps));
             }
         }
         // Cross-chart placement, above the grid because it outranks it: a body on the
@@ -9075,79 +8954,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
             out.append("</tr>");
         }
-    }
-
-    private String formatPlanetPlacement(int n, double d, double d2, String string) {
-        int n2 = (int)(d / 30.0);
-        int n3 = (int)(d % 30.0);
-        int n4 = (int)((d - Math.floor(d)) * 60.0);
-        int n5 = 1;
-        for (int i = 1; i <= 12; ++i) {
-            double d3;
-            double d4;
-            double d5 = this.activeCusps[i];
-            double d6 = d4 = i == 12 ? this.activeCusps[1] : this.activeCusps[i + 1];
-            if (d4 < d5) {
-                d4 += 360.0;
-            }
-            if ((d3 = d) < d5 && d4 > 360.0) {
-                d3 += 360.0;
-            }
-            if (!(d3 >= d5) || !(d3 < d4)) continue;
-            n5 = i;
-            break;
-        }
-        String string2 = SkymapPanel.showsDirection(n) ? (d2 < 0.0 ? " R" : " D") : "";
-        String string3 = this.getElementColorHex(Zodiac.elementIndex(n2));
-        // <b>Both decan rulers, each named, under the placement.</b> The app runs two schemes
-        // at once and they disagree for 30 of the 36 decans, so an unlabelled "sub-ruler" here
-        // would be worse than none: the reader cannot tell whether it governs the prose or the
-        // tarot. Triplicity rules the decan prose; the Chaldean face rules the Golden Dawn
-        // cards and the Sabian decan_ruler field. Zodiac's header carries the full note.
-        String decanLine = SkymapPanel.decanRulers(d);
-        return String.format("<div style='margin-bottom:4px;'><a href='%s%d' style='color:#cccccc; text-decoration:none; font-family:SansSerif; font-size:14px;'><span style='font-size:16px;'>%s</span> %d&deg; %02d'%s <span style='color:%s; font-size:16px;'>%s</span> House %s</a>%s</div>", string, n, BODY_GLYPHS[n], n3, n4, string2, string3, ZODIAC_SYMBOLS[n2], this.romanNumeral(n5), decanLine);
-    }
-
-    /**
-     * The decan and its two rulers, as one small line for a placement row.
-     *
-     * Static and shared so the placements list and the hover card cannot drift apart - they
-     * are the two surfaces a reader compares, and a decan named differently on each would be
-     * read as a bug in the chart rather than a difference between two traditions.
-     */
-    static String decanRulers(double lon) {
-        int decan = Zodiac.decan(lon);
-        String triplicity = Zodiac.triplicityDecanRuler(lon);
-        String face = Zodiac.chaldeanDecanRuler(lon);
-        if ((triplicity == null || triplicity.isEmpty()) && (face == null || face.isEmpty())) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(
-            "<div style='color:#9FB4C7; font-size:10px; margin-left:20px;'>Decan ");
-        sb.append(decan).append(" &middot; ");
-        if (triplicity != null && !triplicity.isEmpty()) {
-            sb.append("triplicity <b>").append(triplicity).append("</b>");
-        }
-        if (face != null && !face.isEmpty()) {
-            if (triplicity != null && !triplicity.isEmpty()) {
-                sb.append(" &middot; ");
-            }
-            sb.append("Chaldean <b>").append(face).append("</b>");
-        }
-        return sb.append("</div>").toString();
-    }
-
-    private static boolean showsDirection(int n) {
-        Bodies.Source source = Bodies.at((int)n).source;
-        return source == Bodies.Source.EPHEMERIS || source == Bodies.Source.SOUTH_NODE;
-    }
-
-    private String romanNumeral(int n) {
-        String[] stringArray = new String[]{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
-        if (n >= 1 && n <= 12) {
-            return stringArray[n];
-        }
-        return String.valueOf(n);
     }
 
     /**
