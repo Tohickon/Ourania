@@ -777,10 +777,33 @@ class FileData implements java.io.Serializable {
 			}
 			return SweConst.OK;
 		} catch (java.io.IOException e) {
+			forget(pdp);
 			throw damaged(tfstart, e, serr);
 		} catch (Exception e) {
+			forget(pdp);
 			throw damaged(tfstart, e, serr);
 		}
+	}
+
+	/**
+	 * A segment that failed to read must not stay behind looking like one that succeeded.
+	 *
+	 * <b>This is how the Sun came to carry the Moon's longitude.</b> tseg0 and tseg1 are set
+	 * above before a byte has been read, and segp is zeroed ready to be filled. When the read
+	 * then failed, both stayed: the NEXT request for the same body found segp present and the
+	 * date inside [tseg0, tseg1], skipped the read, and evaluated a Chebyshev series of zeros
+	 * as a position - and sweph() reported it OK and cached it as SWIEPH. With the barycentric
+	 * Sun and the Earth-Moon barycentre both at the origin, the Earth sits a Moon's width from
+	 * it (embofs), so the geocentric Sun points exactly along the Moon and is stated with no
+	 * warning: 39.447 for 101.593 on Sydney, 4 July 1975. Every body read from a damaged file
+	 * could do the same on its second request; the Sun was only the one whose zero landed on
+	 * another body's degree. Forgetting the segment makes every request read again, fail
+	 * again and say so.
+	 */
+	private static void forget(PlanData pdp) {
+		pdp.segp = null;
+		pdp.tseg0 = 0;
+		pdp.tseg1 = 0;
 	}
 
 	/**

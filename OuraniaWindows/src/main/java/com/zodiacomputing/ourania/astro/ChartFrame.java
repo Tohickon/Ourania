@@ -724,6 +724,14 @@ public final class ChartFrame {
             if (d.source == Bodies.Source.EPHEMERIS) continue;
             bodies[i].lon = Bodies.derive(d.source, asc, mc, vertex, equatorialAsc, lonByIndex);
             bodies[i].ok = !Double.isNaN(bodies[i].lon);
+            // A point that is another body's opposition is only as good as that body, so it
+            // says what that body said. Without this the south node read from the Moshier
+            // fallback carried no warning while the north node it restates did.
+            int from = Bodies.oppositeOf(i);
+            if (from >= 0 && bodies[from] != null) {
+                bodies[i].returnCode = bodies[from].returnCode;
+                bodies[i].error = bodies[from].error;
+            }
         }
 
         // Lunar phase. swe_pheno_ut gives illuminated fraction, but the eightfold phase
