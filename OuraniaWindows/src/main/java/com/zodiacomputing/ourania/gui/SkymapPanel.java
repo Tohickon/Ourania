@@ -371,18 +371,7 @@ implements WheelSource {
         this.compositeRefPlace = (name == null || name.trim().isEmpty()) ? null : name.trim();
         this.relationshipFrame = null;
         this.relationshipCacheKey = null;
-        Settings.update(p -> {
-            if (Double.isNaN(lat)) {
-                p.remove("composite.reference.lat");
-                p.remove("composite.reference.lon");
-                p.remove("composite.reference.name");
-            } else {
-                p.setProperty("composite.reference.lat", String.valueOf(lat));
-                p.setProperty("composite.reference.lon", String.valueOf(lon));
-                p.setProperty("composite.reference.name",
-                    this.compositeRefPlace == null ? "" : this.compositeRefPlace);
-            }
-        });
+        Settings.setCompositeReference(lat, lon, this.compositeRefPlace);
         this.repaint();
     }
 
@@ -393,22 +382,15 @@ implements WheelSource {
 
     /** Restore a saved reference place. Silently keeps the default if the setting is absent. */
     private void loadCompositeReferencePlace() {
-        String lat = Settings.get("composite.reference.lat", null);
-        String lon = Settings.get("composite.reference.lon", null);
-        if (lat == null || lon == null) {
+        // A corrupt setting is not worth refusing to start over: Settings answers null for it,
+        // and the default stands.
+        double[] ref = Settings.compositeReference();
+        if (ref == null) {
             return;
         }
-        try {
-            this.compositeRefLat = Double.parseDouble(lat);
-            this.compositeRefLon = Double.parseDouble(lon);
-            String n = Settings.get("composite.reference.name", "");
-            this.compositeRefPlace = n.isEmpty() ? null : n;
-        } catch (NumberFormatException ex) {
-            // A corrupt setting is not worth refusing to start over.
-            this.compositeRefLat = Double.NaN;
-            this.compositeRefLon = Double.NaN;
-            this.compositeRefPlace = null;
-        }
+        this.compositeRefLat = ref[0];
+        this.compositeRefLon = ref[1];
+        this.compositeRefPlace = Settings.compositeReferenceName();
     }
 
     /**

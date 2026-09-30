@@ -70,6 +70,7 @@ public final class MainActivity extends Activity {
     private static final int BIRTH = 0;
     private static final int SYNASTRY = 1;
     private static final int COMPOSITE = 2;
+    private static final int DAVISON = 3;
     private int mode = BIRTH;
     private LinearLayout relRow;
     private Button partnerButton;
@@ -206,6 +207,11 @@ public final class MainActivity extends Activity {
         this.skyCaption = new TextView(this);
         this.skyCaption.setTextSize(14f);
         this.skyCaption.setVisibility(View.GONE);
+        this.skyCaption.setOnClickListener(v -> {
+            if (this.mode == COMPOSITE) {
+                this.chooseCompositePlace();
+            }
+        });
         form.addView(this.skyCaption);
 
         // Two charts (M10): whose chart to compare with, and how.
@@ -217,7 +223,7 @@ public final class MainActivity extends Activity {
         this.partnerButton.setOnClickListener(v -> this.choosePartner());
         rel.addView(this.partnerButton, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        this.modePicker = this.spinner(new String[] {"Birth chart", "Synastry", "Composite"},
+        this.modePicker = this.spinner(new String[] {"Birth chart", "Synastry", "Composite", "Davison"},
             "Birth chart");
         this.modePicker.setOnItemSelectedListener(
             new android.widget.AdapterView.OnItemSelectedListener() {
@@ -684,9 +690,9 @@ public final class MainActivity extends Activity {
                 com.zodiacomputing.ourania.astro.ChartFrame comp = this.compositeFrame;
                 PhoneChart.Cast other = this.partner;
                 if (patterns) {
-                    html = this.mode == COMPOSITE && comp != null ? PhoneReading.patterns(comp)
+                    html = this.isComposite() && comp != null ? PhoneReading.patterns(comp)
                         : PhoneReading.patterns(c);
-                } else if (this.mode == COMPOSITE && comp != null) {
+                } else if (this.isComposite() && comp != null) {
                     html = PhoneRelationship.compositeSynthesis(comp);
                 } else if (this.mode == SYNASTRY && other != null) {
                     html = PhoneRelationship.synastry(this.chartName(), c.frame, this.partnerName,
@@ -725,14 +731,18 @@ public final class MainActivity extends Activity {
     /** Picks the second chart from the book, casts it, and shows the two as synastry. */
     private void choosePartner() {
         final java.util.List<String> names = PhoneBook.names();
-        if (names.isEmpty()) {
-            toast("Save the other person's chart first: cast it, tap \"Save this chart\", then "
-                + "come back to your own.");
-            return;
-        }
+        final java.util.List<String> items = new java.util.ArrayList<>();
+        items.add("Enter their birth details...");
+        items.addAll(names);
         new android.app.AlertDialog.Builder(this)
             .setTitle("Compare with")
-            .setItems(names.toArray(new String[0]), (d, i) -> this.loadPartner(names.get(i)))
+            .setItems(items.toArray(new String[0]), (d, i) -> {
+                if (i == 0) {
+                    this.enterPartner();
+                } else {
+                    this.loadPartner(names.get(i - 1));
+                }
+            })
             .setNegativeButton("Cancel", null)
             .show();
     }
@@ -743,10 +753,137 @@ public final class MainActivity extends Activity {
             toast("\"" + name + "\" could not be opened offline.");
             return;
         }
+        this.castPartner(name, b.date, b.time, b.place);
+    }
+
+    /**
+     * The second person's birth, typed in rather than taken from the book - with the choice to
+     * save it there too. The same three answers as the main form, in a dialog.
+     */
+    private void enterPartner() {
+        final LocalDate[] day = {null};
+        final LocalTime[] hour = {LocalTime.NOON};
+        final Atlas.Place[] where = {null};
+        LinearLayout f = new LinearLayout(this);
+        f.setOrientation(LinearLayout.VERTICAL);
+        f.setPadding(48, 16, 48, 16);
+        final android.widget.EditText name = new android.widget.EditText(this);
+        name.setHint("Their name");
+        name.setSingleLine(true);
+        f.addView(name);
+        final TextView dateBox = field("Birth date - tap to choose");
+        dateBox.setOnClickListener(v -> {
+            LocalDate start = day[0] != null ? day[0] : LocalDate.of(1990, 1, 1);
+            new DatePickerDialog(this, (picker, y, m, dd) -> {
+                day[0] = LocalDate.of(y, m + 1, dd);
+                dateBox.setText(day[0].toString());
+            }, start.getYear(), start.getMonthValue() - 1, start.getDayOfMonth()).show();
+        });
+        f.addView(dateBox);
+        final TextView timeBox = field("12:00");
+        timeBox.setOnClickListener(v -> new TimePickerDialog(this, (picker, h, m) -> {
+            hour[0] = LocalTime.of(h, m);
+            timeBox.setText(String.format("%02d:%02d", h, m));
+        }, hour[0].getHour(), hour[0].getMinute(), true).show());
+        f.addView(timeBox);
+        final CheckBox unknown = new CheckBox(this);
+        unknown.setText("Birth time unknown");
+        unknown.setOnCheckedChangeListener((b, on) -> timeBox.setEnabled(!on));
+        f.addView(unknown);
+        final AutoCompleteTextView placeBox = this.placeBox(p -> where[0] = p);
+        f.addView(placeBox);
+        final CheckBox keep = new CheckBox(this);
+        keep.setText("Save them to the chart book");
+        keep.setChecked(true);
+        f.addView(keep);
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Their birth")
+            .setView(f)
+            .setPositiveButton("Compare", (d, w) -> {
+                String n = name.getText().toString().trim();
+                if (n.isEmpty()) {
+                    n = "Them";
+                }
+                if (day[0] == null || where[0] == null) {
+                    toast("Their chart needs a date and a place from the list.");
+                    return;
+                }
+                LocalTime t = unknown.isChecked() ? null : hour[0];
+                if (keep.isChecked()) {
+                    if (PhoneBook.exists(n)) {
+                        toast("\"" + n + "\" is already in the book, so it was not replaced.");
+                    } else {
+                        PhoneBook.save(n, day[0], t, where[0]);
+                    }
+                }
+                this.castPartner(n, day[0], t, where[0]);
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    /** A place box with the atlas's suggestions, telling {@code picked} what was chosen. */
+    private AutoCompleteTextView placeBox(java.util.function.Consumer<Atlas.Place> picked) {
+        final AutoCompleteTextView box = new AutoCompleteTextView(this);
+        box.setHint("Start typing a town or city");
+        box.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        box.setThreshold(2);
+        final Places places = new Places();
+        box.setAdapter(places);
+        box.setOnItemClickListener((parent, view, pos, id) -> {
+            Atlas.Place p = places.getItem(pos);
+            box.setText(PhoneChart.label(p), false);
+            box.dismissDropDown();
+            picked.accept(p);
+        });
+        return box;
+    }
+
+    /**
+     * Where the relationship lives: the composite's houses cast there, saved under the
+     * desktop's own keys so both apps use it. "Use the midpoint" goes back to the default.
+     */
+    private void chooseCompositePlace() {
+        final Atlas.Place[] where = {null};
+        LinearLayout f = new LinearLayout(this);
+        f.setOrientation(LinearLayout.VERTICAL);
+        f.setPadding(48, 16, 48, 16);
+        TextView note = new TextView(this);
+        note.setText("Now: " + PhoneRelationship.compositePlace() + ". Only the latitude moves "
+            + "the composite's houses; the planets stay where they are.");
+        f.addView(note);
+        f.addView(this.placeBox(p -> where[0] = p));
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Where does the relationship live?")
+            .setView(f)
+            .setPositiveButton("Use this place", (d, w) -> {
+                if (where[0] == null) {
+                    toast("Choose a place from the list.");
+                    return;
+                }
+                Settings.setCompositeReference(where[0].latitude, where[0].longitude,
+                    PhoneChart.label(where[0]));
+                this.redraw();
+            })
+            .setNeutralButton("Use the midpoint", (d, w) -> {
+                Settings.setCompositeReference(Double.NaN, Double.NaN, null);
+                this.redraw();
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private boolean isComposite() {
+        return this.mode == COMPOSITE || this.mode == DAVISON;
+    }
+
+    /** Casts the second person's chart and shows the two together. */
+    private void castPartner(final String name, final LocalDate date, final LocalTime time,
+            final Atlas.Place place) {
         new Thread(() -> {
             PhoneChart.Cast other;
             try {
-                other = PhoneChart.cast(new SwissEph(Ephemeris.PATH), b.date, b.time, b.place);
+                other = PhoneChart.cast(new SwissEph(Ephemeris.PATH), date, time, place);
             } catch (Throwable e) {
                 other = null;
             }
@@ -800,22 +937,25 @@ public final class MainActivity extends Activity {
                 + " planets are on the outer ring. Tap one, or Whole-chart reading for the "
                 + "synastry.");
             showBody(-1);
-        } else if (this.mode == COMPOSITE && this.partner != null) {
+        } else if (this.isComposite() && this.partner != null) {
             this.shownSky = null;
             final PhoneChart.Cast other = this.partner;
+            final boolean davison = this.mode == DAVISON;
             this.skyCaption.setText("Casting the composite...");
             new Thread(() -> {
                 com.zodiacomputing.ourania.astro.ChartFrame comp;
                 try {
-                    comp = PhoneRelationship.composite(new SwissEph(Ephemeris.PATH), c.frame,
-                        other.frame);
+                    SwissEph sw = new SwissEph(Ephemeris.PATH);
+                    comp = davison ? PhoneRelationship.davison(sw, c.frame, other.frame)
+                        : PhoneRelationship.composite(sw, c.frame, other.frame);
                 } catch (Throwable e) {
                     comp = null;
                 }
                 final com.zodiacomputing.ourania.astro.ChartFrame shown = comp;
                 runOnUiThread(() -> {
-                    if (this.shownCast != c || this.partner != other) {
-                        return;
+                    if (this.shownCast != c || this.partner != other
+                            || (this.mode == DAVISON) != davison) {
+                        return;                         // the view moved on while it was cast
                     }
                     if (shown == null) {
                         this.skyCaption.setText("The composite could not be cast.");
@@ -823,8 +963,12 @@ public final class MainActivity extends Activity {
                     }
                     this.compositeFrame = shown;
                     this.wheel.show(shown);
-                    this.skyCaption.setText("The composite of " + this.chartName() + " and "
-                        + this.partnerName + ": the relationship as a chart of its own.");
+                    this.skyCaption.setText(davison
+                        ? "The Davison chart of " + this.chartName() + " and " + this.partnerName
+                            + ": the moment and place halfway between the two births."
+                        : "The composite of " + this.chartName() + " and " + this.partnerName
+                            + ", its houses cast for " + PhoneRelationship.compositePlace()
+                            + ". Tap here to choose where the relationship lives.");
                     showBody(-1);
                 });
             }).start();
@@ -970,7 +1114,7 @@ public final class MainActivity extends Activity {
     private void showBody(int body) {
         InterpretationService svc = InterpretationService.getInstance();
         String html = this.shownCast == null || body < 0 ? ""
-            : this.mode == COMPOSITE && this.compositeFrame != null
+            : this.isComposite() && this.compositeFrame != null
                 ? PhoneRelationship.compositePlanet(this.compositeFrame, body, svc)
             : this.mode == SYNASTRY && this.partner != null && body >= PhoneWheel.SKY
                 ? PhoneRelationship.partnerPlanet(this.chartName(), this.shownCast.frame,

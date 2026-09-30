@@ -1055,6 +1055,55 @@ public final class Settings {
         com.zodiacomputing.ourania.astro.ProgressedAngles.method = progressedAngleMethod();
     }
 
+    /**
+     * Where a midpoint composite's houses are derived, when the reader has chosen somewhere
+     * other than the couple's geographic midpoint. Read and written by {@code SkymapPanel} under
+     * these keys since before 30 Sep; moved here then so the phone (M10) uses the same place.
+     */
+    public static final String COMPOSITE_REF_LAT_KEY = "composite.reference.lat";
+    public static final String COMPOSITE_REF_LON_KEY = "composite.reference.lon";
+    public static final String COMPOSITE_REF_NAME_KEY = "composite.reference.name";
+
+    /**
+     * The chosen reference place as {lat, lon}, or null for the couple's midpoint - including
+     * when the stored values do not parse, since a corrupt setting is not worth refusing a chart
+     * over.
+     */
+    public static double[] compositeReference() {
+        String lat = get(COMPOSITE_REF_LAT_KEY, null);
+        String lon = get(COMPOSITE_REF_LON_KEY, null);
+        if (lat == null || lon == null) {
+            return null;
+        }
+        try {
+            return new double[] {Double.parseDouble(lat), Double.parseDouble(lon)};
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    /** The chosen reference place's name, or null for the midpoint (or a place with no name). */
+    public static String compositeReferenceName() {
+        String n = get(COMPOSITE_REF_NAME_KEY, "");
+        return n.trim().isEmpty() ? null : n.trim();
+    }
+
+    /** Chooses the reference place; a NaN latitude goes back to the couple's midpoint. */
+    public static void setCompositeReference(double lat, double lon, String name) {
+        update(p -> {
+            if (Double.isNaN(lat)) {
+                p.remove(COMPOSITE_REF_LAT_KEY);
+                p.remove(COMPOSITE_REF_LON_KEY);
+                p.remove(COMPOSITE_REF_NAME_KEY);
+            } else {
+                p.setProperty(COMPOSITE_REF_LAT_KEY, String.valueOf(lat));
+                p.setProperty(COMPOSITE_REF_LON_KEY, String.valueOf(lon));
+                p.setProperty(COMPOSITE_REF_NAME_KEY,
+                    name == null || name.trim().isEmpty() ? "" : name.trim());
+            }
+        });
+    }
+
     /** Tropical, or one of the sidereal ayanamsas; the labels are Ephemeris.ZODIACS. */
     public static final String ZODIAC_KEY = "chart.zodiac";
 

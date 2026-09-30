@@ -135,4 +135,45 @@ public class PhoneRelationshipTest {
         assertEquals(PhoneRelationship.contacts(a, b).size(),
             PhoneRelationship.crosses(PhoneRelationship.contacts(a, b)).size());
     }
+
+    @Test
+    public void theDavisonIsARealChartHalfwayBetweenTheBirths() {
+        ChartFrame a = jane();
+        ChartFrame b = john(LocalTime.NOON);
+        ChartFrame d = PhoneRelationship.davison(new SwissEph(Ephemeris.PATH), a, b);
+        assertEquals("halfway in time", (a.julianDayUt + b.julianDayUt) / 2.0, d.julianDayUt,
+            1e-9);
+        // A real moment, so its Sun is where the Sun was then - not the midpoint of two Suns.
+        ChartFrame then = ChartFrame.compute(new SwissEph(Ephemeris.PATH), d.julianDayUt,
+            d.geoLat, d.geoLon, PhoneChart.houseSystem(), false, 0.0);
+        assertEquals(then.bodies[0].lon, d.bodies[0].lon, 1e-9);
+        assertTrue("the lunar phase is real", d.phaseName != null);
+    }
+
+    @Test
+    public void whereTheRelationshipLivesMovesTheHousesAndNotThePlanets() {
+        com.zodiacomputing.ourania.gui.Settings.useScratchFile();
+        try {
+            ChartFrame a = jane();
+            ChartFrame b = john(LocalTime.NOON);
+            ChartFrame mid = PhoneRelationship.composite(new SwissEph(Ephemeris.PATH), a, b);
+            assertEquals("the midpoint of the two birthplaces",
+                PhoneRelationship.compositePlace());
+            Atlas.Place oslo = place("Oslo", "Norway");
+            com.zodiacomputing.ourania.gui.Settings.setCompositeReference(oslo.latitude,
+                oslo.longitude, "Oslo, Norway");
+            ChartFrame there = PhoneRelationship.composite(new SwissEph(Ephemeris.PATH), a, b);
+            assertEquals("Oslo, Norway", PhoneRelationship.compositePlace());
+            assertEquals("the planets stay", mid.bodies[0].lon, there.bodies[0].lon, 1e-9);
+            assertTrue("the Ascendant moves: " + mid.asc + " vs " + there.asc,
+                Math.abs(mid.asc - there.asc) > 1.0);
+            com.zodiacomputing.ourania.gui.Settings.setCompositeReference(Double.NaN,
+                Double.NaN, null);
+            assertEquals(mid.asc, PhoneRelationship.composite(new SwissEph(Ephemeris.PATH), a,
+                b).asc, 1e-9);
+        } finally {
+            com.zodiacomputing.ourania.gui.Settings.setCompositeReference(Double.NaN,
+                Double.NaN, null);
+        }
+    }
 }

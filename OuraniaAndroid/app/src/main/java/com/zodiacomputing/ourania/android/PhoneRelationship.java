@@ -210,9 +210,32 @@ final class PhoneRelationship {
         return h.toString();
     }
 
-    /** The two charts' midpoint composite, at the midpoint of the two birthplaces. */
+    /**
+     * The two charts' midpoint composite, with its houses derived at the reader's chosen place
+     * ({@link com.zodiacomputing.ourania.gui.Settings#compositeReference}) or, by default, the
+     * midpoint of the two birthplaces - as the desktop casts it.
+     */
     static ChartFrame composite(SwissEph sw, ChartFrame a, ChartFrame b) {
-        return ChartFrame.computeMidpointComposite(sw, a, b);
+        double[] ref = com.zodiacomputing.ourania.gui.Settings.compositeReference();
+        return ref == null ? ChartFrame.computeMidpointComposite(sw, a, b)
+            : ChartFrame.computeMidpointComposite(sw, a, b, ref[0], ref[1]);
+    }
+
+    /**
+     * The Davison chart: a real chart cast for the moment and place halfway between the two
+     * births. Not an average of two charts, so it takes no reference place.
+     */
+    static ChartFrame davison(SwissEph sw, ChartFrame a, ChartFrame b) {
+        return ChartFrame.computeDavisonComposite(sw, a, b);
+    }
+
+    /** Where the composite's houses are cast, in words, for the screen. */
+    static String compositePlace() {
+        if (com.zodiacomputing.ourania.gui.Settings.compositeReference() == null) {
+            return "the midpoint of the two birthplaces";
+        }
+        String n = com.zodiacomputing.ourania.gui.Settings.compositeReferenceName();
+        return n != null ? n : "a chosen place";
     }
 
     /** A planet of the composite: the relationship's, read from the composite corpus. */
