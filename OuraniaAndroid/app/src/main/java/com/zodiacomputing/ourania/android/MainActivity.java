@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.InputType;
 import android.view.View;
 import android.view.ViewGroup;
@@ -218,13 +219,16 @@ public final class MainActivity extends Activity {
         }).start();
     }
 
-    /** A tapped planet's place and reading under the wheel; a hint when none is tapped. */
+    /** A tapped planet's full reading under the wheel (M5); a hint when none is tapped. */
     private void showBody(int body) {
-        String text = this.shownCast == null || body < 0 ? ""
-            : PhoneChart.planet(this.shownCast, body, InterpretationService.getInstance());
-        this.tapped.setText(text.isEmpty()
-            ? "Tap a planet on the wheel to read it. Pinch to zoom; double-tap to reset."
-            : text.trim());
+        String html = this.shownCast == null || body < 0 ? ""
+            : PhoneReading.planet(this.shownCast, body, InterpretationService.getInstance());
+        if (html.isEmpty()) {
+            this.tapped.setText(
+                "Tap a planet on the wheel to read it. Pinch to zoom; double-tap to reset.");
+        } else {
+            this.tapped.setText(Html.fromHtml(html, Html.FROM_HTML_MODE_COMPACT));
+        }
     }
 
     /**

@@ -202,18 +202,30 @@ final class PhoneWheel {
     }
 
     /**
-     * The natal aspects between the planets, at the desktop's natal orbs - {@link Aspects}
+     * The natal aspects between the drawn planets, at the desktop's natal orbs - {@link Aspects}
      * decides, the same call the desktop wheel and grid make.
      */
     List<Line> aspects() {
         List<Line> out = new ArrayList<>();
-        for (int a = 0; a < PLANETS; a++) {
-            for (int b = a + 1; b < PLANETS; b++) {
-                if (this.bodyRadius[a] <= 0 || this.bodyRadius[b] <= 0) {
+        for (Line l : aspectsOf(this.frame, PLANETS)) {
+            if (this.bodyRadius[l.a] > 0 && this.bodyRadius[l.b] > 0) {
+                out.add(l);
+            }
+        }
+        return out;
+    }
+
+    /** The natal aspects among a chart's first {@code count} bodies - the wheel's and the reading's. */
+    static List<Line> aspectsOf(ChartFrame frame, int count) {
+        List<Line> out = new ArrayList<>();
+        int n = Math.min(count, frame.bodies.length);
+        for (int a = 0; a < n; a++) {
+            for (int b = a + 1; b < n; b++) {
+                ChartFrame.Body x = frame.bodies[a];
+                ChartFrame.Body y = frame.bodies[b];
+                if (x == null || y == null || !x.ok || !y.ok) {
                     continue;
                 }
-                ChartFrame.Body x = this.frame.bodies[a];
-                ChartFrame.Body y = this.frame.bodies[b];
                 double sep = Math.abs(x.lon - y.lon);
                 if (sep > 180.0) {
                     sep = 360.0 - sep;
