@@ -1,7 +1,8 @@
 package com.zodiacomputing.ourania.gui;
 
+import com.zodiacomputing.ourania.astro.DataFiles;
+
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -89,8 +90,6 @@ public final class Atlas {
      */
     static final String FILE_NAME = "atlas.tsv.gz";
 
-    private static final String FILE = InterpretationService.DATA_DIR + FILE_NAME;
-
     // Parallel arrays rather than 168,549 objects: a Place is built only for the handful a
     // search actually returns. The strings that repeat - zones, countries, regions - are shared
     // rather than copied, which is most of the file's bulk.
@@ -148,7 +147,7 @@ public final class Atlas {
         List<String[]> rows = new ArrayList<>(180000);
         Map<String, String> shared = new HashMap<>();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                new GZIPInputStream(new FileInputStream(FILE)), StandardCharsets.UTF_8))) {
+                new GZIPInputStream(DataFiles.entry(FILE_NAME).open()), StandardCharsets.UTF_8))) {
             String line;
             while ((line = in.readLine()) != null) {
                 if (line.isEmpty() || line.charAt(0) == '#') {

@@ -23,6 +23,8 @@ import java.util.TreeSet;
  * readings have to come back anyway. Every name the source is asked for is recorded, so a file
  * the loader stopped asking for shows up too.
  *
+ * <p>The offline atlas reads the same way, since the phone's place search (M3) needs it too.
+ *
  * <p><b>And the other way round:</b> a second corpus built over a source that holds nothing reads
  * nothing, so the readings above cannot be coming from somewhere this part does not know about.
  */
@@ -95,6 +97,12 @@ public final class DataFilesCheck {
             yes(r[0] + " reads from the source: \"" + clip(r[1]) + "\"",
                 !PlainText.plainText(r[1]).isEmpty());
         }
+
+        System.out.println("=== Part C2: the atlas, through the same source ===");
+        java.util.List<Atlas.Place> london = Atlas.search("London", 5);
+        yes("the atlas loaded through the source: " + Atlas.failure(), Atlas.failure() == null);
+        yes(Atlas.FILE_NAME + " was opened through the source", asked.contains(Atlas.FILE_NAME));
+        yes("and a place search finds London (" + london.size() + " results)", !london.isEmpty());
 
         System.out.println("=== Part D: a source with nothing gives nothing ===");
         DataFiles.use(new DataFiles.Source() {
