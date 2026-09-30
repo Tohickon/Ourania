@@ -3598,7 +3598,7 @@ extends JPanel {
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 SkymapPanel.this.dragFrom = null;
-                if (SkymapPanel.this.scrubbing && SkymapPanel.this.scrubDragged) {
+                if (SkymapPanel.this.isScrubbing() && SkymapPanel.this.scrubDragged) {
                     SkymapPanel.this.endScrub();
                     SkymapPanel.this.chartPanel.setCursor(java.awt.Cursor.getDefaultCursor());
                 }
@@ -3634,12 +3634,12 @@ extends JPanel {
                 // so dragging back to it returns to the moment the scrub began. E8.
                 if (mouseEvent.isShiftDown() || SkymapPanel.this.scrubDragged) {
                     int sdx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
-                    if (!SkymapPanel.this.scrubDragged && Math.abs(sdx) < SCRUB_PX) {
+                    if (!SkymapPanel.this.scrubDragged && Math.abs(sdx) < SkyScrub.PX_PER_STEP) {
                         return;
                     }
                     SkymapPanel.this.scrubDragged = true;
                     SkymapPanel.this.beginScrub();
-                    SkymapPanel.this.scrubTo(sdx / SCRUB_PX);
+                    SkymapPanel.this.scrubTo(sdx / SkyScrub.PX_PER_STEP);
                     SkymapPanel.this.chartPanel.setCursor(
                         java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.E_RESIZE_CURSOR));
                     SkymapPanel.this.chartPanel.repaint();
@@ -7402,70 +7402,60 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     // ------------------------------------------------------------------ scrubbing
 
     /**
-     * Master list E8: "Drag-to-time scrubbing - transport buttons step time; no timeline slider
-     * or drag gesture."
-     *
-     * <b>A scrub moves the sky, and only the sky.</b> It is how a reader walks transits across
-     * a chart. Until 30 Sep there was a bar for each chart and Shift+drag followed the
-     * transport's rule, which on a single birth chart could walk the birth time itself; David,
-     * that day: "time scrubbing is really only needed for the transit chart not a b or another
-     * charts". Birth times are changed from Chart Setup. The transport buttons are unchanged -
-     * Play is animation, not scrubbing, and keeps its own rule in {@link #stepTime}.
-     *
-     * <b>A scrub is an offset from where it began, not a run of steps.</b> Every change puts the
-     * sky back where the scrub started and moves it once by the whole offset, so dragging out
-     * and back lands exactly where it began - a run of one-month steps from the 31st would not
-     * (31 January, 28 February, 28 March).
-     *
-     * Shift+drag on the wheel, or the scrub bar under the transport buttons. A plain drag is
-     * left to the pan.
+     * Scrubbing - walking the sky through time by hand. Its state and its rules are
+     * {@link SkyScrub}'s (J13, step 4); what stays here is what it is handed: the sky ring, the
+     * Step setting, the Play flag and the recompute.
      */
-    private boolean scrubbing;
-    private ZonedDateTime scrubSky;
-    /** Steps from where the scrub began. */
-    int scrubSteps;
+    final SkyScrub scrub = new SkyScrub(new SkyScrub.Host() {
+        @Override
+        public WheelRing sky() {
+            return SkymapPanel.this.skyRing;
+        }
+
+        @Override
+        public String stepSetting() {
+            return SkymapPanel.this.stepAmount;
+        }
+
+        @Override
+        public void pause() {
+            SkymapPanel.this.isPlaying = false;
+        }
+
+        @Override
+        public void recompute() {
+            SkymapPanel.this.updateChartData();
+            this.repaint();
+        }
+
+        @Override
+        public void repaint() {
+            if (SkymapPanel.this.chartPanel != null) {
+                SkymapPanel.this.chartPanel.repaint();
+            }
+        }
+    });
     /** Set while a Shift+drag has scrubbed, so its closing click does not also select. */
     private boolean scrubDragged;
-    private boolean scrubRefreshQueued;
-    /** Screen pixels of drag per step. */
-    static final int SCRUB_PX = 10;
 
     boolean isScrubbing() {
-        return this.scrubbing;
+        return this.scrub.isScrubbing();
     }
 
-    /** The unit a scrub moves in: the Step setting, or an hour when Step follows the clock. */
     String scrubUnit() {
-        return "Real Time".equals(this.stepAmount) ? "1 Hour" : this.stepAmount;
+        return this.scrub.unit();
     }
 
     void beginScrub() {
-        if (this.scrubbing) {
-            return;
-        }
-        this.isPlaying = false;
-        this.scrubSky = this.skyRing.time;
-        this.scrubSteps = 0;
-        this.scrubbing = true;
+        this.scrub.begin();
     }
 
-    /** Moves the sky to this many steps from where the scrub began. */
     void scrubTo(int steps) {
-        if (!this.scrubbing) {
-            this.beginScrub();
-        }
-        if (steps == this.scrubSteps) {
-            return;
-        }
-        String unit = this.stepAmount;
-        try {
-            this.stepAmount = this.scrubUnit();
-            this.skyRing.time = this.stepped(this.scrubSky, steps);
-        } finally {
-            this.stepAmount = unit;
-        }
-        this.scrubSteps = steps;
-        this.requestScrubRefresh();
+        this.scrub.to(steps);
+    }
+
+    void endScrub() {
+        this.scrub.end();
     }
 
     /**
@@ -7501,7 +7491,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // Room after the name: the slider's track starts at its bounds and clipped the last
         // letter, so "Chart B" read "Chart E".
         label.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 4));
-        javax.swing.JSlider slider = SkymapPanel.scrubSlider(this);
+        javax.swing.JSlider slider = this.scrub.slider(this::refreshScrubBars);
         slider.setPreferredSize(new java.awt.Dimension(170, 24));
         bar.add(label);
         bar.add(slider);
@@ -7509,118 +7499,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return bar;
     }
 
-    /** Ends the scrub where it stands, and draws that moment at once. */
-    void endScrub() {
-        if (!this.scrubbing) {
-            return;
-        }
-        this.scrubbing = false;
-        this.scrubSky = null;
-        this.scrubRefreshQueued = false;
-        this.updateChartData();
-        if (this.chartPanel != null) {
-            this.chartPanel.repaint();
-        }
-    }
-
-    /**
-     * One recompute for however many drag events arrived before it could run.
-     *
-     * A drag delivers an event per pixel; recomputing the chart for each would queue work
-     * faster than it is done and the wheel would trail the mouse by seconds.
-     */
-    private void requestScrubRefresh() {
-        if (this.scrubRefreshQueued) {
-            return;
-        }
-        this.scrubRefreshQueued = true;
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            if (!this.scrubRefreshQueued) {
-                return;
-            }
-            this.scrubRefreshQueued = false;
-            this.updateChartData();
-            if (this.chartPanel != null) {
-                this.chartPanel.repaint();
-            }
-        });
-    }
-
     /** The scrub bar's slider, kept for the check. */
     javax.swing.JSlider scrubSlider;
     /** The row the scrub bar sits on, with the house-frame selector. */
     private JPanel scrubRow;
-
-    /** How many steps the slider reaches each way from where the scrub began. */
-    static final int SCRUB_SLIDER_REACH = 60;
-
-    /**
-     * A slider that springs back: drag the knob and the chart follows it, let go and the chart
-     * stays where it was put while the knob returns to the middle, ready to go again.
-     *
-     * <b>Why it springs back.</b> A slider with a fixed range pinned to a date would need a
-     * range, and any range is wrong - a day's worth for a transit, a century for a progression.
-     * Springing back makes the range relative: sixty steps of the Step setting each way, from
-     * wherever the chart is, as many times as the reader likes. An arrow key on the focused
-     * slider is a single step.
-     */
-    static javax.swing.JSlider scrubSlider(SkymapPanel panel) {
-        javax.swing.JSlider slider = new javax.swing.JSlider(-SCRUB_SLIDER_REACH, SCRUB_SLIDER_REACH, 0);
-        slider.setOpaque(false);
-        slider.setPreferredSize(new java.awt.Dimension(220, 26));
-        slider.setToolTipText("Drag to move the sky through time by the Step setting. Hold it "
-            + "pulled and time keeps going that way, faster the further you pull; it stays where "
-            + "you let go.");
-        final boolean[] resetting = {false};
-        // Steps run up while the knob is held off the dead zone, on top of where the knob sits.
-        final double[] travel = {0.0};
-        // <b>By the clock, not by the tick.</b> Each tick recomputes the chart on the event thread,
-        // and Swing coalesces ticks that pile up behind it: counted per tick, a bar held at 48 for
-        // two seconds ran 6 steps where its rate said 23.
-        final long[] lastTick = {0L};
-        final javax.swing.Timer shuttle = new javax.swing.Timer(SHUTTLE_TICK_MS, null);
-        shuttle.addActionListener(ev -> {
-            if (!slider.getValueIsAdjusting() || !panel.isScrubbing()) {
-                shuttle.stop();
-                return;
-            }
-            long now = System.nanoTime();
-            travel[0] += shuttleRate(slider.getValue()) * (now - lastTick[0]) / 1.0e9;
-            lastTick[0] = now;
-            panel.scrubTo(slider.getValue() + (int) travel[0]);
-            if (panel.chartPanel != null) {
-                panel.chartPanel.repaint();
-            }
-        });
-        slider.addChangeListener(e -> {
-            if (resetting[0]) {
-                return;
-            }
-            panel.beginScrub();
-            panel.scrubTo(slider.getValue() + (int) travel[0]);
-            if (panel.chartPanel != null) {
-                panel.chartPanel.repaint();
-            }
-            if (slider.getValueIsAdjusting()) {
-                if (!shuttle.isRunning()) {
-                    lastTick[0] = System.nanoTime();
-                    shuttle.start();
-                }
-                return;
-            }
-            shuttle.stop();
-            travel[0] = 0.0;
-            panel.endScrub();
-            panel.refreshScrubBars();
-            resetting[0] = true;
-            try {
-                slider.setValue(0);
-            } finally {
-                resetting[0] = false;
-            }
-        });
-        return slider;
-    }
 
     /**
      * Where a house begins, from a cusp array.
@@ -7758,54 +7640,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
-    /** How often a held bar redraws while it runs on, in milliseconds; the distance is by the clock. */
-    static final int SHUTTLE_TICK_MS = 50;
-    /** Steps a second with the knob pulled all the way. */
-    static final double SHUTTLE_MAX_RATE = 20.0;
-    /** Knob positions either side of the middle that only offset, and do not run on. */
-    static final int SHUTTLE_DEAD_ZONE = 10;
-
-    /**
-     * Steps a second a bar runs at with its knob held here.
-     *
-     * David: "when you pull them forward or backward can you have the time keep going until
-     * released". The knob still offsets the chart by where it sits, so a short flick is still a
-     * few steps; held past the dead zone it also runs on, like a shuttle, and the rate climbs with
-     * the square of the pull - a gentle pull creeps, a full one covers twenty steps a second.
-     */
-    static double shuttleRate(int value) {
-        int pull = Math.abs(value) - SHUTTLE_DEAD_ZONE;
-        if (pull <= 0) {
-            return 0.0;
-        }
-        double share = (double) pull / (SCRUB_SLIDER_REACH - SHUTTLE_DEAD_ZONE);
-        return Math.signum(value) * SHUTTLE_MAX_RATE * share * share;
-    }
-
-    /** "+3 days", "-1 month": the offset a scrub stands at, in words. */
-    static String scrubLabel(int steps, String unit) {
-        String word = unit.replaceFirst("^1 ", "").toLowerCase();
-        String sign = steps > 0 ? "+" : steps < 0 ? "−" : "±";
-        int n = Math.abs(steps);
-        return sign + n + " " + word + (n == 1 ? "" : "s");
-    }
-
     /** The offset, over the top of the wheel while a scrub is running. */
     void paintScrubTag(Graphics2D g2, int w) {
-        if (!this.scrubbing) {
-            return;
-        }
-        String text = "Scrubbing the sky " + scrubLabel(this.scrubSteps, this.scrubUnit());
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setFont(Theme.font("Segoe UI", Font.BOLD, 13));
-        java.awt.FontMetrics fm = g2.getFontMetrics();
-        int tw = fm.stringWidth(text) + 24;
-        int x = (w - tw) / 2;
-        g2.setColor(new Color(22, 28, 43, 230));
-        g2.fillRoundRect(x, 10, tw, 26, 12, 12);
-        g2.setColor(new Color(226, 178, 88));
-        g2.drawRoundRect(x, 10, tw, 26, 12, 12);
-        g2.drawString(text, x + 12, 10 + (26 + fm.getAscent() - fm.getDescent()) / 2);
+        this.scrub.paintTag(g2, w);
     }
 
     /**
@@ -7816,10 +7653,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * come to disagree about what "1 Week" means.
      */
     private ZonedDateTime stepped(ZonedDateTime when, int n) {
+        return SkymapPanel.stepBy(when, this.stepAmount, n);
+    }
+
+    /** The same, in a unit given rather than the one selected - a scrub's may differ from it. */
+    static ZonedDateTime stepBy(ZonedDateTime when, String unit, int n) {
         if (when == null) {
             return null;
         }
-        switch (this.stepAmount) {
+        switch (unit) {
             case "1 Minute": return when.plusMinutes(n);
             case "1 Hour":   return when.plusHours(n);
             case "1 Day":    return when.plusDays(n);
