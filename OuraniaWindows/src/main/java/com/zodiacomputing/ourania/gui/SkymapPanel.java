@@ -21,6 +21,7 @@ import com.zodiacomputing.ourania.astro.SolarArc;
 import com.zodiacomputing.ourania.astro.Themes;
 import com.zodiacomputing.ourania.astro.Topics;
 import com.zodiacomputing.ourania.astro.Transits;
+import com.zodiacomputing.ourania.astro.YearScan;
 import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.gui.OuraniaWindow;
 import com.zodiacomputing.ourania.gui.ChartMode;
@@ -7519,19 +7520,5 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         SYNTHESIZE,
         TIMELINE;
 
-    }
-
-    public static final class YearScan {
-        public List<Transits.EventHit> events = Collections.emptyList();
-        public List<Transits.Perfection> perfections = Collections.emptyList();
-        public List<SolarArc.Contact> arcs = Collections.emptyList();
-        public List<Progressions.Contact> progressions = Collections.emptyList();
-        public List<Returns.Contact> returns = Collections.emptyList();
-        /** K12 stage 2: the progressed Moon's tenancies of the natal houses across the year. */
-        public List<Progressions.Tenancy> moonClock = Collections.emptyList();
-        /** K12 stage 2: aspects between two progressed bodies perfecting in the year. */
-        public List<Progressions.Mutual> mutuals = Collections.emptyList();
-        /** K12 stage 3: Sun and Mars touches on the themes' points, for dating - never voting. */
-        public List<Transits.Perfection> catalysts = Collections.emptyList();
     }
 }

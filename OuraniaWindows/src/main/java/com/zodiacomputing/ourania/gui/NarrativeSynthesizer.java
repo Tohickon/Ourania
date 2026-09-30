@@ -16,7 +16,7 @@ import de.thmac.swisseph.SweDate;
 import com.zodiacomputing.ourania.astro.TransferOfLight;
 import com.zodiacomputing.ourania.astro.Transits;
 import com.zodiacomputing.ourania.astro.Zodiac;
-import com.zodiacomputing.ourania.gui.SkymapPanel.YearScan;
+import com.zodiacomputing.ourania.astro.YearScan;
 
 import java.util.ArrayList;
 import java.util.List;
