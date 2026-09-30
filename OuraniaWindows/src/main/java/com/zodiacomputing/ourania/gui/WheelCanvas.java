@@ -71,20 +71,20 @@ import javax.swing.Timer;
  *
  * <p>It was {@code SkymapPanel.ChartPanel}, an inner class, so every one of its reads of the
  * panel was invisible - an inner class reaches its outer instance's fields without saying
- * which. It is a top-level class now and reaches the panel through one named field,
- * {@link #panel}, so what the painter depends on is exactly the set of {@code panel.}
- * references below and can be counted, then narrowed. That narrowing is the next step: this
- * one moves the painter, it does not yet re-plumb it.
+ * which. Step 5b made it a top-level class holding the panel through one named field, which
+ * made those reads countable; step 6 wrote them down as {@link WheelSource} and typed the
+ * field as that, so the compiler now holds the painter to the list. It reads; it does not
+ * write, bar {@link WheelSource#clampView}.
  *
  * <p>The pieces it is drawn from are {@link WheelShapes}'s (step 5a). Moved rather than
  * changed, and measured as such: the wheel rendered in 49 chart states gives the same pixels.
  */
 final class WheelCanvas extends JPanel {
 
-    /** The chart this canvas draws, and the one place it reads it from. */
-    private final SkymapPanel panel;
+    /** The chart this canvas draws, and everything it may read about it. */
+    private final WheelSource panel;
 
-    WheelCanvas(SkymapPanel panel) {
+    WheelCanvas(WheelSource panel) {
         this.panel = panel;
     }
 
@@ -108,7 +108,7 @@ final class WheelCanvas extends JPanel {
      */
     @Override
     public String getToolTipText(MouseEvent event) {
-        if (panel.globeMode) {
+        if (panel.globeMode()) {
             return panel.hoverTextAt(event.getX(), event.getY());
         }
         java.awt.Point at = panel.toWheel(event.getX(), event.getY());
@@ -143,7 +143,7 @@ final class WheelCanvas extends JPanel {
         graphics.setColor(ChartPalette.colorOr(ChartPalette.backgroundHex(null),
             Color.BLACK));
         graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
-        if (panel.sw == null || panel.natalRing.sd == null) {
+        if (!panel.chartReady()) {
             return;
         }
         Graphics2D graphics2D = (Graphics2D)graphics;
@@ -151,15 +151,8 @@ final class WheelCanvas extends JPanel {
         // flat wheel; the globe reads the same arrays and paints them as shells. One
         // branch, at the top, because the two share no drawing at all - the alternative
         // is a flag threaded through five thousand lines of painter.
-        if (panel.globeMode) {
-            // <b>Coasting counts as turning.</b> The cheap path - no halos, coarser
-            // arcs - is for frames the reader cannot study, and a globe still gliding to a
-            // stop is exactly that. Reading only globeDragging would switch the expensive
-            // path back on the instant the button came up, which is the one moment the
-            // frame rate has to hold.
-            GlobeRenderer.paint(graphics2D, panel.globe,
-                this.getWidth(), this.getHeight(), panel,
-                panel.globeDragging || panel.globe.coasting());
+        if (panel.globeMode()) {
+            panel.paintGlobe(graphics2D, this.getWidth(), this.getHeight());
             SkymapPanel.paintZodiacTag(graphics2D, this.getWidth(), this.getHeight());
             panel.paintScrubTag(graphics2D, this.getWidth());
             return;
@@ -208,7 +201,7 @@ final class WheelCanvas extends JPanel {
             graphics2D.setColor(disc);
             graphics2D.fillOval(n12 - n14, n13 - n14, n14 * 2, n14 * 2);
         }
-        double[] dArray = panel.activeCusps;
+        double[] dArray = panel.activeCusps();
         double d4 = panel.getPinLongitude();
         graphics2D.setColor(SkymapPanel.inkColor());
         graphics2D.setStroke(new BasicStroke(1.0f));
@@ -375,13 +368,13 @@ final class WheelCanvas extends JPanel {
             graphics2D.drawString(houseText, n22 - houseFm.stringWidth(houseText) / 2,
                 n23 + houseFm.getAscent() / 2 - 1);
         }
-        if (panel.showTransitChart && "Both".equals(panel.houseAlignment)) {
+        if (panel.showTransitChart() && "Both".equals(panel.houseAlignment())) {
             Stroke stroke = graphics2D.getStroke();
             graphics2D.setStroke(new BasicStroke(2.0f, 0, 0, 10.0f, new float[]{4.0f, 4.0f}, 0.0f));
             for (int i = 1; i <= 12; ++i) {
                 // Across the partner band, which is where those cusps belong - not from
                 // the decan ring, which the reorder moved to the other side of the wheel.
-                double d9 = Math.toRadians(180.0 + d4 - panel.outerRing.cusps[i]);
+                double d9 = Math.toRadians(180.0 + d4 - panel.outerRing().cusps[i]);
                 n = n12 + (int)((double)nBodyTop * Math.cos(d9));
                 n7 = n13 + (int)((double)nBodyTop * Math.sin(d9));
                 n6 = n12 + (int)((double)n15 * Math.cos(d9));
@@ -433,19 +426,19 @@ final class WheelCanvas extends JPanel {
         int n25 = n = aspectLayer && panel.drawsCrossAspects() ? 1 : 0;
         if (bl) {
             for (n7 = 0; n7 < SkymapPanel.BODY_COUNT; ++n7) {
-                if (!SkymapPanel.aspecting(n7, panel.natalRing.valid)) continue;
+                if (!SkymapPanel.aspecting(n7, panel.natalRing().valid)) continue;
                 for (n6 = n7 + 1; n6 < SkymapPanel.BODY_COUNT; ++n6) {
-                    if (!SkymapPanel.aspecting(n6, panel.natalRing.valid) || Bodies.isOppositePair(n7, n6)) continue;
-                    this.drawAspectLine(graphics2D, panel.natalRing.lon[n7], panel.natalRing.lon[n6], d4, n12, n13, discNatal, discNatal, SkymapPanel.WHEEL_NATAL, n7, n6);
+                    if (!SkymapPanel.aspecting(n6, panel.natalRing().valid) || Bodies.isOppositePair(n7, n6)) continue;
+                    this.drawAspectLine(graphics2D, panel.natalRing().lon[n7], panel.natalRing().lon[n6], d4, n12, n13, discNatal, discNatal, SkymapPanel.WHEEL_NATAL, n7, n6);
                 }
             }
         }
         if (n != 0) {
             for (n7 = 0; n7 < SkymapPanel.BODY_COUNT; ++n7) {
-                if (!SkymapPanel.aspecting(n7, panel.outerRing.valid)) continue;
+                if (!SkymapPanel.aspecting(n7, panel.outerRing().valid)) continue;
                 for (n6 = 0; n6 < SkymapPanel.BODY_COUNT; ++n6) {
-                    if (!SkymapPanel.aspecting(n6, panel.natalRing.valid)) continue;
-                    this.drawAspectLine(graphics2D, panel.outerRing.lon[n7], panel.natalRing.lon[n6], d4, n12, n13, discOuter, discOuter, SkymapPanel.WHEEL_OUTER, n7, n6);
+                    if (!SkymapPanel.aspecting(n6, panel.natalRing().valid)) continue;
+                    this.drawAspectLine(graphics2D, panel.outerRing().lon[n7], panel.natalRing().lon[n6], d4, n12, n13, discOuter, discOuter, SkymapPanel.WHEEL_OUTER, n7, n6);
                 }
             }
         }
@@ -455,11 +448,11 @@ final class WheelCanvas extends JPanel {
         // put them where they do not cross the other two.
         if (n != 0 && panel.triRingDrawn()) {
             for (n7 = 0; n7 < SkymapPanel.BODY_COUNT; ++n7) {
-                if (!SkymapPanel.aspecting(n7, panel.skyRing.valid)) continue;
+                if (!SkymapPanel.aspecting(n7, panel.skyRing().valid)) continue;
                 for (n6 = 0; n6 < SkymapPanel.BODY_COUNT; ++n6) {
-                    if (!SkymapPanel.aspecting(n6, panel.natalRing.valid)) continue;
-                    this.drawAspectLine(graphics2D, panel.skyRing.lon[n7],
-                        panel.natalRing.lon[n6], d4, n12, n13, discSky, discSky,
+                    if (!SkymapPanel.aspecting(n6, panel.natalRing().valid)) continue;
+                    this.drawAspectLine(graphics2D, panel.skyRing().lon[n7],
+                        panel.natalRing().lon[n6], d4, n12, n13, discSky, discSky,
                         SkymapPanel.WHEEL_SKY, n7, n6);
                 }
             }
@@ -474,31 +467,31 @@ final class WheelCanvas extends JPanel {
         // holds no aspect, so the loop can be over members rather than over the figure's
         // own legs, which the Pattern does not record.
         java.util.List<int[]> litFigures = new java.util.ArrayList<>();
-        for (int[] members : panel.autoPatterns) {
+        for (int[] members : panel.autoPatterns()) {
             litFigures.add(members);
         }
-        if (panel.highlightPattern.length > 0) {
-            litFigures.add(panel.highlightPattern);
+        if (panel.highlightPattern().length > 0) {
+            litFigures.add(panel.highlightPattern());
         }
         for (int[] lit : litFigures) {
             for (int li = 0; li < lit.length; li++) {
                 for (int lj = li + 1; lj < lit.length; lj++) {
                     int pa = lit[li];
                     int pb = lit[lj];
-                    if (!SkymapPanel.aspecting(pa, panel.natalRing.valid)
-                        || !SkymapPanel.aspecting(pb, panel.natalRing.valid)) {
+                    if (!SkymapPanel.aspecting(pa, panel.natalRing().valid)
+                        || !SkymapPanel.aspecting(pb, panel.natalRing().valid)) {
                         continue;
                     }
-                    this.drawAspectLine(graphics2D, panel.natalRing.lon[pa],
-                        panel.natalRing.lon[pb], d4, n12, n13, discNatal, discNatal,
+                    this.drawAspectLine(graphics2D, panel.natalRing().lon[pa],
+                        panel.natalRing().lon[pb], d4, n12, n13, discNatal, discNatal,
                         SkymapPanel.WHEEL_NATAL, pa, pb);
                 }
             }
         }
 
-        int hlA = panel.highlightA;
-        int hlB = panel.highlightB;
-        int hlWheel = panel.highlightWheel;
+        int hlA = panel.highlightA();
+        int hlB = panel.highlightB();
+        int hlWheel = panel.highlightWheel();
         if (hlA >= 0 && hlB >= 0) {
             // <b>Off the ring it belongs to.</b> This redraw picked the outer wheel for
             // every cross-chart line, so a hovered sky aspect was drawn again on the
@@ -507,9 +500,9 @@ final class WheelCanvas extends JPanel {
             int hlDisc = hlWheel == SkymapPanel.WHEEL_SKY ? discSky
                 : (hlWheel == SkymapPanel.WHEEL_OUTER ? discOuter : discNatal);
             if (SkymapPanel.aspecting(hlA, panel.wheelValid(hlWheel))
-                && SkymapPanel.aspecting(hlB, panel.natalRing.valid)) {
+                && SkymapPanel.aspecting(hlB, panel.natalRing().valid)) {
                 this.drawAspectLine(graphics2D,
-                    panel.wheelLon(hlWheel)[hlA], panel.natalRing.lon[hlB],
+                    panel.wheelLon(hlWheel)[hlA], panel.natalRing().lon[hlB],
                     d4, n12, n13, hlDisc, hlDisc, hlWheel, hlA, hlB);
             }
         }
@@ -517,11 +510,11 @@ final class WheelCanvas extends JPanel {
         // before anything else is painted - every loop below resets to it.
         final java.awt.geom.AffineTransform bodyTx = graphics2D.getTransform();
         for (n7 = 0; panel.layerShown(SkymapPanel.Layer.NATAL) && n7 < SkymapPanel.BODY_COUNT; ++n7) {
-            if (!panel.natalRing.valid[n7]) continue;
-            double d10 = Math.toRadians(180.0 + d4 - panel.natalRing.lon[n7]);
+            if (!panel.natalRing().valid[n7]) continue;
+            double d10 = Math.toRadians(180.0 + d4 - panel.natalRing().lon[n7]);
             n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));
             int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
-            SkymapPanel.bulge(graphics2D, bodyTx, n4, n26, panel.hoverBody == n7);
+            SkymapPanel.bulge(graphics2D, bodyTx, n4, n26, panel.hoverBody() == n7);
             if (panel.onHighlightedLine(n7, SkymapPanel.WHEEL_NATAL)) {
                 WheelShapes.drawHighlightHalo(graphics2D, n4, n26,
                     Bodies.at(n7).isAngle() ? 13 : SkymapPanel.natalSize(n7).radius);
@@ -554,8 +547,8 @@ final class WheelCanvas extends JPanel {
             graphics2D.setFont(glyphSize.font);
             WheelShapes.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
                 new Color(192, 192, 192), Settings.natalMarker());
-            if (n7 == SkymapPanel.MOON && panel.natalRing.valid[SkymapPanel.SUN]) {
-                double d11 = (panel.natalRing.lon[SkymapPanel.MOON] - panel.natalRing.lon[SkymapPanel.SUN]) % 360.0;
+            if (n7 == SkymapPanel.MOON && panel.natalRing().valid[SkymapPanel.SUN]) {
+                double d11 = (panel.natalRing().lon[SkymapPanel.MOON] - panel.natalRing().lon[SkymapPanel.SUN]) % 360.0;
                 if (d11 < 0.0) {
                     d11 += 360.0;
                 }
@@ -584,8 +577,8 @@ final class WheelCanvas extends JPanel {
                 // leader is a hint and none of them is an answer; the one the cursor is on
                 // is the reader asking which degree this glyph occupies, so it is drawn
                 // solid and the rest stay a background.
-                boolean lit = panel.focusBody == n7
-                    && !panel.focusTransit;
+                boolean lit = panel.focusBody() == n7
+                    && !panel.focusTransit();
                 Color leader = ChartPalette.colorOr(ChartPalette.leaderHex(null),
                     Color.WHITE);
                 Stroke priorLeader = graphics2D.getStroke();
@@ -610,12 +603,12 @@ final class WheelCanvas extends JPanel {
             // synastry this wheel is a second person, anywhere else it is a moment.
             final SkymapPanel.AngleRole outerRole = panel.angleRoleFor(false, true);
             for (n7 = 0; n7 < SkymapPanel.BODY_COUNT; ++n7) {
-                if (!panel.outerRing.valid[n7]) continue;
-                double d12 = Math.toRadians(180.0 + d4 - panel.outerRing.lon[n7]);
+                if (!panel.outerRing().valid[n7]) continue;
+                double d12 = Math.toRadians(180.0 + d4 - panel.outerRing().lon[n7]);
                 n4 = n12 + (int)((double)nArray2[n7] * Math.cos(d12));
                 int n27 = n13 + (int)((double)nArray2[n7] * Math.sin(d12));
                 SkymapPanel.bulge(graphics2D, bodyTx, n4, n27,
-                    panel.hoverBody == (n7 | SkymapPanel.TRANSIT_BIT));
+                    panel.hoverBody() == (n7 | SkymapPanel.TRANSIT_BIT));
                 if (panel.onHighlightedLine(n7, SkymapPanel.WHEEL_OUTER)) {
                     WheelShapes.drawHighlightHalo(graphics2D, n4, n27,
                         Bodies.at(n7).isAngle() ? 13
@@ -625,7 +618,7 @@ final class WheelCanvas extends JPanel {
                     graphics2D.setFont(SkymapPanel.ANGLE_FONT);
                     WheelShapes.drawBodyMarker(graphics2D, n4, n27, 13,
                         SkymapPanel.ringBead(outerRole),
-                        SkymapPanel.outerRingMarker(panel.chartMode));
+                        SkymapPanel.outerRingMarker(panel.chartMode()));
                     graphics2D.setColor(panel.ringAngleInk(outerRole));
                     object = Bodies.at((int)n7).glyph;
                     graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n27 + 4);
@@ -636,9 +629,9 @@ final class WheelCanvas extends JPanel {
                 object = panel.ringInk(n7, outerRole);
                 WheelShapes.drawBodyMarker(graphics2D, n4, n27, glyphSize2.radius,
                     SkymapPanel.ringBead(outerRole),
-                    SkymapPanel.outerRingMarker(panel.chartMode));
-                if (n7 == SkymapPanel.MOON && panel.outerRing.valid[SkymapPanel.SUN]) {
-                    double d13 = (panel.outerRing.lon[SkymapPanel.MOON] - panel.outerRing.lon[SkymapPanel.SUN]) % 360.0;
+                    SkymapPanel.outerRingMarker(panel.chartMode()));
+                if (n7 == SkymapPanel.MOON && panel.outerRing().valid[SkymapPanel.SUN]) {
+                    double d13 = (panel.outerRing().lon[SkymapPanel.MOON] - panel.outerRing().lon[SkymapPanel.SUN]) % 360.0;
                     if (d13 < 0.0) {
                         d13 += 360.0;
                     }
@@ -663,8 +656,8 @@ final class WheelCanvas extends JPanel {
                     AlphaComposite.getInstance(AlphaComposite.SRC_OVER, triA));
             }
             for (n7 = 0; n7 < SkymapPanel.BODY_COUNT; ++n7) {
-                if (!panel.skyRing.valid[n7]) continue;
-                double d14 = Math.toRadians(180.0 + d4 - panel.skyRing.lon[n7]);
+                if (!panel.skyRing().valid[n7]) continue;
+                double d14 = Math.toRadians(180.0 + d4 - panel.skyRing().lon[n7]);
                 n4 = n12 + (int)((double)nArrayC[n7] * Math.cos(d14));
                 int n28 = n13 + (int)((double)nArrayC[n7] * Math.sin(d14));
                 // The sky ring never had this at all: its chords could light and the two
@@ -689,8 +682,8 @@ final class WheelCanvas extends JPanel {
                 Color cColor = panel.ringInk(n7, SkymapPanel.AngleRole.SKY);
                 WheelShapes.drawBodyMarker(graphics2D, n4, n28, glyphSize3.radius,
                     SkymapPanel.ringBead(SkymapPanel.AngleRole.SKY), Settings.transitMarker());
-                if (n7 == SkymapPanel.MOON && panel.skyRing.valid[SkymapPanel.SUN]) {
-                    double d15 = (panel.skyRing.lon[SkymapPanel.MOON] - panel.skyRing.lon[SkymapPanel.SUN]) % 360.0;
+                if (n7 == SkymapPanel.MOON && panel.skyRing().valid[SkymapPanel.SUN]) {
+                    double d15 = (panel.skyRing().lon[SkymapPanel.MOON] - panel.skyRing().lon[SkymapPanel.SUN]) % 360.0;
                     if (d15 < 0.0) d15 += 360.0;
                     WheelShapes.drawMoonPhase(graphics2D, n4, n28, Math.round((float)glyphSize3.radius * 0.44f), d15 / 360.0);
                     continue;

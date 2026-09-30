@@ -74,7 +74,8 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
 public class SkymapPanel
-extends JPanel {
+extends JPanel
+implements WheelSource {
     SwissEph sw;
     /**
      * The wheel's three rings - the chart, the outer ring (transits, progressions or Chart B),
@@ -258,7 +259,7 @@ extends JPanel {
     }
 
     /** The ring a wheel index names. */
-    WheelRing ringAt(int ring) {
+    public WheelRing ringAt(int ring) {
         if (ring == WHEEL_SKY) {
             return this.skyRing;
         }
@@ -505,7 +506,7 @@ extends JPanel {
     }
 
     /** Whether a layer is drawn at all - folded layers are skipped rather than drawn at zero. */
-    boolean layerShown(Layer layer) {
+    public boolean layerShown(Layer layer) {
         return this.layerOpen(layer) > 0.004;
     }
 
@@ -559,12 +560,12 @@ extends JPanel {
      * question differently is this project's most-found defect, and a filter that half works
      * is worse than one that does not exist, because the reader believes it.
      */
-    boolean drawsNatalAspects() {
+    public boolean drawsNatalAspects() {
         return "Natal-Natal".equals(this.aspectFilter) || "Both".equals(this.aspectFilter);
     }
 
     /** As above, for aspects between an outer ring and the natal wheel. */
-    boolean drawsCrossAspects() {
+    public boolean drawsCrossAspects() {
         return ("Transit-Natal".equals(this.aspectFilter) || "Both".equals(this.aspectFilter))
             && this.showTransitChart;
     }
@@ -682,12 +683,12 @@ extends JPanel {
      * a fold turns into a disappearance, and splitting the wrong way is how a glyph you can
      * see becomes a glyph you cannot click.
      */
-    boolean outerRingDrawn() {
+    public boolean outerRingDrawn() {
         return this.outerOpenFraction() > 0.001;
     }
 
     /** As above, for the outermost sky ring. */
-    boolean triRingDrawn() {
+    public boolean triRingDrawn() {
         return this.triOpenFraction() > 0.001;
     }
 
@@ -700,7 +701,7 @@ extends JPanel {
      * missing one is a broken chart. The one case where the bloom knows better is a fold, and
      * there the flag has already gone false, so the two cannot fight.
      */
-    double outerOpenFraction() {
+    public double outerOpenFraction() {
         if (this.showTransitChart && !this.outerBloom.opening()) {
             return 1.0;
         }
@@ -708,7 +709,7 @@ extends JPanel {
     }
 
     /** As above, for the outermost sky ring. */
-    double triOpenFraction() {
+    public double triOpenFraction() {
         if (this.showTriWheel && !this.triBloom.opening()) {
             return 1.0;
         }
@@ -1157,7 +1158,7 @@ extends JPanel {
      * of range, or a ring whose radii have not been laid out yet. A line drawn at the wrong
      * radius is a line pointing at nothing.
      */
-    int endpointRadius(int wheel, int bodyIndex, int discRadius) {
+    public int endpointRadius(int wheel, int bodyIndex, int discRadius) {
         if (!Settings.aspectLinesToBodies()) {
             return discRadius;
         }
@@ -1659,7 +1660,7 @@ extends JPanel {
      * views come to disagree about the one station that is highlighted - the defect this
      * project keeps finding in the seams between surfaces rather than in the arithmetic.
      */
-    com.zodiacomputing.ourania.astro.LunarMansions.Mansion moonMansion() {
+    public com.zodiacomputing.ourania.astro.LunarMansions.Mansion moonMansion() {
         com.zodiacomputing.ourania.astro.ChartFrame frame = this.getCurrentChart();
         return frame == null ? null
             : com.zodiacomputing.ourania.astro.LunarMansions.ofMoon(frame);
@@ -1817,7 +1818,7 @@ extends JPanel {
      * synastry ring, then natal. Each is drawn on top of the one inside it, so this
      * matches what the eye sees where rings overlap.
      */
-    String hoverTextAt(int x, int y) {
+    public String hoverTextAt(int x, int y) {
         if (this.sw == null || this.natalRing.sd == null || this.chartPanel == null) {
             return null;
         }
@@ -2038,7 +2039,7 @@ extends JPanel {
     }
 
     /** As above, for the painter, which is handed the size it is painting into. */
-    Geometry geometry(int w, int h) {
+    public Geometry geometry(int w, int h) {
         return w <= 0 || h <= 0 ? null : new Geometry(w, h);
     }
 
@@ -2133,7 +2134,7 @@ extends JPanel {
     private boolean focusPinned;
 
     /** True when nothing is focused, so every aspect draws at its ordinary strength. */
-    boolean noFocus() {
+    public boolean noFocus() {
         return this.focusBody < 0;
     }
 
@@ -2145,7 +2146,7 @@ extends JPanel {
      * context that makes one body's web mean anything, and removing it would leave a reader
      * looking at five lines in an empty circle.
      */
-    double focusWeight(int a, int b, boolean transitPair) {
+    public double focusWeight(int a, int b, boolean transitPair) {
         if (this.noFocus()) {
             return 1.0;
         }
@@ -2162,7 +2163,7 @@ extends JPanel {
      * asked through {@code visibleAspect}, the same gate the lines use, so a glyph cannot stay
      * lit for an aspect that was switched off in Settings.
      */
-    double glyphWeight(int i, boolean transit) {
+    public double glyphWeight(int i, boolean transit) {
         if (this.noFocus()) {
             return 1.0;
         }
@@ -2278,7 +2279,7 @@ extends JPanel {
         return this.chartPanel == null ? 0 : this.chartPanel.getHeight();
     }
 
-    java.awt.geom.AffineTransform viewTransform(int w, int h) {
+    public java.awt.geom.AffineTransform viewTransform(int w, int h) {
         return this.view.transform(w, h);
     }
 
@@ -2286,7 +2287,7 @@ extends JPanel {
         return this.view.isFit();
     }
 
-    java.awt.Point toWheel(int x, int y) {
+    public java.awt.Point toWheel(int x, int y) {
         return this.chartPanel == null
             ? new java.awt.Point(x, y)
             : this.view.toWheel(x, y, this.viewW(), this.viewH());
@@ -2308,7 +2309,7 @@ extends JPanel {
         this.view.fit();
     }
 
-    void clampView() {
+    public void clampView() {
         if (this.chartPanel != null) {
             this.view.reclamp(this.viewW(), this.viewH());
         }
@@ -2318,7 +2319,7 @@ extends JPanel {
         return WheelView.fitChipBounds();
     }
 
-    void paintFitChip(Graphics2D g2) {
+    public void paintFitChip(Graphics2D g2) {
         this.view.paintFitChip(g2);
     }
 
@@ -2489,7 +2490,7 @@ extends JPanel {
     }
 
     /** The swell for a hovered ring target, painted over the finished wheel. */
-    void paintHover(Graphics2D g2, Geometry g) {
+    public void paintHover(Graphics2D g2, Geometry g) {
         if (this.hoverRing < 0 || g == null) {
             return;
         }
@@ -3379,7 +3380,7 @@ extends JPanel {
      * fallback, because a reading is light text on a dark panel. Three surfaces, three
      * grounds - the element is the same, the legible ink is not.
      */
-    Color getElementColor(int n) {
+    public Color getElementColor(int n) {
         return getElementColor(n, true);
     }
 
@@ -3395,7 +3396,7 @@ extends JPanel {
      * and a per-body override added to some of them would have produced a chart where a body
      * was one colour on the wheel and another in the table.
      */
-    Color bodyColor(int bodyIndex) {
+    public Color bodyColor(int bodyIndex) {
         return ChartPalette.colorOr(
             ChartPalette.bodyHex(Bodies.at(bodyIndex).id),
             this.getElementColor(BODY_ELEMENTS[bodyIndex]));
@@ -5520,7 +5521,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * orb. Two different questions sharing a word; routing one into the other would visibly change
      * the wheel and is a decision for the stage that builds the preset bar.
      */
-    Aspects.Profile profileForPair(boolean crossChart) {
+    public Aspects.Profile profileForPair(boolean crossChart) {
         if (crossChart && this.chartMode == ChartMode.SYNASTRY) {
             return Aspects.Profile.SYNASTRY;
         }
@@ -5592,7 +5593,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     private static final Color SKY_HUE = new Color(143, 208, 255);
 
     /** A body's glyph colour on a given ring. ANCHOR keeps the element colour untouched. */
-    Color ringInk(int body, AngleRole role) {
+    public Color ringInk(int body, AngleRole role) {
         if (role == AngleRole.ANCHOR) {
             return this.bodyColor(body);
         }
@@ -5619,11 +5620,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * and nothing else. Body index -1 is not a body, and ANCHOR never reaches the branch that
      * would use it.
      */
-    Color ringAngleInk(AngleRole role) {
+    public Color ringAngleInk(AngleRole role) {
         return role == AngleRole.ANCHOR ? new Color(255, 228, 160) : this.ringInk(-1, role);
     }
 
-    AngleRole angleRoleFor(boolean isSky, boolean isTransit) {
+    public AngleRole angleRoleFor(boolean isSky, boolean isTransit) {
         if (isSky) {
             return AngleRole.SKY;
         }
@@ -5705,7 +5706,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             role.name(), hostHouse);
     }
 
-    double getOrbFor(int n, int n2, Aspects.Profile profile) {
+    public double getOrbFor(int n, int n2, Aspects.Profile profile) {
         return Aspects.orbFor(SkymapPanel.planetName(n), SkymapPanel.planetName(n2), profile);
     }
 
@@ -5739,7 +5740,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * disagreed about which aspects exist. That is this project's most-logged defect and it
      * would have been invisible: both surfaces look entirely plausible on their own.
      */
-    Aspects.Type visibleAspect(double sep, int a, int b, Aspects.Profile profile) {
+    public Aspects.Type visibleAspect(double sep, int a, int b, Aspects.Profile profile) {
         return AspectGate.visible(sep, a, b, profile, this.aspectShown);
     }
 
@@ -5760,7 +5761,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * Seeded at declaration and refreshed on the settings hook, not per call: this runs once
      * per body pair per repaint, and reading a properties file inside that loop would be felt.
      */
-    boolean drawsPair(int a, int b) {
+    public boolean drawsPair(int a, int b) {
         if (Settings.ASPECTS_ESOTERIC.equals(this.aspectMode)) {
             return true;
         }
@@ -5981,7 +5982,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * into each of the glyph loops, because the natal loop and the outer loop read the
      * highlight from opposite ends of the pair.
      */
-    boolean onHighlightedLine(int body, int wheel) {
+    public boolean onHighlightedLine(int body, int wheel) {
         if (this.highlightA < 0 || this.highlightB < 0) {
             return false;
         }
@@ -6369,7 +6370,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** The longitudes of one wheel. */
-    double[] wheelLon(int wheel) {
+    public double[] wheelLon(int wheel) {
         return wheel == WHEEL_SKY ? this.skyRing.lon : (wheel == WHEEL_OUTER ? this.outerRing.lon : this.natalRing.lon);
     }
 
@@ -6380,7 +6381,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** Which points of one wheel are computed. */
-    boolean[] wheelValid(int wheel) {
+    public boolean[] wheelValid(int wheel) {
         return wheel == WHEEL_SKY ? this.skyRing.valid
             : (wheel == WHEEL_OUTER ? this.outerRing.valid : this.natalRing.valid);
     }
@@ -6694,7 +6695,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** True when this line is the one the grid is hovering, or part of the lit pattern. */
-    boolean isHighlighted(int a, int b, int wheel) {
+    public boolean isHighlighted(int a, int b, int wheel) {
         if (isPatternMemberPair(a, b, wheel != WHEEL_NATAL)) {
             return true;
         }
@@ -7172,6 +7173,45 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
+    // ------------------------------------------------------------------ the wheel's source
+    //
+    // What WheelCanvas reads, as WheelSource states it (J13, step 6). The fields keep their
+    // names and their writers; these are the read side the painter is allowed.
+
+    @Override public WheelRing natalRing() { return this.natalRing; }
+    @Override public WheelRing outerRing() { return this.outerRing; }
+    @Override public WheelRing skyRing() { return this.skyRing; }
+    @Override public ChartMode chartMode() { return this.chartMode; }
+    @Override public double[] activeCusps() { return this.activeCusps; }
+    @Override public String houseAlignment() { return this.houseAlignment; }
+    @Override public boolean showTransitChart() { return this.showTransitChart; }
+    @Override public boolean globeMode() { return this.globeMode; }
+    @Override public int highlightA() { return this.highlightA; }
+    @Override public int highlightB() { return this.highlightB; }
+    @Override public int highlightWheel() { return this.highlightWheel; }
+    @Override public int[] highlightPattern() { return this.highlightPattern; }
+    @Override public int[][] autoPatterns() { return this.autoPatterns; }
+    @Override public int focusBody() { return this.focusBody; }
+    @Override public boolean focusTransit() { return this.focusTransit; }
+    @Override public int hoverBody() { return this.hoverBody; }
+
+    @Override
+    public boolean chartReady() {
+        return this.sw != null && this.natalRing.sd != null;
+    }
+
+    /**
+     * <b>Coasting counts as turning.</b> The cheap path - no halos, coarser arcs - is for
+     * frames the reader cannot study, and a globe still gliding to a stop is exactly that.
+     * Reading only globeDragging would switch the expensive path back on the instant the
+     * button came up, which is the one moment the frame rate has to hold.
+     */
+    @Override
+    public void paintGlobe(Graphics2D g, int w, int h) {
+        GlobeRenderer.paint(g, this.globe, w, h, this,
+            this.globeDragging || this.globe.coasting());
+    }
+
     // ------------------------------------------------------------------ scrubbing
 
     /**
@@ -7414,7 +7454,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** The offset, over the top of the wheel while a scrub is running. */
-    void paintScrubTag(Graphics2D g2, int w) {
+    public void paintScrubTag(Graphics2D g2, int w) {
         this.scrub.paintTag(g2, w);
     }
 
@@ -7871,7 +7911,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
-    double getPinLongitude() {
+    public double getPinLongitude() {
         if ("Aries".equals(this.wheelPin)) {
             return 0.0;
         }
