@@ -1,0 +1,17 @@
+// M2: the phone app. It builds from the same engine source as the desktop, never a copy of it.
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "OuraniaAndroid"
+include ":app"

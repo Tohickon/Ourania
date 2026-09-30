@@ -1,0 +1,64 @@
+plugins {
+    id "com.android.application"
+}
+
+// <b>The engine is compiled from the desktop tree, not copied into this one.</b> The rule since
+// the phone was first planned (M1): one engine, two apps, and never a second copy of the source,
+// which is this project's most-named defect. What "the engine" is lives in ONE place -
+// EngineIsolationCheck, which also proves it builds on its own - so its list of shared desktop
+// classes is read out of that file here rather than written out a second time.
+def desktop = file("../../OuraniaWindows/src/main/java")
+def isolationCheck = new File(desktop, "com/zodiacomputing/ourania/gui/EngineIsolationCheck.java")
+def sharedBlock = (isolationCheck.text =~ /(?s)SHARED\s*=\s*new TreeSet<>\(List\.of\((.*?)\)\)/)
+if (!sharedBlock.find()) {
+    throw new GradleException("EngineIsolationCheck.SHARED not found - the engine's list moved")
+}
+def shared = (sharedBlock.group(1) =~ /"(\w+)"/).collect { it[1] }
+
+def engineSources = tasks.register("engineSources", Sync) {
+    from(desktop) {
+        include "com/zodiacomputing/ourania/astro/**/*.java"
+        include "de/thmac/swisseph/**/*.java"
+        shared.each { include "com/zodiacomputing/ourania/gui/${it}.java" }
+        exclude "**/*Check.java", "**/*SelfTest.java"
+    }
+    into layout.buildDirectory.dir("generated/engine")
+}
+
+android {
+    namespace "com.zodiacomputing.ourania.android"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.zodiacomputing.ourania"
+        // Android 13. The engine uses List.of, Map.of and String.repeat, which a phone has only
+        // from here; the target is a Galaxy S23 Ultra on Android 14.
+        minSdk 33
+        targetSdk 34
+        versionCode 1
+        versionName file("../../OuraniaWindows/VERSION").text.trim()
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    sourceSets {
+        main {
+            java.srcDir(layout.buildDirectory.dir("generated/engine"))
+            // The interpretation corpus and the atlas, opened by name through DataFiles (M1).
+            // Served from the desktop's data folder, again rather than a copy of it.
+            assets.srcDirs = ["../../OuraniaWindows/src/main/resources/data"]
+        }
+    }
+
+    // The Swiss Ephemeris files are fetched, never committed (THIRD-PARTY-NOTICES.md), and are
+    // not bundled yet - without them the engine computes with its built-in Moshier ephemeris,
+    // which the screen says. The gazetteer is already gzipped and gains nothing from a second pass.
+    androidResources {
+        noCompress "se1", "gz"
+    }
+}
+
+tasks.named("preBuild") { dependsOn(engineSources) }
