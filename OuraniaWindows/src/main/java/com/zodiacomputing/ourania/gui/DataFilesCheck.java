@@ -66,7 +66,9 @@ public final class DataFilesCheck {
 
         System.out.println("=== Part A: the trap is set ===");
         yes("DATA_DIR points at the folder that does not exist: " + InterpretationService.DATA_DIR,
-            InterpretationService.DATA_DIR.startsWith(nowhere));
+            // AppPaths writes every path with forward slashes; on Windows the temp folder has
+            // backslashes, so the two are compared in one form.
+            InterpretationService.DATA_DIR.replace('\\', '/').startsWith(nowhere.replace('\\', '/')));
         yes("and it does not exist", !new java.io.File(InterpretationService.DATA_DIR).exists());
         yes("the real data is where it was: " + real, new java.io.File(real).isDirectory());
 
@@ -103,6 +105,33 @@ public final class DataFilesCheck {
         yes("the atlas loaded through the source: " + Atlas.failure(), Atlas.failure() == null);
         yes(Atlas.FILE_NAME + " was opened through the source", asked.contains(Atlas.FILE_NAME));
         yes("and a place search finds London (" + london.size() + " results)", !london.isEmpty());
+
+        System.out.println("=== Part C3: the atlas as the phone's packager leaves it ===");
+        // Android stores a .gz asset decompressed and without the suffix (measured in the first
+        // APK, 30 Sep). Served that way - plain text under the .gz name - it must still read.
+        byte[] plain;
+        try (InputStream gz = new java.util.zip.GZIPInputStream(folder.open(Atlas.FILE_NAME))) {
+            java.io.ByteArrayOutputStream buf = new java.io.ByteArrayOutputStream();
+            byte[] b = new byte[1 << 16];
+            for (int n; (n = gz.read(b)) > 0; ) {
+                buf.write(b, 0, n);
+            }
+            plain = buf.toByteArray();
+        }
+        yes("the gazetteer really is gzipped on disk, so this is a different form",
+            plain.length > 0 && folder.exists(Atlas.FILE_NAME));
+        int lines = 0;
+        // Caught and counted, not thrown: a suite that crashes reports no failures at all.
+        try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.InputStreamReader(
+                Atlas.plainOrGzipped(new java.io.ByteArrayInputStream(plain)),
+                java.nio.charset.StandardCharsets.UTF_8))) {
+            while (r.readLine() != null) {
+                lines++;
+            }
+        } catch (java.io.IOException e) {
+            yes("the decompressed gazetteer reads at all, threw " + e, false);
+        }
+        yes("read decompressed, it is still the whole gazetteer (" + lines + " lines)", lines > 160000);
 
         System.out.println("=== Part D: a source with nothing gives nothing ===");
         DataFiles.use(new DataFiles.Source() {

@@ -139,6 +139,24 @@ public final class Atlas {
         return sb.toString().toLowerCase(java.util.Locale.ROOT).trim().replaceAll("\\s+", " ");
     }
 
+    /**
+     * The gazetteer's text, whether it arrives gzipped or not.
+     *
+     * <b>Because Android unpacks it.</b> The build that packs the phone's assets stores a
+     * {@code .gz} file decompressed and without the suffix - measured in the first APK, 30 Sep
+     * (M2): {@code atlas.tsv.gz} went in as a 14 MB {@code atlas.tsv}. The phone's data source
+     * finds it under either name; this reads it either way, by its first two bytes rather than
+     * by its name, since the name is exactly what the packager changed.
+     */
+    static java.io.InputStream plainOrGzipped(java.io.InputStream raw) throws java.io.IOException {
+        java.io.BufferedInputStream in = new java.io.BufferedInputStream(raw);
+        in.mark(2);
+        int b1 = in.read();
+        int b2 = in.read();
+        in.reset();
+        return b1 == 0x1f && b2 == 0x8b ? new GZIPInputStream(in) : in;
+    }
+
     private static synchronized void load() {
         if (loaded) {
             return;
@@ -147,7 +165,7 @@ public final class Atlas {
         List<String[]> rows = new ArrayList<>(180000);
         Map<String, String> shared = new HashMap<>();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                new GZIPInputStream(DataFiles.entry(FILE_NAME).open()), StandardCharsets.UTF_8))) {
+                plainOrGzipped(DataFiles.entry(FILE_NAME).open()), StandardCharsets.UTF_8))) {
             String line;
             while ((line = in.readLine()) != null) {
                 if (line.isEmpty() || line.charAt(0) == '#') {
