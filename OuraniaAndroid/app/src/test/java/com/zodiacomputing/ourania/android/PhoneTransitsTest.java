@@ -196,4 +196,24 @@ public class PhoneTransitsTest {
         assertFalse("timing is on", r.contains("Transit data not enabled"));
         assertFalse(r.contains("style="));
     }
+
+    @Test
+    public void releasingShowsTheEnginesActiveChainFromBothLots() {
+        PhoneChart.Cast natal = sydney(LocalTime.of(14, 15));
+        String r = PhoneTransits.releasing(natal, SEP_2026);
+        assertTrue(r.contains("From the Lot of Spirit") && r.contains("From the Lot of Fortune"));
+        ChartFrame f = natal.frame;
+        java.util.List<com.zodiacomputing.ourania.astro.ZodiacalReleasing.Period> periods =
+            com.zodiacomputing.ourania.astro.ZodiacalReleasing.release(f.julianDayUt,
+                f.lotOfSpirit, f.lotOfSpirit, f.julianDayUt + 100 * 365.2422, 4);
+        java.util.List<com.zodiacomputing.ourania.astro.ZodiacalReleasing.Period> chain =
+            com.zodiacomputing.ourania.astro.ZodiacalReleasing.activeChain(periods,
+                Moments.sweDate(SEP_2026).getJulDay());
+        assertEquals("four levels active", 4, chain.size());
+        for (com.zodiacomputing.ourania.astro.ZodiacalReleasing.Period p : chain) {
+            assertTrue(p.level + "", r.contains(PhoneTransits.period(p, SEP_2026.getZone())));
+        }
+        assertEquals("the current chapter is marked once per Lot", 2, r.split("&larr; now").length - 1);
+        assertEquals("", PhoneTransits.releasing(sydney(null), SEP_2026));
+    }
 }

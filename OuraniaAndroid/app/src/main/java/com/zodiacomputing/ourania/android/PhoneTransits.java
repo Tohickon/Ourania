@@ -8,6 +8,7 @@ import com.zodiacomputing.ourania.astro.Moments;
 import com.zodiacomputing.ourania.astro.Profection;
 import com.zodiacomputing.ourania.astro.Transits;
 import com.zodiacomputing.ourania.astro.Zodiac;
+import com.zodiacomputing.ourania.astro.ZodiacalReleasing;
 import com.zodiacomputing.ourania.astro.Themes;
 import com.zodiacomputing.ourania.astro.Topics;
 import com.zodiacomputing.ourania.gui.InterpretationService;
@@ -265,6 +266,83 @@ final class PhoneTransits {
                 .append("<br>");
         }
         return h.append("</p>").toString();
+    }
+
+    /**
+     * Zodiacal releasing at a moment, from both Lots: the chain of periods active now,
+     * level by level, the next few sub-periods, and the life's chapters - the desktop's
+     * Releasing tree ({@code ReleasingPanel}), from the same {@link ZodiacalReleasing#release}
+     * to the same four levels. Needs a birth time, since the Lots are measured from the
+     * Ascendant; "" without one.
+     */
+    static String releasing(PhoneChart.Cast natal, ZonedDateTime when) {
+        if (natal.timeUnknown) {
+            return "";
+        }
+        ChartFrame f = natal.frame;
+        double now = Moments.sweDate(when).getJulDay();
+        ZoneId zone = when.getZone();
+        StringBuilder h = new StringBuilder("<h2>Zodiacal releasing</h2>");
+        h.append("<p><i>From the Lot of Spirit for career and action, from the Lot of Fortune "
+            + "for body and circumstance. A peak is a period in an angle from the Lot of "
+            + "Spirit; the bond is loosed when a period jumps to the opposite sign.</i></p>");
+        String[] names = {"Spirit", "Fortune"};
+        double[] lots = {f.lotOfSpirit, f.lotOfFortune};
+        for (int k = 0; k < 2; k++) {
+            List<ZodiacalReleasing.Period> periods = ZodiacalReleasing.release(
+                f.julianDayUt, lots[k], f.lotOfSpirit, f.julianDayUt + 100 * 365.2422, 4);
+            h.append("<h3>From the Lot of ").append(names[k]).append(" (")
+                .append(capital(Zodiac.signName(lots[k]))).append(")</h3>");
+            List<ZodiacalReleasing.Period> chain = ZodiacalReleasing.activeChain(periods, now);
+            if (chain.isEmpty()) {
+                h.append("<p>No period is active at this date.</p>");
+                continue;
+            }
+            h.append("<p><b>Now:</b><br>");
+            for (ZodiacalReleasing.Period p : chain) {
+                h.append("&nbsp;&nbsp;").append(period(p, zone)).append("<br>");
+            }
+            h.append("</p>");
+            if (chain.size() >= 2) {
+                // What the current chapter holds next, at the second level.
+                ZodiacalReleasing.Period chapter = chain.get(0);
+                StringBuilder next = new StringBuilder();
+                int shown = 0;
+                for (ZodiacalReleasing.Period p : chapter.children) {
+                    if (p.startJd > now && shown < 4) {
+                        next.append("&nbsp;&nbsp;").append(period(p, zone)).append("<br>");
+                        shown++;
+                    }
+                }
+                if (shown > 0) {
+                    h.append("<p><b>Next in this chapter:</b><br>").append(next).append("</p>");
+                }
+            }
+            h.append("<p><b>The chapters of the life:</b><br>");
+            for (ZodiacalReleasing.Period p : periods) {
+                h.append("&nbsp;&nbsp;").append(p == chain.get(0) ? "<b>" : "")
+                    .append(period(p, zone)).append(p == chain.get(0) ? " &larr; now</b>" : "")
+                    .append("<br>");
+            }
+            h.append("</p>");
+        }
+        return h.toString();
+    }
+
+    /** "L2 Leo, 3 Mar 2026 - 1 Oct 2026, peak" - one period as the desktop's tree names it. */
+    static String period(ZodiacalReleasing.Period p, ZoneId zone) {
+        DateTimeFormatter d = DateTimeFormatter.ofPattern("d MMM yyyy");
+        StringBuilder sb = new StringBuilder();
+        sb.append('L').append(p.level).append(' ').append(capital(Zodiac.SIGNS[p.sign]))
+            .append(", ").append(fromJd(p.startJd, zone).format(d)).append(" - ")
+            .append(fromJd(p.endJd, zone).format(d));
+        if (p.peak) {
+            sb.append(", <b>peak</b>");
+        }
+        if (p.afterBond) {
+            sb.append(", <b>bond loosed</b>");
+        }
+        return sb.toString();
     }
 
     /** A Julian day (UT) as a local date and time in a zone. */

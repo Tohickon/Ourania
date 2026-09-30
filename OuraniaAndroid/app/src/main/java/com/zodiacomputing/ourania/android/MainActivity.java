@@ -218,6 +218,11 @@ public final class MainActivity extends Activity {
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         this.timing.addView(calendar, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        Button releasing = new Button(this);
+        releasing.setText("Releasing");
+        releasing.setOnClickListener(v -> this.showReleasing());
+        this.timing.addView(releasing, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         form.addView(this.timing);
         this.save = new Button(this);
         this.save.setText("Save this chart");
@@ -599,6 +604,23 @@ public final class MainActivity extends Activity {
         have = PhoneTransits.at(new SwissEph(Ephemeris.PATH), c, when, true);
         this.scannedSky = have;
         return have;
+    }
+
+    /** Zodiacal releasing from both Lots, at the sky's moment (now unless a day is set). */
+    private void showReleasing() {
+        final PhoneChart.Cast c = this.shownCast;
+        if (c == null) {
+            return;
+        }
+        if (c.timeUnknown) {
+            this.tapped.setText("Releasing starts from the Lots, which are measured from the "
+                + "Ascendant, so it needs a birth time.");
+            return;
+        }
+        PhoneTransits.Sky sky = this.shownSky;
+        java.time.ZonedDateTime when = sky != null ? sky.when : PhoneTransits.now(c.place.zoneId);
+        this.tapped.setText(Html.fromHtml(PhoneTransits.releasing(c, when),
+            Html.FROM_HTML_MODE_COMPACT));
     }
 
     /** The year ahead, month by month: what perfects on this chart, and when. */
