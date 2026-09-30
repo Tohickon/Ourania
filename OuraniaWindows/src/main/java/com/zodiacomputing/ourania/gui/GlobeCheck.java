@@ -163,6 +163,12 @@ public final class GlobeCheck {
         report("Part S", before);
 
         System.out.println();
+        System.out.println("=== Part T: from straight above, the globe is the wheel ===");
+        before = failures.size();
+        fromAboveItIsTheWheel();
+        report("Part T", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -3292,6 +3298,138 @@ public final class GlobeCheck {
             sum += cam.project(pt[0], pt[1], pt[2], 900, 900).y - centre.y;
         }
         return sum / 180.0;
+    }
+
+    /**
+     * David, 30 Sep: "the wheel chart is really just the top down view of the globe - is there a
+     * way we can make the wheel and the globe one seamless body". So from straight above Chart
+     * A the globe has to put every ring where the wheel does: flat, at the wheel's proportions,
+     * and every body in the direction the wheel draws it. And getting there has to be a
+     * glide, not a switch - the 19 and 20 Sep mirrors snapped at a threshold and were taken
+     * out for it.
+     *
+     * <p>The wheel side is read from {@link SkymapPanel#ringRadii}, the chain the wheel is
+     * drawn from, and the globe side from the camera's own projection - not from
+     * {@link GlobeRenderer#wheelRadii}, which is the thing under test.
+     */
+    private static void fromAboveItIsTheWheel() throws Exception {
+        Globe cam = new Globe();
+        cam.pitch = -Globe.MAX_PITCH;
+        near("straight down onto Chart A, the globe is wholly the wheel", 1.0,
+            GlobeRenderer.flatness(cam), 1e-12);
+        cam.pitch = -GlobeRenderer.FLAT_FROM;
+        near("where the change begins, nothing has changed yet", 0.0, GlobeRenderer.flatness(cam), 1e-12);
+        for (double p : new double[] {new Globe().pitch, -0.32, 0.0, 0.32, Globe.MAX_PITCH}) {
+            cam.pitch = p;
+            near("at pitch " + p + " the decks are the globe's own", 0.0, GlobeRenderer.flatness(cam), 1e-12);
+        }
+        // A glide: never backwards, and no step bigger than the pitch step could explain.
+        double prev = 0.0;
+        double worstStep = 0.0;
+        boolean backwards = false;
+        int steps = 4000;
+        for (int i = 0; i <= steps; i++) {
+            cam.pitch = -Globe.MAX_PITCH * i / steps;
+            double f = GlobeRenderer.flatness(cam);
+            backwards |= f < prev - 1e-12;
+            worstStep = Math.max(worstStep, Math.abs(f - prev));
+            prev = f;
+        }
+        yes("climbing to overhead the change only ever goes one way", !backwards);
+        yes("and never jumps: the largest step over " + steps + " pitch steps is " + worstStep,
+            worstStep < 0.002);
+
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            final SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            // Waited for, not slept through: the window casts its chart on a worker.
+            long end = System.nanoTime() + 15_000_000_000L;
+            while (System.nanoTime() < end && panel.natalRing.time == null) {
+                Thread.sleep(20);
+            }
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                panel.chartMode = ChartMode.SYNASTRY;
+                panel.showTransitChart = true;
+                panel.showTriWheel = true;
+                for (int i = 0; i < SkymapPanel.BODY_COUNT; i++) {
+                    panel.natalRing.lon[i] = (i * 47.0) % 360.0;
+                    panel.outerRing.lon[i] = (i * 47.0 + 11.0) % 360.0;
+                    panel.skyRing.lon[i] = (i * 47.0 + 23.0) % 360.0;
+                    panel.natalRing.valid[i] = true;
+                    panel.outerRing.valid[i] = true;
+                    panel.skyRing.valid[i] = true;
+                }
+            });
+            final int w = 900;
+            final int h = 820;
+            Globe top = new Globe();
+            top.pitch = -Globe.MAX_PITCH;
+            double origin = panel.pinLongitude();
+            for (boolean stacked : new boolean[] {true, false}) {
+                for (int deck : new int[] {SkymapPanel.DECK_UPPER, SkymapPanel.DECK_MIDDLE,
+                        SkymapPanel.DECK_LOWER}) {
+                    near("overhead, " + (stacked ? "stacked" : "crossed") + " deck " + deck
+                        + " lies in the middle plane", 0.0, GlobeRenderer.liftFor(deck, stacked, top), 1e-12);
+                    near("and is not tilted", 0.0, GlobeRenderer.inclinationFor(deck, stacked, top), 1e-12);
+                }
+            }
+            double[] shells = GlobeRenderer.shellRadii(panel, top, w, h);
+            yes("overhead the rings nest as the wheel's do - Chart A inside, the outer ring, the "
+                + "sky outermost: " + java.util.Arrays.toString(shells),
+                shells[0] < shells[1] && shells[1] < shells[2]);
+            yes("and all of them inside the signs", shells[2] < Globe.SHELL_SIGN_INNER);
+
+            int[] rings = SkymapPanel.ringRadii(w, h, 1.0, 1.0);
+            double wheelSign = rings[SkymapPanel.RING_SIGN_INNER];
+            int natalTop = panel.bodyBaseRadius(rings);
+            double[] wheelMid = {
+                natalTop - SkymapPanel.natalBandDepth(natalTop) / 2.0,     // Chart A's band
+                (rings[SkymapPanel.RING_TRANSIT] + rings[SkymapPanel.RING_BODY_TOP]) / 2.0,
+                (rings[SkymapPanel.RING_TRI] + rings[SkymapPanel.RING_TRANSIT]) / 2.0,
+            };
+            Globe.Projected centre = top.project(0, 0, 0, w, h);
+            double[] sign = Globe.onShell(0.0, origin, Globe.SHELL_SIGN_INNER, 0.0);
+            Globe.Projected signAt = top.project(sign[0], sign[1], sign[2], w, h);
+            double globeSign = Math.hypot(signAt.x - centre.x, signAt.y - centre.y);
+            java.util.List<double[]> wheelLons = java.util.List.of(panel.natalRing.lon,
+                panel.outerRing.lon, panel.skyRing.lon);
+            double worstAngle = 0.0;
+            for (int ring = 0; ring < 3; ring++) {
+                int deck = panel.ringDeck(ring);
+                double[] lon = wheelLons.get(ring);
+                double globeR = -1;
+                for (int i = 0; i < SkymapPanel.BODY_COUNT; i++) {
+                    double[] pt = Globe.onShell(lon[i], origin, shells[ring],
+                        GlobeRenderer.liftFor(deck, true, top), GlobeRenderer.inclinationFor(deck, true, top));
+                    Globe.Projected q = top.project(pt[0], pt[1], pt[2], w, h);
+                    double dx = q.x - centre.x;
+                    double dy = q.y - centre.y;
+                    globeR = Math.hypot(dx, dy);
+                    // The wheel draws longitude L at angle 180 + pin - L, y down.
+                    double a = Math.toRadians(180.0 + origin - lon[i]);
+                    double diff = Math.abs(Math.toDegrees(Math.atan2(dy, dx) - Math.atan2(Math.sin(a), Math.cos(a))));
+                    worstAngle = Math.max(worstAngle, Math.min(diff, 360.0 - diff));
+                }
+                {
+                    near("overhead, ring " + ring + " sits where the wheel puts it, as a share of the "
+                        + "sign band", wheelMid[ring] / wheelSign, globeR / globeSign, 0.01);
+                }
+            }
+            yes("and every body points where the wheel draws it: worst " + worstAngle + " degrees",
+                worstAngle < 0.5);
+
+            Globe tilted = new Globe();
+            double[] atRest = GlobeRenderer.shellRadii(panel, tilted, w, h);
+            yes("at the ordinary tilt the three charts still share one shell: "
+                + java.util.Arrays.toString(atRest),
+                atRest[0] == Globe.SHELL_CHART && atRest[1] == Globe.SHELL_CHART
+                    && atRest[2] == Globe.SHELL_CHART);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
     }
 
     private static void yes(String label, boolean condition) {

@@ -99,7 +99,7 @@ final class GlobeRenderer {
         r.stacked = Settings.globeStackedRings();
         r.bowed = Settings.globeAspectArcs();
 
-        double[] shells = shellRadii(panel);
+        double[] shells = shellRadii(panel, cam, w, h);
         double natalR = shells[0];
         double partnerR = shells[1];
         double skyR = shells[2];
@@ -153,13 +153,13 @@ final class GlobeRenderer {
         if (panel.outerRingDrawn()) {
             int outerDeck = panel.ringDeck(1);
             r.ribbon(partnerR, shade(deckInk(outerDeck), 54),
-                inclinationOf(outerDeck, r.stacked),
+                inclinationFor(outerDeck, r.stacked, r.cam),
                 liftFor(outerDeck, r.stacked, r.cam), turning);
         }
         if (panel.triRingDrawn()) {
             int triDeck = panel.ringDeck(2);
             r.ribbon(skyR, shade(deckInk(triDeck), 54),
-                inclinationOf(triDeck, r.stacked),
+                inclinationFor(triDeck, r.stacked, r.cam),
                 liftFor(triDeck, r.stacked, r.cam), turning);
         }
 
@@ -169,7 +169,7 @@ final class GlobeRenderer {
         if (r.shown(SkymapPanel.Layer.NATAL)) {
             int innerDeck = panel.ringDeck(0);
             r.ribbon(natalR, r.faded(shade(deckInk(innerDeck), 54), SkymapPanel.Layer.NATAL),
-                inclinationOf(innerDeck, r.stacked),
+                inclinationFor(innerDeck, r.stacked, r.cam),
                 liftFor(innerDeck, r.stacked, r.cam), turning);
             r.bodies(panel.natalRing.lon, panel.natalRing.valid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
                 false, 0);
@@ -232,6 +232,56 @@ final class GlobeRenderer {
      * @return the radius for wheel 0, 1 and 2, in that order
      */
     static double[] shellRadii(SkymapPanel panel) {
+        return deckRadii(panel);
+    }
+
+    /**
+     * The radius each wheel's bodies ride at from this camera: the decks' shared shell at an
+     * ordinary tilt, the wheel's own bands looking straight down, and in between as
+     * {@link #flatness} says. Still the one statement the painter and the hit test share.
+     */
+    static double[] shellRadii(SkymapPanel panel, Globe cam, int w, int h) {
+        double[] deck = deckRadii(panel);
+        double f = flatness(cam);
+        if (f <= 0.0) {
+            return deck;
+        }
+        double[] flat = wheelRadii(panel, w, h);
+        for (int i = 0; i < deck.length; i++) {
+            deck[i] += (flat[i] - deck[i]) * f;
+        }
+        return deck;
+    }
+
+    /**
+     * Where the flat wheel puts each wheel's bodies, in the globe's units.
+     *
+     * <b>Asked of the wheel, not restated.</b> The radii come from
+     * {@link SkymapPanel#ringRadii} and {@link SkymapPanel#bodyBaseRadius} - the chain the
+     * wheel is painted and hit-tested from - at this panel's size, with both outer bands open,
+     * which is the globe's own rule: a chart keeps its place whether or not the others are
+     * drawn. Each wheel goes to the middle of its band.
+     *
+     * <b>Scaled so the two zodiacs meet.</b> The wheel's sign band's inner edge lands on the
+     * globe's, {@link Globe#SHELL_SIGN_INNER}, so every ring stays inside the frame that
+     * measures it. Matching the globe's bands to the wheel's proportions as well is the next
+     * step and will make this scale the whole map.
+     *
+     * @return the radius for wheel 0 (Chart A), 1 (the outer ring) and 2 (the sky)
+     */
+    static double[] wheelRadii(SkymapPanel panel, int w, int h) {
+        int[] rings = SkymapPanel.ringRadii(w, h, 1.0, 1.0);
+        double k = Globe.SHELL_SIGN_INNER / Math.max(1, rings[SkymapPanel.RING_SIGN_INNER]);
+        int natalTop = panel.bodyBaseRadius(rings);
+        int natalFloor = natalTop - SkymapPanel.natalBandDepth(Math.max(1, natalTop));
+        return new double[] {
+            k * (natalTop + natalFloor) / 2.0,
+            k * (rings[SkymapPanel.RING_TRANSIT] + rings[SkymapPanel.RING_BODY_TOP]) / 2.0,
+            k * (rings[SkymapPanel.RING_TRI] + rings[SkymapPanel.RING_TRANSIT]) / 2.0,
+        };
+    }
+
+    private static double[] deckRadii(SkymapPanel panel) {
         return new double[] {
             DECK_RADIUS[panel.ringDeck(0)],
             DECK_RADIUS[panel.ringDeck(1)],
@@ -291,8 +341,61 @@ final class GlobeRenderer {
      * see-it-but-cannot-click-it defect this file has already had once.
      */
     static double liftFor(int deck, boolean stacked, Globe cam) {
-        return liftOf(deck, stacked);
+        return liftOf(deck, stacked) * (1.0 - flatness(cam));
     }
+
+    /**
+     * The tilt the scene is actually drawn with - the deck's own, eased away as the camera
+     * comes round to looking straight down. See {@link #flatness}.
+     */
+    static double inclinationFor(int deck, boolean stacked, Globe cam) {
+        return inclinationOf(deck, stacked) * (1.0 - flatness(cam));
+    }
+
+    /**
+     * How far the globe has become the wheel: 0 at every ordinary tilt, 1 looking straight
+     * down on Chart A.
+     *
+     * <b>The wheel is the globe seen from above, so from above it should be the wheel.</b>
+     * David, 30 Sep: "the wheel chart is really just the top down view of the globe - is there a
+     * way we can make the wheel and the globe one seamless body". The globe keeps its three
+     * charts apart by HEIGHT - one shell, three decks - because rings of different sizes at one
+     * height cannot keep their order when tilted (21 Sep). The wheel keeps them apart by SIZE.
+     * Seen from straight above, height is invisible and the decks would draw on top of one
+     * another, so the two views could not agree.
+     *
+     * They agree now by trading one for the other as the camera climbs: past
+     * {@link #FLAT_FROM} the decks sink toward the middle plane and each ring slides from the
+     * shared shell out to its own band on the wheel, and overhead the heights are gone and the
+     * sizes are the wheel's. It is a smoothstep, so it starts and ends gently, and it is a
+     * function of the pitch alone, so it is continuous - the lesson of the 19 and 20 Sep
+     * mirrors, where a change made at a threshold snapped in one frame.
+     *
+     * <b>Only from above.</b> Straight down from underneath is the back of the glass, which
+     * reads in reverse; it is not the wheel and is left as it was.
+     */
+    static double flatness(Globe cam) {
+        if (cam == null) {
+            return 0.0;
+        }
+        double over = -cam.pitch;               // straight down onto Chart A is -MAX_PITCH
+        double t = (over - FLAT_FROM) / (Globe.MAX_PITCH - FLAT_FROM);
+        if (t <= 0.0) {
+            return 0.0;
+        }
+        if (t >= 1.0) {
+            return 1.0;
+        }
+        return t * t * (3.0 - 2.0 * t);
+    }
+
+    /**
+     * The pitch, in radians below the chart's plane, at which the decks start to become the
+     * wheel. About 52 degrees: the default tilt and everything a reader uses to see the decks
+     * stacked is well short of it, and there are still forty degrees of climb for the change
+     * to happen in, which is slow enough to watch.
+     */
+    static final double FLAT_FROM = 0.9;
 
     static double liftOf(int deck, boolean stacked) {
         if (!stacked) {
@@ -315,7 +418,7 @@ final class GlobeRenderer {
      */
     static int bodyAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
         double origin = panel.pinLongitude();
-        double[] shells = shellRadii(panel);
+        double[] shells = shellRadii(panel, cam, w, h);
         // Once for the whole hit test, for the reason set out on inclinationOf.
         boolean stacked = Settings.globeStackedRings();
         int best = -1;
@@ -340,7 +443,7 @@ final class GlobeRenderer {
                 int deck = panel.ringDeck(ring);
                 double[] p = Globe.onShell(lon[i], origin, shells[ring],
                     liftFor(deck, stacked, cam) + level[i] * Globe.STACK_STEP,
-                    inclinationOf(deck, stacked));
+                    inclinationFor(deck, stacked, cam));
                 Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
                 if (!q.visible) {
                     continue;
@@ -1571,11 +1674,11 @@ final class GlobeRenderer {
             double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
                 liftFor(deck, this.stacked, this.cam)
                     + levels[ring][c[1]] * Globe.STACK_STEP,
-                inclinationOf(deck, this.stacked));
+                inclinationFor(deck, this.stacked, this.cam));
             double[] to = Globe.onShell(panel.natalRing.lon[c[2]], origin, shells[0],
                 liftFor(innerDeck, this.stacked, this.cam)
                     + levels[0][c[2]] * Globe.STACK_STEP,
-                inclinationOf(innerDeck, this.stacked));
+                inclinationFor(innerDeck, this.stacked, this.cam));
             // <b>The hovered chord, at full strength and on its own ring.</b> The globe drew
             // every chord alike, so pointing at a cell of the grid lit the flat wheel and did
             // nothing at all here - a reader who had switched views lost the one gesture that
@@ -1646,7 +1749,7 @@ final class GlobeRenderer {
             double y = liftFor(deck, this.stacked, this.cam)
                 + level[i] * Globe.STACK_STEP;
             double[] p = Globe.onShell(lon[i], this.origin, radius, y,
-                inclinationOf(deck, this.stacked));
+                inclinationFor(deck, this.stacked, this.cam));
             Globe.Projected q = at(p);
             if (!q.visible) {
                 continue;
@@ -1663,7 +1766,7 @@ final class GlobeRenderer {
             // sort puts it behind the glyph rather than over it.
             if (Settings.showDegreeLines()) {
                 Globe.Projected mark = at(Globe.onShell(lon[i], this.origin,
-                    Globe.SHELL_SIGN_INNER, 0.0, inclinationOf(deck, this.stacked)));
+                    Globe.SHELL_SIGN_INNER, 0.0, inclinationFor(deck, this.stacked, this.cam)));
                 if (mark.visible) {
                     boolean leaderLit = panel.onGlobeFocus(i, outer);
                     Color leaderInk = ChartPalette.colorOr(ChartPalette.leaderHex(null),
