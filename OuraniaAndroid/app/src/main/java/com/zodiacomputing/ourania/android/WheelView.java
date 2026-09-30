@@ -5,6 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RadialGradient;
+import android.graphics.RectF;
+import android.graphics.Shader;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -217,8 +221,6 @@ final class WheelView extends View {
         ChartFrame f = w.frame;
         c.drawCircle(w.cx, w.cy, w.aspectDisc, this.line);
         if (!f.timeUnknown) {
-            this.text.setTextSize(11f * density);
-            this.text.setColor(Color.rgb(150, 160, 180));
             for (int h = 1; h <= 12; h++) {
                 boolean angle = h == 1 || h == 4 || h == 7 || h == 10;
                 this.line.setColor(angle ? Color.rgb(220, 220, 230) : Color.rgb(70, 76, 90));
@@ -226,11 +228,18 @@ final class WheelView extends View {
                 float[] a = w.point(f.cusps[h], w.aspectDisc);
                 float[] b = w.point(f.cusps[h], signInner);
                 c.drawLine(a[0], a[1], b[0], b[1], this.line);
-                double next = f.cusps[h == 12 ? 1 : h + 1];
-                double mid = f.cusps[h] + (((next - f.cusps[h]) % 360.0 + 360.0) % 360.0) / 2.0;
-                float[] n = w.point(mid, w.aspectDisc - 12 * density);
-                c.drawText(String.valueOf(h), n[0], n[1] + 4 * density, this.text);
             }
+            // The numbers in the open ring between the aspect circle and the planets, bold, in
+            // the colour of their house's element - as the desktop draws them.
+            this.text.setTextSize(w.houseTextSize(density));
+            this.text.setFakeBoldText(true);
+            for (int h = 1; h <= 12; h++) {
+                float[] n = w.housePoint(h);
+                int[] rgb = elementRgb((h - 1) % 4);
+                this.text.setColor(Color.argb(200, rgb[0], rgb[1], rgb[2]));
+                c.drawText(String.valueOf(h), n[0], n[1] + this.text.getTextSize() * 0.36f, this.text);
+            }
+            this.text.setFakeBoldText(false);
         }
 
         // Aspect lines, inside the aspect circle, each end at its planet's longitude.
@@ -243,35 +252,133 @@ final class WheelView extends View {
             c.drawLine(a[0], a[1], b[0], b[1], this.line);
         }
 
-        // The planets: a disc with its glyph, the selected one ringed.
+        // The planets as themselves - the globe's pictures of them - with each one's glyph
+        // small just inside it, so Mercury and Pluto are told apart without a tap.
+        this.text.setTextSize(12f * density);
         for (int i = 0; i < PhoneWheel.PLANETS; i++) {
             float[] p = w.body(i);
             if (p == null) {
                 continue;
             }
-            float rad = PhoneWheel.glyphRadius(i);
-            this.fill.setColor(i == this.selected ? Color.rgb(255, 214, 102) : Color.rgb(196, 200, 210));
-            c.drawCircle(p[0], p[1], rad, this.fill);
-            if (i == this.selected) {
-                this.line.setColor(Color.rgb(255, 238, 170));
-                this.line.setStrokeWidth(2f);
-                c.drawCircle(p[0], p[1], rad + 5, this.line);
-            }
-            this.text.setColor(Color.rgb(20, 22, 30));
-            this.text.setTextSize(rad * 1.3f);
-            c.drawText(Bodies.at(i).glyph, p[0], p[1] + rad * 0.45f, this.text);
+            int rad = w.planetRadius(i);
+            drawPlanet(c, i, p[0], p[1], rad, i == this.selected);
+            float[] g = w.point(f.bodies[i].lon, w.bodyRadius[i] - rad - 9 * density);
+            int[] rgb = PhoneWheel.faceColour(i);
+            this.text.setColor(Color.rgb(rgb[0], rgb[1], rgb[2]));
+            c.drawText(Bodies.at(i).glyph, g[0], g[1] + 4 * density, this.text);
         }
         c.restore();
     }
 
     /** Fire, earth, air, water - the desktop's element hues, lightened for a dark ground. */
     private static int elementColour(int element) {
+        int[] c = elementRgb(element);
+        return Color.rgb(c[0], c[1], c[2]);
+    }
+
+    private static int[] elementRgb(int element) {
         switch (element) {
-            case 0: return Color.rgb(255, 120, 90);
-            case 1: return Color.rgb(120, 200, 110);
-            case 2: return Color.rgb(240, 214, 90);
-            default: return Color.rgb(110, 170, 255);
+            case 0: return new int[] {255, 120, 90};
+            case 1: return new int[] {120, 200, 110};
+            case 2: return new int[] {240, 214, 90};
+            default: return new int[] {110, 170, 255};
         }
+    }
+
+    /**
+     * One planet drawn as itself - GlobeRenderer.drawPlanet's pictures, on Android's canvas: lit
+     * from the upper left, the Sun glowing with a white core, Jupiter belted, Saturn ringed
+     * (the back of the ring, the planet, then the front), and the Moon grey with its seas.
+     */
+    private void drawPlanet(Canvas c, int i, float x, float y, float rad, boolean lit) {
+        int[] base = PhoneWheel.faceColour(i);
+        PhoneWheel.Face face = PhoneWheel.face(i);
+        this.fill.setShader(null);
+        if (face == PhoneWheel.Face.SUN) {
+            for (int k = 5; k >= 1; k--) {
+                this.fill.setColor(Color.argb((int) (255 * 0.16 / k), 255, 186, 82));
+                c.drawCircle(x, y, rad + k * rad * 0.28f, this.fill);
+            }
+            this.fill.setShader(new RadialGradient(x - rad * 0.22f, y - rad * 0.22f, rad * 1.5f,
+                new int[] {Color.rgb(255, 255, 246), Color.rgb(255, 232, 158),
+                    Color.rgb(255, 168, 56), Color.rgb(214, 96, 28)},
+                new float[] {0f, 0.35f, 0.75f, 1f}, Shader.TileMode.CLAMP));
+            c.drawCircle(x, y, rad, this.fill);
+            this.fill.setShader(null);
+            ring(c, x, y, rad, lit, Color.rgb(255, 214, 130));
+            return;
+        }
+        float rw = rad * 2.15f;
+        float rh = Math.max(2f, rad * 0.52f);
+        RectF ringBox = new RectF(x - rw, y - rh, x + rw, y + rh);
+        if (face == PhoneWheel.Face.RINGED) {
+            this.line.setColor(Color.argb(184, 206, 186, 142));
+            this.line.setStrokeWidth(rad * 0.16f);
+            c.drawArc(ringBox, 180, 180, false, this.line);     // the back of the ring
+        }
+        // A soft halo in the planet's own colour, so it reads as a light above the band.
+        for (float[] pass : new float[][] {{0.7f, 0.06f}, {0.42f, 0.10f}, {0.2f, 0.16f}}) {
+            this.fill.setColor(Color.argb((int) (255 * pass[1]), lighten(base[0], 0.35),
+                lighten(base[1], 0.35), lighten(base[2], 0.35)));
+            c.drawCircle(x, y, rad * (1 + pass[0]), this.fill);
+        }
+        this.fill.setShader(new RadialGradient(x - rad * 0.35f, y - rad * 0.35f, rad * 1.5f,
+            Color.rgb(lighten(base[0], 0.45), lighten(base[1], 0.45), lighten(base[2], 0.45)),
+            Color.rgb((int) (base[0] * 0.5), (int) (base[1] * 0.5), (int) (base[2] * 0.5)),
+            Shader.TileMode.CLAMP));
+        c.drawCircle(x, y, rad, this.fill);
+        this.fill.setShader(null);
+        if (face == PhoneWheel.Face.BANDED || face == PhoneWheel.Face.MOON) {
+            c.save();
+            Path clip = new Path();
+            clip.addCircle(x, y, rad, Path.Direction.CW);
+            c.clipPath(clip);
+            if (face == PhoneWheel.Face.BANDED) {
+                this.line.setStrokeWidth(rad * 0.14f);
+                for (int k = -2; k <= 2; k++) {
+                    if (k == 0) {
+                        continue;
+                    }
+                    float by = y + k * rad * 0.34f;
+                    this.line.setColor(k % 2 == 0
+                        ? Color.argb(217, (int) (base[0] * 0.72), (int) (base[1] * 0.72),
+                            (int) (base[2] * 0.72))
+                        : Color.argb(217, lighten(base[0], 0.25), lighten(base[1], 0.25),
+                            lighten(base[2], 0.25)));
+                    c.drawLine(x - rad, by, x + rad, by, this.line);
+                }
+            } else {
+                // The Moon's seas: a few darker patches, the same on every chart.
+                this.fill.setColor(Color.argb(70, 60, 64, 76));
+                c.drawCircle(x - rad * 0.25f, y - rad * 0.2f, rad * 0.3f, this.fill);
+                c.drawCircle(x + rad * 0.2f, y - rad * 0.3f, rad * 0.2f, this.fill);
+                c.drawCircle(x + rad * 0.05f, y + rad * 0.3f, rad * 0.24f, this.fill);
+            }
+            c.restore();
+        }
+        if (face == PhoneWheel.Face.RINGED) {
+            this.line.setColor(Color.rgb(232, 214, 170));
+            this.line.setStrokeWidth(rad * 0.18f);
+            c.drawArc(ringBox, 0, 180, false, this.line);       // the front of the ring
+        }
+        ring(c, x, y, rad, lit,
+            Color.rgb((int) (base[0] * 0.5), (int) (base[1] * 0.5), (int) (base[2] * 0.5)));
+    }
+
+    /** A planet's rim; a bright ring, and a second fainter one, around the tapped planet. */
+    private void ring(Canvas c, float x, float y, float rad, boolean lit, int rim) {
+        this.line.setColor(lit ? Color.rgb(255, 238, 170) : rim);
+        this.line.setStrokeWidth(lit ? 3f : 1f);
+        c.drawCircle(x, y, rad, this.line);
+        if (lit) {
+            this.line.setColor(Color.argb(110, 255, 238, 170));
+            this.line.setStrokeWidth(2f);
+            c.drawCircle(x, y, rad + 8, this.line);
+        }
+    }
+
+    private static int lighten(int v, double t) {
+        return (int) (v + (255 - v) * t);
     }
 
     /** Hard aspects red, soft blue, the conjunction gold, the rest grey. */

@@ -105,6 +105,69 @@ final class PhoneWheel {
     }
 
     /**
+     * How big a planet is drawn on the phone: the desktop's glyph radius, seven tenths larger. The
+     * desktop's beads carry a glyph; the phone's are pictures of the planets, which need the
+     * room to read as Saturn's rings or Jupiter's belts (reported 30 Sep: "basic glyphs in
+     * circles"). The band spreads crowded planets by the same spacing either way.
+     */
+    int planetRadius(int i) {
+        return Math.round(glyphRadius(i) * 1.7f);
+    }
+
+    /** How a planet is pictured: the globe's faces (GlobeRenderer.drawPlanet), and the Moon's. */
+    enum Face { SUN, MOON, BANDED, RINGED, PLAIN }
+
+    static Face face(int i) {
+        switch (Bodies.at(i).name) {
+            case "Sun": return Face.SUN;
+            case "Moon": return Face.MOON;
+            case "Jupiter": return Face.BANDED;
+            case "Saturn": return Face.RINGED;
+            default: return Face.PLAIN;
+        }
+    }
+
+    /** A planet's colour as {r, g, b}: the globe's, warm to cold, and a pale grey Moon. */
+    static int[] faceColour(int i) {
+        switch (Bodies.at(i).name) {
+            case "Sun": return new int[] {255, 196, 84};
+            case "Moon": return new int[] {214, 216, 222};
+            case "Mercury": return new int[] {178, 172, 160};
+            case "Venus": return new int[] {226, 200, 148};
+            case "Mars": return new int[] {198, 96, 66};
+            case "Jupiter": return new int[] {206, 176, 138};
+            case "Saturn": return new int[] {214, 194, 146};
+            case "Uranus": return new int[] {150, 206, 208};
+            case "Neptune": return new int[] {104, 138, 214};
+            case "Pluto": return new int[] {164, 146, 132};
+            default: return new int[] {190, 190, 196};
+        }
+    }
+
+    /**
+     * Where a house's number goes: halfway through its house, in the open ring between the
+     * aspect circle and the planets. It sat just inside the aspect circle among the lines,
+     * which on a phone read as cramped (reported 30 Sep); the desktop puts its numbers in this
+     * same open ring, just inside the natal band.
+     */
+    float[] housePoint(int h) {
+        double from = this.frame.cusps[h];
+        double to = this.frame.cusps[h == 12 ? 1 : h + 1];
+        double mid = from + (((to - from) % 360.0 + 360.0) % 360.0) / 2.0;
+        return this.point(mid, this.houseRadius());
+    }
+
+    /** The radius the house numbers sit on: two thirds of the way out to the planets. */
+    double houseRadius() {
+        return this.aspectDisc + (this.natalFloor - this.aspectDisc) * 0.62;
+    }
+
+    /** The house numbers' text size in pixels: 15dp, and never wider than their ring. */
+    float houseTextSize(float density) {
+        return Math.min(15f * density, (this.natalFloor - this.aspectDisc) * 0.4f);
+    }
+
+    /**
      * The planet under a tap, nearest first, within {@code grab} pixels of its edge; or -1.
      * Nearest wins so two planets close together are each still reachable.
      */
@@ -117,7 +180,7 @@ final class PhoneWheel {
                 continue;
             }
             double d = Math.hypot(x - p[0], y - p[1]);
-            if (d <= glyphRadius(i) + grab && d < bestDistance) {
+            if (d <= this.planetRadius(i) + grab && d < bestDistance) {
                 best = i;
                 bestDistance = d;
             }

@@ -103,4 +103,17 @@ public class PhoneWheelTest {
         assertEquals("nothing for no planet", "",
             PhoneChart.planet(c, -1, InterpretationService.getInstance()));
     }
+
+    @Test
+    public void houseNumbersSitInTheOpenRingClearOfTheLinesAndPlanets() {
+        PhoneWheel w = wheel();
+        float size = w.houseTextSize(3f);                 // an S23's density
+        for (int h = 1; h <= 12; h++) {
+            float[] n = w.housePoint(h);
+            double r = Math.hypot(n[0] - w.cx, n[1] - w.cy);
+            assertTrue("house " + h + " clear of the aspect lines",
+                r - size / 2 > w.aspectDisc);
+            assertTrue("house " + h + " clear of the planets", r + size / 2 < w.natalFloor);
+        }
+    }
 }
