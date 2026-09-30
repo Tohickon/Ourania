@@ -63,6 +63,7 @@ public final class MainActivity extends Activity {
     private TextView result;
     private WheelView wheel;
     private TextView tapped;
+    private LinearLayout readings;
     private Button cast;
     private PhoneChart.Cast shownCast;
 
@@ -129,6 +130,22 @@ public final class MainActivity extends Activity {
         this.tapped.setPadding(0, 16, 0, 0);
         this.tapped.setVisibility(View.GONE);
         form.addView(this.tapped);
+
+        // The whole chart's readings (M5): the synthesis, and the aspect patterns.
+        this.readings = new LinearLayout(this);
+        this.readings.setOrientation(LinearLayout.HORIZONTAL);
+        this.readings.setVisibility(View.GONE);
+        Button whole = new Button(this);
+        whole.setText("Whole-chart reading");
+        whole.setOnClickListener(v -> this.showReading(false));
+        Button patterns = new Button(this);
+        patterns.setText("Patterns");
+        patterns.setOnClickListener(v -> this.showReading(true));
+        this.readings.addView(whole, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        this.readings.addView(patterns, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        form.addView(this.readings);
 
         this.result = new TextView(this);
         this.result.setTextSize(15f);
@@ -209,12 +226,45 @@ public final class MainActivity extends Activity {
                 this.shownCast = cast;
                 this.wheel.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.tapped.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.readings.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 if (cast != null) {
                     this.wheel.show(cast.frame);
                     showBody(-1);
                 }
                 this.result.setText(shown);
                 this.cast.setEnabled(true);
+            });
+        }).start();
+    }
+
+    /**
+     * The whole-chart synthesis, or every aspect pattern, in the reading panel under the wheel.
+     * Computed off the main thread: the synthesis ranks and scores every body.
+     */
+    private void showReading(boolean patterns) {
+        final PhoneChart.Cast c = this.shownCast;
+        if (c == null) {
+            return;
+        }
+        this.tapped.setText(patterns ? "Finding the patterns..." : "Reading the whole chart...");
+        new Thread(() -> {
+            String html;
+            try {
+                html = patterns ? PhoneReading.patterns(c) : PhoneReading.synthesis(c);
+                if (html.isEmpty()) {
+                    html = "<p>This chart has no aspect patterns - no T-squares, grand trines, "
+                        + "yods or the like among its planets.</p>";
+                } else if (patterns) {
+                    html = "<h2>Aspect patterns</h2>" + html;
+                }
+            } catch (Throwable e) {
+                html = "<p>The reading could not be made: " + Html.escapeHtml(e.toString()) + "</p>";
+            }
+            final String shown = html;
+            runOnUiThread(() -> {
+                if (this.shownCast == c) {
+                    this.tapped.setText(Html.fromHtml(shown, Html.FROM_HTML_MODE_COMPACT));
+                }
             });
         }).start();
     }

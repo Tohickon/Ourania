@@ -1,9 +1,19 @@
 package com.zodiacomputing.ourania.android;
 
+import com.zodiacomputing.ourania.astro.AspectPatterns;
 import com.zodiacomputing.ourania.astro.Aspects;
+import com.zodiacomputing.ourania.astro.BodyScore;
 import com.zodiacomputing.ourania.astro.ChartFrame;
+import com.zodiacomputing.ourania.astro.Gestalt;
+import com.zodiacomputing.ourania.astro.TensionRelease;
+import com.zodiacomputing.ourania.astro.Themes;
+import com.zodiacomputing.ourania.astro.Topics;
 import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.gui.InterpretationService;
+import com.zodiacomputing.ourania.gui.NarrativeSynthesizer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A planet's full reading on the phone (M5): its sign, its house, each aspect it makes, and
@@ -15,6 +25,9 @@ import com.zodiacomputing.ourania.gui.InterpretationService;
  * fetched through the same {@link InterpretationService} calls. Only the order differs: on a
  * phone the three things a reader reads first - sign, house, aspects - come before the
  * reference detail rather than after the tarot, the way the Interpretation tab ranks them.
+ *
+ * <p>Also the chart's aspect patterns and its synthesized whole-chart reading - the rest of
+ * M5 - through the same engine calls the desktop's pattern page and Synthesize button make.
  *
  * <p>No Android in here, like {@link PhoneChart}: {@code PhoneReadingTest} runs it on the JVM.
  */
@@ -70,6 +83,19 @@ final class PhoneReading {
             h.append("<h3>Aspects</h3>").append(aspects);
         }
 
+        List<AspectPatterns.Pattern> mine = new ArrayList<>();
+        for (AspectPatterns.Pattern p : patternsOf(f)) {
+            if (p.bodies.contains(b.name)) {
+                mine.add(p);
+            }
+        }
+        if (!mine.isEmpty()) {
+            h.append("<h3>In a pattern</h3>");
+            for (AspectPatterns.Pattern p : mine) {
+                pattern(h, p, f, null);
+            }
+        }
+
         section(h, "Decan " + decan + " of " + sign, svc.getDecan(sign, decan));
         String decanBody = svc.getBodyDecan(b.name, sign, decan, false);
         if (usable(decanBody)) {
@@ -97,6 +123,97 @@ final class PhoneReading {
         section(h, "The degree, " + sign + ' ' + degree + "&deg;",
             svc.getDegreeSummary(sign, degree));
         return h.toString();
+    }
+
+    /** The chart's aspect patterns, found as the desktop finds them for its pattern page. */
+    static List<AspectPatterns.Pattern> patternsOf(ChartFrame f) {
+        return Gestalt.compute(f).aspectPatterns;
+    }
+
+    /**
+     * Every aspect pattern in the chart, each with its members, how tight it is and its
+     * reading - the desktop's pattern page ({@code InterpretationPanel.patternDetail}) for
+     * each. "" when the chart has none.
+     */
+    static String patterns(PhoneChart.Cast c) {
+        Gestalt.Result g = Gestalt.compute(c.frame);
+        StringBuilder h = new StringBuilder();
+        for (AspectPatterns.Pattern p : g.aspectPatterns) {
+            pattern(h, p, c.frame, g);
+        }
+        return h.toString();
+    }
+
+    /** One pattern; its discharge too when {@code g} is given (the planet view leaves it out). */
+    private static void pattern(StringBuilder h, AspectPatterns.Pattern p, ChartFrame f,
+            Gestalt.Result g) {
+        InterpretationService svc = InterpretationService.getInstance();
+        h.append("<h4>").append(p.name);
+        if (p.modality != null && (p.name.equals("T-square") || p.name.equals("Grand cross"))) {
+            h.append(" &middot; ").append(capital(p.modality));
+        } else if (p.element != null
+                && (p.name.equals("Grand trine") || p.name.equals("Kite"))) {
+            h.append(" &middot; ").append(capital(p.element));
+        }
+        h.append("</h4><p>");
+        for (String name : p.bodies) {
+            ChartFrame.Body b = f.body(name);
+            h.append("<b>").append(name).append("</b>");
+            if (name.equals(p.apex)) {
+                h.append(" (apex)");
+            }
+            if (b != null && b.ok) {
+                h.append(" &nbsp;").append(Zodiac.format(b.lon));
+                if (!f.timeUnknown) {
+                    h.append(", house ").append(Zodiac.houseOf(b.lon, f.cusps));
+                }
+            }
+            h.append("<br>");
+        }
+        h.append(String.format("<small>Widest leg %.1f&deg; from exact.</small></p>",
+            p.widestOrb));
+        macro(h, svc, p.detailKey());
+        macro(h, svc, p.variantKey());
+        if (p.isDissociate()) {
+            macro(h, svc, "pattern_dissociate");
+        }
+        if (g != null) {
+            for (TensionRelease.Release rel : g.releases) {
+                if (rel.source.equals(p.name) && rel.bodies.equals(p.bodies)
+                        && usable(rel.sentence)) {
+                    h.append("<p><b>Where it discharges:</b> ").append(rel.sentence).append("</p>");
+                }
+            }
+        }
+    }
+
+    private static void macro(StringBuilder h, InterpretationService svc, String key) {
+        if (key == null) {
+            return;
+        }
+        String text = svc.getMacroDynamic(key);
+        if (usable(text)) {
+            h.append("<p>").append(text).append("</p>");
+        }
+    }
+
+    /**
+     * The synthesized whole-chart reading: the desktop's Synthesize, for the natal chart alone.
+     * Its timing sections (profection, transits, the year ahead) wait for M7, so they are
+     * passed as absent, which the synthesizer already handles for a chart with transits off.
+     *
+     * <p>The desktop's inline colours are stripped: they are written for its black pane, and
+     * white headings on the phone's page would vanish.
+     */
+    static String synthesis(PhoneChart.Cast c) {
+        ChartFrame f = c.frame;
+        Gestalt.Result g = Gestalt.compute(f);
+        List<BodyScore.Vector> ranked = BodyScore.rank(f, g);
+        Themes.Result themes = Themes.extract(f, g, ranked, Topics.analyse(f, ranked));
+        String html = NarrativeSynthesizer.generateReport(f, g, ranked, themes, null, null, null,
+            null, null, false, false);
+        return html.replaceAll("(?i)</?(html|body)[^>]*>", "")
+            .replaceAll("(?i)\\s(style|color|bgcolor)\\s*=\\s*('[^']*'|\"[^\"]*\")", "");
     }
 
     private static void section(StringBuilder h, String heading, String prose) {

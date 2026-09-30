@@ -98,4 +98,69 @@ public class PhoneReadingTest {
     public void nothingForNoPlanet() {
         assertEquals("", PhoneReading.planet(sydney(LocalTime.of(14, 15)), -1, SVC));
     }
+
+    /** London, noon 1 Jan 1980: two grand trines and a T-square (Mercury, Moon, Saturn). */
+    private static PhoneChart.Cast london1980() {
+        Atlas.Place place = null;
+        for (Atlas.Place p : Atlas.search("London", 8)) {
+            if (p.country != null && p.country.contains("United Kingdom")) {
+                place = p;
+                break;
+            }
+        }
+        assertNotNull(place);
+        return PhoneChart.cast(new SwissEph(Ephemeris.PATH), LocalDate.of(1980, 1, 1),
+            LocalTime.NOON, place);
+    }
+
+    @Test
+    public void everyPatternTheEngineFindsIsReadWithItsMembers() {
+        PhoneChart.Cast c = london1980();
+        java.util.List<com.zodiacomputing.ourania.astro.AspectPatterns.Pattern> found =
+            PhoneReading.patternsOf(c.frame);
+        assertTrue("the chart has patterns", found.size() >= 2);
+        String r = PhoneReading.patterns(c);
+        assertEquals("one heading per pattern", found.size(), r.split("<h4>", -1).length - 1);
+        for (com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p : found) {
+            assertTrue(p.name, r.contains("<h4>" + p.name));
+            for (String b : p.bodies) {
+                assertTrue(p.name + " names " + b, r.contains("<b>" + b + "</b>"));
+            }
+            String mechanics = SVC.getMacroDynamic(p.detailKey());
+            assertTrue(p.name + " carries the desktop's reading of it",
+                mechanics.isEmpty() || r.contains(mechanics));
+        }
+        assertFalse(r.contains("not found"));
+    }
+
+    @Test
+    public void aPlanetInAPatternSaysSo() {
+        PhoneChart.Cast c = london1980();
+        int saturn = -1;
+        for (int i = 0; i < PhoneChart.PLANETS; i++) {
+            if (c.frame.bodies[i].name.equals("Saturn")) {
+                saturn = i;
+            }
+        }
+        String r = PhoneReading.planet(c, saturn, SVC);
+        assertTrue(r.contains("<h3>In a pattern</h3>") && r.contains("<h4>T-square"));
+        assertFalse("and Sydney's Sun, in none, does not",
+            PhoneReading.planet(sydney(LocalTime.of(14, 15)), 0, SVC).contains("In a pattern"));
+    }
+
+    @Test
+    public void aChartWithNoPatternsSaysNothing() {
+        assertEquals("", PhoneReading.patterns(sydney(LocalTime.of(14, 15))));
+    }
+
+    @Test
+    public void theWholeChartReadingIsTheDesktopsSynthesisWithoutItsColours() {
+        PhoneChart.Cast c = sydney(LocalTime.of(14, 15));
+        String r = PhoneReading.synthesis(c);
+        assertTrue(r, r.startsWith("<h1>Chart Synthesis</h1>"));
+        assertTrue("it ranks the planets", r.contains("Prominence"));
+        assertFalse("no colours written for a black pane", r.contains("style=")
+            || r.contains("<body") || r.contains("<html"));
+        assertTrue("and is long", r.length() > 10000);
+    }
 }
