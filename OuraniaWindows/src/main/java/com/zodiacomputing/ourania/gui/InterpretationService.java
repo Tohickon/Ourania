@@ -1,5 +1,6 @@
 package com.zodiacomputing.ourania.gui;
 
+import com.zodiacomputing.ourania.astro.DataFiles;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -110,7 +111,7 @@ public class InterpretationService {
     }
 
     /** Says a corpus file will not parse, in the one voice every loader uses. */
-    private static void willNotParse(File file, Exception bad) {
+    private static void willNotParse(DataFiles.Entry file, Exception bad) {
         System.err.println(file.getName() + " is not valid JSON: " + bad.getMessage()
             + " - NOTHING from this file was loaded.");
         ErrorLog.record("corpus file " + file.getName() + " will not parse", bad);
@@ -118,7 +119,7 @@ public class InterpretationService {
 
     /** The modern Sabian tiers. Read as JSON since 28 Sep (J12). */
     private void loadModernSabians() {
-        File file = new File(DATA_DIR + "modern_sabians.json");
+        DataFiles.Entry file = DataFiles.entry("modern_sabians.json");
         if (!file.exists()) {
             return;
         }
@@ -377,7 +378,7 @@ public class InterpretationService {
 
     private void loadExtraBodiesData() {
         for (String name : EXTRA_FILES) {
-            loadExtraFile(new File(DATA_DIR + name));
+            loadExtraFile(DataFiles.entry(name));
         }
     }
 
@@ -429,7 +430,7 @@ public class InterpretationService {
         }
         for (String[] row : LAZY_FILES) {
             if (row[0].equals(section)) {
-                loadExtraFile(new File(DATA_DIR + row[1]));
+                loadExtraFile(DataFiles.entry(row[1]));
                 return;
             }
         }
@@ -519,7 +520,7 @@ public class InterpretationService {
     }
 
 
-    private void loadExtraFile(File file) {
+    private void loadExtraFile(DataFiles.Entry file) {
         if (!file.exists()) {
             System.err.println(file.getName() + " not found - some chart points will show "
                 + "their one-line meanings only.");
@@ -570,9 +571,18 @@ public class InterpretationService {
      * section whose values are objects or numbers is not something any consumer of this class
      * knows what to do with, so it is skipped with its name said out loud rather than coerced.
      */
+    static Map<String, Map<String, String>> readJson(DataFiles.Entry file) throws java.io.IOException {
+        return sections(Json.parse(file));
+    }
+
+    /** The same, from a file on disk - for the suites that compare readers file by file. */
     static Map<String, Map<String, String>> readJson(File file) throws java.io.IOException {
+        return sections(Json.parse(file));
+    }
+
+    private static Map<String, Map<String, String>> sections(Object parsed) {
         Map<String, Map<String, String>> out = new java.util.LinkedHashMap<>();
-        Map<String, Object> doc = Json.object(Json.parse(file));
+        Map<String, Object> doc = Json.object(parsed);
         for (Map.Entry<String, Object> section : doc.entrySet()) {
             if (!(section.getValue() instanceof Map)) {
                 continue;
@@ -860,7 +870,7 @@ public class InterpretationService {
      * {@code "aspects"} appeared in the chain twice and nobody noticed.
      */
     private void loadData() {
-        File file = new File(DATA_DIR + "interpretations.json");
+        DataFiles.Entry file = DataFiles.entry("interpretations.json");
         if (!file.exists()) {
             System.err.println("Interpretations JSON not found!");
             return;
@@ -913,7 +923,7 @@ public class InterpretationService {
 
     /** The 360 degree summaries and their long forms. Read as JSON since 28 Sep (J12). */
     private void loadDegreesData() {
-        File file = new File(DATA_DIR + "degree_interpretations.json");
+        DataFiles.Entry file = DataFiles.entry("degree_interpretations.json");
         if (!file.exists()) {
             System.err.println("Degree Interpretations JSON not found!");
             return;
@@ -942,11 +952,11 @@ public class InterpretationService {
 
     /** The four angles' prose, one file each. Read as JSON since 28 Sep (J12). */
     private void loadAnglesData() {
-        File[] files = {new File(DATA_DIR + "Ascendent.json"),
-                        new File(DATA_DIR + "ic.json"),
-                        new File(DATA_DIR + "mc.json"),
-                        new File(DATA_DIR + "Descendant.json")};
-        for (File file : files) {
+        DataFiles.Entry[] files = {DataFiles.entry("Ascendent.json"),
+                        DataFiles.entry("ic.json"),
+                        DataFiles.entry("mc.json"),
+                        DataFiles.entry("Descendant.json")};
+        for (DataFiles.Entry file : files) {
             if (!file.exists()) {
                 continue;
             }
@@ -990,7 +1000,7 @@ public class InterpretationService {
      * the limitation admitting what it is. Absence of the file is still non-fatal.
      */
     private void loadSabianDetailData() {
-        File file = new File(DATA_DIR + "Sabian_interpretations.json");
+        DataFiles.Entry file = DataFiles.entry("Sabian_interpretations.json");
         if (!file.exists()) {
             System.err.println("Sabian detail JSON not found - shadow/keywords unavailable.");
             return;
