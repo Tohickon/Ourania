@@ -64,6 +64,16 @@ public final class MainActivity extends Activity {
     private WheelView wheel;
     private TextView tapped;
     private LinearLayout readings;
+    private Button save;
+    /** The birth the shown chart was cast from, for saving it. */
+    private LocalDate castDate;
+    private LocalTime castTime;
+    private Atlas.Place castPlace;
+    /** The saved name the shown chart was opened from, offered again when it is saved. */
+    private String openedName;
+
+    private static final int EXPORT = 1;
+    private static final int IMPORT = 2;
     private Button cast;
     private PhoneChart.Cast shownCast;
 
@@ -81,10 +91,20 @@ public final class MainActivity extends Activity {
         form.setOrientation(LinearLayout.VERTICAL);
         form.setPadding(48, 64, 48, 64);
 
+        // The title, and the chart book beside it (M6).
+        LinearLayout top = new LinearLayout(this);
+        top.setOrientation(LinearLayout.HORIZONTAL);
+        top.setGravity(android.view.Gravity.CENTER_VERTICAL);
         TextView title = new TextView(this);
         title.setText("Ourania");
         title.setTextSize(26f);
-        form.addView(title);
+        top.addView(title, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        Button book = new Button(this);
+        book.setText("Chart book");
+        book.setOnClickListener(v -> this.showBook());
+        top.addView(book);
+        form.addView(top);
 
         this.dateField = field("Birth date - tap to choose");
         this.dateField.setOnClickListener(v -> this.chooseDate());
@@ -146,6 +166,11 @@ public final class MainActivity extends Activity {
         this.readings.addView(patterns, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         form.addView(this.readings);
+        this.save = new Button(this);
+        this.save.setText("Save this chart");
+        this.save.setVisibility(View.GONE);
+        this.save.setOnClickListener(v -> this.saveChart());
+        form.addView(this.save);
 
         this.result = new TextView(this);
         this.result.setTextSize(15f);
@@ -227,6 +252,10 @@ public final class MainActivity extends Activity {
                 this.wheel.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.tapped.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.readings.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.save.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.castDate = d;
+                this.castTime = t;
+                this.castPlace = p;
                 if (cast != null) {
                     this.wheel.show(cast.frame);
                     showBody(-1);
@@ -235,6 +264,170 @@ public final class MainActivity extends Activity {
                 this.cast.setEnabled(true);
             });
         }).start();
+    }
+
+    /** Names the shown chart and saves it into the book, asking before replacing one. */
+    private void saveChart() {
+        if (this.castDate == null || this.castPlace == null) {
+            return;
+        }
+        final android.widget.EditText name = new android.widget.EditText(this);
+        name.setHint("Name, e.g. Jane Smith");
+        name.setSingleLine(true);
+        if (this.openedName != null) {
+            name.setText(this.openedName);
+        }
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Save this chart")
+            .setView(name)
+            .setPositiveButton("Save", (dlg, w) -> {
+                String n = name.getText().toString().trim();
+                if (n.isEmpty()) {
+                    toast("A saved chart needs a name.");
+                } else if (PhoneBook.exists(n)) {
+                    new android.app.AlertDialog.Builder(this)
+                        .setMessage("\"" + n + "\" is already in the book. Replace it?")
+                        .setPositiveButton("Replace", (d2, w2) -> this.writeChart(n))
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                } else {
+                    this.writeChart(n);
+                }
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void writeChart(String name) {
+        boolean ok = PhoneBook.save(name, this.castDate, this.castTime, this.castPlace);
+        if (ok) {
+            this.openedName = name;
+        }
+        toast(ok ? "Saved \"" + name + "\"." : "The chart book could not be written.");
+    }
+
+    /** The book: tap a name to open or delete it; export and import the whole book. */
+    private void showBook() {
+        final java.util.List<String> names = PhoneBook.names();
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(this)
+            .setTitle("Chart book (" + names.size() + ")")
+            .setPositiveButton("Export", (d, w) -> this.pickFile(true))
+            .setNeutralButton("Import", (d, w) -> this.pickFile(false))
+            .setNegativeButton("Close", null);
+        if (names.isEmpty()) {
+            b.setMessage("No saved charts yet. Cast a chart and tap \"Save this chart\", or "
+                + "import a book exported from the desktop.");
+        } else {
+            b.setItems(names.toArray(new String[0]), (d, i) -> this.chartActions(names.get(i)));
+        }
+        b.show();
+    }
+
+    private void chartActions(String name) {
+        new android.app.AlertDialog.Builder(this)
+            .setTitle(name)
+            .setItems(new String[] {"Open", "Delete"}, (d, i) -> {
+                if (i == 0) {
+                    this.openChart(name);
+                } else {
+                    new android.app.AlertDialog.Builder(this)
+                        .setMessage("Delete \"" + name + "\" from the book?")
+                        .setPositiveButton("Delete", (d2, w2) -> {
+                            toast(PhoneBook.remove(name) ? "Deleted." : "Could not delete.");
+                            if (name.equals(this.openedName)) {
+                                this.openedName = null;
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                }
+            })
+            .show();
+    }
+
+    /** Fills the form from a saved chart and casts it. */
+    private void openChart(String name) {
+        PhoneBook.Birth b = PhoneBook.open(name);
+        if (b == null) {
+            toast("\"" + name + "\" could not be opened: its date or place cannot be read "
+                + "offline. Open it on the desktop and save it again with a place from the list.");
+            return;
+        }
+        this.openedName = name;
+        this.date = b.date;
+        this.dateField.setText(b.date.toString());
+        this.timeUnknown.setChecked(b.time == null);
+        if (b.time != null) {
+            this.time = b.time;
+            this.timeField.setText(String.format("%02d:%02d", b.time.getHour(),
+                b.time.getMinute()));
+        }
+        this.place = b.place;
+        this.placeField.setText(PhoneChart.label(b.place), false);
+        this.castChart();
+    }
+
+    /** Asks Android for a file to export the book to, or one to import. */
+    private void pickFile(boolean export) {
+        android.content.Intent i = new android.content.Intent(export
+            ? android.content.Intent.ACTION_CREATE_DOCUMENT
+            : android.content.Intent.ACTION_OPEN_DOCUMENT);
+        i.addCategory(android.content.Intent.CATEGORY_OPENABLE);
+        i.setType(export ? "text/plain" : "*/*");
+        if (export) {
+            i.putExtra(android.content.Intent.EXTRA_TITLE, "ourania-chart-book.properties");
+        }
+        startActivityForResult(i, export ? EXPORT : IMPORT);
+    }
+
+    /**
+     * The chosen file. The book's own export and import work on files, so the phone's
+     * document goes through a file in the app's cache on the way.
+     */
+    @Override
+    protected void onActivityResult(int request, int result, android.content.Intent data) {
+        super.onActivityResult(request, result, data);
+        if (result != RESULT_OK || data == null || data.getData() == null) {
+            return;
+        }
+        android.net.Uri uri = data.getData();
+        File temp = new File(getCacheDir(), "chart-book.properties");
+        try {
+            if (request == EXPORT) {
+                if (!PhoneBook.export(temp)) {
+                    toast("The book could not be exported.");
+                    return;
+                }
+                try (InputStream in = new java.io.FileInputStream(temp);
+                     OutputStream out = getContentResolver().openOutputStream(uri)) {
+                    copy(in, out);
+                }
+                toast("Exported " + PhoneBook.names().size() + " charts.");
+            } else if (request == IMPORT) {
+                try (InputStream in = getContentResolver().openInputStream(uri);
+                     OutputStream out = new FileOutputStream(temp)) {
+                    copy(in, out);
+                }
+                int added = PhoneBook.importFrom(temp);
+                toast(added == 0 ? "No new charts: the file had none, or all were already here."
+                    : "Imported " + added + (added == 1 ? " chart." : " charts."));
+            }
+        } catch (IOException | RuntimeException e) {
+            toast("That did not work: " + e.getMessage());
+        } finally {
+            temp.delete();
+        }
+    }
+
+    private static void copy(InputStream in, OutputStream out) throws IOException {
+        byte[] buf = new byte[1 << 14];
+        for (int n; (n = in.read(buf)) > 0; ) {
+            out.write(buf, 0, n);
+        }
+    }
+
+    private void toast(String message) {
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show();
     }
 
     /**

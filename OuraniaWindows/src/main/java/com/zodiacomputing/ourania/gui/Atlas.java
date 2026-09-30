@@ -312,6 +312,42 @@ public final class Atlas {
         return best < 0 ? null : at(best);
     }
 
+    /**
+     * Reads "39.95, -75.16" as a place, taking its zone from the nearest town the atlas knows.
+     *
+     * Returns null for anything that is not a pair of numbers, which is how a place name falls
+     * through to the lookups below. The bounds are checked rather than assumed: "12, 2000" is
+     * two numbers and is not a coordinate, and a chart cast at longitude 2000 fails somewhere
+     * far less legible than here.
+     *
+     * <p>Moved here from {@code Geocoder} on 30 Sep so the phone's chart book reads a saved
+     * place exactly as the desktop does (M6); Geocoder asks this first, as before.
+     */
+    public static Place fromCoordinates(String query) {
+        String[] parts = query.split(",");
+        if (parts.length != 2) {
+            return null;
+        }
+        double lat;
+        double lon;
+        try {
+            lat = Double.parseDouble(parts[0].trim());
+            lon = Double.parseDouble(parts[1].trim());
+        } catch (NumberFormatException notANumber) {
+            return null;
+        }
+        if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+            return null;
+        }
+        Place near = nearest(lat, lon);
+        String zone = near == null ? "UTC" : near.zoneId;
+        String name = near == null ? String.format(java.util.Locale.ROOT, "%.4f, %.4f", lat, lon)
+            : near.label();
+        // The coordinates the reader gave, not the town's - a birth place is not its nearest
+        // city centre, and the houses are cast from these.
+        return new Place(name, "", "", lat, lon, zone, 0);
+    }
+
     /** The one place a typed name most likely means, or null when the atlas has none. */
     public static Place resolve(String query) {
         List<Place> hits = search(query, 1);
