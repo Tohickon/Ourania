@@ -3,6 +3,7 @@ package com.zodiacomputing.ourania.android;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -16,6 +17,7 @@ import android.view.View;
 
 import com.zodiacomputing.ourania.astro.Aspects;
 import com.zodiacomputing.ourania.astro.Bodies;
+import com.zodiacomputing.ourania.astro.Transits;
 import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.gui.WheelLayout;
@@ -40,6 +42,8 @@ final class WheelView extends View {
 
     private PhoneWheel wheel;
     private ChartFrame frame;
+    private ChartFrame sky;
+    private java.util.List<Transits.Hit> contacts = java.util.Collections.emptyList();
     private int selected = -1;
     private OnBody listener;
 
@@ -103,7 +107,17 @@ final class WheelView extends View {
     }
 
     void show(ChartFrame f) {
+        show(f, null, null);
+    }
+
+    /**
+     * The chart with the sky on a ring outside its planets, and a dashed line for each contact
+     * the sky makes to a natal planet (M7). A null sky is the birth chart alone.
+     */
+    void show(ChartFrame f, ChartFrame sky, java.util.List<Transits.Hit> contacts) {
         this.frame = f;
+        this.sky = sky;
+        this.contacts = contacts == null ? java.util.Collections.emptyList() : contacts;
         this.wheel = null;
         this.selected = -1;
         this.zoom = 1f;
@@ -123,7 +137,7 @@ final class WheelView extends View {
             return null;
         }
         if (this.wheel == null || this.wheel.width != getWidth()) {
-            this.wheel = PhoneWheel.of(this.frame, getWidth(), getHeight());
+            this.wheel = PhoneWheel.of(this.frame, this.sky, getWidth(), getHeight());
         }
         return this.wheel;
     }
@@ -252,6 +266,37 @@ final class WheelView extends View {
             c.drawLine(a[0], a[1], b[0], b[1], this.line);
         }
 
+        // The sky's contacts to natal planets, dashed so they are not read as natal aspects.
+        if (w.sky != null) {
+            this.line.setPathEffect(new DashPathEffect(new float[] {6 * density, 4 * density}, 0));
+            for (Transits.Hit h : this.contacts) {
+                int t = index(w.sky, h.transiting);
+                int n = index(f, h.natal);
+                if (t < 0 || n < 0) {
+                    continue;                           // a contact to an angle: no planet to join
+                }
+                boolean lit = this.selected < 0 || this.selected == PhoneWheel.SKY + t
+                    || this.selected == n;
+                this.line.setColor(aspectColour(h.type, lit ? 230 : 40));
+                this.line.setStrokeWidth(lit && this.selected >= 0 ? 2.6f : 1.6f);
+                float[] a = w.point(w.sky.bodies[t].lon, w.aspectDisc);
+                float[] b = w.point(f.bodies[n].lon, w.aspectDisc);
+                c.drawLine(a[0], a[1], b[0], b[1], this.line);
+            }
+            this.line.setPathEffect(null);
+            // The sky's ring: the boundary it shares with the natal planets.
+            this.line.setColor(Color.rgb(70, 90, 130));
+            this.line.setStrokeWidth(1.2f);
+            c.drawCircle(w.cx, w.cy, w.rings[WheelLayout.RING_BODY_TOP], this.line);
+            for (int i = 0; i < PhoneWheel.PLANETS; i++) {
+                float[] p = w.skyBody(i);
+                if (p != null) {
+                    drawPlanet(c, i, p[0], p[1], PhoneWheel.skyPlanetRadius(i),
+                        this.selected == PhoneWheel.SKY + i);
+                }
+            }
+        }
+
         // The planets as themselves - the globe's pictures of them - with each one's glyph
         // small just inside it, so Mercury and Pluto are told apart without a tap.
         this.text.setTextSize(12f * density);
@@ -268,6 +313,16 @@ final class WheelView extends View {
             c.drawText(Bodies.at(i).glyph, g[0], g[1] + 4 * density, this.text);
         }
         c.restore();
+    }
+
+    /** Where a named planet is among the first ten of a frame, or -1. */
+    private static int index(ChartFrame f, String name) {
+        for (int i = 0; i < PhoneWheel.PLANETS && i < f.bodies.length; i++) {
+            if (f.bodies[i] != null && name.equals(f.bodies[i].name)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** Fire, earth, air, water - the desktop's element hues, lightened for a dark ground. */

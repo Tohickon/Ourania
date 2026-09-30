@@ -34,7 +34,10 @@ final class PhoneWheel {
     final int height;
     final int cx;
     final int cy;
-    /** {@link WheelLayout#ringRadii}, one outer ring (none open), at this size. */
+    /** What {@link #bodyAt} adds to a planet's index when it is on the sky's ring (M7). */
+    static final int SKY = 100;
+
+    /** {@link WheelLayout#ringRadii} at this size, with the sky's band open when it is shown. */
     final int[] rings;
     /** The top and floor of the natal band. */
     final int natalTop;
@@ -46,14 +49,21 @@ final class PhoneWheel {
     /** Each planet's radius, 0 for one not drawn. */
     final int[] bodyRadius;
     final ChartFrame frame;
+    /** The sky on the ring inside the signs, or null for the birth chart alone (M7). */
+    final ChartFrame sky;
+    /** Each sky planet's radius, 0 for one not drawn; empty without a sky. */
+    final int[] skyRadius;
 
-    private PhoneWheel(ChartFrame frame, int width, int height) {
+    private PhoneWheel(ChartFrame frame, ChartFrame sky, int width, int height) {
         this.frame = frame;
+        this.sky = sky;
         this.width = width;
         this.height = height;
         this.cx = width / 2;
         this.cy = height / 2;
-        this.rings = WheelLayout.ringRadii(width, height, false);
+        // The desktop's transit band: with it open, the natal band moves in to make room, and
+        // the sky's planets ride between the signs and the natal planets, as on the desktop.
+        this.rings = WheelLayout.ringRadii(width, height, sky != null);
         this.natalTop = WheelLayout.bodyBase(this.rings, Settings.bodyRing());
         this.natalFloor = this.natalTop - WheelLayout.natalBandDepth(Math.max(1, this.natalTop));
         this.aspectDisc = WheelLayout.aspectDiscs(this.natalFloor)[0];
@@ -73,10 +83,45 @@ final class PhoneWheel {
         for (int i = 0; i < radii.length && i < this.bodyRadius.length; i++) {
             this.bodyRadius[i] = drawn[i] ? radii[i] : 0;
         }
+        this.skyRadius = new int[sky == null ? 0 : Bodies.count()];
+        if (sky != null) {
+            double[] skyLon = new double[Bodies.count()];
+            boolean[] skyDrawn = new boolean[Bodies.count()];
+            for (int i = 0; i < PLANETS && i < sky.bodies.length; i++) {
+                ChartFrame.Body b = sky.bodies[i];
+                if (b != null && b.ok) {
+                    skyLon[i] = b.lon;
+                    skyDrawn[i] = true;
+                }
+            }
+            int[] sr = WheelLayout.bandRadii(skyLon, skyDrawn,
+                this.rings[WheelLayout.RING_TRANSIT], this.rings[WheelLayout.RING_BODY_TOP]);
+            for (int i = 0; i < sr.length && i < this.skyRadius.length; i++) {
+                this.skyRadius[i] = skyDrawn[i] ? sr[i] : 0;
+            }
+        }
     }
 
     static PhoneWheel of(ChartFrame frame, int width, int height) {
-        return new PhoneWheel(frame, width, height);
+        return new PhoneWheel(frame, null, width, height);
+    }
+
+    /** The birth chart with the sky on the ring outside its planets (M7). */
+    static PhoneWheel of(ChartFrame frame, ChartFrame sky, int width, int height) {
+        return new PhoneWheel(frame, sky, width, height);
+    }
+
+    /** A sky planet's centre, or null when there is no sky or it is not drawn. */
+    float[] skyBody(int i) {
+        if (i < 0 || i >= this.skyRadius.length || this.skyRadius[i] <= 0) {
+            return null;
+        }
+        return this.point(this.sky.bodies[i].lon, this.skyRadius[i]);
+    }
+
+    /** How big a sky planet is drawn: the desktop's transit glyph, a third larger. */
+    static int skyPlanetRadius(int i) {
+        return Math.round(WheelLayout.transitSize(i).radius * 1.35f);
     }
 
     /** The screen angle of a longitude, in radians. */
@@ -169,6 +214,7 @@ final class PhoneWheel {
 
     /**
      * The planet under a tap, nearest first, within {@code grab} pixels of its edge; or -1.
+     * A planet on the sky's ring answers {@link #SKY} plus its index.
      * Nearest wins so two planets close together are each still reachable.
      */
     int bodyAt(float x, float y, float grab) {
@@ -176,13 +222,20 @@ final class PhoneWheel {
         double bestDistance = Double.MAX_VALUE;
         for (int i = 0; i < PLANETS; i++) {
             float[] p = this.body(i);
-            if (p == null) {
-                continue;
+            if (p != null) {
+                double d = Math.hypot(x - p[0], y - p[1]);
+                if (d <= this.planetRadius(i) + grab && d < bestDistance) {
+                    best = i;
+                    bestDistance = d;
+                }
             }
-            double d = Math.hypot(x - p[0], y - p[1]);
-            if (d <= this.planetRadius(i) + grab && d < bestDistance) {
-                best = i;
-                bestDistance = d;
+            float[] q = this.skyBody(i);
+            if (q != null) {
+                double d = Math.hypot(x - q[0], y - q[1]);
+                if (d <= skyPlanetRadius(i) + grab && d < bestDistance) {
+                    best = SKY + i;
+                    bestDistance = d;
+                }
             }
         }
         return best;

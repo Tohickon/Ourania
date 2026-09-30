@@ -174,7 +174,7 @@ public final class WheelLayout {
         int n2 = WheelLayout.tierOf(n);
         return NATAL_SIZES[n2 < 0 ? TIER_INNER : n2];
     }
-    static GlyphSize transitSize(int n) {
+    public static GlyphSize transitSize(int n) {
         int n2 = WheelLayout.tierOf(n);
         return TRANSIT_SIZES[n2 < 0 ? TIER_INNER : n2];
     }
@@ -363,7 +363,7 @@ public final class WheelLayout {
      * @param bandOuter the band's outer boundary
      * @param bandInner the band's inner boundary
      */
-    static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner) {
+    public static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner) {
         return WheelLayout.bandRadii(lon, valid, bandOuter, bandInner, BAND_EDGE, 28.0);
     }
     /**
@@ -445,7 +445,7 @@ public final class WheelLayout {
     /** Indices into {@link #ringRadii}. */
     public static final int RING_OUTER = 0;
     static final int RING_TRI = 1;
-    static final int RING_TRANSIT = 2;
+    public static final int RING_TRANSIT = 2;
     public static final int RING_DECAN_OUTER = 3;
     public static final int RING_SIGN_OUTER = 4;
     public static final int RING_SIGN_INNER = 5;

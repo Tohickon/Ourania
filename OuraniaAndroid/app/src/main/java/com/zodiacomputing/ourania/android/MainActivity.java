@@ -64,6 +64,13 @@ public final class MainActivity extends Activity {
     private WheelView wheel;
     private TextView tapped;
     private LinearLayout readings;
+    private LinearLayout skyRow;
+    private CheckBox skyOn;
+    private TextView skyDateField;
+    private TextView skyCaption;
+    /** The day the sky is cast for, or null for now. */
+    private LocalDate skyDate;
+    private PhoneTransits.Sky shownSky;
     private Button save;
     /** The birth the shown chart was cast from, for saving it. */
     private LocalDate castDate;
@@ -145,6 +152,34 @@ public final class MainActivity extends Activity {
         this.wheel.setVisibility(View.GONE);
         this.wheel.setOnBody(this::showBody);
         form.addView(this.wheel);
+
+        // The sky over the chart (M7): on or off, and on which day.
+        this.skyRow = new LinearLayout(this);
+        this.skyRow.setOrientation(LinearLayout.HORIZONTAL);
+        this.skyRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        this.skyRow.setVisibility(View.GONE);
+        this.skyOn = new CheckBox(this);
+        this.skyOn.setText("Sky on");
+        this.skyOn.setOnCheckedChangeListener((b, on) -> this.refreshSky());
+        this.skyRow.addView(this.skyOn);
+        this.skyDateField = field("today");
+        this.skyDateField.setPadding(24, 12, 24, 12);
+        this.skyDateField.setOnClickListener(v -> this.chooseSkyDate());
+        this.skyRow.addView(this.skyDateField, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        Button skyNow = new Button(this);
+        skyNow.setText("Now");
+        skyNow.setOnClickListener(v -> {
+            this.skyDate = null;
+            this.skyOn.setChecked(true);
+            this.refreshSky();
+        });
+        this.skyRow.addView(skyNow);
+        form.addView(this.skyRow);
+        this.skyCaption = new TextView(this);
+        this.skyCaption.setTextSize(14f);
+        this.skyCaption.setVisibility(View.GONE);
+        form.addView(this.skyCaption);
         this.tapped = new TextView(this);
         this.tapped.setTextSize(16f);
         this.tapped.setPadding(0, 16, 0, 0);
@@ -161,9 +196,14 @@ public final class MainActivity extends Activity {
         Button patterns = new Button(this);
         patterns.setText("Patterns");
         patterns.setOnClickListener(v -> this.showReading(true));
+        Button transits = new Button(this);
+        transits.setText("Transits");
+        transits.setOnClickListener(v -> this.showTransits());
         this.readings.addView(whole, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         this.readings.addView(patterns, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        this.readings.addView(transits, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         form.addView(this.readings);
         this.save = new Button(this);
@@ -252,13 +292,17 @@ public final class MainActivity extends Activity {
                 this.wheel.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.tapped.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.readings.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.skyRow.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.skyCaption.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.save.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.castDate = d;
                 this.castTime = t;
                 this.castPlace = p;
                 if (cast != null) {
+                    this.shownSky = null;
                     this.wheel.show(cast.frame);
                     showBody(-1);
+                    this.refreshSky();
                 }
                 this.result.setText(shown);
                 this.cast.setEnabled(true);
@@ -462,9 +506,81 @@ public final class MainActivity extends Activity {
         }).start();
     }
 
+    /**
+     * Casts the sky for the chosen day (or now) and puts it on the wheel, or takes it off.
+     * Off the main thread: the contacts rank the chart's bodies first.
+     */
+    private void refreshSky() {
+        final PhoneChart.Cast c = this.shownCast;
+        if (c == null) {
+            return;
+        }
+        if (!this.skyOn.isChecked()) {
+            this.shownSky = null;
+            this.wheel.show(c.frame);
+            this.skyCaption.setText("Turn the sky on to see today's planets around the chart.");
+            return;
+        }
+        final LocalDate day = this.skyDate;
+        this.skyCaption.setText("Casting the sky...");
+        new Thread(() -> {
+            PhoneTransits.Sky sky;
+            try {
+                java.time.ZonedDateTime now = PhoneTransits.now(c.place.zoneId);
+                java.time.ZonedDateTime when = day == null ? now
+                    : day.atTime(now.toLocalTime()).atZone(now.getZone());
+                sky = PhoneTransits.at(new SwissEph(Ephemeris.PATH), c, when);
+            } catch (Throwable e) {
+                sky = null;
+            }
+            final PhoneTransits.Sky shown = sky;
+            runOnUiThread(() -> {
+                if (this.shownCast != c) {
+                    return;
+                }
+                if (shown == null) {
+                    this.skyCaption.setText("The sky could not be cast.");
+                    return;
+                }
+                this.shownSky = shown;
+                this.wheel.show(c.frame, shown.frame, shown.hits);
+                this.skyDateField.setText(day == null ? "now" : day.toString());
+                this.skyCaption.setText(PhoneTransits.headline(shown)
+                    + ". Tap a planet on the outer ring, or Transits for the full reading.");
+                showBody(-1);
+            });
+        }).start();
+    }
+
+    private void chooseSkyDate() {
+        LocalDate start = this.skyDate != null ? this.skyDate : LocalDate.now();
+        new DatePickerDialog(this, (picker, y, m, d) -> {
+            this.skyDate = LocalDate.of(y, m + 1, d);
+            this.skyOn.setChecked(true);
+            this.refreshSky();
+        }, start.getYear(), start.getMonthValue() - 1, start.getDayOfMonth()).show();
+    }
+
+    /** Every transit contact now (or on the chosen day), with the year and their readings. */
+    private void showTransits() {
+        if (this.shownSky == null) {
+            this.skyOn.setChecked(true);                // casts it; tap Transits again to read
+            this.tapped.setText("Casting the sky - tap Transits again in a moment.");
+            return;
+        }
+        final PhoneChart.Cast c = this.shownCast;
+        final PhoneTransits.Sky sky = this.shownSky;
+        this.tapped.setText(Html.fromHtml(
+            PhoneTransits.reading(c, sky, InterpretationService.getInstance()),
+            Html.FROM_HTML_MODE_COMPACT));
+    }
+
     /** A tapped planet's full reading under the wheel (M5); a hint when none is tapped. */
     private void showBody(int body) {
         String html = this.shownCast == null || body < 0 ? ""
+            : body >= PhoneWheel.SKY && this.shownSky != null
+                ? PhoneTransits.skyPlanet(this.shownCast, this.shownSky, body - PhoneWheel.SKY,
+                    InterpretationService.getInstance())
             : PhoneReading.planet(this.shownCast, body, InterpretationService.getInstance());
         if (html.isEmpty()) {
             this.tapped.setText(
