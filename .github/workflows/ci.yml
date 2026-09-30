@@ -138,8 +138,29 @@ jobs:
         with:
           packages: "platforms;android-34 build-tools;34.0.0"
 
-      - name: Build the APK
-        run: ./gradlew --no-daemon assembleDebug
+      # The same five files the Windows jobs fetch; packed into the APK so the phone computes
+      # with the Swiss Ephemeris rather than its built-in fallback, and used by the tests.
+      - name: Fetch the Swiss Ephemeris files
+        run: |
+          dir="$RUNNER_TEMP/ephe"
+          mkdir -p "$dir"
+          for f in sepl_18.se1 semo_18.se1 seas_18.se1 sefstars.txt seasnam.txt; do
+            curl -sSfL "https://raw.githubusercontent.com/aloistr/swisseph/master/ephe/$f" -o "$dir/$f"
+          done
+          echo "OURANIA_EPHE=$dir" >> "$GITHUB_ENV"
+
+      # M3: PhoneChartTest runs the phone's whole path - atlas search, cast, placements - on the
+      # JVM, since there is no emulator here.
+      - name: Build the APK and run the phone's tests
+        run: ./gradlew --no-daemon assembleDebug testDebugUnitTest
+
+      - name: Keep the test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-tests
+          path: OuraniaAndroid/app/build/reports/tests
+          retention-days: 14
 
       - name: Keep the APK
         uses: actions/upload-artifact@v4

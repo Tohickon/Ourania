@@ -25,6 +25,18 @@ def engineSources = tasks.register("engineSources", Sync) {
     into layout.buildDirectory.dir("generated/engine")
 }
 
+// The Swiss Ephemeris files are fetched, never committed (THIRD-PARTY-NOTICES.md). When the
+// build is given a folder of them - OURANIA_EPHE, the variable the desktop suites and CI already
+// use - they are packed under assets/ephe and the app copies them out on first launch. Without
+// it the app still builds, and the engine uses its built-in Moshier ephemeris.
+def epheDir = System.getenv("OURANIA_EPHE")
+def ephemerisAssets = tasks.register("ephemerisAssets", Sync) {
+    if (epheDir != null && new File(epheDir).isDirectory()) {
+        from(epheDir) { include "*.se1" }
+    }
+    into layout.buildDirectory.dir("generated/ephe-assets/ephe")
+}
+
 android {
     namespace "com.zodiacomputing.ourania.android"
     compileSdk 34
@@ -49,16 +61,32 @@ android {
             java.srcDir(layout.buildDirectory.dir("generated/engine"))
             // The interpretation corpus and the atlas, opened by name through DataFiles (M1).
             // Served from the desktop's data folder, again rather than a copy of it.
-            assets.srcDirs = ["../../OuraniaWindows/src/main/resources/data"]
+            assets.srcDirs = ["../../OuraniaWindows/src/main/resources/data",
+                              layout.buildDirectory.dir("generated/ephe-assets").get().asFile]
         }
     }
 
-    // The Swiss Ephemeris files are fetched, never committed (THIRD-PARTY-NOTICES.md), and are
-    // not bundled yet - without them the engine computes with its built-in Moshier ephemeris,
-    // which the screen says. The gazetteer is already gzipped and gains nothing from a second pass.
+    // The ephemeris is read by seeking, so it is stored uncompressed; the gazetteer is already
+    // gzipped and gains nothing from a second pass.
     androidResources {
         noCompress "se1", "gz"
     }
+
+    testOptions {
+        unitTests.all {
+            // PhoneChartTest reads the corpus and the atlas from the desktop's data folder, and
+            // the ephemeris from OURANIA_EPHE when it is set.
+            systemProperty "ourania.data", file("../../OuraniaWindows/src/main/resources/data").path
+            systemProperty "ourania.home", layout.buildDirectory.dir("test-home").get().asFile.path
+            if (epheDir != null) {
+                systemProperty "ourania.ephe", epheDir
+            }
+        }
+    }
 }
 
-tasks.named("preBuild") { dependsOn(engineSources) }
+dependencies {
+    testImplementation "junit:junit:4.13.2"
+}
+
+tasks.named("preBuild") { dependsOn(engineSources, ephemerisAssets) }

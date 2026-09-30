@@ -1,103 +1,287 @@
 package com.zodiacomputing.ourania.android;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.zodiacomputing.ourania.astro.AppPaths;
-import com.zodiacomputing.ourania.astro.Bodies;
-import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.DataFiles;
 import com.zodiacomputing.ourania.astro.Ephemeris;
-import com.zodiacomputing.ourania.astro.PlainText;
-import com.zodiacomputing.ourania.astro.Zodiac;
+import com.zodiacomputing.ourania.gui.Atlas;
 import com.zodiacomputing.ourania.gui.InterpretationService;
 
-import de.thmac.swisseph.SweDate;
 import de.thmac.swisseph.SwissEph;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The phone's first screen: the sky now, cast by the desktop's own engine (M2).
+ * Casting a chart on the phone: a birth date, a time (or "unknown"), and a place found in the
+ * offline atlas as it is typed; then the placements (M3).
  *
- * <p>Not the app yet - that is M3 onward. This proves the thing M2 exists to prove: the engine,
- * the readings and their data run on the device, built from the same source as the desktop.
- * Where the engine would look for a folder, it is told where the phone keeps things:
- * {@link DataFiles} opens the corpus from the app's assets, and the reader's own files live in
- * the app's private storage.
+ * <p>Everything this screen does with the engine goes through {@link PhoneChart}, which has no
+ * Android in it and is tested on the JVM. This class gathers the three answers and shows text.
+ *
+ * <p>Where the engine would look for a folder it is told where the phone keeps things, once, at
+ * the top of {@link #onCreate}: the corpus and the atlas are opened from the app's assets
+ * through {@link DataFiles}, the reader's own files live in the app's private storage, and the
+ * Swiss Ephemeris files - when the build packed them - are copied out of the assets once,
+ * because the ephemeris seeks inside its files and a packed asset cannot be sought.
  */
 public final class MainActivity extends Activity {
+
+    private LocalDate date;
+    private LocalTime time = LocalTime.of(12, 0);
+    private Atlas.Place place;
+
+    private TextView dateField;
+    private TextView timeField;
+    private CheckBox timeUnknown;
+    private AutoCompleteTextView placeField;
+    private TextView result;
+    private Button cast;
 
     @Override
     protected void onCreate(Bundle saved) {
         super.onCreate(saved);
-        // Before anything in the engine is touched: AppPaths and Ephemeris read these once.
         String home = getFilesDir().getPath();
+        File ephe = new File(getFilesDir(), "ephe");
         System.setProperty(AppPaths.HOME_PROPERTY, home);
         System.setProperty(AppPaths.DATA_PROPERTY, home);
-        System.setProperty(Ephemeris.PROPERTY, new java.io.File(getFilesDir(), "ephe").getPath());
+        System.setProperty(Ephemeris.PROPERTY, ephe.getPath());
         DataFiles.use(new Assets(getAssets()));
 
-        TextView text = new TextView(this);
-        text.setPadding(40, 60, 40, 60);
-        text.setTextSize(15f);
-        text.setText("Casting the sky...");
+        LinearLayout form = new LinearLayout(this);
+        form.setOrientation(LinearLayout.VERTICAL);
+        form.setPadding(48, 64, 48, 64);
+
+        TextView title = new TextView(this);
+        title.setText("Ourania");
+        title.setTextSize(26f);
+        form.addView(title);
+
+        this.dateField = field("Birth date - tap to choose");
+        this.dateField.setOnClickListener(v -> this.chooseDate());
+        form.addView(label("Date"));
+        form.addView(this.dateField);
+
+        this.timeField = field("12:00");
+        this.timeField.setOnClickListener(v -> this.chooseTime());
+        form.addView(label("Time, as on the birth certificate"));
+        form.addView(this.timeField);
+        this.timeUnknown = new CheckBox(this);
+        this.timeUnknown.setText("Birth time unknown");
+        this.timeUnknown.setOnCheckedChangeListener((b, on) -> this.timeField.setEnabled(!on));
+        form.addView(this.timeUnknown);
+
+        this.placeField = new AutoCompleteTextView(this);
+        this.placeField.setHint("Start typing a town or city");
+        this.placeField.setInputType(InputType.TYPE_CLASS_TEXT
+            | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        this.placeField.setThreshold(2);
+        final Places places = new Places();
+        this.placeField.setAdapter(places);
+        this.placeField.setOnItemClickListener((parent, view, pos, id) -> {
+            this.place = places.getItem(pos);
+            this.placeField.setText(PhoneChart.label(this.place), false);
+            this.placeField.dismissDropDown();
+        });
+        form.addView(label("Place of birth"));
+        form.addView(this.placeField);
+
+        this.cast = new Button(this);
+        this.cast.setText("Cast the chart");
+        this.cast.setOnClickListener(v -> this.castChart());
+        form.addView(this.cast);
+
+        this.result = new TextView(this);
+        this.result.setTextSize(15f);
+        this.result.setPadding(0, 32, 0, 0);
+        this.result.setTextIsSelectable(true);
+        form.addView(this.result);
+
         ScrollView scroll = new ScrollView(this);
-        scroll.addView(text);
+        scroll.addView(form);
         setContentView(scroll);
 
-        // The corpus is a few seconds of reading; off the main thread so the screen is not frozen.
+        // The ephemeris copy and the corpus are seconds of work; neither belongs on the main
+        // thread, and both are needed before the first chart, so they start now.
         new Thread(() -> {
-            String out;
-            try {
-                out = skyNow();
-            } catch (Throwable t) {
-                out = "The engine did not run: " + t;
-            }
-            final String shown = out;
-            runOnUiThread(() -> text.setText(shown));
+            copyEphemeris(ephe);
+            InterpretationService.getInstance();
         }).start();
     }
 
-    /** The planets now, from Greenwich, each with the first line of its reading. */
-    private static String skyNow() {
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        double hour = now.getHour() + now.getMinute() / 60.0;
-        double jd = new SweDate(now.getYear(), now.getMonthValue(), now.getDayOfMonth(), hour)
-            .getJulDay();
-        ChartFrame f = ChartFrame.compute(new SwissEph(Ephemeris.PATH), jd, 51.4779, 0.0,
-            'P', false, 0.0);
-        InterpretationService svc = InterpretationService.getInstance();
+    private TextView label(String text) {
+        TextView t = new TextView(this);
+        t.setText(text);
+        t.setPadding(0, 28, 0, 4);
+        return t;
+    }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Ourania - the sky now\n")
-          .append(now.toLocalDate()).append(' ')
-          .append(String.format("%02d:%02d", now.getHour(), now.getMinute()))
-          .append(" UT, Greenwich\n\n");
-        for (int i = 0; i < Bodies.count() && i < f.bodies.length; i++) {
-            ChartFrame.Body b = f.bodies[i];
-            if (b == null || !b.ok || i > 9) {
-                continue;                       // the ten planets, for a first screen
-            }
-            sb.append(b.name).append("  ").append(Zodiac.format(b.lon))
-              .append(b.retrograde ? "  R" : "").append('\n');
-            String reading = PlainText.summary(svc.getPlanetInSign(b.name, Zodiac.signName(b.lon)));
-            if (!reading.isEmpty()) {
-                sb.append("   ").append(reading).append('\n');
-            }
-            sb.append('\n');
+    private TextView field(String hint) {
+        TextView t = new TextView(this);
+        t.setHint(hint);
+        t.setTextSize(18f);
+        t.setPadding(0, 12, 0, 12);
+        return t;
+    }
+
+    private void chooseDate() {
+        LocalDate start = this.date != null ? this.date : LocalDate.of(1990, 1, 1);
+        new DatePickerDialog(this, (picker, y, m, d) -> {
+            this.date = LocalDate.of(y, m + 1, d);
+            this.dateField.setText(this.date.toString());
+        }, start.getYear(), start.getMonthValue() - 1, start.getDayOfMonth()).show();
+    }
+
+    private void chooseTime() {
+        new TimePickerDialog(this, (picker, h, m) -> {
+            this.time = LocalTime.of(h, m);
+            this.timeField.setText(String.format("%02d:%02d", h, m));
+        }, this.time.getHour(), this.time.getMinute(), true).show();
+    }
+
+    private void castChart() {
+        if (this.date == null) {
+            this.result.setText("Choose the birth date first.");
+            return;
         }
-        sb.append("Ascendant  ").append(Zodiac.format(f.asc)).append('\n');
-        boolean files = new java.io.File(Ephemeris.PATH).isDirectory();
-        sb.append("\nEphemeris: ").append(files ? "Swiss Ephemeris files"
-            : "built-in (Moshier) - the Swiss Ephemeris files are not bundled yet");
-        return sb.toString();
+        if (this.place == null) {
+            this.result.setText("Choose the place from the list that appears as you type - "
+                + "the chart needs its latitude, longitude and time zone.");
+            return;
+        }
+        final LocalDate d = this.date;
+        final LocalTime t = this.timeUnknown.isChecked() ? null : this.time;
+        final Atlas.Place p = this.place;
+        this.cast.setEnabled(false);
+        this.result.setText("Casting...");
+        new Thread(() -> {
+            String out;
+            try {
+                PhoneChart.Cast c = PhoneChart.cast(new SwissEph(Ephemeris.PATH), d, t, p);
+                out = PhoneChart.describe(c, InterpretationService.getInstance());
+            } catch (Throwable e) {
+                out = "The chart could not be cast: " + e;
+            }
+            final String shown = out;
+            runOnUiThread(() -> {
+                this.result.setText(shown);
+                this.cast.setEnabled(true);
+            });
+        }).start();
+    }
+
+    /**
+     * The Swiss Ephemeris files out of the assets and into private storage, once.
+     *
+     * Skipped for a file already there at the same size, so a relaunch copies nothing. With none
+     * packed the folder stays empty and the engine uses its built-in Moshier ephemeris.
+     */
+    private void copyEphemeris(File dir) {
+        try {
+            String[] names = getAssets().list("ephe");
+            if (names == null || names.length == 0) {
+                return;
+            }
+            dir.mkdirs();
+            byte[] buf = new byte[1 << 16];
+            for (String name : names) {
+                File out = new File(dir, name);
+                try (InputStream in = getAssets().open("ephe/" + name)) {
+                    if (out.isFile() && out.length() == in.available()) {
+                        continue;
+                    }
+                    try (OutputStream o = new FileOutputStream(out)) {
+                        for (int n; (n = in.read(buf)) > 0; ) {
+                            o.write(buf, 0, n);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // Without the files the engine falls back to Moshier, which it says in the chart.
+        }
+    }
+
+    /** The atlas as the place box's suggestions, searched off the main thread as it is typed. */
+    private final class Places extends BaseAdapter implements Filterable {
+        private List<Atlas.Place> shown = new ArrayList<>();
+
+        @Override
+        public int getCount() {
+            return this.shown.size();
+        }
+
+        @Override
+        public Atlas.Place getItem(int position) {
+            return this.shown.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convert, ViewGroup parent) {
+            TextView t = convert instanceof TextView ? (TextView) convert
+                : new TextView(MainActivity.this);
+            t.setPadding(32, 24, 32, 24);
+            t.setTextSize(16f);
+            t.setText(PhoneChart.label(getItem(position)));
+            return t;
+        }
+
+        @Override
+        public Filter getFilter() {
+            return new Filter() {
+                @Override
+                protected FilterResults performFiltering(CharSequence typed) {
+                    FilterResults r = new FilterResults();
+                    List<Atlas.Place> found = typed == null || typed.length() < 2
+                        ? new ArrayList<>() : Atlas.search(typed.toString(), 8);
+                    r.values = found;
+                    r.count = found.size();
+                    return r;
+                }
+
+                @Override
+                @SuppressWarnings("unchecked")
+                protected void publishResults(CharSequence typed, FilterResults r) {
+                    Places.this.shown = r.values == null ? new ArrayList<>()
+                        : (List<Atlas.Place>) r.values;
+                    notifyDataSetChanged();
+                }
+
+                @Override
+                public CharSequence convertResultToString(Object value) {
+                    return value instanceof Atlas.Place ? PhoneChart.label((Atlas.Place) value) : "";
+                }
+            };
+        }
     }
 
     /** The app's packed assets, as the engine's data files (M1). */
