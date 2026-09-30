@@ -40,7 +40,7 @@ public final class ScrubCheck {
             part("E: the slider springs back and the chart stays", () -> slider(sky));
             part("F: the wheel is redrawn at the scrubbed moment", () -> redraw(sky, chart));
             part("G: Play moves the chart the app opens onto", () -> play(sky));
-            part("H: a bar per chart, each moving only its own", () -> bars(sky));
+            part("H: one bar, and a scrub never moves a birth time", () -> bars(sky));
             part("I: a bar held pulled keeps time going until it is let go", () -> shuttle(sky));
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
@@ -401,62 +401,57 @@ public final class ScrubCheck {
     }
 
     /**
-     * David: "could we have different scrub bars that control different charts in the wheel and
-     * globe". One bar per chart, shown while that chart is on the wheel, each moving only its own
-     * moment; a birth time moved by its bar can be put back.
+     * David, 30 Sep: "time scrubbing is really only needed for the transit chart not a b or
+     * another charts". There were three bars from 20 Sep - Chart A, Chart B and the sky - and
+     * Shift+drag followed the transport's rule, which on a birth chart with Play aimed at "Both"
+     * walked the birth time too. Now there is one bar, and every scrub moves the sky alone.
      */
     private static void bars(SkymapPanel sky) throws Exception {
         final ZonedDateTime personB = ZonedDateTime.of(1985, 3, 2, 14, 30, 0, 0, ZoneId.of("UTC"));
-        ok("there is a bar for Chart A, Chart B and the sky",
-            sky.scrubSliders.containsKey(SkymapPanel.ScrubTarget.CHART_A)
-                && sky.scrubSliders.containsKey(SkymapPanel.ScrubTarget.CHART_B)
-                && sky.scrubSliders.containsKey(SkymapPanel.ScrubTarget.SKY));
+        javax.swing.JPanel row = (javax.swing.JPanel) field(sky, "scrubRow");
+        eq("the scrub row carries one bar", 1, sliders(row));
 
-        mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
-        ok("the cold open shows the sky's bar alone", shown(sky) .equals("SKY"));
-
-        mode(sky, ChartMode.SINGLE, true, false, personB, "1 Hour");
-        ok("a natal chart shows Chart A's bar and the sky's, " + shown(sky), shown(sky).equals("CHART_A SKY"));
-        slide(sky, SkymapPanel.ScrubTarget.CHART_A, 3);
-        eq("Chart A's bar moves Chart A's birth three hours", ANCHOR.plusHours(3), time(sky, "natalRing.time"));
-        eq("and leaves the sky where it was", ANCHOR, time(sky, "skyRing.time"));
-        ok("and offers the birth time back", sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).isEnabled());
-        slide(sky, SkymapPanel.ScrubTarget.CHART_A, 2);
-        eq("a second slide goes on from there", ANCHOR.plusHours(5), time(sky, "natalRing.time"));
-        SwingUtilities.invokeAndWait(() -> sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).doClick());
-        eq("the reset puts the birth time back where it was before either slide", ANCHOR, time(sky, "natalRing.time"));
-        ok("and has nothing more to reset", !sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_A).isEnabled());
+        // The case the old rule got wrong: a birth chart, transits on, Play aimed at both.
+        mode(sky, ChartMode.SINGLE, true, true, personB, "1 Hour");
+        set(sky, "animateTarget", "Both");
+        SwingUtilities.invokeAndWait(() -> {
+            sky.beginScrub();
+            sky.scrubTo(3);
+            sky.endScrub();
+        });
+        eq("a scrub on a birth chart moves the sky three hours", ANCHOR.plusHours(3),
+            time(sky, "skyRing.time"));
+        eq("and not the birth, whatever Play is aimed at", ANCHOR, time(sky, "natalRing.time"));
+        slide(sky.scrubSlider, 2);
+        eq("the bar goes on from there", ANCHOR.plusHours(5), time(sky, "skyRing.time"));
+        eq("and leaves the birth where it was", ANCHOR, time(sky, "natalRing.time"));
+        set(sky, "animateTarget", "Transit");
 
         mode(sky, ChartMode.SYNASTRY, true, true, personB, "1 Day");
-        ok("a synastry shows all three bars, " + shown(sky), shown(sky).equals("CHART_A CHART_B SKY"));
-        slide(sky, SkymapPanel.ScrubTarget.CHART_B, -2);
-        eq("Chart B's bar moves Chart B's birth back two days", personB.minusDays(2), time(sky, "outerRing.time"));
-        eq("and not Chart A's", ANCHOR, time(sky, "natalRing.time"));
-        eq("nor the sky", ANCHOR, time(sky, "skyRing.time"));
-        slide(sky, SkymapPanel.ScrubTarget.SKY, 4);
-        eq("the sky's bar moves the sky four days", ANCHOR.plusDays(4), time(sky, "skyRing.time"));
-        eq("and neither birth", personB.minusDays(2), time(sky, "outerRing.time"));
-        SwingUtilities.invokeAndWait(() -> sky.scrubResets.get(SkymapPanel.ScrubTarget.CHART_B).doClick());
-        eq("Chart B's reset puts that birth back", personB, time(sky, "outerRing.time"));
+        slide(sky.scrubSlider, 4);
+        eq("on a synastry the bar moves the sky four days", ANCHOR.plusDays(4), time(sky, "skyRing.time"));
+        eq("and not Chart A's birth", ANCHOR, time(sky, "natalRing.time"));
+        eq("nor Chart B's", personB, time(sky, "outerRing.time"));
 
         mode(sky, ChartMode.COMPOSITE_MIDPOINT, true, true, personB, "1 Day");
-        ok("a composite shows both people's bars, " + shown(sky), shown(sky).equals("CHART_A CHART_B SKY"));
-
-        // The globe reads the same moments.
-        mode(sky, ChartMode.SINGLE, true, false, personB, "1 Day");
-        SwingUtilities.invokeAndWait(() -> sky.setGlobeMode(true));
-        double[] before = ((double[]) field(sky, "natalRing.lon")).clone();
-        slide(sky, SkymapPanel.ScrubTarget.CHART_A, 5);
-        int moon = com.zodiacomputing.ourania.astro.Bodies.indexOf("moon");
-        double moved = com.zodiacomputing.ourania.astro.Aspects.separation(before[moon], ((double[]) field(sky, "natalRing.lon"))[moon]);
-        ok("on the globe, Chart A's bar moves Chart A's Moon five days, " + Math.round(moved) + " degrees",
-            moved > 50 && moved < 80);
-        SwingUtilities.invokeAndWait(() -> {
-            sky.setGlobeMode(false);
-            sky.scrubOrigins.clear();
-            sky.refreshScrubBars();
-        });
+        slide(sky.scrubSlider, -2);
+        eq("on a composite it moves the sky back two days", ANCHOR.minusDays(2), time(sky, "skyRing.time"));
+        eq("and neither person", ANCHOR, time(sky, "natalRing.time"));
+        eq("of the two", personB, time(sky, "outerRing.time"));
         mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
+    }
+
+    /** How many sliders a container holds, however deep. */
+    private static int sliders(java.awt.Container c) {
+        int n = 0;
+        for (Component child : c.getComponents()) {
+            if (child instanceof javax.swing.JSlider) {
+                n++;
+            } else if (child instanceof java.awt.Container) {
+                n += sliders((java.awt.Container) child);
+            }
+        }
+        return n;
     }
 
     /**
@@ -483,7 +478,7 @@ public final class ScrubCheck {
 
         final ZonedDateTime personB = ZonedDateTime.of(1985, 3, 2, 14, 30, 0, 0, ZoneId.of("UTC"));
         mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
-        javax.swing.JSlider bar = sky.scrubSliders.get(SkymapPanel.ScrubTarget.SKY);
+        javax.swing.JSlider bar = sky.scrubSlider;
         final int reach = SkymapPanel.SCRUB_SLIDER_REACH;
 
         final long held = System.nanoTime();
@@ -588,22 +583,6 @@ public final class ScrubCheck {
         eq("a small pull held still is just that many steps", from.plusHours(SkymapPanel.SHUTTLE_DEAD_ZONE),
             time(sky, "skyRing.time"));
 
-        // Chart A's bar runs Chart A's birth, and the sky holds still.
-        mode(sky, ChartMode.SINGLE, true, false, personB, "1 Hour");
-        javax.swing.JSlider a = sky.scrubSliders.get(SkymapPanel.ScrubTarget.CHART_A);
-        SwingUtilities.invokeAndWait(() -> {
-            a.setValueIsAdjusting(true);
-            a.setValue(reach);
-        });
-        Thread.sleep(1000);
-        SwingUtilities.invokeAndWait(() -> a.setValueIsAdjusting(false));
-        long birth = java.time.Duration.between(ANCHOR, time(sky, "natalRing.time")).toHours();
-        ok("Chart A's bar held runs Chart A's birth on: +" + birth + "h", birth > reach);
-        eq("and leaves the sky where it was", ANCHOR, time(sky, "skyRing.time"));
-        SwingUtilities.invokeAndWait(() -> {
-            sky.scrubOrigins.clear();
-            sky.refreshScrubBars();
-        });
         mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
     }
 
@@ -616,7 +595,6 @@ public final class ScrubCheck {
                 set(sky, "innerIsBirthChart", natal);
                 set(sky, "showTransitChart", transits);
                 set(sky, "outerRing.time", personB);
-                sky.scrubOrigins.clear();
                 sky.updateChartData();
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -624,20 +602,8 @@ public final class ScrubCheck {
         });
     }
 
-    /** Which bars are showing, in order. */
-    private static String shown(SkymapPanel sky) {
-        StringBuilder sb = new StringBuilder();
-        for (SkymapPanel.ScrubTarget t : sky.scrubBars.keySet()) {
-            if (sky.scrubBars.get(t).isVisible()) {
-                sb.append(sb.length() == 0 ? "" : " ").append(t.name());
-            }
-        }
-        return sb.toString();
-    }
-
     /** Drags one bar's knob to a value and lets go, as a reader does. */
-    private static void slide(SkymapPanel sky, SkymapPanel.ScrubTarget t, int value) throws Exception {
-        javax.swing.JSlider slider = sky.scrubSliders.get(t);
+    private static void slide(javax.swing.JSlider slider, int value) throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             slider.setValueIsAdjusting(true);
             slider.setValue(value);
