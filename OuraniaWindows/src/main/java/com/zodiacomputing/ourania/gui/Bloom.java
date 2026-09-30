@@ -145,10 +145,7 @@ public final class Bloom {
      * at 0 every item moves together, at 0.5 the last one starts halfway through.
      */
     public static double stagger(double t, int index, int count, double spread) {
-        double offset = (index / (double) Math.max(1, count)) * spread;
-        double span = 1.0 - spread;
-        double local = span <= 0 ? 1.0 : (t - offset) / span;
-        return Math.min(1.0, Math.max(0.0, local));
+        return WheelLayout.stagger(t, index, count, spread);
     }
 
     /** Smooth 0..1 ramp between two edges, for fading a thing in over part of a bloom. */

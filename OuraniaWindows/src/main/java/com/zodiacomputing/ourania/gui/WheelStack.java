@@ -66,7 +66,7 @@ public final class WheelStack {
      * progressed, directed, partner, transits, sky. There is no seventh technique waiting, and
      * a number larger than the order can fill would be a cap that never binds.
      */
-    public static final int MOST_BANDS = 5;
+    public static final int MOST_BANDS = WheelLayout.MOST_BANDS;
 
     /**
      * Every kind that can be an inner wheel. Both belong to the chart being read; one of them

@@ -2,7 +2,6 @@ package com.zodiacomputing.ourania.gui;
 
 import com.zodiacomputing.ourania.astro.Bodies;
 
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -31,6 +30,31 @@ final class WheelLayout {
     private WheelLayout() {
     }
 
+    /** The registry's size and its two lights, asked of the registry rather than the panel. */
+    private static final int BODY_COUNT = Bodies.count();
+    private static final int SUN = Bodies.indexOf("sun");
+    private static final int MOON = Bodies.indexOf("moon");
+
+    /**
+     * The most body bands the wheel will lay out. Here because the layout is what it limits;
+     * {@code WheelStack.MOST_BANDS} names the same number for the stack's own readers.
+     */
+    static final int MOST_BANDS = 5;
+
+    /**
+     * How far one of {@code count} items has come, at time {@code t} of a staggered opening.
+     *
+     * <p>Pure arithmetic, so it lives with the layout that uses it and a phone can open a ring
+     * the same way; {@code Bloom.stagger} is this. Each item starts {@code spread} of the way
+     * later than the one before and takes the rest of the time to arrive.
+     */
+    static double stagger(double t, int index, int count, double spread) {
+        double offset = (index / (double) Math.max(1, count)) * spread;
+        double span = 1.0 - spread;
+        double local = span <= 0 ? 1.0 : (t - offset) / span;
+        return Math.min(1.0, Math.max(0.0, local));
+    }
+
     // ---------------------------------------------------------------- glyph sizes
     //
     // Size carries the same information the rings do, on a second channel: the Sun and
@@ -43,7 +67,7 @@ final class WheelLayout {
     // the font rather than stored, so there is one number to change per tier, not three.
 
     /**
-     * How much of the bloom is spent letting earlier bodies lead. See Bloom.stagger.
+     * How much of the bloom is spent letting earlier bodies lead. See {@link #stagger}.
      *
      * At 0.45 the last body starts a little under halfway through, so the ring reads as
      * unfurling rather than as one object sliding outward.
@@ -71,7 +95,7 @@ final class WheelLayout {
         }
         int[] out = new int[settled.length];
         for (int i = 0; i < settled.length; i++) {
-            double p = Bloom.stagger(v, i, settled.length, RING_SPREAD);
+            double p = WheelLayout.stagger(v, i, settled.length, RING_SPREAD);
             out[i] = (int) Math.round(inner + (settled[i] - inner) * p);
         }
         return out;
@@ -86,13 +110,18 @@ final class WheelLayout {
     static final int TIER_SMALL = 3;
     static final class GlyphSize {
         final int radius;
-        final Font font;
+        /**
+         * The glyph's point size. A number rather than a {@code java.awt.Font}, so this table
+         * is the same on the phone, which has no AWT; each screen makes its own font from it
+         * ({@code WheelCanvas.glyphFont} on the desktop).
+         */
+        final int fontPoints;
         /** Distance below centre to sit the glyph baseline so it looks centred. */
         final int baseline;
 
         GlyphSize(int radius, int fontPoints) {
             this.radius = radius;
-            this.font = new Font("SansSerif", 0, fontPoints);
+            this.fontPoints = fontPoints;
             this.baseline = Math.round((float)fontPoints * 0.25f);
         }
     }
@@ -129,7 +158,7 @@ final class WheelLayout {
         if (def.isAngle()) {
             return -1;
         }
-        if (n == SkymapPanel.SUN || n == SkymapPanel.MOON) {
+        if (n == SUN || n == MOON) {
             return TIER_LIGHT;
         }
         switch (def.group) {
@@ -275,7 +304,7 @@ final class WheelLayout {
     static int maxBodyBands(int outer) {
         int room = outer - WheelLayout.zodiacDepth() - WheelLayout.minNatalRadius();
         int most = 0;
-        for (int n = 1; n <= WheelStack.MOST_BANDS; n++) {
+        for (int n = 1; n <= MOST_BANDS; n++) {
             // <b>Stops at the first count that does not fit rather than taking the largest
             // that does</b>, and the difference is not pedantry. Band depth is integer
             // division, which throws away up to n-1 pixels per band, and MIN_BAND_DEPTH
@@ -370,8 +399,8 @@ final class WheelLayout {
         int[] levels = WheelLayout.radialLevels(lon, WheelLayout.restrict(valid, true),
             mid, angleStep, spacing);
 
-        int[] out = new int[SkymapPanel.BODY_COUNT];
-        for (int i = 0; i < SkymapPanel.BODY_COUNT; i++) {
+        int[] out = new int[BODY_COUNT];
+        for (int i = 0; i < BODY_COUNT; i++) {
             out[i] = Bodies.at(i).isAngle()
                 ? (int) Math.max(mid - (double) levels[i] * angleStep, floor)
                 : bodies[i];
@@ -688,8 +717,8 @@ final class WheelLayout {
             nArray[i] = WheelLayout.radialLevels(dArray, WheelLayout.restrictToRing(blArray, i),
                 base - (double)i * gap, step, spacing);
         }
-        int[] nArray2 = new int[SkymapPanel.BODY_COUNT];
-        for (int i = 0; i < SkymapPanel.BODY_COUNT; ++i) {
+        int[] nArray2 = new int[BODY_COUNT];
+        for (int i = 0; i < BODY_COUNT; ++i) {
             int n = WheelLayout.ringOf(i);
             if (n < 0) {
                 continue;                       // an angle; the caller fills these in

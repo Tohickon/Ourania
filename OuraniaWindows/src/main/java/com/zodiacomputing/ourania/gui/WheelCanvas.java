@@ -84,6 +84,13 @@ final class WheelCanvas extends JPanel {
     /** The chart this canvas draws, and everything it may read about it. */
     private final WheelSource panel;
 
+    /** A glyph size's font, made once per point size. {@link WheelLayout.GlyphSize} holds the number. */
+    private static final java.util.Map<Integer, Font> GLYPH_FONTS = new java.util.HashMap<>();
+
+    static Font glyphFont(WheelLayout.GlyphSize size) {
+        return GLYPH_FONTS.computeIfAbsent(size.fontPoints, p -> new Font("SansSerif", 0, p));
+    }
+
     WheelCanvas(WheelSource panel) {
         this.panel = panel;
     }
@@ -544,7 +551,7 @@ final class WheelCanvas extends JPanel {
                     (float) panel.glyphWeight(n7, false)));
             }
             WheelLayout.GlyphSize glyphSize = WheelLayout.natalSize(n7);
-            graphics2D.setFont(glyphSize.font);
+            graphics2D.setFont(glyphFont(glyphSize));
             WheelShapes.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
                 new Color(192, 192, 192), Settings.natalMarker());
             if (n7 == SkymapPanel.MOON && panel.natalRing().valid[SkymapPanel.SUN]) {
@@ -555,7 +562,7 @@ final class WheelCanvas extends JPanel {
                 WheelShapes.drawMoonPhase(graphics2D, n4, n26, Math.round((float)glyphSize.radius * 0.47f), d11 / 360.0);
             } else {
                 graphics2D.setColor(panel.bodyColor(n7));
-                object = SkymapPanel.glyphFor(n7, glyphSize.font);
+                object = SkymapPanel.glyphFor(n7, glyphFont(glyphSize));
                 WheelShapes.drawBodyLabel(graphics2D, (String)object, n4, n26, glyphSize.baseline);
             }
             graphics2D.setTransform(bodyTx);
@@ -625,7 +632,7 @@ final class WheelCanvas extends JPanel {
                     continue;
                 }
                 WheelLayout.GlyphSize glyphSize2 = WheelLayout.transitSize(n7);
-                graphics2D.setFont(glyphSize2.font);
+                graphics2D.setFont(glyphFont(glyphSize2));
                 object = panel.ringInk(n7, outerRole);
                 WheelShapes.drawBodyMarker(graphics2D, n4, n27, glyphSize2.radius,
                     SkymapPanel.ringBead(outerRole),
@@ -639,7 +646,7 @@ final class WheelCanvas extends JPanel {
                     continue;
                 }
                 graphics2D.setColor((Color)object);
-                String string = SkymapPanel.glyphFor(n7, glyphSize2.font);
+                String string = SkymapPanel.glyphFor(n7, glyphFont(glyphSize2));
                 WheelShapes.drawBodyLabel(graphics2D, string, n4, n27, glyphSize2.baseline);
             }
             graphics2D.setComposite(outerWas);
@@ -678,7 +685,7 @@ final class WheelCanvas extends JPanel {
                     continue;
                 }
                 WheelLayout.GlyphSize glyphSize3 = WheelLayout.transitSize(n7);
-                graphics2D.setFont(glyphSize3.font);
+                graphics2D.setFont(glyphFont(glyphSize3));
                 Color cColor = panel.ringInk(n7, SkymapPanel.AngleRole.SKY);
                 WheelShapes.drawBodyMarker(graphics2D, n4, n28, glyphSize3.radius,
                     SkymapPanel.ringBead(SkymapPanel.AngleRole.SKY), Settings.transitMarker());
@@ -689,7 +696,7 @@ final class WheelCanvas extends JPanel {
                     continue;
                 }
                 graphics2D.setColor(cColor);
-                String stringC = SkymapPanel.glyphFor(n7, glyphSize3.font);
+                String stringC = SkymapPanel.glyphFor(n7, glyphFont(glyphSize3));
                 WheelShapes.drawBodyLabel(graphics2D, stringC, n4, n28, glyphSize3.baseline);
             }
             graphics2D.setComposite(triWas);
