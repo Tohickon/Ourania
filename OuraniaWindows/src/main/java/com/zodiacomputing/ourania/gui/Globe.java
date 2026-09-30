@@ -22,7 +22,7 @@ package com.zodiacomputing.ourania.gui;
  * be asserted without painting anything - which is the only way the painter and the hit test
  * will be able to agree about where a body is, the same way Geometry does for the flat wheel.
  */
-final class Globe {
+public final class Globe {
 
     /**
      * Shell radii, in world units, innermost first.
@@ -33,7 +33,7 @@ final class Globe {
      * they were arrived at by looking; keeping them means the two views agree about what is
      * near and what is far.
      */
-    static final double SHELL_CORE = 0.90;
+    public static final double SHELL_CORE = 0.90;
     /**
      * The obliquity of the ecliptic, in radians - and the reason the ribbons sit where they do.
      *
@@ -46,7 +46,7 @@ final class Globe {
      * {@code 1.75 * sin(23.44) = 0.696}, and on the 1.92 house shell at 0.764. The tuned
      * number and the astronomical one are the same number, so the astronomical one is used.
      */
-    static final double OBLIQUITY = Math.toRadians(23.4392911);
+    public static final double OBLIQUITY = Math.toRadians(23.4392911);
 
     /**
      * The one shell all three chart ribbons ride, just inside the houses.
@@ -58,10 +58,10 @@ final class Globe {
      * beneath the sky fell below it. On one shell the radius term is identical for all three
      * and the latitude alone decides, which is what makes a bloom a bloom.
      */
-    static final double SHELL_CHART = 1.75;
+    public static final double SHELL_CHART = 1.75;
 
-    static final double SHELL_NATAL = SHELL_CHART;
-    static final double SHELL_PARTNER = SHELL_CHART;
+    public static final double SHELL_NATAL = SHELL_CHART;
+    public static final double SHELL_PARTNER = SHELL_CHART;
     /**
      * The sky ring, now inside the zodiac rather than outside it.
      *
@@ -70,15 +70,15 @@ final class Globe {
      * is in - which is the one thing the zodiac is for. Every body ring is inside the plane
      * now: natal, partner and sky, in that order, with the zodiac wrapped around all three.
      */
-    static final double SHELL_SKY = SHELL_CHART;
-    static final double SHELL_HOUSE = 1.92;
+    public static final double SHELL_SKY = SHELL_CHART;
+    public static final double SHELL_HOUSE = 1.92;
     /** Egyptian bounds, just inside the signs - the flat wheel's order, kept. */
-    static final double SHELL_BOUND = 1.99;
-    static final double SHELL_SIGN_INNER = 2.08;
-    static final double SHELL_SIGN_OUTER = 2.30;
+    public static final double SHELL_BOUND = 1.99;
+    public static final double SHELL_SIGN_INNER = 2.08;
+    public static final double SHELL_SIGN_OUTER = 2.30;
     /** Decans, just outside the signs, as on the flat wheel. */
-    static final double SHELL_DECAN = 2.38;
-    static final double SHELL_TICK = 2.42;
+    public static final double SHELL_DECAN = 2.38;
+    public static final double SHELL_TICK = 2.42;
 
     /**
      * How far a hovered degree tick stands out of the scale.
@@ -88,7 +88,7 @@ final class Globe {
      * could still hold. At 0.21 the lit tick is still the longest on the scale - a sign
      * boundary reaches 0.20 - and it stops a hair short of the band rather than crossing it.
      */
-    static final double TICK_HOVER_REACH = 0.21;
+    public static final double TICK_HOVER_REACH = 0.21;
 
     /**
      * The lunar mansion band, outside everything else.
@@ -102,10 +102,10 @@ final class Globe {
      * The inner edge clears the degree scale: the ticks start at SHELL_SIGN_OUTER + 0.03 and
      * the longest of them reaches TICK_HOVER_REACH beyond that, which is 2.54.
      */
-    static final double SHELL_MANSION_INNER = 2.55;
+    public static final double SHELL_MANSION_INNER = 2.55;
 
     /** The outside of that band. */
-    static final double SHELL_MANSION_OUTER = 2.70;
+    public static final double SHELL_MANSION_OUTER = 2.70;
 
     /**
      * How far above and below the equator a filled shell reaches, in radians of latitude.
@@ -118,10 +118,10 @@ final class Globe {
      * left the globe with a hole at each end, which read as unfinished rather than as
      * restraint.
      */
-    static final double FILL_SPAN = Math.PI / 2;
+    public static final double FILL_SPAN = Math.PI / 2;
 
     /** How far up the shell one collision level lifts a body. */
-    static final double STACK_STEP = 0.085;
+    public static final double STACK_STEP = 0.085;
 
     /**
      * How far the partner and sky rings are tilted out of the natal plane, in radians.
@@ -136,8 +136,8 @@ final class Globe {
      * At zero this is the old behaviour exactly, which is what lets the flat wheel and the
      * natal ring go on agreeing.
      */
-    static final double INCLINE_PARTNER = 0.48;
-    static final double INCLINE_SKY = -0.48;
+    public static final double INCLINE_PARTNER = 0.48;
+    public static final double INCLINE_SKY = -0.48;
 
     /**
      * How far apart the three decks sit, as a share of the ribbon's own radius.
@@ -153,7 +153,7 @@ final class Globe {
      * parallel rings are drawn, which was never a question about the sky: the rings are not
      * the ecliptic and the equator, they are three charts that have to be told apart.
      */
-    static final double LIFT_FRACTION = 0.60;
+    public static final double LIFT_FRACTION = 0.60;
 
     /**
      * How far the upper deck sits above the middle one, when the decks are stacked rather
@@ -187,7 +187,7 @@ final class Globe {
      * difference from his prototype that did not exist. A constant that names its contents is
      * wrong the moment the contents move; one that names its place cannot go stale.
      */
-    static final double LIFT_UPPER = SHELL_CHART * Math.min(LIFT_FRACTION, 1.0);
+    public static final double LIFT_UPPER = SHELL_CHART * Math.min(LIFT_FRACTION, 1.0);
 
     /** The lower deck, the same distance under the middle as the upper one is over it.
      *
@@ -197,21 +197,21 @@ final class Globe {
      * the old value. That cost a measurement run on 2026-09-21: three deck lifts were rendered
      * and produced three identical sets of numbers. Derived from {@link #OBLIQUITY} through a
      * method call, it cannot be folded, so every reader sees the same number as this file. */
-    static final double LIFT_LOWER = -LIFT_UPPER;
+    public static final double LIFT_LOWER = -LIFT_UPPER;
 
     /** Half-height of a meridian arc, in radians of latitude. Matches the prototype's 0.92. */
-    static final double MERIDIAN_SPAN = 0.92;
+    public static final double MERIDIAN_SPAN = 0.92;
 
     /** A point projected to the panel, with the depth that decides what covers what. */
-    static final class Projected {
-        final double x;
-        final double y;
+    public static final class Projected {
+        public final double x;
+        public final double y;
         /** Distance from the camera. Larger is further away, so paint larger first. */
-        final double depth;
+        public final double depth;
         /** False when the point is behind the camera and must not be drawn at all. */
-        final boolean visible;
+        public final boolean visible;
 
-        Projected(double x, double y, double depth, boolean visible) {
+        public Projected(double x, double y, double depth, boolean visible) {
             this.x = x;
             this.y = y;
             this.depth = depth;
@@ -220,11 +220,11 @@ final class Globe {
     }
 
     /** Rotation about the vertical axis, radians. The reader drags this. */
-    double yaw;
+    public double yaw;
     /** Tilt toward the reader, radians. Clamped so the globe never turns inside out. */
-    double pitch;
+    public double pitch;
     /** Camera distance in world units. The reader scrolls this. */
-    double distance = 5.6;
+    public double distance = 5.6;
 
     /**
      * Focal length as a multiple of the panel's smaller side.
@@ -264,7 +264,7 @@ final class Globe {
      * reference: MIN_PITCH is declared below, and reordering two constants to satisfy the
      * compiler would put them in an order that reads worse than it computes.
      */
-    static final double MAX_PITCH = Math.PI / 2;
+    public static final double MAX_PITCH = Math.PI / 2;
 
     /**
      * How near edge-on the camera may come, on either side of the chart's plane.
@@ -287,9 +287,9 @@ final class Globe {
      * rests in: about three degrees, because edge-on the whole plane collapses to a line and the
      * direction of the houses is not visible at all.
      */
-    static final double MIN_PITCH = 0.01;
+    public static final double MIN_PITCH = 0.01;
 
-    Globe() {
+    public Globe() {
         this.yaw = 0.0;
         // <b>Nearly edge-on, at about eighteen degrees.</b> This was fifty for a while, on
         // the reasoning that a low angle made the shells project to ellipses flat enough that
@@ -326,7 +326,7 @@ final class Globe {
      * dead. David, 2026-09-23, on the prototype: "i wanted it to move and tilt and spin and
      * bloom and zoom like this".
      */
-    static final double DAMPING = 0.05;
+    public static final double DAMPING = 0.05;
 
     /** Below this a pending move is over, and is zeroed so it cannot drift. */
     private static final double SETTLED = 1e-5;
@@ -343,9 +343,9 @@ final class Globe {
     private double pendingPanZ;
 
     /** The point the camera looks at and turns about. Panning moves this, not the camera. */
-    double targetX;
-    double targetY;
-    double targetZ;
+    public double targetX;
+    public double targetY;
+    public double targetZ;
 
     /** How far the target may be dragged from the middle before it stops. */
     private static final double PAN_REACH = SHELL_MANSION_OUTER;
@@ -364,7 +364,7 @@ final class Globe {
      * {@link #project}. Reversing it below would be the same discontinuity in the hand that the
      * flip was in the picture.
      */
-    void drag(double dx, double dy, int panelHeight) {
+    public void drag(double dx, double dy, int panelHeight) {
         int h = Math.max(1, panelHeight);
         this.pendingYaw += (dx / h) * Math.PI * 2.0;
         this.pendingPitch += (dy / h) * Math.PI * 2.0;
@@ -385,7 +385,7 @@ final class Globe {
      * {@code (cos yaw, 0, sin yaw)} and camera up is
      * {@code (sin pitch sin yaw, cos pitch, -sin pitch cos yaw)}.
      */
-    void pan(double dx, double dy, int panelWidth, int panelHeight) {
+    public void pan(double dx, double dy, int panelWidth, int panelHeight) {
         double focal = Math.max(1.0, Math.min(panelWidth, panelHeight) * ZOOM);
         double k = this.distance / focal;
         double cy = Math.cos(this.yaw);
@@ -403,7 +403,7 @@ final class Globe {
      *
      * The caller runs this on a timer and repaints while it answers true; see SkymapPanel.
      */
-    boolean settle() {
+    public boolean settle() {
         boolean moving = false;
         if (Math.abs(this.pendingYaw) > SETTLED) {
             this.yaw += this.pendingYaw * DAMPING;
@@ -438,14 +438,14 @@ final class Globe {
     }
 
     /** True while the glide is still running, which is what "the globe is moving" means. */
-    boolean coasting() {
+    public boolean coasting() {
         return Math.abs(this.pendingYaw) > SETTLED || Math.abs(this.pendingPitch) > SETTLED
             || Math.abs(this.pendingPanX) > SETTLED || Math.abs(this.pendingPanY) > SETTLED
             || Math.abs(this.pendingPanZ) > SETTLED;
     }
 
     /** Runs the glide to a standstill. For measurement, where there are no frames. */
-    void settleFully() {
+    public void settleFully() {
         for (int i = 0; i < 10000 && settle(); i++) {
             continue;
         }
@@ -461,7 +461,7 @@ final class Globe {
      * was already moving - one continuous motion from above the chart to below it, pausing
      * nowhere.
      */
-    static double clampPitch(double pitch, double step) {
+    public static double clampPitch(double pitch, double step) {
         // <b>Pole to pole, with nothing excluded in between.</b> David, pointing at his own
         // prototype: "i can go full tilt from south pole to north pole on that site." So the
         // camera walks the whole meridian - down on the north pole, through edge-on, up at the
@@ -490,7 +490,7 @@ final class Globe {
      * reads correctly from above - see {@link #onShell}. The projection is unchanged; what
      * changed is which side the right-way-round view is on.
      */
-    boolean fromBelow() {
+    public boolean fromBelow() {
         return this.pitch > 0.0;
     }
 
@@ -510,7 +510,7 @@ final class Globe {
      * The wheel reports positive when it is rolled away, which should move the camera back, so
      * the exponent is negated - a notch out is 1/0.95, about five and a quarter percent.
      */
-    void zoom(double ticks) {
+    public void zoom(double ticks) {
         this.distance = clamp(this.distance * Math.pow(ZOOM_STEP, -ticks), 3.2, 12.0);
     }
 
@@ -522,7 +522,7 @@ final class Globe {
      * - the classic gimbal complaint, and the reason this is one method rather than a matrix
      * assembled at each call site.
      */
-    Projected project(double worldX, double worldY, double worldZ, int width, int height) {
+    public Projected project(double worldX, double worldY, double worldZ, int width, int height) {
         // <b>Everything is measured from the target, not from the middle of the world.</b>
         // Panning moves the target; the camera keeps looking at it and keeps turning about it,
         // so a globe dragged into the corner spins about the point under the cursor rather than
@@ -583,7 +583,7 @@ final class Globe {
      * @param radius the shell
      * @param y      height above the shell's equator, for stacked bodies
      */
-    static double[] onShell(double lon, double origin, double radius, double y) {
+    public static double[] onShell(double lon, double origin, double radius, double y) {
         return onShell(lon, origin, radius, y, 0.0);
     }
 
@@ -595,7 +595,7 @@ final class Globe {
      * tilted ring still crosses the horizontal one where the reader is looking to orient
      * themselves, and only the quarters in between rise and fall.
      */
-    static double[] onShell(double lon, double origin, double radius, double y,
+    public static double[] onShell(double lon, double origin, double radius, double y,
                             double inclination) {
         double t = Math.toRadians(lon - origin);
         // The equatorial radius shrinks as a body rides up the shell, so a stacked body stays
@@ -623,12 +623,12 @@ final class Globe {
     }
 
     /** The full circle of a shell's equator, as world points. */
-    static double[][] equator(double origin, double radius, int segments) {
+    public static double[][] equator(double origin, double radius, int segments) {
         return equator(origin, radius, segments, 0.0);
     }
 
     /** As above, on a ring tilted out of the horizontal. */
-    static double[][] equator(double origin, double radius, int segments, double inclination) {
+    public static double[][] equator(double origin, double radius, int segments, double inclination) {
         int n = Math.max(3, segments);
         double[][] pts = new double[n + 1][];
         for (int i = 0; i <= n; i++) {
@@ -643,7 +643,7 @@ final class Globe {
      * Stops short of the poles: a full meridian converges with every other one at two points,
      * and a dozen of them meeting reads as a knot rather than as a sphere.
      */
-    static double[][] meridian(double lon, double origin, double radius, int segments) {
+    public static double[][] meridian(double lon, double origin, double radius, int segments) {
         return meridian(lon, origin, radius, segments, MERIDIAN_SPAN);
     }
 
@@ -655,7 +655,7 @@ final class Globe {
      * PI/2 and meet at the poles the way they actually do. A wireframe meridian is there to
      * suggest a surface, and a dozen of those converging is a knot.
      */
-    static double[][] meridian(double lon, double origin, double radius, int segments,
+    public static double[][] meridian(double lon, double origin, double radius, int segments,
                                double span) {
         int n = Math.max(2, segments);
         double t = Math.toRadians(lon - origin);
@@ -683,7 +683,7 @@ final class Globe {
      * bodies. Lowering this flattens them back toward chords; raising it puts arcs through the
      * rings outside them.
      */
-    static final double ARC_RISE = 1.0;
+    public static final double ARC_RISE = 1.0;
 
     /**
      * An aspect as an arc over the middle, rather than a chord through it.
@@ -714,7 +714,7 @@ final class Globe {
      * @param segments how many straight pieces stand in for the curve
      * @return segments + 1 world points, starting at a and ending at b
      */
-    static double[][] arc(double[] a, double[] b, int segments) {
+    public static double[][] arc(double[] a, double[] b, int segments) {
         return arc(a, b, segments, ARC_RISE);
     }
 
@@ -726,7 +726,7 @@ final class Globe {
      * sorts and steps by different arithmetic than the curved one - which is this project's
      * most common defect wearing a new hat. At a rise of zero this returns the chord exactly.
      */
-    static double[][] arc(double[] a, double[] b, int segments, double rise) {
+    public static double[][] arc(double[] a, double[] b, int segments, double rise) {
         int n = Math.max(1, segments);
         double[] lift = arcLift(a, b, rise);
         double[][] pts = new double[n + 1][];
@@ -750,7 +750,7 @@ final class Globe {
      * Separate from {@link #arc} because the painter sizes its curve from the height and the
      * check suite asserts the height, and neither wants the whole polyline to get one number.
      */
-    static double[] arcLift(double[] a, double[] b) {
+    public static double[] arcLift(double[] a, double[] b) {
         return arcLift(a, b, ARC_RISE);
     }
 
@@ -776,7 +776,7 @@ final class Globe {
      * @param shell how far out the middle of the span rides - the crown it combs over
      * @param sign  +1 to comb over the top, -1 under the chin, from the deck's own rule
      */
-    static double[][] arcOverShell(double[] a, double[] b, int segments, double shell,
+    public static double[][] arcOverShell(double[] a, double[] b, int segments, double shell,
                                    double sign) {
         int n = Math.max(1, segments);
         double[] dir = arcLift(a, b, 1.0);
@@ -833,7 +833,7 @@ final class Globe {
      *
      * @return 0 when the shell is inside the chord's own midpoint, where no bow reaches it
      */
-    static double riseToShell(double[] a, double[] b, double shell) {
+    public static double riseToShell(double[] a, double[] b, double shell) {
         double dx = b[0] - a[0];
         double dy = b[1] - a[1];
         double dz = b[2] - a[2];
@@ -853,7 +853,7 @@ final class Globe {
     }
 
     /** As above, over a chosen rise. */
-    static double[] arcLift(double[] a, double[] b, double rise) {
+    public static double[] arcLift(double[] a, double[] b, double rise) {
         double dx = b[0] - a[0];
         double dy = b[1] - a[1];
         double dz = b[2] - a[2];
@@ -892,7 +892,7 @@ final class Globe {
      *
      * @param minDeg how close two longitudes must be before the later one steps up
      */
-    static int[] stackLevels(double[] lon, boolean[] valid, double minDeg) {
+    public static int[] stackLevels(double[] lon, boolean[] valid, double minDeg) {
         int n = lon.length;
         int[] level = new int[n];
         Integer[] order = new Integer[n];
@@ -946,7 +946,7 @@ final class Globe {
      * @return vertex indices bounding each run: always starts at 0 and ends at mid.length, so
      *         neighbouring runs share their boundary vertex and leave no gap between them
      */
-    static int[] bandRuns(double[] mid, double limit, double[] edgeA, double[] edgeB) {
+    public static int[] bandRuns(double[] mid, double limit, double[] edgeA, double[] edgeB) {
         int n = mid.length;
         if (n == 0) {
             return new int[] {0};
@@ -991,7 +991,7 @@ final class Globe {
     }
 
     /** Shortest angular distance between two longitudes, 0 to 180. */
-    static double separation(double a, double b) {
+    public static double separation(double a, double b) {
         double d = Math.abs(norm(a) - norm(b)) % 360.0;
         return d > 180.0 ? 360.0 - d : d;
     }

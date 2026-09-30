@@ -41,12 +41,13 @@ public final class EngineIsolationCheck {
      * The desktop-package classes the engine may use. Each is itself clean - Part B holds
      * them to the same rule - and each is here because an engine source or the reading
      * needs it: settings and the chart book, the interpretation corpus and its loader, the
-     * error log, the synthesized reading, the offline atlas the phone's place search reads (M3), and the wheel's layout, which
-     * the phone's wheel draws from (M4).
+     * error log, the synthesized reading, the offline atlas the phone's place search reads (M3), the wheel's layout, which
+     * the phone's wheel draws from (M4), and the globe's camera and projection, which the phone's
+     * globe turns and projects with (M11).
      */
     static final Set<String> SHARED = new TreeSet<>(List.of(
         "Settings", "SavedCharts", "InterpretationService", "ErrorLog", "Json",
-        "NarrativeSynthesizer", "Atlas", "WheelLayout"));
+        "NarrativeSynthesizer", "Atlas", "WheelLayout", "Globe"));
 
     /** The Java level Android builds accept. */
     static final String RELEASE = "17";
