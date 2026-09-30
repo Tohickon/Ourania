@@ -2973,7 +2973,7 @@ implements WheelSource {
             String string = serializable.getProperty("home.location");
             this.baseLocationName = string != null ? string : serializable.getProperty("default.base.location", "Los Angeles, CA");
             this.transitLocationName = string != null ? string : serializable.getProperty("default.transit.location", "Los Angeles, CA");
-            this.currentHouseSystemName = serializable.getProperty("default.house.system",
+            this.currentHouseSystemName = serializable.getProperty(Settings.HOUSE_SYSTEM_KEY,
                 com.zodiacomputing.ourania.astro.HouseSystems.DEFAULT_NAME);
             // <b>A name this build does not know falls back rather than throwing.</b> It can come
             // from a hand-edited settings file, or one written by a later version of this app;
@@ -4418,7 +4418,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // break, which was harmless only because it happened to be written last - a new
             // system added after it would have fallen through and cast the wrong houses.
             this.houseSystem = com.zodiacomputing.ourania.astro.HouseSystems.codeFor(string);
-            Settings.set("default.house.system", string);
+            Settings.setHouseSystem(string);
             this.updateChartData();
             this.chartPanel.repaint();
             // Placidus can fail where Whole Sign cannot, so the notice is a fact about this choice.

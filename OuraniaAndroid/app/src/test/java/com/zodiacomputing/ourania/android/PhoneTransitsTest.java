@@ -46,7 +46,7 @@ public class PhoneTransitsTest {
         ZonedDateTime when = ZonedDateTime.parse("2026-09-30T12:00:00+10:00[Australia/Sydney]");
         PhoneTransits.Sky sky = PhoneTransits.at(sw(), natal, when);
         ChartFrame direct = ChartFrame.compute(sw(), Moments.sweDate(when).getJulDay(),
-            natal.place.latitude, natal.place.longitude, PhoneChart.HOUSE_SYSTEM, false, 0.0);
+            natal.place.latitude, natal.place.longitude, PhoneChart.houseSystem(), false, 0.0);
         for (int i = 0; i < PhoneChart.PLANETS; i++) {
             assertEquals(direct.bodies[i].name, direct.bodies[i].lon, sky.frame.bodies[i].lon,
                 1e-9);

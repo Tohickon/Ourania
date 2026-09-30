@@ -24,6 +24,7 @@ import com.zodiacomputing.ourania.astro.DataFiles;
 import com.zodiacomputing.ourania.astro.Ephemeris;
 import com.zodiacomputing.ourania.gui.Atlas;
 import com.zodiacomputing.ourania.gui.InterpretationService;
+import com.zodiacomputing.ourania.gui.Settings;
 
 import de.thmac.swisseph.SwissEph;
 
@@ -96,6 +97,9 @@ public final class MainActivity extends Activity {
         System.setProperty(AppPaths.DATA_PROPERTY, home);
         System.setProperty(Ephemeris.PROPERTY, ephe.getPath());
         DataFiles.use(new Assets(getAssets()));
+        // The reader's zodiac, orbs and the rest into the engine before anything is cast (M9) -
+        // the list the desktop's window applies at startup.
+        Settings.applyToEngine();
 
         LinearLayout form = new LinearLayout(this);
         form.setOrientation(LinearLayout.VERTICAL);
@@ -114,6 +118,10 @@ public final class MainActivity extends Activity {
         book.setText("Chart book");
         book.setOnClickListener(v -> this.showBook());
         top.addView(book);
+        Button settings = new Button(this);
+        settings.setText("Settings");
+        settings.setOnClickListener(v -> this.showSettings());
+        top.addView(settings);
         form.addView(top);
 
         this.dateField = field("Birth date - tap to choose");
@@ -327,6 +335,127 @@ public final class MainActivity extends Activity {
                 this.cast.setEnabled(true);
             });
         }).start();
+    }
+
+    /**
+     * The settings (M9): house system, zodiac, transit orb, each planet's orb and the aspects
+     * drawn. Saved through {@link PhoneSettings}; the chart on screen is cast again with them.
+     */
+    private void showSettings() {
+        final PhoneSettings.Values v = PhoneSettings.read();
+        LinearLayout f = new LinearLayout(this);
+        f.setOrientation(LinearLayout.VERTICAL);
+        f.setPadding(48, 16, 48, 16);
+
+        f.addView(label("House system"));
+        final android.widget.Spinner houses = spinner(PhoneSettings.houseSystems(), v.houseSystem);
+        f.addView(houses);
+        f.addView(label("Zodiac"));
+        final android.widget.Spinner zodiac = spinner(PhoneSettings.zodiacs(), v.zodiac);
+        f.addView(zodiac);
+
+        f.addView(label("Transit orb, in degrees (how close a transit must be to count)"));
+        final android.widget.EditText transitOrb = number(v.transitOrb);
+        f.addView(transitOrb);
+
+        f.addView(label("Orb of each planet in the birth chart, in degrees"));
+        final android.widget.EditText[] orbs = new android.widget.EditText[v.orbs.length];
+        for (int i = 0; i < orbs.length; i++) {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            TextView name = new TextView(this);
+            name.setText(PhoneSettings.planet(i));
+            name.setTextSize(16f);
+            row.addView(name, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            orbs[i] = number(v.orbs[i]);
+            row.addView(orbs[i], new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            f.addView(row);
+        }
+
+        f.addView(label("Aspects drawn on the wheel and read for each planet"));
+        final CheckBox[] aspects = new CheckBox[com.zodiacomputing.ourania.astro.Aspects.Type
+            .values().length];
+        for (com.zodiacomputing.ourania.astro.Aspects.Type t
+                : com.zodiacomputing.ourania.astro.Aspects.Type.values()) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(t.label);
+            cb.setChecked(t.ordinal() < v.aspects.length && v.aspects[t.ordinal()]);
+            aspects[t.ordinal()] = cb;
+            f.addView(cb);
+        }
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(f);
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Settings")
+            .setView(scroll)
+            .setPositiveButton("Save", (d, w) -> {
+                v.houseSystem = (String) houses.getSelectedItem();
+                v.zodiac = (String) zodiac.getSelectedItem();
+                v.transitOrb = parse(transitOrb, v.transitOrb);
+                for (int i = 0; i < orbs.length; i++) {
+                    v.orbs[i] = parse(orbs[i], v.orbs[i]);
+                }
+                boolean[] on = new boolean[aspects.length];
+                for (int i = 0; i < on.length; i++) {
+                    on[i] = aspects[i].isChecked();
+                }
+                v.aspects = on;
+                PhoneSettings.save(v);
+                this.settingsChanged("Saved.");
+            })
+            .setNeutralButton("Reset all", (d, w) -> new android.app.AlertDialog.Builder(this)
+                .setMessage("Put every setting on this screen back to its default?")
+                .setPositiveButton("Reset", (d2, w2) -> {
+                    PhoneSettings.reset();
+                    this.settingsChanged("Settings reset.");
+                })
+                .setNegativeButton("Cancel", null)
+                .show())
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    /** Casts the chart on screen again, so a new house system or orb shows at once. */
+    private void settingsChanged(String message) {
+        toast(message);
+        this.scannedSky = null;
+        if (this.shownCast != null && this.date != null && this.place != null) {
+            this.castChart();
+        }
+    }
+
+    private android.widget.Spinner spinner(String[] items, String selected) {
+        android.widget.Spinner sp = new android.widget.Spinner(this);
+        android.widget.ArrayAdapter<String> a = new android.widget.ArrayAdapter<>(this,
+            android.R.layout.simple_spinner_item, items);
+        a.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp.setAdapter(a);
+        for (int i = 0; i < items.length; i++) {
+            if (items[i].equals(selected)) {
+                sp.setSelection(i);
+            }
+        }
+        return sp;
+    }
+
+    private android.widget.EditText number(double value) {
+        android.widget.EditText e = new android.widget.EditText(this);
+        e.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        e.setText(String.format(java.util.Locale.ROOT, "%.2f", value).replaceAll("0+$", "")
+            .replaceAll("\\.$", ""));
+        return e;
+    }
+
+    /** A typed number, or the old value when the box does not hold one. */
+    private static double parse(android.widget.EditText e, double fallback) {
+        try {
+            return Double.parseDouble(e.getText().toString().trim().replace(',', '.'));
+        } catch (NumberFormatException notANumber) {
+            return fallback;
+        }
     }
 
     /** Names the shown chart and saves it into the book, asking before replacing one. */

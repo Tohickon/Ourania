@@ -7,6 +7,7 @@ import com.zodiacomputing.ourania.astro.PlainText;
 import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.gui.Atlas;
 import com.zodiacomputing.ourania.gui.InterpretationService;
+import com.zodiacomputing.ourania.gui.Settings;
 
 import de.thmac.swisseph.SwissEph;
 
@@ -36,8 +37,13 @@ final class PhoneChart {
 
     private PhoneChart() { }
 
-    /** Placidus, the desktop's default, until the phone has settings of its own. */
-    static final char HOUSE_SYSTEM = 'P';
+    /**
+     * The reader's house system, from the settings file both apps read (M9) - Placidus, the
+     * desktop's default, until one is chosen.
+     */
+    static char houseSystem() {
+        return Settings.houseSystem();
+    }
 
     /** How many of the registry's points the list shows: the ten planets. */
     static final int PLANETS = 10;
@@ -69,9 +75,9 @@ final class PhoneChart {
         double jd = Moments.sweDate(r.when).getJulDay();
         ChartFrame f = unknown
             ? ChartFrame.computeTimeUnknown(sw, jd, place.latitude, place.longitude,
-                HOUSE_SYSTEM, false, 0.0)
+                houseSystem(), false, 0.0)
             : ChartFrame.compute(sw, jd, place.latitude, place.longitude,
-                HOUSE_SYSTEM, false, 0.0);
+                houseSystem(), false, 0.0);
         return new Cast(f, r, place, unknown);
     }
 

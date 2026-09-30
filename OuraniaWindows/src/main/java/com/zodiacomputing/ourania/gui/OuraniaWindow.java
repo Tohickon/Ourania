@@ -147,15 +147,9 @@ public class OuraniaWindow extends JFrame {
     }
 
     public OuraniaWindow() {
-        // Before anything casts a chart: the zodiac is read by every ephemeris call.
-        com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(Settings.zodiac());
-        // And the transit orb, read by every transit list, search and calendar.
-        com.zodiacomputing.ourania.astro.Transits.orb = Settings.transitOrb();
-        // H1: the reader's natal orbs, pushed the same way and for the same reason.
-        Settings.applyBodyOrbs();
-        Settings.applyAspectCaps();
-        // And the rule that progresses the angles.
-        com.zodiacomputing.ourania.astro.ProgressedAngles.method = Settings.progressedAngleMethod();
+        // Before anything casts a chart: the zodiac, the orbs and the rest the engine reads -
+        // the one list the phone applies too.
+        Settings.applyToEngine();
         // J6: what version this is, so a bug report can name it. "development build" when running
         // from classes, because a made-up number looks like information.
         setTitle("Ourania+ (Windows Edition) - " + Version.display());

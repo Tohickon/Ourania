@@ -77,7 +77,7 @@ public class PhoneChartTest {
         double jd = new SweDate(ut.getYear(), ut.getMonthValue(), ut.getDayOfMonth(),
             ut.getHour() + ut.getMinute() / 60.0).getJulDay();
         ChartFrame direct = ChartFrame.compute(ephemeris(), jd, sydney.latitude, sydney.longitude,
-            PhoneChart.HOUSE_SYSTEM, false, 0.0);
+            PhoneChart.houseSystem(), false, 0.0);
         for (int i = 0; i < PhoneChart.PLANETS; i++) {
             assertEquals(direct.bodies[i].name, direct.bodies[i].lon, c.frame.bodies[i].lon, 1e-9);
         }

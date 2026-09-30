@@ -1014,6 +1014,47 @@ public final class Settings {
         return "true".equals(get(LILITH_VARIANT_KEY, "false"));
     }
 
+    /**
+     * The house system's name, as the chart's picker shows it. The desktop wrote this key from
+     * {@code SkymapPanel} alone; it is named here on 30 Sep so the phone's settings (M9) read
+     * and write the same key and cannot spell it differently.
+     */
+    public static final String HOUSE_SYSTEM_KEY = "default.house.system";
+
+    /** The reader's house system by name - {@link com.zodiacomputing.ourania.astro.HouseSystems}'s. */
+    public static String houseSystemName() {
+        return get(HOUSE_SYSTEM_KEY, com.zodiacomputing.ourania.astro.HouseSystems.DEFAULT_NAME);
+    }
+
+    /** The reader's house system as the ephemeris character; an unknown name is the default. */
+    public static char houseSystem() {
+        return com.zodiacomputing.ourania.astro.HouseSystems.codeFor(houseSystemName());
+    }
+
+    public static void setHouseSystem(String name) {
+        set(HOUSE_SYSTEM_KEY, name);
+    }
+
+    /**
+     * Puts every stored setting the engine reads into force: the zodiac, the transit orb, the
+     * natal orbs and aspect ceilings, and the rule that progresses the angles.
+     *
+     * <b>One list, called by both apps before anything is cast.</b> It was five lines at the top
+     * of {@code OuraniaWindow}'s constructor until 30 Sep, when the phone needed the same five
+     * (M9); a phone that pushed four of them would cast a chart the desktop does not.
+     */
+    public static void applyToEngine() {
+        // Before anything casts a chart: the zodiac is read by every ephemeris call.
+        com.zodiacomputing.ourania.astro.Ephemeris.setZodiac(zodiac());
+        // And the transit orb, read by every transit list, search and calendar.
+        com.zodiacomputing.ourania.astro.Transits.orb = transitOrb();
+        // H1: the reader's natal orbs, pushed the same way and for the same reason.
+        applyBodyOrbs();
+        applyAspectCaps();
+        // And the rule that progresses the angles.
+        com.zodiacomputing.ourania.astro.ProgressedAngles.method = progressedAngleMethod();
+    }
+
     /** Tropical, or one of the sidereal ayanamsas; the labels are Ephemeris.ZODIACS. */
     public static final String ZODIAC_KEY = "chart.zodiac";
 

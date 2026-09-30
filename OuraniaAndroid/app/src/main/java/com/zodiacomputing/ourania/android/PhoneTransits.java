@@ -83,11 +83,11 @@ final class PhoneTransits {
         if (!natal.timeUnknown) {
             double birthJd = Moments.sweDate(natal.moment.when).getJulDay();
             Chronometry time = Chronometry.at(sw, natal.frame, birthJd, jd, ranked, jd, lat, lon,
-                lat, lon, PhoneChart.HOUSE_SYSTEM, scanYear);
+                lat, lon, PhoneChart.houseSystem(), scanYear);
             return new Sky(when, time.transit, time.hits, time.profection,
                 scanYear ? time : null);
         }
-        ChartFrame sky = ChartFrame.compute(sw, jd, lat, lon, PhoneChart.HOUSE_SYSTEM, false,
+        ChartFrame sky = ChartFrame.compute(sw, jd, lat, lon, PhoneChart.houseSystem(), false,
             0.0);
         List<Transits.Hit> hits = Transits.toNatal(natal.frame, sky, ranked, null);
         hits.removeIf(h -> "angle".equals(h.why));

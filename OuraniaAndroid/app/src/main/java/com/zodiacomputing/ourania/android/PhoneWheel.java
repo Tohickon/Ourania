@@ -268,9 +268,14 @@ final class PhoneWheel {
         return out;
     }
 
-    /** The natal aspects among a chart's first {@code count} bodies - the wheel's and the reading's. */
+    /**
+     * The natal aspects among a chart's first {@code count} bodies - the wheel's and the
+     * reading's - leaving out the aspect types the reader has switched off (M9), which is the
+     * same setting, {@link Settings#loadAspectSelection}, the desktop's wheel and grid obey.
+     */
     static List<Line> aspectsOf(ChartFrame frame, int count) {
         List<Line> out = new ArrayList<>();
+        boolean[] shown = Settings.loadAspectSelection();
         int n = Math.min(count, frame.bodies.length);
         for (int a = 0; a < n; a++) {
             for (int b = a + 1; b < n; b++) {
@@ -284,7 +289,7 @@ final class PhoneWheel {
                     sep = 360.0 - sep;
                 }
                 Aspects.Type t = Aspects.typeOf(sep, x.name, y.name, Aspects.Profile.NATAL);
-                if (t != null) {
+                if (t != null && (t.ordinal() >= shown.length || shown[t.ordinal()])) {
                     out.add(new Line(a, b, t));
                 }
             }
