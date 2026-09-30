@@ -136,10 +136,15 @@ final class PhoneReading {
      * each. "" when the chart has none.
      */
     static String patterns(PhoneChart.Cast c) {
-        Gestalt.Result g = Gestalt.compute(c.frame);
+        return patterns(c.frame);
+    }
+
+    /** The same for any chart - a composite's patterns are the relationship's (M10). */
+    static String patterns(ChartFrame f) {
+        Gestalt.Result g = Gestalt.compute(f);
         StringBuilder h = new StringBuilder();
         for (AspectPatterns.Pattern p : g.aspectPatterns) {
-            pattern(h, p, c.frame, g);
+            pattern(h, p, f, g);
         }
         return h.toString();
     }

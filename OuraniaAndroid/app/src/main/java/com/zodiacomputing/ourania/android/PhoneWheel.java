@@ -241,6 +241,46 @@ final class PhoneWheel {
         return best;
     }
 
+    /** A contact between a planet on the outer ring and one of the chart's own, by index. */
+    static final class Cross {
+        final int outer;
+        final int inner;
+        final Aspects.Type type;
+
+        Cross(int outer, int inner, Aspects.Type type) {
+            this.outer = outer;
+            this.inner = inner;
+            this.type = type;
+        }
+    }
+
+    /**
+     * The sky's contacts as lines: each transit between two of the ten planets. A contact to
+     * an angle has no planet to join and is left to the reading.
+     */
+    static List<Cross> crosses(List<com.zodiacomputing.ourania.astro.Transits.Hit> hits,
+            ChartFrame sky, ChartFrame natal) {
+        List<Cross> out = new ArrayList<>();
+        for (com.zodiacomputing.ourania.astro.Transits.Hit h : hits) {
+            int t = index(sky, h.transiting);
+            int n = index(natal, h.natal);
+            if (t >= 0 && n >= 0) {
+                out.add(new Cross(t, n, h.type));
+            }
+        }
+        return out;
+    }
+
+    /** Where a named planet is among the first ten of a frame, or -1. */
+    static int index(ChartFrame f, String name) {
+        for (int i = 0; i < PLANETS && i < f.bodies.length; i++) {
+            if (f.bodies[i] != null && name.equals(f.bodies[i].name)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     /** One aspect line: the two planets and the aspect between them. */
     static final class Line {
         final int a;

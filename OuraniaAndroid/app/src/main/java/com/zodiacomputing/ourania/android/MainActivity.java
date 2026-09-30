@@ -66,6 +66,17 @@ public final class MainActivity extends Activity {
     private TextView tapped;
     private LinearLayout readings;
     private LinearLayout timing;
+    /** M10: the second chart, how the two are shown, and the composite when it is. */
+    private static final int BIRTH = 0;
+    private static final int SYNASTRY = 1;
+    private static final int COMPOSITE = 2;
+    private int mode = BIRTH;
+    private LinearLayout relRow;
+    private Button partnerButton;
+    private android.widget.Spinner modePicker;
+    private String partnerName;
+    private PhoneChart.Cast partner;
+    private com.zodiacomputing.ourania.astro.ChartFrame compositeFrame;
     /** The shown sky with its year scanned, made on first asking; null until then. */
     private PhoneTransits.Sky scannedSky;
     private LinearLayout skyRow;
@@ -171,7 +182,12 @@ public final class MainActivity extends Activity {
         this.skyRow.setVisibility(View.GONE);
         this.skyOn = new CheckBox(this);
         this.skyOn.setText("Sky on");
-        this.skyOn.setOnCheckedChangeListener((b, on) -> this.refreshSky());
+        this.skyOn.setOnCheckedChangeListener((b, on) -> {
+            if (on && this.mode != BIRTH) {
+                this.modePicker.setSelection(BIRTH);    // one outer ring: the sky or a partner
+            }
+            this.refreshSky();
+        });
         this.skyRow.addView(this.skyOn);
         this.skyDateField = field("today");
         this.skyDateField.setPadding(24, 12, 24, 12);
@@ -191,6 +207,34 @@ public final class MainActivity extends Activity {
         this.skyCaption.setTextSize(14f);
         this.skyCaption.setVisibility(View.GONE);
         form.addView(this.skyCaption);
+
+        // Two charts (M10): whose chart to compare with, and how.
+        LinearLayout rel = new LinearLayout(this);
+        rel.setOrientation(LinearLayout.HORIZONTAL);
+        rel.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        this.partnerButton = new Button(this);
+        this.partnerButton.setText("Compare with...");
+        this.partnerButton.setOnClickListener(v -> this.choosePartner());
+        rel.addView(this.partnerButton, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        this.modePicker = this.spinner(new String[] {"Birth chart", "Synastry", "Composite"},
+            "Birth chart");
+        this.modePicker.setOnItemSelectedListener(
+            new android.widget.AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view,
+                        int pos, long id) {
+                    MainActivity.this.setMode(pos);
+                }
+
+                @Override
+                public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+            });
+        rel.addView(this.modePicker, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        this.relRow = rel;
+        this.relRow.setVisibility(View.GONE);
+        form.addView(this.relRow);
         this.tapped = new TextView(this);
         this.tapped.setTextSize(16f);
         this.tapped.setPadding(0, 16, 0, 0);
@@ -319,6 +363,7 @@ public final class MainActivity extends Activity {
                 this.tapped.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.readings.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.timing.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.relRow.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.skyRow.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.skyCaption.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.save.setVisibility(cast == null ? View.GONE : View.VISIBLE);
@@ -327,9 +372,10 @@ public final class MainActivity extends Activity {
                 this.castPlace = p;
                 if (cast != null) {
                     this.shownSky = null;
+                    this.compositeFrame = null;
                     this.wheel.show(cast.frame);
                     showBody(-1);
-                    this.refreshSky();
+                    this.redraw();
                 }
                 this.result.setText(shown);
                 this.cast.setEnabled(true);
@@ -635,8 +681,16 @@ public final class MainActivity extends Activity {
         new Thread(() -> {
             String html;
             try {
+                com.zodiacomputing.ourania.astro.ChartFrame comp = this.compositeFrame;
+                PhoneChart.Cast other = this.partner;
                 if (patterns) {
-                    html = PhoneReading.patterns(c);
+                    html = this.mode == COMPOSITE && comp != null ? PhoneReading.patterns(comp)
+                        : PhoneReading.patterns(c);
+                } else if (this.mode == COMPOSITE && comp != null) {
+                    html = PhoneRelationship.compositeSynthesis(comp);
+                } else if (this.mode == SYNASTRY && other != null) {
+                    html = PhoneRelationship.synastry(this.chartName(), c.frame, this.partnerName,
+                        other.frame, InterpretationService.getInstance());
                 } else if (c.timeUnknown) {
                     html = "<p><i>Without a birth time there is no Ascendant to count the years "
                         + "from, so this reading is the birth chart alone.</i></p>"
@@ -661,6 +715,122 @@ public final class MainActivity extends Activity {
                 }
             });
         }).start();
+    }
+
+    /** The name the chart on screen goes by in a comparison: its saved name, or "You". */
+    private String chartName() {
+        return this.openedName != null ? this.openedName : "You";
+    }
+
+    /** Picks the second chart from the book, casts it, and shows the two as synastry. */
+    private void choosePartner() {
+        final java.util.List<String> names = PhoneBook.names();
+        if (names.isEmpty()) {
+            toast("Save the other person's chart first: cast it, tap \"Save this chart\", then "
+                + "come back to your own.");
+            return;
+        }
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Compare with")
+            .setItems(names.toArray(new String[0]), (d, i) -> this.loadPartner(names.get(i)))
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void loadPartner(String name) {
+        final PhoneBook.Birth b = PhoneBook.open(name);
+        if (b == null) {
+            toast("\"" + name + "\" could not be opened offline.");
+            return;
+        }
+        new Thread(() -> {
+            PhoneChart.Cast other;
+            try {
+                other = PhoneChart.cast(new SwissEph(Ephemeris.PATH), b.date, b.time, b.place);
+            } catch (Throwable e) {
+                other = null;
+            }
+            final PhoneChart.Cast shown = other;
+            runOnUiThread(() -> {
+                if (shown == null) {
+                    toast("That chart could not be cast.");
+                    return;
+                }
+                this.partner = shown;
+                this.partnerName = name;
+                this.compositeFrame = null;
+                this.partnerButton.setText("With " + name);
+                if (this.mode == BIRTH) {
+                    this.modePicker.setSelection(SYNASTRY);   // calls setMode
+                } else {
+                    this.redraw();
+                }
+            });
+        }).start();
+    }
+
+    private void setMode(int m) {
+        if (m != BIRTH && this.partner == null) {
+            if (this.mode == BIRTH) {
+                this.modePicker.setSelection(BIRTH);
+                if (this.shownCast != null) {
+                    toast("Choose whose chart to compare with first.");
+                }
+                return;
+            }
+        }
+        this.mode = m;
+        if (m != BIRTH && this.skyOn.isChecked()) {
+            this.skyOn.setChecked(false);
+        }
+        this.redraw();
+    }
+
+    /** Puts the right chart or charts on the wheel for the mode. */
+    private void redraw() {
+        final PhoneChart.Cast c = this.shownCast;
+        if (c == null) {
+            return;
+        }
+        if (this.mode == SYNASTRY && this.partner != null) {
+            this.shownSky = null;
+            this.wheel.show(c.frame, this.partner.frame, PhoneRelationship.crosses(
+                PhoneRelationship.contacts(c.frame, this.partner.frame)));
+            this.skyCaption.setText(PhoneRelationship.possessive(this.partnerName).trim()
+                + " planets are on the outer ring. Tap one, or Whole-chart reading for the "
+                + "synastry.");
+            showBody(-1);
+        } else if (this.mode == COMPOSITE && this.partner != null) {
+            this.shownSky = null;
+            final PhoneChart.Cast other = this.partner;
+            this.skyCaption.setText("Casting the composite...");
+            new Thread(() -> {
+                com.zodiacomputing.ourania.astro.ChartFrame comp;
+                try {
+                    comp = PhoneRelationship.composite(new SwissEph(Ephemeris.PATH), c.frame,
+                        other.frame);
+                } catch (Throwable e) {
+                    comp = null;
+                }
+                final com.zodiacomputing.ourania.astro.ChartFrame shown = comp;
+                runOnUiThread(() -> {
+                    if (this.shownCast != c || this.partner != other) {
+                        return;
+                    }
+                    if (shown == null) {
+                        this.skyCaption.setText("The composite could not be cast.");
+                        return;
+                    }
+                    this.compositeFrame = shown;
+                    this.wheel.show(shown);
+                    this.skyCaption.setText("The composite of " + this.chartName() + " and "
+                        + this.partnerName + ": the relationship as a chart of its own.");
+                    showBody(-1);
+                });
+            }).start();
+        } else {
+            this.refreshSky();
+        }
     }
 
     /**
@@ -692,15 +862,16 @@ public final class MainActivity extends Activity {
             }
             final PhoneTransits.Sky shown = sky;
             runOnUiThread(() -> {
-                if (this.shownCast != c) {
-                    return;
+                if (this.shownCast != c || this.mode != BIRTH || !this.skyOn.isChecked()) {
+                    return;                             // the view moved on while it was cast
                 }
                 if (shown == null) {
                     this.skyCaption.setText("The sky could not be cast.");
                     return;
                 }
                 this.shownSky = shown;
-                this.wheel.show(c.frame, shown.frame, shown.hits);
+                this.wheel.show(c.frame, shown.frame,
+                    PhoneWheel.crosses(shown.hits, shown.frame, c.frame));
                 this.skyDateField.setText(day == null ? "now" : day.toString());
                 this.skyCaption.setText(PhoneTransits.headline(shown)
                     + ". Tap a planet on the outer ring, or Transits for the full reading.");
@@ -797,7 +968,13 @@ public final class MainActivity extends Activity {
 
     /** A tapped planet's full reading under the wheel (M5); a hint when none is tapped. */
     private void showBody(int body) {
+        InterpretationService svc = InterpretationService.getInstance();
         String html = this.shownCast == null || body < 0 ? ""
+            : this.mode == COMPOSITE && this.compositeFrame != null
+                ? PhoneRelationship.compositePlanet(this.compositeFrame, body, svc)
+            : this.mode == SYNASTRY && this.partner != null && body >= PhoneWheel.SKY
+                ? PhoneRelationship.partnerPlanet(this.chartName(), this.shownCast.frame,
+                    this.partnerName, this.partner.frame, body - PhoneWheel.SKY, svc)
             : body >= PhoneWheel.SKY && this.shownSky != null
                 ? PhoneTransits.skyPlanet(this.shownCast, this.shownSky, body - PhoneWheel.SKY,
                     InterpretationService.getInstance())
