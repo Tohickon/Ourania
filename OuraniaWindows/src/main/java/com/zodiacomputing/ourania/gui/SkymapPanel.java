@@ -6869,8 +6869,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     private SweDate createSweDate(ZonedDateTime zonedDateTime) {
-        ZonedDateTime zonedDateTime2 = zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
-        return new SweDate(zonedDateTime2.getYear(), zonedDateTime2.getMonthValue(), zonedDateTime2.getDayOfMonth(), (double)zonedDateTime2.getHour() + (double)zonedDateTime2.getMinute() / 60.0 + (double)zonedDateTime2.getSecond() / 3600.0);
+        return com.zodiacomputing.ourania.astro.Moments.sweDate(zonedDateTime);
     }
 
     /**
