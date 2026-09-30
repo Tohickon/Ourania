@@ -64,6 +64,9 @@ public final class MainActivity extends Activity {
     private WheelView wheel;
     private TextView tapped;
     private LinearLayout readings;
+    private LinearLayout timing;
+    /** The shown sky with its year scanned, made on first asking; null until then. */
+    private PhoneTransits.Sky scannedSky;
     private LinearLayout skyRow;
     private CheckBox skyOn;
     private TextView skyDateField;
@@ -203,9 +206,19 @@ public final class MainActivity extends Activity {
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         this.readings.addView(patterns, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        this.readings.addView(transits, new LinearLayout.LayoutParams(0,
-            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         form.addView(this.readings);
+        // Timing (M7): the transits now, and the calendar of the year ahead.
+        this.timing = new LinearLayout(this);
+        this.timing.setOrientation(LinearLayout.HORIZONTAL);
+        this.timing.setVisibility(View.GONE);
+        Button calendar = new Button(this);
+        calendar.setText("Calendar");
+        calendar.setOnClickListener(v -> this.showCalendar());
+        this.timing.addView(transits, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        this.timing.addView(calendar, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        form.addView(this.timing);
         this.save = new Button(this);
         this.save.setText("Save this chart");
         this.save.setVisibility(View.GONE);
@@ -292,6 +305,7 @@ public final class MainActivity extends Activity {
                 this.wheel.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.tapped.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.readings.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.timing.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.skyRow.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.skyCaption.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.save.setVisibility(cast == null ? View.GONE : View.VISIBLE);
@@ -487,7 +501,16 @@ public final class MainActivity extends Activity {
         new Thread(() -> {
             String html;
             try {
-                html = patterns ? PhoneReading.patterns(c) : PhoneReading.synthesis(c);
+                if (patterns) {
+                    html = PhoneReading.patterns(c);
+                } else if (c.timeUnknown) {
+                    html = "<p><i>Without a birth time there is no Ascendant to count the years "
+                        + "from, so this reading is the birth chart alone.</i></p>"
+                        + PhoneReading.synthesis(c);
+                } else {
+                    // With the timing sections, at the sky's moment (now unless a day is set).
+                    html = PhoneTransits.synthesis(c, this.scanned(c));
+                }
                 if (html.isEmpty()) {
                     html = "<p>This chart has no aspect patterns - no T-squares, grand trines, "
                         + "yods or the like among its planets.</p>";
@@ -559,6 +582,52 @@ public final class MainActivity extends Activity {
             this.skyOn.setChecked(true);
             this.refreshSky();
         }, start.getYear(), start.getMonthValue() - 1, start.getDayOfMonth()).show();
+    }
+
+    /**
+     * The sky at the shown moment with its year scanned, cast once and kept until the chart or
+     * the moment changes. Called off the main thread.
+     */
+    private PhoneTransits.Sky scanned(PhoneChart.Cast c) {
+        PhoneTransits.Sky shown = this.shownSky;
+        java.time.ZonedDateTime when = shown != null ? shown.when
+            : PhoneTransits.now(c.place.zoneId);
+        PhoneTransits.Sky have = this.scannedSky;
+        if (have != null && have.when.equals(when) && this.shownCast == c) {
+            return have;
+        }
+        have = PhoneTransits.at(new SwissEph(Ephemeris.PATH), c, when, true);
+        this.scannedSky = have;
+        return have;
+    }
+
+    /** The year ahead, month by month: what perfects on this chart, and when. */
+    private void showCalendar() {
+        final PhoneChart.Cast c = this.shownCast;
+        if (c == null) {
+            return;
+        }
+        if (c.timeUnknown) {
+            this.tapped.setText("The calendar counts the year from the birthday's Ascendant, "
+                + "so it needs a birth time.");
+            return;
+        }
+        this.tapped.setText("Scanning the year ahead...");
+        new Thread(() -> {
+            String html;
+            try {
+                html = PhoneTransits.calendar(this.scanned(c));
+            } catch (Throwable e) {
+                html = "<p>The calendar could not be made: " + Html.escapeHtml(e.toString())
+                    + "</p>";
+            }
+            final String shown = html;
+            runOnUiThread(() -> {
+                if (this.shownCast == c) {
+                    this.tapped.setText(Html.fromHtml(shown, Html.FROM_HTML_MODE_COMPACT));
+                }
+            });
+        }).start();
     }
 
     /** Every transit contact now (or on the chosen day), with the year and their readings. */

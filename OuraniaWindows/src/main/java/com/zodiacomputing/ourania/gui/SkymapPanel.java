@@ -9,6 +9,7 @@ import com.zodiacomputing.ourania.astro.Aspects;
 import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.BodyScore;
 import com.zodiacomputing.ourania.astro.ChartFrame;
+import com.zodiacomputing.ourania.astro.Chronometry;
 import com.zodiacomputing.ourania.astro.Dignity;
 import com.zodiacomputing.ourania.astro.Convergence;
 import com.zodiacomputing.ourania.astro.Gestalt;
@@ -3499,37 +3500,6 @@ implements WheelSource {
         }.execute();
     }
 
-    private static YearScan scanProfectionYear(ChartFrame chartFrame, double d, double d2, Profection profection, List<BodyScore.Vector> list, double d3, double d4, int n) {
-        Returns.Return return_;
-        SwissEph swissEph = new SwissEph(EPHE_PATH);
-        double d5 = Double.NaN;
-        double d6 = Double.NaN;
-        ChartFrame.Body body = chartFrame.body("Sun");
-        if (body != null && body.ok) {
-            d5 = Profection.solarReturnJd(swissEph, d, body.lon, profection.age);
-            d6 = Profection.solarReturnJd(swissEph, d, body.lon, profection.age + 1);
-        }
-        if (Double.isNaN(d5) || Double.isNaN(d6) || d6 <= d5) {
-            d5 = d2 - 182.6;
-            d6 = d2 + 182.6;
-        }
-        YearScan yearScan = new YearScan();
-        yearScan.events = Transits.eventsToNatal(Almanac.datedMoments(swissEph, d5, d6), chartFrame, list, profection.lord);
-        yearScan.perfections = Transits.perfectionsOverRange(swissEph, chartFrame, list, profection.lord, d5, d6);
-        yearScan.arcs = SolarArc.contacts(swissEph, chartFrame, d, list, profection.lord, d5, d6);
-        yearScan.progressions = Progressions.contacts(swissEph, chartFrame, d, list, profection.lord, d5, d6);
-        yearScan.moonClock = Progressions.clock(swissEph, d, chartFrame.cusps, d5, d6);
-        yearScan.mutuals = Progressions.mutual(swissEph, d, d5, d6);
-        // K12 stage 3: the days, for whichever themes turn out to be headlines.
-        yearScan.catalysts = Transits.datingHits(swissEph, chartFrame,
-            com.zodiacomputing.ourania.astro.ThemeConvergence.allThemePoints(chartFrame), d5, d6);
-        ChartFrame.Body body2 = chartFrame.body("Sun");
-        if (body2 != null && body2.ok && (return_ = Returns.solar(swissEph, d, body2.lon, profection.age, d3, d4, n)) != null) {
-            yearScan.returns = Returns.contacts(return_, chartFrame, list, profection.lord);
-        }
-        return yearScan;
-    }
-
     private static String formatCalendar(List<Almanac.Event> list) {
         String[] stringArray = new String[]{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         StringBuilder stringBuilder = new StringBuilder();
@@ -4065,35 +4035,20 @@ implements WheelSource {
                 // and wants a window, so AspectGridCheck reaches generateReport directly and
                 // never sees which moment was passed. Mutation-tested on 2026-09-23 and it
                 // survived. Taking the alternative away is worth more than naming the rule.
-                if (!Double.isNaN(dNow)) {
-                    profection = Profection.at(d, dNow, chartFrame.asc);
-                    ChartFrame.Body theSun = chartFrame.body("Sun");
-                    if (theSun != null && theSun.ok) {
-                        double d7 = Profection.solarReturnJd(SkymapPanel.this.sw, d, theSun.lon,
-                            profection.age);
-                        // The year this chart actually has, not a mean one - see
-                        // computeSubPeriods for the thirteenth month that came of a round
-                        // number. One more root-find, once per reading.
-                        double d8 = Profection.solarReturnJd(SkymapPanel.this.sw, d, theSun.lon,
-                            profection.age + 1);
-                        profection.computeSubPeriods(dNow, d7, d8);
-                    }
-                }
-                if (bl) {
-                    chartFrame2 = ChartFrame.compute(SkymapPanel.this.sw, d4, d5, d6, c, false, 0.0);
-                    list2 = Transits.toNatal(chartFrame, chartFrame2, list, profection.lord);
-                    if (readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
-                        yearScan = SkymapPanel.scanProfectionYear(chartFrame, d, d4, profection, list, d2, d3, c);
-                        // Releasing gates the ranking rather than voting in it, which is what
-                        // finally puts it inside a reading. The chart carries the lots already,
-                        // so the gate costs one release walk and no ephemeris. d4 is the moment.
-                        Convergence.Gate gate = Convergence.Gate.at(
-                            d, chartFrame.lotOfFortune, chartFrame.lotOfSpirit, d4);
-                        list3 = Convergence.collect(profection, yearScan.perfections,
-                            yearScan.events, yearScan.arcs, yearScan.progressions,
-                            yearScan.returns, gate, yearScan.mutuals);
-                    }
-                }
+                // <b>The chronometry is the engine's, not this worker's (M7, 30 Sep).</b> The
+                // profection, the transit frame and its contacts, the year scan and the
+                // convergence were computed here, inline, and the phone needs every one of them
+                // in the same order - so they moved to Chronometry, and this worker and the
+                // phone both call it. The comments that explained each step moved with them.
+                Chronometry time = Chronometry.at(SkymapPanel.this.sw, chartFrame, d, dNow, list,
+                    bl ? d4 : Double.NaN, d5, d6, d2, d3, c,
+                    readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE
+                        || readingTier == ReadingTier.TIMELINE);
+                profection = time.profection;
+                chartFrame2 = time.transit;
+                list2 = time.hits;
+                yearScan = time.scan;
+                list3 = time.convergence;
                 if (readingTier == ReadingTier.REPORT) {
                     object = Snapshot.report(chartFrame, result, list, result2)
                         + Snapshot.topicLayer(topics);

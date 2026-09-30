@@ -122,4 +122,78 @@ public class PhoneTransitsTest {
             assertEquals("sky " + i, PhoneWheel.SKY + i, hit);
         }
     }
+
+    private static final ZonedDateTime SEP_2026 =
+        ZonedDateTime.parse("2026-09-30T12:00:00+10:00[Australia/Sydney]");
+
+    @Test
+    public void theYearIsTheDesktopsChronometry() {
+        // The phone's year is Chronometry's - the call the desktop's reading worker makes - so
+        // its months and days come with it, and the contacts are the ones the reading lists.
+        PhoneChart.Cast natal = sydney(LocalTime.of(14, 15));
+        PhoneTransits.Sky sky = PhoneTransits.at(sw(), natal, SEP_2026, true);
+        com.zodiacomputing.ourania.astro.Chronometry direct =
+            com.zodiacomputing.ourania.astro.Chronometry.at(sw(), natal.frame,
+                Moments.sweDate(natal.moment.when).getJulDay(),
+                Moments.sweDate(SEP_2026).getJulDay(),
+                com.zodiacomputing.ourania.astro.BodyScore.rank(natal.frame,
+                    com.zodiacomputing.ourania.astro.Gestalt.compute(natal.frame)),
+                Moments.sweDate(SEP_2026).getJulDay(), natal.place.latitude,
+                natal.place.longitude, natal.place.latitude, natal.place.longitude, 'P', true);
+        assertEquals(direct.profection.lord, sky.year.lord);
+        assertNotNull("the month's lord", sky.year.monthlyLord);
+        assertEquals(direct.profection.monthlyLord, sky.year.monthlyLord);
+        assertEquals(direct.hits.size(), sky.hits.size());
+        assertEquals(direct.scan.perfections.size(), sky.time.scan.perfections.size());
+        assertTrue(PhoneTransits.reading(natal, sky, SVC).contains("This month is ruled by"));
+    }
+
+    @Test
+    public void theCalendarRunsForwardFromTheDayMonthByMonth() {
+        PhoneChart.Cast natal = sydney(LocalTime.of(14, 15));
+        PhoneTransits.Sky sky = PhoneTransits.at(sw(), natal, SEP_2026, true);
+        String cal = PhoneTransits.calendar(sky);
+        double from = Moments.sweDate(SEP_2026).getJulDay();
+        int expected = 0;
+        for (Transits.Perfection p : sky.time.scan.perfections) {
+            if (p.jd >= from) {
+                expected++;
+                assertTrue(p.toString(), cal.contains("Transiting " + p.transiting));
+            }
+        }
+        for (Transits.EventHit e : sky.time.scan.events) {
+            if (e.event.jd >= from) {
+                expected++;
+            }
+        }
+        assertTrue("the year has dated moments ahead", expected > 5);
+        assertEquals("one line each", expected, cal.split("<br>", -1).length - 1);
+        // Months in order: the first heading is this month, and none repeats.
+        java.util.List<String> months = new java.util.ArrayList<>();
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("<h3>([^<]+)</h3>")
+            .matcher(cal);
+        while (m.find()) {
+            assertFalse("month once: " + m.group(1), months.contains(m.group(1)));
+            months.add(m.group(1));
+        }
+        assertTrue(months.get(0), months.get(0).equals("September 2026")
+            || months.get(0).equals("October 2026"));
+    }
+
+    @Test
+    public void aJulianDayReadsBackAsTheLocalMoment() {
+        ZonedDateTime back = PhoneTransits.fromJd(Moments.sweDate(SEP_2026).getJulDay(),
+            SEP_2026.getZone());
+        assertEquals(SEP_2026.toLocalDateTime(), back.toLocalDateTime());
+    }
+
+    @Test
+    public void theWholeReadingCarriesItsTimingSections() {
+        PhoneChart.Cast natal = sydney(LocalTime.of(14, 15));
+        String r = PhoneTransits.synthesis(natal, PhoneTransits.at(sw(), natal, SEP_2026, true));
+        assertTrue(r.contains("Current Chronometry"));
+        assertTrue(r.contains("Current Transits"));
+        assertFalse("timing is on", r.contains("Transit data not enabled"));
+        assertFalse(r.contains("style="));
+    }
 }

@@ -212,6 +212,11 @@ final class PhoneReading {
         Themes.Result themes = Themes.extract(f, g, ranked, Topics.analyse(f, ranked));
         String html = NarrativeSynthesizer.generateReport(f, g, ranked, themes, null, null, null,
             null, null, false, false);
+        return forPhone(html);
+    }
+
+    /** A desktop reading's HTML without its page wrapper and its colours for a black pane. */
+    static String forPhone(String html) {
         return html.replaceAll("(?i)</?(html|body)[^>]*>", "")
             .replaceAll("(?i)\\s(style|color|bgcolor)\\s*=\\s*('[^']*'|\"[^\"]*\")", "");
     }
