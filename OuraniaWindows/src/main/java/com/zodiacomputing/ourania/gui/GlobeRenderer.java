@@ -270,14 +270,14 @@ final class GlobeRenderer {
      * @return the radius for wheel 0 (Chart A), 1 (the outer ring) and 2 (the sky)
      */
     static double[] wheelRadii(SkymapPanel panel, int w, int h) {
-        int[] rings = SkymapPanel.ringRadii(w, h, 1.0, 1.0);
-        double k = Globe.SHELL_SIGN_INNER / Math.max(1, rings[SkymapPanel.RING_SIGN_INNER]);
+        int[] rings = WheelLayout.ringRadii(w, h, 1.0, 1.0);
+        double k = Globe.SHELL_SIGN_INNER / Math.max(1, rings[WheelLayout.RING_SIGN_INNER]);
         int natalTop = panel.bodyBaseRadius(rings);
-        int natalFloor = natalTop - SkymapPanel.natalBandDepth(Math.max(1, natalTop));
+        int natalFloor = natalTop - WheelLayout.natalBandDepth(Math.max(1, natalTop));
         return new double[] {
             k * (natalTop + natalFloor) / 2.0,
-            k * (rings[SkymapPanel.RING_TRANSIT] + rings[SkymapPanel.RING_BODY_TOP]) / 2.0,
-            k * (rings[SkymapPanel.RING_TRI] + rings[SkymapPanel.RING_TRANSIT]) / 2.0,
+            k * (rings[WheelLayout.RING_TRANSIT] + rings[WheelLayout.RING_BODY_TOP]) / 2.0,
+            k * (rings[WheelLayout.RING_TRI] + rings[WheelLayout.RING_TRANSIT]) / 2.0,
         };
     }
 

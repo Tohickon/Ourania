@@ -3382,13 +3382,13 @@ public final class GlobeCheck {
                 shells[0] < shells[1] && shells[1] < shells[2]);
             yes("and all of them inside the signs", shells[2] < Globe.SHELL_SIGN_INNER);
 
-            int[] rings = SkymapPanel.ringRadii(w, h, 1.0, 1.0);
-            double wheelSign = rings[SkymapPanel.RING_SIGN_INNER];
+            int[] rings = WheelLayout.ringRadii(w, h, 1.0, 1.0);
+            double wheelSign = rings[WheelLayout.RING_SIGN_INNER];
             int natalTop = panel.bodyBaseRadius(rings);
             double[] wheelMid = {
-                natalTop - SkymapPanel.natalBandDepth(natalTop) / 2.0,     // Chart A's band
-                (rings[SkymapPanel.RING_TRANSIT] + rings[SkymapPanel.RING_BODY_TOP]) / 2.0,
-                (rings[SkymapPanel.RING_TRI] + rings[SkymapPanel.RING_TRANSIT]) / 2.0,
+                natalTop - WheelLayout.natalBandDepth(natalTop) / 2.0,     // Chart A's band
+                (rings[WheelLayout.RING_TRANSIT] + rings[WheelLayout.RING_BODY_TOP]) / 2.0,
+                (rings[WheelLayout.RING_TRI] + rings[WheelLayout.RING_TRANSIT]) / 2.0,
             };
             Globe.Projected centre = top.project(0, 0, 0, w, h);
             double[] sign = Globe.onShell(0.0, origin, Globe.SHELL_SIGN_INNER, 0.0);

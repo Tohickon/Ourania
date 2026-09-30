@@ -47,7 +47,7 @@ import java.util.Set;
  *
  * <h3>A stack that does not fit is refused rather than drawn</h3>
  *
- * <p>Bands have a floor - {@code SkymapPanel.MIN_BAND_DEPTH}, below which a band cannot hold a
+ * <p>Bands have a floor - {@code WheelLayout.MIN_BAND_DEPTH}, below which a band cannot hold a
  * glyph - so on a small window they stop sharing the radius and start taking it, and the natal
  * wheel is drawn underneath them without anything saying so. {@link #trimmedTo} makes that a
  * stated outcome instead: the stack comes back at the size that fits and {@link #dropped}
@@ -208,7 +208,7 @@ public final class WheelStack {
      * nothing in particular, and dropping the band the reader most recently opened would make
      * the answer depend on the order they clicked.
      *
-     * @param most how many bands fit, from {@code SkymapPanel.maxBodyBands}
+     * @param most how many bands fit, from {@code WheelLayout.maxBodyBands}
      */
     public WheelStack trimmedTo(int most) {
         int keep = Math.max(0, Math.min(most, this.bands.size()));
@@ -227,7 +227,7 @@ public final class WheelStack {
      *
      * <p><b>The two orders are opposite and this is the seam between them.</b> A reader counts
      * outward from the chart, so {@link #bands} is innermost first; the geometry hangs each
-     * band below the one outside it, so {@code SkymapPanel.bodyBands} counts inward from the
+     * band below the one outside it, so {@code WheelLayout.bodyBands} counts inward from the
      * zodiac. Reversing in one named place beats reversing at each call site, which is where an
      * off-by-one puts the sky's glyphs in the partner's band.
      *

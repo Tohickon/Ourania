@@ -171,7 +171,7 @@ final class WheelCanvas extends JPanel {
             graphics2D.transform(panel.viewTransform(n10, n11));
         }
         // The same geometry both hit tests and the click dispatcher use. This painter is
-        // the site that diverged: it drew bodies at SkymapPanel.RING_SIGN_INNER while bodyAt tested
+        // the site that diverged: it drew bodies at WheelLayout.RING_SIGN_INNER while bodyAt tested
         // bodyBaseRadius, so with the reader's placement anywhere but the default the
         // glyphs and the clicks were tens of pixels apart.
         SkymapPanel.Geometry g = panel.geometry(n10, n11);
@@ -181,18 +181,18 @@ final class WheelCanvas extends JPanel {
         int n12 = g.cx;
         int n13 = g.cy;
         int[] rings = g.rings;
-        int n14 = n9 = rings[SkymapPanel.RING_OUTER];
-        int nTriOuter = rings[SkymapPanel.RING_TRI];
-        int n15 = rings[SkymapPanel.RING_TRANSIT];
-        int n16 = rings[SkymapPanel.RING_DECAN_OUTER];
-        int n17 = rings[SkymapPanel.RING_SIGN_OUTER];
-        int n18 = rings[SkymapPanel.RING_SIGN_INNER];
-        int nBodyTop = rings[SkymapPanel.RING_BODY_TOP];
-        int nTermInner = rings[SkymapPanel.RING_TERM_INNER];
-        int nDegreeInner = rings[SkymapPanel.RING_DEGREE_INNER];
+        int n14 = n9 = rings[WheelLayout.RING_OUTER];
+        int nTriOuter = rings[WheelLayout.RING_TRI];
+        int n15 = rings[WheelLayout.RING_TRANSIT];
+        int n16 = rings[WheelLayout.RING_DECAN_OUTER];
+        int n17 = rings[WheelLayout.RING_SIGN_OUTER];
+        int n18 = rings[WheelLayout.RING_SIGN_INNER];
+        int nBodyTop = rings[WheelLayout.RING_BODY_TOP];
+        int nTermInner = rings[WheelLayout.RING_TERM_INNER];
+        int nDegreeInner = rings[WheelLayout.RING_DEGREE_INNER];
         // The rim scale's outer edge: the rim itself with the mansions folded, and the
         // underside of the mansion band once they open.
-        int nMansionInner = rings[SkymapPanel.RING_MANSION_INNER];
+        int nMansionInner = rings[WheelLayout.RING_MANSION_INNER];
         // <b>The disc, filled separately from the page.</b> One colour used to do both -
         // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
         // Filled before any ring is drawn, so every stroke below lands on top of it.
@@ -290,10 +290,10 @@ final class WheelCanvas extends JPanel {
         // The 28 lunar mansions, in a band of their own at the rim.
         //
         // <b>It used to share the rim with the degree ticks and cover them.</b> The band is
-        // now carved out of the rim by the chain - SkymapPanel.RING_MANSION_INNER - and the ticks below
+        // now carved out of the rim by the chain - WheelLayout.RING_MANSION_INNER - and the ticks below
         // read from the same number, so the two cannot overlap. Carving it here rather than
         // inside the zodiac is what keeps the bodies where they are: every radius from
-        // SkymapPanel.RING_DECAN_OUTER inward is untouched.
+        // WheelLayout.RING_DECAN_OUTER inward is untouched.
         if (panel.layerShown(SkymapPanel.Layer.MANSIONS)) {
             WheelShapes.drawMansionRing(graphics2D, n12, n13, n14, nMansionInner, d4,
                 panel.moonMansion());
@@ -385,10 +385,10 @@ final class WheelCanvas extends JPanel {
             }
             graphics2D.setStroke(stroke);
         }
-        // Body radii come from the shared geometry, not from n18. n18 is SkymapPanel.RING_SIGN_INNER
+        // Body radii come from the shared geometry, not from n18. n18 is WheelLayout.RING_SIGN_INNER
         // and this painter used to draw bodies there whatever placement the reader chose,
         // while bodyAt tested bodyBaseRadius - 325 against 201 in the centre at 820px, so
-        // nothing on the wheel could be clicked. n18 keeps SkymapPanel.RING_SIGN_INNER for the sign
+        // nothing on the wheel could be clicked. n18 keeps WheelLayout.RING_SIGN_INNER for the sign
         // circle it strokes and the spokes it ends, because those are the sign ring.
         int[] nArray = g.natalRadii();
         int[] nArray2 = g.transitRadii();
@@ -517,7 +517,7 @@ final class WheelCanvas extends JPanel {
             SkymapPanel.bulge(graphics2D, bodyTx, n4, n26, panel.hoverBody() == n7);
             if (panel.onHighlightedLine(n7, SkymapPanel.WHEEL_NATAL)) {
                 WheelShapes.drawHighlightHalo(graphics2D, n4, n26,
-                    Bodies.at(n7).isAngle() ? 13 : SkymapPanel.natalSize(n7).radius);
+                    Bodies.at(n7).isAngle() ? 13 : WheelLayout.natalSize(n7).radius);
             }
             if (Bodies.at(n7).isAngle()) {
                 graphics2D.setFont(SkymapPanel.ANGLE_FONT);
@@ -543,7 +543,7 @@ final class WheelCanvas extends JPanel {
                     java.awt.AlphaComposite.SRC_OVER,
                     (float) panel.glyphWeight(n7, false)));
             }
-            SkymapPanel.GlyphSize glyphSize = SkymapPanel.natalSize(n7);
+            WheelLayout.GlyphSize glyphSize = WheelLayout.natalSize(n7);
             graphics2D.setFont(glyphSize.font);
             WheelShapes.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
                 new Color(192, 192, 192), Settings.natalMarker());
@@ -612,7 +612,7 @@ final class WheelCanvas extends JPanel {
                 if (panel.onHighlightedLine(n7, SkymapPanel.WHEEL_OUTER)) {
                     WheelShapes.drawHighlightHalo(graphics2D, n4, n27,
                         Bodies.at(n7).isAngle() ? 13
-                            : SkymapPanel.transitSize(n7).radius);
+                            : WheelLayout.transitSize(n7).radius);
                 }
                 if (Bodies.at(n7).isAngle()) {
                     graphics2D.setFont(SkymapPanel.ANGLE_FONT);
@@ -624,7 +624,7 @@ final class WheelCanvas extends JPanel {
                     graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n27 + 4);
                     continue;
                 }
-                SkymapPanel.GlyphSize glyphSize2 = SkymapPanel.transitSize(n7);
+                WheelLayout.GlyphSize glyphSize2 = WheelLayout.transitSize(n7);
                 graphics2D.setFont(glyphSize2.font);
                 object = panel.ringInk(n7, outerRole);
                 WheelShapes.drawBodyMarker(graphics2D, n4, n27, glyphSize2.radius,
@@ -666,7 +666,7 @@ final class WheelCanvas extends JPanel {
                 if (panel.onHighlightedLine(n7, SkymapPanel.WHEEL_SKY)) {
                     WheelShapes.drawHighlightHalo(graphics2D, n4, n28,
                         Bodies.at(n7).isAngle() ? 13
-                            : SkymapPanel.transitSize(n7).radius);
+                            : WheelLayout.transitSize(n7).radius);
                 }
                 if (Bodies.at(n7).isAngle()) {
                     graphics2D.setFont(SkymapPanel.ANGLE_FONT);
@@ -677,7 +677,7 @@ final class WheelCanvas extends JPanel {
                     graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n28 + 4);
                     continue;
                 }
-                SkymapPanel.GlyphSize glyphSize3 = SkymapPanel.transitSize(n7);
+                WheelLayout.GlyphSize glyphSize3 = WheelLayout.transitSize(n7);
                 graphics2D.setFont(glyphSize3.font);
                 Color cColor = panel.ringInk(n7, SkymapPanel.AngleRole.SKY);
                 WheelShapes.drawBodyMarker(graphics2D, n4, n28, glyphSize3.radius,

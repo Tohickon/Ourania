@@ -163,57 +163,57 @@ public final class WheelStackCheck {
                 double t = op[0];
                 double o = op[1];
                 int outer = Math.min(size, size) / 2 - 10;
-                int depth = SkymapPanel.outerBandDepth(outer);
-                int[] radii = SkymapPanel.ringRadii(size, size, o, t);
+                int depth = WheelLayout.outerBandDepth(outer);
+                int[] radii = WheelLayout.ringRadii(size, size, o, t);
                 // The formula exactly as it stood before bodyBands existed.
-                int wasTri = radii[SkymapPanel.RING_DEGREE_INNER];
+                int wasTri = radii[WheelLayout.RING_DEGREE_INNER];
                 int wasTransit = (int) Math.round((double) wasTri - (double) depth * t);
                 int wasBodyTop = (int) Math.round((double) wasTransit - (double) depth * o);
                 ok("tri unchanged at " + size + " " + Arrays.toString(op),
-                    radii[SkymapPanel.RING_TRI] == wasTri);
+                    radii[WheelLayout.RING_TRI] == wasTri);
                 ok("transit unchanged at " + size + " " + Arrays.toString(op),
-                    radii[SkymapPanel.RING_TRANSIT] == wasTransit);
+                    radii[WheelLayout.RING_TRANSIT] == wasTransit);
                 ok("body top unchanged at " + size + " " + Arrays.toString(op),
-                    radii[SkymapPanel.RING_BODY_TOP] == wasBodyTop);
+                    radii[WheelLayout.RING_BODY_TOP] == wasBodyTop);
 
                 // And the panel actually goes through the generalisation rather than keeping
                 // its own copy beside it - which is the failure this refactor could have.
-                int[] bands = SkymapPanel.bodyBands(wasTri, depth, new double[] {t, o});
+                int[] bands = WheelLayout.bodyBands(wasTri, depth, new double[] {t, o});
                 ok("the wheel's radii come from bodyBands at " + size,
-                    bands[0] == radii[SkymapPanel.RING_TRI]
-                        && bands[1] == radii[SkymapPanel.RING_TRANSIT]
-                        && bands[2] == radii[SkymapPanel.RING_BODY_TOP]);
+                    bands[0] == radii[WheelLayout.RING_TRI]
+                        && bands[1] == radii[WheelLayout.RING_TRANSIT]
+                        && bands[2] == radii[WheelLayout.RING_BODY_TOP]);
             }
         }
 
         // <b>Rounding compounds from the rounded value, not the exact one.</b> Measuring every
         // band off an unrounded running total is the more obvious code and is a different
         // wheel: at depth 37 and three half-open bands it parts company by a pixel.
-        int[] stepped = SkymapPanel.bodyBands(500, 37, new double[] {0.5, 0.5, 0.5});
+        int[] stepped = WheelLayout.bodyBands(500, 37, new double[] {0.5, 0.5, 0.5});
         ok("each edge is measured from the rounded one before it: "
             + Arrays.toString(stepped),
             stepped[1] == 482 && stepped[2] == 464 && stepped[3] == 446);
 
         // A band that is shut takes no room at all, which is what lets one wheel lay out as it
         // always has however many bands are declared.
-        int[] shut = SkymapPanel.bodyBands(400, 40, new double[] {0, 0, 0, 0, 0});
+        int[] shut = WheelLayout.bodyBands(400, 40, new double[] {0, 0, 0, 0, 0});
         for (int i = 0; i < shut.length; i++) {
             ok("a shut band takes nothing (edge " + i + ")", shut[i] == 400);
         }
         ok("one more edge than bands", shut.length == 6);
 
-        int[] none = SkymapPanel.bodyBands(400, 40, new double[0]);
+        int[] none = WheelLayout.bodyBands(400, 40, new double[0]);
         ok("no bands is the ceiling alone", none.length == 1 && none[0] == 400);
         ok("null bands is the ceiling alone",
-            SkymapPanel.bodyBands(400, 40, null).length == 1);
+            WheelLayout.bodyBands(400, 40, null).length == 1);
 
         // Out-of-range fractions are clamped rather than allowed to invert the chain.
-        int[] wild = SkymapPanel.bodyBands(400, 40, new double[] {-3.0, 9.0});
+        int[] wild = WheelLayout.bodyBands(400, 40, new double[] {-3.0, 9.0});
         ok("a negative fraction does not push a band outward", wild[1] == 400);
         ok("a fraction over one does not take two bands' worth", wild[2] == 360);
 
         // Five open bands is the point of the exercise: strictly decreasing, nothing inverted.
-        int[] five = SkymapPanel.bodyBands(500, 30, new double[] {1, 1, 1, 1, 1});
+        int[] five = WheelLayout.bodyBands(500, 30, new double[] {1, 1, 1, 1, 1});
         for (int i = 1; i < five.length; i++) {
             ok("band " + i + " sits inside band " + (i - 1), five[i] < five[i - 1]);
         }
@@ -230,30 +230,30 @@ public final class WheelStackCheck {
         for (int outer = 40; outer <= 1200; outer++) {
             // Frozen: the formula as it read before it took a band count, with its own
             // literals rather than the constants it derived them from.
-            int historical = Math.max(SkymapPanel.MIN_BAND_DEPTH,
-                Math.min(2 * 20 + 2 * SkymapPanel.BAND_EDGE, outer / 6));
-            if (SkymapPanel.outerBandDepth(outer, 2) != historical
-                || SkymapPanel.outerBandDepth(outer) != historical) {
+            int historical = Math.max(WheelLayout.MIN_BAND_DEPTH,
+                Math.min(2 * 20 + 2 * WheelLayout.BAND_EDGE, outer / 6));
+            if (WheelLayout.outerBandDepth(outer, 2) != historical
+                || WheelLayout.outerBandDepth(outer) != historical) {
                 drift++;
             }
         }
         ok("the two-band depth is the historical depth at every width 40-1200 ("
             + drift + " disagreed)", drift == 0);
         ok("one band is not handed the whole budget",
-            SkymapPanel.outerBandDepth(600, 1) == SkymapPanel.outerBandDepth(600, 2));
+            WheelLayout.outerBandDepth(600, 1) == WheelLayout.outerBandDepth(600, 2));
 
         // <b>Sharing only bites where the share is the binding constraint.</b> The first draft
         // of this asserted that four bands are always shallower than two and was wrong: at 900
         // both hit the ideal depth of 66, because there is room for four bands at full depth
         // and shrinking them would buy nothing. The budget is a cap, not a quota.
         ok("with room to spare, more bands does not mean thinner bands",
-            SkymapPanel.outerBandDepth(900, 4) == SkymapPanel.outerBandDepth(900, 2));
+            WheelLayout.outerBandDepth(900, 4) == WheelLayout.outerBandDepth(900, 2));
         ok("where the budget binds, more bands do share it",
-            SkymapPanel.outerBandDepth(300, 5) < SkymapPanel.outerBandDepth(300, 2));
+            WheelLayout.outerBandDepth(300, 5) < WheelLayout.outerBandDepth(300, 2));
         ok("a band never goes below the floor a glyph needs",
-            SkymapPanel.outerBandDepth(120, 5) >= SkymapPanel.MIN_BAND_DEPTH);
+            WheelLayout.outerBandDepth(120, 5) >= WheelLayout.MIN_BAND_DEPTH);
         ok("more bands never means a deeper band",
-            SkymapPanel.outerBandDepth(900, 5) <= SkymapPanel.outerBandDepth(900, 3));
+            WheelLayout.outerBandDepth(900, 5) <= WheelLayout.outerBandDepth(900, 3));
     }
 
     /**
@@ -266,7 +266,7 @@ public final class WheelStackCheck {
         int smallest = 0;
         for (int size = 300; size <= 1600; size += 20) {
             int outer = size / 2 - 10;
-            int most = SkymapPanel.maxBodyBands(outer);
+            int most = WheelLayout.maxBodyBands(outer);
             ok("never more bands than the order offers at " + size,
                 most <= WheelStack.MOST_BANDS);
             if (most == 0) {
@@ -279,12 +279,12 @@ public final class WheelStackCheck {
             // The whole point: draw that many bands and the natal wheel still has its floor.
             double[] all = new double[most];
             Arrays.fill(all, 1.0);
-            int[] radii = SkymapPanel.ringRadii(size, size, 1.0, 1.0);
-            int[] bands = SkymapPanel.bodyBands(radii[SkymapPanel.RING_DEGREE_INNER],
-                SkymapPanel.outerBandDepth(outer, most), all);
+            int[] radii = WheelLayout.ringRadii(size, size, 1.0, 1.0);
+            int[] bands = WheelLayout.bodyBands(radii[WheelLayout.RING_DEGREE_INNER],
+                WheelLayout.outerBandDepth(outer, most), all);
             ok("the natal wheel keeps its floor at " + size + " with " + most + " bands ("
-                + bands[most] + " >= " + SkymapPanel.minNatalRadius() + ")",
-                bands[most] >= SkymapPanel.minNatalRadius());
+                + bands[most] + " >= " + WheelLayout.minNatalRadius() + ")",
+                bands[most] >= WheelLayout.minNatalRadius());
         }
         ok("a window too small for any band is reported rather than drawn on (first that fits: "
             + smallest + ")", smallest > 300);
@@ -293,23 +293,23 @@ public final class WheelStackCheck {
         // wheel has always laid an outer band out at these sizes regardless, which leaves the
         // natal wheel at a NEGATIVE radius - drawn every frame, reported by nothing. This is
         // older than the stack and is why maxBodyBands is allowed to answer zero.
-        int[] tiny = SkymapPanel.ringRadii(300, 300, 1.0, 1.0);
+        int[] tiny = WheelLayout.ringRadii(300, 300, 1.0, 1.0);
         ok("the unguarded layout really does go negative at 300 ("
-            + tiny[SkymapPanel.RING_BODY_TOP] + ")",
-            tiny[SkymapPanel.RING_BODY_TOP] < 0);
+            + tiny[WheelLayout.RING_BODY_TOP] + ")",
+            tiny[WheelLayout.RING_BODY_TOP] < 0);
         ok("and the fit rule refuses that window",
-            SkymapPanel.maxBodyBands(300 / 2 - 10) == 0);
+            WheelLayout.maxBodyBands(300 / 2 - 10) == 0);
 
         // A bigger window never carries fewer rings.
         int worse = 0;
         for (int outer = 100; outer < 1000; outer++) {
-            if (SkymapPanel.maxBodyBands(outer + 1) < SkymapPanel.maxBodyBands(outer)) {
+            if (WheelLayout.maxBodyBands(outer + 1) < WheelLayout.maxBodyBands(outer)) {
                 worse++;
             }
         }
         ok("a wider wheel never carries fewer bands (" + worse + " did)", worse == 0);
         ok("a big window carries the whole order",
-            SkymapPanel.maxBodyBands(1000) == WheelStack.MOST_BANDS);
+            WheelLayout.maxBodyBands(1000) == WheelStack.MOST_BANDS);
 
         WheelStack six = WheelStack.of(WheelRing.Kind.CHART_A,
             Arrays.asList(WheelStack.ORDER));
