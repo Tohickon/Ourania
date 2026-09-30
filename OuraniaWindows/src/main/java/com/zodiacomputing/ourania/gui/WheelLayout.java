@@ -25,7 +25,7 @@ import java.util.List;
  * several of them record the day a second copy of the same arithmetic went wrong, which is
  * the reason there is only one copy now.
  */
-final class WheelLayout {
+public final class WheelLayout {
 
     private WheelLayout() {
     }
@@ -108,8 +108,8 @@ final class WheelLayout {
     static final int TIER_OUTER = 2;
     /** Asteroids, centaurs, nodes and calculated points. */
     static final int TIER_SMALL = 3;
-    static final class GlyphSize {
-        final int radius;
+    public static final class GlyphSize {
+        public final int radius;
         /**
          * The glyph's point size. A number rather than a {@code java.awt.Font}, so this table
          * is the same on the phone, which has no AWT; each screen makes its own font from it
@@ -170,7 +170,7 @@ final class WheelLayout {
                 return TIER_SMALL;
         }
     }
-    static GlyphSize natalSize(int n) {
+    public static GlyphSize natalSize(int n) {
         int n2 = WheelLayout.tierOf(n);
         return NATAL_SIZES[n2 < 0 ? TIER_INNER : n2];
     }
@@ -247,9 +247,9 @@ final class WheelLayout {
      * Wider than the outer rings' on both counts, because the natal wheel carries the largest
      * glyphs and is the thing being read - the outer rings are context around it.
      */
-    static final int NATAL_EDGE = 15;
+    public static final int NATAL_EDGE = 15;
     static final int NATAL_SUB_RING_GAP = 24;
-    static final double NATAL_SPACING = 32.0;
+    public static final double NATAL_SPACING = 32.0;
     /**
      * The least radius the natal wheel can be drawn in, derived the way a band's depth is.
      *
@@ -335,7 +335,7 @@ final class WheelLayout {
      * Capped at a third of its own ceiling, so the band cannot crowd out the fields inside it
      * on a small wheel.
      */
-    static int natalBandDepth(int natalTop) {
+    public static int natalBandDepth(int natalTop) {
         int ideal = (RING_COUNT - 1) * NATAL_SUB_RING_GAP + 2 * NATAL_EDGE;
         return Math.max(MIN_BAND_DEPTH, Math.min(ideal, natalTop / 3));
     }
@@ -377,7 +377,7 @@ final class WheelLayout {
      * @param maxEdge  the most clearance to keep at each boundary
      * @param spacing  minimum glyph separation in pixels, before a body steps to a new level
      */
-    static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner,
+    public static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner,
                            int maxEdge, double spacing) {
         // On a band too shallow for full clearance, give up half of what there is at each
         // edge rather than letting top and floor cross - crossed bounds put every body on the
@@ -443,12 +443,12 @@ final class WheelLayout {
         return radius >= rings[RING_OUTER] - RIM_BAND_DEPTH && radius < ceiling;
     }
     /** Indices into {@link #ringRadii}. */
-    static final int RING_OUTER = 0;
+    public static final int RING_OUTER = 0;
     static final int RING_TRI = 1;
     static final int RING_TRANSIT = 2;
-    static final int RING_DECAN_OUTER = 3;
-    static final int RING_SIGN_OUTER = 4;
-    static final int RING_SIGN_INNER = 5;
+    public static final int RING_DECAN_OUTER = 3;
+    public static final int RING_SIGN_OUTER = 4;
+    public static final int RING_SIGN_INNER = 5;
     /**
      * Inner edge of the partner band, and so the ceiling of the natal wheel.
      *
@@ -457,7 +457,7 @@ final class WheelLayout {
      * natal wheel is now allowed to start. Before the reorder this was RING_SIGN_INNER, and
      * with no outer ring open it still equals it exactly.
      */
-    static final int RING_BODY_TOP = 6;
+    public static final int RING_BODY_TOP = 6;
     /**
      * Floor of the bound (term) band, whose ceiling is {@code RING_SIGN_INNER}.
      *
@@ -465,7 +465,7 @@ final class WheelLayout {
      * signs, then the Egyptian bounds inside - so the sign band is framed by the two rings
      * that divide it rather than carrying them both on one side.
      */
-    static final int RING_TERM_INNER = 7;
+    public static final int RING_TERM_INNER = 7;
     /**
      * Floor of the inner degree ring, whose ceiling is {@code RING_TERM_INNER}.
      *
@@ -474,7 +474,7 @@ final class WheelLayout {
      * the wheels, so a body's leader line has somewhere near to land. Everything between the
      * two scales - decans, signs, bounds - is sandwiched by them.
      */
-    static final int RING_DEGREE_INNER = 8;
+    public static final int RING_DEGREE_INNER = 8;
     /**
      * Inner edge of the lunar mansion band, and so the outer edge of the rim degree scale.
      *
@@ -646,7 +646,7 @@ final class WheelLayout {
         return edges;
     }
     /** Overload for callers that pre-date the tri-wheel; preserves the old contract. */
-    static int[] ringRadii(int width, int height, boolean showTransit) {
+    public static int[] ringRadii(int width, int height, boolean showTransit) {
         return ringRadii(width, height, showTransit, false);
     }
 
@@ -761,5 +761,44 @@ final class WheelLayout {
             blArray2[i] = blArray[i] && WheelLayout.ringOf(i) == n;
         }
         return blArray2;
+    }
+
+    /**
+     * Where the natal bodies sit - the top of their band - for the reader's placement setting.
+     *
+     * <p>Here rather than on the panel so the phone places bodies by the same rule (M4); the
+     * panel's {@code bodyBaseRadius} passes {@code Settings.bodyRing()}.
+     */
+    public static int bodyBase(int[] rings, String placement) {
+        int base = rings[RING_BODY_TOP];
+        String ring = placement;
+        if (Settings.RING_CENTRE.equals(ring)) {
+            // Well inside the rings, leaving the body bands and the zodiac clear.
+            return (int) (base * 0.62);
+        }
+        if (Settings.RING_OUTSIDE.equals(ring)) {
+            // <b>This option lost its old destination in the reorder.</b> "Outside the sign
+            // ring" used to mean between the signs and the transit wheel; with the zodiac now
+            // outermost there is nothing out there but the degree ticks, and putting bodies
+            // there would place them beyond the frame that measures them. It now means as far
+            // out as the natal wheel goes - hard against whatever ring is above it.
+            return base;
+        }
+        return base - 14;
+    }
+
+    /**
+     * The three circles aspect lines are drawn on, innermost first: natal to natal, the ring
+     * outside it, the sky. Sized from the natal band's floor so they hold still as the chart
+     * changes; see {@code Geometry.aspectDisc} for why each ring has its own. Here so the phone
+     * draws its lines on the same circles (M4).
+     */
+    public static int[] aspectDiscs(int natalFloor) {
+        int top = Math.max(30, natalFloor - 14);
+        return new int[] {
+            (int) Math.round(top * 0.52),
+            (int) Math.round(top * 0.76),
+            top,
+        };
     }
 }

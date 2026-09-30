@@ -87,6 +87,35 @@ final class PhoneChart {
         return sb.toString();
     }
 
+    /**
+     * One planet as text: its place, retrograde, house, and its reading on the next line - what
+     * the list shows for it and what tapping it on the wheel shows. Empty for one not cast.
+     */
+    static String planet(Cast c, int i, InterpretationService svc) {
+        if (i < 0 || i >= PLANETS || i >= Bodies.count() || i >= c.frame.bodies.length) {
+            return "";
+        }
+        ChartFrame.Body b = c.frame.bodies[i];
+        if (b == null || !b.ok) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(b.name).append("  ").append(Zodiac.format(b.lon));
+        if (b.retrograde) {
+            sb.append("  R");
+        }
+        int house = c.timeUnknown ? 0 : Zodiac.houseOf(b.lon, c.frame.cusps);
+        if (house > 0) {
+            sb.append("  house ").append(house);
+        }
+        sb.append('\n');
+        String reading = PlainText.summary(svc.getPlanetInSign(b.name, Zodiac.signName(b.lon)));
+        if (!reading.isEmpty()) {
+            sb.append("   ").append(reading).append('\n');
+        }
+        return sb.toString();
+    }
+
     /** The chart as text: when and where, anything assumed, then each planet with its reading. */
     static String describe(Cast c, InterpretationService svc) {
         StringBuilder sb = new StringBuilder();
@@ -108,26 +137,11 @@ final class PhoneChart {
             }
         }
         sb.append('\n');
-        for (int i = 0; i < Bodies.count() && i < c.frame.bodies.length && i < PLANETS; i++) {
-            ChartFrame.Body b = c.frame.bodies[i];
-            if (b == null || !b.ok) {
-                continue;
+        for (int i = 0; i < PLANETS; i++) {
+            String p = planet(c, i, svc);
+            if (!p.isEmpty()) {
+                sb.append(p).append('\n');
             }
-            sb.append(b.name).append("  ").append(Zodiac.format(b.lon));
-            if (b.retrograde) {
-                sb.append("  R");
-            }
-            int house = c.timeUnknown ? 0 : Zodiac.houseOf(b.lon, c.frame.cusps);
-            if (house > 0) {
-                sb.append("  house ").append(house);
-            }
-            sb.append('\n');
-            String reading = PlainText.summary(
-                svc.getPlanetInSign(b.name, Zodiac.signName(b.lon)));
-            if (!reading.isEmpty()) {
-                sb.append("   ").append(reading).append('\n');
-            }
-            sb.append('\n');
         }
         if (!c.timeUnknown) {
             sb.append("Ascendant  ").append(Zodiac.format(c.frame.asc)).append('\n');

@@ -1914,12 +1914,7 @@ implements WheelSource {
                 // bodies made the fields resize as the chart changed - switch a point off and
                 // every aspect line moves - which reads as the wheel breathing rather than as
                 // a layout. The floor is a property of the wheel, so the fields hold still.
-                int top = Math.max(30, this.natalFloor - 14);
-                this.discs = new int[] {
-                    (int) Math.round(top * 0.52),
-                    (int) Math.round(top * 0.76),
-                    top,
-                };
+                this.discs = WheelLayout.aspectDiscs(this.natalFloor);
             }
             return this.discs[Math.max(0, Math.min(this.discs.length - 1, level))];
         }
@@ -2868,21 +2863,7 @@ implements WheelSource {
      * someone tries to click a planet and nothing happens.
      */
     int bodyBaseRadius(int[] rings) {
-        int base = rings[RING_BODY_TOP];
-        String ring = Settings.bodyRing();
-        if (Settings.RING_CENTRE.equals(ring)) {
-            // Well inside the rings, leaving the body bands and the zodiac clear.
-            return (int) (base * 0.62);
-        }
-        if (Settings.RING_OUTSIDE.equals(ring)) {
-            // <b>This option lost its old destination in the reorder.</b> "Outside the sign
-            // ring" used to mean between the signs and the transit wheel; with the zodiac now
-            // outermost there is nothing out there but the degree ticks, and putting bodies
-            // there would place them beyond the frame that measures them. It now means as far
-            // out as the natal wheel goes - hard against whatever ring is above it.
-            return base;
-        }
-        return base - 14;
+        return WheelLayout.bodyBase(rings, Settings.bodyRing());
     }
 
 
@@ -7499,7 +7480,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             SkymapPanel.BODY_GLYPHS[i] = def.glyph;
             SkymapPanel.BODY_ELEMENTS[i] = def.element;
         }
-        ZODIAC_SYMBOLS = new String[]{"\u2648\ufe0e", "\u2649\ufe0e", "\u264a\ufe0e", "\u264b\ufe0e", "\u264c\ufe0e", "\u264d\ufe0e", "\u264e\ufe0e", "\u264f\ufe0e", "\u2650\ufe0e", "\u2651\ufe0e", "\u2652\ufe0e", "\u2653\ufe0e"};
+        ZODIAC_SYMBOLS = com.zodiacomputing.ourania.astro.Zodiac.SIGN_GLYPHS;
         FIRE = new Color(255, 69, 0);
         EARTH = new Color(50, 205, 50);
         AIR = new Color(255, 215, 0);

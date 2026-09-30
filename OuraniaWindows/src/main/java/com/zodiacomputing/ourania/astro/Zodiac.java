@@ -13,6 +13,15 @@ package com.zodiacomputing.ourania.astro;
 public final class Zodiac {
 
     /** Sign names in zodiacal order, lowercase to match the JSON key prefixes. */
+    /**
+     * The twelve sign glyphs, Aries first, each with the text-presentation selector (U+FE0E) so
+     * a phone or a font with colour emoji draws the glyph and not a purple tile. Here, in the
+     * engine, so the desktop wheel and the phone's (M4) draw the same twelve.
+     */
+    public static final String[] SIGN_GLYPHS = {"\u2648\ufe0e", "\u2649\ufe0e", "\u264a\ufe0e",
+        "\u264b\ufe0e", "\u264c\ufe0e", "\u264d\ufe0e", "\u264e\ufe0e", "\u264f\ufe0e",
+        "\u2650\ufe0e", "\u2651\ufe0e", "\u2652\ufe0e", "\u2653\ufe0e"};
+
     public static final String[] SIGNS = {
         "aries", "taurus", "gemini", "cancer", "leo", "virgo",
         "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces"

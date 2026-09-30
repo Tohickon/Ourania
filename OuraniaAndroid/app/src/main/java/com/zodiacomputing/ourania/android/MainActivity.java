@@ -38,7 +38,7 @@ import java.util.List;
 
 /**
  * Casting a chart on the phone: a birth date, a time (or "unknown"), and a place found in the
- * offline atlas as it is typed; then the placements (M3).
+ * offline atlas as it is typed; then the wheel (M4) and the placements (M3).
  *
  * <p>Everything this screen does with the engine goes through {@link PhoneChart}, which has no
  * Android in it and is tested on the JVM. This class gathers the three answers and shows text.
@@ -60,7 +60,10 @@ public final class MainActivity extends Activity {
     private CheckBox timeUnknown;
     private AutoCompleteTextView placeField;
     private TextView result;
+    private WheelView wheel;
+    private TextView tapped;
     private Button cast;
+    private PhoneChart.Cast shownCast;
 
     @Override
     protected void onCreate(Bundle saved) {
@@ -114,6 +117,17 @@ public final class MainActivity extends Activity {
         this.cast.setText("Cast the chart");
         this.cast.setOnClickListener(v -> this.castChart());
         form.addView(this.cast);
+
+        // The wheel (M4), hidden until there is a chart; a tapped planet's lines under it.
+        this.wheel = new WheelView(this);
+        this.wheel.setVisibility(View.GONE);
+        this.wheel.setOnBody(this::showBody);
+        form.addView(this.wheel);
+        this.tapped = new TextView(this);
+        this.tapped.setTextSize(16f);
+        this.tapped.setPadding(0, 16, 0, 0);
+        this.tapped.setVisibility(View.GONE);
+        form.addView(this.tapped);
 
         this.result = new TextView(this);
         this.result.setTextSize(15f);
@@ -180,18 +194,37 @@ public final class MainActivity extends Activity {
         this.result.setText("Casting...");
         new Thread(() -> {
             String out;
+            PhoneChart.Cast c = null;
             try {
-                PhoneChart.Cast c = PhoneChart.cast(new SwissEph(Ephemeris.PATH), d, t, p);
+                c = PhoneChart.cast(new SwissEph(Ephemeris.PATH), d, t, p);
                 out = PhoneChart.describe(c, InterpretationService.getInstance());
             } catch (Throwable e) {
+                c = null;
                 out = "The chart could not be cast: " + e;
             }
             final String shown = out;
+            final PhoneChart.Cast cast = c;
             runOnUiThread(() -> {
+                this.shownCast = cast;
+                this.wheel.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.tapped.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                if (cast != null) {
+                    this.wheel.show(cast.frame);
+                    showBody(-1);
+                }
                 this.result.setText(shown);
                 this.cast.setEnabled(true);
             });
         }).start();
+    }
+
+    /** A tapped planet's place and reading under the wheel; a hint when none is tapped. */
+    private void showBody(int body) {
+        String text = this.shownCast == null || body < 0 ? ""
+            : PhoneChart.planet(this.shownCast, body, InterpretationService.getInstance());
+        this.tapped.setText(text.isEmpty()
+            ? "Tap a planet on the wheel to read it. Pinch to zoom; double-tap to reset."
+            : text.trim());
     }
 
     /**
