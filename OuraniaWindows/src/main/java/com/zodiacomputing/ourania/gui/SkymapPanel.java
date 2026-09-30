@@ -75,7 +75,7 @@ import javax.swing.Timer;
 
 public class SkymapPanel
 extends JPanel {
-    private SwissEph sw;
+    SwissEph sw;
     /**
      * The wheel's three rings - the chart, the outer ring (transits, progressions or Chart B),
      * and the sky. See {@link WheelRing}: these were thirty loose fields until J13.
@@ -479,7 +479,7 @@ extends JPanel {
      * else; everything around it keeps working because nothing around it was ever about the
      * flat projection.
      */
-    private boolean globeMode;
+    boolean globeMode;
 
     /**
      * The layers of the chart the reader can fold away, each with its own bloom.
@@ -522,7 +522,7 @@ extends JPanel {
     }
 
     /** The camera, kept across a switch so returning to the globe finds it where it was. */
-    private final Globe globe = new Globe();
+    final Globe globe = new Globe();
 
     /**
      * The globe's aspect list, held between frames.
@@ -623,7 +623,7 @@ extends JPanel {
      * swallowed. This one clears on release, and the release repaints - so the full picture
      * arrives the instant the hand stops.
      */
-    private boolean globeDragging;
+    boolean globeDragging;
 
     /** The chips above the transport row, for the window to keep in step with the view. */
     RingBar ringBarComponent() {
@@ -1297,7 +1297,7 @@ extends JPanel {
      * could not be chosen at all. David, 2026-09-20: "for synastry charts ... have a selector
      * to align to either Chart A or Chart B or Transit houses."
      */
-    private String houseAlignment = "Chart A";
+    String houseAlignment = "Chart A";
     private String wheelPin = "Natal Asc";
     private JComboBox<String> pinCombo;
     /**
@@ -1366,7 +1366,7 @@ extends JPanel {
      * already did - it was the only one seeded from a literal.
      */
     private String stepAmount = "1 Hour";
-    private ChartPanel chartPanel;
+    private WheelCanvas chartPanel;
     /** Which aspects are drawn, by {@code Aspects.Type} ordinal. Absent setting means all. */
     private boolean[] aspectShown = Settings.loadAspectSelection();
 
@@ -1379,8 +1379,8 @@ extends JPanel {
     static final String[] BODY_NAMES = new String[BODY_COUNT];
     static final String[] BODY_GLYPHS = new String[BODY_COUNT];
     private static final int[] BODY_ELEMENTS = new int[BODY_COUNT];
-    private static final int SUN = Bodies.indexOf("sun");
-    private static final int MOON = Bodies.indexOf("moon");
+    static final int SUN = Bodies.indexOf("sun");
+    static final int MOON = Bodies.indexOf("moon");
     private static final int NORTH_NODE = Bodies.indexOf("north_node");
     /**
      * Package-private rather than private so InterpretationPanel's cards can use the same
@@ -1399,7 +1399,7 @@ extends JPanel {
     private static final String[] ELEMENT_TEXT_HEX;
     private static final Font NATAL_GLYPH_FONT;
     private static final Font TRANSIT_GLYPH_FONT;
-    private static final Font ANGLE_FONT;
+    static final Font ANGLE_FONT;
     private OuraniaWindow window;
     public static final String EPHE_PATH = com.zodiacomputing.ourania.astro.Ephemeris.PATH;
     private ReadingTier readingTier = ReadingTier.NONE;
@@ -1521,7 +1521,7 @@ extends JPanel {
         return nArray;
     }
 
-    private static String glyphFor(int n, Font font) {
+    static String glyphFor(int n, Font font) {
         Bodies.Def def = Bodies.at(n);
         return font.canDisplay(def.glyph.codePointAt(0)) ? def.glyph : def.fallback;
     }
@@ -1817,7 +1817,7 @@ extends JPanel {
      * synastry ring, then natal. Each is drawn on top of the one inside it, so this
      * matches what the eye sees where rings overlap.
      */
-    private String hoverTextAt(int x, int y) {
+    String hoverTextAt(int x, int y) {
         if (this.sw == null || this.natalRing.sd == null || this.chartPanel == null) {
             return null;
         }
@@ -2025,12 +2025,12 @@ extends JPanel {
      * Reaches full well before the bloom does, so the reader watches the glyphs travel rather
      * than watching them fade in once they have already arrived.
      */
-    private static float ringAlpha(double open) {
+    static float ringAlpha(double open) {
         return (float) Bloom.smoothstep(0.0, 0.45, open);
     }
 
     /** The wheel's geometry at its current size, or null when it has none to speak of. */
-    private Geometry geometry() {
+    Geometry geometry() {
         if (this.chartPanel == null) {
             return null;
         }
@@ -2038,7 +2038,7 @@ extends JPanel {
     }
 
     /** As above, for the painter, which is handed the size it is painting into. */
-    private Geometry geometry(int w, int h) {
+    Geometry geometry(int w, int h) {
         return w <= 0 || h <= 0 ? null : new Geometry(w, h);
     }
 
@@ -2119,8 +2119,8 @@ extends JPanel {
      * sweeping the wheel sees each body's own web in turn without having to select and
      * deselect. Clicking still opens the reading - that is a separate, deliberate act.
      */
-    private int focusBody = -1;
-    private boolean focusTransit;
+    int focusBody = -1;
+    boolean focusTransit;
 
     /**
      * True when the focus was set by a click rather than by the cursor resting on a body.
@@ -2133,7 +2133,7 @@ extends JPanel {
     private boolean focusPinned;
 
     /** True when nothing is focused, so every aspect draws at its ordinary strength. */
-    private boolean noFocus() {
+    boolean noFocus() {
         return this.focusBody < 0;
     }
 
@@ -2145,7 +2145,7 @@ extends JPanel {
      * context that makes one body's web mean anything, and removing it would leave a reader
      * looking at five lines in an empty circle.
      */
-    private double focusWeight(int a, int b, boolean transitPair) {
+    double focusWeight(int a, int b, boolean transitPair) {
         if (this.noFocus()) {
             return 1.0;
         }
@@ -2162,7 +2162,7 @@ extends JPanel {
      * asked through {@code visibleAspect}, the same gate the lines use, so a glyph cannot stay
      * lit for an aspect that was switched off in Settings.
      */
-    private double glyphWeight(int i, boolean transit) {
+    double glyphWeight(int i, boolean transit) {
         if (this.noFocus()) {
             return 1.0;
         }
@@ -2959,7 +2959,7 @@ extends JPanel {
     /** Asteroids, centaurs, nodes and calculated points. */
     private static final int TIER_SMALL = 3;
 
-    private static final class GlyphSize {
+    static final class GlyphSize {
         final int radius;
         final Font font;
         /** Distance below centre to sit the glyph baseline so it looks centred. */
@@ -3018,12 +3018,12 @@ extends JPanel {
         }
     }
 
-    private static GlyphSize natalSize(int n) {
+    static GlyphSize natalSize(int n) {
         int n2 = SkymapPanel.tierOf(n);
         return NATAL_SIZES[n2 < 0 ? TIER_INNER : n2];
     }
 
-    private static GlyphSize transitSize(int n) {
+    static GlyphSize transitSize(int n) {
         int n2 = SkymapPanel.tierOf(n);
         return TRANSIT_SIZES[n2 < 0 ? TIER_INNER : n2];
     }
@@ -3379,7 +3379,7 @@ extends JPanel {
      * fallback, because a reading is light text on a dark panel. Three surfaces, three
      * grounds - the element is the same, the legible ink is not.
      */
-    private Color getElementColor(int n) {
+    Color getElementColor(int n) {
         return getElementColor(n, true);
     }
 
@@ -3406,7 +3406,7 @@ extends JPanel {
         return own != null ? own : SkymapPanel.getElementColorHex(BODY_ELEMENTS[bodyIndex]);
     }
 
-    private Color getElementColor(int n, boolean lightBacking) {
+    Color getElementColor(int n, boolean lightBacking) {
         if (n < 0 || n >= ELEMENT_COLORS.length) {
             return lightBacking ? Color.BLACK : new Color(226, 228, 234);
         }
@@ -3487,7 +3487,7 @@ extends JPanel {
         this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
         this.outerRing.time = ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId));
         this.updateChartData();
-        this.chartPanel = new ChartPanel();
+        this.chartPanel = new WheelCanvas(this);
         this.chartPanel.addMouseListener(new MouseAdapter(){
 
             @Override
@@ -5520,7 +5520,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * orb. Two different questions sharing a word; routing one into the other would visibly change
      * the wheel and is a decision for the stage that builds the preset bar.
      */
-    private Aspects.Profile profileForPair(boolean crossChart) {
+    Aspects.Profile profileForPair(boolean crossChart) {
         if (crossChart && this.chartMode == ChartMode.SYNASTRY) {
             return Aspects.Profile.SYNASTRY;
         }
@@ -5705,7 +5705,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             role.name(), hostHouse);
     }
 
-    private double getOrbFor(int n, int n2, Aspects.Profile profile) {
+    double getOrbFor(int n, int n2, Aspects.Profile profile) {
         return Aspects.orbFor(SkymapPanel.planetName(n), SkymapPanel.planetName(n2), profile);
     }
 
@@ -5739,7 +5739,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * disagreed about which aspects exist. That is this project's most-logged defect and it
      * would have been invisible: both surfaces look entirely plausible on their own.
      */
-    private Aspects.Type visibleAspect(double sep, int a, int b, Aspects.Profile profile) {
+    Aspects.Type visibleAspect(double sep, int a, int b, Aspects.Profile profile) {
         return AspectGate.visible(sep, a, b, profile, this.aspectShown);
     }
 
@@ -5760,7 +5760,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * Seeded at declaration and refreshed on the settings hook, not per call: this runs once
      * per body pair per repaint, and reading a properties file inside that loop would be felt.
      */
-    private boolean drawsPair(int a, int b) {
+    boolean drawsPair(int a, int b) {
         if (Settings.ASPECTS_ESOTERIC.equals(this.aspectMode)) {
             return true;
         }
@@ -5968,8 +5968,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     static final String BASE_PREFIX = "base_";
 
     /** The aspect the grid is currently hovering, as body indices. -1 when nothing is hovered. */
-    private int highlightA = -1;
-    private int highlightB = -1;
+    int highlightA = -1;
+    int highlightB = -1;
 
     /**
      * Whether this body is one end of the aspect line the cursor is resting on.
@@ -5981,7 +5981,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * into each of the glyph loops, because the natal loop and the outer loop read the
      * highlight from opposite ends of the pair.
      */
-    private boolean onHighlightedLine(int body, int wheel) {
+    boolean onHighlightedLine(int body, int wheel) {
         if (this.highlightA < 0 || this.highlightB < 0) {
             return false;
         }
@@ -5999,7 +5999,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** The wheel the hovered line leaves from. Meaningless while nothing is hovered. */
-    private int highlightWheel = WHEEL_NATAL;
+    int highlightWheel = WHEEL_NATAL;
 
     /**
      * Registry indices of an aspect pattern's members, lit as a group. Empty when none.
@@ -6010,7 +6010,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * within one chart, and {@link com.zodiacomputing.ourania.astro.AspectPatterns} is only
      * ever handed natal aspects.
      */
-    private int[] highlightPattern = new int[0];
+    int[] highlightPattern = new int[0];
 
     /**
      * Every aspect pattern in the current chart, lit without being asked.
@@ -6024,7 +6024,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * repaint: finding patterns means aspecting every pair of bodies, and the painter runs on
      * every mouse move.
      */
-    private int[][] autoPatterns = new int[0][];
+    int[][] autoPatterns = new int[0][];
 
     /** How far in from the outer ring the mansion band starts. The ring is drawn there. */
     static final int MANSION_BAND_DEPTH = 9;
@@ -6369,7 +6369,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** The longitudes of one wheel. */
-    private double[] wheelLon(int wheel) {
+    double[] wheelLon(int wheel) {
         return wheel == WHEEL_SKY ? this.skyRing.lon : (wheel == WHEEL_OUTER ? this.outerRing.lon : this.natalRing.lon);
     }
 
@@ -6380,7 +6380,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** Which points of one wheel are computed. */
-    private boolean[] wheelValid(int wheel) {
+    boolean[] wheelValid(int wheel) {
         return wheel == WHEEL_SKY ? this.skyRing.valid
             : (wheel == WHEEL_OUTER ? this.outerRing.valid : this.natalRing.valid);
     }
@@ -6694,7 +6694,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** True when this line is the one the grid is hovering, or part of the lit pattern. */
-    private boolean isHighlighted(int a, int b, int wheel) {
+    boolean isHighlighted(int a, int b, int wheel) {
         if (isPatternMemberPair(a, b, wheel != WHEEL_NATAL)) {
             return true;
         }
@@ -7871,7 +7871,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
-    private double getPinLongitude() {
+    double getPinLongitude() {
         if ("Aries".equals(this.wheelPin)) {
             return 0.0;
         }
@@ -8193,781 +8193,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         SYNTHESIZE,
         TIMELINE;
 
-    }
-
-    private class ChartPanel
-    extends JPanel {
-        private ChartPanel() {
-        }
-
-        /**
-         * The hover card, asked for rather than pushed.
-         *
-         * <b>This is why hovering a body showed nothing.</b> mouseMoved used to call
-         * setToolTipText with whatever hoverTextAt returned, and a comment here said that
-         * passing null over empty space "unregisters the component, which is exactly the
-         * behaviour wanted". It is not: ToolTipManager.unregisterComponent removes the
-         * listeners it uses to track the pointer. The wheel is mostly empty space, so the
-         * first move over blank chart unregistered the panel; moving on to a glyph set the
-         * text again, but no mouseEntered can fire while the cursor is already inside the
-         * component, so the manager never woke up and no card was ever shown.
-         *
-         * Overriding this instead keeps the panel registered for the life of the window and
-         * lets the answer be per position. Returning null here suppresses the card without
-         * touching registration, which is the behaviour that comment actually wanted.
-         */
-        @Override
-        public String getToolTipText(MouseEvent event) {
-            if (SkymapPanel.this.globeMode) {
-                return SkymapPanel.this.hoverTextAt(event.getX(), event.getY());
-            }
-            java.awt.Point at = SkymapPanel.this.toWheel(event.getX(), event.getY());
-            return SkymapPanel.this.hoverTextAt(at.x, at.y);
-        }
-
-        @Override
-        protected void paintComponent(Graphics graphics) {
-            Object object;
-            int n;
-            int n2;
-            int n3;
-            double d;
-            int n4;
-            int n5;
-            int n6;
-            int n7;
-            double d2;
-            double d3;
-            int n8;
-            int n9;
-            super.paintComponent(graphics);
-            // <b>Jet black, deliberately flat.</b> A radial gradient was tried here on
-            // 2026-08-31 to suggest depth and removed the same day: against the muted
-            // element palette the lifted centre greyed the ground and the copper and sage
-            // glyphs lost contrast. Pure black is the strongest backing those colours have.
-            // <b>The wheel's ground, and the last surface that was not on the theme.</b>
-            // Black since the app existed - which left the chart reading as a hole cut in the
-            // window once everything around it moved to a navy ground. Overridable in
-            // Settings; black is still what it falls back to, so a reader who never opens
-            // Settings sees the chart they had yesterday.
-            graphics.setColor(ChartPalette.colorOr(ChartPalette.backgroundHex(null),
-                Color.BLACK));
-            graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
-            if (SkymapPanel.this.sw == null || SkymapPanel.this.natalRing.sd == null) {
-                return;
-            }
-            Graphics2D graphics2D = (Graphics2D)graphics;
-            // <b>The other view of the same chart.</b> Everything below this line draws the
-            // flat wheel; the globe reads the same arrays and paints them as shells. One
-            // branch, at the top, because the two share no drawing at all - the alternative
-            // is a flag threaded through five thousand lines of painter.
-            if (SkymapPanel.this.globeMode) {
-                // <b>Coasting counts as turning.</b> The cheap path - no halos, coarser
-                // arcs - is for frames the reader cannot study, and a globe still gliding to a
-                // stop is exactly that. Reading only globeDragging would switch the expensive
-                // path back on the instant the button came up, which is the one moment the
-                // frame rate has to hold.
-                GlobeRenderer.paint(graphics2D, SkymapPanel.this.globe,
-                    this.getWidth(), this.getHeight(), SkymapPanel.this,
-                    SkymapPanel.this.globeDragging || SkymapPanel.this.globe.coasting());
-                SkymapPanel.paintZodiacTag(graphics2D, this.getWidth(), this.getHeight());
-                SkymapPanel.this.paintScrubTag(graphics2D, this.getWidth());
-                return;
-            }
-            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            int n10 = this.getWidth();
-            int n11 = this.getHeight();
-            // The zoom and pan, for the screen only - see viewTransform. Everything drawn from
-            // here to the hover swell is in the wheel's own coordinates.
-            final java.awt.geom.AffineTransform screenTx = graphics2D.getTransform();
-            final boolean onScreen = this.getClientProperty(ChartExporter.EXPORTING) == null;
-            if (onScreen) {
-                // Re-clamped at the size being painted: a window made smaller while zoomed would
-                // otherwise keep a pan that now runs past the wheel's edge.
-                SkymapPanel.this.clampView();
-                graphics2D.transform(SkymapPanel.this.viewTransform(n10, n11));
-            }
-            // The same geometry both hit tests and the click dispatcher use. This painter is
-            // the site that diverged: it drew bodies at RING_SIGN_INNER while bodyAt tested
-            // bodyBaseRadius, so with the reader's placement anywhere but the default the
-            // glyphs and the clicks were tens of pixels apart.
-            Geometry g = SkymapPanel.this.geometry(n10, n11);
-            if (g == null) {
-                return;
-            }
-            int n12 = g.cx;
-            int n13 = g.cy;
-            int[] rings = g.rings;
-            int n14 = n9 = rings[RING_OUTER];
-            int nTriOuter = rings[RING_TRI];
-            int n15 = rings[RING_TRANSIT];
-            int n16 = rings[RING_DECAN_OUTER];
-            int n17 = rings[RING_SIGN_OUTER];
-            int n18 = rings[RING_SIGN_INNER];
-            int nBodyTop = rings[RING_BODY_TOP];
-            int nTermInner = rings[RING_TERM_INNER];
-            int nDegreeInner = rings[RING_DEGREE_INNER];
-            // The rim scale's outer edge: the rim itself with the mansions folded, and the
-            // underside of the mansion band once they open.
-            int nMansionInner = rings[RING_MANSION_INNER];
-            // <b>The disc, filled separately from the page.</b> One colour used to do both -
-            // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
-            // Filled before any ring is drawn, so every stroke below lands on top of it.
-            Color disc = ChartPalette.colorOr(ChartPalette.wheelHex(null), null);
-            if (disc != null) {
-                graphics2D.setColor(disc);
-                graphics2D.fillOval(n12 - n14, n13 - n14, n14 * 2, n14 * 2);
-            }
-            double[] dArray = SkymapPanel.this.activeCusps;
-            double d4 = SkymapPanel.this.getPinLongitude();
-            graphics2D.setColor(SkymapPanel.inkColor());
-            graphics2D.setStroke(new BasicStroke(1.0f));
-            graphics2D.drawLine(n12 - 10, n13, n12 + 10, n13);
-            graphics2D.drawLine(n12, n13 - 10, n12, n13 + 10);
-            graphics2D.setColor(SkymapPanel.inkColor());
-            graphics2D.setStroke(new BasicStroke(2.0f));
-            if (SkymapPanel.this.layerShown(Layer.SIGNS)) {
-                graphics2D.drawOval(n12 - n18, n13 - n18, n18 * 2, n18 * 2);
-                graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
-            }
-            if (SkymapPanel.this.layerShown(Layer.DECANS)) {
-                graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
-            }
-            graphics2D.drawOval(n12 - nTermInner, n13 - nTermInner,
-                nTermInner * 2, nTermInner * 2);
-            graphics2D.drawOval(n12 - nDegreeInner, n13 - nDegreeInner,
-                nDegreeInner * 2, nDegreeInner * 2);
-            if (SkymapPanel.this.outerRingDrawn()) {
-                // Both boundaries of the partner band. Since the reorder it hangs below the
-                // zodiac rather than outside it, so its floor is a line of its own - without
-                // it the band bleeds into the natal wheel and stops reading as a field.
-                graphics2D.setColor(new Color(80, 40, 80));
-                graphics2D.drawOval(n12 - n15, n13 - n15, n15 * 2, n15 * 2);
-                graphics2D.drawOval(n12 - nBodyTop, n13 - nBodyTop,
-                    nBodyTop * 2, nBodyTop * 2);
-            }
-            // Tri-wheel: an additional ring outside the synastry ring.
-            if (SkymapPanel.this.triRingDrawn()) {
-                graphics2D.setColor(new Color(30, 60, 80));
-                graphics2D.drawOval(n12 - nTriOuter, n13 - nTriOuter, nTriOuter * 2, nTriOuter * 2);
-            }
-            graphics2D.setFont(new Font("SansSerif", 0, 12));
-            for (n8 = 0; SkymapPanel.this.layerShown(Layer.DECANS) && n8 < 36; ++n8) {
-                d3 = (double)n8 * 10.0;
-                d2 = Math.toRadians(180.0 + d4 - d3);
-                n7 = n12 + (int)((double)n17 * Math.cos(d2));
-                n6 = n13 + (int)((double)n17 * Math.sin(d2));
-                n5 = n12 + (int)((double)n16 * Math.cos(d2));
-                n4 = n13 + (int)((double)n16 * Math.sin(d2));
-                graphics2D.setColor(Color.LIGHT_GRAY);
-                graphics2D.setStroke(new BasicStroke(1.0f));
-                graphics2D.drawLine(n7, n6, n5, n4);
-                d = Math.toRadians(180.0 + d4 - (d3 + 5.0));
-                n3 = n12 + (int)((double)(n16 - 10) * Math.cos(d));
-                n2 = n13 + (int)((double)(n16 - 10) * Math.sin(d));
-                // <b>One band, two traditions, and the reader picks which one it draws.</b>
-                // Visual only: the prose and the tarot keep their own schemes whatever this
-                // says, because they are bound to datasets that cannot be remapped. See
-                // Settings.decanRing for why a global decan-system toggle is not on offer.
-                int n19 = n8 / 3;
-                if (Settings.DECAN_RING_CHALDEAN.equals(Settings.decanRing())) {
-                    String faceRuler = Zodiac.chaldeanDecanRuler(Zodiac.SIGNS[n19], n8 % 3 + 1);
-                    int fi = Bodies.indexOfName(faceRuler);
-                    if (fi >= 0 && fi < BODY_GLYPHS.length) {
-                        graphics2D.setColor(SkymapPanel.this.bodyColor(fi));
-                        graphics2D.drawString(BODY_GLYPHS[fi], n3 - 4, n2 + 4);
-                        continue;
-                    }
-                    // An unresolvable ruler falls through to the sign glyph rather than
-                    // leaving a gap in the band, which would read as a rendering fault.
-                }
-                int n20 = Zodiac.triplicityDecanSignIndex(n19, n8 % 3 + 1);
-                graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n20)));
-                graphics2D.drawString(ZODIAC_SYMBOLS[n20], n3 - 4, n2 + 4);
-            }
-            // <b>The Egyptian bounds, one glyph per segment.</b> Dignity has scored bound
-            // placements since it was written and nothing drew them, so a reader comparing
-            // this wheel against another program found the terms simply missing. Sixty
-            // segments, five to a sign, each ruled by one of the five non-luminary planets -
-            // read from Dignity rather than from a second copy of the table.
-            if (SkymapPanel.this.layerShown(Layer.BOUNDS)) {
-                WheelShapes.drawBoundRing(graphics2D, n12, n13, n18, nTermInner, d4,
-                    SkymapPanel.this::bodyColor);
-            }
-
-            // <b>The second degree scale, sitting directly above the wheels.</b> The outer
-            // ticks are at the rim beside the lunar mansions, too far from any glyph to read
-            // a body against; this one is where a body's leader line lands, so a reader can
-            // follow a glyph out to the degree it actually occupies.
-            if (SkymapPanel.this.layerShown(Layer.DEGREES)) {
-                WheelShapes.drawInnerDegreeRing(graphics2D, n12, n13, nTermInner,
-                    nDegreeInner, d4);
-            }
-
-            // The 28 lunar mansions, in a band of their own at the rim.
-            //
-            // <b>It used to share the rim with the degree ticks and cover them.</b> The band is
-            // now carved out of the rim by the chain - RING_MANSION_INNER - and the ticks below
-            // read from the same number, so the two cannot overlap. Carving it here rather than
-            // inside the zodiac is what keeps the bodies where they are: every radius from
-            // RING_DECAN_OUTER inward is untouched.
-            if (SkymapPanel.this.layerShown(Layer.MANSIONS)) {
-                WheelShapes.drawMansionRing(graphics2D, n12, n13, n14, nMansionInner, d4,
-                    SkymapPanel.this.moonMansion());
-            }
-
-            graphics2D.setFont(new Font("SansSerif", 0, 22));
-            for (n8 = 0; SkymapPanel.this.layerShown(Layer.SIGNS) && n8 < 12; ++n8) {
-                d3 = (double)n8 * 30.0;
-                d2 = Math.toRadians(180.0 + d4 - d3);
-                n7 = n12 + (int)((double)n18 * Math.cos(d2));
-                n6 = n13 + (int)((double)n18 * Math.sin(d2));
-                n5 = n12 + (int)((double)n17 * Math.cos(d2));
-                n4 = n13 + (int)((double)n17 * Math.sin(d2));
-                graphics2D.setColor(SkymapPanel.inkColor());
-                graphics2D.setStroke(new BasicStroke(2.0f));
-                graphics2D.drawLine(n7, n6, n5, n4);
-                d = Math.toRadians(180.0 + d4 - (d3 + 15.0));
-                n3 = n12 + (int)((double)(n17 - 18) * Math.cos(d));
-                n2 = n13 + (int)((double)(n17 - 18) * Math.sin(d));
-                graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n8)));
-                graphics2D.drawString(ZODIAC_SYMBOLS[n8], n3 - 9, n2 + 6);
-            }
-            graphics2D.setColor(new Color(150, 150, 150));
-            for (n8 = 0; SkymapPanel.this.layerShown(Layer.DEGREES) && n8 < 360; ++n8) {
-                d3 = Math.toRadians(180.0 + d4 - (double)n8);
-                // Hanging from the mansion band's underside rather than from the rim, so the
-                // two scales and the mansions are three separate bands the reader can tell
-                // apart. With the mansions folded this is the rim, exactly as before.
-                int n21 = nMansionInner;
-                n = n8 % 10 == 0 ? n21 - 6 : (n8 % 5 == 0 ? n21 - 4 : n21 - 2);
-                n7 = n12 + (int)((double)n * Math.cos(d3));
-                n6 = n13 + (int)((double)n * Math.sin(d3));
-                n5 = n12 + (int)((double)n21 * Math.cos(d3));
-                n4 = n13 + (int)((double)n21 * Math.sin(d3));
-                graphics2D.setStroke(new BasicStroke(n8 % 10 == 0 ? 1.5f : 0.5f));
-                graphics2D.drawLine(n7, n6, n5, n4);
-            }
-            for (n8 = 1; SkymapPanel.this.layerShown(Layer.HOUSES) && n8 <= 12; ++n8) {
-                d3 = dArray[n8];
-                double d5 = Math.toRadians(180.0 + d4 - d3);
-                n7 = n12;
-                n6 = n13;
-                n5 = n12 + (int)((double)n18 * Math.cos(d5));
-                n4 = n13 + (int)((double)n18 * Math.sin(d5));
-                if (n8 == 1 || n8 == 4 || n8 == 7 || n8 == 10) {
-                    graphics2D.setColor(SkymapPanel.inkColor());
-                    graphics2D.setStroke(new BasicStroke(3.0f));
-                } else {
-                    graphics2D.setColor(Color.DARK_GRAY);
-                    graphics2D.setStroke(new BasicStroke(2.0f));
-                }
-                graphics2D.drawLine(n7, n6, n5, n4);
-                double d6 = d = n8 == 12 ? dArray[1] : dArray[n8 + 1];
-                if (d < d3) {
-                    d += 360.0;
-                }
-                double d7 = d3 + (d - d3) / 2.0;
-                double d8 = Math.toRadians(180.0 + d4 - d7);
-                // <b>Just inside the aspect field's rim, not under the sign ring.</b> The number
-                // sat 15 px inside the sign ring's inner edge, which was open space when it was
-                // placed; the bounds ring and the degree scale have since grown into exactly that
-                // band, and an 11 px digit among the bound glyphs and the 0/10/20 labels read as
-                // no house numbers at all (reported 2026-09-14). The rim of the aspect disc is
-                // the one ring on the wheel nothing else is drawn on.
-                int houseR = g.natalFloor - 16;
-                int n22 = n12 + (int)((double)houseR * Math.cos(d8));
-                int n23 = n13 + (int)((double)houseR * Math.sin(d8));
-                graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n8 - 1)));
-                graphics2D.setFont(Theme.font("Arial", 1, 15));
-                java.awt.FontMetrics houseFm = graphics2D.getFontMetrics();
-                String houseText = String.valueOf(n8);
-                graphics2D.drawString(houseText, n22 - houseFm.stringWidth(houseText) / 2,
-                    n23 + houseFm.getAscent() / 2 - 1);
-            }
-            if (SkymapPanel.this.showTransitChart && "Both".equals(SkymapPanel.this.houseAlignment)) {
-                Stroke stroke = graphics2D.getStroke();
-                graphics2D.setStroke(new BasicStroke(2.0f, 0, 0, 10.0f, new float[]{4.0f, 4.0f}, 0.0f));
-                for (int i = 1; i <= 12; ++i) {
-                    // Across the partner band, which is where those cusps belong - not from
-                    // the decan ring, which the reorder moved to the other side of the wheel.
-                    double d9 = Math.toRadians(180.0 + d4 - SkymapPanel.this.outerRing.cusps[i]);
-                    n = n12 + (int)((double)nBodyTop * Math.cos(d9));
-                    n7 = n13 + (int)((double)nBodyTop * Math.sin(d9));
-                    n6 = n12 + (int)((double)n15 * Math.cos(d9));
-                    n5 = n13 + (int)((double)n15 * Math.sin(d9));
-                    n4 = i == 1 || i == 4 || i == 7 || i == 10 ? 1 : 0;
-                    graphics2D.setColor(n4 != 0 ? new Color(210, 150, 230) : new Color(120, 80, 140));
-                    graphics2D.drawLine(n, n7, n6, n5);
-                }
-                graphics2D.setStroke(stroke);
-            }
-            // Body radii come from the shared geometry, not from n18. n18 is RING_SIGN_INNER
-            // and this painter used to draw bodies there whatever placement the reader chose,
-            // while bodyAt tested bodyBaseRadius - 325 against 201 in the centre at 820px, so
-            // nothing on the wheel could be clicked. n18 keeps RING_SIGN_INNER for the sign
-            // circle it strokes and the spokes it ends, because those are the sign ring.
-            int[] nArray = g.natalRadii();
-            int[] nArray2 = g.transitRadii();
-            int[] nArrayC = g.triRadii();
-            // The three aspect fields. Lines are drawn on these, not between the glyphs -
-            // see Geometry.aspectDisc for why, and note that the hit test reads the same
-            // three numbers, because a line you can see has to be a line you can hover.
-            int discNatal = g.aspectDisc(0);
-            int discOuter = g.aspectDisc(1);
-            int discSky = g.aspectDisc(2);
-            // <b>One circle, where the lines stop and the bodies start.</b> Three nested
-            // fields of chords with nothing around them read as weather in the middle of the
-            // wheel; a single boundary at the natal band's floor turns them into a thing with
-            // an edge. Nothing has to be clipped to it: every chord has both ends on a disc
-            // inside this radius, so the widest line the wheel can draw is a diameter of the
-            // outermost field and still falls short of the circle around it.
-            //
-            // Alpha 190 rather than the 120 it was first drawn at. A circle sampled across ten
-            // spokes of the rendered wheel registered on six of them at 120, where every other
-            // ring line registered on ten - present in the file and absent to a reader, which
-            // is the one outcome a boundary cannot have. Still below the zodiac's full-weight
-            // strokes, because it marks an edge rather than another ring.
-            Color edge = SkymapPanel.inkColor();
-            graphics2D.setColor(new Color(edge.getRed(), edge.getGreen(), edge.getBlue(), 190));
-            graphics2D.setStroke(new BasicStroke(1.5f));
-            graphics2D.drawOval(n12 - g.natalFloor, n13 - g.natalFloor,
-                g.natalFloor * 2, g.natalFloor * 2);
-            int n24 = n18 - 60;
-            graphics2D.setStroke(new BasicStroke(0.5f));
-            // <b>The layer folds the lines; the filter chooses which families.</b> Two
-            // different questions, and a reader who folded the aspects away expects all of
-            // them gone whatever the filter says.
-            boolean aspectLayer = SkymapPanel.this.layerShown(Layer.ASPECTS);
-            boolean bl = aspectLayer && SkymapPanel.this.drawsNatalAspects();
-            int n25 = n = aspectLayer && SkymapPanel.this.drawsCrossAspects() ? 1 : 0;
-            if (bl) {
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.natalRing.valid)) continue;
-                    for (n6 = n7 + 1; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid) || Bodies.isOppositePair(n7, n6)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.natalRing.lon[n7], SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discNatal, discNatal, WHEEL_NATAL, n7, n6);
-                    }
-                }
-            }
-            if (n != 0) {
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.outerRing.valid)) continue;
-                    for (n6 = 0; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.outerRing.lon[n7], SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discOuter, discOuter, WHEEL_OUTER, n7, n6);
-                    }
-                }
-            }
-            // <b>The sky ring had no aspect lines at all.</b> It could be drawn, hovered and
-            // read, and the one thing the wheel is for - showing what is in aspect to what -
-            // stopped at the ring below it. With a field of its own there is now somewhere to
-            // put them where they do not cross the other two.
-            if (n != 0 && SkymapPanel.this.triRingDrawn()) {
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.skyRing.valid)) continue;
-                    for (n6 = 0; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.skyRing.lon[n7],
-                            SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discSky, discSky,
-                            WHEEL_SKY, n7, n6);
-                    }
-                }
-            }
-            // Draw the hovered line once more, last, so it sits on top of the weave. Emphasis
-            // alone is not enough: with 28 points switched on, a highlighted line drawn in
-            // registry order disappears under every pair that comes after it.
-            // The lit pattern goes down before the hovered line, for the same reason the
-            // hovered line goes down after the weave: emphasis alone loses to draw order once
-            // there are 28 points on the wheel. A figure is several lines, so all of its
-            // member pairs are redrawn here - drawAspectLine draws nothing for a pair that
-            // holds no aspect, so the loop can be over members rather than over the figure's
-            // own legs, which the Pattern does not record.
-            java.util.List<int[]> litFigures = new java.util.ArrayList<>();
-            for (int[] members : SkymapPanel.this.autoPatterns) {
-                litFigures.add(members);
-            }
-            if (SkymapPanel.this.highlightPattern.length > 0) {
-                litFigures.add(SkymapPanel.this.highlightPattern);
-            }
-            for (int[] lit : litFigures) {
-                for (int li = 0; li < lit.length; li++) {
-                    for (int lj = li + 1; lj < lit.length; lj++) {
-                        int pa = lit[li];
-                        int pb = lit[lj];
-                        if (!SkymapPanel.aspecting(pa, SkymapPanel.this.natalRing.valid)
-                            || !SkymapPanel.aspecting(pb, SkymapPanel.this.natalRing.valid)) {
-                            continue;
-                        }
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.natalRing.lon[pa],
-                            SkymapPanel.this.natalRing.lon[pb], d4, n12, n13, discNatal, discNatal,
-                            WHEEL_NATAL, pa, pb);
-                    }
-                }
-            }
-
-            int hlA = SkymapPanel.this.highlightA;
-            int hlB = SkymapPanel.this.highlightB;
-            int hlWheel = SkymapPanel.this.highlightWheel;
-            if (hlA >= 0 && hlB >= 0) {
-                // <b>Off the ring it belongs to.</b> This redraw picked the outer wheel for
-                // every cross-chart line, so a hovered sky aspect was drawn again on the
-                // partner ring - a bright chord in the wrong field, next to the faint one it
-                // was meant to be.
-                int hlDisc = hlWheel == WHEEL_SKY ? discSky
-                    : (hlWheel == WHEEL_OUTER ? discOuter : discNatal);
-                if (SkymapPanel.aspecting(hlA, SkymapPanel.this.wheelValid(hlWheel))
-                    && SkymapPanel.aspecting(hlB, SkymapPanel.this.natalRing.valid)) {
-                    this.drawAspectLine(graphics2D,
-                        SkymapPanel.this.wheelLon(hlWheel)[hlA], SkymapPanel.this.natalRing.lon[hlB],
-                        d4, n12, n13, hlDisc, hlDisc, hlWheel, hlA, hlB);
-                }
-            }
-            // The transform the bodies are drawn in, so a hovered glyph's swell is undone
-            // before anything else is painted - every loop below resets to it.
-            final java.awt.geom.AffineTransform bodyTx = graphics2D.getTransform();
-            for (n7 = 0; SkymapPanel.this.layerShown(Layer.NATAL) && n7 < BODY_COUNT; ++n7) {
-                if (!SkymapPanel.this.natalRing.valid[n7]) continue;
-                double d10 = Math.toRadians(180.0 + d4 - SkymapPanel.this.natalRing.lon[n7]);
-                n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));
-                int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
-                SkymapPanel.bulge(graphics2D, bodyTx, n4, n26, SkymapPanel.this.hoverBody == n7);
-                if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_NATAL)) {
-                    WheelShapes.drawHighlightHalo(graphics2D, n4, n26,
-                        Bodies.at(n7).isAngle() ? 13 : SkymapPanel.natalSize(n7).radius);
-                }
-                if (Bodies.at(n7).isAngle()) {
-                    graphics2D.setFont(ANGLE_FONT);
-                    // The angle marker follows the template: gold is invisible on a white
-                    // ground and is the only warm thing in a cool palette.
-                    Color angle = ChartPalette.colorOr(ChartPalette.angleHex("#D4AF37"),
-                        new Color(212, 175, 55));
-                    WheelShapes.drawBodyMarker(graphics2D, n4, n26, 13, angle,
-                        Settings.natalMarker());
-                    // The glyph reads against its own bead rather than against a fixed dark
-                    // brown, which disappears on a pale marker.
-                    graphics2D.setColor(SkymapPanel.readableOn(angle));
-                    object = Bodies.at((int)n7).glyph;
-                    graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n26 + 4);
-                    continue;
-                }
-                // A body recedes with its lines unless it IS the focus or aspects it. Without
-                // this the web dims and the glyphs stay bright, which reads as the lines being
-                // broken rather than as one body being singled out.
-                java.awt.Composite priorComposite = graphics2D.getComposite();
-                if (!SkymapPanel.this.noFocus()) {
-                    graphics2D.setComposite(java.awt.AlphaComposite.getInstance(
-                        java.awt.AlphaComposite.SRC_OVER,
-                        (float) SkymapPanel.this.glyphWeight(n7, false)));
-                }
-                GlyphSize glyphSize = SkymapPanel.natalSize(n7);
-                graphics2D.setFont(glyphSize.font);
-                WheelShapes.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
-                    new Color(192, 192, 192), Settings.natalMarker());
-                if (n7 == MOON && SkymapPanel.this.natalRing.valid[SUN]) {
-                    double d11 = (SkymapPanel.this.natalRing.lon[MOON] - SkymapPanel.this.natalRing.lon[SUN]) % 360.0;
-                    if (d11 < 0.0) {
-                        d11 += 360.0;
-                    }
-                    WheelShapes.drawMoonPhase(graphics2D, n4, n26, Math.round((float)glyphSize.radius * 0.47f), d11 / 360.0);
-                } else {
-                    graphics2D.setColor(SkymapPanel.this.bodyColor(n7));
-                    object = SkymapPanel.glyphFor(n7, glyphSize.font);
-                    WheelShapes.drawBodyLabel(graphics2D, (String)object, n4, n26, glyphSize.baseline);
-                }
-                graphics2D.setTransform(bodyTx);
-                // The leader from the glyph to the degree it actually occupies. Bodies are
-                // spread outward when they crowd, so without this a reader cannot tell which
-                // degree a glyph belongs to. Colour and visibility are both settings; the
-                // alpha stays here because a solid leader would compete with the aspect lines.
-                graphics2D.setComposite(priorComposite);
-                if (Settings.showDegreeLines()) {
-                    // <b>To the far scale, at the reader's asking.</b> These ran to the inner
-                    // degree scale on the argument that a leader crossing the decans and the
-                    // bounds is a line the reader has to trace rather than read. David,
-                    // 2026-09-16: "can we extend the line all the way to the second sabian ring
-                    // degree" - so they now reach the rim scale, which is the outer of the two.
-                    // The inner scale is still drawn and still readable; what changed is where
-                    // the line ends, and that is his call to make while looking at it.
-                    //
-                    // <b>The hovered body's leader is drawn to be seen.</b> At alpha 60 every
-                    // leader is a hint and none of them is an answer; the one the cursor is on
-                    // is the reader asking which degree this glyph occupies, so it is drawn
-                    // solid and the rest stay a background.
-                    boolean lit = SkymapPanel.this.focusBody == n7
-                        && !SkymapPanel.this.focusTransit;
-                    Color leader = ChartPalette.colorOr(ChartPalette.leaderHex(null),
-                        Color.WHITE);
-                    Stroke priorLeader = graphics2D.getStroke();
-                    graphics2D.setColor(new Color(leader.getRed(), leader.getGreen(),
-                        leader.getBlue(), lit ? 235 : 60));
-                    graphics2D.setStroke(new BasicStroke(lit ? 1.8f : 1.0f));
-                    graphics2D.drawLine(n4, n26,
-                        n12 + (int)((double)nMansionInner * Math.cos(d10)),
-                        n13 + (int)((double)nMansionInner * Math.sin(d10)));
-                    graphics2D.setStroke(priorLeader);
-                }
-            }
-            graphics2D.setTransform(bodyTx);
-            if (SkymapPanel.this.outerRingDrawn()) {
-                Composite outerWas = graphics2D.getComposite();
-                float outerA = SkymapPanel.ringAlpha(SkymapPanel.this.outerOpenFraction());
-                if (outerA < 0.999f) {
-                    graphics2D.setComposite(
-                        AlphaComposite.getInstance(AlphaComposite.SRC_OVER, outerA));
-                }
-                // The same question the angle cards ask, asked once for the whole ring: in a
-                // synastry this wheel is a second person, anywhere else it is a moment.
-                final AngleRole outerRole = SkymapPanel.this.angleRoleFor(false, true);
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.this.outerRing.valid[n7]) continue;
-                    double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.outerRing.lon[n7]);
-                    n4 = n12 + (int)((double)nArray2[n7] * Math.cos(d12));
-                    int n27 = n13 + (int)((double)nArray2[n7] * Math.sin(d12));
-                    SkymapPanel.bulge(graphics2D, bodyTx, n4, n27,
-                        SkymapPanel.this.hoverBody == (n7 | TRANSIT_BIT));
-                    if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_OUTER)) {
-                        WheelShapes.drawHighlightHalo(graphics2D, n4, n27,
-                            Bodies.at(n7).isAngle() ? 13
-                                : SkymapPanel.transitSize(n7).radius);
-                    }
-                    if (Bodies.at(n7).isAngle()) {
-                        graphics2D.setFont(ANGLE_FONT);
-                        WheelShapes.drawBodyMarker(graphics2D, n4, n27, 13,
-                            SkymapPanel.ringBead(outerRole),
-                            SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
-                        graphics2D.setColor(SkymapPanel.this.ringAngleInk(outerRole));
-                        object = Bodies.at((int)n7).glyph;
-                        graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n27 + 4);
-                        continue;
-                    }
-                    GlyphSize glyphSize2 = SkymapPanel.transitSize(n7);
-                    graphics2D.setFont(glyphSize2.font);
-                    object = SkymapPanel.this.ringInk(n7, outerRole);
-                    WheelShapes.drawBodyMarker(graphics2D, n4, n27, glyphSize2.radius,
-                        SkymapPanel.ringBead(outerRole),
-                        SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
-                    if (n7 == MOON && SkymapPanel.this.outerRing.valid[SUN]) {
-                        double d13 = (SkymapPanel.this.outerRing.lon[MOON] - SkymapPanel.this.outerRing.lon[SUN]) % 360.0;
-                        if (d13 < 0.0) {
-                            d13 += 360.0;
-                        }
-                        WheelShapes.drawMoonPhase(graphics2D, n4, n27, Math.round((float)glyphSize2.radius * 0.44f), d13 / 360.0);
-                        continue;
-                    }
-                    graphics2D.setColor((Color)object);
-                    String string = SkymapPanel.glyphFor(n7, glyphSize2.font);
-                    WheelShapes.drawBodyLabel(graphics2D, string, n4, n27, glyphSize2.baseline);
-                }
-                graphics2D.setComposite(outerWas);
-            }
-            // Tri-wheel: sky positions in the outermost ring. Blue-tinted, and by default a
-            // different shape from the synastry ring inside it - see Settings.MARKER_SHAPES
-            // for why the tint alone was not enough.
-            graphics2D.setTransform(bodyTx);
-            if (SkymapPanel.this.triRingDrawn()) {
-                Composite triWas = graphics2D.getComposite();
-                float triA = SkymapPanel.ringAlpha(SkymapPanel.this.triOpenFraction());
-                if (triA < 0.999f) {
-                    graphics2D.setComposite(
-                        AlphaComposite.getInstance(AlphaComposite.SRC_OVER, triA));
-                }
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.this.skyRing.valid[n7]) continue;
-                    double d14 = Math.toRadians(180.0 + d4 - SkymapPanel.this.skyRing.lon[n7]);
-                    n4 = n12 + (int)((double)nArrayC[n7] * Math.cos(d14));
-                    int n28 = n13 + (int)((double)nArrayC[n7] * Math.sin(d14));
-                    // The sky ring never had this at all: its chords could light and the two
-                    // glyphs at their ends stayed dark, so a reader could see a sky aspect
-                    // and still have to work out which points it joined.
-                    if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_SKY)) {
-                        WheelShapes.drawHighlightHalo(graphics2D, n4, n28,
-                            Bodies.at(n7).isAngle() ? 13
-                                : SkymapPanel.transitSize(n7).radius);
-                    }
-                    if (Bodies.at(n7).isAngle()) {
-                        graphics2D.setFont(ANGLE_FONT);
-                        WheelShapes.drawBodyMarker(graphics2D, n4, n28, 13,
-                            SkymapPanel.ringBead(AngleRole.SKY), Settings.transitMarker());
-                        graphics2D.setColor(SkymapPanel.this.ringAngleInk(AngleRole.SKY));
-                        object = Bodies.at((int)n7).glyph;
-                        graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n28 + 4);
-                        continue;
-                    }
-                    GlyphSize glyphSize3 = SkymapPanel.transitSize(n7);
-                    graphics2D.setFont(glyphSize3.font);
-                    Color cColor = SkymapPanel.this.ringInk(n7, AngleRole.SKY);
-                    WheelShapes.drawBodyMarker(graphics2D, n4, n28, glyphSize3.radius,
-                        SkymapPanel.ringBead(AngleRole.SKY), Settings.transitMarker());
-                    if (n7 == MOON && SkymapPanel.this.skyRing.valid[SUN]) {
-                        double d15 = (SkymapPanel.this.skyRing.lon[MOON] - SkymapPanel.this.skyRing.lon[SUN]) % 360.0;
-                        if (d15 < 0.0) d15 += 360.0;
-                        WheelShapes.drawMoonPhase(graphics2D, n4, n28, Math.round((float)glyphSize3.radius * 0.44f), d15 / 360.0);
-                        continue;
-                    }
-                    graphics2D.setColor(cColor);
-                    String stringC = SkymapPanel.glyphFor(n7, glyphSize3.font);
-                    WheelShapes.drawBodyLabel(graphics2D, stringC, n4, n28, glyphSize3.baseline);
-                }
-                graphics2D.setComposite(triWas);
-            }
-            graphics2D.setTransform(bodyTx);
-            SkymapPanel.this.paintHover(graphics2D, g);
-            graphics2D.setTransform(screenTx);
-            SkymapPanel.paintZodiacTag(graphics2D, n10, n11);
-            if (onScreen) {
-                SkymapPanel.this.paintFitChip(graphics2D);
-                SkymapPanel.this.paintScrubTag(graphics2D, n10);
-            }
-        }
-
-        /**
-         * How many widening passes make the glow.
-         *
-         * Three is where it stops being worth it: a fourth pass is wide enough to overlap its
-         * neighbours and turns a chart with forty aspects into a haze. Measured by eye on a
-         * chart with every point switched on, which is the case that breaks first.
-         */
-        private static final int GLOW_PASSES = 3;
-
-        private void drawAspectLine(Graphics2D graphics2D, double d, double d2, double d3, int n, int n2, int n3, int n4, int wheel, int n5, int n6) {
-            double d4 = Math.abs(d - d2);
-            if (d4 > 180.0) {
-                d4 = 360.0 - d4;
-            }
-            // wheel says which ring the first body is on, and used to be a boolean meaning
-            // "the outer one" - which could not tell the partner ring from the sky ring, so
-            // the two lit each other's lines. Only the partner ring is ever a synastry pair;
-            // the sky ring is a moment and is judged at natal orbs, the same as the grid and
-            // the hit test judge it.
-            boolean bl = wheel != SkymapPanel.WHEEL_NATAL;
-            Aspects.Profile syn = SkymapPanel.this.profileForPair(
-                wheel == SkymapPanel.WHEEL_OUTER);
-            double d5 = SkymapPanel.this.getOrbFor(n5, n6, syn);
-            Color color = null;
-            double d6 = 0.0;
-            // Which aspect this is, and what colour it takes, both come from the one place
-            // that already knows.
-            //
-            // <b>This used to be a hand-written if/else ladder</b> re-testing 0/60/90/120/180
-            // with the colours inlined as RGB triples - a third copy of Aspects.typeOf and a
-            // second copy of getAspectColorHex. It had no 150-degree branch for months, so the
-            // grid listed quincunxes the wheel could not draw, and adding five more aspects to
-            // a hand-written ladder would have been five more chances at the same silence.
-            // Now a new constant on Aspects.Type appears here automatically.
-            // Through the same gate the grid uses, so a switched-off aspect disappears from
-            // both or from neither.
-            Aspects.Type drawn = SkymapPanel.this.visibleAspect(d4, n5, n6, syn);
-            // The reader's aspect mode applies to the line and not to the aspect. A pair the
-            // mode excludes is still computed, still in the grid, still in the reading - it
-            // simply does not cross the middle of the wheel. See drawsPair.
-            if (drawn != null && !SkymapPanel.this.drawsPair(n5, n6)) {
-                drawn = null;
-            }
-            if (drawn != null) {
-                color = Color.decode(SkymapPanel.getAspectColorHex(drawn.label));
-                d6 = drawn.exactAngle;
-                // The alpha ramp below fades a line as it widens, and it has to fade against
-                // the orb this aspect was actually judged by. Against the raw body orb a
-                // 1-degree semisextile would render at nearly full strength however loose it is.
-                d5 = Aspects.effectiveOrb(SkymapPanel.planetName(n5),
-                    SkymapPanel.planetName(n6), drawn, syn);
-            }
-            if (color != null) {
-                // <b>What "close" is measured against.</b> Relative to the orb in force by
-                // default, which is what the wheel has always done; in absolute mode, degrees
-                // from exact, so that widening an orb adds lines without brightening the ones
-                // already drawn. David, 25 Sep.
-                double reach = Settings.aspectWeightAbsolute()
-                    ? Settings.ABSOLUTE_FADE_DEGREES : d5;
-                double d7 = Math.min(1.0, Math.abs(d4 - d6) / Math.max(0.0001, reach));
-                float f = (float)Math.pow(1.0 - d7, 2.0);
-                int n7 = (int)(35.0f + 220.0f * f);
-                n7 = Math.max(20, Math.min(255, n7));
-                // Focus, applied on top of the orb fade rather than instead of it: a loose
-                // aspect to the focused body is still a loose aspect and should still look
-                // like one.
-                double focus = SkymapPanel.this.focusWeight(n5, n6, bl);
-                n7 = Math.max(6, (int)(n7 * focus));
-                // <b>Weight is the aspect's own force times how close it is to exact.</b> Before
-                // this the width carried only proximity, so a semisextile at 0 degrees inked
-                // exactly as heavily as a conjunction at 0 degrees - the two lines said the same
-                // thing about very different aspects. Amplitude belongs to the harmonic family
-                // and lives on Aspects.Type beside the harmonic it comes from.
-                double amplitude = drawn == null ? 1.0 : drawn.amplitude();
-                // A hovered line is drawn at full strength regardless of how wide its orb is.
-                // The normal alpha ramp fades a loose aspect almost to nothing, which is right
-                // for the background weave and useless for "show me the one I am pointing at".
-                boolean highlighted = SkymapPanel.this.isHighlighted(n5, n6, wheel);
-                color = new Color(color.getRed(), color.getGreen(), color.getBlue(),
-                    highlighted ? 255 : n7);
-                // <b>Scaled into a range a reader can actually see.</b> 0.3 to 1.0 was under
-                // one pixel of variation, so the tightness rule was true and unreadable.
-                double lo = Settings.aspectWeightMin();
-                double hi = Settings.aspectWeightMax();
-                float f2 = highlighted ? (float)(hi * 1.4)
-                    : (float)(lo + (hi - lo) * f * amplitude);
-                double d8 = Math.toRadians(180.0 + d3 - d);
-                double d9 = Math.toRadians(180.0 + d3 - d2);
-                // <b>Where the ends sit, decided in one place.</b> Six call sites pass these
-                // radii and deciding it at each of them would be six chances to disagree - the
-                // defect this file has supplied all day. The first body is on `wheel`; the
-                // second is always on the natal ring, which is what every call site does.
-                int ra = SkymapPanel.this.endpointRadius(wheel, n5, n3);
-                int rb = SkymapPanel.this.endpointRadius(WHEEL_NATAL, n6, n4);
-                int n8 = n + (int)((double)ra * Math.cos(d8));
-                int n9 = n2 + (int)((double)ra * Math.sin(d8));
-                int n10 = n + (int)((double)rb * Math.cos(d9));
-                int n11 = n2 + (int)((double)rb * Math.sin(d9));
-                Stroke stroke = graphics2D.getStroke();
-                if (highlighted) {
-                    // White halo underneath, so the line reads against whichever aspect colour
-                    // it is and against the wheel's own spokes.
-                    graphics2D.setColor(new Color(255, 255, 255, 90));
-                    graphics2D.setStroke(new BasicStroke(f2 + 4.0f, BasicStroke.CAP_ROUND,
-                        BasicStroke.JOIN_ROUND));
-                    graphics2D.drawLine(n8, n9, n10, n11);
-                }
-                // <b>The glow: a wide, faint pass of the same colour under the crisp line.</b>
-                // Real bloom needs a blur, which Java2D will not do cheaply on every frame -
-                // but two or three widening strokes at low alpha read as light spilling off a
-                // strand, which is the whole effect. The passes are driven by the SAME f as the
-                // line, so a tight aspect glows and a loose one barely does: the fade already
-                // in this method is what makes the weave legible, and the glow must not undo it
-                // by lighting up the aspects the ramp is busy hiding.
-                if (!bl) {
-                    for (int pass = GLOW_PASSES; pass >= 1; pass--) {
-                        int glowAlpha = (int) (n7 * 0.10f * f / pass);
-                        if (glowAlpha < 3) {
-                            continue;
-                        }
-                        graphics2D.setColor(new Color(color.getRed(), color.getGreen(),
-                            color.getBlue(), Math.min(60, glowAlpha * 3)));
-                        graphics2D.setStroke(new BasicStroke(f2 + pass * 2.4f,
-                            BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                        graphics2D.drawLine(n8, n9, n10, n11);
-                    }
-                }
-
-                graphics2D.setColor(color);
-                // <b>Which chart this line belongs to, from the ring itself.</b> This was
-                // `if (bl)` - not the natal ring - so a partner's line, a transit and the sky
-                // were dashed identically and a reader could not tell them apart. The ring knows
-                // what it is since 383408c8; the pattern is its own.
-                float[] dash = SkymapPanel.this.ringAt(wheel).kind.dashPattern();
-                if (dash != null) {
-                    graphics2D.setStroke(new BasicStroke(f2, 0, 0, 10.0f, dash, 0.0f));
-                } else {
-                    // Thinner core than before (was f2 alone at up to 1.0). A strand reads as
-                    // light when the bright part is narrow and the spill is wide; a thick core
-                    // with a glow around it just looks like a thick line.
-                    graphics2D.setStroke(new BasicStroke(Math.max(0.6f, f2 * 0.8f),
-                        BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                }
-                graphics2D.drawLine(n8, n9, n10, n11);
-                graphics2D.setStroke(stroke);
-            }
-        }
     }
 
     public static final class YearScan {
