@@ -78,7 +78,7 @@ import javax.swing.Timer;
 
 public class SkymapPanel
 extends JPanel
-implements WheelSource {
+implements WheelSource, GlobeSource {
     SwissEph sw;
     /**
      * The wheel's three rings - the chart, the outer ring (transits, progressions or Chart B),
@@ -485,7 +485,8 @@ implements WheelSource {
         new java.util.EnumMap<>(Layer.class);
 
     /** How far a layer is open, 0 folded to 1 shown. */
-    double layerOpen(Layer layer) {
+    @Override
+    public double layerOpen(Layer layer) {
         Bloom b = this.layerBlooms.get(layer);
         return b == null ? 1.0 : b.value();
     }
@@ -556,7 +557,8 @@ implements WheelSource {
     }
 
     /** The globe's aspects, computed once per chart rather than once per frame. */
-    int[][] globeChords(java.util.function.Supplier<int[][]> build) {
+    @Override
+    public int[][] globeChords(java.util.function.Supplier<int[][]> build) {
         if (this.globeChords == null) {
             this.globeChords = build.get();
         }
@@ -1494,7 +1496,8 @@ implements WheelSource {
     }
 
     /** Longitude the view is pinned to - the Ascendant unless the reader chose otherwise. */
-    double pinLongitude() {
+    @Override
+    public double pinLongitude() {
         return this.getPinLongitude();
     }
 
@@ -1506,7 +1509,8 @@ implements WheelSource {
      * the globe for the same reason it is absent from the wheel - otherwise the two views
      * disagree about what is in aspect, which is worse than either being wrong alone.
      */
-    Color aspectInkFor(double lonA, double lonB, int a, int b, boolean cross) {
+    @Override
+    public Color aspectInkFor(double lonA, double lonB, int a, int b, boolean cross) {
         double sep = Math.abs(lonA - lonB);
         if (sep > 180.0) {
             sep = 360.0 - sep;
@@ -1532,7 +1536,8 @@ implements WheelSource {
      * A rule with two implementations is how the sky ring came to be lit by the partner ring's
      * hover in the first place.
      */
-    boolean lightsChord(int a, int b, int wheel) {
+    @Override
+    public boolean lightsChord(int a, int b, int wheel) {
         return this.isHighlighted(a, b, wheel);
     }
 
@@ -1572,7 +1577,8 @@ implements WheelSource {
     private int focusMansion = -1;
 
     /** The mansion the cursor is over, for the globe's band to light. */
-    int focusedMansion() {
+    @Override
+    public int focusedMansion() {
         return this.focusMansion;
     }
 
@@ -1600,7 +1606,8 @@ implements WheelSource {
     }
 
     /** The house the cursor is over, for the globe to carve. */
-    int focusedHouse() {
+    @Override
+    public int focusedHouse() {
         return this.focusHouse;
     }
 
@@ -1614,7 +1621,8 @@ implements WheelSource {
     }
 
     /** The degree under the cursor, for the globe's scale to light. */
-    int focusedDegree() {
+    @Override
+    public int focusedDegree() {
         return this.focusDegree;
     }
 
@@ -1628,7 +1636,8 @@ implements WheelSource {
     }
 
     /** The body the cursor is resting on, or -1. Read by the globe to light its wedges. */
-    int focusedBody() {
+    @Override
+    public int focusedBody() {
         return this.focusBody;
     }
 
@@ -1640,7 +1649,8 @@ implements WheelSource {
      * same index happens to occupy - a wedge confidently highlighting the wrong sign, which
      * is worse than not highlighting at all.
      */
-    double focusedLongitude() {
+    @Override
+    public double focusedLongitude() {
         if (this.focusBody < 0) {
             return Double.NaN;
         }
@@ -1649,7 +1659,8 @@ implements WheelSource {
     }
 
     /** Whether the globe should light this body - the cursor is resting on it. */
-    boolean onGlobeFocus(int body, boolean outer) {
+    @Override
+    public boolean onGlobeFocus(int body, boolean outer) {
         return this.focusBody == body && this.focusTransit == outer;
     }
 
@@ -2845,7 +2856,8 @@ implements WheelSource {
      * one of them would put the glyphs somewhere the clicks are not. That is invisible until
      * someone tries to click a planet and nothing happens.
      */
-    int bodyBaseRadius(int[] rings) {
+    @Override
+    public int bodyBaseRadius(int[] rings) {
         return WheelLayout.bodyBase(rings, Settings.bodyRing());
     }
 
@@ -5373,7 +5385,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * outright now, so Chart A takes the upper deck and Chart B the lower, and a promoted
      * Chart B stays on the lower deck it would have had anyway.
      */
-    int ringDeck(int wheel) {
+    @Override
+    public int ringDeck(int wheel) {
         if (wheel == WHEEL_SKY) {
             return DECK_MIDDLE;
         }
@@ -6388,6 +6401,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     @Override public WheelRing skyRing() { return this.skyRing; }
     @Override public ChartMode chartMode() { return this.chartMode; }
     @Override public double[] activeCusps() { return this.activeCusps; }
+
+    /** GlobeSource: a ring's arrays by the renderer's numbering - 0 inner, 1 outer, 2 sky. */
+    @Override public double[] ringLon(int ring) {
+        return ring == 0 ? this.natalRing.lon : ring == 1 ? this.outerRing.lon : this.skyRing.lon;
+    }
+
+    @Override public boolean[] ringValid(int ring) {
+        return ring == 0 ? this.natalRing.valid
+            : ring == 1 ? this.outerRing.valid : this.skyRing.valid;
+    }
     @Override public String houseAlignment() { return this.houseAlignment; }
     @Override public boolean showTransitChart() { return this.showTransitChart; }
     @Override public boolean globeMode() { return this.globeMode; }

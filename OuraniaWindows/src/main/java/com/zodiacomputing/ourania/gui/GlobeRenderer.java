@@ -51,11 +51,11 @@ final class GlobeRenderer {
     private final int w;
     private final int h;
     private final double origin;
-    private final SkymapPanel panel;
+    private final GlobeSource panel;
     private final List<Piece> pieces = new ArrayList<>();
 
     private GlobeRenderer(Graphics2D g, Globe cam, int w, int h, double origin,
-                          SkymapPanel panel) {
+                          GlobeSource panel) {
         this.g = g;
         this.cam = cam;
         this.w = w;
@@ -91,7 +91,7 @@ final class GlobeRenderer {
     /**
      * @param turning true while the reader is dragging the globe
      */
-    static void paint(Graphics2D g, Globe cam, int w, int h, SkymapPanel panel,
+    static void paint(Graphics2D g, Globe cam, int w, int h, GlobeSource panel,
                       boolean turning) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         GlobeRenderer r = new GlobeRenderer(g, cam, w, h, panel.pinLongitude(), panel);
@@ -124,7 +124,7 @@ final class GlobeRenderer {
         // going in wedges around the globe." Left out while turning for the same reason the
         // sign shell is - the fills are what cost a drag its frame rate.
         if (!turning && r.shown(SkymapPanel.Layer.HOUSES) && Settings.globeHouseFill()) {
-            r.housePlane(panel.activeCusps);
+            r.housePlane(panel.activeCusps());
         }
 
         r.focusWedges(panel);
@@ -145,8 +145,8 @@ final class GlobeRenderer {
             r.decanRing();
         }
         if (r.shown(SkymapPanel.Layer.HOUSES)) {
-            r.houseMeridians(panel.activeCusps);
-            r.houseNumbers(panel.activeCusps);
+            r.houseMeridians(panel.activeCusps());
+            r.houseNumbers(panel.activeCusps());
         }
         // The three charts as ribbons, each lying in its own plane. Painted before the
         // chords and the bodies so they read as the ground those sit on.
@@ -171,15 +171,15 @@ final class GlobeRenderer {
             r.ribbon(natalR, r.faded(shade(deckInk(innerDeck), 54), SkymapPanel.Layer.NATAL),
                 inclinationFor(innerDeck, r.stacked, r.cam),
                 liftFor(innerDeck, r.stacked, r.cam), turning);
-            r.bodies(panel.natalRing.lon, panel.natalRing.valid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
+            r.bodies(panel.ringLon(0), panel.ringValid(0), natalR, SkymapPanel.AngleRole.ANCHOR, panel,
                 false, 0);
         }
         if (panel.outerRingDrawn()) {
-            r.bodies(panel.outerRing.lon, panel.outerRing.valid, partnerR,
+            r.bodies(panel.ringLon(1), panel.ringValid(1), partnerR,
                 panel.angleRoleFor(false, true), panel, true, 1);
         }
         if (panel.triRingDrawn()) {
-            r.bodies(panel.skyRing.lon, panel.skyRing.valid, skyR, SkymapPanel.AngleRole.SKY, panel, true, 2);
+            r.bodies(panel.ringLon(2), panel.ringValid(2), skyR, SkymapPanel.AngleRole.SKY, panel, true, 2);
         }
 
         r.flush();
@@ -231,7 +231,7 @@ final class GlobeRenderer {
      *
      * @return the radius for wheel 0, 1 and 2, in that order
      */
-    static double[] shellRadii(SkymapPanel panel) {
+    static double[] shellRadii(GlobeSource panel) {
         return deckRadii(panel);
     }
 
@@ -240,7 +240,7 @@ final class GlobeRenderer {
      * ordinary tilt, the wheel's own bands looking straight down, and in between as
      * {@link #flatness} says. Still the one statement the painter and the hit test share.
      */
-    static double[] shellRadii(SkymapPanel panel, Globe cam, int w, int h) {
+    static double[] shellRadii(GlobeSource panel, Globe cam, int w, int h) {
         double[] deck = deckRadii(panel);
         double f = flatness(cam);
         if (f <= 0.0) {
@@ -269,7 +269,7 @@ final class GlobeRenderer {
      *
      * @return the radius for wheel 0 (Chart A), 1 (the outer ring) and 2 (the sky)
      */
-    static double[] wheelRadii(SkymapPanel panel, int w, int h) {
+    static double[] wheelRadii(GlobeSource panel, int w, int h) {
         int[] rings = WheelLayout.ringRadii(w, h, 1.0, 1.0);
         double k = Globe.SHELL_SIGN_INNER / Math.max(1, rings[WheelLayout.RING_SIGN_INNER]);
         int natalTop = panel.bodyBaseRadius(rings);
@@ -281,7 +281,7 @@ final class GlobeRenderer {
         };
     }
 
-    private static double[] deckRadii(SkymapPanel panel) {
+    private static double[] deckRadii(GlobeSource panel) {
         return new double[] {
             DECK_RADIUS[panel.ringDeck(0)],
             DECK_RADIUS[panel.ringDeck(1)],
@@ -416,7 +416,7 @@ final class GlobeRenderer {
      * Nearest wins rather than first, and only within a glyph's radius, so a click on empty
      * sky selects nothing instead of the closest thing on the far side of the world.
      */
-    static int bodyAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int bodyAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         double origin = panel.pinLongitude();
         double[] shells = shellRadii(panel, cam, w, h);
         // Once for the whole hit test, for the reason set out on inclinationOf.
@@ -426,9 +426,9 @@ final class GlobeRenderer {
 
         // Outermost first only matters for ties; nearest-wins settles the rest.
         for (int ring = 0; ring < 3; ring++) {
-            double[] lon = ring == 0 ? panel.natalRing.lon : (ring == 1 ? panel.outerRing.lon : panel.skyRing.lon);
-            boolean[] valid = ring == 0 ? panel.natalRing.valid
-                : (ring == 1 ? panel.outerRing.valid : panel.skyRing.valid);
+            double[] lon = ring == 0 ? panel.ringLon(0) : (ring == 1 ? panel.ringLon(1) : panel.ringLon(2));
+            boolean[] valid = ring == 0 ? panel.ringValid(0)
+                : (ring == 1 ? panel.ringValid(1) : panel.ringValid(2));
             if (ring == 1 && !panel.outerRingDrawn()) {
                 continue;
             }
@@ -734,7 +734,7 @@ final class GlobeRenderer {
      * translucent and half of it overlaps, so a brighter patch reads as one more overlap. A
      * wedge that reaches past the ring it belongs to is unambiguous from any angle.
      */
-    private void focusWedges(SkymapPanel panel) {
+    private void focusWedges(GlobeSource panel) {
         int body = panel.focusedBody();
         if (body < 0) {
             return;
@@ -763,7 +763,7 @@ final class GlobeRenderer {
                     SkymapPanel.Layer.SIGNS));
         }
 
-        double[] cusps = panel.activeCusps;
+        double[] cusps = panel.activeCusps();
         if (cusps == null || cusps.length < 13) {
             return;
         }
@@ -1099,8 +1099,8 @@ final class GlobeRenderer {
      * and degree hit tests keep: a label the reader can see and cannot point at is worse than
      * no label, because they will try.
      */
-    static int houseNumberAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
-        double[] cusps = panel.activeCusps;
+    static int houseNumberAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
+        double[] cusps = panel.activeCusps();
         if (cusps == null || cusps.length < 13
             || !panel.layerShown(SkymapPanel.Layer.HOUSES)) {
             return -1;
@@ -1177,7 +1177,7 @@ final class GlobeRenderer {
      * candidate degrees and taking the nearest. Cheap, and it cannot disagree with the drawing
      * the way an independently derived angle would.
      */
-    static int degreeAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int degreeAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.DEGREES)) {
             return -1;
         }
@@ -1223,7 +1223,7 @@ final class GlobeRenderer {
      * the decan glyphs, and a tick is always within reach, so a decan tested after them could
      * never be clicked. The radius is tight for the same reason.
      */
-    static int decanAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int decanAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.DECANS)) {
             return -1;
         }
@@ -1241,7 +1241,7 @@ final class GlobeRenderer {
      * nearest of samples every two degrees along three radii across the band, within a margin.
      * One sampler for every band, so they are hit the same way.
      */
-    static int bandAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py,
+    static int bandAt(Globe cam, int w, int h, GlobeSource panel, int px, int py,
                       double inner, double outer, double margin) {
         double origin = panel.pinLongitude();
         double[] radii = {inner, (inner + outer) / 2.0, outer};
@@ -1265,7 +1265,7 @@ final class GlobeRenderer {
     }
 
     /** The bound under a point: its longitude in whole degrees, or -1. The bounds band's width. */
-    static int boundAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int boundAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.BOUNDS)) {
             return -1;
         }
@@ -1281,8 +1281,8 @@ final class GlobeRenderer {
      * whole space. Bodies are tested before this by the caller, so a glyph standing in a house
      * still opens the body.
      */
-    static int houseAreaAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
-        double[] cusps = panel.activeCusps;
+    static int houseAreaAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
+        double[] cusps = panel.activeCusps();
         if (cusps == null || cusps.length < 13 || !panel.layerShown(SkymapPanel.Layer.HOUSES)) {
             return -1;
         }
@@ -1315,7 +1315,7 @@ final class GlobeRenderer {
      * The sign under a point, 0 to 11, or -1: anywhere on the sign band, sampled across its
      * width and along every two degrees, the way {@link #mansionAt} samples its band.
      */
-    static int signAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int signAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.SIGNS)) {
             return -1;
         }
@@ -1342,7 +1342,7 @@ final class GlobeRenderer {
         return best;
     }
 
-    static int mansionAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int mansionAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.MANSIONS)) {
             return -1;
         }
@@ -1629,7 +1629,7 @@ final class GlobeRenderer {
      * - see Globe.arc - so the widest ride highest and the figure has a silhouette from the
      * side as well as a shape from above.
      */
-    private void aspectChords(SkymapPanel panel, double[] shells) {
+    private void aspectChords(GlobeSource panel, double[] shells) {
         // <b>Body to body, so every glyph is a node.</b> The chords were drawn on nested
         // circles inside the wheels, which is what the flat chart has to do - a line between
         // two glyphs on a disc crosses everything between them. A sphere does not have that
@@ -1643,11 +1643,11 @@ final class GlobeRenderer {
         int[][] chords = panel.globeChords(() -> buildChords(panel));
         double origin = this.origin;
         int[][] levels = {
-            Globe.stackLevels(panel.natalRing.lon, panel.natalRing.valid, 7.0),
-            Globe.stackLevels(panel.outerRing.lon, panel.outerRing.valid, 7.0),
-            Globe.stackLevels(panel.skyRing.lon, panel.skyRing.valid, 7.0),
+            Globe.stackLevels(panel.ringLon(0), panel.ringValid(0), 7.0),
+            Globe.stackLevels(panel.ringLon(1), panel.ringValid(1), 7.0),
+            Globe.stackLevels(panel.ringLon(2), panel.ringValid(2), 7.0),
         };
-        double[][] lons = {panel.natalRing.lon, panel.outerRing.lon, panel.skyRing.lon};
+        double[][] lons = {panel.ringLon(0), panel.ringLon(1), panel.ringLon(2)};
 
         // <b>The reader's filter, applied when drawing rather than when building.</b> It
         // decides which families are shown, not which pairs are in aspect, so it belongs here
@@ -1675,7 +1675,7 @@ final class GlobeRenderer {
                 liftFor(deck, this.stacked, this.cam)
                     + levels[ring][c[1]] * Globe.STACK_STEP,
                 inclinationFor(deck, this.stacked, this.cam));
-            double[] to = Globe.onShell(panel.natalRing.lon[c[2]], origin, shells[0],
+            double[] to = Globe.onShell(panel.ringLon(0)[c[2]], origin, shells[0],
                 liftFor(innerDeck, this.stacked, this.cam)
                     + levels[0][c[2]] * Globe.STACK_STEP,
                 inclinationFor(innerDeck, this.stacked, this.cam));
@@ -1704,10 +1704,10 @@ final class GlobeRenderer {
      * Every ring back to the natal wheel. Within one chart a pair is counted once; across two
      * charts the pairing is directional, so every body meets every body.
      */
-    private static int[][] buildChords(SkymapPanel panel) {
+    private static int[][] buildChords(GlobeSource panel) {
         java.util.List<int[]> out = new java.util.ArrayList<>();
-        double[][] lons = {panel.natalRing.lon, panel.outerRing.lon, panel.skyRing.lon};
-        boolean[][] valids = {panel.natalRing.valid, panel.outerRing.valid, panel.skyRing.valid};
+        double[][] lons = {panel.ringLon(0), panel.ringLon(1), panel.ringLon(2)};
+        boolean[][] valids = {panel.ringValid(0), panel.ringValid(1), panel.ringValid(2)};
         for (int ring = 0; ring < 3; ring++) {
             boolean cross = ring > 0;
             for (int a = 0; a < SkymapPanel.BODY_COUNT && a < lons[ring].length; a++) {
@@ -1715,7 +1715,7 @@ final class GlobeRenderer {
                     continue;
                 }
                 for (int b = cross ? 0 : a + 1; b < SkymapPanel.BODY_COUNT; b++) {
-                    if (!SkymapPanel.aspecting(b, panel.natalRing.valid)) {
+                    if (!SkymapPanel.aspecting(b, panel.ringValid(0))) {
                         continue;
                     }
                     if (!cross && Bodies.isOppositePair(a, b)) {
@@ -1725,7 +1725,7 @@ final class GlobeRenderer {
                     // is judged at natal orbs, the same as the flat wheel and the grid judge
                     // it. Passing "cross" for both halved the sky ring's orbs in a synastry
                     // chart and dropped chords the flat view was drawing.
-                    Color ink = panel.aspectInkFor(lons[ring][a], panel.natalRing.lon[b], a, b,
+                    Color ink = panel.aspectInkFor(lons[ring][a], panel.ringLon(0)[b], a, b,
                         ring == SkymapPanel.WHEEL_OUTER);
                     if (ink != null) {
                         out.add(new int[] {ring, a, b, ink.getRGB()});
@@ -1738,7 +1738,7 @@ final class GlobeRenderer {
 
     /** One ring of bodies on its shell, stacked up the shell where longitudes crowd. */
     private void bodies(double[] lon, boolean[] valid, double radius,
-                        SkymapPanel.AngleRole role, SkymapPanel panel, boolean outer,
+                        SkymapPanel.AngleRole role, GlobeSource panel, boolean outer,
                         int ring) {
         int[] level = Globe.stackLevels(lon, valid, 7.0);
         for (int i = 0; i < SkymapPanel.BODY_COUNT && i < lon.length; i++) {
@@ -2205,7 +2205,7 @@ final class GlobeRenderer {
      * @param bowed false when the reader has switched arcs off, which is the chord either way
      * @return +1 up, -1 down, 0 when arcs are off
      */
-    static double riseFor(SkymapPanel panel, int ring, boolean bowed) {
+    static double riseFor(GlobeSource panel, int ring, boolean bowed) {
         if (!bowed) {
             return 0.0;
         }

@@ -2342,10 +2342,10 @@ public final class GlobeCheck {
 
             // The painter's own chord list, and the painter's own geometry for its ends.
             java.lang.reflect.Method build = GlobeRenderer.class.getDeclaredMethod(
-                "buildChords", SkymapPanel.class);
+                "buildChords", GlobeSource.class);
             build.setAccessible(true);
             java.lang.reflect.Method radii = GlobeRenderer.class.getDeclaredMethod(
-                "shellRadii", SkymapPanel.class);
+                "shellRadii", GlobeSource.class);
             radii.setAccessible(true);
             int[][] chords = (int[][]) build.invoke(null, panel);
             double[] shells = (double[]) radii.invoke(null, panel);
