@@ -81,6 +81,21 @@ public final class Moments {
     private Moments() { }
 
     /**
+     * An instant as the Swiss Ephemeris dates it: the UT calendar date and the hour as a
+     * fraction, seconds included.
+     *
+     * <b>Here, so there is one statement of it.</b> It was a private method on the desktop's
+     * chart panel; the phone (M3) casts charts too, and a second copy of this arithmetic is a
+     * second place for a birth to land a few seconds apart.
+     */
+    public static de.thmac.swisseph.SweDate sweDate(ZonedDateTime when) {
+        ZonedDateTime ut = when.withZoneSameInstant(ZoneOffset.UTC);
+        return new de.thmac.swisseph.SweDate(ut.getYear(), ut.getMonthValue(),
+            ut.getDayOfMonth(), (double) ut.getHour() + (double) ut.getMinute() / 60.0
+                + (double) ut.getSecond() / 3600.0);
+    }
+
+    /**
      * Resolves a local date and time in a zone, reporting any daylight-saving ambiguity.
      *
      * @param date  the local date, and

@@ -394,7 +394,7 @@ public final class Snapshot {
         for (int ai = 0; ai < angleNames.length; ai++) {
             sb.append(String.format("  %-11s %s%n", angleNames[ai], Zodiac.format(angleLons[ai])));
             String aSign = Zodiac.signName(angleLons[ai]);
-            String aText = com.zodiacomputing.ourania.gui.Prose.plainText(
+            String aText = PlainText.plainText(
                 asvc.getAngleInterpretation(angleNames[ai], aSign));
             if (!aText.isEmpty()) {
                 sb.append("      ").append(wrap(aText, 76).replace("\n", "\n      ")).append("\n");
@@ -405,7 +405,7 @@ public final class Snapshot {
         // Everything below prints into a PLAIN TEXT report, and every value coming out of
         // InterpretationService is HTML the loader never unescaped. Pasting one straight in
         // put 351 literal tags into a 97,000-character report. Route new ones through
-        // Prose.plainText as well - nothing throws when you forget, the reader just gets
+        // PlainText.plainText as well - nothing throws when you forget, the reader just gets
         // markup.
         sb.append("\nPLANETARY PLACEMENTS (RANKED BY PROMINENCE)\n");
         com.zodiacomputing.ourania.gui.InterpretationService svc = com.zodiacomputing.ourania.gui.InterpretationService.getInstance();
@@ -416,20 +416,20 @@ public final class Snapshot {
             sb.append(String.format("  %-11s %-16s  %s%n",
                 v.body, Zodiac.format(v.longitude), String.join("; ", v.allReasons())));
                 
-            String core = com.zodiacomputing.ourania.gui.Prose.plainText(svc.getBodyCore(v.body));
+            String core = PlainText.plainText(svc.getBodyCore(v.body));
             if (core != null && !core.isEmpty()) {
                 sb.append("      Core: ").append(wrap(core, 76).replace("\n", "\n      ")).append("\n");
             }
             
             String sign = Zodiac.signName(v.longitude);
-            String signText = com.zodiacomputing.ourania.gui.Prose.plainText(svc.getPlanetInSign(v.body, sign));
+            String signText = PlainText.plainText(svc.getPlanetInSign(v.body, sign));
             if (!signText.isEmpty()) {
                 sb.append("      In ").append(Character.toUpperCase(sign.charAt(0))).append(sign.substring(1)).append(": ")
                   .append(wrap(signText, 76).replace("\n", "\n      ")).append("\n");
             }
             
             if (v.house > 0) {
-                String houseText = com.zodiacomputing.ourania.gui.Prose.plainText(svc.getPlanetInHouse(v.body, v.house));
+                String houseText = PlainText.plainText(svc.getPlanetInHouse(v.body, v.house));
                 if (!houseText.isEmpty()) {
                     sb.append("      In House ").append(v.house).append(": ")
                       .append(wrap(houseText, 76).replace("\n", "\n      ")).append("\n");
@@ -437,7 +437,7 @@ public final class Snapshot {
             }
             
             if (v.nearestAngle != null && v.angularity > 0.5) {
-                String angleText = com.zodiacomputing.ourania.gui.Prose.plainText(svc.getAngleInterpretation(v.nearestAngle, sign));
+                String angleText = PlainText.plainText(svc.getAngleInterpretation(v.nearestAngle, sign));
                 if (!angleText.isEmpty()) {
                     sb.append("      On ").append(v.nearestAngle).append(": ")
                       .append(wrap(angleText, 76).replace("\n", "\n      ")).append("\n");
@@ -448,7 +448,7 @@ public final class Snapshot {
                 for (int i = 0; i < Math.min(3, v.aspects.size()); i++) {
                     Aspects.Hit h = v.aspects.get(i);
                     String other = v.body.equals(h.a) ? h.b : h.a;
-                    String aspectText = com.zodiacomputing.ourania.gui.Prose.plainText(svc.getAspect(v.body, other, h.type.label));
+                    String aspectText = PlainText.plainText(svc.getAspect(v.body, other, h.type.label));
                     if (!aspectText.isEmpty()) {
                         sb.append("      Aspect (").append(h.type.label).append(" to ").append(other).append("): ")
                           .append(wrap(aspectText, 76).replace("\n", "\n      ")).append("\n");

@@ -3,11 +3,13 @@
  */
 package com.zodiacomputing.ourania.gui;
 
+import static com.zodiacomputing.ourania.gui.WheelLayout.*;
 import com.zodiacomputing.ourania.astro.Almanac;
 import com.zodiacomputing.ourania.astro.Aspects;
 import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.BodyScore;
 import com.zodiacomputing.ourania.astro.ChartFrame;
+import com.zodiacomputing.ourania.astro.Chronometry;
 import com.zodiacomputing.ourania.astro.Dignity;
 import com.zodiacomputing.ourania.astro.Convergence;
 import com.zodiacomputing.ourania.astro.Gestalt;
@@ -20,6 +22,7 @@ import com.zodiacomputing.ourania.astro.SolarArc;
 import com.zodiacomputing.ourania.astro.Themes;
 import com.zodiacomputing.ourania.astro.Topics;
 import com.zodiacomputing.ourania.astro.Transits;
+import com.zodiacomputing.ourania.astro.YearScan;
 import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.gui.OuraniaWindow;
 import com.zodiacomputing.ourania.gui.ChartMode;
@@ -74,8 +77,9 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
 public class SkymapPanel
-extends JPanel {
-    private SwissEph sw;
+extends JPanel
+implements WheelSource, GlobeSource {
+    SwissEph sw;
     /**
      * The wheel's three rings - the chart, the outer ring (transits, progressions or Chart B),
      * and the sky. See {@link WheelRing}: these were thirty loose fields until J13.
@@ -258,7 +262,7 @@ extends JPanel {
     }
 
     /** The ring a wheel index names. */
-    WheelRing ringAt(int ring) {
+    public WheelRing ringAt(int ring) {
         if (ring == WHEEL_SKY) {
             return this.skyRing;
         }
@@ -367,18 +371,7 @@ extends JPanel {
         this.compositeRefPlace = (name == null || name.trim().isEmpty()) ? null : name.trim();
         this.relationshipFrame = null;
         this.relationshipCacheKey = null;
-        Settings.update(p -> {
-            if (Double.isNaN(lat)) {
-                p.remove("composite.reference.lat");
-                p.remove("composite.reference.lon");
-                p.remove("composite.reference.name");
-            } else {
-                p.setProperty("composite.reference.lat", String.valueOf(lat));
-                p.setProperty("composite.reference.lon", String.valueOf(lon));
-                p.setProperty("composite.reference.name",
-                    this.compositeRefPlace == null ? "" : this.compositeRefPlace);
-            }
-        });
+        Settings.setCompositeReference(lat, lon, this.compositeRefPlace);
         this.repaint();
     }
 
@@ -389,22 +382,15 @@ extends JPanel {
 
     /** Restore a saved reference place. Silently keeps the default if the setting is absent. */
     private void loadCompositeReferencePlace() {
-        String lat = Settings.get("composite.reference.lat", null);
-        String lon = Settings.get("composite.reference.lon", null);
-        if (lat == null || lon == null) {
+        // A corrupt setting is not worth refusing to start over: Settings answers null for it,
+        // and the default stands.
+        double[] ref = Settings.compositeReference();
+        if (ref == null) {
             return;
         }
-        try {
-            this.compositeRefLat = Double.parseDouble(lat);
-            this.compositeRefLon = Double.parseDouble(lon);
-            String n = Settings.get("composite.reference.name", "");
-            this.compositeRefPlace = n.isEmpty() ? null : n;
-        } catch (NumberFormatException ex) {
-            // A corrupt setting is not worth refusing to start over.
-            this.compositeRefLat = Double.NaN;
-            this.compositeRefLon = Double.NaN;
-            this.compositeRefPlace = null;
-        }
+        this.compositeRefLat = ref[0];
+        this.compositeRefLon = ref[1];
+        this.compositeRefPlace = Settings.compositeReferenceName();
     }
 
     /**
@@ -479,7 +465,7 @@ extends JPanel {
      * else; everything around it keeps working because nothing around it was ever about the
      * flat projection.
      */
-    private boolean globeMode;
+    boolean globeMode;
 
     /**
      * The layers of the chart the reader can fold away, each with its own bloom.
@@ -499,13 +485,14 @@ extends JPanel {
         new java.util.EnumMap<>(Layer.class);
 
     /** How far a layer is open, 0 folded to 1 shown. */
-    double layerOpen(Layer layer) {
+    @Override
+    public double layerOpen(Layer layer) {
         Bloom b = this.layerBlooms.get(layer);
         return b == null ? 1.0 : b.value();
     }
 
     /** Whether a layer is drawn at all - folded layers are skipped rather than drawn at zero. */
-    boolean layerShown(Layer layer) {
+    public boolean layerShown(Layer layer) {
         return this.layerOpen(layer) > 0.004;
     }
 
@@ -522,7 +509,7 @@ extends JPanel {
     }
 
     /** The camera, kept across a switch so returning to the globe finds it where it was. */
-    private final Globe globe = new Globe();
+    final Globe globe = new Globe();
 
     /**
      * The globe's aspect list, held between frames.
@@ -559,18 +546,19 @@ extends JPanel {
      * question differently is this project's most-found defect, and a filter that half works
      * is worse than one that does not exist, because the reader believes it.
      */
-    boolean drawsNatalAspects() {
+    public boolean drawsNatalAspects() {
         return "Natal-Natal".equals(this.aspectFilter) || "Both".equals(this.aspectFilter);
     }
 
     /** As above, for aspects between an outer ring and the natal wheel. */
-    boolean drawsCrossAspects() {
+    public boolean drawsCrossAspects() {
         return ("Transit-Natal".equals(this.aspectFilter) || "Both".equals(this.aspectFilter))
             && this.showTransitChart;
     }
 
     /** The globe's aspects, computed once per chart rather than once per frame. */
-    int[][] globeChords(java.util.function.Supplier<int[][]> build) {
+    @Override
+    public int[][] globeChords(java.util.function.Supplier<int[][]> build) {
         if (this.globeChords == null) {
             this.globeChords = build.get();
         }
@@ -623,7 +611,7 @@ extends JPanel {
      * swallowed. This one clears on release, and the release repaints - so the full picture
      * arrives the instant the hand stops.
      */
-    private boolean globeDragging;
+    boolean globeDragging;
 
     /** The chips above the transport row, for the window to keep in step with the view. */
     RingBar ringBarComponent() {
@@ -660,13 +648,6 @@ extends JPanel {
     private final Bloom outerBloom = new Bloom(false, this::repaintWheel);
     private final Bloom triBloom = new Bloom(false, this::repaintWheel);
 
-    /**
-     * How much of the bloom is spent letting earlier bodies lead. See Bloom.stagger.
-     *
-     * At 0.45 the last body starts a little under halfway through, so the ring reads as
-     * unfurling rather than as one object sliding outward.
-     */
-    private static final double RING_SPREAD = 0.45;
 
     /**
      * Whether the outer ring is <b>on screen</b>, as opposed to whether it exists.
@@ -682,12 +663,12 @@ extends JPanel {
      * a fold turns into a disappearance, and splitting the wrong way is how a glyph you can
      * see becomes a glyph you cannot click.
      */
-    boolean outerRingDrawn() {
+    public boolean outerRingDrawn() {
         return this.outerOpenFraction() > 0.001;
     }
 
     /** As above, for the outermost sky ring. */
-    boolean triRingDrawn() {
+    public boolean triRingDrawn() {
         return this.triOpenFraction() > 0.001;
     }
 
@@ -700,7 +681,7 @@ extends JPanel {
      * missing one is a broken chart. The one case where the bloom knows better is a fold, and
      * there the flag has already gone false, so the two cannot fight.
      */
-    double outerOpenFraction() {
+    public double outerOpenFraction() {
         if (this.showTransitChart && !this.outerBloom.opening()) {
             return 1.0;
         }
@@ -708,7 +689,7 @@ extends JPanel {
     }
 
     /** As above, for the outermost sky ring. */
-    double triOpenFraction() {
+    public double triOpenFraction() {
         if (this.showTriWheel && !this.triBloom.opening()) {
             return 1.0;
         }
@@ -1157,7 +1138,7 @@ extends JPanel {
      * of range, or a ring whose radii have not been laid out yet. A line drawn at the wrong
      * radius is a line pointing at nothing.
      */
-    int endpointRadius(int wheel, int bodyIndex, int discRadius) {
+    public int endpointRadius(int wheel, int bodyIndex, int discRadius) {
         if (!Settings.aspectLinesToBodies()) {
             return discRadius;
         }
@@ -1297,7 +1278,7 @@ extends JPanel {
      * could not be chosen at all. David, 2026-09-20: "for synastry charts ... have a selector
      * to align to either Chart A or Chart B or Transit houses."
      */
-    private String houseAlignment = "Chart A";
+    String houseAlignment = "Chart A";
     private String wheelPin = "Natal Asc";
     private JComboBox<String> pinCombo;
     /**
@@ -1366,7 +1347,7 @@ extends JPanel {
      * already did - it was the only one seeded from a literal.
      */
     private String stepAmount = "1 Hour";
-    private ChartPanel chartPanel;
+    private WheelCanvas chartPanel;
     /** Which aspects are drawn, by {@code Aspects.Type} ordinal. Absent setting means all. */
     private boolean[] aspectShown = Settings.loadAspectSelection();
 
@@ -1376,11 +1357,11 @@ extends JPanel {
     private char houseSystem = (char)80;
     private String currentHouseSystemName = com.zodiacomputing.ourania.astro.HouseSystems.DEFAULT_NAME;
     public static final int BODY_COUNT = Bodies.count();
-    private static final String[] BODY_NAMES = new String[BODY_COUNT];
-    private static final String[] BODY_GLYPHS = new String[BODY_COUNT];
+    static final String[] BODY_NAMES = new String[BODY_COUNT];
+    static final String[] BODY_GLYPHS = new String[BODY_COUNT];
     private static final int[] BODY_ELEMENTS = new int[BODY_COUNT];
-    private static final int SUN = Bodies.indexOf("sun");
-    private static final int MOON = Bodies.indexOf("moon");
+    static final int SUN = Bodies.indexOf("sun");
+    static final int MOON = Bodies.indexOf("moon");
     private static final int NORTH_NODE = Bodies.indexOf("north_node");
     /**
      * Package-private rather than private so InterpretationPanel's cards can use the same
@@ -1399,7 +1380,7 @@ extends JPanel {
     private static final String[] ELEMENT_TEXT_HEX;
     private static final Font NATAL_GLYPH_FONT;
     private static final Font TRANSIT_GLYPH_FONT;
-    private static final Font ANGLE_FONT;
+    static final Font ANGLE_FONT;
     private OuraniaWindow window;
     public static final String EPHE_PATH = com.zodiacomputing.ourania.astro.Ephemeris.PATH;
     private ReadingTier readingTier = ReadingTier.NONE;
@@ -1474,72 +1455,9 @@ extends JPanel {
         return new Color((int)Math.round((double)color.getRed() + (double)(255 - color.getRed()) * d), (int)Math.round((double)color.getGreen() + (double)(255 - color.getGreen()) * d), (int)Math.round((double)color.getBlue() + (double)(255 - color.getBlue()) * d));
     }
 
-    private static double angularGap(double d, double d2) {
-        double d3 = Math.abs(d - d2) % 360.0;
-        return d3 > 180.0 ? 360.0 - d3 : d3;
-    }
 
-    private static int[] radialLevels(double[] dArray, boolean[] blArray, double d, double d2, double d3) {
-        int n3 = dArray.length;
-        int[] nArray = new int[n3];
-        Integer[] integerArray = new Integer[n3];
-        for (int i = 0; i < n3; ++i) {
-            integerArray[i] = i;
-        }
-        Arrays.sort(integerArray, (n, n2) -> Double.compare(dArray[n], dArray[n2]));
-        ArrayList arrayList = new ArrayList();
-        Integer[] integerArray2 = integerArray;
-        int n4 = integerArray2.length;
-        block1: for (int i = 0; i < n4; ++i) {
-            int n5 = integerArray2[i];
-            if (!blArray[n5]) continue;
-            double d4 = (dArray[n5] % 360.0 + 360.0) % 360.0;
-            int n6 = 0;
-            while (true) {
-                if (arrayList.size() <= n6) {
-                    arrayList.add(new ArrayList());
-                    continue;
-                }
-                double d5 = Math.max(d - (double)n6 * d2, 12.0);
-                double d6 = Math.toDegrees(d3 / d5);
-                boolean bl = false;
-                Iterator iterator = ((List)arrayList.get(n6)).iterator();
-                while (iterator.hasNext()) {
-                    double d7 = (Double)iterator.next();
-                    if (!(SkymapPanel.angularGap(d4, d7) < d6)) continue;
-                    bl = true;
-                    break;
-                }
-                if (!bl) {
-                    ((List)arrayList.get(n6)).add(d4);
-                    nArray[n5] = n6;
-                    continue block1;
-                }
-                ++n6;
-            }
-        }
-        return nArray;
-    }
 
-    /**
-     * A body's label centred on its marker.
-     *
-     * <b>A two-letter label is drawn smaller.</b> The font is sized for one glyph on a sphere; a
-     * fallback like Nessus' "Ns", or the Vertex's "Vx" and the lots added on 2026-09-14, drawn at
-     * that size spilled past the marker on both sides and ran into its neighbours.
-     */
-    static void drawBodyLabel(Graphics2D g2, String text, int x, int y, int baseline) {
-        Font was = g2.getFont();
-        boolean wide = text.codePointCount(0, text.length()) > 1;
-        if (wide) {
-            g2.setFont(was.deriveFont(was.getSize2D() * 0.62f));
-        }
-        java.awt.FontMetrics fm = g2.getFontMetrics();
-        g2.drawString(text, x - fm.stringWidth(text) / 2, wide ? y + fm.getAscent() / 2 - 1 : y + baseline);
-        g2.setFont(was);
-    }
-
-    private static String glyphFor(int n, Font font) {
+    static String glyphFor(int n, Font font) {
         Bodies.Def def = Bodies.at(n);
         return font.canDisplay(def.glyph.codePointAt(0)) ? def.glyph : def.fallback;
     }
@@ -1578,7 +1496,8 @@ extends JPanel {
     }
 
     /** Longitude the view is pinned to - the Ascendant unless the reader chose otherwise. */
-    double pinLongitude() {
+    @Override
+    public double pinLongitude() {
         return this.getPinLongitude();
     }
 
@@ -1590,7 +1509,7 @@ extends JPanel {
      * the globe for the same reason it is absent from the wheel - otherwise the two views
      * disagree about what is in aspect, which is worse than either being wrong alone.
      */
-    Color aspectInkFor(double lonA, double lonB, int a, int b, boolean cross) {
+    public Color aspectInkFor(double lonA, double lonB, int a, int b, boolean cross) {
         double sep = Math.abs(lonA - lonB);
         if (sep > 180.0) {
             sep = 360.0 - sep;
@@ -1616,7 +1535,8 @@ extends JPanel {
      * A rule with two implementations is how the sky ring came to be lit by the partner ring's
      * hover in the first place.
      */
-    boolean lightsChord(int a, int b, int wheel) {
+    @Override
+    public boolean lightsChord(int a, int b, int wheel) {
         return this.isHighlighted(a, b, wheel);
     }
 
@@ -1656,7 +1576,8 @@ extends JPanel {
     private int focusMansion = -1;
 
     /** The mansion the cursor is over, for the globe's band to light. */
-    int focusedMansion() {
+    @Override
+    public int focusedMansion() {
         return this.focusMansion;
     }
 
@@ -1677,14 +1598,15 @@ extends JPanel {
      * views come to disagree about the one station that is highlighted - the defect this
      * project keeps finding in the seams between surfaces rather than in the arithmetic.
      */
-    com.zodiacomputing.ourania.astro.LunarMansions.Mansion moonMansion() {
+    public com.zodiacomputing.ourania.astro.LunarMansions.Mansion moonMansion() {
         com.zodiacomputing.ourania.astro.ChartFrame frame = this.getCurrentChart();
         return frame == null ? null
             : com.zodiacomputing.ourania.astro.LunarMansions.ofMoon(frame);
     }
 
     /** The house the cursor is over, for the globe to carve. */
-    int focusedHouse() {
+    @Override
+    public int focusedHouse() {
         return this.focusHouse;
     }
 
@@ -1698,7 +1620,8 @@ extends JPanel {
     }
 
     /** The degree under the cursor, for the globe's scale to light. */
-    int focusedDegree() {
+    @Override
+    public int focusedDegree() {
         return this.focusDegree;
     }
 
@@ -1712,7 +1635,8 @@ extends JPanel {
     }
 
     /** The body the cursor is resting on, or -1. Read by the globe to light its wedges. */
-    int focusedBody() {
+    @Override
+    public int focusedBody() {
         return this.focusBody;
     }
 
@@ -1724,7 +1648,8 @@ extends JPanel {
      * same index happens to occupy - a wedge confidently highlighting the wrong sign, which
      * is worse than not highlighting at all.
      */
-    double focusedLongitude() {
+    @Override
+    public double focusedLongitude() {
         if (this.focusBody < 0) {
             return Double.NaN;
         }
@@ -1733,7 +1658,8 @@ extends JPanel {
     }
 
     /** Whether the globe should light this body - the cursor is resting on it. */
-    boolean onGlobeFocus(int body, boolean outer) {
+    @Override
+    public boolean onGlobeFocus(int body, boolean outer) {
         return this.focusBody == body && this.focusTransit == outer;
     }
 
@@ -1741,13 +1667,6 @@ extends JPanel {
         return blArray[n] && !Bodies.at(n).isAngle();
     }
 
-    private static boolean[] restrict(boolean[] blArray, boolean bl) {
-        boolean[] blArray2 = new boolean[blArray.length];
-        for (int i = 0; i < blArray.length; ++i) {
-            blArray2[i] = blArray[i] && Bodies.at(i).isAngle() == bl;
-        }
-        return blArray2;
-    }
 
     // ---------------------------------------------------------------- concentric rings
     //
@@ -1795,7 +1714,7 @@ extends JPanel {
         if (Bodies.at(n).isAngle()) {
             return ANGLE_HIT_RADIUS;
         }
-        int r = (transit ? SkymapPanel.transitSize(n) : SkymapPanel.natalSize(n)).radius + 2;
+        int r = (transit ? WheelLayout.transitSize(n) : WheelLayout.natalSize(n)).radius + 2;
         return Math.min(r, transit ? 14 : 16);
     }
 
@@ -1835,7 +1754,7 @@ extends JPanel {
      * synastry ring, then natal. Each is drawn on top of the one inside it, so this
      * matches what the eye sees where rings overlap.
      */
-    private String hoverTextAt(int x, int y) {
+    public String hoverTextAt(int x, int y) {
         if (this.sw == null || this.natalRing.sd == null || this.chartPanel == null) {
             return null;
         }
@@ -1927,7 +1846,7 @@ extends JPanel {
             // Laid out from what is on screen, not from what was asked for. A ring folding
             // away still occupies its band until the fold ends - otherwise the whole wheel
             // resizes on the first frame of the fold and there is nothing left to animate.
-            this.rings = SkymapPanel.ringRadii(w, h,
+            this.rings = WheelLayout.ringRadii(w, h,
                 SkymapPanel.this.outerOpenFraction(), SkymapPanel.this.triOpenFraction(),
                 SkymapPanel.this.layerOpen(Layer.DECANS),
                 SkymapPanel.this.layerOpen(Layer.SIGNS),
@@ -1936,7 +1855,7 @@ extends JPanel {
                 SkymapPanel.this.layerOpen(Layer.MANSIONS));
             this.bodyBase = SkymapPanel.this.bodyBaseRadius(this.rings);
             this.natalFloor = this.bodyBase
-                - SkymapPanel.natalBandDepth(Math.max(1, this.bodyBase));
+                - WheelLayout.natalBandDepth(Math.max(1, this.bodyBase));
             this.pin = SkymapPanel.this.getPinLongitude();
         }
 
@@ -1946,17 +1865,17 @@ extends JPanel {
 
         int[] natalRadii() {
             if (this.natal == null) {
-                this.natal = SkymapPanel.bandRadii(SkymapPanel.this.natalRing.lon,
+                this.natal = WheelLayout.bandRadii(SkymapPanel.this.natalRing.lon,
                     SkymapPanel.this.natalRing.valid, this.bodyBase, this.natalFloor,
-                    SkymapPanel.NATAL_EDGE, SkymapPanel.NATAL_SPACING);
+                    WheelLayout.NATAL_EDGE, WheelLayout.NATAL_SPACING);
             }
             return this.natal;
         }
 
         int[] transitRadii() {
             if (this.transit == null) {
-                this.transit = SkymapPanel.bloomed(
-                    SkymapPanel.bandRadii(SkymapPanel.this.outerRing.lon, SkymapPanel.this.outerRing.valid,
+                this.transit = WheelLayout.bloomed(
+                    WheelLayout.bandRadii(SkymapPanel.this.outerRing.lon, SkymapPanel.this.outerRing.valid,
                         this.rings[RING_TRANSIT], this.rings[RING_BODY_TOP]),
                     this.rings[RING_BODY_TOP], SkymapPanel.this.outerOpenFraction());
             }
@@ -1988,20 +1907,15 @@ extends JPanel {
                 // bodies made the fields resize as the chart changed - switch a point off and
                 // every aspect line moves - which reads as the wheel breathing rather than as
                 // a layout. The floor is a property of the wheel, so the fields hold still.
-                int top = Math.max(30, this.natalFloor - 14);
-                this.discs = new int[] {
-                    (int) Math.round(top * 0.52),
-                    (int) Math.round(top * 0.76),
-                    top,
-                };
+                this.discs = WheelLayout.aspectDiscs(this.natalFloor);
             }
             return this.discs[Math.max(0, Math.min(this.discs.length - 1, level))];
         }
 
         int[] triRadii() {
             if (this.tri == null) {
-                this.tri = SkymapPanel.bloomed(
-                    SkymapPanel.bandRadii(SkymapPanel.this.skyRing.lon, SkymapPanel.this.skyRing.valid,
+                this.tri = WheelLayout.bloomed(
+                    WheelLayout.bandRadii(SkymapPanel.this.skyRing.lon, SkymapPanel.this.skyRing.valid,
                         this.rings[RING_TRI], this.rings[RING_TRANSIT]),
                     this.rings[RING_TRANSIT], SkymapPanel.this.triOpenFraction());
             }
@@ -2009,33 +1923,6 @@ extends JPanel {
         }
     }
 
-    /**
-     * A ring's radii, part-way out of the band they unfurl from.
-     *
-     * <b>Applied here rather than in the painter, so the hit test moves with the glyphs.</b>
-     * Both sides read these arrays through Geometry - the note on that class records the day
-     * they did not - so blooming the array is the only way to bloom the ring without
-     * reintroducing exactly the defect Geometry exists to prevent. A glyph half-way out is
-     * clickable half-way out.
-     *
-     * Bodies are staggered so the ring opens around the wheel instead of expanding as a disc.
-     * Angles ride the same bloom as everything else: they are drawn on the ring, so they
-     * arrive with it.
-     *
-     * @param settled where each body sits once the ring is fully open
-     * @param inner   the band's inner edge - where a folded ring is gathered
-     */
-    static int[] bloomed(int[] settled, int inner, double v) {
-        if (v >= 0.999) {
-            return settled;                     // open: the array as computed, untouched
-        }
-        int[] out = new int[settled.length];
-        for (int i = 0; i < settled.length; i++) {
-            double p = Bloom.stagger(v, i, settled.length, RING_SPREAD);
-            out[i] = (int) Math.round(inner + (settled[i] - inner) * p);
-        }
-        return out;
-    }
 
     /**
      * How opaque a blooming ring is drawn, 0 to 1.
@@ -2043,12 +1930,12 @@ extends JPanel {
      * Reaches full well before the bloom does, so the reader watches the glyphs travel rather
      * than watching them fade in once they have already arrived.
      */
-    private static float ringAlpha(double open) {
+    static float ringAlpha(double open) {
         return (float) Bloom.smoothstep(0.0, 0.45, open);
     }
 
     /** The wheel's geometry at its current size, or null when it has none to speak of. */
-    private Geometry geometry() {
+    Geometry geometry() {
         if (this.chartPanel == null) {
             return null;
         }
@@ -2056,7 +1943,7 @@ extends JPanel {
     }
 
     /** As above, for the painter, which is handed the size it is painting into. */
-    private Geometry geometry(int w, int h) {
+    public Geometry geometry(int w, int h) {
         return w <= 0 || h <= 0 ? null : new Geometry(w, h);
     }
 
@@ -2137,8 +2024,8 @@ extends JPanel {
      * sweeping the wheel sees each body's own web in turn without having to select and
      * deselect. Clicking still opens the reading - that is a separate, deliberate act.
      */
-    private int focusBody = -1;
-    private boolean focusTransit;
+    int focusBody = -1;
+    boolean focusTransit;
 
     /**
      * True when the focus was set by a click rather than by the cursor resting on a body.
@@ -2151,7 +2038,7 @@ extends JPanel {
     private boolean focusPinned;
 
     /** True when nothing is focused, so every aspect draws at its ordinary strength. */
-    private boolean noFocus() {
+    public boolean noFocus() {
         return this.focusBody < 0;
     }
 
@@ -2163,7 +2050,7 @@ extends JPanel {
      * context that makes one body's web mean anything, and removing it would leave a reader
      * looking at five lines in an empty circle.
      */
-    private double focusWeight(int a, int b, boolean transitPair) {
+    public double focusWeight(int a, int b, boolean transitPair) {
         if (this.noFocus()) {
             return 1.0;
         }
@@ -2180,7 +2067,7 @@ extends JPanel {
      * asked through {@code visibleAspect}, the same gate the lines use, so a glyph cannot stay
      * lit for an aspect that was switched off in Settings.
      */
-    private double glyphWeight(int i, boolean transit) {
+    public double glyphWeight(int i, boolean transit) {
         if (this.noFocus()) {
             return 1.0;
         }
@@ -2296,7 +2183,7 @@ extends JPanel {
         return this.chartPanel == null ? 0 : this.chartPanel.getHeight();
     }
 
-    java.awt.geom.AffineTransform viewTransform(int w, int h) {
+    public java.awt.geom.AffineTransform viewTransform(int w, int h) {
         return this.view.transform(w, h);
     }
 
@@ -2304,7 +2191,7 @@ extends JPanel {
         return this.view.isFit();
     }
 
-    java.awt.Point toWheel(int x, int y) {
+    public java.awt.Point toWheel(int x, int y) {
         return this.chartPanel == null
             ? new java.awt.Point(x, y)
             : this.view.toWheel(x, y, this.viewW(), this.viewH());
@@ -2326,7 +2213,7 @@ extends JPanel {
         this.view.fit();
     }
 
-    void clampView() {
+    public void clampView() {
         if (this.chartPanel != null) {
             this.view.reclamp(this.viewW(), this.viewH());
         }
@@ -2336,7 +2223,7 @@ extends JPanel {
         return WheelView.fitChipBounds();
     }
 
-    void paintFitChip(Graphics2D g2) {
+    public void paintFitChip(Graphics2D g2) {
         this.view.paintFitChip(g2);
     }
 
@@ -2457,11 +2344,11 @@ extends JPanel {
             default:
                 break;
         }
-        if (this.layerShown(Layer.MANSIONS) && SkymapPanel.inMansionRing(r, g.rings)) {
+        if (this.layerShown(Layer.MANSIONS) && WheelLayout.inMansionRing(r, g.rings)) {
             return HOVER_MANSION * 1000
                 + com.zodiacomputing.ourania.astro.LunarMansions.at(lon).number;
         }
-        if (this.layerShown(Layer.DEGREES) && SkymapPanel.inRimDegreeBand(r, g.rings)) {
+        if (this.layerShown(Layer.DEGREES) && WheelLayout.inRimDegreeBand(r, g.rings)) {
             return HOVER_RIM_DEGREE * 1000 + ((int) Math.round(lon) % 360);
         }
         // The rim with both folded away: nothing is drawn there, so nothing answers.
@@ -2507,7 +2394,7 @@ extends JPanel {
     }
 
     /** The swell for a hovered ring target, painted over the finished wheel. */
-    void paintHover(Graphics2D g2, Geometry g) {
+    public void paintHover(Graphics2D g2, Geometry g) {
         if (this.hoverRing < 0 || g == null) {
             return;
         }
@@ -2946,429 +2833,19 @@ extends JPanel {
             this.selectionSpeed, this.selectionTransit));
     }
 
+    /**
+     * The hover card for a body on one of the rings. The words are {@link PlacementText}'s; what
+     * stays here is the one thing only the panel knows - which ring, so which cusps and name.
+     */
     private String hoverHtml(int n, double lon, double speed, int ring) {
         final boolean transit = ring != WHEEL_NATAL;
-        Bodies.Def def = Bodies.at(n);
-        int signIdx = Zodiac.signIndex(lon);
-        String sign = Zodiac.SIGNS[signIdx];
-        int degInSign = (int)(lon % 30.0);
-        int minInSign = (int)((lon % 30.0 - (double)degInSign) * 60.0);
-        int decan = Zodiac.decan(lon);
-
-        StringBuilder sb = new StringBuilder();
-        // <b>Its own background and its own ink, because this card lands in two places.</b>
-        // It is a tooltip over the wheel and it is also the top of the Selection drawer -
-        // selectionHtml builds on it - and it set neither colour, so it inherited whatever it
-        // landed on. Over a pale tooltip the default black read fine; in the dark drawer the
-        // point's name was black on near-black, which is what David saw. A fragment reused on
-        // two surfaces has to carry its own contrast rather than borrow one.
-        sb.append("<html><body style='width:250px; font-family:SansSerif; font-size:11px;"
-            + " background:#12151A; color:#E0E0E0;'>");
-        sb.append("<div style='font-size:13px;'><b>").append(def.name).append("</b>");
-        if (transit) {
-            sb.append(" <span style='color:#5A7FBF;'>(")
-                  .append(this.ringWord(ring)).append(")</span>");
-        }
-        if (!def.isAngle() && speed < 0.0) {
-            sb.append(" <span style='color:#B03030;'><b>R</b></span>");
-        }
-        sb.append("</div>");
-
-        sb.append("<div><b>").append(degInSign).append("&deg;")
-          .append(minInSign < 10 ? "0" : "").append(minInSign).append("'</b> ")
-          .append(SkymapPanel.capitalise(sign));
-        int house = Zodiac.houseOf(lon, transit ? this.outerRing.cusps : this.activeCusps);
-        if (house > 0) {
-            sb.append(" &nbsp;&middot;&nbsp; House ").append(house);
-        }
-        sb.append("</div>");
-
-        // <b>Both decan schemes, each named.</b> This line used to read "sub-ruler Mercury"
-        // without saying which of the two systems that was, which is the one thing a reader
-        // cannot afford not to know here: they disagree for 30 of the 36 decans, and the app
-        // uses both at once. The triplicity ruler is the one the decan prose is written to;
-        // the Chaldean face is the one the Golden Dawn tarot cards and the Sabian decan_ruler
-        // field encode. Naming them is what lets a practitioner reconcile the two surfaces
-        // instead of reading the difference as a fault. Zodiac's header carries the full note.
-        // <b>The degree's own condition, when it has one.</b> Open in the work plan since
-        // 21 Aug and settled 2026-09-03: anaretic is exactly 29d00'00" to 29d59'59" with no
-        // tolerance either side, and 0d is the opposite condition rather than the same one.
-        // See DECISIONS.md, K3.
-        Zodiac.DegreeStatus status = Zodiac.degreeStatus(lon);
-        if (status == Zodiac.DegreeStatus.ANARETIC) {
-            sb.append("<div style='color:#E8B24A;'><b>Anaretic</b> &middot; the 30th degree, ")
-              .append("completing this sign</div>");
-        } else if (status == Zodiac.DegreeStatus.INITIATION) {
-            sb.append("<div style='color:#7FB3FF;'><b>First degree</b> &middot; the sign just ")
-              .append("begun</div>");
-        }
-        String triplicity = Zodiac.triplicityDecanRuler(lon);
-        String face = Zodiac.chaldeanDecanRuler(lon);
-        int decanFrom = (decan - 1) * 10;
-        sb.append("<div style='color:#9FB4C7;'>Decan ").append(decan)
-          .append(" &middot; ").append(decanFrom).append("&deg;&ndash;").append(decanFrom + 10)
-          .append("&deg;</div>");
-        if ((triplicity != null && !triplicity.isEmpty()) || (face != null && !face.isEmpty())) {
-            sb.append("<div style='color:#9FB4C7; font-size:10px;'>");
-            if (triplicity != null && !triplicity.isEmpty()) {
-                sb.append("Triplicity <b>").append(triplicity).append("</b>");
-            }
-            if (face != null && !face.isEmpty()) {
-                if (triplicity != null && !triplicity.isEmpty()) {
-                    sb.append(" &nbsp;&middot;&nbsp; ");
-                }
-                sb.append("Chaldean face <b>").append(face).append("</b>");
-            }
-            sb.append("</div>");
-        }
-
-        try {
-            String sabian = InterpretationService.getInstance()
-                .getSabianSymbol(SkymapPanel.capitalise(sign), degInSign + 1);
-            if (sabian != null && !sabian.isEmpty() && !sabian.startsWith("Interpretation not found")) {
-                sb.append("<div style='margin-top:4px; color:#C9BFA0; font-style:italic;'>")
-                  .append(degInSign + 1).append("&deg; ").append(SkymapPanel.capitalise(sign))
-                  .append(": &ldquo;").append(sabian).append("&rdquo;</div>");
-            }
-        } catch (Exception e) {
-            // A tooltip is not worth throwing out of a mouse-moved handler for.
-        }
-        if (!def.meaning.isEmpty()) {
-            sb.append("<div style='margin-top:4px; color:#8FA98F;'>").append(def.meaning).append("</div>");
-        }
-        sb.append("</body></html>");
-        return sb.toString();
+        return PlacementText.hoverCard(n, lon, speed, transit,
+            transit ? this.ringWord(ring) : null,
+            transit ? this.outerRing.cusps : this.activeCusps);
     }
 
-    private static String capitalise(String s) {
-        return s == null || s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
-    }
 
-    // ---------------------------------------------------------------- glyph sizes
-    //
-    // Size carries the same information the rings do, on a second channel: the Sun and
-    // Moon are the two biggest objects on the wheel, then the personal planets, then the
-    // slow ones, with the asteroids smallest. A reader should be able to find the lights
-    // without reading a single glyph.
-    //
-    // Radius and font are kept together because they cannot be tuned apart - a 20pt glyph
-    // in an 11px sphere spills over the edge of it. The baseline offset is derived from
-    // the font rather than stored, so there is one number to change per tier, not three.
 
-    /** The Sun and the Moon. */
-    private static final int TIER_LIGHT = 0;
-    /** Mercury, Venus, Mars - the rest of Group.LUMINARIES. */
-    private static final int TIER_INNER = 1;
-    /** Jupiter through Pluto. */
-    private static final int TIER_OUTER = 2;
-    /** Asteroids, centaurs, nodes and calculated points. */
-    private static final int TIER_SMALL = 3;
-
-    private static final class GlyphSize {
-        final int radius;
-        final Font font;
-        /** Distance below centre to sit the glyph baseline so it looks centred. */
-        final int baseline;
-
-        GlyphSize(int radius, int fontPoints) {
-            this.radius = radius;
-            this.font = new Font("SansSerif", 0, fontPoints);
-            this.baseline = Math.round((float)fontPoints * 0.25f);
-        }
-    }
-
-    /**
-     * <b>Four tiers, close together on purpose.</b> The lights used to be drawn at nearly
-     * twice an asteroid's radius, which read as a hierarchy of importance the chart does not
-     * actually claim - and, more practically, made a Sun and a Moon next to each other wide
-     * enough to push their neighbours out of the band they belong to. They are still the
-     * largest, by enough to find at a glance and no more.
-     *
-     * The largest transit radius here is what BAND_EDGE is set from; raising one without the
-     * other is what lets a glyph overhang the ring it is drawn on.
-     */
-    private static final GlyphSize[] NATAL_SIZES = {
-        new GlyphSize(14, 24),      // lights
-        new GlyphSize(13, 22),      // inner planets
-        new GlyphSize(12, 21),      // outer planets
-        new GlyphSize(11, 20)       // asteroids and points
-    };
-
-    private static final GlyphSize[] TRANSIT_SIZES = {
-        new GlyphSize(12, 20),
-        new GlyphSize(11, 19),
-        new GlyphSize(11, 18),
-        new GlyphSize(10, 17)
-    };
-
-    /**
-     * Size tier for a registry point, or -1 for the four angles, which are drawn as
-     * labelled cubes at a fixed size and are not competing with the bodies for attention.
-     */
-    private static int tierOf(int n) {
-        Bodies.Def def = Bodies.at(n);
-        if (def.isAngle()) {
-            return -1;
-        }
-        if (n == SUN || n == MOON) {
-            return TIER_LIGHT;
-        }
-        switch (def.group) {
-            case LUMINARIES:
-                return TIER_INNER;
-            case SOCIAL:
-                return TIER_OUTER;
-            default:
-                return TIER_SMALL;
-        }
-    }
-
-    private static GlyphSize natalSize(int n) {
-        int n2 = SkymapPanel.tierOf(n);
-        return NATAL_SIZES[n2 < 0 ? TIER_INNER : n2];
-    }
-
-    private static GlyphSize transitSize(int n) {
-        int n2 = SkymapPanel.tierOf(n);
-        return TRANSIT_SIZES[n2 < 0 ? TIER_INNER : n2];
-    }
-
-    /** Outermost ring: Sun through Mars - the fast, personal bodies. */
-    private static final int RING_INNER_PLANETS = 0;
-    /** Middle ring: Jupiter through Pluto - the slow, generational ones. */
-    private static final int RING_OUTER_PLANETS = 1;
-    /** Innermost ring: asteroids, centaurs, nodes and the calculated points. */
-    private static final int RING_ASTEROIDS = 2;
-    private static final int RING_COUNT = 3;
-
-    /**
-     * Clearance kept at each edge of an outer band, so a glyph on the outermost sub-ring
-     * does not overhang the boundary it is drawn against. One more than the largest radius
-     * in TRANSIT_SIZES.
-     */
-    static final int BAND_EDGE = 13;
-
-    /** Shallowest an outer band is allowed to get before the wheel is simply too small. */
-    static final int MIN_BAND_DEPTH = 22;
-
-    /**
-     * How deep a band the partner ring and the sky ring each get.
-     *
-     * <b>Derived from what the band has to hold, not chosen.</b> The two bands used to be 22
-     * and 25 pixels, while the layout inside them ran RING_COUNT sub-rings apart - three rings
-     * twenty pixels apart is sixty pixels of content in a twenty-five pixel band, so the
-     * asteroid sub-ring landed in the decans and the signs. Reading it as "a ring" was
-     * accurate: it was a line with things scattered on both sides of it. A band is an area,
-     * and its depth is the space its own sub-rings need.
-     *
-     * Capped at a sixth of the wheel, because on a small window a band that insists on its
-     * ideal depth eats the chart it is wrapped around; there it compresses, and bandRadii
-     * closes the sub-rings up to match.
-     */
-    static int outerBandDepth(int outer) {
-        return SkymapPanel.outerBandDepth(outer, 2);
-    }
-
-    /**
-     * The same depth, shared out when more than two bands are open (G17).
-     *
-     * <p><b>The cap was never about one band, it was about the budget.</b> Two bands at
-     * {@code outer / 6} each is a third of the radius spent on context, leaving two thirds for
-     * the chart being read - and that ratio is the judgement in the sixth, not the six. So the
-     * budget is stated as the third it has always been and divided among however many bands are
-     * open, which is why this returns {@code outer / 6} unchanged at two bands. That is exact
-     * rather than approximate: {@code (outer / 3) / 2} and {@code outer / 6} are the same
-     * integer for every {@code outer}, so {@code AspectGridCheck} goes on asserting the formula
-     * it has always asserted.
-     *
-     * <p><b>{@link #MIN_BAND_DEPTH} can still win, and then the bands overrun their budget.</b>
-     * A band shallower than 22 pixels cannot hold a glyph, so the floor is right - but six
-     * bands at the floor need 132 pixels of a wheel that may be 150 across, and the natal wheel
-     * is what pays. The geometry cannot fix that, because the answer is not a smaller band: it
-     * is fewer bands. {@link WheelStack#fits} is where that is decided, and it is decided
-     * before a ring is opened rather than discovered when one is drawn over the other.
-     *
-     * <p>Note that {@code RING_COUNT} above is <i>not</i> this count. It is the three sub-rings
-     * <i>within</i> one band - inner planets, outer planets, asteroids - and the collision of
-     * names is old; it is what {@code ideal} is derived from and has nothing to do with how
-     * many bands the wheel carries.
-     *
-     * @param bands how many body bands are open; fewer than two is treated as two, because the
-     *     budget is not handed to a single band merely because it is alone
-     */
-    static int outerBandDepth(int outer, int bands) {
-        int ideal = (RING_COUNT - 1) * (int) TRANSIT_RING_GAP + 2 * BAND_EDGE;
-        return Math.max(MIN_BAND_DEPTH, Math.min(ideal, (outer / 3) / Math.max(2, bands)));
-    }
-
-    /**
-     * Clearance and sub-ring spacing for the natal band.
-     *
-     * Wider than the outer rings' on both counts, because the natal wheel carries the largest
-     * glyphs and is the thing being read - the outer rings are context around it.
-     */
-    static final int NATAL_EDGE = 15;
-    private static final int NATAL_SUB_RING_GAP = 24;
-    private static final double NATAL_SPACING = 32.0;
-
-    /**
-     * The least radius the natal wheel can be drawn in, derived the way a band's depth is.
-     *
-     * <p><b>Derived from what it has to hold.</b> The natal wheel lays its bodies out on
-     * {@code RING_COUNT} sub-rings {@link #NATAL_SUB_RING_GAP} apart with {@link #NATAL_EDGE}
-     * of clearance at each end - exactly as an outer band does with its own two numbers - so
-     * the floor is that same sum and moves if either number does. A round number chosen here
-     * instead would be a second statement of the layout that nothing keeps in step with the
-     * first, which is this project's most-found defect.
-     */
-    static int minNatalRadius() {
-        return (RING_COUNT - 1) * NATAL_SUB_RING_GAP + 2 * NATAL_EDGE;
-    }
-
-    /**
-     * How deep the zodiac and its scales are, from the rim down to where the bodies may start.
-     *
-     * <p>Read outward-in: the rim, the decans, the signs, the Egyptian bounds and the inner
-     * degree scale - the chain {@link #ringRadii} subtracts with every band fully open, which
-     * is the worst case and therefore the one a fit has to survive.
-     */
-    static int zodiacDepth() {
-        return 20 + 20 + 35 + TERM_BAND_DEPTH + DEGREE_RING_DEPTH;
-    }
-
-    /**
-     * How many body bands fit on a wheel of this radius (G17).
-     *
-     * <p><b>Asked before a ring is opened, not discovered when one is drawn.</b>
-     * {@link #MIN_BAND_DEPTH} is a floor a band cannot go below and still hold a glyph, so on a
-     * small window the bands stop sharing the budget and start taking whatever they need - and
-     * what pays is the natal wheel, silently, by being drawn underneath them. The failure mode
-     * is a chart that looks fine and is unreadable at the centre, which is the worst kind:
-     * nothing reports it.
-     *
-     * <p>So the question is turned round. Rather than letting any number of bands open and
-     * hoping, this says how many the wheel can carry and {@link WheelStack} refuses the rest. A
-     * reader who asks for six wheels on a small window is told they have four - a true answer
-     * they can act on, by making the window bigger - instead of a drawing that lies.
-     *
-     * <p><b>Zero is a real answer, and finding that out was the point of asking.</b> The first
-     * version of this floored at one, on the reasoning that a wheel too small for a single band
-     * is too small for the chart and that is not this method's argument to make. The check
-     * disagreed, and it was right: below about a 470-pixel window there is genuinely no room
-     * for a band, and the wheel has been drawing one anyway. At 300 pixels the zodiac and its
-     * scales take the radius down to 31, one band takes 23 more, and the natal wheel is left
-     * with <b>-15</b> - a negative radius, drawn every time, reported by nothing.
-     *
-     * <p>That is older than any of this and is not a regression; it is what the assertion found
-     * when the layout was finally asked whether it fits instead of told to lay out. Returning
-     * zero is what lets the caller say "this window is too small for an outer wheel" rather
-     * than draw one on top of the chart.
-     */
-    static int maxBodyBands(int outer) {
-        int room = outer - SkymapPanel.zodiacDepth() - SkymapPanel.minNatalRadius();
-        int most = 0;
-        for (int n = 1; n <= WheelStack.MOST_BANDS; n++) {
-            // <b>Stops at the first count that does not fit rather than taking the largest
-            // that does</b>, and the difference is not pedantry. Band depth is integer
-            // division, which throws away up to n-1 pixels per band, and MIN_BAND_DEPTH
-            // clamps it from below - so the total is NOT monotonic in the count. At an outer
-            // radius of 275 there is room for 88: two bands want 45 each and cost 90, four
-            // want 22 each and cost 88. Scanning for the largest that fits therefore answered
-            // FOUR bands on a wheel that cannot carry two. "How many fit" has to mean they can
-            // be added one at a time.
-            if ((long) n * SkymapPanel.outerBandDepth(outer, n) > room) {
-                break;
-            }
-            most = n;
-        }
-        return most;
-    }
-
-    /**
-     * How deep a band the natal wheel gets.
-     *
-     * <b>The natal wheel used to have no floor at all.</b> It ran from its ceiling inward at
-     * forty pixels a sub-ring with no lower bound, so twenty-nine bodies sprawled across a
-     * hundred and ten pixels - "not on a singular ring but all over the place", which is how
-     * David put it - and whatever was left over became the aspect area by accident. Giving it
-     * a floor does two things at once: the bodies gather onto three tight sub-rings, and the
-     * space inside the floor becomes a field the aspect lines can be laid out in deliberately.
-     *
-     * The forty-pixel gap was sized for nineteen-pixel glyphs. They are fourteen now.
-     *
-     * Capped at a third of its own ceiling, so the band cannot crowd out the fields inside it
-     * on a small wheel.
-     */
-    static int natalBandDepth(int natalTop) {
-        int ideal = (RING_COUNT - 1) * NATAL_SUB_RING_GAP + 2 * NATAL_EDGE;
-        return Math.max(MIN_BAND_DEPTH, Math.min(ideal, natalTop / 3));
-    }
-    /** Stagger applied to a body that collides with one already placed in its ring. */
-    /** The transit band is thinner than the natal wheel, so its rings sit closer. */
-    private static final double TRANSIT_RING_GAP = 20.0;
-    private static final double TRANSIT_RING_STEP = 12.0;
-
-    /**
-     * Which ring a registry point belongs to, or -1 for the four angles.
-     *
-     * Reads Bodies.Group rather than a list of names here, so a point added to the
-     * registry lands in a ring automatically instead of silently defaulting to the
-     * outermost one and looking like a planet.
-     */
-    private static int ringOf(int n) {
-        Bodies.Def def = Bodies.at(n);
-        if (def.isAngle()) {
-            return -1;
-        }
-        switch (def.group) {
-            case LUMINARIES:
-                return RING_INNER_PLANETS;
-            case SOCIAL:
-                return RING_OUTER_PLANETS;
-            default:
-                return RING_ASTEROIDS;
-        }
-    }
-
-    /** The validity mask narrowed to one ring, so each ring staggers independently. */
-    private static boolean[] restrictToRing(boolean[] blArray, int n) {
-        boolean[] blArray2 = new boolean[blArray.length];
-        for (int i = 0; i < blArray.length; ++i) {
-            blArray2[i] = blArray[i] && SkymapPanel.ringOf(i) == n;
-        }
-        return blArray2;
-    }
-
-    /**
-     * Radius per body, one ring per kind of body.
-     *
-     * @param dArray   longitudes, natal or transit
-     * @param blArray  which of them are valid to draw
-     * @param base     radius of the outermost ring
-     * @param gap      distance to the next ring in
-     * @param step     within-ring collision stagger; keep it under gap or a crowded ring
-     *                 spills into the one inside it and the banding stops reading
-     * @param spacing  minimum glyph separation in pixels, passed through to radialLevels
-     * @param floorPx  never draw closer to the centre than this
-     */
-    private static int[] ringedRadii(double[] dArray, boolean[] blArray, double base, double gap,
-                              double step, double spacing, double floorPx) {
-        int[][] nArray = new int[RING_COUNT][];
-        for (int i = 0; i < RING_COUNT; ++i) {
-            nArray[i] = SkymapPanel.radialLevels(dArray, SkymapPanel.restrictToRing(blArray, i),
-                base - (double)i * gap, step, spacing);
-        }
-        int[] nArray2 = new int[BODY_COUNT];
-        for (int i = 0; i < BODY_COUNT; ++i) {
-            int n = SkymapPanel.ringOf(i);
-            if (n < 0) {
-                continue;                       // an angle; the caller fills these in
-            }
-            nArray2[i] = (int)Math.max(
-                base - (double)n * gap - (double)nArray[n][i] * step, floorPx);
-        }
-        return nArray2;
-    }
 
     /**
      * Where the bodies sit, from the ring table and the reader's choice.
@@ -3378,89 +2855,12 @@ extends JPanel {
      * one of them would put the glyphs somewhere the clicks are not. That is invisible until
      * someone tries to click a planet and nothing happens.
      */
-    int bodyBaseRadius(int[] rings) {
-        int base = rings[RING_BODY_TOP];
-        String ring = Settings.bodyRing();
-        if (Settings.RING_CENTRE.equals(ring)) {
-            // Well inside the rings, leaving the body bands and the zodiac clear.
-            return (int) (base * 0.62);
-        }
-        if (Settings.RING_OUTSIDE.equals(ring)) {
-            // <b>This option lost its old destination in the reorder.</b> "Outside the sign
-            // ring" used to mean between the signs and the transit wheel; with the zodiac now
-            // outermost there is nothing out there but the degree ticks, and putting bodies
-            // there would place them beyond the frame that measures them. It now means as far
-            // out as the natal wheel goes - hard against whatever ring is above it.
-            return base;
-        }
-        return base - 14;
+    @Override
+    public int bodyBaseRadius(int[] rings) {
+        return WheelLayout.bodyBase(rings, Settings.bodyRing());
     }
 
-    /**
-     * Where one outer band's bodies sit, contained inside the band by construction.
-     *
-     * <b>This was two methods, and the second one's own header said it "mirrors" the first.</b>
-     * That is the project's most expensive defect written down as a comment: one rule, two
-     * implementations, drifting. The partner ring and the sky ring differ only in which
-     * longitude array they read and which two radii bound them, so they are one method taking
-     * those as arguments.
-     *
-     * <b>The sub-rings are derived from the band, not fixed.</b> The old pair asked for three
-     * sub-rings twenty pixels apart regardless of how deep the band actually was, which is how
-     * bodies ended up in the decans. Here the gap is whatever divides the usable depth, so the
-     * innermost sub-ring lands exactly on the floor and nothing can be laid outside
-     * {@code [bandInner + edge, bandOuter - edge]} - not by a wide glyph, not by a crowded
-     * collision level, and not on a window too small to give the band its ideal depth.
-     * AspectGridCheck asserts that containment across sizes rather than trusting it.
-     *
-     * @param bandOuter the band's outer boundary
-     * @param bandInner the band's inner boundary
-     */
-    static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner) {
-        return SkymapPanel.bandRadii(lon, valid, bandOuter, bandInner, BAND_EDGE, 28.0);
-    }
 
-    /**
-     * As above, for a ring whose glyphs are a different size from the outer rings'.
-     *
-     * <b>The clearance and the spacing are the ring's, not the method's.</b> The natal wheel
-     * draws the largest glyphs on the chart and wants more room between them; hard-coding the
-     * outer rings' numbers here and calling it shared would be sharing the name and not the
-     * rule.
-     *
-     * @param maxEdge  the most clearance to keep at each boundary
-     * @param spacing  minimum glyph separation in pixels, before a body steps to a new level
-     */
-    static int[] bandRadii(double[] lon, boolean[] valid, int bandOuter, int bandInner,
-                           int maxEdge, double spacing) {
-        // On a band too shallow for full clearance, give up half of what there is at each
-        // edge rather than letting top and floor cross - crossed bounds put every body on the
-        // wrong side of the boundary, which is worse than a tight fit.
-        int edge = Math.min(maxEdge, Math.max(0, (bandOuter - bandInner) / 2));
-        int top = bandOuter - edge;
-        int floor = bandInner + edge;
-        double usable = Math.max(0.0, top - floor);
-        double gap = usable / (double) (RING_COUNT - 1);
-        double step = Math.min(gap * 0.35, TRANSIT_RING_STEP);
-
-        int[] bodies = SkymapPanel.ringedRadii(lon, SkymapPanel.restrict(valid, false),
-            top, gap, step, spacing, floor);
-
-        // Angles ride the middle of the band, where they read as belonging to it rather than
-        // to either neighbour.
-        double mid = (top + floor) / 2.0;
-        double angleStep = Math.min(gap * 0.5, 18.0);
-        int[] levels = SkymapPanel.radialLevels(lon, SkymapPanel.restrict(valid, true),
-            mid, angleStep, spacing);
-
-        int[] out = new int[BODY_COUNT];
-        for (int i = 0; i < BODY_COUNT; i++) {
-            out[i] = Bodies.at(i).isAngle()
-                ? (int) Math.max(mid - (double) levels[i] * angleStep, floor)
-                : bodies[i];
-        }
-        return out;
-    }
 
     /**
      * The colour a glyph is drawn in, by element.
@@ -3484,7 +2884,7 @@ extends JPanel {
      * fallback, because a reading is light text on a dark panel. Three surfaces, three
      * grounds - the element is the same, the legible ink is not.
      */
-    private Color getElementColor(int n) {
+    public Color getElementColor(int n) {
         return getElementColor(n, true);
     }
 
@@ -3500,18 +2900,18 @@ extends JPanel {
      * and a per-body override added to some of them would have produced a chart where a body
      * was one colour on the wheel and another in the table.
      */
-    Color bodyColor(int bodyIndex) {
+    public Color bodyColor(int bodyIndex) {
         return ChartPalette.colorOr(
             ChartPalette.bodyHex(Bodies.at(bodyIndex).id),
             this.getElementColor(BODY_ELEMENTS[bodyIndex]));
     }
 
-    String bodyColorHex(int bodyIndex) {
+    static String bodyColorHex(int bodyIndex) {
         String own = ChartPalette.bodyHex(Bodies.at(bodyIndex).id);
-        return own != null ? own : this.getElementColorHex(BODY_ELEMENTS[bodyIndex]);
+        return own != null ? own : SkymapPanel.getElementColorHex(BODY_ELEMENTS[bodyIndex]);
     }
 
-    private Color getElementColor(int n, boolean lightBacking) {
+    Color getElementColor(int n, boolean lightBacking) {
         if (n < 0 || n >= ELEMENT_COLORS.length) {
             return lightBacking ? Color.BLACK : new Color(226, 228, 234);
         }
@@ -3545,45 +2945,6 @@ extends JPanel {
         return String.format("#%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
     }
 
-    private void drawMoonPhase(Graphics2D graphics2D, int n, int n2, int n3, double d) {
-        int n4 = n3 * 2;
-        int n5 = n - n3;
-        int n6 = n2 - n3;
-        graphics2D.setColor(Color.BLACK);
-        graphics2D.fillOval(n5, n6, n4, n4);
-        if (d <= 0.5) {
-            graphics2D.setColor(Color.WHITE);
-            graphics2D.fillArc(n5, n6, n4, n4, 270, 180);
-            if (d <= 0.25) {
-                double d2 = 1.0 - d / 0.25;
-                int n7 = (int)((double)n4 * d2);
-                graphics2D.setColor(Color.BLACK);
-                graphics2D.fillOval(n - n7 / 2, n6, n7, n4);
-            } else {
-                double d3 = (d - 0.25) / 0.25;
-                int n8 = (int)((double)n4 * d3);
-                graphics2D.setColor(Color.WHITE);
-                graphics2D.fillOval(n - n8 / 2, n6, n8, n4);
-            }
-        } else {
-            graphics2D.setColor(Color.WHITE);
-            graphics2D.fillArc(n5, n6, n4, n4, 90, 180);
-            if (d <= 0.75) {
-                double d4 = 1.0 - (d - 0.5) / 0.25;
-                int n9 = (int)((double)n4 * d4);
-                graphics2D.setColor(Color.WHITE);
-                graphics2D.fillOval(n - n9 / 2, n6, n9, n4);
-            } else {
-                double d5 = (d - 0.75) / 0.25;
-                int n10 = (int)((double)n4 * d5);
-                graphics2D.setColor(Color.BLACK);
-                graphics2D.fillOval(n - n10 / 2, n6, n10, n4);
-            }
-        }
-        graphics2D.setColor(new Color(150, 150, 150));
-        graphics2D.drawOval(n5, n6, n4, n4);
-    }
-
     public SkymapPanel(OuraniaWindow ouraniaWindow) {
         java.util.Properties serializable;
     JPanel controlPanel;
@@ -3605,7 +2966,7 @@ extends JPanel {
             String string = serializable.getProperty("home.location");
             this.baseLocationName = string != null ? string : serializable.getProperty("default.base.location", "Los Angeles, CA");
             this.transitLocationName = string != null ? string : serializable.getProperty("default.transit.location", "Los Angeles, CA");
-            this.currentHouseSystemName = serializable.getProperty("default.house.system",
+            this.currentHouseSystemName = serializable.getProperty(Settings.HOUSE_SYSTEM_KEY,
                 com.zodiacomputing.ourania.astro.HouseSystems.DEFAULT_NAME);
             // <b>A name this build does not know falls back rather than throwing.</b> It can come
             // from a hand-edited settings file, or one written by a later version of this app;
@@ -3631,7 +2992,7 @@ extends JPanel {
         this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
         this.outerRing.time = ZonedDateTime.now(ZoneId.of(this.transitTimeZoneId));
         this.updateChartData();
-        this.chartPanel = new ChartPanel();
+        this.chartPanel = new WheelCanvas(this);
         this.chartPanel.addMouseListener(new MouseAdapter(){
 
             @Override
@@ -3685,7 +3046,7 @@ extends JPanel {
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 SkymapPanel.this.dragFrom = null;
-                if (SkymapPanel.this.scrubbing && SkymapPanel.this.scrubDragged) {
+                if (SkymapPanel.this.isScrubbing() && SkymapPanel.this.scrubDragged) {
                     SkymapPanel.this.endScrub();
                     SkymapPanel.this.chartPanel.setCursor(java.awt.Cursor.getDefaultCursor());
                 }
@@ -3721,12 +3082,12 @@ extends JPanel {
                 // so dragging back to it returns to the moment the scrub began. E8.
                 if (mouseEvent.isShiftDown() || SkymapPanel.this.scrubDragged) {
                     int sdx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
-                    if (!SkymapPanel.this.scrubDragged && Math.abs(sdx) < SCRUB_PX) {
+                    if (!SkymapPanel.this.scrubDragged && Math.abs(sdx) < SkyScrub.PX_PER_STEP) {
                         return;
                     }
                     SkymapPanel.this.scrubDragged = true;
                     SkymapPanel.this.beginScrub();
-                    SkymapPanel.this.scrubTo(sdx / SCRUB_PX);
+                    SkymapPanel.this.scrubTo(sdx / SkyScrub.PX_PER_STEP);
                     SkymapPanel.this.chartPanel.setCursor(
                         java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.E_RESIZE_CURSOR));
                     SkymapPanel.this.chartPanel.repaint();
@@ -3919,8 +3280,6 @@ extends JPanel {
     /** As above, with Chart B's own zone override - every subject has one now. */
     public void applyChartSettings(final String string, final String string2, final String string3, ChartMode chartMode, final String string4, final String string5, final String string6, final boolean transits, final boolean baseUnknown, final String zoneOverride, final String relocate, final String tZoneOverride) {
         this.baseTimeUnknown = baseUnknown;
-        // A chart cast from the form is a new birth time, not a scrubbed one: nothing to reset to.
-        this.scrubOrigins.clear();
         this.baseZoneOverride = zoneOverride == null ? "" : zoneOverride.trim();
         this.transitZoneOverride = tZoneOverride == null ? "" : tZoneOverride.trim();
         this.relocateTo = relocate == null ? "" : relocate.trim();
@@ -4134,37 +3493,6 @@ extends JPanel {
         }.execute();
     }
 
-    private static YearScan scanProfectionYear(ChartFrame chartFrame, double d, double d2, Profection profection, List<BodyScore.Vector> list, double d3, double d4, int n) {
-        Returns.Return return_;
-        SwissEph swissEph = new SwissEph(EPHE_PATH);
-        double d5 = Double.NaN;
-        double d6 = Double.NaN;
-        ChartFrame.Body body = chartFrame.body("Sun");
-        if (body != null && body.ok) {
-            d5 = Profection.solarReturnJd(swissEph, d, body.lon, profection.age);
-            d6 = Profection.solarReturnJd(swissEph, d, body.lon, profection.age + 1);
-        }
-        if (Double.isNaN(d5) || Double.isNaN(d6) || d6 <= d5) {
-            d5 = d2 - 182.6;
-            d6 = d2 + 182.6;
-        }
-        YearScan yearScan = new YearScan();
-        yearScan.events = Transits.eventsToNatal(Almanac.datedMoments(swissEph, d5, d6), chartFrame, list, profection.lord);
-        yearScan.perfections = Transits.perfectionsOverRange(swissEph, chartFrame, list, profection.lord, d5, d6);
-        yearScan.arcs = SolarArc.contacts(swissEph, chartFrame, d, list, profection.lord, d5, d6);
-        yearScan.progressions = Progressions.contacts(swissEph, chartFrame, d, list, profection.lord, d5, d6);
-        yearScan.moonClock = Progressions.clock(swissEph, d, chartFrame.cusps, d5, d6);
-        yearScan.mutuals = Progressions.mutual(swissEph, d, d5, d6);
-        // K12 stage 3: the days, for whichever themes turn out to be headlines.
-        yearScan.catalysts = Transits.datingHits(swissEph, chartFrame,
-            com.zodiacomputing.ourania.astro.ThemeConvergence.allThemePoints(chartFrame), d5, d6);
-        ChartFrame.Body body2 = chartFrame.body("Sun");
-        if (body2 != null && body2.ok && (return_ = Returns.solar(swissEph, d, body2.lon, profection.age, d3, d4, n)) != null) {
-            yearScan.returns = Returns.contacts(return_, chartFrame, list, profection.lord);
-        }
-        return yearScan;
-    }
-
     private static String formatCalendar(List<Almanac.Event> list) {
         String[] stringArray = new String[]{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         StringBuilder stringBuilder = new StringBuilder();
@@ -4267,145 +3595,7 @@ extends JPanel {
         if (chartFrame == null || chartFrame2 == null) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<br><hr style='border-color:#444;'><br>");
-        stringBuilder.append(this.angleContactsHtml("Chart A on Chart B's angles",
-            chartFrame, chartFrame2));
-        stringBuilder.append(this.angleContactsHtml("Chart B on Chart A's angles",
-            chartFrame2, chartFrame));
-        stringBuilder.append(this.houseOverlayHtml("Chart A's placements in Chart B's houses",
-            chartFrame, chartFrame2));
-        stringBuilder.append(this.houseOverlayHtml("Chart B's placements in Chart A's houses",
-            chartFrame2, chartFrame));
-        return stringBuilder.toString();
-    }
-
-    /** One direction of angle contacts, tightest first. */
-    private String angleContactsHtml(String string, ChartFrame chartFrame, ChartFrame chartFrame2) {
-        List<Synastry.AngleContact> list = Synastry.angleContacts(chartFrame, chartFrame2);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<h3 style='color:#FFD166; margin:0 0 4px 0;'>Angle contacts &middot; ")
-            .append(string).append("</h3>");
-        if (list.isEmpty()) {
-            // Said out loud rather than left blank, on the same reasoning as the aspect
-            // pattern box: a section that vanishes cannot be told from a section that broke.
-            stringBuilder.append("<div style='color:#9AA5B1; font-size:11px; margin-bottom:10px;'>")
-                .append("Nothing sits on the Ascendant, Descendant, MC or IC within orb.</div>");
-            return stringBuilder.toString();
-        }
-        stringBuilder.append("<div style='border:1px solid #FFD166; padding:6px; margin-bottom:10px;'>");
-        for (Synastry.AngleContact angleContact : list) {
-            stringBuilder.append("<div style='margin-bottom:3px; color:#cccccc; font-size:12px;'>")
-                .append("<span style='font-size:15px;'>").append(SkymapPanel.namedGlyph(angleContact.bodyIndex))
-                .append("</span> ").append(angleContact.body).append(" ")
-                .append(Zodiac.format(angleContact.bodyLon))
-                .append(" <span style='color:#FFD166;'>on</span> ").append(angleContact.angle)
-                .append(" ").append(Zodiac.format(angleContact.angleLon))
-                .append(" <span style='color:#9AA5B1;'>&mdash; orb ")
-                .append(SkymapPanel.formatOrb(angleContact.orb)).append(" of ")
-                .append(SkymapPanel.formatOrb(angleContact.maxOrb)).append("</span></div>");
-        }
-        // What landing on that particular angle means, once per angle actually involved.
-        // Once, not once per row: two bodies on the same Ascendant is one fact about the
-        // Ascendant repeated, and printing the paragraph twice would say so twice.
-        java.util.Set<String> said = new java.util.LinkedHashSet<>();
-        for (Synastry.AngleContact angleContact : list) {
-            if (!said.add(angleContact.angle)) {
-                continue;
-            }
-            String prose = InterpretationService.getInstance()
-                .getAngleContact(angleContact.angle.toLowerCase());
-            if (prose != null) {
-                stringBuilder.append("<div style='color:#dddddd; font-size:11px; ")
-                    .append("margin-top:6px;'>").append(prose).append("</div>");
-            }
-        }
-        stringBuilder.append("</div>");
-        return stringBuilder.toString();
-    }
-
-    /**
-     * One direction of house overlays, grouped by the host's house.
-     *
-     * Grouped rather than listed body by body because the reading is about the house: six
-     * of A's bodies in B's 12th is one fact, not six. The houses nothing lands in are named
-     * on their own line for the same reason the empty case above is - so that an absent
-     * house reads as empty rather than as missing.
-     */
-    private String houseOverlayHtml(String string, ChartFrame chartFrame, ChartFrame chartFrame2) {
-        List<Synastry.Overlay> list = Synastry.houseOverlays(chartFrame, chartFrame2);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<h3 style='color:#add8e6; margin:0 0 4px 0;'>House overlays &middot; ")
-            .append(string).append("</h3>");
-        if (list.isEmpty()) {
-            stringBuilder.append("<div style='color:#9AA5B1; font-size:11px; margin-bottom:10px;'>")
-                .append("The visiting chart computed no bodies.</div>");
-            return stringBuilder.toString();
-        }
-        StringBuilder[] stringBuilderArray = new StringBuilder[13];
-        StringBuilder stringBuilder2 = new StringBuilder();
-        for (Synastry.Overlay overlay : list) {
-            StringBuilder stringBuilder3;
-            if (overlay.house < 1 || overlay.house > 12) {
-                stringBuilder3 = stringBuilder2;
-            } else {
-                if (stringBuilderArray[overlay.house] == null) {
-                    stringBuilderArray[overlay.house] = new StringBuilder();
-                }
-                stringBuilder3 = stringBuilderArray[overlay.house];
-            }
-            if (stringBuilder3.length() > 0) {
-                stringBuilder3.append(", ");
-            }
-            stringBuilder3.append("<span style='font-size:15px;'>")
-                .append(SkymapPanel.namedGlyph(overlay.bodyIndex)).append("</span> ").append(overlay.body);
-        }
-        stringBuilder.append("<div style='margin-bottom:10px;'>");
-        StringBuilder stringBuilder4 = new StringBuilder();
-        for (int i = 1; i <= 12; ++i) {
-            if (stringBuilderArray[i] == null) {
-                if (stringBuilder4.length() > 0) {
-                    stringBuilder4.append(", ");
-                }
-                stringBuilder4.append(this.romanNumeral(i));
-                continue;
-            }
-            boolean bl = i == 1 || i == 4 || i == 7 || i == 10;
-            stringBuilder.append("<div style='margin-bottom:3px; color:#cccccc; font-size:12px;'>")
-                .append("<span style='color:").append(bl ? "#FFD166" : "#add8e6").append(";'>House ")
-                .append(this.romanNumeral(i)).append(bl ? " (angular)" : "").append("</span> &nbsp;")
-                .append(stringBuilderArray[i]);
-            // The lead only. The full overlay paragraph is worth reading for one house and
-            // unreadable twelve times over, and the lead is the sentence the format exists to
-            // provide - see boldLead.
-            String lead = SkymapPanel.boldLead(
-                InterpretationService.getInstance().getOverlayHouse(i));
-            if (lead != null) {
-                stringBuilder.append("<div style='color:#9AA5B1; font-size:11px; ")
-                    .append("margin-left:14px;'>").append(lead).append("</div>");
-            }
-            stringBuilder.append("</div>");
-        }
-        if (stringBuilder4.length() > 0) {
-            stringBuilder.append("<div style='color:#9AA5B1; font-size:11px;'>Nothing of theirs in: ")
-                .append(stringBuilder4).append(".</div>");
-        }
-        if (stringBuilder2.length() > 0) {
-            // House 0 from Zodiac.houseOf means the receiving chart's cusp set is degenerate,
-            // which is a fact about that chart and not about these bodies.
-            stringBuilder.append("<div style='color:#ff8080; font-size:11px;'>No house could be "
-                + "determined for: ").append(stringBuilder2)
-                .append(" &mdash; the receiving chart's cusps are degenerate at its latitude.</div>");
-        }
-        stringBuilder.append("</div>");
-        return stringBuilder.toString();
-    }
-
-    /** Degrees and arcminutes, for an orb. Truncated to the minute, as Zodiac.format is. */
-    private static String formatOrb(double d) {
-        int n = (int)Math.floor(d);
-        int n2 = (int)Math.floor((d - (double)n) * 60.0);
-        return n + "&deg;" + String.format("%02d", n2) + "'";
+        return SynastryPage.crossContacts(chartFrame, chartFrame2);
     }
 
     /**
@@ -4535,10 +3725,10 @@ extends JPanel {
             com.zodiacomputing.ourania.astro.Declinations.Entry dec = decs.get(BODY_NAMES[i]);
             sb.append(BODY_NAMES[i]).append('\t')
               .append(String.format("%.4f", lon)).append('\t')
-              .append(SkymapPanel.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)])).append('\t')
+              .append(PlacementText.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)])).append('\t')
               .append(String.format("%.2f", Zodiac.degreeInSign(lon))).append('\t')
               .append(house > 0 ? String.valueOf(house) : "").append('\t')
-              .append(SkymapPanel.showsDirection(i) && this.natalRing.speed[i] < 0.0 ? "R" : "")
+              .append(PlacementText.showsDirection(i) && this.natalRing.speed[i] < 0.0 ? "R" : "")
               .append('\t')
               // The declination table's own formatter, so the column and the table cannot disagree.
               .append(dec == null ? "" : ChartTables.declination(dec.declination)).append('\t')
@@ -4838,35 +4028,20 @@ extends JPanel {
                 // and wants a window, so AspectGridCheck reaches generateReport directly and
                 // never sees which moment was passed. Mutation-tested on 2026-09-23 and it
                 // survived. Taking the alternative away is worth more than naming the rule.
-                if (!Double.isNaN(dNow)) {
-                    profection = Profection.at(d, dNow, chartFrame.asc);
-                    ChartFrame.Body theSun = chartFrame.body("Sun");
-                    if (theSun != null && theSun.ok) {
-                        double d7 = Profection.solarReturnJd(SkymapPanel.this.sw, d, theSun.lon,
-                            profection.age);
-                        // The year this chart actually has, not a mean one - see
-                        // computeSubPeriods for the thirteenth month that came of a round
-                        // number. One more root-find, once per reading.
-                        double d8 = Profection.solarReturnJd(SkymapPanel.this.sw, d, theSun.lon,
-                            profection.age + 1);
-                        profection.computeSubPeriods(dNow, d7, d8);
-                    }
-                }
-                if (bl) {
-                    chartFrame2 = ChartFrame.compute(SkymapPanel.this.sw, d4, d5, d6, c, false, 0.0);
-                    list2 = Transits.toNatal(chartFrame, chartFrame2, list, profection.lord);
-                    if (readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
-                        yearScan = SkymapPanel.scanProfectionYear(chartFrame, d, d4, profection, list, d2, d3, c);
-                        // Releasing gates the ranking rather than voting in it, which is what
-                        // finally puts it inside a reading. The chart carries the lots already,
-                        // so the gate costs one release walk and no ephemeris. d4 is the moment.
-                        Convergence.Gate gate = Convergence.Gate.at(
-                            d, chartFrame.lotOfFortune, chartFrame.lotOfSpirit, d4);
-                        list3 = Convergence.collect(profection, yearScan.perfections,
-                            yearScan.events, yearScan.arcs, yearScan.progressions,
-                            yearScan.returns, gate, yearScan.mutuals);
-                    }
-                }
+                // <b>The chronometry is the engine's, not this worker's (M7, 30 Sep).</b> The
+                // profection, the transit frame and its contacts, the year scan and the
+                // convergence were computed here, inline, and the phone needs every one of them
+                // in the same order - so they moved to Chronometry, and this worker and the
+                // phone both call it. The comments that explained each step moved with them.
+                Chronometry time = Chronometry.at(SkymapPanel.this.sw, chartFrame, d, dNow, list,
+                    bl ? d4 : Double.NaN, d5, d6, d2, d3, c,
+                    readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE
+                        || readingTier == ReadingTier.TIMELINE);
+                profection = time.profection;
+                chartFrame2 = time.transit;
+                list2 = time.hits;
+                yearScan = time.scan;
+                list3 = time.convergence;
                 if (readingTier == ReadingTier.REPORT) {
                     object = Snapshot.report(chartFrame, result, list, result2)
                         + Snapshot.topicLayer(topics);
@@ -4976,7 +4151,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (when.isEmpty() && outer != null) {
                 when = outer.format(fmt);
             }
-            out.append("      ").append(capitalise(this.ringWord(WHEEL_OUTER)))
+            out.append("      ").append(PlacementText.capitalise(this.ringWord(WHEEL_OUTER)))
                .append(": ").append(when);
         }
         if (this.triRingDrawn() && this.skyRing.time != null) {
@@ -5084,19 +4259,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             Widgets.styleButton(jButtonArray[bi], buttonRoles[bi]);
             jPanel2.add(jButtonArray[bi]);
         }
-        // <b>A bar per chart, on a row of its own.</b> One Scrub slider moved whatever the
-        // transport moves; David asked for "different scrub bars that control different charts".
-        // Each is shown only while its chart is on the wheel - see refreshScrubBars.
+        // <b>One bar, the sky's, on a row of its own.</b> There were three from 20 Sep - Chart A,
+        // Chart B and the sky - and David, 30 Sep: "time scrubbing is really only needed for the
+        // transit chart not a b or another charts". A birth time is changed from Chart Setup, and
+        // rectification has its own screen (G8). The row stays because the house-frame selector
+        // shares it - see refreshScrubBars.
         scrubRow = new JPanel(new Widgets.WrapLayout(1, 14, 2));
         scrubRow.setBackground(Color.BLACK);
         scrubRow.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         JLabel scrubLabel = new JLabel("Scrub:");
         scrubLabel.setForeground(Color.WHITE);
         scrubRow.add(scrubLabel);
-        for (ScrubTarget t : new ScrubTarget[] {ScrubTarget.CHART_A, ScrubTarget.CHART_B, ScrubTarget.SKY}) {
-            scrubRow.add(this.scrubBar(t));
-        }
-        this.scrubSlider = this.scrubSliders.get(ScrubTarget.SKY);
+        scrubRow.add(this.scrubBar());
 
         // <b>Readings, Tables and Tools have moved to the sidebar.</b> They were popup
         // menus here, which grouped the controls but stayed menus: they floated over the
@@ -5237,7 +4411,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // break, which was harmless only because it happened to be written last - a new
             // system added after it would have fallen through and cast the wrong houses.
             this.houseSystem = com.zodiacomputing.ourania.astro.HouseSystems.codeFor(string);
-            Settings.set("default.house.system", string);
+            Settings.setHouseSystem(string);
             this.updateChartData();
             this.chartPanel.repaint();
             // Placidus can fail where Whole Sign cannot, so the notice is a fact about this choice.
@@ -5722,13 +4896,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // RING_MANSION_INNER, the degree scale below it. With the mansions folded the scale has
         // the whole rim and answers everywhere in it, which is what it did before the band was
         // carved out.
-        if (this.layerShown(Layer.MANSIONS) && SkymapPanel.inMansionRing(d6, rings)) {
+        if (this.layerShown(Layer.MANSIONS) && WheelLayout.inMansionRing(d6, rings)) {
             this.window.showInterpretationForMansion(
                 com.zodiacomputing.ourania.astro.LunarMansions.at(d9).number);
             return;
         }
         if (SkymapPanel.inMansionBand(d6, n9)) {
-            if (this.layerShown(Layer.MANSIONS) && !SkymapPanel.inRimDegreeBand(d6, rings)) {
+            if (this.layerShown(Layer.MANSIONS) && !WheelLayout.inRimDegreeBand(d6, rings)) {
                 this.window.showInterpretationForMansion(
                     com.zodiacomputing.ourania.astro.LunarMansions.at(d9).number);
                 return;
@@ -5805,7 +4979,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * orb. Two different questions sharing a word; routing one into the other would visibly change
      * the wheel and is a decision for the stage that builds the preset bar.
      */
-    private Aspects.Profile profileForPair(boolean crossChart) {
+    public Aspects.Profile profileForPair(boolean crossChart) {
         if (crossChart && this.chartMode == ChartMode.SYNASTRY) {
             return Aspects.Profile.SYNASTRY;
         }
@@ -5816,7 +4990,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return Aspects.Profile.NATAL;
     }
 
-    private static String planetName(int n) {
+    static String planetName(int n) {
         return n >= 0 && n < BODY_NAMES.length ? BODY_NAMES[n] : null;
     }
 
@@ -5877,7 +5051,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     private static final Color SKY_HUE = new Color(143, 208, 255);
 
     /** A body's glyph colour on a given ring. ANCHOR keeps the element colour untouched. */
-    Color ringInk(int body, AngleRole role) {
+    public Color ringInk(int body, AngleRole role) {
         if (role == AngleRole.ANCHOR) {
             return this.bodyColor(body);
         }
@@ -5904,11 +5078,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * and nothing else. Body index -1 is not a body, and ANCHOR never reaches the branch that
      * would use it.
      */
-    Color ringAngleInk(AngleRole role) {
+    public Color ringAngleInk(AngleRole role) {
         return role == AngleRole.ANCHOR ? new Color(255, 228, 160) : this.ringInk(-1, role);
     }
 
-    AngleRole angleRoleFor(boolean isSky, boolean isTransit) {
+    public AngleRole angleRoleFor(boolean isSky, boolean isTransit) {
         if (isSky) {
             return AngleRole.SKY;
         }
@@ -5990,7 +5164,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             role.name(), hostHouse);
     }
 
-    private double getOrbFor(int n, int n2, Aspects.Profile profile) {
+    public double getOrbFor(int n, int n2, Aspects.Profile profile) {
         return Aspects.orbFor(SkymapPanel.planetName(n), SkymapPanel.planetName(n2), profile);
     }
 
@@ -6024,14 +5198,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * disagreed about which aspects exist. That is this project's most-logged defect and it
      * would have been invisible: both surfaces look entirely plausible on their own.
      */
-    private Aspects.Type visibleAspect(double sep, int a, int b, Aspects.Profile profile) {
-        Aspects.Type type = Aspects.typeOf(sep, SkymapPanel.planetName(a),
-            SkymapPanel.planetName(b), profile);
-        if (type == null) {
-            return null;
-        }
-        return this.aspectShown == null || type.ordinal() >= this.aspectShown.length
-            || this.aspectShown[type.ordinal()] ? type : null;
+    public Aspects.Type visibleAspect(double sep, int a, int b, Aspects.Profile profile) {
+        return AspectGate.visible(sep, a, b, profile, this.aspectShown);
     }
 
     /**
@@ -6051,7 +5219,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * Seeded at declaration and refreshed on the settings hook, not per call: this runs once
      * per body pair per repaint, and reading a properties file inside that loop would be felt.
      */
-    private boolean drawsPair(int a, int b) {
+    public boolean drawsPair(int a, int b) {
         if (Settings.ASPECTS_ESOTERIC.equals(this.aspectMode)) {
             return true;
         }
@@ -6154,7 +5322,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     // ------------------------------------------------- aspect grid: click, hover, highlight
 
     /** Prefix the aspect grid puts on the row body when the row is a transiting point. */
-    private static final String TRANSIT_PREFIX = "transit_";
+    static final String TRANSIT_PREFIX = "transit_";
 
     /**
      * Which wheel an aspect line runs from.
@@ -6216,7 +5384,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * outright now, so Chart A takes the upper deck and Chart B the lower, and a promoted
      * Chart B stays on the lower deck it would have had anyway.
      */
-    int ringDeck(int wheel) {
+    @Override
+    public int ringDeck(int wheel) {
         if (wheel == WHEEL_SKY) {
             return DECK_MIDDLE;
         }
@@ -6256,11 +5425,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * The natal half of the placement href, which was a bare literal in one place and is now
      * read by two: the placements list that writes it and the wheel click that sends it.
      */
-    private static final String BASE_PREFIX = "base_";
+    static final String BASE_PREFIX = "base_";
 
     /** The aspect the grid is currently hovering, as body indices. -1 when nothing is hovered. */
-    private int highlightA = -1;
-    private int highlightB = -1;
+    int highlightA = -1;
+    int highlightB = -1;
 
     /**
      * Whether this body is one end of the aspect line the cursor is resting on.
@@ -6272,7 +5441,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * into each of the glyph loops, because the natal loop and the outer loop read the
      * highlight from opposite ends of the pair.
      */
-    private boolean onHighlightedLine(int body, int wheel) {
+    public boolean onHighlightedLine(int body, int wheel) {
         if (this.highlightA < 0 || this.highlightB < 0) {
             return false;
         }
@@ -6290,19 +5459,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** The wheel the hovered line leaves from. Meaningless while nothing is hovered. */
-    private int highlightWheel = WHEEL_NATAL;
-
-    /** A ring of light around a glyph at the end of the hovered aspect line. */
-    private static void drawHighlightHalo(Graphics2D g, int x, int y, int r) {
-        Stroke was = g.getStroke();
-        g.setStroke(new BasicStroke(2.0f));
-        g.setColor(new Color(255, 238, 170, 225));
-        g.drawOval(x - r - 4, y - r - 4, (r + 4) * 2, (r + 4) * 2);
-        g.setColor(new Color(255, 238, 170, 80));
-        g.setStroke(new BasicStroke(1.0f));
-        g.drawOval(x - r - 8, y - r - 8, (r + 8) * 2, (r + 8) * 2);
-        g.setStroke(was);
-    }
+    int highlightWheel = WHEEL_NATAL;
 
     /**
      * Registry indices of an aspect pattern's members, lit as a group. Empty when none.
@@ -6313,7 +5470,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * within one chart, and {@link com.zodiacomputing.ourania.astro.AspectPatterns} is only
      * ever handed natal aspects.
      */
-    private int[] highlightPattern = new int[0];
+    int[] highlightPattern = new int[0];
 
     /**
      * Every aspect pattern in the current chart, lit without being asked.
@@ -6327,24 +5484,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * repaint: finding patterns means aspecting every pair of bodies, and the painter runs on
      * every mouse move.
      */
-    private int[][] autoPatterns = new int[0][];
+    int[][] autoPatterns = new int[0][];
 
-    /** How far in from the outer ring the mansion band starts. The ring is drawn there. */
-    static final int MANSION_BAND_DEPTH = 9;
 
-    /**
-     * How far in from the outer ring the rim's click target reaches: all the way to the decan
-     * ring, 20 px.
-     *
-     * <b>The whole rim is one target now.</b> It was split three ways - the mansion band from 9 px
-     * in, an undrawn "Sabian strip" from 15 to 9, and a dead strip from 20 to 15 - so a click on
-     * the inner half of the visible rim opened a Sabian symbol nothing on screen pointed to, or
-     * nothing at all. Measured by colouring every pixel of the wheel by what the real click
-     * handler opens (2026-09-14). David: "each click should be the entire space of the item". The
-     * Sabian symbols have their own drawn ring, the inner degree scale, where every degree cell
-     * opens its symbol.
-     */
-    static final int RIM_BAND_DEPTH = 20;
 
     /**
      * True when a click radius lands on the lunar mansion ring.
@@ -6360,245 +5502,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return radius >= outer - RIM_BAND_DEPTH && radius <= outer + 15;
     }
 
-    /**
-     * True when a click radius lands on the lunar mansion ring, given the whole chain.
-     *
-     * <b>The rim is two targets now, because it draws two things.</b> While the mansions were
-     * drawn over the degree scale one target for the whole rim was the honest answer - there was
-     * no way to point at the scale. Now the band has an edge, the mansions answer above it and
-     * the scale answers below it, which is David's rule from 2026-09-14: each click is the
-     * entire space of the item. With the mansions folded the band is empty and the scale takes
-     * the rim back, so nothing is pointing at an invisible ring.
-     */
-    static boolean inMansionRing(double radius, int[] rings) {
-        return rings[RING_MANSION_INNER] < rings[RING_OUTER]
-            && radius >= rings[RING_MANSION_INNER] && radius <= rings[RING_OUTER] + 15;
-    }
 
-    /** True when a click radius lands on the rim degree scale, below any mansion band. */
-    static boolean inRimDegreeBand(double radius, int[] rings) {
-        double ceiling = rings[RING_MANSION_INNER] < rings[RING_OUTER]
-            ? rings[RING_MANSION_INNER] : rings[RING_OUTER] + 15;
-        return radius >= rings[RING_OUTER] - RIM_BAND_DEPTH && radius < ceiling;
-    }
 
-    /** Indices into {@link #ringRadii}. */
-    static final int RING_OUTER = 0;
-    static final int RING_TRI = 1;
-    static final int RING_TRANSIT = 2;
-    static final int RING_DECAN_OUTER = 3;
-    static final int RING_SIGN_OUTER = 4;
-    static final int RING_SIGN_INNER = 5;
-    /**
-     * Inner edge of the partner band, and so the ceiling of the natal wheel.
-     *
-     * Added when the zodiac moved outward: with the body bands nested underneath the signs
-     * there has to be a name for where the innermost of them stops, because that is where the
-     * natal wheel is now allowed to start. Before the reorder this was RING_SIGN_INNER, and
-     * with no outer ring open it still equals it exactly.
-     */
-    static final int RING_BODY_TOP = 6;
-    /**
-     * Floor of the bound (term) band, whose ceiling is {@code RING_SIGN_INNER}.
-     *
-     * <b>The signs sit between their two subdivisions now, not under both.</b> Decans outside,
-     * signs, then the Egyptian bounds inside - so the sign band is framed by the two rings
-     * that divide it rather than carrying them both on one side.
-     */
-    static final int RING_TERM_INNER = 7;
 
-    /**
-     * Floor of the inner degree ring, whose ceiling is {@code RING_TERM_INNER}.
-     *
-     * <b>The second degree scale, and the one the bodies point at.</b> The outer ticks sit at
-     * the rim with the lunar mansions, a long way from any glyph; this one sits directly above
-     * the wheels, so a body's leader line has somewhere near to land. Everything between the
-     * two scales - decans, signs, bounds - is sandwiched by them.
-     */
-    static final int RING_DEGREE_INNER = 8;
 
-    /**
-     * Inner edge of the lunar mansion band, and so the outer edge of the rim degree scale.
-     *
-     * <b>The mansions used to share the rim with the degree ticks, and covered them.</b> They
-     * were drawn from {@code outer - 9} outward while the ticks reached {@code outer - 6}, so
-     * with the mansions open the outer scale was underneath a lavender wash and its numbers -
-     * David, 2026-09-16: "when lunar mansions are selected they cover over the second outer
-     * sabian ring". The band now has an edge of its own and the ticks hang below it.
-     *
-     * <b>Appended rather than inserted, and zero when the mansions are folded.</b> Every index
-     * before this one is load-bearing in four places, so an insert would move the bodies; and a
-     * caller that knows nothing about mansions gets {@code outer} back, which is where the rim
-     * scale has always sat. With the layer folded the two are equal, so the wheel lays out
-     * exactly as it did - which is what lets AspectGridCheck go on asserting its formula.
-     */
-    static final int RING_MANSION_INNER = 9;
 
-    /** How deep the bound band is. Two pixels shallower than the decans, being finer. */
-    static final int TERM_BAND_DEPTH = 18;
 
-    /** How deep the inner degree scale is. Ticks only, so it needs little. */
-    static final int DEGREE_RING_DEPTH = 16;
 
-    /**
-     * The wheel's ring radii, outermost first, derived in one place.
-     *
-     * <b>This chain was written out inline in four places</b> - click, paint, hover and the
-     * ring code - all computing {@code min/2-10, -20, +-25, -20, -35} independently. The
-     * handover has listed it as "the two-surfaces defect waiting to happen" since 2026-08-21,
-     * and it was extracted here before adding a fifth copy for the lunar mansions rather than
-     * after. The historical formula is asserted against this method in AspectGridCheck, so the
-     * extraction cannot have silently moved the wheel.
-     *
-     * <b>The zodiac is the outermost thing, and the bodies nest underneath it.</b> Reading
-     * inward from the rim: degree ticks inside {@code RING_OUTER}, the decan band from
-     * {@code RING_DECAN_OUTER} to {@code RING_SIGN_OUTER}, the sign band from there to
-     * {@code RING_SIGN_INNER}, the Egyptian bounds down to {@code RING_TERM_INNER}, and the
-     * inner degree scale down to {@code RING_DEGREE_INNER}. The signs are framed by their two
-     * subdivisions, and the whole zodiac is framed by the two degree scales. The body bands hang below that - the sky from
-     * {@code RING_SIGN_INNER} (== {@code RING_TRI}) to {@code RING_TRANSIT}, the partner from
-     * there to {@code RING_BODY_TOP}, and the natal wheel inside all of it.
-     *
-     * <b>It used to be the other way up</b>, with the two body bands wrapped around the
-     * outside of the zodiac. Two things were wrong with that. The signs are the frame every
-     * position is read against, and a frame drawn inside the things it measures reads as one
-     * more ring rather than as the scale; and the outer bands, being widest, gave the most
-     * room to the wheels with the fewest reasons to need it. Turning it over puts the zodiac
-     * where it is read and the bodies where they are compared.
-     *
-     * With nothing open, RING_TRI == RING_TRANSIT == RING_BODY_TOP == RING_SIGN_INNER, so a
-     * single wheel lays out exactly as it always has - which is asserted rather than assumed.
-     */
-    static int[] ringRadii(int width, int height, boolean showTransit, boolean showTri) {
-        return ringRadii(width, height, showTransit ? 1.0 : 0.0, showTri ? 1.0 : 0.0);
-    }
 
-    /**
-     * The same rings, with each outer band part-way open.
-     *
-     * <b>The bands have to widen with the bloom, or the wheel jumps.</b> A ring being switched
-     * on costs the wheel inside it 25 pixels; done as a boolean that happens on the first
-     * frame, so the reader sees the natal wheel snap smaller and only then watches the new
-     * ring unfurl into the gap. Carving the band open at the same rate as the ring that fills
-     * it is what makes the whole thing one movement.
-     *
-     * The two booleans were only ever switching a fixed inset on and off - 22 pixels for the
-     * sky band, 25 for the band inside it - so the fractional form is the same arithmetic with
-     * the insets scaled, and at every one of the four corners it is the historical formula to
-     * the pixel. That is what lets AspectGridCheck keep asserting the formula it has always
-     * asserted, and Part J of that suite is what caught the first attempt at this: scaling
-     * decanOuter's inset off the already-scaled transit radius looked equivalent and was not,
-     * because the boolean form ignores transit entirely when there is no outer wheel. The
-     * band is therefore interpolated between the two layouts it actually has, not derived.
-     */
-    static int[] ringRadii(int width, int height, double outerOpen, double triOpen) {
-        return ringRadii(width, height, outerOpen, triOpen, 1.0, 1.0, 1.0, 1.0);
-    }
 
-    /**
-     * As above, with the zodiac's own bands able to fold away.
-     *
-     * <b>A folded band takes no room, so the wheel gets it back.</b> Fading a band's contents
-     * and leaving its width allocated would be a layer that hides without helping - the reader
-     * folds the decans because they want the space, and a gap where the decans were is not
-     * the space. Each band's depth is scaled by how far its layer is open, which is the same
-     * arithmetic the partner and sky bands already use.
-     *
-     * At all ones this is the chain exactly as it was, which is what lets AspectGridCheck go
-     * on asserting the formula it has always asserted.
-     */
-    static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
-                           double decanOpen, double signOpen, double boundOpen,
-                           double degreeOpen) {
-        // Mansions folded: the rim degree scale keeps the whole rim, which is the layout every
-        // caller of this arity was written against.
-        return ringRadii(width, height, outerOpen, triOpen, decanOpen, signOpen, boundOpen,
-            degreeOpen, 0.0);
-    }
 
-    /**
-     * The same chain, with the lunar mansion band able to open at the rim.
-     *
-     * <b>The band has to carve its own space, not borrow the scale's.</b> The rim is 20 pixels
-     * between {@code RING_OUTER} and {@code RING_DECAN_OUTER}; the mansions take the outermost
-     * {@link #MANSION_BAND_DEPTH} of it as they open, and the degree ticks hang from whatever
-     * is left. At {@code mansionOpen == 0} the two edges coincide and this is the old layout
-     * to the pixel.
-     */
-    static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
-                           double decanOpen, double signOpen, double boundOpen,
-                           double degreeOpen, double mansionOpen) {
-        double o = Math.max(0.0, Math.min(1.0, outerOpen));
-        double t = Math.max(0.0, Math.min(1.0, triOpen));
-        double dc = Math.max(0.0, Math.min(1.0, decanOpen));
-        double sg = Math.max(0.0, Math.min(1.0, signOpen));
-        double bd = Math.max(0.0, Math.min(1.0, boundOpen));
-        double dg = Math.max(0.0, Math.min(1.0, degreeOpen));
-        int outer = Math.min(width, height) / 2 - 10;
-        // Both body bands get the same depth, deep enough to hold their own sub-rings.
-        int depth = SkymapPanel.outerBandDepth(outer);
-        // The zodiac sits at fixed radii just inside the rim; it no longer moves when a body
-        // ring opens, which is the point of putting it outside them.
-        int decanOuter = outer - 20;
-        int signOuter = (int) Math.round(decanOuter - 20 * dc);
-        int signInner = (int) Math.round(signOuter - 35 * sg);
-        int termInner = (int) Math.round(signInner - TERM_BAND_DEPTH * bd);
-        int degreeInner = (int) Math.round(termInner - DEGREE_RING_DEPTH * dg);
-        // The body bands hang below the inner degree scale, each opening downward. Two of
-        // them here; bodyBands is the same arithmetic for any number - see G17.
-        int[] body = SkymapPanel.bodyBands(degreeInner, depth, new double[] {t, o});
-        int tri     = body[0];
-        int transit = body[1];
-        int bodyTop = body[2];
-        double mn = Math.max(0.0, Math.min(1.0, mansionOpen));
-        int mansionInner = (int) Math.round(outer - MANSION_BAND_DEPTH * mn);
-        return new int[] {
-            outer, tri, transit, decanOuter, signOuter, signInner, bodyTop,
-            termInner, degreeInner, mansionInner };
-    }
 
-    /**
-     * Where each body band's edge falls, for any number of bands (G17).
-     *
-     * <p><b>This is the loop that was already here, unrolled.</b> The wheel has always laid its
-     * body bands out as a chain - each one hangs one {@code depth} below the edge of the band
-     * outside it, scaled by how far that band is open - but the chain was written as two
-     * statements, {@code transit = tri - depth*t} and {@code bodyTop = transit - depth*o}, which
-     * is the recurrence with the loop written out twice. Two statements is also two bands, and
-     * the whole of G17 is that four techniques - natal, progressed, directed and transiting -
-     * cannot be read together while the wheel has room for three.
-     *
-     * <p><b>The rounding is the part that has to be copied exactly.</b> Each edge is rounded to
-     * a whole pixel and the <i>next</i> one is measured from the rounded value, not from the
-     * exact one. Measuring every band from an unrounded running total would be the more obvious
-     * code and would move the wheel by a pixel at some sizes - which {@code AspectGridCheck}
-     * asserts against, and its Part J has already caught one restructuring of this that looked
-     * equivalent and was not.
-     *
-     * <p>A band whose open fraction is zero takes no room, so its two edges coincide. That is
-     * what lets a single wheel lay out exactly as it did before any of this existed, and it is
-     * why the returned array is always one longer than {@code opens} - the last entry is the
-     * ceiling of the natal wheel, which is what is left when every outer band has taken its.
-     *
-     * @param ceiling the inner edge of the zodiac, which the outermost body band hangs from
-     * @param depth how deep one fully-open band is, from {@link #outerBandDepth}
-     * @param opens how far each band is open, outermost first, each clamped to 0..1
-     * @return {@code opens.length + 1} edges, outermost first
-     */
-    static int[] bodyBands(int ceiling, int depth, double[] opens) {
-        int[] edges = new int[(opens == null ? 0 : opens.length) + 1];
-        edges[0] = ceiling;
-        for (int i = 0; opens != null && i < opens.length; i++) {
-            double open = Math.max(0.0, Math.min(1.0, opens[i]));
-            edges[i + 1] = (int) Math.round((double) edges[i] - (double) depth * open);
-        }
-        return edges;
-    }
 
-    /** Overload for callers that pre-date the tri-wheel; preserves the old contract. */
-    static int[] ringRadii(int width, int height, boolean showTransit) {
-        return ringRadii(width, height, showTransit, false);
-    }
 
     /** The same figures as objects, for the banner at the top of the aspect chart. */
     private java.util.List<com.zodiacomputing.ourania.astro.AspectPatterns.Pattern>
@@ -6672,7 +5587,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** The longitudes of one wheel. */
-    private double[] wheelLon(int wheel) {
+    public double[] wheelLon(int wheel) {
         return wheel == WHEEL_SKY ? this.skyRing.lon : (wheel == WHEEL_OUTER ? this.outerRing.lon : this.natalRing.lon);
     }
 
@@ -6683,7 +5598,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** Which points of one wheel are computed. */
-    private boolean[] wheelValid(int wheel) {
+    public boolean[] wheelValid(int wheel) {
         return wheel == WHEEL_SKY ? this.skyRing.valid
             : (wheel == WHEEL_OUTER ? this.outerRing.valid : this.natalRing.valid);
     }
@@ -6795,7 +5710,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         int deg = (int) (lon % 30.0);
         int min = (int) ((lon % 30.0 - deg) * 60.0);
         return deg + "&deg;" + (min < 10 ? "0" : "") + min + "' "
-            + SkymapPanel.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)]);
+            + PlacementText.capitalise(Zodiac.SIGNS[Zodiac.signIndex(lon)]);
     }
 
     /**
@@ -6970,164 +5885,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * Defensive throughout: this is decoration on a chart that must draw with or without it.
      */
     /**
-     * The Egyptian bounds, five segments a sign, in the band between decans and signs.
-     *
-     * <b>Both halves come from Dignity.</b> The edges from {@code boundEdges} and the ruler
-     * from {@code boundRulerOf}, so the ring cannot disagree with the score: a planet the
-     * dignity table says is in its own bound is a planet standing in the segment this ring
-     * draws for it. Writing the table out again here would have been a second statement of a
-     * rule whose whole point is being stated once - and the two would not diverge on the day
-     * it was copied, but on the day one of them was corrected.
-     *
-     * Drawn in the ruler's own body colour so the band is scannable at a glance: the run of
-     * Saturn segments at the ends of the signs reads as a band of one colour.
-     *
-     * @param outer the band's outer edge   (RING_SIGN_INNER)
-     * @param inner the band's inner edge   (RING_TERM_INNER)
-     */
-    /**
-     * The inner degree scale: 360 ticks, sitting directly above the wheels.
-     *
-     * <b>A second scale rather than a busier first one.</b> The outer ticks live at the rim
-     * with the lunar mansions, and a body drawn near the middle of the wheel is a long way
-     * from them - the leader line that connects the two crossed the decans, the signs and the
-     * bounds to get there, which is a lot of chart for one thin line to survive. This scale is
-     * the near edge of the same measurement, so the leader has a short run and lands on ticks
-     * the reader can actually count.
-     *
-     * Marked in tens and fives like the outer one, with the degree-in-sign written at every
-     * ten so the number is readable without counting from the sign boundary.
-     *
-     * @param outer the scale's outer edge   (RING_TERM_INNER)
-     * @param inner the scale's inner edge   (RING_DEGREE_INNER)
-     */
-    private void drawInnerDegreeRing(Graphics2D g, int cx, int cy, int outer, int inner,
-                                     double pin) {
-        java.awt.Font was = g.getFont();
-        g.setColor(new Color(150, 150, 150));
-        for (int d = 0; d < 360; d++) {
-            double a = Math.toRadians(180.0 + pin - d);
-            int depth = d % 10 == 0 ? outer - inner : (d % 5 == 0 ? 6 : 3);
-            int from = outer - depth;
-            g.setStroke(new BasicStroke(d % 10 == 0 ? 1.2f : 0.5f));
-            g.drawLine(cx + (int) (from * Math.cos(a)), cy + (int) (from * Math.sin(a)),
-                cx + (int) (outer * Math.cos(a)), cy + (int) (outer * Math.sin(a)));
-        }
-        // The degree within its sign, at every ten. Written between the tens rather than on
-        // them, so a number never sits on the tick it labels.
-        g.setFont(new Font("SansSerif", 0, 8));
-        g.setColor(new Color(130, 138, 148));
-        for (int d = 0; d < 360; d += 10) {
-            double a = Math.toRadians(180.0 + pin - (d + 5.0));
-            int mid = (outer + inner) / 2;
-            String label = String.valueOf(d % 30);
-            g.drawString(label,
-                cx + (int) (mid * Math.cos(a)) - g.getFontMetrics().stringWidth(label) / 2,
-                cy + (int) (mid * Math.sin(a)) + 3);
-        }
-        g.setFont(was);
-    }
-
-    private void drawBoundRing(Graphics2D g, int cx, int cy, int outer, int inner, double pin) {
-        java.awt.Font was = g.getFont();
-        g.setFont(new Font("SansSerif", 0, 11));
-        int mid = (outer + inner) / 2;
-        for (int sign = 0; sign < 12; sign++) {
-            double[] edges = Dignity.boundEdges(sign);
-            for (int i = 0; i < edges.length - 1; i++) {
-                double startLon = sign * 30.0 + edges[i];
-                double endLon = sign * 30.0 + edges[i + 1];
-
-                // The division at the segment's start. The sign boundary already has a line
-                // of its own, so the first edge of each sign is left to it.
-                if (i > 0) {
-                    double a = Math.toRadians(180.0 + pin - startLon);
-                    g.setColor(new Color(150, 150, 150, 140));
-                    g.setStroke(new BasicStroke(1.0f));
-                    g.drawLine(cx + (int) (outer * Math.cos(a)), cy + (int) (outer * Math.sin(a)),
-                        cx + (int) (inner * Math.cos(a)), cy + (int) (inner * Math.sin(a)));
-                }
-
-                // The ruler goes at the segment's midpoint, asked for at that longitude so
-                // this ring and the dignity score are answering the same question.
-                double centreLon = (startLon + endLon) / 2.0;
-                String ruler = Dignity.boundRulerOf(centreLon % 360.0);
-                int bi = Bodies.indexOfName(ruler);
-                if (bi < 0 || bi >= BODY_GLYPHS.length) {
-                    continue;                   // unresolvable ruler: leave the segment blank
-                }
-                double c = Math.toRadians(180.0 + pin - centreLon);
-                int gx = cx + (int) (mid * Math.cos(c));
-                int gy = cy + (int) (mid * Math.sin(c));
-                g.setColor(this.bodyColor(bi));
-                String glyph = BODY_GLYPHS[bi];
-                g.drawString(glyph, gx - g.getFontMetrics().stringWidth(glyph) / 2, gy + 4);
-            }
-        }
-        g.setFont(was);
-    }
-
-    private void drawMansionRing(Graphics2D g, int cx, int cy, int outer, int inner,
-                                 double pin) {
-        try {
-            java.util.List<com.zodiacomputing.ourania.astro.LunarMansions.Mansion> all =
-                com.zodiacomputing.ourania.astro.LunarMansions.all();
-            com.zodiacomputing.ourania.astro.LunarMansions.Mansion moonMansion =
-                this.moonMansion();
-
-            int bandOuter = outer;
-            // <b>From the chain, not from outer - 9 written here.</b> The band's inner edge is
-            // also the degree scale's outer edge, so the two have to be one number: while this
-            // method computed its own, the scale had no way to know where the band ended and
-            // was drawn underneath it.
-            int bandInner = Math.min(inner, outer - 1);
-            Stroke saved = g.getStroke();
-            Font savedFont = g.getFont();
-
-            // The Moon's station first, so the boundary ticks sit on top of it.
-            if (moonMansion != null) {
-                double startTheta = 180.0 + pin - moonMansion.start;
-                int r = (bandOuter + bandInner) / 2;
-                // The mansion ring's colour, overridable in Settings. Alpha kept here: the
-                // ring sits under the glyphs and a solid band would bury them.
-                Color mansion = ChartPalette.colorOr(ChartPalette.mansionHex(null),
-                    new Color(181, 160, 227));
-                g.setColor(new Color(mansion.getRed(), mansion.getGreen(), mansion.getBlue(), 110));
-                g.setStroke(new BasicStroke(bandOuter - bandInner));
-                g.drawArc(cx - r, cy - r, r * 2, r * 2,
-                    (int) Math.round(-startTheta),
-                    (int) Math.round(com.zodiacomputing.ourania.astro.LunarMansions.WIDTH));
-            }
-
-            g.setFont(new Font("SansSerif", 0, 9));
-            for (com.zodiacomputing.ourania.astro.LunarMansions.Mansion m : all) {
-                boolean current = moonMansion != null && moonMansion.number == m.number;
-                double theta = Math.toRadians(180.0 + pin - m.start);
-                g.setColor(current ? new Color(181, 160, 227) : new Color(120, 105, 150));
-                g.setStroke(new BasicStroke(current ? 2.0f : 1.0f));
-                g.drawLine(cx + (int) (bandOuter * Math.cos(theta)),
-                    cy + (int) (bandOuter * Math.sin(theta)),
-                    cx + (int) (bandInner * Math.cos(theta)),
-                    cy + (int) (bandInner * Math.sin(theta)));
-
-                // The number sits at the middle of the station, not on its cusp.
-                double mid = Math.toRadians(180.0 + pin
-                    - (m.start + com.zodiacomputing.ourania.astro.LunarMansions.WIDTH / 2.0));
-                int labelR = (bandOuter + bandInner) / 2;
-                int lx = cx + (int) (labelR * Math.cos(mid));
-                int ly = cy + (int) (labelR * Math.sin(mid));
-                g.setColor(current ? Color.WHITE : new Color(150, 135, 180));
-                String label = String.valueOf(m.number);
-                g.drawString(label, lx - (label.length() * 3), ly + 3);
-            }
-            g.setStroke(saved);
-            g.setFont(savedFont);
-        } catch (Exception e) {
-            // A decorative ring is not worth losing the chart over.
-        }
-    }
-
-    /**
      * Recompute the figures in the current chart and light them.
      *
      * Called from the one place that already runs once per chart change. Failure here must
@@ -7155,7 +5912,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** True when this line is the one the grid is hovering, or part of the lit pattern. */
-    private boolean isHighlighted(int a, int b, int wheel) {
+    public boolean isHighlighted(int a, int b, int wheel) {
         if (isPatternMemberPair(a, b, wheel != WHEEL_NATAL)) {
             return true;
         }
@@ -7633,176 +6390,157 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
+    // ------------------------------------------------------------------ the wheel's source
+    //
+    // What WheelCanvas reads, as WheelSource states it (J13, step 6). The fields keep their
+    // names and their writers; these are the read side the painter is allowed.
+
+    @Override public WheelRing natalRing() { return this.natalRing; }
+    @Override public WheelRing outerRing() { return this.outerRing; }
+    @Override public WheelRing skyRing() { return this.skyRing; }
+    @Override public ChartMode chartMode() { return this.chartMode; }
+    @Override public double[] activeCusps() { return this.activeCusps; }
+
+    /** GlobeSource: a ring's arrays by the renderer's numbering - 0 inner, 1 outer, 2 sky. */
+    @Override public double[] ringLon(int ring) {
+        return ring == 0 ? this.natalRing.lon : ring == 1 ? this.outerRing.lon : this.skyRing.lon;
+    }
+
+    /** GlobeSource: the desktop's colours as Inks, for the globe drawn without AWT (M11). */
+    @Override public Ink globeAspectInk(double lonA, double lonB, int a, int b, boolean cross) {
+        return AwtPen.ink(this.aspectInkFor(lonA, lonB, a, b, cross));
+    }
+
+    @Override public Ink globeRingInk(int body, AngleRole role) {
+        return AwtPen.ink(this.ringInk(body, role));
+    }
+
+    @Override public Ink elementInk(int element) {
+        return AwtPen.ink(SkymapPanel.elementColorFor(element));
+    }
+
+    @Override public Ink bodyInk(int body) {
+        return AwtPen.ink(SkymapPanel.bodyInkFor(body));
+    }
+
+    @Override public Ink mansionInk() {
+        return AwtPen.ink(ChartPalette.colorOr(ChartPalette.mansionHex(null),
+            new Color(181, 160, 227)));
+    }
+
+    @Override public Ink leaderInk() {
+        return AwtPen.ink(ChartPalette.colorOr(ChartPalette.leaderHex(null), Color.WHITE));
+    }
+
+    @Override public Ink beadInk(AngleRole role) {
+        return AwtPen.ink(SkymapPanel.ringBead(role));
+    }
+
+    @Override public boolean[] ringValid(int ring) {
+        return ring == 0 ? this.natalRing.valid
+            : ring == 1 ? this.outerRing.valid : this.skyRing.valid;
+    }
+    @Override public String houseAlignment() { return this.houseAlignment; }
+    @Override public boolean showTransitChart() { return this.showTransitChart; }
+    @Override public boolean globeMode() { return this.globeMode; }
+    @Override public int highlightA() { return this.highlightA; }
+    @Override public int highlightB() { return this.highlightB; }
+    @Override public int highlightWheel() { return this.highlightWheel; }
+    @Override public int[] highlightPattern() { return this.highlightPattern; }
+    @Override public int[][] autoPatterns() { return this.autoPatterns; }
+    @Override public int focusBody() { return this.focusBody; }
+    @Override public boolean focusTransit() { return this.focusTransit; }
+    @Override public int hoverBody() { return this.hoverBody; }
+
+    @Override
+    public boolean chartReady() {
+        return this.sw != null && this.natalRing.sd != null;
+    }
+
+    /**
+     * <b>Coasting counts as turning.</b> The cheap path - no halos, coarser arcs - is for
+     * frames the reader cannot study, and a globe still gliding to a stop is exactly that.
+     * Reading only globeDragging would switch the expensive path back on the instant the
+     * button came up, which is the one moment the frame rate has to hold.
+     */
+    @Override
+    public void paintGlobe(Graphics2D g, int w, int h) {
+        GlobeRenderer.paint(g, this.globe, w, h, this,
+            this.globeDragging || this.globe.coasting());
+    }
+
     // ------------------------------------------------------------------ scrubbing
 
     /**
-     * Master list E8: "Drag-to-time scrubbing - transport buttons step time; no timeline slider
-     * or drag gesture."
-     *
-     * <b>A scrub is an offset from where it began, not a run of steps.</b> Every change puts the
-     * times back where the scrub started and moves them once by the whole offset, so dragging
-     * out and back lands exactly where it began - a run of one-month steps from the 31st would
-     * not (31 January, 28 February, 28 March). And it goes through {@link #stepTime} with the
-     * offset as its step count, so which chart moves is the transport's own rule: the sky, and
-     * never a birth time on a synastry or a composite.
-     *
-     * Shift+drag on the wheel, or the Scrub slider beside the transport buttons. A plain drag
-     * is left to the pan.
+     * Scrubbing - walking the sky through time by hand. Its state and its rules are
+     * {@link SkyScrub}'s (J13, step 4); what stays here is what it is handed: the sky ring, the
+     * Step setting, the Play flag and the recompute.
      */
-    private boolean scrubbing;
-    private ZonedDateTime scrubBase;
-    private ZonedDateTime scrubSky;
-    /** Steps from where the scrub began. */
-    int scrubSteps;
+    final SkyScrub scrub = new SkyScrub(new SkyScrub.Host() {
+        @Override
+        public WheelRing sky() {
+            return SkymapPanel.this.skyRing;
+        }
+
+        @Override
+        public String stepSetting() {
+            return SkymapPanel.this.stepAmount;
+        }
+
+        @Override
+        public void pause() {
+            SkymapPanel.this.isPlaying = false;
+        }
+
+        @Override
+        public void recompute() {
+            SkymapPanel.this.updateChartData();
+            this.repaint();
+        }
+
+        @Override
+        public void repaint() {
+            if (SkymapPanel.this.chartPanel != null) {
+                SkymapPanel.this.chartPanel.repaint();
+            }
+        }
+    });
     /** Set while a Shift+drag has scrubbed, so its closing click does not also select. */
     private boolean scrubDragged;
-    private boolean scrubRefreshQueued;
-    /** Screen pixels of drag per step. */
-    static final int SCRUB_PX = 10;
 
     boolean isScrubbing() {
-        return this.scrubbing;
+        return this.scrub.isScrubbing();
     }
 
-    /** The unit a scrub moves in: the Step setting, or an hour when Step follows the clock. */
     String scrubUnit() {
-        return "Real Time".equals(this.stepAmount) ? "1 Hour" : this.stepAmount;
+        return this.scrub.unit();
     }
-
-    /**
-     * What a scrub moves.
-     *
-     * <b>TRANSPORT</b> is the transport's own rule - the sky, and never a birth time on a
-     * synastry or composite - and is what Shift+drag on the wheel uses. The other three are the
-     * per-chart bars David asked for: "different scrub bars that control different charts in the
-     * wheel and globe". Each moves one moment only, whichever ring it drives, so a birth time
-     * can be walked for rectification while the sky holds still, or the sky walked across a
-     * relationship without touching either person.
-     */
-    enum ScrubTarget {
-        TRANSPORT("the chart"), CHART_A("Chart A"), CHART_B("Chart B"), SKY("Sky");
-
-        final String label;
-
-        ScrubTarget(String label) {
-            this.label = label;
-        }
-    }
-
-    ScrubTarget scrubTarget = ScrubTarget.TRANSPORT;
-    private ZonedDateTime scrubTransit;
-    /**
-     * A birth time as it was before any bar moved it, so its ↺ can put it back. Kept for Chart A
-     * and Chart B only - the sky has no "true" moment to return to - and cleared whenever a chart
-     * is cast from Chart Setup, because that is a new birth time rather than a scrubbed one.
-     */
-    final java.util.EnumMap<ScrubTarget, ZonedDateTime> scrubOrigins =
-        new java.util.EnumMap<>(ScrubTarget.class);
 
     void beginScrub() {
-        this.beginScrub(ScrubTarget.TRANSPORT);
+        this.scrub.begin();
     }
 
-    void beginScrub(ScrubTarget target) {
-        if (this.scrubbing) {
-            return;
-        }
-        this.isPlaying = false;
-        this.scrubTarget = target;
-        this.scrubBase = this.natalRing.time;
-        this.scrubSky = this.skyRing.time;
-        this.scrubTransit = this.outerRing.time;
-        if (target == ScrubTarget.CHART_A && this.natalRing.time != null) {
-            this.scrubOrigins.putIfAbsent(target, this.natalRing.time);
-        }
-        if (target == ScrubTarget.CHART_B && this.outerRing.time != null) {
-            this.scrubOrigins.putIfAbsent(target, this.outerRing.time);
-        }
-        this.scrubSteps = 0;
-        this.scrubbing = true;
-    }
-
-    /** Moves the chart to this many steps from where the scrub began. */
     void scrubTo(int steps) {
-        if (!this.scrubbing) {
-            this.beginScrub();
-        }
-        if (steps == this.scrubSteps) {
-            return;
-        }
-        this.natalRing.time = this.scrubBase;
-        this.skyRing.time = this.scrubSky;
-        this.outerRing.time = this.scrubTransit;
-        String unit = this.stepAmount;
-        int direction = this.animationDirection;
-        try {
-            this.stepAmount = this.scrubUnit();
-            this.animationDirection = steps;
-            switch (this.scrubTarget) {
-                case CHART_A:
-                    this.natalRing.time = this.stepped(this.scrubBase, steps);
-                    break;
-                case CHART_B:
-                    this.outerRing.time = this.stepped(this.scrubTransit, steps);
-                    break;
-                case SKY:
-                    this.skyRing.time = this.stepped(this.scrubSky, steps);
-                    break;
-                default:
-                    if (steps != 0) {
-                        this.stepTime();
-                    }
-            }
-        } finally {
-            this.stepAmount = unit;
-            this.animationDirection = direction;
-        }
-        this.scrubSteps = steps;
-        this.requestScrubRefresh();
+        this.scrub.to(steps);
     }
 
-    /** Puts a scrubbed birth time back where it was before any bar moved it. */
-    void resetScrub(ScrubTarget target) {
-        ZonedDateTime origin = this.scrubOrigins.remove(target);
-        if (origin == null) {
-            return;
-        }
-        if (target == ScrubTarget.CHART_A) {
-            this.natalRing.time = origin;
-        } else if (target == ScrubTarget.CHART_B) {
-            this.outerRing.time = origin;
-        }
-        this.updateChartData();
-        if (this.chartPanel != null) {
-            this.chartPanel.repaint();
-        }
+    void endScrub() {
+        this.scrub.end();
     }
-
-    /** The per-chart bars, by what they move. */
-    final java.util.EnumMap<ScrubTarget, javax.swing.JSlider> scrubSliders =
-        new java.util.EnumMap<>(ScrubTarget.class);
-    /** Each bar's label, slider and reset, shown and hidden together. */
-    final java.util.EnumMap<ScrubTarget, JPanel> scrubBars = new java.util.EnumMap<>(ScrubTarget.class);
-    final java.util.EnumMap<ScrubTarget, JButton> scrubResets = new java.util.EnumMap<>(ScrubTarget.class);
 
     /**
-     * Shows the bars for the charts that are on the wheel.
+     * Shows the house-frame selector only where there is a choice to make.
      *
-     * Chart A's bar only when Chart A is a birth chart - with no Chart A the inner wheel IS the
-     * sky, and a second bar moving the same moment would be two controls for one thing. Chart
-     * B's on a synastry or a composite, where there is a second person. The sky's always.
+     * Named for the scrub bars it once also showed and hid, one per chart; there is one bar now
+     * and it is always there, so the selector that shares its row is all that is left to decide.
      */
     void refreshScrubBars() {
         boolean relationship = this.isRelationshipChart();
-        this.showBar(ScrubTarget.CHART_A, this.innerIsBirthChart || relationship);
-        this.showBar(ScrubTarget.CHART_B, this.isSynastryChart() || relationship);
-        this.showBar(ScrubTarget.SKY, true);
         // <b>Only where there is a choice to make.</b> David, 2026-09-20: "Only for synastry
         // though." With one chart on the wheel there is one set of houses and a selector
         // offering it is a control that cannot do anything; with two there are two frames and
         // the reader has to say which one the planets are being read against. Hidden rather
-        // than disabled, because it shares a row with the scrub bars, which come and go the
-        // same way.
+        // than disabled, because it shares a row with the scrub bar.
         boolean twoCharts = this.isSynastryChart() || relationship;
         if (this.alignCombo != null && this.alignCombo.isVisible() != twoCharts) {
             this.alignCombo.setVisible(twoCharts);
@@ -7811,169 +6549,30 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.scrubRow.revalidate();
             }
         }
-        for (java.util.Map.Entry<ScrubTarget, JButton> e : this.scrubResets.entrySet()) {
-            e.getValue().setEnabled(this.scrubOrigins.containsKey(e.getKey()));
-        }
     }
 
-    private void showBar(ScrubTarget target, boolean on) {
-        JPanel bar = this.scrubBars.get(target);
-        if (bar != null && bar.isVisible() != on) {
-            bar.setVisible(on);
-            if (bar.getParent() != null) {
-                bar.getParent().revalidate();
-            }
-        }
-    }
-
-    /** One labelled bar: the chart's name, its slider, and for a birth chart a reset. */
-    private JPanel scrubBar(ScrubTarget target) {
+    /** The bar: its name and its slider. */
+    private JPanel scrubBar() {
         JPanel bar = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 6, 0));
         bar.setOpaque(false);
-        JLabel label = new JLabel(target.label);
+        JLabel label = new JLabel("Sky");
         label.setForeground(Theme.TEXT_DIM);
         label.setFont(Theme.SMALL);
         // Room after the name: the slider's track starts at its bounds and clipped the last
         // letter, so "Chart B" read "Chart E".
         label.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 4));
-        javax.swing.JSlider slider = SkymapPanel.scrubSlider(this, target);
+        javax.swing.JSlider slider = this.scrub.slider(this::refreshScrubBars);
         slider.setPreferredSize(new java.awt.Dimension(170, 24));
         bar.add(label);
         bar.add(slider);
-        if (target == ScrubTarget.CHART_A || target == ScrubTarget.CHART_B) {
-            JButton reset = new JButton("↺");
-            Widgets.styleButton(reset, Widgets.Role.TRANSPORT);
-            reset.setFont(Theme.font("Segoe UI", Font.PLAIN, 13));
-            reset.setToolTipText("Put " + target.label + "'s birth time back where it was");
-            reset.setEnabled(false);
-            reset.addActionListener(e -> {
-                this.resetScrub(target);
-                this.refreshScrubBars();
-            });
-            bar.add(reset);
-            this.scrubResets.put(target, reset);
-        }
-        this.scrubSliders.put(target, slider);
-        this.scrubBars.put(target, bar);
+        this.scrubSlider = slider;
         return bar;
     }
 
-    /** Ends the scrub where it stands, and draws that moment at once. */
-    void endScrub() {
-        if (!this.scrubbing) {
-            return;
-        }
-        this.scrubbing = false;
-        this.scrubBase = null;
-        this.scrubSky = null;
-        this.scrubRefreshQueued = false;
-        this.updateChartData();
-        if (this.chartPanel != null) {
-            this.chartPanel.repaint();
-        }
-    }
-
-    /**
-     * One recompute for however many drag events arrived before it could run.
-     *
-     * A drag delivers an event per pixel; recomputing the chart for each would queue work
-     * faster than it is done and the wheel would trail the mouse by seconds.
-     */
-    private void requestScrubRefresh() {
-        if (this.scrubRefreshQueued) {
-            return;
-        }
-        this.scrubRefreshQueued = true;
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            if (!this.scrubRefreshQueued) {
-                return;
-            }
-            this.scrubRefreshQueued = false;
-            this.updateChartData();
-            if (this.chartPanel != null) {
-                this.chartPanel.repaint();
-            }
-        });
-    }
-
-    /** The sky's scrub bar, kept for the check. */
+    /** The scrub bar's slider, kept for the check. */
     javax.swing.JSlider scrubSlider;
-    /** The row the per-chart scrub bars sit on. */
+    /** The row the scrub bar sits on, with the house-frame selector. */
     private JPanel scrubRow;
-
-    /** How many steps the slider reaches each way from where the scrub began. */
-    static final int SCRUB_SLIDER_REACH = 60;
-
-    /**
-     * A slider that springs back: drag the knob and the chart follows it, let go and the chart
-     * stays where it was put while the knob returns to the middle, ready to go again.
-     *
-     * <b>Why it springs back.</b> A slider with a fixed range pinned to a date would need a
-     * range, and any range is wrong - a day's worth for a transit, a century for a progression.
-     * Springing back makes the range relative: sixty steps of the Step setting each way, from
-     * wherever the chart is, as many times as the reader likes. An arrow key on the focused
-     * slider is a single step.
-     */
-    static javax.swing.JSlider scrubSlider(SkymapPanel panel, ScrubTarget target) {
-        javax.swing.JSlider slider = new javax.swing.JSlider(-SCRUB_SLIDER_REACH, SCRUB_SLIDER_REACH, 0);
-        slider.setOpaque(false);
-        slider.setPreferredSize(new java.awt.Dimension(220, 26));
-        slider.setToolTipText(target == ScrubTarget.SKY
-            ? "Drag to move the sky through time by the Step setting. Hold it pulled and time keeps "
-                + "going that way, faster the further you pull; it stays where you let go."
-            : "Drag to move " + target.label + "'s birth time by the Step setting - for trying a "
-                + "time, not saving one. Hold it pulled and time keeps going until you let go. "
-                + "The ↺ beside it puts the birth time back.");
-        final boolean[] resetting = {false};
-        // Steps run up while the knob is held off the dead zone, on top of where the knob sits.
-        final double[] travel = {0.0};
-        // <b>By the clock, not by the tick.</b> Each tick recomputes the chart on the event thread,
-        // and Swing coalesces ticks that pile up behind it: counted per tick, a bar held at 48 for
-        // two seconds ran 6 steps where its rate said 23.
-        final long[] lastTick = {0L};
-        final javax.swing.Timer shuttle = new javax.swing.Timer(SHUTTLE_TICK_MS, null);
-        shuttle.addActionListener(ev -> {
-            if (!slider.getValueIsAdjusting() || !panel.isScrubbing()) {
-                shuttle.stop();
-                return;
-            }
-            long now = System.nanoTime();
-            travel[0] += shuttleRate(slider.getValue()) * (now - lastTick[0]) / 1.0e9;
-            lastTick[0] = now;
-            panel.scrubTo(slider.getValue() + (int) travel[0]);
-            if (panel.chartPanel != null) {
-                panel.chartPanel.repaint();
-            }
-        });
-        slider.addChangeListener(e -> {
-            if (resetting[0]) {
-                return;
-            }
-            panel.beginScrub(target);
-            panel.scrubTo(slider.getValue() + (int) travel[0]);
-            if (panel.chartPanel != null) {
-                panel.chartPanel.repaint();
-            }
-            if (slider.getValueIsAdjusting()) {
-                if (!shuttle.isRunning()) {
-                    lastTick[0] = System.nanoTime();
-                    shuttle.start();
-                }
-                return;
-            }
-            shuttle.stop();
-            travel[0] = 0.0;
-            panel.endScrub();
-            panel.refreshScrubBars();
-            resetting[0] = true;
-            try {
-                slider.setValue(0);
-            } finally {
-                resetting[0] = false;
-            }
-        });
-        return slider;
-    }
 
     /**
      * Where a house begins, from a cusp array.
@@ -8111,55 +6710,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
-    /** How often a held bar redraws while it runs on, in milliseconds; the distance is by the clock. */
-    static final int SHUTTLE_TICK_MS = 50;
-    /** Steps a second with the knob pulled all the way. */
-    static final double SHUTTLE_MAX_RATE = 20.0;
-    /** Knob positions either side of the middle that only offset, and do not run on. */
-    static final int SHUTTLE_DEAD_ZONE = 10;
-
-    /**
-     * Steps a second a bar runs at with its knob held here.
-     *
-     * David: "when you pull them forward or backward can you have the time keep going until
-     * released". The knob still offsets the chart by where it sits, so a short flick is still a
-     * few steps; held past the dead zone it also runs on, like a shuttle, and the rate climbs with
-     * the square of the pull - a gentle pull creeps, a full one covers twenty steps a second.
-     */
-    static double shuttleRate(int value) {
-        int pull = Math.abs(value) - SHUTTLE_DEAD_ZONE;
-        if (pull <= 0) {
-            return 0.0;
-        }
-        double share = (double) pull / (SCRUB_SLIDER_REACH - SHUTTLE_DEAD_ZONE);
-        return Math.signum(value) * SHUTTLE_MAX_RATE * share * share;
-    }
-
-    /** "+3 days", "-1 month": the offset a scrub stands at, in words. */
-    static String scrubLabel(int steps, String unit) {
-        String word = unit.replaceFirst("^1 ", "").toLowerCase();
-        String sign = steps > 0 ? "+" : steps < 0 ? "−" : "±";
-        int n = Math.abs(steps);
-        return sign + n + " " + word + (n == 1 ? "" : "s");
-    }
-
     /** The offset, over the top of the wheel while a scrub is running. */
-    void paintScrubTag(Graphics2D g2, int w) {
-        if (!this.scrubbing) {
-            return;
-        }
-        String text = "Scrubbing " + (this.scrubTarget == ScrubTarget.TRANSPORT ? "" : this.scrubTarget.label + " ")
-            + scrubLabel(this.scrubSteps, this.scrubUnit());
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setFont(Theme.font("Segoe UI", Font.BOLD, 13));
-        java.awt.FontMetrics fm = g2.getFontMetrics();
-        int tw = fm.stringWidth(text) + 24;
-        int x = (w - tw) / 2;
-        g2.setColor(new Color(22, 28, 43, 230));
-        g2.fillRoundRect(x, 10, tw, 26, 12, 12);
-        g2.setColor(new Color(226, 178, 88));
-        g2.drawRoundRect(x, 10, tw, 26, 12, 12);
-        g2.drawString(text, x + 12, 10 + (26 + fm.getAscent() - fm.getDescent()) / 2);
+    public void paintScrubTag(Graphics2D g2, int w) {
+        this.scrub.paintTag(g2, w);
     }
 
     /**
@@ -8170,10 +6723,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * come to disagree about what "1 Week" means.
      */
     private ZonedDateTime stepped(ZonedDateTime when, int n) {
+        return SkymapPanel.stepBy(when, this.stepAmount, n);
+    }
+
+    /** The same, in a unit given rather than the one selected - a scrub's may differ from it. */
+    static ZonedDateTime stepBy(ZonedDateTime when, String unit, int n) {
         if (when == null) {
             return null;
         }
-        switch (this.stepAmount) {
+        switch (unit) {
             case "1 Minute": return when.plusMinutes(n);
             case "1 Hour":   return when.plusHours(n);
             case "1 Day":    return when.plusDays(n);
@@ -8281,8 +6839,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     private SweDate createSweDate(ZonedDateTime zonedDateTime) {
-        ZonedDateTime zonedDateTime2 = zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
-        return new SweDate(zonedDateTime2.getYear(), zonedDateTime2.getMonthValue(), zonedDateTime2.getDayOfMonth(), (double)zonedDateTime2.getHour() + (double)zonedDateTime2.getMinute() / 60.0 + (double)zonedDateTime2.getSecond() / 3600.0);
+        return com.zodiacomputing.ourania.astro.Moments.sweDate(zonedDateTime);
     }
 
     /**
@@ -8610,7 +7167,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
-    private double getPinLongitude() {
+    public double getPinLongitude() {
         if ("Aries".equals(this.wheelPin)) {
             return 0.0;
         }
@@ -8743,45 +7300,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return this.generatePlanetPlacementsHtml(PlacementPart.ALL);
     }
 
-    /**
-     * One figure in the pattern banner, every word of it a link to the figure's reading.
-     *
-     * <b>Only the bold name was a link.</b> The quality after it and the line of planets under
-     * it were plain text, so a reader clicking "Mercury, Pluto, Uranus" under a grand trine got
-     * nothing. David, 2026-09-14: "Grand trine (air) Mercury, Pluto, Uranus ... not letting me
-     * select them". Swing's HTML cannot wrap a block in one anchor, so each run carries the same
-     * href in its own colour. NavigationCheck Part Q clicks every character of this markup.
-     */
-    static String patternEntryHtml(com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p) {
-        String href = InterpretationPanel.patternHref(p.name, p.bodies);
-        StringBuilder sb = new StringBuilder("<div style='margin-bottom:3px;'>");
-        sb.append("<a href='").append(href)
-            .append("' style='color:#FFD166; text-decoration:none;'><b>").append(p.name).append("</b>");
-        String quality = p.modality != null
-            && (p.name.equals("T-square") || p.name.equals("Grand cross"))
-                ? p.modality
-                : p.element != null
-                    && (p.name.equals("Grand trine") || p.name.equals("Kite"))
-                        ? p.element : null;
-        if (quality != null) {
-            sb.append(" <span style='color:#dddddd;'>(").append(quality).append(")</span>");
-        }
-        sb.append("</a>");
-        sb.append("<div style='font-size:11px;'><a href='").append(href)
-            .append("' style='color:#dddddd; text-decoration:none;'>")
-            .append(String.join(", ", p.bodies));
-        if (p.apex != null) {
-            sb.append(" &nbsp;|&nbsp; apex ").append(p.apex);
-        }
-        sb.append("</a></div></div>");
-        return sb.toString();
-    }
-
-    /** The width the aspect grid has to fit into: the drawer, less padding and scrollbar. */
-    private static final int GRID_FIT_WIDTH = 276;
-
-    /** Below this the glyphs stop being distinguishable, so the grid scrolls rather than lies. */
-    private static final int GRID_MIN_CELL = 11;
 
     private String generatePlanetPlacementsHtml(PlacementPart part) {
         final boolean wantNatal = part == PlacementPart.ALL || part == PlacementPart.NATAL;
@@ -8789,7 +7307,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         final boolean wantGrid = part == PlacementPart.ALL || part == PlacementPart.GRID;
         final boolean wantSynastry = part == PlacementPart.ALL || part == PlacementPart.SYNASTRY;
         int n;
-        int n2;
         String stringArray;
         int n3;
         StringBuilder stringBuilder = new StringBuilder("<html><body style='font-family:Arial; font-size:12px; color:white;'>");
@@ -8825,71 +7342,23 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // this same formatter, so leaving it inside the natal section made it invisible there.
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy HH:mm z");
         if (wantNatal) {
-        stringBuilder.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(string).append("</h2>");
-        String string2 = this.natalRing.time != null ? this.natalRing.time.format(dateTimeFormatter) : "";
-        String string3 = String.format("%.2f, %.2f", this.natalRing.latitude, this.natalRing.longitude);
-        stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(string2).append("<br>").append(string3).append("</div>");
-        // <b>The one link that is always on screen.</b> Everything else in the index is
-        // reached from a page you have to open first; this panel is up from the moment the
-        // app starts, which makes it the only place a door actually works.
-        stringBuilder.append("<div style='margin-bottom:10px;'><a href='index' "
-            + "style='color:#7FB3FF; font-size:11px; text-decoration:none;'>"
-            + "&#9776; Index &middot; browse bodies, signs, houses, aspects, dignities, "
-            + "decans, Sabians, tarot and mansions</a></div>");
-
-        // Aspect patterns, at the top of the aspect chart and without being asked for.
-        //
-        // These are closed circuits - several placements behaving as one unit - so they
-        // outrank everything below them, and a chart that has one should say so before it
-        // lists a single degree. Recomputed here because this method already runs once per
-        // chart change; the wheel's highlight is refreshed from the same call.
-        this.refreshPatterns();
-        if (this.currentPatterns.isEmpty()) {
-            // Said out loud rather than left blank. Patterns are held to physical bodies at a
-            // tight orb, so about six charts in ten have none - and a section that simply
-            // vanishes is indistinguishable from a section that is broken.
-            stringBuilder.append("<div style='color:#9AA5B1; font-size:11px; "
-                + "margin-bottom:10px;'>No aspect patterns in this chart - no T-square, "
-                + "grand cross, grand trine, kite, yod or boomerang among the planets "
-                + "within 5&deg;.</div>");
-        } else {
-            stringBuilder.append("<div style='border:1px solid #FFD166; padding:6px; "
-                + "margin-bottom:10px;'>");
-            stringBuilder.append("<h3 style='color:#FFD166; margin:0 0 4px 0;'>Aspect "
-                + "Pattern").append(this.currentPatterns.size() > 1 ? "s" : "")
-                .append(" &middot; lit on the wheel</h3>");
-            for (com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p
-                    : this.currentPatterns) {
-                stringBuilder.append(SkymapPanel.patternEntryHtml(p));
-            }
-            stringBuilder.append("<div style='color:#9AA5B1; font-size:10px;'>Click a figure "
-                + "for the full reading.</div>");
-            stringBuilder.append("</div>");
-        }
-
-        stringBuilder.append("<h3 style='color:#add8e6;'>Placements</h3>");
-        for (n3 = 0; n3 < BODY_COUNT; ++n3) {
-            if (!this.natalRing.valid[n3]) continue;
-            stringBuilder.append(this.formatPlanetPlacement(n3, this.natalRing.lon[n3], this.natalRing.speed[n3], BASE_PREFIX));
-        }
+            // Recomputed here because this method already runs once per chart change; the
+            // wheel's highlight is refreshed from the same call.
+            this.refreshPatterns();
+            stringBuilder.append(PlacementsPage.natalSection(string, this.natalRing,
+                dateTimeFormatter, this.currentPatterns, this.activeCusps));
         }
         if (wantTransits && this.showTransitChart) {
             // The third copy of the same choice, and the one that called a progressed ring a
             // transit chart. ringWord is the statement of it; this only capitalises.
             String string4 = this.chartMode == ChartMode.SYNASTRY ? "Chart B (Outer)"
                 : (this.showProgressed() ? "Progressed Chart" : "Transit Chart");
-            stringBuilder.append("<br><h2 style='color:#ffa500; margin-bottom: 2px;'>").append(string4).append("</h2>");
             stringArray = this.outerCastLabel();
             if (stringArray.isEmpty() && this.outerRing.time != null) {
                 stringArray = this.outerRing.time.format(dateTimeFormatter);
             }
-            String stringArray2 = String.format("%.2f, %.2f", this.outerRing.latitude, this.outerRing.longitude);
-            stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(stringArray).append("<br>").append(stringArray2).append("</div>");
-            stringBuilder.append("<h3 style='color:#ffa500;'>Placements</h3>");
-            for (n2 = 0; n2 < BODY_COUNT; ++n2) {
-                if (!this.outerRing.valid[n2]) continue;
-                stringBuilder.append(this.formatPlanetPlacement(n2, this.outerRing.lon[n2], this.outerRing.speed[n2], "transit_"));
-            }
+            stringBuilder.append(PlacementsPage.ringSection(string4, "#ffa500", stringArray,
+                this.outerRing, "transit_", this.activeCusps));
         }
         // <b>Whether the sky ring is DRAWN, not whether it is wrapped around two people.</b>
         // This asked showTriWheel, whose own javadoc says it means "the sky is wrapped around
@@ -8898,18 +7367,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // method already asks triRingDrawn() a hundred lines further down, which is the
         // question both places wanted.
         if (wantTransits && this.triRingDrawn()) {
-            stringBuilder.append("<br><h2 style='color:#a0d2ff; margin-bottom: 2px;'>Sky (Transiting)</h2>");
-            String stringSkyTime = this.skyRing.time != null ? this.skyRing.time.format(dateTimeFormatter) : "";
-            // Its own coordinates. This printed Chart B's, which is the same borrowing the
-            // houses were doing until the sky got a row of its own - right whenever the two
-            // happened to be the same city and quietly wrong otherwise.
-            String stringSkyLoc = String.format("%.2f, %.2f", this.skyRing.latitude, this.skyRing.longitude);
-            stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(stringSkyTime).append("<br>").append(stringSkyLoc).append("</div>");
-            stringBuilder.append("<h3 style='color:#a0d2ff;'>Placements</h3>");
-            for (int k = 0; k < BODY_COUNT; ++k) {
-                if (!this.skyRing.valid[k]) continue;
-                stringBuilder.append(this.formatPlanetPlacement(k, this.skyRing.lon[k], this.skyRing.speed[k], "sky_"));
-            }
+            stringBuilder.append(PlacementsPage.ringSection("Sky (Transiting)", "#a0d2ff",
+                this.skyRing.time != null ? this.skyRing.time.format(dateTimeFormatter) : "",
+                this.skyRing, "sky_", this.activeCusps));
         }
         // Cross-chart placement, above the grid because it outranks it: a body on the
         // other person's Ascendant is a larger fact than any single cell of the
@@ -8931,58 +7391,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             stringBuilder.append("<br><hr style='border-color:#444;'><br>");
         }
         int n4 = n3 = this.showTransitChart && (this.aspectFilter.equals("Transit-Natal") || this.aspectFilter.equals("Both")) ? 1 : 0;
+        String gridHeading;
         if (n3 != 0) {
-            if (this.chartMode == ChartMode.SYNASTRY) {
-                stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>Synastry Aspects Grid</h3>");
-            } else {
-                stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>Transit to Natal Grid</h3>");
-            }
+            gridHeading = this.chartMode == ChartMode.SYNASTRY
+                ? "Synastry Aspects Grid" : "Transit to Natal Grid";
         } else {
-            stringBuilder.append("<h3 style='color:white; margin-bottom: 4px;'>")
-                .append(this.innerIsBirthChart ? "Natal Aspects Grid" : "Sky Aspects Grid")
-                .append("</h3>");
+            gridHeading = this.innerIsBirthChart ? "Natal Aspects Grid" : "Sky Aspects Grid";
         }
-        stringBuilder.append("<div style='font-size:10px; margin-bottom:10px;'>");
-        // Quincunx belongs here: the grid has always emitted quincunx cells, so leaving it out
-        // of the legend left a symbol on the table that nothing explained.
-        // Driven from Aspects.Type rather than a hand-written list, so an aspect the engine
-        // can emit cannot be missing from the legend. That is exactly how the quincunx came to
-        // be drawn on the grid with nothing explaining it.
-        for (Aspects.Type aspectType : Aspects.Type.values()) {
-            String string5 = aspectType.label;
-            stringBuilder.append("<span style='color:").append(this.getAspectColorHex(string5)).append("; font-size:14px;'>").append(this.getAspectSymbol(string5)).append("</span> <span style='color:#ccc;'>").append(string5).append("</span> &nbsp; ");
-        }
-        stringBuilder.append("</div>");
-        // <b>The grid sizes itself to the points that are switched on.</b> It was a fixed
-        // 22px cell at 14px type, which is a table as wide as the number of bodies enabled -
-        // with the asteroids and angles on that is far wider than any drawer, and the columns
-        // ran off the edge where they could not be read at all. Scaled to fit instead of
-        // scrolled: a triangular grid is read by scanning across a row, and a table you have
-        // to drag sideways to finish one row is worse than a small one you can take in whole.
-        int gridCols = 0;
-        for (n = 0; n < BODY_COUNT; ++n) {
-            if (SkymapPanel.aspecting(n, this.natalRing.valid)) {
-                gridCols++;
-            }
-        }
-        // The drawer's content width, less its padding and the vertical scrollbar.
-        int cell = gridCols > 0 ? (GRID_FIT_WIDTH / (gridCols + 1)) : 22;
-        cell = Math.max(GRID_MIN_CELL, Math.min(22, cell));
-        int glyph = Math.max(8, cell - 3);
-        stringBuilder.append("<table border='1' cellspacing='0' cellpadding='0' style='border-collapse: collapse; border-color: #555; text-align:center;'>");
-        stringBuilder.append("<tr><td style='width:").append(cell).append("px;'></td>");
-        for (n = 0; n < BODY_COUNT; ++n) {
-            if (!SkymapPanel.aspecting(n, this.natalRing.valid)) continue;
-            stringBuilder.append("<td style='color:").append(this.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
-        }
-        stringBuilder.append("</tr>");
+        java.util.List<AspectGrid.Band> bands = new java.util.ArrayList<>();
         // <b>And the block above the sky one had no band at all.</b> Its rows sat straight
         // under the heading, so in a synastry the grid never said "Chart B" anywhere - which is
         // what David asked about on 2026-09-24: where are chart A and chart B in any of it.
-        // A natal-only grid still gets none, because ringWord has no word for the inner wheel:
-        // rows that are simply the chart being read need no qualifier.
-        this.appendGridBand(stringBuilder, n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL, gridCols);
-        this.appendGridRows(stringBuilder, n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL, cell, glyph);
+        bands.add(this.gridBand(n3 != 0 ? WHEEL_OUTER : WHEEL_NATAL));
         // <b>The sky ring had no rows here at all.</b> It is drawn, it is hovered, it has its
         // own field of chords - and the grid, which is where a reader goes to find an aspect
         // by name rather than by eye, stopped at the ring below it. So its lines could be seen
@@ -8992,162 +7412,24 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // reader's filter had cross-chart lines switched off would be naming pairs the wheel
         // deliberately does not draw.
         if (n3 != 0 && this.triRingDrawn()) {
-            this.appendGridBand(stringBuilder, WHEEL_SKY, gridCols);
-            this.appendGridRows(stringBuilder, WHEEL_SKY, cell, glyph);
+            bands.add(this.gridBand(WHEEL_SKY));
         }
-        stringBuilder.append("</table>");
+        stringBuilder.append(AspectGrid.table(gridHeading, this.natalRing, bands,
+            this.aspectShown));
         stringBuilder.append("</body></html>");
         return stringBuilder.toString();
     }
 
     /**
-     * One wheel's worth of rows in the aspect grid.
+     * One ring's rows for the aspect grid, with what only the panel knows about that ring:
+     * what it is called and which orb profile its pairs are judged at.
      *
-     * <b>Written once because there are three wheels now.</b> The rows used to be built inline
-     * with the wheel chosen by a boolean in three separate expressions, which is the shape the
-     * sky ring could not be added to without a fourth copy - and a fourth copy of a cell test
-     * is a fourth chance for the grid to disagree with the wheel about what is in aspect.
-     *
-     * Columns are always the natal points: every aspect on this grid is something aspecting
-     * the chart. The natal rows are the triangular half, since a natal pair appears once.
+     * <b>Only the partner ring is a synastry pair.</b> The sky ring is a moment and is judged at
+     * natal orbs - the same call the wheel and the hit test make.
      */
-    /**
-     * A band across the grid naming the ring whose rows follow it.
-     *
-     * <b>Through ringWord, not a literal.</b> The sky band used to be the string "sky" written
-     * here, which is a second copy of a rule that already had a home - and the copies on this
-     * particular question have drifted apart five times now, most recently leaving Chart B
-     * labelled "(transiting)" on the aspect card. One helper, one source, and the grid cannot
-     * disagree with the card about what a ring is called.
-     *
-     * <b>Silent for the inner wheel.</b> {@link #ringWord} returns null there: rows that are
-     * simply the chart being read need no qualifier, and a band saying "natal" over a natal-only
-     * grid would be noise.
-     */
-    private void appendGridBand(StringBuilder sb, int ring, int gridCols) {
-        String word = this.ringWord(ring);
-        if (word == null) {
-            return;
-        }
-        sb.append("<tr><td colspan='").append(gridCols + 1)
-          .append("' style='color:#8FD0FF; font-size:10px; text-align:left;"
-              + " padding:3px 0 1px 2px; background-color:#111;'>")
-          .append(word).append("</td></tr>");
-    }
-
-    private void appendGridRows(StringBuilder out, int wheel, int cell, int glyph) {
-        double[] lon = this.wheelLon(wheel);
-        boolean[] valid = this.wheelValid(wheel);
-        for (int n = 0; n < BODY_COUNT; ++n) {
-            if (!SkymapPanel.aspecting(n, valid)) continue;
-            out.append("<tr>");
-            out.append("<td style='color:").append(this.bodyColorHex(n))
-               .append("; font-size:").append(glyph).append("px; width:").append(cell)
-               .append("px;'>").append(BODY_GLYPHS[n]).append("</td>");
-            for (int i = 0; i < BODY_COUNT; ++i) {
-                if (!SkymapPanel.aspecting(i, this.natalRing.valid)) continue;
-                if ((wheel == WHEEL_NATAL && i >= n) || Bodies.isOppositePair(n, i)) {
-                    out.append("<td style='background-color:#111;'></td>");
-                    continue;
-                }
-                double sep = Math.abs(lon[n] - this.natalRing.lon[i]);
-                if (sep > 180.0) {
-                    sep = 360.0 - sep;
-                }
-                // Only the partner ring is a synastry pair. The sky ring is a moment and is
-                // judged at natal orbs - the same call the wheel and the hit test make.
-                String type = this.getAspectType(sep, n, i,
-                    this.profileForPair(wheel == WHEEL_OUTER));
-                if (type == null) {
-                    out.append("<td style='background-color:#222;'></td>");
-                    continue;
-                }
-                String row = wheel == WHEEL_NATAL ? BODY_NAMES[n]
-                    : TRANSIT_PREFIX + BODY_NAMES[n].toLowerCase();
-                // Through aspectHref, never formatted inline: the parser is the only other
-                // place that knows this format and the two must not be able to drift.
-                String href = SkymapPanel.aspectHref(row, BODY_NAMES[i], type, wheel);
-                out.append("<td style='background-color:#222;'><a href='").append(href)
-                   .append("' style='text-decoration:none;'>").append("<span style='color:")
-                   .append(this.getAspectColorHex(type)).append("; font-size:").append(glyph)
-                   .append("px;'>").append(this.getAspectSymbol(type))
-                   .append("</span></a></td>");
-            }
-            out.append("</tr>");
-        }
-    }
-
-    private String formatPlanetPlacement(int n, double d, double d2, String string) {
-        int n2 = (int)(d / 30.0);
-        int n3 = (int)(d % 30.0);
-        int n4 = (int)((d - Math.floor(d)) * 60.0);
-        int n5 = 1;
-        for (int i = 1; i <= 12; ++i) {
-            double d3;
-            double d4;
-            double d5 = this.activeCusps[i];
-            double d6 = d4 = i == 12 ? this.activeCusps[1] : this.activeCusps[i + 1];
-            if (d4 < d5) {
-                d4 += 360.0;
-            }
-            if ((d3 = d) < d5 && d4 > 360.0) {
-                d3 += 360.0;
-            }
-            if (!(d3 >= d5) || !(d3 < d4)) continue;
-            n5 = i;
-            break;
-        }
-        String string2 = SkymapPanel.showsDirection(n) ? (d2 < 0.0 ? " R" : " D") : "";
-        String string3 = this.getElementColorHex(Zodiac.elementIndex(n2));
-        // <b>Both decan rulers, each named, under the placement.</b> The app runs two schemes
-        // at once and they disagree for 30 of the 36 decans, so an unlabelled "sub-ruler" here
-        // would be worse than none: the reader cannot tell whether it governs the prose or the
-        // tarot. Triplicity rules the decan prose; the Chaldean face rules the Golden Dawn
-        // cards and the Sabian decan_ruler field. Zodiac's header carries the full note.
-        String decanLine = SkymapPanel.decanRulers(d);
-        return String.format("<div style='margin-bottom:4px;'><a href='%s%d' style='color:#cccccc; text-decoration:none; font-family:SansSerif; font-size:14px;'><span style='font-size:16px;'>%s</span> %d&deg; %02d'%s <span style='color:%s; font-size:16px;'>%s</span> House %s</a>%s</div>", string, n, BODY_GLYPHS[n], n3, n4, string2, string3, ZODIAC_SYMBOLS[n2], this.romanNumeral(n5), decanLine);
-    }
-
-    /**
-     * The decan and its two rulers, as one small line for a placement row.
-     *
-     * Static and shared so the placements list and the hover card cannot drift apart - they
-     * are the two surfaces a reader compares, and a decan named differently on each would be
-     * read as a bug in the chart rather than a difference between two traditions.
-     */
-    static String decanRulers(double lon) {
-        int decan = Zodiac.decan(lon);
-        String triplicity = Zodiac.triplicityDecanRuler(lon);
-        String face = Zodiac.chaldeanDecanRuler(lon);
-        if ((triplicity == null || triplicity.isEmpty()) && (face == null || face.isEmpty())) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(
-            "<div style='color:#9FB4C7; font-size:10px; margin-left:20px;'>Decan ");
-        sb.append(decan).append(" &middot; ");
-        if (triplicity != null && !triplicity.isEmpty()) {
-            sb.append("triplicity <b>").append(triplicity).append("</b>");
-        }
-        if (face != null && !face.isEmpty()) {
-            if (triplicity != null && !triplicity.isEmpty()) {
-                sb.append(" &middot; ");
-            }
-            sb.append("Chaldean <b>").append(face).append("</b>");
-        }
-        return sb.append("</div>").toString();
-    }
-
-    private static boolean showsDirection(int n) {
-        Bodies.Source source = Bodies.at((int)n).source;
-        return source == Bodies.Source.EPHEMERIS || source == Bodies.Source.SOUTH_NODE;
-    }
-
-    private String romanNumeral(int n) {
-        String[] stringArray = new String[]{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
-        if (n >= 1 && n <= 12) {
-            return stringArray[n];
-        }
-        return String.valueOf(n);
+    private AspectGrid.Band gridBand(int wheel) {
+        return new AspectGrid.Band(this.ringWord(wheel), this.ringAt(wheel), wheel,
+            this.profileForPair(wheel == WHEEL_OUTER));
     }
 
     /**
@@ -9173,7 +7455,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return BODY_ELEMENTS[bodyIndex];
     }
 
-    private String getElementColorHex(int n) {
+    private static String getElementColorHex(int n) {
         if (n < 0 || n >= ELEMENT_TEXT_HEX.length) {
             return "#ffffff";
         }
@@ -9187,7 +7469,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             SkymapPanel.BODY_GLYPHS[i] = def.glyph;
             SkymapPanel.BODY_ELEMENTS[i] = def.element;
         }
-        ZODIAC_SYMBOLS = new String[]{"\u2648\ufe0e", "\u2649\ufe0e", "\u264a\ufe0e", "\u264b\ufe0e", "\u264c\ufe0e", "\u264d\ufe0e", "\u264e\ufe0e", "\u264f\ufe0e", "\u2650\ufe0e", "\u2651\ufe0e", "\u2652\ufe0e", "\u2653\ufe0e"};
+        ZODIAC_SYMBOLS = com.zodiacomputing.ourania.astro.Zodiac.SIGN_GLYPHS;
         FIRE = new Color(255, 69, 0);
         EARTH = new Color(50, 205, 50);
         AIR = new Color(255, 215, 0);
@@ -9207,909 +7489,5 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         SYNTHESIZE,
         TIMELINE;
 
-    }
-
-    private class ChartPanel
-    extends JPanel {
-        private ChartPanel() {
-        }
-
-        /**
-         * The hover card, asked for rather than pushed.
-         *
-         * <b>This is why hovering a body showed nothing.</b> mouseMoved used to call
-         * setToolTipText with whatever hoverTextAt returned, and a comment here said that
-         * passing null over empty space "unregisters the component, which is exactly the
-         * behaviour wanted". It is not: ToolTipManager.unregisterComponent removes the
-         * listeners it uses to track the pointer. The wheel is mostly empty space, so the
-         * first move over blank chart unregistered the panel; moving on to a glyph set the
-         * text again, but no mouseEntered can fire while the cursor is already inside the
-         * component, so the manager never woke up and no card was ever shown.
-         *
-         * Overriding this instead keeps the panel registered for the life of the window and
-         * lets the answer be per position. Returning null here suppresses the card without
-         * touching registration, which is the behaviour that comment actually wanted.
-         */
-        @Override
-        public String getToolTipText(MouseEvent event) {
-            if (SkymapPanel.this.globeMode) {
-                return SkymapPanel.this.hoverTextAt(event.getX(), event.getY());
-            }
-            java.awt.Point at = SkymapPanel.this.toWheel(event.getX(), event.getY());
-            return SkymapPanel.this.hoverTextAt(at.x, at.y);
-        }
-
-        @Override
-        protected void paintComponent(Graphics graphics) {
-            Object object;
-            int n;
-            int n2;
-            int n3;
-            double d;
-            int n4;
-            int n5;
-            int n6;
-            int n7;
-            double d2;
-            double d3;
-            int n8;
-            int n9;
-            super.paintComponent(graphics);
-            // <b>Jet black, deliberately flat.</b> A radial gradient was tried here on
-            // 2026-08-31 to suggest depth and removed the same day: against the muted
-            // element palette the lifted centre greyed the ground and the copper and sage
-            // glyphs lost contrast. Pure black is the strongest backing those colours have.
-            // <b>The wheel's ground, and the last surface that was not on the theme.</b>
-            // Black since the app existed - which left the chart reading as a hole cut in the
-            // window once everything around it moved to a navy ground. Overridable in
-            // Settings; black is still what it falls back to, so a reader who never opens
-            // Settings sees the chart they had yesterday.
-            graphics.setColor(ChartPalette.colorOr(ChartPalette.backgroundHex(null),
-                Color.BLACK));
-            graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
-            if (SkymapPanel.this.sw == null || SkymapPanel.this.natalRing.sd == null) {
-                return;
-            }
-            Graphics2D graphics2D = (Graphics2D)graphics;
-            // <b>The other view of the same chart.</b> Everything below this line draws the
-            // flat wheel; the globe reads the same arrays and paints them as shells. One
-            // branch, at the top, because the two share no drawing at all - the alternative
-            // is a flag threaded through five thousand lines of painter.
-            if (SkymapPanel.this.globeMode) {
-                // <b>Coasting counts as turning.</b> The cheap path - no halos, coarser
-                // arcs - is for frames the reader cannot study, and a globe still gliding to a
-                // stop is exactly that. Reading only globeDragging would switch the expensive
-                // path back on the instant the button came up, which is the one moment the
-                // frame rate has to hold.
-                GlobeRenderer.paint(graphics2D, SkymapPanel.this.globe,
-                    this.getWidth(), this.getHeight(), SkymapPanel.this,
-                    SkymapPanel.this.globeDragging || SkymapPanel.this.globe.coasting());
-                SkymapPanel.paintZodiacTag(graphics2D, this.getWidth(), this.getHeight());
-                SkymapPanel.this.paintScrubTag(graphics2D, this.getWidth());
-                return;
-            }
-            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            int n10 = this.getWidth();
-            int n11 = this.getHeight();
-            // The zoom and pan, for the screen only - see viewTransform. Everything drawn from
-            // here to the hover swell is in the wheel's own coordinates.
-            final java.awt.geom.AffineTransform screenTx = graphics2D.getTransform();
-            final boolean onScreen = this.getClientProperty(ChartExporter.EXPORTING) == null;
-            if (onScreen) {
-                // Re-clamped at the size being painted: a window made smaller while zoomed would
-                // otherwise keep a pan that now runs past the wheel's edge.
-                SkymapPanel.this.clampView();
-                graphics2D.transform(SkymapPanel.this.viewTransform(n10, n11));
-            }
-            // The same geometry both hit tests and the click dispatcher use. This painter is
-            // the site that diverged: it drew bodies at RING_SIGN_INNER while bodyAt tested
-            // bodyBaseRadius, so with the reader's placement anywhere but the default the
-            // glyphs and the clicks were tens of pixels apart.
-            Geometry g = SkymapPanel.this.geometry(n10, n11);
-            if (g == null) {
-                return;
-            }
-            int n12 = g.cx;
-            int n13 = g.cy;
-            int[] rings = g.rings;
-            int n14 = n9 = rings[RING_OUTER];
-            int nTriOuter = rings[RING_TRI];
-            int n15 = rings[RING_TRANSIT];
-            int n16 = rings[RING_DECAN_OUTER];
-            int n17 = rings[RING_SIGN_OUTER];
-            int n18 = rings[RING_SIGN_INNER];
-            int nBodyTop = rings[RING_BODY_TOP];
-            int nTermInner = rings[RING_TERM_INNER];
-            int nDegreeInner = rings[RING_DEGREE_INNER];
-            // The rim scale's outer edge: the rim itself with the mansions folded, and the
-            // underside of the mansion band once they open.
-            int nMansionInner = rings[RING_MANSION_INNER];
-            // <b>The disc, filled separately from the page.</b> One colour used to do both -
-            // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
-            // Filled before any ring is drawn, so every stroke below lands on top of it.
-            Color disc = ChartPalette.colorOr(ChartPalette.wheelHex(null), null);
-            if (disc != null) {
-                graphics2D.setColor(disc);
-                graphics2D.fillOval(n12 - n14, n13 - n14, n14 * 2, n14 * 2);
-            }
-            double[] dArray = SkymapPanel.this.activeCusps;
-            double d4 = SkymapPanel.this.getPinLongitude();
-            graphics2D.setColor(SkymapPanel.inkColor());
-            graphics2D.setStroke(new BasicStroke(1.0f));
-            graphics2D.drawLine(n12 - 10, n13, n12 + 10, n13);
-            graphics2D.drawLine(n12, n13 - 10, n12, n13 + 10);
-            graphics2D.setColor(SkymapPanel.inkColor());
-            graphics2D.setStroke(new BasicStroke(2.0f));
-            if (SkymapPanel.this.layerShown(Layer.SIGNS)) {
-                graphics2D.drawOval(n12 - n18, n13 - n18, n18 * 2, n18 * 2);
-                graphics2D.drawOval(n12 - n17, n13 - n17, n17 * 2, n17 * 2);
-            }
-            if (SkymapPanel.this.layerShown(Layer.DECANS)) {
-                graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
-            }
-            graphics2D.drawOval(n12 - nTermInner, n13 - nTermInner,
-                nTermInner * 2, nTermInner * 2);
-            graphics2D.drawOval(n12 - nDegreeInner, n13 - nDegreeInner,
-                nDegreeInner * 2, nDegreeInner * 2);
-            if (SkymapPanel.this.outerRingDrawn()) {
-                // Both boundaries of the partner band. Since the reorder it hangs below the
-                // zodiac rather than outside it, so its floor is a line of its own - without
-                // it the band bleeds into the natal wheel and stops reading as a field.
-                graphics2D.setColor(new Color(80, 40, 80));
-                graphics2D.drawOval(n12 - n15, n13 - n15, n15 * 2, n15 * 2);
-                graphics2D.drawOval(n12 - nBodyTop, n13 - nBodyTop,
-                    nBodyTop * 2, nBodyTop * 2);
-            }
-            // Tri-wheel: an additional ring outside the synastry ring.
-            if (SkymapPanel.this.triRingDrawn()) {
-                graphics2D.setColor(new Color(30, 60, 80));
-                graphics2D.drawOval(n12 - nTriOuter, n13 - nTriOuter, nTriOuter * 2, nTriOuter * 2);
-            }
-            graphics2D.setFont(new Font("SansSerif", 0, 12));
-            for (n8 = 0; SkymapPanel.this.layerShown(Layer.DECANS) && n8 < 36; ++n8) {
-                d3 = (double)n8 * 10.0;
-                d2 = Math.toRadians(180.0 + d4 - d3);
-                n7 = n12 + (int)((double)n17 * Math.cos(d2));
-                n6 = n13 + (int)((double)n17 * Math.sin(d2));
-                n5 = n12 + (int)((double)n16 * Math.cos(d2));
-                n4 = n13 + (int)((double)n16 * Math.sin(d2));
-                graphics2D.setColor(Color.LIGHT_GRAY);
-                graphics2D.setStroke(new BasicStroke(1.0f));
-                graphics2D.drawLine(n7, n6, n5, n4);
-                d = Math.toRadians(180.0 + d4 - (d3 + 5.0));
-                n3 = n12 + (int)((double)(n16 - 10) * Math.cos(d));
-                n2 = n13 + (int)((double)(n16 - 10) * Math.sin(d));
-                // <b>One band, two traditions, and the reader picks which one it draws.</b>
-                // Visual only: the prose and the tarot keep their own schemes whatever this
-                // says, because they are bound to datasets that cannot be remapped. See
-                // Settings.decanRing for why a global decan-system toggle is not on offer.
-                int n19 = n8 / 3;
-                if (Settings.DECAN_RING_CHALDEAN.equals(Settings.decanRing())) {
-                    String faceRuler = Zodiac.chaldeanDecanRuler(Zodiac.SIGNS[n19], n8 % 3 + 1);
-                    int fi = Bodies.indexOfName(faceRuler);
-                    if (fi >= 0 && fi < BODY_GLYPHS.length) {
-                        graphics2D.setColor(SkymapPanel.this.bodyColor(fi));
-                        graphics2D.drawString(BODY_GLYPHS[fi], n3 - 4, n2 + 4);
-                        continue;
-                    }
-                    // An unresolvable ruler falls through to the sign glyph rather than
-                    // leaving a gap in the band, which would read as a rendering fault.
-                }
-                int n20 = Zodiac.triplicityDecanSignIndex(n19, n8 % 3 + 1);
-                graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n20)));
-                graphics2D.drawString(ZODIAC_SYMBOLS[n20], n3 - 4, n2 + 4);
-            }
-            // <b>The Egyptian bounds, one glyph per segment.</b> Dignity has scored bound
-            // placements since it was written and nothing drew them, so a reader comparing
-            // this wheel against another program found the terms simply missing. Sixty
-            // segments, five to a sign, each ruled by one of the five non-luminary planets -
-            // read from Dignity rather than from a second copy of the table.
-            if (SkymapPanel.this.layerShown(Layer.BOUNDS)) {
-                SkymapPanel.this.drawBoundRing(graphics2D, n12, n13, n18, nTermInner, d4);
-            }
-
-            // <b>The second degree scale, sitting directly above the wheels.</b> The outer
-            // ticks are at the rim beside the lunar mansions, too far from any glyph to read
-            // a body against; this one is where a body's leader line lands, so a reader can
-            // follow a glyph out to the degree it actually occupies.
-            if (SkymapPanel.this.layerShown(Layer.DEGREES)) {
-                SkymapPanel.this.drawInnerDegreeRing(graphics2D, n12, n13, nTermInner,
-                    nDegreeInner, d4);
-            }
-
-            // The 28 lunar mansions, in a band of their own at the rim.
-            //
-            // <b>It used to share the rim with the degree ticks and cover them.</b> The band is
-            // now carved out of the rim by the chain - RING_MANSION_INNER - and the ticks below
-            // read from the same number, so the two cannot overlap. Carving it here rather than
-            // inside the zodiac is what keeps the bodies where they are: every radius from
-            // RING_DECAN_OUTER inward is untouched.
-            if (SkymapPanel.this.layerShown(Layer.MANSIONS)) {
-                SkymapPanel.this.drawMansionRing(graphics2D, n12, n13, n14, nMansionInner, d4);
-            }
-
-            graphics2D.setFont(new Font("SansSerif", 0, 22));
-            for (n8 = 0; SkymapPanel.this.layerShown(Layer.SIGNS) && n8 < 12; ++n8) {
-                d3 = (double)n8 * 30.0;
-                d2 = Math.toRadians(180.0 + d4 - d3);
-                n7 = n12 + (int)((double)n18 * Math.cos(d2));
-                n6 = n13 + (int)((double)n18 * Math.sin(d2));
-                n5 = n12 + (int)((double)n17 * Math.cos(d2));
-                n4 = n13 + (int)((double)n17 * Math.sin(d2));
-                graphics2D.setColor(SkymapPanel.inkColor());
-                graphics2D.setStroke(new BasicStroke(2.0f));
-                graphics2D.drawLine(n7, n6, n5, n4);
-                d = Math.toRadians(180.0 + d4 - (d3 + 15.0));
-                n3 = n12 + (int)((double)(n17 - 18) * Math.cos(d));
-                n2 = n13 + (int)((double)(n17 - 18) * Math.sin(d));
-                graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n8)));
-                graphics2D.drawString(ZODIAC_SYMBOLS[n8], n3 - 9, n2 + 6);
-            }
-            graphics2D.setColor(new Color(150, 150, 150));
-            for (n8 = 0; SkymapPanel.this.layerShown(Layer.DEGREES) && n8 < 360; ++n8) {
-                d3 = Math.toRadians(180.0 + d4 - (double)n8);
-                // Hanging from the mansion band's underside rather than from the rim, so the
-                // two scales and the mansions are three separate bands the reader can tell
-                // apart. With the mansions folded this is the rim, exactly as before.
-                int n21 = nMansionInner;
-                n = n8 % 10 == 0 ? n21 - 6 : (n8 % 5 == 0 ? n21 - 4 : n21 - 2);
-                n7 = n12 + (int)((double)n * Math.cos(d3));
-                n6 = n13 + (int)((double)n * Math.sin(d3));
-                n5 = n12 + (int)((double)n21 * Math.cos(d3));
-                n4 = n13 + (int)((double)n21 * Math.sin(d3));
-                graphics2D.setStroke(new BasicStroke(n8 % 10 == 0 ? 1.5f : 0.5f));
-                graphics2D.drawLine(n7, n6, n5, n4);
-            }
-            for (n8 = 1; SkymapPanel.this.layerShown(Layer.HOUSES) && n8 <= 12; ++n8) {
-                d3 = dArray[n8];
-                double d5 = Math.toRadians(180.0 + d4 - d3);
-                n7 = n12;
-                n6 = n13;
-                n5 = n12 + (int)((double)n18 * Math.cos(d5));
-                n4 = n13 + (int)((double)n18 * Math.sin(d5));
-                if (n8 == 1 || n8 == 4 || n8 == 7 || n8 == 10) {
-                    graphics2D.setColor(SkymapPanel.inkColor());
-                    graphics2D.setStroke(new BasicStroke(3.0f));
-                } else {
-                    graphics2D.setColor(Color.DARK_GRAY);
-                    graphics2D.setStroke(new BasicStroke(2.0f));
-                }
-                graphics2D.drawLine(n7, n6, n5, n4);
-                double d6 = d = n8 == 12 ? dArray[1] : dArray[n8 + 1];
-                if (d < d3) {
-                    d += 360.0;
-                }
-                double d7 = d3 + (d - d3) / 2.0;
-                double d8 = Math.toRadians(180.0 + d4 - d7);
-                // <b>Just inside the aspect field's rim, not under the sign ring.</b> The number
-                // sat 15 px inside the sign ring's inner edge, which was open space when it was
-                // placed; the bounds ring and the degree scale have since grown into exactly that
-                // band, and an 11 px digit among the bound glyphs and the 0/10/20 labels read as
-                // no house numbers at all (reported 2026-09-14). The rim of the aspect disc is
-                // the one ring on the wheel nothing else is drawn on.
-                int houseR = g.natalFloor - 16;
-                int n22 = n12 + (int)((double)houseR * Math.cos(d8));
-                int n23 = n13 + (int)((double)houseR * Math.sin(d8));
-                graphics2D.setColor(SkymapPanel.this.getElementColor(Zodiac.elementIndex(n8 - 1)));
-                graphics2D.setFont(Theme.font("Arial", 1, 15));
-                java.awt.FontMetrics houseFm = graphics2D.getFontMetrics();
-                String houseText = String.valueOf(n8);
-                graphics2D.drawString(houseText, n22 - houseFm.stringWidth(houseText) / 2,
-                    n23 + houseFm.getAscent() / 2 - 1);
-            }
-            if (SkymapPanel.this.showTransitChart && "Both".equals(SkymapPanel.this.houseAlignment)) {
-                Stroke stroke = graphics2D.getStroke();
-                graphics2D.setStroke(new BasicStroke(2.0f, 0, 0, 10.0f, new float[]{4.0f, 4.0f}, 0.0f));
-                for (int i = 1; i <= 12; ++i) {
-                    // Across the partner band, which is where those cusps belong - not from
-                    // the decan ring, which the reorder moved to the other side of the wheel.
-                    double d9 = Math.toRadians(180.0 + d4 - SkymapPanel.this.outerRing.cusps[i]);
-                    n = n12 + (int)((double)nBodyTop * Math.cos(d9));
-                    n7 = n13 + (int)((double)nBodyTop * Math.sin(d9));
-                    n6 = n12 + (int)((double)n15 * Math.cos(d9));
-                    n5 = n13 + (int)((double)n15 * Math.sin(d9));
-                    n4 = i == 1 || i == 4 || i == 7 || i == 10 ? 1 : 0;
-                    graphics2D.setColor(n4 != 0 ? new Color(210, 150, 230) : new Color(120, 80, 140));
-                    graphics2D.drawLine(n, n7, n6, n5);
-                }
-                graphics2D.setStroke(stroke);
-            }
-            // Body radii come from the shared geometry, not from n18. n18 is RING_SIGN_INNER
-            // and this painter used to draw bodies there whatever placement the reader chose,
-            // while bodyAt tested bodyBaseRadius - 325 against 201 in the centre at 820px, so
-            // nothing on the wheel could be clicked. n18 keeps RING_SIGN_INNER for the sign
-            // circle it strokes and the spokes it ends, because those are the sign ring.
-            int[] nArray = g.natalRadii();
-            int[] nArray2 = g.transitRadii();
-            int[] nArrayC = g.triRadii();
-            // The three aspect fields. Lines are drawn on these, not between the glyphs -
-            // see Geometry.aspectDisc for why, and note that the hit test reads the same
-            // three numbers, because a line you can see has to be a line you can hover.
-            int discNatal = g.aspectDisc(0);
-            int discOuter = g.aspectDisc(1);
-            int discSky = g.aspectDisc(2);
-            // <b>One circle, where the lines stop and the bodies start.</b> Three nested
-            // fields of chords with nothing around them read as weather in the middle of the
-            // wheel; a single boundary at the natal band's floor turns them into a thing with
-            // an edge. Nothing has to be clipped to it: every chord has both ends on a disc
-            // inside this radius, so the widest line the wheel can draw is a diameter of the
-            // outermost field and still falls short of the circle around it.
-            //
-            // Alpha 190 rather than the 120 it was first drawn at. A circle sampled across ten
-            // spokes of the rendered wheel registered on six of them at 120, where every other
-            // ring line registered on ten - present in the file and absent to a reader, which
-            // is the one outcome a boundary cannot have. Still below the zodiac's full-weight
-            // strokes, because it marks an edge rather than another ring.
-            Color edge = SkymapPanel.inkColor();
-            graphics2D.setColor(new Color(edge.getRed(), edge.getGreen(), edge.getBlue(), 190));
-            graphics2D.setStroke(new BasicStroke(1.5f));
-            graphics2D.drawOval(n12 - g.natalFloor, n13 - g.natalFloor,
-                g.natalFloor * 2, g.natalFloor * 2);
-            int n24 = n18 - 60;
-            graphics2D.setStroke(new BasicStroke(0.5f));
-            // <b>The layer folds the lines; the filter chooses which families.</b> Two
-            // different questions, and a reader who folded the aspects away expects all of
-            // them gone whatever the filter says.
-            boolean aspectLayer = SkymapPanel.this.layerShown(Layer.ASPECTS);
-            boolean bl = aspectLayer && SkymapPanel.this.drawsNatalAspects();
-            int n25 = n = aspectLayer && SkymapPanel.this.drawsCrossAspects() ? 1 : 0;
-            if (bl) {
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.natalRing.valid)) continue;
-                    for (n6 = n7 + 1; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid) || Bodies.isOppositePair(n7, n6)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.natalRing.lon[n7], SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discNatal, discNatal, WHEEL_NATAL, n7, n6);
-                    }
-                }
-            }
-            if (n != 0) {
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.outerRing.valid)) continue;
-                    for (n6 = 0; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.outerRing.lon[n7], SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discOuter, discOuter, WHEEL_OUTER, n7, n6);
-                    }
-                }
-            }
-            // <b>The sky ring had no aspect lines at all.</b> It could be drawn, hovered and
-            // read, and the one thing the wheel is for - showing what is in aspect to what -
-            // stopped at the ring below it. With a field of its own there is now somewhere to
-            // put them where they do not cross the other two.
-            if (n != 0 && SkymapPanel.this.triRingDrawn()) {
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.aspecting(n7, SkymapPanel.this.skyRing.valid)) continue;
-                    for (n6 = 0; n6 < BODY_COUNT; ++n6) {
-                        if (!SkymapPanel.aspecting(n6, SkymapPanel.this.natalRing.valid)) continue;
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.skyRing.lon[n7],
-                            SkymapPanel.this.natalRing.lon[n6], d4, n12, n13, discSky, discSky,
-                            WHEEL_SKY, n7, n6);
-                    }
-                }
-            }
-            // Draw the hovered line once more, last, so it sits on top of the weave. Emphasis
-            // alone is not enough: with 28 points switched on, a highlighted line drawn in
-            // registry order disappears under every pair that comes after it.
-            // The lit pattern goes down before the hovered line, for the same reason the
-            // hovered line goes down after the weave: emphasis alone loses to draw order once
-            // there are 28 points on the wheel. A figure is several lines, so all of its
-            // member pairs are redrawn here - drawAspectLine draws nothing for a pair that
-            // holds no aspect, so the loop can be over members rather than over the figure's
-            // own legs, which the Pattern does not record.
-            java.util.List<int[]> litFigures = new java.util.ArrayList<>();
-            for (int[] members : SkymapPanel.this.autoPatterns) {
-                litFigures.add(members);
-            }
-            if (SkymapPanel.this.highlightPattern.length > 0) {
-                litFigures.add(SkymapPanel.this.highlightPattern);
-            }
-            for (int[] lit : litFigures) {
-                for (int li = 0; li < lit.length; li++) {
-                    for (int lj = li + 1; lj < lit.length; lj++) {
-                        int pa = lit[li];
-                        int pb = lit[lj];
-                        if (!SkymapPanel.aspecting(pa, SkymapPanel.this.natalRing.valid)
-                            || !SkymapPanel.aspecting(pb, SkymapPanel.this.natalRing.valid)) {
-                            continue;
-                        }
-                        this.drawAspectLine(graphics2D, SkymapPanel.this.natalRing.lon[pa],
-                            SkymapPanel.this.natalRing.lon[pb], d4, n12, n13, discNatal, discNatal,
-                            WHEEL_NATAL, pa, pb);
-                    }
-                }
-            }
-
-            int hlA = SkymapPanel.this.highlightA;
-            int hlB = SkymapPanel.this.highlightB;
-            int hlWheel = SkymapPanel.this.highlightWheel;
-            if (hlA >= 0 && hlB >= 0) {
-                // <b>Off the ring it belongs to.</b> This redraw picked the outer wheel for
-                // every cross-chart line, so a hovered sky aspect was drawn again on the
-                // partner ring - a bright chord in the wrong field, next to the faint one it
-                // was meant to be.
-                int hlDisc = hlWheel == WHEEL_SKY ? discSky
-                    : (hlWheel == WHEEL_OUTER ? discOuter : discNatal);
-                if (SkymapPanel.aspecting(hlA, SkymapPanel.this.wheelValid(hlWheel))
-                    && SkymapPanel.aspecting(hlB, SkymapPanel.this.natalRing.valid)) {
-                    this.drawAspectLine(graphics2D,
-                        SkymapPanel.this.wheelLon(hlWheel)[hlA], SkymapPanel.this.natalRing.lon[hlB],
-                        d4, n12, n13, hlDisc, hlDisc, hlWheel, hlA, hlB);
-                }
-            }
-            // The transform the bodies are drawn in, so a hovered glyph's swell is undone
-            // before anything else is painted - every loop below resets to it.
-            final java.awt.geom.AffineTransform bodyTx = graphics2D.getTransform();
-            for (n7 = 0; SkymapPanel.this.layerShown(Layer.NATAL) && n7 < BODY_COUNT; ++n7) {
-                if (!SkymapPanel.this.natalRing.valid[n7]) continue;
-                double d10 = Math.toRadians(180.0 + d4 - SkymapPanel.this.natalRing.lon[n7]);
-                n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));
-                int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
-                SkymapPanel.bulge(graphics2D, bodyTx, n4, n26, SkymapPanel.this.hoverBody == n7);
-                if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_NATAL)) {
-                    SkymapPanel.drawHighlightHalo(graphics2D, n4, n26,
-                        Bodies.at(n7).isAngle() ? 13 : SkymapPanel.natalSize(n7).radius);
-                }
-                if (Bodies.at(n7).isAngle()) {
-                    graphics2D.setFont(ANGLE_FONT);
-                    // The angle marker follows the template: gold is invisible on a white
-                    // ground and is the only warm thing in a cool palette.
-                    Color angle = ChartPalette.colorOr(ChartPalette.angleHex("#D4AF37"),
-                        new Color(212, 175, 55));
-                    this.drawBodyMarker(graphics2D, n4, n26, 13, angle,
-                        Settings.natalMarker());
-                    // The glyph reads against its own bead rather than against a fixed dark
-                    // brown, which disappears on a pale marker.
-                    graphics2D.setColor(SkymapPanel.readableOn(angle));
-                    object = Bodies.at((int)n7).glyph;
-                    graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n26 + 4);
-                    continue;
-                }
-                // A body recedes with its lines unless it IS the focus or aspects it. Without
-                // this the web dims and the glyphs stay bright, which reads as the lines being
-                // broken rather than as one body being singled out.
-                java.awt.Composite priorComposite = graphics2D.getComposite();
-                if (!SkymapPanel.this.noFocus()) {
-                    graphics2D.setComposite(java.awt.AlphaComposite.getInstance(
-                        java.awt.AlphaComposite.SRC_OVER,
-                        (float) SkymapPanel.this.glyphWeight(n7, false)));
-                }
-                GlyphSize glyphSize = SkymapPanel.natalSize(n7);
-                graphics2D.setFont(glyphSize.font);
-                this.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
-                    new Color(192, 192, 192), Settings.natalMarker());
-                if (n7 == MOON && SkymapPanel.this.natalRing.valid[SUN]) {
-                    double d11 = (SkymapPanel.this.natalRing.lon[MOON] - SkymapPanel.this.natalRing.lon[SUN]) % 360.0;
-                    if (d11 < 0.0) {
-                        d11 += 360.0;
-                    }
-                    SkymapPanel.this.drawMoonPhase(graphics2D, n4, n26, Math.round((float)glyphSize.radius * 0.47f), d11 / 360.0);
-                } else {
-                    graphics2D.setColor(SkymapPanel.this.bodyColor(n7));
-                    object = SkymapPanel.glyphFor(n7, glyphSize.font);
-                    SkymapPanel.drawBodyLabel(graphics2D, (String)object, n4, n26, glyphSize.baseline);
-                }
-                graphics2D.setTransform(bodyTx);
-                // The leader from the glyph to the degree it actually occupies. Bodies are
-                // spread outward when they crowd, so without this a reader cannot tell which
-                // degree a glyph belongs to. Colour and visibility are both settings; the
-                // alpha stays here because a solid leader would compete with the aspect lines.
-                graphics2D.setComposite(priorComposite);
-                if (Settings.showDegreeLines()) {
-                    // <b>To the far scale, at the reader's asking.</b> These ran to the inner
-                    // degree scale on the argument that a leader crossing the decans and the
-                    // bounds is a line the reader has to trace rather than read. David,
-                    // 2026-09-16: "can we extend the line all the way to the second sabian ring
-                    // degree" - so they now reach the rim scale, which is the outer of the two.
-                    // The inner scale is still drawn and still readable; what changed is where
-                    // the line ends, and that is his call to make while looking at it.
-                    //
-                    // <b>The hovered body's leader is drawn to be seen.</b> At alpha 60 every
-                    // leader is a hint and none of them is an answer; the one the cursor is on
-                    // is the reader asking which degree this glyph occupies, so it is drawn
-                    // solid and the rest stay a background.
-                    boolean lit = SkymapPanel.this.focusBody == n7
-                        && !SkymapPanel.this.focusTransit;
-                    Color leader = ChartPalette.colorOr(ChartPalette.leaderHex(null),
-                        Color.WHITE);
-                    Stroke priorLeader = graphics2D.getStroke();
-                    graphics2D.setColor(new Color(leader.getRed(), leader.getGreen(),
-                        leader.getBlue(), lit ? 235 : 60));
-                    graphics2D.setStroke(new BasicStroke(lit ? 1.8f : 1.0f));
-                    graphics2D.drawLine(n4, n26,
-                        n12 + (int)((double)nMansionInner * Math.cos(d10)),
-                        n13 + (int)((double)nMansionInner * Math.sin(d10)));
-                    graphics2D.setStroke(priorLeader);
-                }
-            }
-            graphics2D.setTransform(bodyTx);
-            if (SkymapPanel.this.outerRingDrawn()) {
-                Composite outerWas = graphics2D.getComposite();
-                float outerA = SkymapPanel.ringAlpha(SkymapPanel.this.outerOpenFraction());
-                if (outerA < 0.999f) {
-                    graphics2D.setComposite(
-                        AlphaComposite.getInstance(AlphaComposite.SRC_OVER, outerA));
-                }
-                // The same question the angle cards ask, asked once for the whole ring: in a
-                // synastry this wheel is a second person, anywhere else it is a moment.
-                final AngleRole outerRole = SkymapPanel.this.angleRoleFor(false, true);
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.this.outerRing.valid[n7]) continue;
-                    double d12 = Math.toRadians(180.0 + d4 - SkymapPanel.this.outerRing.lon[n7]);
-                    n4 = n12 + (int)((double)nArray2[n7] * Math.cos(d12));
-                    int n27 = n13 + (int)((double)nArray2[n7] * Math.sin(d12));
-                    SkymapPanel.bulge(graphics2D, bodyTx, n4, n27,
-                        SkymapPanel.this.hoverBody == (n7 | TRANSIT_BIT));
-                    if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_OUTER)) {
-                        SkymapPanel.drawHighlightHalo(graphics2D, n4, n27,
-                            Bodies.at(n7).isAngle() ? 13
-                                : SkymapPanel.transitSize(n7).radius);
-                    }
-                    if (Bodies.at(n7).isAngle()) {
-                        graphics2D.setFont(ANGLE_FONT);
-                        this.drawBodyMarker(graphics2D, n4, n27, 13,
-                            SkymapPanel.ringBead(outerRole),
-                            SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
-                        graphics2D.setColor(SkymapPanel.this.ringAngleInk(outerRole));
-                        object = Bodies.at((int)n7).glyph;
-                        graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n27 + 4);
-                        continue;
-                    }
-                    GlyphSize glyphSize2 = SkymapPanel.transitSize(n7);
-                    graphics2D.setFont(glyphSize2.font);
-                    object = SkymapPanel.this.ringInk(n7, outerRole);
-                    this.drawBodyMarker(graphics2D, n4, n27, glyphSize2.radius,
-                        SkymapPanel.ringBead(outerRole),
-                        SkymapPanel.outerRingMarker(SkymapPanel.this.chartMode));
-                    if (n7 == MOON && SkymapPanel.this.outerRing.valid[SUN]) {
-                        double d13 = (SkymapPanel.this.outerRing.lon[MOON] - SkymapPanel.this.outerRing.lon[SUN]) % 360.0;
-                        if (d13 < 0.0) {
-                            d13 += 360.0;
-                        }
-                        SkymapPanel.this.drawMoonPhase(graphics2D, n4, n27, Math.round((float)glyphSize2.radius * 0.44f), d13 / 360.0);
-                        continue;
-                    }
-                    graphics2D.setColor((Color)object);
-                    String string = SkymapPanel.glyphFor(n7, glyphSize2.font);
-                    SkymapPanel.drawBodyLabel(graphics2D, string, n4, n27, glyphSize2.baseline);
-                }
-                graphics2D.setComposite(outerWas);
-            }
-            // Tri-wheel: sky positions in the outermost ring. Blue-tinted, and by default a
-            // different shape from the synastry ring inside it - see Settings.MARKER_SHAPES
-            // for why the tint alone was not enough.
-            graphics2D.setTransform(bodyTx);
-            if (SkymapPanel.this.triRingDrawn()) {
-                Composite triWas = graphics2D.getComposite();
-                float triA = SkymapPanel.ringAlpha(SkymapPanel.this.triOpenFraction());
-                if (triA < 0.999f) {
-                    graphics2D.setComposite(
-                        AlphaComposite.getInstance(AlphaComposite.SRC_OVER, triA));
-                }
-                for (n7 = 0; n7 < BODY_COUNT; ++n7) {
-                    if (!SkymapPanel.this.skyRing.valid[n7]) continue;
-                    double d14 = Math.toRadians(180.0 + d4 - SkymapPanel.this.skyRing.lon[n7]);
-                    n4 = n12 + (int)((double)nArrayC[n7] * Math.cos(d14));
-                    int n28 = n13 + (int)((double)nArrayC[n7] * Math.sin(d14));
-                    // The sky ring never had this at all: its chords could light and the two
-                    // glyphs at their ends stayed dark, so a reader could see a sky aspect
-                    // and still have to work out which points it joined.
-                    if (SkymapPanel.this.onHighlightedLine(n7, WHEEL_SKY)) {
-                        SkymapPanel.drawHighlightHalo(graphics2D, n4, n28,
-                            Bodies.at(n7).isAngle() ? 13
-                                : SkymapPanel.transitSize(n7).radius);
-                    }
-                    if (Bodies.at(n7).isAngle()) {
-                        graphics2D.setFont(ANGLE_FONT);
-                        this.drawBodyMarker(graphics2D, n4, n28, 13,
-                            SkymapPanel.ringBead(AngleRole.SKY), Settings.transitMarker());
-                        graphics2D.setColor(SkymapPanel.this.ringAngleInk(AngleRole.SKY));
-                        object = Bodies.at((int)n7).glyph;
-                        graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n28 + 4);
-                        continue;
-                    }
-                    GlyphSize glyphSize3 = SkymapPanel.transitSize(n7);
-                    graphics2D.setFont(glyphSize3.font);
-                    Color cColor = SkymapPanel.this.ringInk(n7, AngleRole.SKY);
-                    this.drawBodyMarker(graphics2D, n4, n28, glyphSize3.radius,
-                        SkymapPanel.ringBead(AngleRole.SKY), Settings.transitMarker());
-                    if (n7 == MOON && SkymapPanel.this.skyRing.valid[SUN]) {
-                        double d15 = (SkymapPanel.this.skyRing.lon[MOON] - SkymapPanel.this.skyRing.lon[SUN]) % 360.0;
-                        if (d15 < 0.0) d15 += 360.0;
-                        SkymapPanel.this.drawMoonPhase(graphics2D, n4, n28, Math.round((float)glyphSize3.radius * 0.44f), d15 / 360.0);
-                        continue;
-                    }
-                    graphics2D.setColor(cColor);
-                    String stringC = SkymapPanel.glyphFor(n7, glyphSize3.font);
-                    SkymapPanel.drawBodyLabel(graphics2D, stringC, n4, n28, glyphSize3.baseline);
-                }
-                graphics2D.setComposite(triWas);
-            }
-            graphics2D.setTransform(bodyTx);
-            SkymapPanel.this.paintHover(graphics2D, g);
-            graphics2D.setTransform(screenTx);
-            SkymapPanel.paintZodiacTag(graphics2D, n10, n11);
-            if (onScreen) {
-                SkymapPanel.this.paintFitChip(graphics2D);
-                SkymapPanel.this.paintScrubTag(graphics2D, n10);
-            }
-        }
-
-        /**
-         * The bead a glyph sits on, in whatever shape its ring's role asks for.
-         *
-         * <b>One gate for the classical look.</b> {@code showPlanetSpheres} used to be checked
-         * inside drawMetallicSphere alone, so switching it off cleared the natal ring and left
-         * the outer wheels drawing cubes - a chart that had asked for bare glyphs and got them
-         * on one ring out of three. Every marker now comes through here, so the switch means
-         * what it says.
-         */
-        private void drawBodyMarker(Graphics2D graphics2D, int n, int n2, int n3, Color color,
-                                    String shape) {
-            if (!Settings.showPlanetSpheres()) {
-                return;
-            }
-            if (Settings.MARKER_CUBE.equals(shape)) {
-                this.drawMetallicCube(graphics2D, n, n2, n3, color);
-            } else if (Settings.MARKER_PYRAMID.equals(shape)) {
-                this.drawMetallicPyramid(graphics2D, n, n2, n3, color);
-            } else if (Settings.MARKER_SPHERE.equals(shape)) {
-                this.drawMetallicSphere(graphics2D, n, n2, n3, color);
-            }
-            // MARKER_NONE draws nothing, which is the whole of what it is for.
-        }
-
-        /**
-         * A four-sided pyramid seen from the same angle as the cube.
-         *
-         * <b>Two faces, because only two are ever visible.</b> Drawing the back pair as well
-         * would put seams across a bead thirteen pixels wide. The lit face is on the left and
-         * the shaded one on the right, which is the cube's convention - the two have to read
-         * as the same chart lit by the same lamp, or the wheel looks like two drawings.
-         */
-        private void drawMetallicPyramid(Graphics2D graphics2D, int n, int n2, int n3,
-                                         Color color) {
-            // <b>Wider at the base than the cube is.</b> A pyramid's mass is at the bottom, so
-            // at the height the glyph is drawn it is only about two thirds as wide as a cube of
-            // the same radius - and the glyph overhung the sides. Widening the base restores
-            // the width where the glyph actually sits, and keeps the three shapes reading as
-            // one weight on the ring.
-            int n4 = (int)((double)n3 * 1.18);
-            int n5 = (int)((double)n3 * 0.52);
-            int n6 = (int)((double)n3 * 0.95);
-            int apexY = n2 - n6 / 2 - n5;
-            int baseY = n2 + n6 / 2;
-            int footY = baseY + n5;
-            Polygon left = new Polygon(new int[]{n, n - n4, n},
-                new int[]{apexY, baseY, footY}, 3);
-            Polygon right = new Polygon(new int[]{n, n + n4, n},
-                new int[]{apexY, baseY, footY}, 3);
-            Paint paint = graphics2D.getPaint();
-            Stroke stroke = graphics2D.getStroke();
-            Color color2 = color.brighter();
-            Color color3 = color.darker();
-            graphics2D.setPaint(new GradientPaint(n - n4, apexY, color2, n, footY,
-                color2.darker()));
-            graphics2D.fill(left);
-            graphics2D.setPaint(new GradientPaint(n, apexY, color3.brighter(), n + n4, footY,
-                color3.darker().darker()));
-            graphics2D.fill(right);
-            graphics2D.setPaint(paint);
-            graphics2D.setColor(color.darker().darker());
-            graphics2D.setStroke(new BasicStroke(1.0f));
-            graphics2D.draw(left);
-            graphics2D.draw(right);
-            graphics2D.setStroke(stroke);
-        }
-
-        private void drawMetallicCube(Graphics2D graphics2D, int n, int n2, int n3, Color color) {
-            int n4 = n3;
-            int n5 = (int)((double)n3 * 0.52);
-            int n6 = (int)((double)n3 * 0.95);
-            int n7 = n2 - n6 / 2;
-            int n8 = n2 + n6 / 2;
-            Polygon polygon = new Polygon(new int[]{n, n + n4, n, n - n4}, new int[]{n7 - n5, n7, n7 + n5, n7}, 4);
-            Polygon polygon2 = new Polygon(new int[]{n - n4, n, n, n - n4}, new int[]{n7, n7 + n5, n8 + n5, n8}, 4);
-            Polygon polygon3 = new Polygon(new int[]{n + n4, n, n, n + n4}, new int[]{n7, n7 + n5, n8 + n5, n8}, 4);
-            Paint paint = graphics2D.getPaint();
-            Stroke stroke = graphics2D.getStroke();
-            Color color2 = color.brighter();
-            Color color3 = color.darker();
-            Color color4 = color.darker().darker();
-            graphics2D.setPaint(new GradientPaint(n - n4, n7 - n5, color2, n + n4, n7 + n5, color2.darker()));
-            graphics2D.fill(polygon);
-            graphics2D.setPaint(new GradientPaint(n - n4, n7, color3.brighter(), n, n8 + n5, color3.darker()));
-            graphics2D.fill(polygon2);
-            graphics2D.setPaint(new GradientPaint(n, n7 + n5, color4.brighter(), n + n4, n8, color4.darker().darker()));
-            graphics2D.fill(polygon3);
-            graphics2D.setPaint(paint);
-            graphics2D.setColor(color.darker().darker());
-            graphics2D.setStroke(new BasicStroke(1.0f));
-            graphics2D.draw(polygon);
-            graphics2D.draw(polygon2);
-            graphics2D.draw(polygon3);
-            graphics2D.setStroke(stroke);
-        }
-
-        /**
-         * The bead a glyph sits on: the metallic sphere, and the default for a natal ring.
-         *
-         * <b>Whether any bead is drawn is decided by drawBodyMarker, not here.</b> This method
-         * used to test showPlanetSpheres itself, which read as the switch belonging to the
-         * sphere rather than to the beads - and it did, which is exactly how the cubes went on
-         * being drawn on a chart that had asked for bare glyphs.
-         */
-        private void drawMetallicSphere(Graphics2D graphics2D, int n, int n2, int n3, Color color) {
-            float[] fArray = new float[]{0.0f, 0.4f, 1.0f};
-            Color color2 = new Color(255, 255, 255, 200);
-            Color color3 = color.darker().darker();
-            RadialGradientPaint radialGradientPaint = new RadialGradientPaint(new Point2D.Float((float)n - (float)n3 * 0.3f, (float)n2 - (float)n3 * 0.3f), n3, fArray, new Color[]{color2, color, color3});
-            Paint paint = graphics2D.getPaint();
-            graphics2D.setPaint(radialGradientPaint);
-            graphics2D.fillOval(n - n3, n2 - n3, n3 * 2, n3 * 2);
-            graphics2D.setPaint(paint);
-            graphics2D.setColor(color3);
-            graphics2D.drawOval(n - n3, n2 - n3, n3 * 2, n3 * 2);
-        }
-
-        /**
-         * How many widening passes make the glow.
-         *
-         * Three is where it stops being worth it: a fourth pass is wide enough to overlap its
-         * neighbours and turns a chart with forty aspects into a haze. Measured by eye on a
-         * chart with every point switched on, which is the case that breaks first.
-         */
-        private static final int GLOW_PASSES = 3;
-
-        private void drawAspectLine(Graphics2D graphics2D, double d, double d2, double d3, int n, int n2, int n3, int n4, int wheel, int n5, int n6) {
-            double d4 = Math.abs(d - d2);
-            if (d4 > 180.0) {
-                d4 = 360.0 - d4;
-            }
-            // wheel says which ring the first body is on, and used to be a boolean meaning
-            // "the outer one" - which could not tell the partner ring from the sky ring, so
-            // the two lit each other's lines. Only the partner ring is ever a synastry pair;
-            // the sky ring is a moment and is judged at natal orbs, the same as the grid and
-            // the hit test judge it.
-            boolean bl = wheel != SkymapPanel.WHEEL_NATAL;
-            Aspects.Profile syn = SkymapPanel.this.profileForPair(
-                wheel == SkymapPanel.WHEEL_OUTER);
-            double d5 = SkymapPanel.this.getOrbFor(n5, n6, syn);
-            Color color = null;
-            double d6 = 0.0;
-            // Which aspect this is, and what colour it takes, both come from the one place
-            // that already knows.
-            //
-            // <b>This used to be a hand-written if/else ladder</b> re-testing 0/60/90/120/180
-            // with the colours inlined as RGB triples - a third copy of Aspects.typeOf and a
-            // second copy of getAspectColorHex. It had no 150-degree branch for months, so the
-            // grid listed quincunxes the wheel could not draw, and adding five more aspects to
-            // a hand-written ladder would have been five more chances at the same silence.
-            // Now a new constant on Aspects.Type appears here automatically.
-            // Through the same gate the grid uses, so a switched-off aspect disappears from
-            // both or from neither.
-            Aspects.Type drawn = SkymapPanel.this.visibleAspect(d4, n5, n6, syn);
-            // The reader's aspect mode applies to the line and not to the aspect. A pair the
-            // mode excludes is still computed, still in the grid, still in the reading - it
-            // simply does not cross the middle of the wheel. See drawsPair.
-            if (drawn != null && !SkymapPanel.this.drawsPair(n5, n6)) {
-                drawn = null;
-            }
-            if (drawn != null) {
-                color = Color.decode(SkymapPanel.getAspectColorHex(drawn.label));
-                d6 = drawn.exactAngle;
-                // The alpha ramp below fades a line as it widens, and it has to fade against
-                // the orb this aspect was actually judged by. Against the raw body orb a
-                // 1-degree semisextile would render at nearly full strength however loose it is.
-                d5 = Aspects.effectiveOrb(SkymapPanel.planetName(n5),
-                    SkymapPanel.planetName(n6), drawn, syn);
-            }
-            if (color != null) {
-                // <b>What "close" is measured against.</b> Relative to the orb in force by
-                // default, which is what the wheel has always done; in absolute mode, degrees
-                // from exact, so that widening an orb adds lines without brightening the ones
-                // already drawn. David, 25 Sep.
-                double reach = Settings.aspectWeightAbsolute()
-                    ? Settings.ABSOLUTE_FADE_DEGREES : d5;
-                double d7 = Math.min(1.0, Math.abs(d4 - d6) / Math.max(0.0001, reach));
-                float f = (float)Math.pow(1.0 - d7, 2.0);
-                int n7 = (int)(35.0f + 220.0f * f);
-                n7 = Math.max(20, Math.min(255, n7));
-                // Focus, applied on top of the orb fade rather than instead of it: a loose
-                // aspect to the focused body is still a loose aspect and should still look
-                // like one.
-                double focus = SkymapPanel.this.focusWeight(n5, n6, bl);
-                n7 = Math.max(6, (int)(n7 * focus));
-                // <b>Weight is the aspect's own force times how close it is to exact.</b> Before
-                // this the width carried only proximity, so a semisextile at 0 degrees inked
-                // exactly as heavily as a conjunction at 0 degrees - the two lines said the same
-                // thing about very different aspects. Amplitude belongs to the harmonic family
-                // and lives on Aspects.Type beside the harmonic it comes from.
-                double amplitude = drawn == null ? 1.0 : drawn.amplitude();
-                // A hovered line is drawn at full strength regardless of how wide its orb is.
-                // The normal alpha ramp fades a loose aspect almost to nothing, which is right
-                // for the background weave and useless for "show me the one I am pointing at".
-                boolean highlighted = SkymapPanel.this.isHighlighted(n5, n6, wheel);
-                color = new Color(color.getRed(), color.getGreen(), color.getBlue(),
-                    highlighted ? 255 : n7);
-                // <b>Scaled into a range a reader can actually see.</b> 0.3 to 1.0 was under
-                // one pixel of variation, so the tightness rule was true and unreadable.
-                double lo = Settings.aspectWeightMin();
-                double hi = Settings.aspectWeightMax();
-                float f2 = highlighted ? (float)(hi * 1.4)
-                    : (float)(lo + (hi - lo) * f * amplitude);
-                double d8 = Math.toRadians(180.0 + d3 - d);
-                double d9 = Math.toRadians(180.0 + d3 - d2);
-                // <b>Where the ends sit, decided in one place.</b> Six call sites pass these
-                // radii and deciding it at each of them would be six chances to disagree - the
-                // defect this file has supplied all day. The first body is on `wheel`; the
-                // second is always on the natal ring, which is what every call site does.
-                int ra = SkymapPanel.this.endpointRadius(wheel, n5, n3);
-                int rb = SkymapPanel.this.endpointRadius(WHEEL_NATAL, n6, n4);
-                int n8 = n + (int)((double)ra * Math.cos(d8));
-                int n9 = n2 + (int)((double)ra * Math.sin(d8));
-                int n10 = n + (int)((double)rb * Math.cos(d9));
-                int n11 = n2 + (int)((double)rb * Math.sin(d9));
-                Stroke stroke = graphics2D.getStroke();
-                if (highlighted) {
-                    // White halo underneath, so the line reads against whichever aspect colour
-                    // it is and against the wheel's own spokes.
-                    graphics2D.setColor(new Color(255, 255, 255, 90));
-                    graphics2D.setStroke(new BasicStroke(f2 + 4.0f, BasicStroke.CAP_ROUND,
-                        BasicStroke.JOIN_ROUND));
-                    graphics2D.drawLine(n8, n9, n10, n11);
-                }
-                // <b>The glow: a wide, faint pass of the same colour under the crisp line.</b>
-                // Real bloom needs a blur, which Java2D will not do cheaply on every frame -
-                // but two or three widening strokes at low alpha read as light spilling off a
-                // strand, which is the whole effect. The passes are driven by the SAME f as the
-                // line, so a tight aspect glows and a loose one barely does: the fade already
-                // in this method is what makes the weave legible, and the glow must not undo it
-                // by lighting up the aspects the ramp is busy hiding.
-                if (!bl) {
-                    for (int pass = GLOW_PASSES; pass >= 1; pass--) {
-                        int glowAlpha = (int) (n7 * 0.10f * f / pass);
-                        if (glowAlpha < 3) {
-                            continue;
-                        }
-                        graphics2D.setColor(new Color(color.getRed(), color.getGreen(),
-                            color.getBlue(), Math.min(60, glowAlpha * 3)));
-                        graphics2D.setStroke(new BasicStroke(f2 + pass * 2.4f,
-                            BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                        graphics2D.drawLine(n8, n9, n10, n11);
-                    }
-                }
-
-                graphics2D.setColor(color);
-                // <b>Which chart this line belongs to, from the ring itself.</b> This was
-                // `if (bl)` - not the natal ring - so a partner's line, a transit and the sky
-                // were dashed identically and a reader could not tell them apart. The ring knows
-                // what it is since 383408c8; the pattern is its own.
-                float[] dash = SkymapPanel.this.ringAt(wheel).kind.dashPattern();
-                if (dash != null) {
-                    graphics2D.setStroke(new BasicStroke(f2, 0, 0, 10.0f, dash, 0.0f));
-                } else {
-                    // Thinner core than before (was f2 alone at up to 1.0). A strand reads as
-                    // light when the bright part is narrow and the spill is wide; a thick core
-                    // with a glow around it just looks like a thick line.
-                    graphics2D.setStroke(new BasicStroke(Math.max(0.6f, f2 * 0.8f),
-                        BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                }
-                graphics2D.drawLine(n8, n9, n10, n11);
-                graphics2D.setStroke(stroke);
-            }
-        }
-    }
-
-    public static final class YearScan {
-        public List<Transits.EventHit> events = Collections.emptyList();
-        public List<Transits.Perfection> perfections = Collections.emptyList();
-        public List<SolarArc.Contact> arcs = Collections.emptyList();
-        public List<Progressions.Contact> progressions = Collections.emptyList();
-        public List<Returns.Contact> returns = Collections.emptyList();
-        /** K12 stage 2: the progressed Moon's tenancies of the natal houses across the year. */
-        public List<Progressions.Tenancy> moonClock = Collections.emptyList();
-        /** K12 stage 2: aspects between two progressed bodies perfecting in the year. */
-        public List<Progressions.Mutual> mutuals = Collections.emptyList();
-        /** K12 stage 3: Sun and Mars touches on the themes' points, for dating - never voting. */
-        public List<Transits.Perfection> catalysts = Collections.emptyList();
     }
 }

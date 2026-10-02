@@ -3,12 +3,7 @@ package com.zodiacomputing.ourania.gui;
 import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.LunarMansions;
 import com.zodiacomputing.ourania.astro.Zodiac;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,16 +41,16 @@ final class GlobeRenderer {
         }
     }
 
-    private final Graphics2D g;
+    private final Pen g;
     private final Globe cam;
     private final int w;
     private final int h;
     private final double origin;
-    private final SkymapPanel panel;
+    private final GlobeSource panel;
     private final List<Piece> pieces = new ArrayList<>();
 
-    private GlobeRenderer(Graphics2D g, Globe cam, int w, int h, double origin,
-                          SkymapPanel panel) {
+    private GlobeRenderer(Pen g, Globe cam, int w, int h, double origin,
+                          GlobeSource panel) {
         this.g = g;
         this.cam = cam;
         this.w = w;
@@ -72,9 +67,9 @@ final class GlobeRenderer {
      * ring blooms do to the bands, applied to everything else that is drawn. At zero the layer
      * is skipped entirely, so a folded layer costs nothing to draw.
      */
-    private Color faded(Color c, SkymapPanel.Layer layer) {
+    private Ink faded(Ink c, SkymapPanel.Layer layer) {
         double open = this.panel.layerOpen(layer);
-        return new Color(c.getRed(), c.getGreen(), c.getBlue(),
+        return new Ink(c.getRed(), c.getGreen(), c.getBlue(),
             (int) Math.round(c.getAlpha() * open));
     }
 
@@ -91,15 +86,19 @@ final class GlobeRenderer {
     /**
      * @param turning true while the reader is dragging the globe
      */
-    static void paint(Graphics2D g, Globe cam, int w, int h, SkymapPanel panel,
+    static void paint(Graphics2D g, Globe cam, int w, int h, GlobeSource panel,
                       boolean turning) {
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        paint(new AwtPen(g), cam, w, h, panel, turning);
+    }
+
+    /** The globe drawn with any {@link Pen}: AWT's on the desktop, the canvas on the phone. */
+    static void paint(Pen g, Globe cam, int w, int h, GlobeSource panel, boolean turning) {
         GlobeRenderer r = new GlobeRenderer(g, cam, w, h, panel.pinLongitude(), panel);
         r.turning = turning;
         r.stacked = Settings.globeStackedRings();
         r.bowed = Settings.globeAspectArcs();
 
-        double[] shells = shellRadii(panel);
+        double[] shells = shellRadii(panel, cam, w, h);
         double natalR = shells[0];
         double partnerR = shells[1];
         double skyR = shells[2];
@@ -124,7 +123,7 @@ final class GlobeRenderer {
         // going in wedges around the globe." Left out while turning for the same reason the
         // sign shell is - the fills are what cost a drag its frame rate.
         if (!turning && r.shown(SkymapPanel.Layer.HOUSES) && Settings.globeHouseFill()) {
-            r.housePlane(panel.activeCusps);
+            r.housePlane(panel.activeCusps());
         }
 
         r.focusWedges(panel);
@@ -145,21 +144,21 @@ final class GlobeRenderer {
             r.decanRing();
         }
         if (r.shown(SkymapPanel.Layer.HOUSES)) {
-            r.houseMeridians(panel.activeCusps);
-            r.houseNumbers(panel.activeCusps);
+            r.houseMeridians(panel.activeCusps());
+            r.houseNumbers(panel.activeCusps());
         }
         // The three charts as ribbons, each lying in its own plane. Painted before the
         // chords and the bodies so they read as the ground those sit on.
         if (panel.outerRingDrawn()) {
             int outerDeck = panel.ringDeck(1);
             r.ribbon(partnerR, shade(deckInk(outerDeck), 54),
-                inclinationOf(outerDeck, r.stacked),
+                inclinationFor(outerDeck, r.stacked, r.cam),
                 liftFor(outerDeck, r.stacked, r.cam), turning);
         }
         if (panel.triRingDrawn()) {
             int triDeck = panel.ringDeck(2);
             r.ribbon(skyR, shade(deckInk(triDeck), 54),
-                inclinationOf(triDeck, r.stacked),
+                inclinationFor(triDeck, r.stacked, r.cam),
                 liftFor(triDeck, r.stacked, r.cam), turning);
         }
 
@@ -169,17 +168,17 @@ final class GlobeRenderer {
         if (r.shown(SkymapPanel.Layer.NATAL)) {
             int innerDeck = panel.ringDeck(0);
             r.ribbon(natalR, r.faded(shade(deckInk(innerDeck), 54), SkymapPanel.Layer.NATAL),
-                inclinationOf(innerDeck, r.stacked),
+                inclinationFor(innerDeck, r.stacked, r.cam),
                 liftFor(innerDeck, r.stacked, r.cam), turning);
-            r.bodies(panel.natalRing.lon, panel.natalRing.valid, natalR, SkymapPanel.AngleRole.ANCHOR, panel,
+            r.bodies(panel.ringLon(0), panel.ringValid(0), natalR, SkymapPanel.AngleRole.ANCHOR, panel,
                 false, 0);
         }
         if (panel.outerRingDrawn()) {
-            r.bodies(panel.outerRing.lon, panel.outerRing.valid, partnerR,
+            r.bodies(panel.ringLon(1), panel.ringValid(1), partnerR,
                 panel.angleRoleFor(false, true), panel, true, 1);
         }
         if (panel.triRingDrawn()) {
-            r.bodies(panel.skyRing.lon, panel.skyRing.valid, skyR, SkymapPanel.AngleRole.SKY, panel, true, 2);
+            r.bodies(panel.ringLon(2), panel.ringValid(2), skyR, SkymapPanel.AngleRole.SKY, panel, true, 2);
         }
 
         r.flush();
@@ -204,13 +203,13 @@ final class GlobeRenderer {
             return;
         }
         String text = "viewed from below - the chart reads in reverse";
-        this.g.setFont(font(11));
-        int width = this.g.getFontMetrics().stringWidth(text);
+        this.g.font(11);
+        int width = this.g.textWidth(text, 11);
         int x = (this.w - width) / 2;
         int y = this.h - 14;
-        this.g.setColor(new Color(10, 12, 16, 170));
+        this.g.color(new Ink(10, 12, 16, 170));
         this.g.fillRect(x - 8, y - 13, width + 16, 20);
-        this.g.setColor(new Color(226, 214, 184, 210));
+        this.g.color(new Ink(226, 214, 184, 210));
         this.g.drawString(text, x, y);
     }
 
@@ -231,7 +230,57 @@ final class GlobeRenderer {
      *
      * @return the radius for wheel 0, 1 and 2, in that order
      */
-    static double[] shellRadii(SkymapPanel panel) {
+    static double[] shellRadii(GlobeSource panel) {
+        return deckRadii(panel);
+    }
+
+    /**
+     * The radius each wheel's bodies ride at from this camera: the decks' shared shell at an
+     * ordinary tilt, the wheel's own bands looking straight down, and in between as
+     * {@link #flatness} says. Still the one statement the painter and the hit test share.
+     */
+    static double[] shellRadii(GlobeSource panel, Globe cam, int w, int h) {
+        double[] deck = deckRadii(panel);
+        double f = flatness(cam);
+        if (f <= 0.0) {
+            return deck;
+        }
+        double[] flat = wheelRadii(panel, w, h);
+        for (int i = 0; i < deck.length; i++) {
+            deck[i] += (flat[i] - deck[i]) * f;
+        }
+        return deck;
+    }
+
+    /**
+     * Where the flat wheel puts each wheel's bodies, in the globe's units.
+     *
+     * <b>Asked of the wheel, not restated.</b> The radii come from
+     * {@link SkymapPanel#ringRadii} and {@link SkymapPanel#bodyBaseRadius} - the chain the
+     * wheel is painted and hit-tested from - at this panel's size, with both outer bands open,
+     * which is the globe's own rule: a chart keeps its place whether or not the others are
+     * drawn. Each wheel goes to the middle of its band.
+     *
+     * <b>Scaled so the two zodiacs meet.</b> The wheel's sign band's inner edge lands on the
+     * globe's, {@link Globe#SHELL_SIGN_INNER}, so every ring stays inside the frame that
+     * measures it. Matching the globe's bands to the wheel's proportions as well is the next
+     * step and will make this scale the whole map.
+     *
+     * @return the radius for wheel 0 (Chart A), 1 (the outer ring) and 2 (the sky)
+     */
+    static double[] wheelRadii(GlobeSource panel, int w, int h) {
+        int[] rings = WheelLayout.ringRadii(w, h, 1.0, 1.0);
+        double k = Globe.SHELL_SIGN_INNER / Math.max(1, rings[WheelLayout.RING_SIGN_INNER]);
+        int natalTop = panel.bodyBaseRadius(rings);
+        int natalFloor = natalTop - WheelLayout.natalBandDepth(Math.max(1, natalTop));
+        return new double[] {
+            k * (natalTop + natalFloor) / 2.0,
+            k * (rings[WheelLayout.RING_TRANSIT] + rings[WheelLayout.RING_BODY_TOP]) / 2.0,
+            k * (rings[WheelLayout.RING_TRI] + rings[WheelLayout.RING_TRANSIT]) / 2.0,
+        };
+    }
+
+    private static double[] deckRadii(GlobeSource panel) {
         return new double[] {
             DECK_RADIUS[panel.ringDeck(0)],
             DECK_RADIUS[panel.ringDeck(1)],
@@ -291,8 +340,61 @@ final class GlobeRenderer {
      * see-it-but-cannot-click-it defect this file has already had once.
      */
     static double liftFor(int deck, boolean stacked, Globe cam) {
-        return liftOf(deck, stacked);
+        return liftOf(deck, stacked) * (1.0 - flatness(cam));
     }
+
+    /**
+     * The tilt the scene is actually drawn with - the deck's own, eased away as the camera
+     * comes round to looking straight down. See {@link #flatness}.
+     */
+    static double inclinationFor(int deck, boolean stacked, Globe cam) {
+        return inclinationOf(deck, stacked) * (1.0 - flatness(cam));
+    }
+
+    /**
+     * How far the globe has become the wheel: 0 at every ordinary tilt, 1 looking straight
+     * down on Chart A.
+     *
+     * <b>The wheel is the globe seen from above, so from above it should be the wheel.</b>
+     * David, 30 Sep: "the wheel chart is really just the top down view of the globe - is there a
+     * way we can make the wheel and the globe one seamless body". The globe keeps its three
+     * charts apart by HEIGHT - one shell, three decks - because rings of different sizes at one
+     * height cannot keep their order when tilted (21 Sep). The wheel keeps them apart by SIZE.
+     * Seen from straight above, height is invisible and the decks would draw on top of one
+     * another, so the two views could not agree.
+     *
+     * They agree now by trading one for the other as the camera climbs: past
+     * {@link #FLAT_FROM} the decks sink toward the middle plane and each ring slides from the
+     * shared shell out to its own band on the wheel, and overhead the heights are gone and the
+     * sizes are the wheel's. It is a smoothstep, so it starts and ends gently, and it is a
+     * function of the pitch alone, so it is continuous - the lesson of the 19 and 20 Sep
+     * mirrors, where a change made at a threshold snapped in one frame.
+     *
+     * <b>Only from above.</b> Straight down from underneath is the back of the glass, which
+     * reads in reverse; it is not the wheel and is left as it was.
+     */
+    static double flatness(Globe cam) {
+        if (cam == null) {
+            return 0.0;
+        }
+        double over = -cam.pitch;               // straight down onto Chart A is -MAX_PITCH
+        double t = (over - FLAT_FROM) / (Globe.MAX_PITCH - FLAT_FROM);
+        if (t <= 0.0) {
+            return 0.0;
+        }
+        if (t >= 1.0) {
+            return 1.0;
+        }
+        return t * t * (3.0 - 2.0 * t);
+    }
+
+    /**
+     * The pitch, in radians below the chart's plane, at which the decks start to become the
+     * wheel. About 52 degrees: the default tilt and everything a reader uses to see the decks
+     * stacked is well short of it, and there are still forty degrees of climb for the change
+     * to happen in, which is slow enough to watch.
+     */
+    static final double FLAT_FROM = 0.9;
 
     static double liftOf(int deck, boolean stacked) {
         if (!stacked) {
@@ -313,9 +415,9 @@ final class GlobeRenderer {
      * Nearest wins rather than first, and only within a glyph's radius, so a click on empty
      * sky selects nothing instead of the closest thing on the far side of the world.
      */
-    static int bodyAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int bodyAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         double origin = panel.pinLongitude();
-        double[] shells = shellRadii(panel);
+        double[] shells = shellRadii(panel, cam, w, h);
         // Once for the whole hit test, for the reason set out on inclinationOf.
         boolean stacked = Settings.globeStackedRings();
         int best = -1;
@@ -323,9 +425,9 @@ final class GlobeRenderer {
 
         // Outermost first only matters for ties; nearest-wins settles the rest.
         for (int ring = 0; ring < 3; ring++) {
-            double[] lon = ring == 0 ? panel.natalRing.lon : (ring == 1 ? panel.outerRing.lon : panel.skyRing.lon);
-            boolean[] valid = ring == 0 ? panel.natalRing.valid
-                : (ring == 1 ? panel.outerRing.valid : panel.skyRing.valid);
+            double[] lon = ring == 0 ? panel.ringLon(0) : (ring == 1 ? panel.ringLon(1) : panel.ringLon(2));
+            boolean[] valid = ring == 0 ? panel.ringValid(0)
+                : (ring == 1 ? panel.ringValid(1) : panel.ringValid(2));
             if (ring == 1 && !panel.outerRingDrawn()) {
                 continue;
             }
@@ -340,7 +442,7 @@ final class GlobeRenderer {
                 int deck = panel.ringDeck(ring);
                 double[] p = Globe.onShell(lon[i], origin, shells[ring],
                     liftFor(deck, stacked, cam) + level[i] * Globe.STACK_STEP,
-                    inclinationOf(deck, stacked));
+                    inclinationFor(deck, stacked, cam));
                 Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
                 if (!q.visible) {
                     continue;
@@ -376,7 +478,7 @@ final class GlobeRenderer {
      * one bright circle says that better than sixty faint lines, especially now the three
      * planes are tilted apart and the crossing points are the thing to see.
      */
-    private void ringCircle(double radius, Color ink, double inclination) {
+    private void ringCircle(double radius, Ink ink, double inclination) {
         polyline(Globe.equator(this.origin, radius, 96, inclination), ink, 1.4f);
     }
 
@@ -442,7 +544,7 @@ final class GlobeRenderer {
      * in the sphere; separate quads cannot express it, and they depth-sort individually so the
      * near wall paints over the far one.
      */
-    private void ribbon(double radius, Color fill, double inclination, double lift,
+    private void ribbon(double radius, Ink fill, double inclination, double lift,
                         boolean turning) {
         final int steps = 96;
         // <b>Rims only while the hand is moving.</b> Three bands are two hundred and
@@ -511,7 +613,7 @@ final class GlobeRenderer {
         };
     }
 
-    private void glowingRim(double[][] path, Color fill, boolean turning) {
+    private void glowingRim(double[][] path, Ink fill, boolean turning) {
         int base = fill.getAlpha();
         float[][] passes = rimPasses();
         // <b>The halo goes while the hand moves, the core never does.</b> Three passes on two
@@ -555,7 +657,7 @@ final class GlobeRenderer {
      * chart. So this is what both callers ask now, and {@code chartInk} below is what it
      * answers with.
      */
-    static Color deckInk(int deck) {
+    static Ink deckInk(int deck) {
         if (deck == SkymapPanel.DECK_LOWER) {
             return chartInk(1);                     // Chart B, blue
         }
@@ -565,14 +667,14 @@ final class GlobeRenderer {
         return chartInk(0);                         // Chart A, gold
     }
 
-    static Color chartInk(int ring) {
+    static Ink chartInk(int ring) {
         if (ring == 1) {
-            return new Color(120, 170, 225);        // Chart B, blue
+            return new Ink(120, 170, 225);        // Chart B, blue
         }
         if (ring == 2) {
-            return new Color(198, 206, 216);        // the sky, silver
+            return new Ink(198, 206, 216);        // the sky, silver
         }
-        return new Color(226, 196, 96);             // Chart A, gold
+        return new Ink(226, 196, 96);             // Chart A, gold
     }
 
     /**
@@ -585,20 +687,20 @@ final class GlobeRenderer {
     private void zodiacBand() {
         for (int sign = 0; sign < 12; sign++) {
             double from = sign * 30.0;
-            Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
+            Ink ink = panel.elementInk(Zodiac.elementIndex(sign));
 
             double[][] arc = new double[25][];
             for (int i = 0; i <= 24; i++) {
                 arc[i] = Globe.onShell(from + (30.0 * i) / 24, this.origin,
                     Globe.SHELL_SIGN_OUTER, 0.0);
             }
-            polyline(arc, faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 190),
+            polyline(arc, faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 190),
                 SkymapPanel.Layer.SIGNS), 2.4f);
 
             // The division at the sign's start, drawn across the band's depth.
             double[] a = Globe.onShell(from, this.origin, Globe.SHELL_SIGN_INNER, 0.0);
             double[] b = Globe.onShell(from, this.origin, Globe.SHELL_SIGN_OUTER, 0.0);
-            segment(a, b, new Color(150, 150, 150, 140), 1.0f);
+            segment(a, b, new Ink(150, 150, 150, 140), 1.0f);
 
             double[] mid = Globe.onShell(from + 15.0, this.origin,
                 (Globe.SHELL_SIGN_INNER + Globe.SHELL_SIGN_OUTER) / 2, 0.0);
@@ -608,7 +710,7 @@ final class GlobeRenderer {
         for (int d = 0; d < 360; d += 10) {
             double[] a = Globe.onShell(d, this.origin, Globe.SHELL_TICK, 0.0);
             double[] b = Globe.onShell(d, this.origin, Globe.SHELL_TICK - 0.06, 0.0);
-            segment(a, b, new Color(140, 148, 160, 130), d % 30 == 0 ? 1.4f : 0.6f);
+            segment(a, b, new Ink(140, 148, 160, 130), d % 30 == 0 ? 1.4f : 0.6f);
         }
     }
 
@@ -631,7 +733,7 @@ final class GlobeRenderer {
      * translucent and half of it overlaps, so a brighter patch reads as one more overlap. A
      * wedge that reaches past the ring it belongs to is unambiguous from any angle.
      */
-    private void focusWedges(SkymapPanel panel) {
+    private void focusWedges(GlobeSource panel) {
         int body = panel.focusedBody();
         if (body < 0) {
             return;
@@ -641,7 +743,7 @@ final class GlobeRenderer {
             return;
         }
         int sign = ((int) Math.floor(lon / 30.0) % 12 + 12) % 12;
-        Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
+        Ink ink = panel.elementInk(Zodiac.elementIndex(sign));
 
         // <b>The sphere wedge is the thing that lights.</b> This lit only the flat sector for
         // a while, which made the twelve wedges over the sphere decoration - they were the
@@ -650,17 +752,17 @@ final class GlobeRenderer {
         // forward rather than as a patch of colour changing.
         if (this.shown(SkymapPanel.Layer.SIGNS)) {
             wedgeOnSphere(sign * 30.0, sign * 30.0 + 30.0, Globe.SHELL_SIGN_INNER + 0.09,
-                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 74),
+                faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 74),
                     SkymapPanel.Layer.SIGNS));
             // And its segment of the flat ring, so the answer is legible from edge-on too -
             // seen along the plane the sphere wedge is a sliver and the ring is not.
             quadRing(sign * 30.0, sign * 30.0 + 30.0,
                 Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER + 0.07,
-                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 150),
+                faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 150),
                     SkymapPanel.Layer.SIGNS));
         }
 
-        double[] cusps = panel.activeCusps;
+        double[] cusps = panel.activeCusps();
         if (cusps == null || cusps.length < 13) {
             return;
         }
@@ -675,7 +777,7 @@ final class GlobeRenderer {
             // a house wedge standing up out of it would be claiming a shape nothing else in
             // the view gives them.
             wedge(from, from + span, 0.10, Globe.SHELL_HOUSE + 0.06,
-                faded(new Color(236, 224, 188, 70), SkymapPanel.Layer.HOUSES));
+                faded(new Ink(236, 224, 188, 70), SkymapPanel.Layer.HOUSES));
         }
     }
 
@@ -689,7 +791,7 @@ final class GlobeRenderer {
      * Tessellated along the arc rather than drawn as one polygon, because the outer edge is a
      * curve and a single quadrilateral would cut the corner off it.
      */
-    private void wedge(double lon0, double lon1, double r0, double r1, Color fill) {
+    private void wedge(double lon0, double lon1, double r0, double r1, Ink fill) {
         int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 6.0));
         for (int i = 0; i < steps; i++) {
             double la = lon0 + ((lon1 - lon0) * i) / steps;
@@ -717,7 +819,7 @@ final class GlobeRenderer {
      */
     private void signPlane() {
         for (int sign = 0; sign < 12; sign++) {
-            Color ink = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
+            Ink ink = panel.elementInk(Zodiac.elementIndex(sign));
             double from = sign * 30.0;
 
             // <b>The zodiac is a belt, so it keeps the belt and gives up the sphere.</b> Twelve
@@ -739,7 +841,7 @@ final class GlobeRenderer {
             // the band to the centre, which washed the whole chart in sign colour and left
             // the aspect network to be read through it.
             quadRing(from, from + 30.0, Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER,
-                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 96),
+                faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 96),
                     SkymapPanel.Layer.SIGNS));
         }
     }
@@ -783,9 +885,9 @@ final class GlobeRenderer {
             // than either one's weight, so the pair is kept close and both are kept low.
             boolean angular = i == 1 || i == 4 || i == 7 || i == 10;
             int alpha = angular ? 24 : (i % 2 == 1 ? 16 : 7);
-            Color ink = angular ? new Color(226, 214, 184) : new Color(150, 152, 164);
+            Ink ink = angular ? new Ink(226, 214, 184) : new Ink(150, 152, 164);
             wedgeOnSphere(from, from + span, Globe.SHELL_HOUSE,
-                faded(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), alpha),
+                faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), alpha),
                     SkymapPanel.Layer.HOUSES));
         }
     }
@@ -803,7 +905,7 @@ final class GlobeRenderer {
      * twenty-six degrees of arc each, which the eye reads as flats. The cells are cheap; the
      * shading was the missing thing, but the two together are what finish it.
      */
-    private void wedgeOnSphere(double lon0, double lon1, double radius, Color fill) {
+    private void wedgeOnSphere(double lon0, double lon1, double radius, Ink fill) {
         // <b>Bands with curved edges, not a grid of flats.</b> A wedge was a mesh of
         // quadrilaterals, and a quadrilateral has straight sides - so every cell boundary was
         // a chord across an arc and the sphere came out faceted however many cells it was cut
@@ -828,7 +930,7 @@ final class GlobeRenderer {
      * arcs they are meant to be. Shaded by the band's own facing, which is smooth enough at
      * five degrees a band that the reader sees a gradient rather than steps.
      */
-    private void bandPath(double lonA, double lonB, double radius, Color fill) {
+    private void bandPath(double lonA, double lonB, double radius, Ink fill) {
         final int steps = 36;
         double[] ax = new double[steps + 1];
         double[] ay = new double[steps + 1];
@@ -876,7 +978,7 @@ final class GlobeRenderer {
      */
     private void fillRun(double[] ax, double[] ay, double[] ad,
             double[] bx, double[] by, double[] bd,
-            int from, int to, double radius, Color fill) {
+            int from, int to, double radius, Ink fill) {
         int span = (to - from + 1) * 2;
         int[] xs = new int[span];
         int[] ys = new int[span];
@@ -897,11 +999,11 @@ final class GlobeRenderer {
         double sits = depth / n;
         double away = (sits - this.cam.distance) / Math.max(1e-6, radius);
         double facing = Math.max(0.0, Math.min(1.0, 0.5 - 0.5 * away));
-        final Color ink = new Color(fill.getRed(), fill.getGreen(), fill.getBlue(),
+        final Ink ink = new Ink(fill.getRed(), fill.getGreen(), fill.getBlue(),
             (int) Math.round(fill.getAlpha() * (0.30 + 0.70 * facing)));
         final int count = n;
         this.pieces.add(new Piece(sits, () -> {
-            this.g.setColor(ink);
+            this.g.color(ink);
             this.g.fillPolygon(xs, ys, count);
         }));
     }
@@ -917,7 +1019,7 @@ final class GlobeRenderer {
      *
      * Never to nothing - the far side is meant to be seen through, not erased.
      */
-    private Color shadeByFacing(Color fill, double[] a, double[] b, double[] c, double[] d,
+    private Ink shadeByFacing(Ink fill, double[] a, double[] b, double[] c, double[] d,
                                 double radius) {
         double depth = 0;
         int seen = 0;
@@ -934,12 +1036,12 @@ final class GlobeRenderer {
         double away = ((depth / seen) - this.cam.distance) / Math.max(1e-6, radius);
         double facing = Math.max(0.0, Math.min(1.0, 0.5 - 0.5 * away));
         double lift = 0.30 + 0.70 * facing;
-        return new Color(fill.getRed(), fill.getGreen(), fill.getBlue(),
+        return new Ink(fill.getRed(), fill.getGreen(), fill.getBlue(),
             (int) Math.round(fill.getAlpha() * lift));
     }
 
     /** One segment of a flat ring in the ecliptic plane. */
-    private void quadRing(double lon0, double lon1, double r0, double r1, Color fill) {
+    private void quadRing(double lon0, double lon1, double r0, double r1, Ink fill) {
         int steps = Math.max(3, (int) Math.ceil(Math.abs(lon1 - lon0) / 6.0));
         for (int i = 0; i < steps; i++) {
             double la = lon0 + ((lon1 - lon0) * i) / steps;
@@ -996,8 +1098,8 @@ final class GlobeRenderer {
      * and degree hit tests keep: a label the reader can see and cannot point at is worse than
      * no label, because they will try.
      */
-    static int houseNumberAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
-        double[] cusps = panel.activeCusps;
+    static int houseNumberAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
+        double[] cusps = panel.activeCusps();
         if (cusps == null || cusps.length < 13
             || !panel.layerShown(SkymapPanel.Layer.HOUSES)) {
             return -1;
@@ -1030,7 +1132,7 @@ final class GlobeRenderer {
         int lit = this.panel.focusedHouse();
         for (int i = 1; i <= 12; i++) {
             boolean here = i == lit;
-            Color ink = faded(here ? new Color(255, 238, 170) : new Color(206, 208, 216),
+            Ink ink = faded(here ? new Ink(255, 238, 170) : new Ink(206, 208, 216),
                 SkymapPanel.Layer.HOUSES);
             billboard(houseLabelAt(cusps, i, this.origin, true), String.valueOf(i),
                 ink, here ? 15 : 12);
@@ -1047,9 +1149,9 @@ final class GlobeRenderer {
         if (lit >= 1 && lit <= 12 && Settings.globeHouseFill()) {
             double span = arc(cusps[lit], cusps[lit == 12 ? 1 : lit + 1]);
             wedgeOnSphere(cusps[lit], cusps[lit] + span, Globe.SHELL_SIGN_INNER + 0.11,
-                faded(new Color(236, 224, 188, 66), SkymapPanel.Layer.HOUSES));
+                faded(new Ink(236, 224, 188, 66), SkymapPanel.Layer.HOUSES));
             wedge(cusps[lit], cusps[lit] + span, 0.10, Globe.SHELL_HOUSE + 0.06,
-                faded(new Color(236, 224, 188, 74), SkymapPanel.Layer.HOUSES));
+                faded(new Ink(236, 224, 188, 74), SkymapPanel.Layer.HOUSES));
         }
     }
 
@@ -1074,7 +1176,7 @@ final class GlobeRenderer {
      * candidate degrees and taking the nearest. Cheap, and it cannot disagree with the drawing
      * the way an independently derived angle would.
      */
-    static int degreeAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int degreeAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.DEGREES)) {
             return -1;
         }
@@ -1120,7 +1222,7 @@ final class GlobeRenderer {
      * the decan glyphs, and a tick is always within reach, so a decan tested after them could
      * never be clicked. The radius is tight for the same reason.
      */
-    static int decanAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int decanAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.DECANS)) {
             return -1;
         }
@@ -1138,7 +1240,7 @@ final class GlobeRenderer {
      * nearest of samples every two degrees along three radii across the band, within a margin.
      * One sampler for every band, so they are hit the same way.
      */
-    static int bandAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py,
+    static int bandAt(Globe cam, int w, int h, GlobeSource panel, int px, int py,
                       double inner, double outer, double margin) {
         double origin = panel.pinLongitude();
         double[] radii = {inner, (inner + outer) / 2.0, outer};
@@ -1162,7 +1264,7 @@ final class GlobeRenderer {
     }
 
     /** The bound under a point: its longitude in whole degrees, or -1. The bounds band's width. */
-    static int boundAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int boundAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.BOUNDS)) {
             return -1;
         }
@@ -1178,8 +1280,8 @@ final class GlobeRenderer {
      * whole space. Bodies are tested before this by the caller, so a glyph standing in a house
      * still opens the body.
      */
-    static int houseAreaAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
-        double[] cusps = panel.activeCusps;
+    static int houseAreaAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
+        double[] cusps = panel.activeCusps();
         if (cusps == null || cusps.length < 13 || !panel.layerShown(SkymapPanel.Layer.HOUSES)) {
             return -1;
         }
@@ -1212,7 +1314,7 @@ final class GlobeRenderer {
      * The sign under a point, 0 to 11, or -1: anywhere on the sign band, sampled across its
      * width and along every two degrees, the way {@link #mansionAt} samples its band.
      */
-    static int signAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int signAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.SIGNS)) {
             return -1;
         }
@@ -1239,7 +1341,7 @@ final class GlobeRenderer {
         return best;
     }
 
-    static int mansionAt(Globe cam, int w, int h, SkymapPanel panel, int px, int py) {
+    static int mansionAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         if (!panel.layerShown(SkymapPanel.Layer.MANSIONS)) {
             return -1;
         }
@@ -1293,8 +1395,7 @@ final class GlobeRenderer {
         // alpha rather than scaling it, so a base faded up front would have its bloom thrown
         // away by the very next call - the ring would snap in and out instead of blooming
         // with its chip the way every ring beside it does.
-        Color base = ChartPalette.colorOr(ChartPalette.mansionHex(null),
-            new Color(181, 160, 227));
+        Ink base = this.panel.mansionInk();
         LunarMansions.Mansion moon = this.panel.moonMansion();
         int lit = this.panel.focusedMansion();
 
@@ -1333,14 +1434,14 @@ final class GlobeRenderer {
             // belongs to neither side and a number on one reads as labelling both.
             billboard(Globe.onShell(m.start + LunarMansions.WIDTH / 2.0, this.origin, mid, 0.0),
                 String.valueOf(i),
-                here ? wash(new Color(255, 255, 255), 245)
+                here ? wash(new Ink(255, 255, 255), 245)
                     : (moonHere ? wash(base, 245) : wash(base, 185)),
                 here ? 11 : 9);
         }
     }
 
     /** One of the mansion band's inks, at the alpha it wants and the bloom it is at. */
-    private Color wash(Color c, int alpha) {
+    private Ink wash(Ink c, int alpha) {
         return faded(shade(c, alpha), SkymapPanel.Layer.MANSIONS);
     }
 
@@ -1360,9 +1461,9 @@ final class GlobeRenderer {
             // it has to be longer than its neighbours to be the one the reader is pointing at.
             double depth = here ? Globe.TICK_HOVER_REACH
                 : (sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.05)));
-            Color ink = here ? new Color(255, 238, 170, 245)
-                : (sign ? new Color(214, 218, 226, 225)
-                    : (ten ? new Color(172, 178, 190, 195) : new Color(138, 144, 156, 150)));
+            Ink ink = here ? new Ink(255, 238, 170, 245)
+                : (sign ? new Ink(214, 218, 226, 225)
+                    : (ten ? new Ink(172, 178, 190, 195) : new Ink(138, 144, 156, 150)));
             segment(Globe.onShell(d, this.origin, inner, 0.0),
                 Globe.onShell(d, this.origin, inner + depth, 0.0),
                 faded(ink, SkymapPanel.Layer.DEGREES),
@@ -1378,17 +1479,17 @@ final class GlobeRenderer {
         // so a degree that lights only the disc is pointing at half of itself.
         if (lit >= 0 && Settings.globeDegreeFill()) {
             wedgeOnSphere(lit, lit + 1.0, Globe.SHELL_SIGN_INNER + 0.09,
-                faded(new Color(255, 238, 170, 96), SkymapPanel.Layer.DEGREES));
+                faded(new Ink(255, 238, 170, 96), SkymapPanel.Layer.DEGREES));
             quadRing(lit, lit + 1.0, 0.10, inner + Globe.TICK_HOVER_REACH,
-                faded(new Color(255, 238, 170, 70), SkymapPanel.Layer.DEGREES));
+                faded(new Ink(255, 238, 170, 70), SkymapPanel.Layer.DEGREES));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
         polyline(Globe.equator(this.origin, inner, 144),
-            faded(new Color(158, 164, 176, 170), SkymapPanel.Layer.DEGREES), 1.0f);
+            faded(new Ink(158, 164, 176, 170), SkymapPanel.Layer.DEGREES), 1.0f);
     }
 
     /** One tessellation cell, filled flat. */
-    private void quad(double[] a, double[] b, double[] c, double[] d, Color fill) {
+    private void quad(double[] a, double[] b, double[] c, double[] d, Ink fill) {
         Globe.Projected pa = at(a);
         Globe.Projected pb = at(b);
         Globe.Projected pc = at(c);
@@ -1403,13 +1504,12 @@ final class GlobeRenderer {
             // neighbours in the same colour, so the only edges that could show are the ones
             // at the outside of a sector, and there the fill is faint enough that a hard edge
             // reads as a boundary rather than as a jagged one. Lines and glyphs keep it.
-            java.awt.Polygon poly = new java.awt.Polygon();
-            poly.addPoint((int) Math.round(pa.x), (int) Math.round(pa.y));
-            poly.addPoint((int) Math.round(pb.x), (int) Math.round(pb.y));
-            poly.addPoint((int) Math.round(pc.x), (int) Math.round(pc.y));
-            poly.addPoint((int) Math.round(pd.x), (int) Math.round(pd.y));
-            this.g.setColor(fill);
-            this.g.fillPolygon(poly);
+            int[] px = {(int) Math.round(pa.x), (int) Math.round(pb.x),
+                (int) Math.round(pc.x), (int) Math.round(pd.x)};
+            int[] py = {(int) Math.round(pa.y), (int) Math.round(pb.y),
+                (int) Math.round(pc.y), (int) Math.round(pd.y)};
+            this.g.color(fill);
+            this.g.fillPolygon(px, py, 4);
         }));
     }
 
@@ -1433,7 +1533,7 @@ final class GlobeRenderer {
                 }
                 billboard(Globe.onShell(mid, this.origin, Globe.SHELL_BOUND, 0.0),
                     SkymapPanel.glyphOf(bi),
-                    faded(SkymapPanel.bodyInkFor(bi), SkymapPanel.Layer.BOUNDS), 10);
+                    faded(panel.bodyInk(bi), SkymapPanel.Layer.BOUNDS), 10);
             }
         }
     }
@@ -1450,14 +1550,14 @@ final class GlobeRenderer {
                 if (bi >= 0) {
                     billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
                         SkymapPanel.glyphOf(bi),
-                        faded(SkymapPanel.bodyInkFor(bi), SkymapPanel.Layer.DECANS), 10);
+                        faded(panel.bodyInk(bi), SkymapPanel.Layer.DECANS), 10);
                     continue;
                 }
             }
             int face = Zodiac.triplicityDecanSignIndex(sign, d % 3 + 1);
             billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
                 SkymapPanel.zodiacSymbol(face),
-                faded(SkymapPanel.elementColorFor(Zodiac.elementIndex(face)),
+                faded(panel.elementInk(Zodiac.elementIndex(face)),
                     SkymapPanel.Layer.DECANS), 10);
         }
     }
@@ -1484,12 +1584,12 @@ final class GlobeRenderer {
             boolean angle = i == 1 || i == 4 || i == 7 || i == 10;
             segment(Globe.onShell(cusps[i], this.origin, 0.02, 0.0),
                 Globe.onShell(cusps[i], this.origin, Globe.SHELL_HOUSE, 0.0),
-                faded(angle ? new Color(226, 214, 184, 220) : new Color(150, 152, 164, 140),
+                faded(angle ? new Ink(226, 214, 184, 220) : new Ink(150, 152, 164, 140),
                     SkymapPanel.Layer.HOUSES), angle ? 1.8f : 1.0f);
         }
         // The rim the spokes end on, so the houses read as a ring rather than as loose lines.
         polyline(Globe.equator(this.origin, Globe.SHELL_HOUSE, 96),
-            faded(new Color(150, 152, 164, 120), SkymapPanel.Layer.HOUSES), 0.9f);
+            faded(new Ink(150, 152, 164, 120), SkymapPanel.Layer.HOUSES), 0.9f);
     }
 
     /**
@@ -1508,7 +1608,7 @@ final class GlobeRenderer {
         for (int sign = 0; sign < 12; sign++) {
             segment(Globe.onShell(sign * 30.0, this.origin, Globe.SHELL_SIGN_INNER, 0.0),
                 Globe.onShell(sign * 30.0, this.origin, Globe.SHELL_SIGN_OUTER, 0.0),
-                faded(new Color(196, 204, 216, 190), SkymapPanel.Layer.SIGNS), 1.1f);
+                faded(new Ink(196, 204, 216, 190), SkymapPanel.Layer.SIGNS), 1.1f);
         }
     }
 
@@ -1526,7 +1626,7 @@ final class GlobeRenderer {
      * - see Globe.arc - so the widest ride highest and the figure has a silhouette from the
      * side as well as a shape from above.
      */
-    private void aspectChords(SkymapPanel panel, double[] shells) {
+    private void aspectChords(GlobeSource panel, double[] shells) {
         // <b>Body to body, so every glyph is a node.</b> The chords were drawn on nested
         // circles inside the wheels, which is what the flat chart has to do - a line between
         // two glyphs on a disc crosses everything between them. A sphere does not have that
@@ -1540,11 +1640,11 @@ final class GlobeRenderer {
         int[][] chords = panel.globeChords(() -> buildChords(panel));
         double origin = this.origin;
         int[][] levels = {
-            Globe.stackLevels(panel.natalRing.lon, panel.natalRing.valid, 7.0),
-            Globe.stackLevels(panel.outerRing.lon, panel.outerRing.valid, 7.0),
-            Globe.stackLevels(panel.skyRing.lon, panel.skyRing.valid, 7.0),
+            Globe.stackLevels(panel.ringLon(0), panel.ringValid(0), 7.0),
+            Globe.stackLevels(panel.ringLon(1), panel.ringValid(1), 7.0),
+            Globe.stackLevels(panel.ringLon(2), panel.ringValid(2), 7.0),
         };
-        double[][] lons = {panel.natalRing.lon, panel.outerRing.lon, panel.skyRing.lon};
+        double[][] lons = {panel.ringLon(0), panel.ringLon(1), panel.ringLon(2)};
 
         // <b>The reader's filter, applied when drawing rather than when building.</b> It
         // decides which families are shown, not which pairs are in aspect, so it belongs here
@@ -1571,11 +1671,11 @@ final class GlobeRenderer {
             double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
                 liftFor(deck, this.stacked, this.cam)
                     + levels[ring][c[1]] * Globe.STACK_STEP,
-                inclinationOf(deck, this.stacked));
-            double[] to = Globe.onShell(panel.natalRing.lon[c[2]], origin, shells[0],
+                inclinationFor(deck, this.stacked, this.cam));
+            double[] to = Globe.onShell(panel.ringLon(0)[c[2]], origin, shells[0],
                 liftFor(innerDeck, this.stacked, this.cam)
                     + levels[0][c[2]] * Globe.STACK_STEP,
-                inclinationOf(innerDeck, this.stacked));
+                inclinationFor(innerDeck, this.stacked, this.cam));
             // <b>The hovered chord, at full strength and on its own ring.</b> The globe drew
             // every chord alike, so pointing at a cell of the grid lit the flat wheel and did
             // nothing at all here - a reader who had switched views lost the one gesture that
@@ -1583,12 +1683,12 @@ final class GlobeRenderer {
             // now uses, so the sky ring lights when the sky ring is hovered and not when the
             // partner ring is.
             boolean lit = panel.lightsChord(c[1], c[2], ring);
-            Color ink = new Color(c[3], true);
+            Ink ink = new Ink(c[3], true);
             double rise = riseFor(panel, ring, this.bowed);
             if (lit) {
-                chord(from, to, rise, faded(new Color(255, 255, 255, 110),
+                chord(from, to, rise, faded(new Ink(255, 255, 255, 110),
                     SkymapPanel.Layer.ASPECTS), 4.0f, false);
-                ink = new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 255);
+                ink = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 255);
             }
             chord(from, to, rise, faded(ink, SkymapPanel.Layer.ASPECTS), lit ? 2.4f : 1.0f,
                 !lit);
@@ -1601,10 +1701,10 @@ final class GlobeRenderer {
      * Every ring back to the natal wheel. Within one chart a pair is counted once; across two
      * charts the pairing is directional, so every body meets every body.
      */
-    private static int[][] buildChords(SkymapPanel panel) {
+    private static int[][] buildChords(GlobeSource panel) {
         java.util.List<int[]> out = new java.util.ArrayList<>();
-        double[][] lons = {panel.natalRing.lon, panel.outerRing.lon, panel.skyRing.lon};
-        boolean[][] valids = {panel.natalRing.valid, panel.outerRing.valid, panel.skyRing.valid};
+        double[][] lons = {panel.ringLon(0), panel.ringLon(1), panel.ringLon(2)};
+        boolean[][] valids = {panel.ringValid(0), panel.ringValid(1), panel.ringValid(2)};
         for (int ring = 0; ring < 3; ring++) {
             boolean cross = ring > 0;
             for (int a = 0; a < SkymapPanel.BODY_COUNT && a < lons[ring].length; a++) {
@@ -1612,7 +1712,7 @@ final class GlobeRenderer {
                     continue;
                 }
                 for (int b = cross ? 0 : a + 1; b < SkymapPanel.BODY_COUNT; b++) {
-                    if (!SkymapPanel.aspecting(b, panel.natalRing.valid)) {
+                    if (!SkymapPanel.aspecting(b, panel.ringValid(0))) {
                         continue;
                     }
                     if (!cross && Bodies.isOppositePair(a, b)) {
@@ -1622,7 +1722,7 @@ final class GlobeRenderer {
                     // is judged at natal orbs, the same as the flat wheel and the grid judge
                     // it. Passing "cross" for both halved the sky ring's orbs in a synastry
                     // chart and dropped chords the flat view was drawing.
-                    Color ink = panel.aspectInkFor(lons[ring][a], panel.natalRing.lon[b], a, b,
+                    Ink ink = panel.globeAspectInk(lons[ring][a], panel.ringLon(0)[b], a, b,
                         ring == SkymapPanel.WHEEL_OUTER);
                     if (ink != null) {
                         out.add(new int[] {ring, a, b, ink.getRGB()});
@@ -1635,7 +1735,7 @@ final class GlobeRenderer {
 
     /** One ring of bodies on its shell, stacked up the shell where longitudes crowd. */
     private void bodies(double[] lon, boolean[] valid, double radius,
-                        SkymapPanel.AngleRole role, SkymapPanel panel, boolean outer,
+                        SkymapPanel.AngleRole role, GlobeSource panel, boolean outer,
                         int ring) {
         int[] level = Globe.stackLevels(lon, valid, 7.0);
         for (int i = 0; i < SkymapPanel.BODY_COUNT && i < lon.length; i++) {
@@ -1646,7 +1746,7 @@ final class GlobeRenderer {
             double y = liftFor(deck, this.stacked, this.cam)
                 + level[i] * Globe.STACK_STEP;
             double[] p = Globe.onShell(lon[i], this.origin, radius, y,
-                inclinationOf(deck, this.stacked));
+                inclinationFor(deck, this.stacked, this.cam));
             Globe.Projected q = at(p);
             if (!q.visible) {
                 continue;
@@ -1663,24 +1763,23 @@ final class GlobeRenderer {
             // sort puts it behind the glyph rather than over it.
             if (Settings.showDegreeLines()) {
                 Globe.Projected mark = at(Globe.onShell(lon[i], this.origin,
-                    Globe.SHELL_SIGN_INNER, 0.0, inclinationOf(deck, this.stacked)));
+                    Globe.SHELL_SIGN_INNER, 0.0, inclinationFor(deck, this.stacked, this.cam)));
                 if (mark.visible) {
                     boolean leaderLit = panel.onGlobeFocus(i, outer);
-                    Color leaderInk = ChartPalette.colorOr(ChartPalette.leaderHex(null),
-                        Color.WHITE);
+                    Ink leaderInk = panel.leaderInk();
                     double leaderFar = q.depth > this.cam.distance ? 0.55 : 1.0;
                     int leaderAlpha = (int) Math.round((leaderLit ? 235 : 60) * leaderFar);
                     this.pieces.add(new Piece(q.depth + 0.01, () -> {
-                        this.g.setStroke(stroke(leaderLit ? 1.8f : 1.0f));
-                        this.g.setColor(new Color(leaderInk.getRed(), leaderInk.getGreen(),
+                        this.g.stroke(leaderLit ? 1.8f : 1.0f);
+                        this.g.color(new Ink(leaderInk.getRed(), leaderInk.getGreen(),
                             leaderInk.getBlue(), leaderAlpha));
                         this.g.drawLine((int) q.x, (int) q.y, (int) mark.x, (int) mark.y);
                     }));
                 }
             }
             boolean lit = panel.onGlobeFocus(i, outer);
-            Color ink = panel.ringInk(i, role);
-            Color bead = SkymapPanel.ringBead(role);
+            Ink ink = panel.globeRingInk(i, role);
+            Ink bead = panel.beadInk(role);
             String glyph = SkymapPanel.glyphOf(i);
             // Bodies on the far side of their own shell are dimmed rather than hidden: a
             // reader turning the globe should see what is coming round, not have it appear.
@@ -1699,9 +1798,9 @@ final class GlobeRenderer {
                 && (!outer || Settings.globePlanetsAllRings());
             // By deck, so a body is circled in the ink of the ribbon it is standing on -
             // see deckInk for the two vocabularies that came apart here.
-            final Color chartRim = shade(deckInk(panel.ringDeck(ring)), alpha);
+            final Ink chartRim = shade(deckInk(panel.ringDeck(ring)), alpha);
             final int bodyIndex = i;
-            final int half = this.g.getFontMetrics(font(13)).stringWidth(glyph) / 2;
+            final int half = this.g.textWidth(glyph, 13) / 2;
             this.pieces.add(new Piece(q.depth, () -> {
                 int rad = lit ? 11 : 9;
                 if (asPlanet) {
@@ -1710,8 +1809,8 @@ final class GlobeRenderer {
                     // and needs no telling apart, and a circle round every body on a full
                     // three-ring globe is the clutter this drawing is trying to avoid.
                     if (outer) {
-                        this.g.setStroke(stroke(lit ? 2.0f : 1.4f));
-                        this.g.setColor(lit ? shade(new Color(255, 238, 170), alpha) : chartRim);
+                        this.g.stroke(lit ? 2.0f : 1.4f);
+                        this.g.color(lit ? shade(new Ink(255, 238, 170), alpha) : chartRim);
                         this.g.drawOval((int) q.x - rad - 2, (int) q.y - rad - 2,
                             (rad + 2) * 2, (rad + 2) * 2);
                     }
@@ -1719,18 +1818,18 @@ final class GlobeRenderer {
                     // recognisable and not readable - two grey worlds are two grey worlds -
                     // and the glyph is how this chart has always named a body. Set off to
                     // the right so it labels the planet rather than sitting on it.
-                    this.g.setFont(font(12));
-                    this.g.setColor(shade(ink, (int) (alpha * 0.92)));
+                    this.g.font(12);
+                    this.g.color(shade(ink, (int) (alpha * 0.92)));
                     this.g.drawString(glyph, (int) q.x + rad + 3, (int) q.y + 4);
                     return;
                 }
-                this.g.setColor(shade(bead, alpha));
+                this.g.color(shade(bead, alpha));
                 this.g.fillOval((int) q.x - rad, (int) q.y - rad, rad * 2, rad * 2);
-                this.g.setStroke(stroke(lit ? 2.0f : 1.0f));
-                this.g.setColor(shade(lit ? new Color(255, 238, 170) : ink, alpha));
+                this.g.stroke(lit ? 2.0f : 1.0f);
+                this.g.color(shade(lit ? new Ink(255, 238, 170) : ink, alpha));
                 this.g.drawOval((int) q.x - rad, (int) q.y - rad, rad * 2, rad * 2);
-                this.g.setFont(font(13));
-                this.g.setColor(shade(ink, alpha));
+                this.g.font(13);
+                this.g.color(shade(ink, alpha));
                 this.g.drawString(glyph, (int) q.x - half, (int) q.y + 5);
             }));
         }
@@ -1789,28 +1888,28 @@ final class GlobeRenderer {
     }
 
     /** The face colour of a body, warm to cold. */
-    private static Color faceColour(int body) {
+    private static Ink faceColour(int body) {
         switch (Bodies.at(body).name) {
             case "Sun":
-                return new Color(255, 196, 84);
+                return new Ink(255, 196, 84);
             case "Mercury":
-                return new Color(178, 172, 160);
+                return new Ink(178, 172, 160);
             case "Venus":
-                return new Color(226, 200, 148);
+                return new Ink(226, 200, 148);
             case "Mars":
-                return new Color(198, 96, 66);
+                return new Ink(198, 96, 66);
             case "Jupiter":
-                return new Color(206, 176, 138);
+                return new Ink(206, 176, 138);
             case "Saturn":
-                return new Color(214, 194, 146);
+                return new Ink(214, 194, 146);
             case "Uranus":
-                return new Color(150, 206, 208);
+                return new Ink(150, 206, 208);
             case "Neptune":
-                return new Color(104, 138, 214);
+                return new Ink(104, 138, 214);
             case "Pluto":
-                return new Color(164, 146, 132);
+                return new Ink(164, 146, 132);
             default:
-                return new Color(190, 190, 196);
+                return new Ink(190, 190, 196);
         }
     }
 
@@ -1844,7 +1943,7 @@ final class GlobeRenderer {
 
     private void drawPlanet(int body, int x, int y, int rad, int alpha, boolean lit) {
         int face = PLANET_FACE[body];
-        Color base = faceColour(body);
+        Ink base = faceColour(body);
         int d = rad * 2;
 
         if (face == FACE_SUN) {
@@ -1855,21 +1954,18 @@ final class GlobeRenderer {
             // one fact about it nobody has to be taught.
             for (int i = 5; i >= 1; i--) {
                 int glow = rad + i * 5;
-                this.g.setColor(new Color(255, 186, 82,
+                this.g.color(new Ink(255, 186, 82,
                     Math.max(0, Math.min(255, (int) (alpha * 0.16 / i)))));
                 this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
             }
-            this.g.setPaint(new java.awt.RadialGradientPaint(
-                new java.awt.geom.Point2D.Float(x - rad * 0.22f, y - rad * 0.22f),
+            this.g.fillOvalRadial(x - rad, y - rad, d, d, x - rad * 0.22f, y - rad * 0.22f,
                 Math.max(1f, rad * 1.5f), new float[] {0f, 0.35f, 0.75f, 1f},
-                new Color[] {shade(new Color(255, 255, 246), alpha),
-                    shade(new Color(255, 232, 158), alpha),
-                    shade(new Color(255, 168, 56), alpha),
-                    shade(new Color(214, 96, 28), alpha)}));
-            this.g.fillOval(x - rad, y - rad, d, d);
-            this.g.setPaint(null);
-            this.g.setColor(shade(new Color(255, 214, 130), alpha));
-            this.g.setStroke(stroke(lit ? 2.0f : 1.0f));
+                new Ink[] {shade(new Ink(255, 255, 246), alpha),
+                    shade(new Ink(255, 232, 158), alpha),
+                    shade(new Ink(255, 168, 56), alpha),
+                    shade(new Ink(214, 96, 28), alpha)});
+            this.g.color(shade(new Ink(255, 214, 130), alpha));
+            this.g.stroke(lit ? 2.0f : 1.0f);
             this.g.drawOval(x - rad, y - rad, d, d);
             return;
         }
@@ -1879,8 +1975,8 @@ final class GlobeRenderer {
         if (face == FACE_RINGED) {
             // Behind the planet, then the planet, then in front - which is the whole reason
             // Saturn reads as Saturn rather than as a disc with a line through it.
-            this.g.setColor(shade(new Color(206, 186, 142), (int) (alpha * 0.72)));
-            this.g.setStroke(stroke(1.4f));
+            this.g.color(shade(new Ink(206, 186, 142), (int) (alpha * 0.72)));
+            this.g.stroke(1.4f);
             this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 0, 180);
         }
 
@@ -1893,55 +1989,51 @@ final class GlobeRenderer {
         if (!this.turning) {
             for (float[] pass : bodyHaloPasses()) {
                 int glow = rad + Math.round(pass[0]);
-                this.g.setColor(shade(lighten(base, 0.35),
+                this.g.color(shade(lighten(base, 0.35),
                     (int) Math.round(alpha * pass[1])));
                 this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
             }
         }
 
-        this.g.setPaint(new java.awt.RadialGradientPaint(
-            new java.awt.geom.Point2D.Float(x - rad * 0.35f, y - rad * 0.35f),
+        this.g.fillOvalRadial(x - rad, y - rad, d, d, x - rad * 0.35f, y - rad * 0.35f,
             Math.max(1f, rad * 1.5f), new float[] {0f, 1f},
-            new Color[] {shade(lighten(base, 0.45), alpha), shade(darken(base, 0.5), alpha)}));
-        this.g.fillOval(x - rad, y - rad, d, d);
-        this.g.setPaint(null);
+            new Ink[] {shade(lighten(base, 0.45), alpha), shade(darken(base, 0.5), alpha)});
 
         if (face == FACE_BANDED) {
             // Jupiter's belts, clipped to the disc so they end where it does.
-            java.awt.Shape was = this.g.getClip();
-            this.g.setClip(new java.awt.geom.Ellipse2D.Float(x - rad, y - rad, d, d));
-            this.g.setStroke(stroke(1.0f));
+            this.g.clipOval(x - rad, y - rad, d, d);
+            this.g.stroke(1.0f);
             for (int i = -2; i <= 2; i++) {
                 if (i == 0) {
                     continue;
                 }
                 int by = y + (int) Math.round(i * rad * 0.34);
-                this.g.setColor(shade(i % 2 == 0 ? darken(base, 0.72) : lighten(base, 0.25),
+                this.g.color(shade(i % 2 == 0 ? darken(base, 0.72) : lighten(base, 0.25),
                     (int) (alpha * 0.85)));
                 this.g.drawLine(x - rad, by, x + rad, by);
             }
-            this.g.setClip(was);
+            this.g.unclip();
         }
 
         if (face == FACE_RINGED) {
-            this.g.setColor(shade(new Color(232, 214, 170), alpha));
-            this.g.setStroke(stroke(1.6f));
+            this.g.color(shade(new Ink(232, 214, 170), alpha));
+            this.g.stroke(1.6f);
             this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 180, 180);
         }
 
-        this.g.setColor(shade(lit ? new Color(255, 238, 170) : darken(base, 0.5), alpha));
-        this.g.setStroke(stroke(lit ? 2.0f : 0.8f));
+        this.g.color(shade(lit ? new Ink(255, 238, 170) : darken(base, 0.5), alpha));
+        this.g.stroke(lit ? 2.0f : 0.8f);
         this.g.drawOval(x - rad, y - rad, d, d);
     }
 
-    private static Color lighten(Color c, double t) {
-        return new Color((int) (c.getRed() + (255 - c.getRed()) * t),
+    private static Ink lighten(Ink c, double t) {
+        return new Ink((int) (c.getRed() + (255 - c.getRed()) * t),
             (int) (c.getGreen() + (255 - c.getGreen()) * t),
             (int) (c.getBlue() + (255 - c.getBlue()) * t));
     }
 
-    private static Color darken(Color c, double t) {
-        return new Color((int) (c.getRed() * t), (int) (c.getGreen() * t),
+    private static Ink darken(Ink c, double t) {
+        return new Ink((int) (c.getRed() * t), (int) (c.getGreen() * t),
             (int) (c.getBlue() * t));
     }
 
@@ -1961,7 +2053,7 @@ final class GlobeRenderer {
      * depth, and the half that is behind would sort as though it were in front. Twelve points
      * a chunk is short enough that a chunk is entirely near or entirely far.
      */
-    private void polyline(double[][] pts, Color ink, float width) {
+    private void polyline(double[][] pts, Ink ink, float width) {
         final int chunk = 12;
         for (int start = 0; start + 1 < pts.length; start += chunk) {
             int end = Math.min(pts.length - 1, start + chunk);
@@ -1985,37 +2077,11 @@ final class GlobeRenderer {
             }
             final int count = kept;
             this.pieces.add(new Piece(depth / kept, () -> {
-                this.g.setStroke(stroke(width));
-                this.g.setColor(ink);
+                this.g.stroke(width);
+                this.g.color(ink);
                 this.g.drawPolyline(xs, ys, count);
             }));
         }
-    }
-
-    /**
-     * Strokes, cached by width.
-     *
-     * A new BasicStroke per segment was allocating thousands of identical objects a frame.
-     * There are four widths in this scene.
-     */
-    private static final java.util.Map<Float, Stroke> STROKES =
-        new java.util.concurrent.ConcurrentHashMap<>();
-
-    private static Stroke stroke(float width) {
-        return STROKES.computeIfAbsent(width, BasicStroke::new);
-    }
-
-    /**
-     * Fonts, cached by point size, for the same reason as the strokes.
-     *
-     * A frame writes about two hundred glyphs - bodies, bounds, decans, signs - and each one
-     * was allocating a Font and asking for fresh FontMetrics. There are three sizes.
-     */
-    private static final java.util.Map<Integer, Font> FONTS =
-        new java.util.concurrent.ConcurrentHashMap<>();
-
-    private static Font font(int points) {
-        return FONTS.computeIfAbsent(points, p -> new Font("SansSerif", 0, p));
     }
 
     /**
@@ -2102,7 +2168,7 @@ final class GlobeRenderer {
      * @param bowed false when the reader has switched arcs off, which is the chord either way
      * @return +1 up, -1 down, 0 when arcs are off
      */
-    static double riseFor(SkymapPanel panel, int ring, boolean bowed) {
+    static double riseFor(GlobeSource panel, int ring, boolean bowed) {
         if (!bowed) {
             return 0.0;
         }
@@ -2180,7 +2246,7 @@ final class GlobeRenderer {
         return Math.signum(rise) * Globe.riseToShell(a, b, target);
     }
 
-    private void chord(double[] a, double[] b, double rise, Color ink, float width,
+    private void chord(double[] a, double[] b, double rise, Ink ink, float width,
                        boolean dim) {
         Globe.Projected pa = at(a);
         Globe.Projected pb = at(b);
@@ -2254,8 +2320,8 @@ final class GlobeRenderer {
             }
             final double mean = sum / p.length;
             this.pieces.add(new Piece(mean, () -> {
-                this.g.setStroke(stroke(width));
-                this.g.setColor(ink);
+                this.g.stroke(width);
+                this.g.color(ink);
                 this.g.drawPolyline(xs, ys, xs.length);
             }));
             return;
@@ -2277,7 +2343,7 @@ final class GlobeRenderer {
             // correctly overpainted piece by piece rather than all at its mean. The middle of
             // the piece is the depth its colour is mixed at.
             final double stepDepth = p[lo + sub / 2].depth;
-            final Color step = shade(ink, (int) Math.round(ink.getAlpha()
+            final Ink step = shade(ink, (int) Math.round(ink.getAlpha()
                 * chordDepthFade(stepDepth, this.cam.distance)));
             final int[] xs = new int[sub + 1];
             final int[] ys = new int[sub + 1];
@@ -2286,8 +2352,8 @@ final class GlobeRenderer {
                 ys[k] = (int) Math.round(p[lo + k].y);
             }
             this.pieces.add(new Piece(stepDepth, () -> {
-                this.g.setStroke(stroke(width));
-                this.g.setColor(step);
+                this.g.stroke(width);
+                this.g.color(step);
                 this.g.drawPolyline(xs, ys, xs.length);
             }));
         }
@@ -2388,7 +2454,7 @@ final class GlobeRenderer {
     /** As above, while the globe is being turned. */
     private static final int ARC_PIECES_TURNING = 3;
 
-    private void segment(double[] a, double[] b, Color ink, float width) {
+    private void segment(double[] a, double[] b, Ink ink, float width) {
         Globe.Projected pa = at(a);
         Globe.Projected pb = at(b);
         if (!pa.visible || !pb.visible) {
@@ -2396,30 +2462,30 @@ final class GlobeRenderer {
         }
         double depth = (pa.depth + pb.depth) / 2.0;
         this.pieces.add(new Piece(depth, () -> {
-            this.g.setStroke(stroke(width));
-            this.g.setColor(ink);
+            this.g.stroke(width);
+            this.g.color(ink);
             this.g.drawLine((int) pa.x, (int) pa.y, (int) pb.x, (int) pb.y);
         }));
     }
 
     /** Text that always faces the reader, however the globe is turned. */
-    private void billboard(double[] world, String text, Color ink, int points) {
+    private void billboard(double[] world, String text, Ink ink, int points) {
         Globe.Projected p = at(world);
         if (!p.visible) {
             return;
         }
         // Width measured once, here, rather than inside the draw - the draw runs after the
         // sort and the metrics do not depend on it.
-        final int half = this.g.getFontMetrics(font(points)).stringWidth(text) / 2;
+        final int half = this.g.textWidth(text, points) / 2;
         this.pieces.add(new Piece(p.depth, () -> {
-            this.g.setFont(font(points));
-            this.g.setColor(ink);
+            this.g.font(points);
+            this.g.color(ink);
             this.g.drawString(text, (int) p.x - half, (int) p.y + points / 3);
         }));
     }
 
-    private static Color shade(Color c, int alpha) {
-        return new Color(c.getRed(), c.getGreen(), c.getBlue(),
+    private static Ink shade(Ink c, int alpha) {
+        return new Ink(c.getRed(), c.getGreen(), c.getBlue(),
             Math.max(0, Math.min(255, alpha)));
     }
 

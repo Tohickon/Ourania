@@ -1,0 +1,92 @@
+plugins {
+    id "com.android.application"
+}
+
+// <b>The engine is compiled from the desktop tree, not copied into this one.</b> The rule since
+// the phone was first planned (M1): one engine, two apps, and never a second copy of the source,
+// which is this project's most-named defect. What "the engine" is lives in ONE place -
+// EngineIsolationCheck, which also proves it builds on its own - so its list of shared desktop
+// classes is read out of that file here rather than written out a second time.
+def desktop = file("../../OuraniaWindows/src/main/java")
+def isolationCheck = new File(desktop, "com/zodiacomputing/ourania/gui/EngineIsolationCheck.java")
+def sharedBlock = (isolationCheck.text =~ /(?s)SHARED\s*=\s*new TreeSet<>\(List\.of\((.*?)\)\)/)
+if (!sharedBlock.find()) {
+    throw new GradleException("EngineIsolationCheck.SHARED not found - the engine's list moved")
+}
+def shared = (sharedBlock.group(1) =~ /"(\w+)"/).collect { it[1] }
+
+def engineSources = tasks.register("engineSources", Sync) {
+    from(desktop) {
+        include "com/zodiacomputing/ourania/astro/**/*.java"
+        include "de/thmac/swisseph/**/*.java"
+        shared.each { include "com/zodiacomputing/ourania/gui/${it}.java" }
+        exclude "**/*Check.java", "**/*SelfTest.java"
+    }
+    into layout.buildDirectory.dir("generated/engine")
+}
+
+// The Swiss Ephemeris files are fetched, never committed (THIRD-PARTY-NOTICES.md). When the
+// build is given a folder of them - OURANIA_EPHE, the variable the desktop suites and CI already
+// use - they are packed under assets/ephe and the app copies them out on first launch. Without
+// it the app still builds, and the engine uses its built-in Moshier ephemeris.
+def epheDir = System.getenv("OURANIA_EPHE")
+def ephemerisAssets = tasks.register("ephemerisAssets", Sync) {
+    if (epheDir != null && new File(epheDir).isDirectory()) {
+        from(epheDir) { include "*.se1" }
+    }
+    into layout.buildDirectory.dir("generated/ephe-assets/ephe")
+}
+
+android {
+    namespace "com.zodiacomputing.ourania.android"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.zodiacomputing.ourania"
+        // Android 13. The engine uses List.of, Map.of and String.repeat, which a phone has only
+        // from here; the target is a Galaxy S23 Ultra on Android 14.
+        minSdk 33
+        targetSdk 34
+        versionCode 1
+        versionName file("../../OuraniaWindows/VERSION").text.trim()
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    sourceSets {
+        main {
+            java.srcDir(layout.buildDirectory.dir("generated/engine"))
+            // The interpretation corpus and the atlas, opened by name through DataFiles (M1).
+            // Served from the desktop's data folder, again rather than a copy of it.
+            assets.srcDirs = ["../../OuraniaWindows/src/main/resources/data",
+                              layout.buildDirectory.dir("generated/ephe-assets").get().asFile]
+        }
+    }
+
+    // The ephemeris is read by seeking, so it is stored uncompressed; the gazetteer is already
+    // gzipped and gains nothing from a second pass.
+    androidResources {
+        noCompress "se1", "gz"
+    }
+
+    testOptions {
+        unitTests.all {
+            // PhoneChartTest reads the corpus and the atlas from the desktop's data folder, and
+            // the ephemeris from OURANIA_EPHE when it is set.
+            systemProperty "ourania.data", file("../../OuraniaWindows/src/main/resources/data").path
+            systemProperty "ourania.home", layout.buildDirectory.dir("test-home").get().asFile.path
+            if (epheDir != null) {
+                systemProperty "ourania.ephe", epheDir
+            }
+        }
+    }
+}
+
+dependencies {
+    testImplementation "junit:junit:4.13.2"
+}
+
+tasks.named("preBuild") { dependsOn(engineSources, ephemerisAssets) }

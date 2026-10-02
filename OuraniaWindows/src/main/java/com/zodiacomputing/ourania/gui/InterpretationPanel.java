@@ -1905,6 +1905,8 @@ public class InterpretationPanel extends JPanel {
             html.append("<tr><td style='padding-right:14px;'>"
                 + "<a href='mansions' style='color:#7FB3FF;'>Lunar mansions</a></td>"
                 + "<td style='color:#9AA5B1;'>28 stations of the Moon</td></tr>");
+            indexRow(html, "glossary", "Glossary", Glossary.all().size()
+                + " terms of astrology, in " + Glossary.chapters().size() + " chapters");
             html.append("</table>");
         } else if (category.equals("bodies")) {
             indexBodies(html);
@@ -1923,6 +1925,9 @@ public class InterpretationPanel extends JPanel {
             indexSabians(html, bar < 0 ? null : category.substring(bar + 1));
         } else if (category.equals("tarot")) {
             indexTarot(html);
+        } else if (category.startsWith("glossary")) {
+            int bar = category.indexOf('|');
+            indexGlossary(html, bar < 0 ? -1 : parseInt(category.substring(bar + 1), -1));
         } else {
             html.append("<h1 style='color:#FFFFFF;'>Index</h1><p>No such section.</p>");
         }
@@ -2080,6 +2085,43 @@ public class InterpretationPanel extends JPanel {
                 .append("</td></tr>");
         }
         html.append("</table>");
+    }
+
+    /**
+     * David's glossary (2 Oct 2026): its chapters, or one chapter's terms with their
+     * definitions. A chapter is named by its position, since the names carry ampersands and
+     * slashes a link would have to escape.
+     */
+    private void indexGlossary(StringBuilder html, int chapter) {
+        java.util.List<String> chapters = Glossary.chapters();
+        if (chapter < 0 || chapter >= chapters.size()) {
+            html.append("<h1 style='color:#FFFFFF;'>Glossary</h1>");
+            if (Glossary.failure() != null) {
+                html.append("<p style='color:#D08A8A;'>").append(escape(Glossary.failure()))
+                    .append("</p>");
+            }
+            html.append("<table style='font-size:13px;'>");
+            for (int i = 0; i < chapters.size(); i++) {
+                html.append("<tr><td style='padding-right:14px;'><a href='index|glossary|")
+                    .append(i).append("' style='color:#7FB3FF;'>").append(escape(chapters.get(i)))
+                    .append("</a></td><td style='color:#9AA5B1;'>")
+                    .append(Glossary.chapter(chapters.get(i)).size()).append(" terms</td></tr>");
+            }
+            html.append("</table>");
+            return;
+        }
+        String name = chapters.get(chapter);
+        html.append("<p><a href='index|glossary' style='color:#7FB3FF;'>Glossary</a></p>");
+        html.append("<h1 style='color:#FFFFFF;'>").append(escape(name)).append("</h1>");
+        String section = null;
+        for (Glossary.Term t : Glossary.chapter(name)) {
+            if (!t.section.isEmpty() && !t.section.equals(section)) {
+                section = t.section;
+                html.append("<h3 style='color:#add8e6;'>").append(escape(section)).append("</h3>");
+            }
+            html.append("<p><b>").append(escape(t.term)).append("</b> &mdash; ").append(t.text)
+                .append("</p>");
+        }
     }
 
     private void indexTarot(StringBuilder html) {

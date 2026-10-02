@@ -1740,8 +1740,8 @@ public final class NavigationCheck {
                 // forty-three strays at radius 527 to 529, which is the numbers and nothing
                 // else. Widening it to hide a real leak would be the wrong move; widening it
                 // to describe the shape that is actually drawn is the right one.
-                int[] rings = SkymapPanel.ringRadii(size, size, 1.0, 1.0);
-                int outer = rings[SkymapPanel.RING_OUTER];
+                int[] rings = WheelLayout.ringRadii(size, size, 1.0, 1.0);
+                int outer = rings[WheelLayout.RING_OUTER];
                 int changed = 0;
                 int strayed = 0;
                 double strayLo = Double.MAX_VALUE;
@@ -1763,7 +1763,7 @@ public final class NavigationCheck {
                         // both axes, which can pull a point up to 1.4 px inward, plus half of
                         // the 1.5 px stroke and a pixel of antialiasing. Two pixels left twelve
                         // strays at radius 522.5, which is exactly the ends of the tens ticks.
-                        int scaleFloor = outer - SkymapPanel.MANSION_BAND_DEPTH - 6 - 3;
+                        int scaleFloor = outer - WheelLayout.MANSION_BAND_DEPTH - 6 - 3;
                         if (r < Math.min(outer - 15, scaleFloor) || r > outer + 2) {
                             strayed++;
                             strayLo = Math.min(strayLo, r);
@@ -1945,12 +1945,12 @@ public final class NavigationCheck {
             SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
 
             // ---- half one: the bands, on the chain as the painter lays it out ----
-            int[] rings = SkymapPanel.ringRadii(1100, 1100, 1.0, 1.0);
-            int decanOuter = rings[SkymapPanel.RING_DECAN_OUTER];
-            int signOuter = rings[SkymapPanel.RING_SIGN_OUTER];
-            int signInner = rings[SkymapPanel.RING_SIGN_INNER];
-            int termInner = rings[SkymapPanel.RING_TERM_INNER];
-            int degreeInner = rings[SkymapPanel.RING_DEGREE_INNER];
+            int[] rings = WheelLayout.ringRadii(1100, 1100, 1.0, 1.0);
+            int decanOuter = rings[WheelLayout.RING_DECAN_OUTER];
+            int signOuter = rings[WheelLayout.RING_SIGN_OUTER];
+            int signInner = rings[WheelLayout.RING_SIGN_INNER];
+            int termInner = rings[WheelLayout.RING_TERM_INNER];
+            int degreeInner = rings[WheelLayout.RING_DEGREE_INNER];
             int bodyBase = 226;
 
             // The chain has to be in this order, or the bands below describe nothing.
@@ -2302,7 +2302,7 @@ public final class NavigationCheck {
             final String[] html = new String[1];
             SwingUtilities.invokeAndWait(() -> html[0] = natal.getText());
             if (!html[0].contains("pattern|")) {
-                String banner = SkymapPanel.patternEntryHtml(figure("Grand trine",
+                String banner = PlacementText.patternEntryHtml(figure("Grand trine",
                     java.util.List.of("Moon", "Sun", "Venus"), null, "air", null));
                 SwingUtilities.invokeAndWait(() -> natal.setText(
                     html[0].replaceFirst("(?i)<body[^>]*>", "$0" + banner)));
@@ -2417,11 +2417,11 @@ public final class NavigationCheck {
             // which is what David was clicking. Three figures in the generator's own markup,
             // the same three his chart showed, and a click on each visible character.
             final String[] names = {"Grand trine", "Kite", "T-square"};
-            final String entries = SkymapPanel.patternEntryHtml(figure("Grand trine",
+            final String entries = PlacementText.patternEntryHtml(figure("Grand trine",
                     java.util.List.of("Mercury", "Pluto", "Uranus"), null, "air", null))
-                + SkymapPanel.patternEntryHtml(figure("Kite",
+                + PlacementText.patternEntryHtml(figure("Kite",
                     java.util.List.of("Mercury", "Neptune", "Pluto", "Uranus"), "Mercury", "air", null))
-                + SkymapPanel.patternEntryHtml(figure("T-square",
+                + PlacementText.patternEntryHtml(figure("T-square",
                     java.util.List.of("Chiron", "Pluto", "Venus"), "Pluto", null, "fixed"));
             final java.util.List<java.awt.Point> points = new java.util.ArrayList<>();
             final java.util.List<String> owners = new java.util.ArrayList<>();

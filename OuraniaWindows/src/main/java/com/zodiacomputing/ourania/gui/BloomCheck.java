@@ -193,8 +193,8 @@ public final class BloomCheck {
             String at = " (" + w + "x" + h + ")";
             for (int oi = 0; oi <= 1; oi++) {
                 for (int ti = 0; ti <= 1; ti++) {
-                    int[] byFlag = SkymapPanel.ringRadii(w, h, oi == 1, ti == 1);
-                    int[] byFraction = SkymapPanel.ringRadii(w, h, (double) oi, (double) ti);
+                    int[] byFlag = WheelLayout.ringRadii(w, h, oi == 1, ti == 1);
+                    int[] byFraction = WheelLayout.ringRadii(w, h, (double) oi, (double) ti);
                     for (int r = 0; r < byFlag.length; r++) {
                         eq("fully open matches the boolean layout, ring " + r
                             + " o=" + oi + " t=" + ti + at, byFlag[r], byFraction[r]);
@@ -209,30 +209,30 @@ public final class BloomCheck {
             // the zodiac is fixed and RING_BODY_TOP is what gives way. This part failed on
             // the reorder, which is the right way round - the assertion was pinned to a
             // radius and the radius stopped being the one that moves.
-            int shut = SkymapPanel.ringRadii(w, h, 0.0, 0.0)[SkymapPanel.RING_BODY_TOP];
-            int open = SkymapPanel.ringRadii(w, h, 1.0, 0.0)[SkymapPanel.RING_BODY_TOP];
+            int shut = WheelLayout.ringRadii(w, h, 0.0, 0.0)[WheelLayout.RING_BODY_TOP];
+            int open = WheelLayout.ringRadii(w, h, 1.0, 0.0)[WheelLayout.RING_BODY_TOP];
             yes("an open ring costs the wheel inside it room" + at, open < shut);
             int last = shut + 1;
             for (int step = 0; step <= 20; step++) {
                 double v = step / 20.0;
-                int d = SkymapPanel.ringRadii(w, h, v, 0.0)[SkymapPanel.RING_BODY_TOP];
+                int d = WheelLayout.ringRadii(w, h, v, 0.0)[WheelLayout.RING_BODY_TOP];
                 yes("the band never widens backwards" + at, d <= last);
                 yes("and never overshoots either end" + at, d <= shut && d >= open);
                 last = d;
             }
             // <b>The point of the whole exercise.</b> If half-open equalled either end, the
             // wheel would jump on one frame and the bloom would be decoration.
-            int half = SkymapPanel.ringRadii(w, h, 0.5, 0.0)[SkymapPanel.RING_BODY_TOP];
+            int half = WheelLayout.ringRadii(w, h, 0.5, 0.0)[WheelLayout.RING_BODY_TOP];
             yes("half-open is genuinely between the two layouts" + at,
                 half < shut && half > open);
             // And the zodiac must sit still throughout, which is what the reorder was for.
             for (int step = 0; step <= 20; step++) {
-                int[] mid = SkymapPanel.ringRadii(w, h, step / 20.0, 0.0);
-                int[] rest = SkymapPanel.ringRadii(w, h, 0.0, 0.0);
+                int[] mid = WheelLayout.ringRadii(w, h, step / 20.0, 0.0);
+                int[] rest = WheelLayout.ringRadii(w, h, 0.0, 0.0);
                 yes("the zodiac does not move while a ring blooms" + at,
-                    mid[SkymapPanel.RING_DECAN_OUTER] == rest[SkymapPanel.RING_DECAN_OUTER]
-                        && mid[SkymapPanel.RING_SIGN_INNER]
-                            == rest[SkymapPanel.RING_SIGN_INNER]);
+                    mid[WheelLayout.RING_DECAN_OUTER] == rest[WheelLayout.RING_DECAN_OUTER]
+                        && mid[WheelLayout.RING_SIGN_INNER]
+                            == rest[WheelLayout.RING_SIGN_INNER]);
             }
         }
     }
@@ -252,12 +252,12 @@ public final class BloomCheck {
             settled[i] = 360 + i;               // distinct, so a mix-up would show
         }
 
-        int[] open = SkymapPanel.bloomed(settled, inner, 1.0);
+        int[] open = WheelLayout.bloomed(settled, inner, 1.0);
         for (int i = 0; i < settled.length; i++) {
             eq("an open ring is the settled radius, body " + i, settled[i], open[i]);
         }
 
-        int[] shut = SkymapPanel.bloomed(settled, inner, 0.0);
+        int[] shut = WheelLayout.bloomed(settled, inner, 0.0);
         for (int i = 0; i < settled.length; i++) {
             eq("a folded ring is gathered at the band's inner edge, body " + i,
                 inner, shut[i]);
@@ -266,7 +266,7 @@ public final class BloomCheck {
         // Every body travels outward and none of them overshoots.
         int[] prev = shut;
         for (int step = 1; step <= 20; step++) {
-            int[] now = SkymapPanel.bloomed(settled, inner, step / 20.0);
+            int[] now = WheelLayout.bloomed(settled, inner, step / 20.0);
             for (int i = 0; i < settled.length; i++) {
                 yes("body " + i + " never travels backwards mid-bloom", now[i] >= prev[i]);
                 yes("body " + i + " stays inside its band",
@@ -277,7 +277,7 @@ public final class BloomCheck {
 
         // <b>Earlier bodies lead.</b> Without this the ring expands as a disc, which reads as
         // the wheel being resized rather than as a ring opening.
-        int[] mid = SkymapPanel.bloomed(settled, inner, 0.35);
+        int[] mid = WheelLayout.bloomed(settled, inner, 0.35);
         double firstOut = mid[0] - inner;
         double lastOut = mid[settled.length - 1] - inner;
         yes("the first body is further out than the last, mid-bloom", firstOut > lastOut);

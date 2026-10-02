@@ -208,7 +208,8 @@ public final class StartupCheck {
     // ---------------------------------------------------------------- Part E
 
     /**
-     * Every {@code DATA_DIR + "..."} in the loader is in a list start-up can check against.
+     * Every file the loader names - {@code DataFiles.entry("...")} since M1, {@code DATA_DIR + "..."}
+     * before it - is in a list start-up can check against.
      *
      * <b>The part that keeps this row closed.</b> {@code CORE_FILES} is a hand-written list beside
      * eight loaders, which is the arrangement this project has watched drift four times - four
@@ -230,7 +231,7 @@ public final class StartupCheck {
             java.nio.file.Files.readAllBytes(src.toPath()),
             java.nio.charset.StandardCharsets.UTF_8));
         java.util.regex.Matcher m = java.util.regex.Pattern
-            .compile("DATA_DIR\\s*\\+\\s*\"([^\"]+)\"").matcher(text);
+            .compile("(?:DATA_DIR\\s*\\+\\s*|DataFiles\\.entry\\(\\s*)\"([^\"]+)\"").matcher(text);
         java.util.Set<String> known = new java.util.HashSet<>(java.util.Arrays.asList(
             InterpretationService.everyFileName()));
         int found = 0;

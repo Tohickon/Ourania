@@ -1,5 +1,6 @@
 package com.zodiacomputing.ourania.gui;
 
+import com.zodiacomputing.ourania.astro.PlainText;
 import com.zodiacomputing.ourania.astro.BodyScore;
 import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.Gestalt;
@@ -371,7 +372,7 @@ public final class PlainSnapshot {
         }
         s = s.replace("<b>", "").replace("</b>", "")
              .replace("<i>", "").replace("</i>", "");
-        s = Prose.unescape(s).trim();
+        s = PlainText.unescape(s).trim();
 
         int colon = s.indexOf(':');
         if (colon > 0 && colon < 40) {

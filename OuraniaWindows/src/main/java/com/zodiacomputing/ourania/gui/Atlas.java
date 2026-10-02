@@ -1,7 +1,8 @@
 package com.zodiacomputing.ourania.gui;
 
+import com.zodiacomputing.ourania.astro.DataFiles;
+
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -89,8 +90,6 @@ public final class Atlas {
      */
     static final String FILE_NAME = "atlas.tsv.gz";
 
-    private static final String FILE = InterpretationService.DATA_DIR + FILE_NAME;
-
     // Parallel arrays rather than 168,549 objects: a Place is built only for the handful a
     // search actually returns. The strings that repeat - zones, countries, regions - are shared
     // rather than copied, which is most of the file's bulk.
@@ -140,6 +139,24 @@ public final class Atlas {
         return sb.toString().toLowerCase(java.util.Locale.ROOT).trim().replaceAll("\\s+", " ");
     }
 
+    /**
+     * The gazetteer's text, whether it arrives gzipped or not.
+     *
+     * <b>Because Android unpacks it.</b> The build that packs the phone's assets stores a
+     * {@code .gz} file decompressed and without the suffix - measured in the first APK, 30 Sep
+     * (M2): {@code atlas.tsv.gz} went in as a 14 MB {@code atlas.tsv}. The phone's data source
+     * finds it under either name; this reads it either way, by its first two bytes rather than
+     * by its name, since the name is exactly what the packager changed.
+     */
+    static java.io.InputStream plainOrGzipped(java.io.InputStream raw) throws java.io.IOException {
+        java.io.BufferedInputStream in = new java.io.BufferedInputStream(raw);
+        in.mark(2);
+        int b1 = in.read();
+        int b2 = in.read();
+        in.reset();
+        return b1 == 0x1f && b2 == 0x8b ? new GZIPInputStream(in) : in;
+    }
+
     private static synchronized void load() {
         if (loaded) {
             return;
@@ -148,7 +165,7 @@ public final class Atlas {
         List<String[]> rows = new ArrayList<>(180000);
         Map<String, String> shared = new HashMap<>();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                new GZIPInputStream(new FileInputStream(FILE)), StandardCharsets.UTF_8))) {
+                plainOrGzipped(DataFiles.entry(FILE_NAME).open()), StandardCharsets.UTF_8))) {
             String line;
             while ((line = in.readLine()) != null) {
                 if (line.isEmpty() || line.charAt(0) == '#') {
@@ -293,6 +310,42 @@ public final class Atlas {
             }
         }
         return best < 0 ? null : at(best);
+    }
+
+    /**
+     * Reads "39.95, -75.16" as a place, taking its zone from the nearest town the atlas knows.
+     *
+     * Returns null for anything that is not a pair of numbers, which is how a place name falls
+     * through to the lookups below. The bounds are checked rather than assumed: "12, 2000" is
+     * two numbers and is not a coordinate, and a chart cast at longitude 2000 fails somewhere
+     * far less legible than here.
+     *
+     * <p>Moved here from {@code Geocoder} on 30 Sep so the phone's chart book reads a saved
+     * place exactly as the desktop does (M6); Geocoder asks this first, as before.
+     */
+    public static Place fromCoordinates(String query) {
+        String[] parts = query.split(",");
+        if (parts.length != 2) {
+            return null;
+        }
+        double lat;
+        double lon;
+        try {
+            lat = Double.parseDouble(parts[0].trim());
+            lon = Double.parseDouble(parts[1].trim());
+        } catch (NumberFormatException notANumber) {
+            return null;
+        }
+        if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+            return null;
+        }
+        Place near = nearest(lat, lon);
+        String zone = near == null ? "UTC" : near.zoneId;
+        String name = near == null ? String.format(java.util.Locale.ROOT, "%.4f, %.4f", lat, lon)
+            : near.label();
+        // The coordinates the reader gave, not the town's - a birth place is not its nearest
+        // city centre, and the houses are cast from these.
+        return new Place(name, "", "", lat, lon, zone, 0);
     }
 
     /** The one place a typed name most likely means, or null when the atlas has none. */

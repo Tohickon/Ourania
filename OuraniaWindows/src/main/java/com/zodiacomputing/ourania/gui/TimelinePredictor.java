@@ -1,5 +1,6 @@
 package com.zodiacomputing.ourania.gui;
 
+import com.zodiacomputing.ourania.astro.PlainText;
 import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.Aspects;
 import java.util.Arrays;
@@ -85,15 +86,15 @@ public class TimelinePredictor {
             String sign = com.zodiacomputing.ourania.astro.Zodiac.signName(b.lon);
             int house = com.zodiacomputing.ourania.astro.Zodiac.houseOf(b.lon, f.cusps);
 
-            // Prose.summary, not the raw value. Each interpretation is
+            // PlainText.summary, not the raw value. Each interpretation is
             // "<b>summary sentence.</b><br><br>a long body", and this used to paste the
             // WHOLE thing through .toLowerCase().replace(".", "") - which lowercased every
             // proper noun ("saturn trine sun") and stripped every full stop rather than one
             // trailing one, welding the sentences together. Measured before the fix: one
             // period per 396 characters across 44,030 characters of "three paragraphs".
-            String core = Prose.summary(svc.getBodyCore(bodyName));
-            String signText = Prose.summary(svc.getPlanetInSign(bodyName, sign));
-            String houseText = house > 0 ? Prose.summary(svc.getPlanetInHouse(bodyName, house)) : "";
+            String core = PlainText.summary(svc.getBodyCore(bodyName));
+            String signText = PlainText.summary(svc.getPlanetInSign(bodyName, sign));
+            String houseText = house > 0 ? PlainText.summary(svc.getPlanetInHouse(bodyName, house)) : "";
 
             pb.append("<b>").append(bodyName).append("</b>");
             if (!core.isEmpty()) {
@@ -125,7 +126,7 @@ public class TimelinePredictor {
                     continue;
                 }
                 String other = h.a.equals(bodyName) ? h.b : h.a;
-                String aspectText = Prose.summary(svc.getAspect(bodyName, other, h.type.label));
+                String aspectText = PlainText.summary(svc.getAspect(bodyName, other, h.type.label));
                 if (!aspectText.isEmpty()) {
                     // Same doubling: "Its quincunx to Venus means Chiron quincunx Venus
                     // indicates..." - the aspect prose names both ends already.

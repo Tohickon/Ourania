@@ -28,9 +28,11 @@ import java.util.List;
  *           PrintWriter's own toString in its place, so every file error this library has
  *           ever reported ended in something like java.io.PrintWriter@1f2a3b.
  *  Part C - a chart still casts, and every body that reports a position reports the right
- *           one. THIS PART IS RED, and the failure is a second defect found while proving
- *           the first: with the crash guarded, the Sun comes back marked ok carrying the
- *           Moon's longitude. See known-red.txt.
+ *           one. This was red from 27 to 30 September on a second defect found while proving
+ *           the first: with the crash guarded, the Sun came back marked ok carrying the Moon's
+ *           longitude. A segment that failed to read was left behind looking loaded, and the
+ *           next request evaluated it as zeros (FileData.forget). Part C opens by asking
+ *           twice, which is the smallest thing that showed it.
  *  Part D - none of this touched the reader's ephemeris (J14).
  *
  * <b>The damage is made, not waited for.</b> On this machine the real files fail a read only
@@ -199,6 +201,19 @@ public final class EphemerisFailureCheck {
      * it succeeded and be wrong.
      */
     private static void stillCasts(Path damaged) {
+        // The defect in its smallest form. The first request fails correctly; before
+        // FileData.forget the second found the failed segment still cached, read zeros as a
+        // position, and returned rc 258 - SWIEPH, no warning - with the Moon's longitude.
+        SwissEph twice = new SwissEph(damaged.getParent().toString());
+        for (int attempt = 1; attempt <= 2; attempt++) {
+            double[] xx = new double[6];
+            int rc = twice.swe_calc_ut(JD, SweConst.SE_SUN, SweConst.SEFLG_SWIEPH, xx,
+                new StringBuffer());
+            yes("asking for the Sun a " + (attempt == 1 ? "first" : "second")
+                + " time on a file that will not read still fails (rc " + rc + ", "
+                + String.format("%.3f", xx[0]) + ")", rc < 0);
+        }
+
         ChartFrame bad;
         try {
             bad = ChartFrame.compute(new SwissEph(damaged.getParent().toString()),
@@ -230,9 +245,22 @@ public final class EphemerisFailureCheck {
             computed++;
             double apart = Math.abs(((bad.bodies[i].lon - good.bodies[i].lon) % 360.0 + 540.0)
                 % 360.0 - 180.0);
-            yes(Bodies.at(i).name + " says it computed, so it must be where it is: "
-                + String.format("%.3f", bad.bodies[i].lon) + " against "
-                + String.format("%.3f", good.bodies[i].lon), apart < 0.001);
+            // A body may fall back to Moshier, which the library says in the return code and
+            // the warning - and is then held to Moshier's precision, not the file's. The true
+            // node is the one that needs it: sensitive to the Moon's speed, it reads 240.2351
+            // from Moshier against 240.2389 from the files, and 240.2351 is exactly what it
+            // reads with NO ephemeris files at all. That is the documented fallback, stated;
+            // the defect this part exists for was 62 degrees, stated as success.
+            boolean moshier = (bad.bodies[i].returnCode & SweConst.SEFLG_MOSEPH) != 0;
+            if (moshier) {
+                yes(Bodies.at(i).name + " fell back to Moshier, so it says so",
+                    bad.bodies[i].error != null && bad.bodies[i].error.contains("Moshier"));
+            }
+            double tolerance = moshier ? 0.01 : 0.001;
+            yes(Bodies.at(i).name + " says it computed"
+                + (moshier ? " (Moshier)" : "") + ", so it must be where it is: "
+                + String.format("%.4f", bad.bodies[i].lon) + " against "
+                + String.format("%.4f", good.bodies[i].lon), apart < tolerance);
         }
         System.out.println("  " + computed + " bodies reported a position, " + refused
             + " said they could not");

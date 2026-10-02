@@ -790,12 +790,12 @@ public final class AspectGridCheck {
         for (int w = 200; w <= 2200; w += 173) {
             for (int h = 200; h <= 2200; h += 197) {
                 swept++;
-                int[] r = SkymapPanel.ringRadii(w, h, true, true);
-                int natalTop = r[SkymapPanel.RING_BODY_TOP];
-                int natalFloor = natalTop - SkymapPanel.natalBandDepth(Math.max(1, natalTop));
+                int[] r = WheelLayout.ringRadii(w, h, true, true);
+                int natalTop = r[WheelLayout.RING_BODY_TOP];
+                int natalFloor = natalTop - WheelLayout.natalBandDepth(Math.max(1, natalTop));
                 int[][] bands = {
-                    {r[SkymapPanel.RING_TRI], r[SkymapPanel.RING_TRANSIT]},
-                    {r[SkymapPanel.RING_TRANSIT], natalTop},
+                    {r[WheelLayout.RING_TRI], r[WheelLayout.RING_TRANSIT]},
+                    {r[WheelLayout.RING_TRANSIT], natalTop},
                     {natalTop, natalFloor},
                 };
                 String[] names = {"the sky band", "the partner band", "the natal band"};
@@ -817,9 +817,9 @@ public final class AspectGridCheck {
                     ok(names[b] + " is not inside out (" + w + "x" + h + ")", hi >= lo);
                     boolean isNatal = b == 2;
                     int[] radii = isNatal
-                        ? SkymapPanel.bandRadii(lon, valid, hi, lo,
-                            SkymapPanel.NATAL_EDGE, 32.0)
-                        : SkymapPanel.bandRadii(lon, valid, hi, lo);
+                        ? WheelLayout.bandRadii(lon, valid, hi, lo,
+                            WheelLayout.NATAL_EDGE, 32.0)
+                        : WheelLayout.bandRadii(lon, valid, hi, lo);
                     int lowest = Integer.MAX_VALUE;
                     int highest = Integer.MIN_VALUE;
                     for (int i = 0; i < radii.length; i++) {
@@ -869,11 +869,11 @@ public final class AspectGridCheck {
         for (int top = 60; top <= 1200; top += 37) {
             int idealNatal = (3 - 1) * 24 + 2 * 15;
             ok("natalBandDepth is its own formula at " + top,
-                SkymapPanel.natalBandDepth(top)
+                WheelLayout.natalBandDepth(top)
                     == Math.max(22, Math.min(idealNatal, top / 3)));
             int idealOuter = (3 - 1) * 20 + 2 * 13;
             ok("outerBandDepth is its own formula at " + top,
-                SkymapPanel.outerBandDepth(top)
+                WheelLayout.outerBandDepth(top)
                     == Math.max(22, Math.min(idealOuter, top / 6)));
         }
     }
@@ -1451,12 +1451,12 @@ public final class AspectGridCheck {
 
         int w = chart.getWidth();
         int h = chart.getHeight();
-        int[] rings = SkymapPanel.ringRadii(w, h, true, true);
+        int[] rings = WheelLayout.ringRadii(w, h, true, true);
         double pin = (Double) pinLon.invoke(sky);
         double[] cLon = (double[]) getField(sky, "skyRing.lon");
         boolean[] cValid = (boolean[]) getField(sky, "skyRing.valid");
-        int[] radii = SkymapPanel.bandRadii(cLon, cValid,
-            rings[SkymapPanel.RING_TRI], rings[SkymapPanel.RING_TRANSIT]);
+        int[] radii = WheelLayout.bandRadii(cLon, cValid,
+            rings[WheelLayout.RING_TRI], rings[WheelLayout.RING_TRANSIT]);
         int cx = w / 2;
         int cy = h / 2;
 
@@ -2237,7 +2237,7 @@ public final class AspectGridCheck {
                         int bodyTop = transit - (partner ? depth : 0);
                         String tag = at + " partner=" + partner + " sky=" + sky;
 
-                        int[] got = SkymapPanel.ringRadii(w, h, partner, sky);
+                        int[] got = WheelLayout.ringRadii(w, h, partner, sky);
                         // Ten since 2026-09-16, when the lunar mansions were given a band of
                         // their own at the rim. The new radius is appended, and equals RING_OUTER
                         // for every caller of this arity - the mansions are folded as far as
@@ -2245,60 +2245,60 @@ public final class AspectGridCheck {
                         // formula this suite has always asserted.
                         ok("ring chain returns ten radii" + tag, got.length == 10);
                         ok("the mansion band is closed for a caller that does not open it" + tag,
-                            got[SkymapPanel.RING_MANSION_INNER] == outer);
-                        ok("outer matches" + tag, got[SkymapPanel.RING_OUTER] == outer);
+                            got[WheelLayout.RING_MANSION_INNER] == outer);
+                        ok("outer matches" + tag, got[WheelLayout.RING_OUTER] == outer);
                         ok("decan outer matches" + tag,
-                            got[SkymapPanel.RING_DECAN_OUTER] == decanOuter);
+                            got[WheelLayout.RING_DECAN_OUTER] == decanOuter);
                         ok("the bound band hangs under the signs" + tag,
-                            got[SkymapPanel.RING_TERM_INNER] == termInner);
+                            got[WheelLayout.RING_TERM_INNER] == termInner);
                         ok("the inner degree scale hangs under the bounds" + tag,
-                            got[SkymapPanel.RING_DEGREE_INNER] == degreeInner);
+                            got[WheelLayout.RING_DEGREE_INNER] == degreeInner);
                         ok("sign outer matches" + tag,
-                            got[SkymapPanel.RING_SIGN_OUTER] == signOuter);
+                            got[WheelLayout.RING_SIGN_OUTER] == signOuter);
                         ok("sign inner matches" + tag,
-                            got[SkymapPanel.RING_SIGN_INNER] == signInner);
+                            got[WheelLayout.RING_SIGN_INNER] == signInner);
                         ok("the sky band hangs from the sign ring" + tag,
-                            got[SkymapPanel.RING_TRI] == tri);
+                            got[WheelLayout.RING_TRI] == tri);
                         ok("the sky|partner boundary matches" + tag,
-                            got[SkymapPanel.RING_TRANSIT] == transit);
+                            got[WheelLayout.RING_TRANSIT] == transit);
                         ok("the natal ceiling matches" + tag,
-                            got[SkymapPanel.RING_BODY_TOP] == bodyTop);
+                            got[WheelLayout.RING_BODY_TOP] == bodyTop);
 
                         // <b>The zodiac must not move when a body ring opens.</b> That it did
                         // is exactly what this reorder was for; asserting the radii above
                         // would still pass if decanOuter were made to depend on the flags,
                         // so the independence is stated on its own.
-                        int[] shut = SkymapPanel.ringRadii(w, h, false, false);
+                        int[] shut = WheelLayout.ringRadii(w, h, false, false);
                         ok("the zodiac does not move when a ring opens" + tag,
-                            got[SkymapPanel.RING_DECAN_OUTER]
-                                    == shut[SkymapPanel.RING_DECAN_OUTER]
-                                && got[SkymapPanel.RING_SIGN_OUTER]
-                                    == shut[SkymapPanel.RING_SIGN_OUTER]
-                                && got[SkymapPanel.RING_SIGN_INNER]
-                                    == shut[SkymapPanel.RING_SIGN_INNER]
-                                && got[SkymapPanel.RING_TERM_INNER]
-                                    == shut[SkymapPanel.RING_TERM_INNER]
-                                && got[SkymapPanel.RING_DEGREE_INNER]
-                                    == shut[SkymapPanel.RING_DEGREE_INNER]);
+                            got[WheelLayout.RING_DECAN_OUTER]
+                                    == shut[WheelLayout.RING_DECAN_OUTER]
+                                && got[WheelLayout.RING_SIGN_OUTER]
+                                    == shut[WheelLayout.RING_SIGN_OUTER]
+                                && got[WheelLayout.RING_SIGN_INNER]
+                                    == shut[WheelLayout.RING_SIGN_INNER]
+                                && got[WheelLayout.RING_TERM_INNER]
+                                    == shut[WheelLayout.RING_TERM_INNER]
+                                && got[WheelLayout.RING_DEGREE_INNER]
+                                    == shut[WheelLayout.RING_DEGREE_INNER]);
 
                         // Everything nests, outermost first, at any size the window can be.
                         if (outer > 120) {
                             ok("rings nest outward-in" + tag,
-                                got[SkymapPanel.RING_OUTER] > got[SkymapPanel.RING_DECAN_OUTER]
-                                    && got[SkymapPanel.RING_DECAN_OUTER]
-                                        > got[SkymapPanel.RING_SIGN_OUTER]
-                                    && got[SkymapPanel.RING_SIGN_OUTER]
-                                        > got[SkymapPanel.RING_SIGN_INNER]
-                                    && got[SkymapPanel.RING_SIGN_INNER]
-                                        > got[SkymapPanel.RING_TERM_INNER]
-                                    && got[SkymapPanel.RING_TERM_INNER]
-                                        > got[SkymapPanel.RING_DEGREE_INNER]
-                                    && got[SkymapPanel.RING_DEGREE_INNER]
-                                        >= got[SkymapPanel.RING_TRI]
-                                    && got[SkymapPanel.RING_TRI]
-                                        >= got[SkymapPanel.RING_TRANSIT]
-                                    && got[SkymapPanel.RING_TRANSIT]
-                                        >= got[SkymapPanel.RING_BODY_TOP]);
+                                got[WheelLayout.RING_OUTER] > got[WheelLayout.RING_DECAN_OUTER]
+                                    && got[WheelLayout.RING_DECAN_OUTER]
+                                        > got[WheelLayout.RING_SIGN_OUTER]
+                                    && got[WheelLayout.RING_SIGN_OUTER]
+                                        > got[WheelLayout.RING_SIGN_INNER]
+                                    && got[WheelLayout.RING_SIGN_INNER]
+                                        > got[WheelLayout.RING_TERM_INNER]
+                                    && got[WheelLayout.RING_TERM_INNER]
+                                        > got[WheelLayout.RING_DEGREE_INNER]
+                                    && got[WheelLayout.RING_DEGREE_INNER]
+                                        >= got[WheelLayout.RING_TRI]
+                                    && got[WheelLayout.RING_TRI]
+                                        >= got[WheelLayout.RING_TRANSIT]
+                                    && got[WheelLayout.RING_TRANSIT]
+                                        >= got[WheelLayout.RING_BODY_TOP]);
                         }
 
                         // A band that is open takes exactly one band depth; a band that is
@@ -2311,10 +2311,10 @@ public final class AspectGridCheck {
                         // than let the band eat the chart. 88 failures that said nothing
                         // about the geometry and everything about the assertion.
                         ok("an open sky band is one band deep" + tag,
-                            got[SkymapPanel.RING_TRI] - got[SkymapPanel.RING_TRANSIT]
+                            got[WheelLayout.RING_TRI] - got[WheelLayout.RING_TRANSIT]
                                 == (sky ? depth : 0));
                         ok("an open partner band is one band deep" + tag,
-                            got[SkymapPanel.RING_TRANSIT] - got[SkymapPanel.RING_BODY_TOP]
+                            got[WheelLayout.RING_TRANSIT] - got[WheelLayout.RING_BODY_TOP]
                                 == (partner ? depth : 0));
                         // And on a wheel that can afford it, a band is deeper than the
                         // clearance its own glyphs need - which is the property that stops
@@ -2332,56 +2332,56 @@ public final class AspectGridCheck {
                 // where the decans were is not the space. Each band is asserted to give up
                 // exactly its own depth and nothing else's.
                 if (outer > 200) {
-                    int[] full = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
-                    int[] noDecans = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0);
-                    int[] noSigns = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0);
-                    int[] noBounds = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0);
-                    int[] noDegrees = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0);
+                    int[] full = WheelLayout.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+                    int[] noDecans = WheelLayout.ringRadii(w, h, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0);
+                    int[] noSigns = WheelLayout.ringRadii(w, h, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0);
+                    int[] noBounds = WheelLayout.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0);
+                    int[] noDegrees = WheelLayout.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0);
 
                     ok("folding the decans gives back twenty pixels" + at,
-                        noDecans[SkymapPanel.RING_SIGN_OUTER]
-                            - full[SkymapPanel.RING_SIGN_OUTER] == 20);
+                        noDecans[WheelLayout.RING_SIGN_OUTER]
+                            - full[WheelLayout.RING_SIGN_OUTER] == 20);
                     ok("folding the signs gives back thirty-five" + at,
-                        noSigns[SkymapPanel.RING_SIGN_INNER]
-                            - full[SkymapPanel.RING_SIGN_INNER] == 35);
+                        noSigns[WheelLayout.RING_SIGN_INNER]
+                            - full[WheelLayout.RING_SIGN_INNER] == 35);
                     ok("folding the bounds gives back eighteen" + at,
-                        noBounds[SkymapPanel.RING_TERM_INNER]
-                            - full[SkymapPanel.RING_TERM_INNER] == 18);
+                        noBounds[WheelLayout.RING_TERM_INNER]
+                            - full[WheelLayout.RING_TERM_INNER] == 18);
                     ok("folding the degree scale gives back sixteen" + at,
-                        noDegrees[SkymapPanel.RING_DEGREE_INNER]
-                            - full[SkymapPanel.RING_DEGREE_INNER] == 16);
+                        noDegrees[WheelLayout.RING_DEGREE_INNER]
+                            - full[WheelLayout.RING_DEGREE_INNER] == 16);
 
                     // <b>And a folded band gives back only its own.</b> One band's depth
                     // written into another's line is invisible until two are folded at once.
                     ok("folding the decans leaves the tick ring alone" + at,
-                        noDecans[SkymapPanel.RING_DECAN_OUTER]
-                            == full[SkymapPanel.RING_DECAN_OUTER]);
+                        noDecans[WheelLayout.RING_DECAN_OUTER]
+                            == full[WheelLayout.RING_DECAN_OUTER]);
                     ok("folding the signs leaves the decan band its width" + at,
-                        noSigns[SkymapPanel.RING_DECAN_OUTER]
-                                - noSigns[SkymapPanel.RING_SIGN_OUTER]
-                            == full[SkymapPanel.RING_DECAN_OUTER]
-                                - full[SkymapPanel.RING_SIGN_OUTER]);
+                        noSigns[WheelLayout.RING_DECAN_OUTER]
+                                - noSigns[WheelLayout.RING_SIGN_OUTER]
+                            == full[WheelLayout.RING_DECAN_OUTER]
+                                - full[WheelLayout.RING_SIGN_OUTER]);
                     ok("folding the bounds leaves the sign band its width" + at,
-                        noBounds[SkymapPanel.RING_SIGN_OUTER]
-                                - noBounds[SkymapPanel.RING_SIGN_INNER]
-                            == full[SkymapPanel.RING_SIGN_OUTER]
-                                - full[SkymapPanel.RING_SIGN_INNER]);
+                        noBounds[WheelLayout.RING_SIGN_OUTER]
+                                - noBounds[WheelLayout.RING_SIGN_INNER]
+                            == full[WheelLayout.RING_SIGN_OUTER]
+                                - full[WheelLayout.RING_SIGN_INNER]);
 
                     // Everything folded reclaims all four, and the natal wheel gets it.
-                    int[] bare = SkymapPanel.ringRadii(w, h, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+                    int[] bare = WheelLayout.ringRadii(w, h, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0);
                     ok("folding every band reclaims all of it" + at,
-                        bare[SkymapPanel.RING_DEGREE_INNER]
-                            - full[SkymapPanel.RING_DEGREE_INNER] == 20 + 35 + 18 + 16);
+                        bare[WheelLayout.RING_DEGREE_INNER]
+                            - full[WheelLayout.RING_DEGREE_INNER] == 20 + 35 + 18 + 16);
                 }
 
                 // <b>A single wheel must lay out exactly as it always has.</b> With nothing
                 // open the three body boundaries collapse onto the sign ring, so the natal
                 // wheel starts where it started before any of this existed.
-                int[] single = SkymapPanel.ringRadii(w, h, false, false);
+                int[] single = WheelLayout.ringRadii(w, h, false, false);
                 ok("a single wheel puts the natal ceiling on the inner degree scale" + at,
-                    single[SkymapPanel.RING_BODY_TOP] == degreeInner
-                        && single[SkymapPanel.RING_TRI] == degreeInner
-                        && single[SkymapPanel.RING_TRANSIT] == degreeInner);
+                    single[WheelLayout.RING_BODY_TOP] == degreeInner
+                        && single[WheelLayout.RING_TRI] == degreeInner
+                        && single[WheelLayout.RING_TRANSIT] == degreeInner);
             }
         }
 
@@ -2392,9 +2392,9 @@ public final class AspectGridCheck {
         // into a mansion band, an undrawn Sabian strip and a dead strip; a click map of the
         // wheel (2026-09-14) showed the inner half of the visible rim opening a Sabian nothing
         // pointed at, or nothing. The Sabian symbols are read from the inner degree scale.
-        int[] r = SkymapPanel.ringRadii(900, 900, false);
-        int outer = r[SkymapPanel.RING_OUTER];
-        int decanOuter = r[SkymapPanel.RING_DECAN_OUTER];
+        int[] r = WheelLayout.ringRadii(900, 900, false);
+        int outer = r[WheelLayout.RING_OUTER];
+        int decanOuter = r[WheelLayout.RING_DECAN_OUTER];
         boolean wholeRim = true;
         for (int radius = decanOuter; radius <= outer; radius++) {
             wholeRim &= SkymapPanel.inMansionBand(radius, outer);

@@ -103,28 +103,28 @@ public final class RimAndFillsCheck {
                 for (double triOpen : new double[] {0.0, 1.0}) {
                     String at = " at " + s[0] + "x" + s[1] + " outer=" + outerOpen
                         + " tri=" + triOpen;
-                    int[] shut = SkymapPanel.ringRadii(s[0], s[1], outerOpen, triOpen,
+                    int[] shut = WheelLayout.ringRadii(s[0], s[1], outerOpen, triOpen,
                         1.0, 1.0, 1.0, 1.0, 0.0);
-                    int[] open = SkymapPanel.ringRadii(s[0], s[1], outerOpen, triOpen,
+                    int[] open = WheelLayout.ringRadii(s[0], s[1], outerOpen, triOpen,
                         1.0, 1.0, 1.0, 1.0, 1.0);
-                    int[] legacy = SkymapPanel.ringRadii(s[0], s[1], outerOpen, triOpen,
+                    int[] legacy = WheelLayout.ringRadii(s[0], s[1], outerOpen, triOpen,
                         1.0, 1.0, 1.0, 1.0);
-                    int outer = open[SkymapPanel.RING_OUTER];
+                    int outer = open[WheelLayout.RING_OUTER];
 
                     eq("the chain has ten radii" + at, 10, open.length);
                     eq("folded, the band has no depth" + at,
-                        outer, shut[SkymapPanel.RING_MANSION_INNER]);
+                        outer, shut[WheelLayout.RING_MANSION_INNER]);
                     eq("a caller that predates the band sees it folded" + at,
-                        outer, legacy[SkymapPanel.RING_MANSION_INNER]);
+                        outer, legacy[WheelLayout.RING_MANSION_INNER]);
                     eq("open, the band is MANSION_BAND_DEPTH deep" + at,
-                        outer - SkymapPanel.MANSION_BAND_DEPTH,
-                        open[SkymapPanel.RING_MANSION_INNER]);
+                        outer - WheelLayout.MANSION_BAND_DEPTH,
+                        open[WheelLayout.RING_MANSION_INNER]);
 
                     // <b>The whole point of carving it from the rim.</b> Every radius from the
                     // decans inward is where the bodies, the hit tests and natalRadii come
                     // from; if opening the mansions moved any of them, the wheel would jump.
                     boolean still = true;
-                    for (int i = 0; i < SkymapPanel.RING_MANSION_INNER; i++) {
+                    for (int i = 0; i < WheelLayout.RING_MANSION_INNER; i++) {
                         if (open[i] != shut[i] || open[i] != legacy[i]) {
                             still = false;
                         }
@@ -133,32 +133,32 @@ public final class RimAndFillsCheck {
 
                     // The band and the ticks below it both fit inside the rim.
                     ok("the band and the outer scale fit above the decans" + at,
-                        open[SkymapPanel.RING_MANSION_INNER] - 6
-                            > open[SkymapPanel.RING_DECAN_OUTER]);
+                        open[WheelLayout.RING_MANSION_INNER] - 6
+                            > open[WheelLayout.RING_DECAN_OUTER]);
                 }
             }
-            int[] half = SkymapPanel.ringRadii(s[0], s[1], 0.0, 0.0, 1, 1, 1, 1, 0.5);
-            int outer = half[SkymapPanel.RING_OUTER];
+            int[] half = WheelLayout.ringRadii(s[0], s[1], 0.0, 0.0, 1, 1, 1, 1, 0.5);
+            int outer = half[WheelLayout.RING_OUTER];
             ok("half open lies between folded and open at " + s[0] + "x" + s[1],
-                half[SkymapPanel.RING_MANSION_INNER] < outer
-                    && half[SkymapPanel.RING_MANSION_INNER]
-                        > outer - SkymapPanel.MANSION_BAND_DEPTH);
+                half[WheelLayout.RING_MANSION_INNER] < outer
+                    && half[WheelLayout.RING_MANSION_INNER]
+                        > outer - WheelLayout.MANSION_BAND_DEPTH);
         }
     }
 
     // ------------------------------------------------------------------ B
 
     private static void targets() {
-        int[] open = SkymapPanel.ringRadii(W, H, 0.0, 0.0, 1, 1, 1, 1, 1.0);
-        int[] shut = SkymapPanel.ringRadii(W, H, 0.0, 0.0, 1, 1, 1, 1, 0.0);
-        int outer = open[SkymapPanel.RING_OUTER];
-        int inner = open[SkymapPanel.RING_MANSION_INNER];
+        int[] open = WheelLayout.ringRadii(W, H, 0.0, 0.0, 1, 1, 1, 1, 1.0);
+        int[] shut = WheelLayout.ringRadii(W, H, 0.0, 0.0, 1, 1, 1, 1, 0.0);
+        int outer = open[WheelLayout.RING_OUTER];
+        int inner = open[WheelLayout.RING_MANSION_INNER];
 
         int both = 0;
         int gaps = 0;
-        for (double r = outer - SkymapPanel.RIM_BAND_DEPTH; r < outer + 15; r += 0.25) {
-            boolean m = SkymapPanel.inMansionRing(r, open);
-            boolean d = SkymapPanel.inRimDegreeBand(r, open);
+        for (double r = outer - WheelLayout.RIM_BAND_DEPTH; r < outer + 15; r += 0.25) {
+            boolean m = WheelLayout.inMansionRing(r, open);
+            boolean d = WheelLayout.inRimDegreeBand(r, open);
             if (m && d) {
                 both++;
             }
@@ -168,15 +168,15 @@ public final class RimAndFillsCheck {
         }
         eq("no radius is both the mansions and the scale", 0, both);
         eq("no radius on the rim answers nothing", 0, gaps);
-        ok("the outer edge of the rim is the mansions", SkymapPanel.inMansionRing(outer - 2, open));
-        ok("just under the band is the scale", SkymapPanel.inRimDegreeBand(inner - 2, open));
-        ok("and the scale is not the mansions", !SkymapPanel.inMansionRing(inner - 2, open));
+        ok("the outer edge of the rim is the mansions", WheelLayout.inMansionRing(outer - 2, open));
+        ok("just under the band is the scale", WheelLayout.inRimDegreeBand(inner - 2, open));
+        ok("and the scale is not the mansions", !WheelLayout.inMansionRing(inner - 2, open));
 
         boolean anyMansion = false;
         boolean allScale = true;
-        for (double r = outer - SkymapPanel.RIM_BAND_DEPTH; r < outer + 15; r += 0.25) {
-            anyMansion |= SkymapPanel.inMansionRing(r, shut);
-            allScale &= SkymapPanel.inRimDegreeBand(r, shut);
+        for (double r = outer - WheelLayout.RIM_BAND_DEPTH; r < outer + 15; r += 0.25) {
+            anyMansion |= WheelLayout.inMansionRing(r, shut);
+            allScale &= WheelLayout.inRimDegreeBand(r, shut);
         }
         ok("folded, nothing on the rim points at a mansion", !anyMansion);
         ok("folded, the scale has the whole rim back", allScale);
@@ -200,9 +200,9 @@ public final class RimAndFillsCheck {
 
         on(sky, SkymapPanel.Layer.MANSIONS, true);
         int[] rings = ringsOf(sky);
-        int outer = rings[SkymapPanel.RING_OUTER];
-        int mansionInner = rings[SkymapPanel.RING_MANSION_INNER];
-        int decanOuter = rings[SkymapPanel.RING_DECAN_OUTER];
+        int outer = rings[WheelLayout.RING_OUTER];
+        int mansionInner = rings[WheelLayout.RING_MANSION_INNER];
+        int decanOuter = rings[WheelLayout.RING_DECAN_OUTER];
         ok("the painted wheel has the band open", mansionInner < outer);
 
         on(sky, SkymapPanel.Layer.DEGREES, true);
@@ -241,9 +241,9 @@ public final class RimAndFillsCheck {
         int cx = intField(g, "cx");
         int cy = intField(g, "cy");
         int[] rings = ringsOf(sky);
-        int mansionInner = rings[SkymapPanel.RING_MANSION_INNER];
-        int degreeInner = rings[SkymapPanel.RING_DEGREE_INNER];
-        int outer = rings[SkymapPanel.RING_OUTER];
+        int mansionInner = rings[WheelLayout.RING_MANSION_INNER];
+        int degreeInner = rings[WheelLayout.RING_DEGREE_INNER];
+        int outer = rings[WheelLayout.RING_OUTER];
 
         Settings.setShowDegreeLines(true);
         BufferedImage lines = stable(chart);

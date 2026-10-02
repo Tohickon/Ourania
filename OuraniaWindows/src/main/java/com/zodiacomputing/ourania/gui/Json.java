@@ -53,8 +53,18 @@ final class Json {
 
     /** Parses a file as UTF-8, with the byte-order mark tolerated. */
     static Object parse(java.io.File file) throws java.io.IOException {
-        String text = new String(java.nio.file.Files.readAllBytes(file.toPath()),
-            java.nio.charset.StandardCharsets.UTF_8);
+        return parse(java.nio.file.Files.readAllBytes(file.toPath()));
+    }
+
+    /** A data file, opened wherever the engine's data comes from (M1). */
+    static Object parse(com.zodiacomputing.ourania.astro.DataFiles.Entry file)
+            throws java.io.IOException {
+        return parse(file.bytes());
+    }
+
+    /** UTF-8 bytes, with the byte-order mark tolerated - one rule for every way in. */
+    static Object parse(byte[] bytes) {
+        String text = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
         // A BOM is not whitespace and is not a value; several of this corpus's files were
         // written by tools that emit one, and the line reader never noticed because it only
         // ever looked at lines beginning with a quote.
