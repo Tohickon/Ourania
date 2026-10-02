@@ -1062,6 +1062,46 @@ public final class AspectGridCheck {
                 ok("Part Q: synthesis for " + label + " closes its document",
                     html != null && html.contains("</body>"));
 
+                // <b>The reading opens on its findings and closes on its machinery.</b> It used
+                // to be the other way round: the sect was section 1 and the convergence
+                // rankings - the part that says what the year is about - sat at the bottom
+                // behind two hundred lines of triggers. Asserted as four positions in order
+                // rather than four contains(), because the failure this guards against is not a
+                // missing tier, it is a tier sliding back below the mechanics.
+                int glance = html.indexOf("1. At a glance");
+                int byTheme = html.indexOf("2. The year by theme");
+                int dates = html.indexOf("3. Dates to watch");
+                int mech = html.indexOf("4. The mechanics");
+                ok("Part Q: " + label + " carries all four tiers",
+                    glance >= 0 && byTheme >= 0 && dates >= 0 && mech >= 0);
+                ok("Part Q: " + label + " puts the summary before the machinery",
+                    glance >= 0 && glance < byTheme && byTheme < dates && dates < mech);
+                ok("Part Q: " + label + " summarises the chart's shape at the top",
+                    glance >= 0 && mech > glance
+                        && html.substring(glance, mech).contains("The chart</b>"));
+
+                // <b>The mechanics tier is optional, and the choice must not reach the
+                // answers.</b> A reader turning the audit trail off is asking not to be handed
+                // the working; if that also changed a summary line or a date, the two settings
+                // would be two different readings of one chart. Asserted as the tiers being
+                // character-for-character identical, which is the only form of this that cannot
+                // pass by accident - four contains() would survive a reworded summary.
+                String lean = NarrativeSynthesizer.generateReport(
+                    f, g, ranked, themes, tf, prof, hits, null, null, withTime, rel, false);
+                int leanMech = lean.indexOf("4. The mechanics");
+                ok("Part Q: " + label + " names the mechanics tier even when it is withheld",
+                    leanMech >= 0);
+                ok("Part Q: " + label + " says where the mechanics went",
+                    lean.contains("Show the mechanics"));
+                ok("Part Q: " + label + " withholding the mechanics leaves tiers 1 to 3 untouched",
+                    mech >= 0 && leanMech >= 0
+                        && lean.substring(0, leanMech).equals(html.substring(0, mech)));
+                ok("Part Q: " + label + " without the mechanics is the shorter reading",
+                    lean.length() < html.length());
+                ok("Part Q: " + label + " without the mechanics drops the placements and transits",
+                    !lean.contains("4.2 Planetary Placements")
+                        && !lean.contains("4.10 Current Transits"));
+
                 // <b>A named pattern must carry its reading.</b> Section 5 used to print one
                 // bare line per pattern and no prose, so a T-square - the loudest thing in a
                 // chart - read as absent. pattern_detail.json had the text all along, plus
@@ -1147,7 +1187,7 @@ public final class AspectGridCheck {
                         !html.contains("at age"));
                     if (withTime) {
                         ok("Part Q: " + label + " still shows transits to the composite",
-                            html.contains("10. Current Transits"));
+                            html.contains("4.10 Current Transits"));
                     }
 
                     // <b>The natal apology must never reach a couple.</b> Where no composite

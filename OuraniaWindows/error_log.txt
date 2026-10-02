@@ -1,17 +1,30 @@
-java.lang.ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 1
-	at com.zodiacomputing.ourania.gui.SkymapPanel.triggerPlanetInterpretation(SkymapPanel.java:2400)
-	at com.zodiacomputing.ourania.gui.OuraniaWindow.handlePlacementClick(OuraniaWindow.java:179)
-	at com.zodiacomputing.ourania.gui.AspectGridCheck.lambda$indexPagesResolve$4(AspectGridCheck.java:845)
-	at java.desktop/java.awt.event.InvocationEvent.dispatch(Unknown Source)
-	at java.desktop/java.awt.EventQueue.dispatchEventImpl(Unknown Source)
-	at java.desktop/java.awt.EventQueue$4.run(Unknown Source)
-	at java.desktop/java.awt.EventQueue$4.run(Unknown Source)
-	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(Unknown Source)
-	at java.desktop/java.awt.EventQueue.dispatchEvent(Unknown Source)
-	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(Unknown Source)
-	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(Unknown Source)
-	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(Unknown Source)
-	at java.desktop/java.awt.EventDispatchThread.pumpEvents(Unknown Source)
-	at java.desktop/java.awt.EventDispatchThread.pumpEvents(Unknown Source)
-	at java.desktop/java.awt.EventDispatchThread.run(Unknown Source)
+java.lang.NullPointerException: Cannot invoke "java.lang.StringBuffer.append(String)" because "<parameter5>" is null
+	at de.thmac.swisseph.FileData.get_new_segment(FileData.java:787)
+	at de.thmac.swisseph.SwissEph.sweph(SwissEph.java:4571)
+	at de.thmac.swisseph.SwissEph.sweph(SwissEph.java:4618)
+	at de.thmac.swisseph.SwissEph.sweplan(SwissEph.java:4133)
+	at de.thmac.swisseph.SwissEph.sweph_moon(SwissEph.java:3774)
+	at de.thmac.swisseph.SwissEph.swecalc(SwissEph.java:3252)
+	at de.thmac.swisseph.SwissEph._calc(SwissEph.java:466)
+	at de.thmac.swisseph.SwissEph.swe_calc(SwissEph.java:366)
+	at de.thmac.swisseph.SwissEph.swe_set_ephe_path(SwissEph.java:716)
+	at de.thmac.swisseph.SwissEph.<init>(SwissEph.java:167)
+	at com.zodiacomputing.ourania.gui.SkymapPanel.<init>(SkymapPanel.java:2339)
+	at com.zodiacomputing.ourania.gui.OuraniaWindow.initScreens(OuraniaWindow.java:176)
+	at com.zodiacomputing.ourania.gui.OuraniaWindow.<init>(OuraniaWindow.java:120)
+	at com.zodiacomputing.ourania.gui.NavigationCheck$Recorder.<init>(NavigationCheck.java:317)
+	at com.zodiacomputing.ourania.gui.NavigationCheck.screenOf(NavigationCheck.java:305)
+	at com.zodiacomputing.ourania.gui.NavigationCheck.everyScreenReachable(NavigationCheck.java:274)
+	at com.zodiacomputing.ourania.gui.NavigationCheck.main(NavigationCheck.java:72)
+---- 2026-09-28T11:30:43.668843400-07:00[America/Los_Angeles]  start-up inspection, development build
+  DEGRADED: The ephemeris is missing one of its files - semo_18.se1 - named by Swiss Ephemeris itself while computing this moment, in C:\Users\daver\Desktop\Ourania\decoded_apk\assets. They can be downloaded from the Swiss Ephemeris distribution and dropped into that folder; nothing else has to change.
+  DEGRADED: 1 body is computed by approximation rather than from the files - Black Moon Lilith - measured at 2026-09-28. The answer is close, within an arcsecond or so, but it is arrived at by a different method from every other point in the same chart.
+  NOTE: The interpretation corpus is complete - 55 files in C:\Users\daver\Projects\Ourania\OuraniaWindows\src\main\resources\data.
+  NOTE: Problems have been written down - error_log.txt - last written 2026-09-08, 1335 bytes. Diagnostics can save it as a report.
+
+---- 2026-09-28T15:42:38.194969-07:00[America/Los_Angeles]  start-up inspection, development build
+  DEGRADED: The ephemeris is missing one of its files - semo_18.se1 - named by Swiss Ephemeris itself while computing this moment, in C:\Users\daver\Desktop\Ourania\decoded_apk\assets. They can be downloaded from the Swiss Ephemeris distribution and dropped into that folder; nothing else has to change.
+  DEGRADED: 1 body is computed by approximation rather than from the files - Black Moon Lilith - measured at 2026-09-28. The answer is close, within an arcsecond or so, but it is arrived at by a different method from every other point in the same chart.
+  NOTE: The interpretation corpus is complete - 55 files in C:\Users\daver\Projects\Ourania\OuraniaWindows\src\main\resources\data.
+  NOTE: Problems have been written down - error_log.txt - last written 2026-09-28, 2261 bytes. Diagnostics can save it as a report.
+

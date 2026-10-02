@@ -1,0 +1,513 @@
+Ourania+ · Windows Edition · completion audit
+
+What Ourania still needs
+An itemized survey of the gap between the engine and the application, measured against the source tree rather than estimated — and against what comparable desktop astrology software ships as a matter of course.
+
+Audited 2 Sep 2026
+Engine 52 astro classes
+Suites 24 · 725,224 checks
+Repo Tohickon/Ourania
+The engine is years ahead of the application
+This is not a half-built calculator. Zodiacal releasing to four levels, secondary progressions, solar arc, returns, profections, midpoints, dignities, sect, decans, lunar mansions, transfer of light, harmonic charts — all computed, all covered by check suites, much of it unreachable from the interface.
+
+Counting references from the gui package to each engine class: five capabilities have zero. Midpoints, Rulership, DecanSystem, HarmonicResonance and Calibration are computed, correct, checked, and have no door. Several more have exactly one reference — reachable only as a side effect of something else.
+
+That is this project's signature defect and it has now been logged four times: the browsable index whose only two entry points were both inside a panel that had to be open first; SavedCharts, a working profile store the "Name List" screen never once read; the harmonic dial the work plan still lists as unimplemented; and these five. The single highest-value work in this list is not new computation. It is doors.
+
+5
+engine capabilities with no UI reference at all
+0
+ways to export, print or save a chart
+4
+menu screens removed as empty placeholders
+0
+commits pushed to the GitHub remote
+Built
+works today
+Partial
+exists, incomplete
+No door
+computed, unreachable
+Missing
+not present
+A
+Astronomy & correctness
+14 items
+The foundation everything else inherits. An error here is invisible and contaminates every reading downstream.
+
+A1
+Swiss Ephemeris integration
+Built
+Bundled, path-resolved through Ephemeris.PATH with property and environment overrides.
+A2
+Moshier fallback disclosure
+Partial
+Ephemeris.present() exists but nothing calls it to decide anything. If the ephemeris directory is wrong the app silently falls back to lower precision. The user is never told.
+A3
+House systems
+Partial
+Six offered (Placidus, Koch, Equal, Whole Sign, Campanus, Regiomontanus). Comparable apps ship 12–20: Porphyry, Alcabitius, Morinus, Topocentric, Meridian, Krusinski.
+A4
+Extreme-latitude house failure
+Missing
+Placidus and Koch are undefined above roughly 66°. No detection, no fallback, no warning — the chart will simply be wrong for a polar birth.
+A5
+Sidereal zodiac & ayanamsa
+Missing
+Tropical only. Sidereal with a selectable ayanamsa (Lahiri, Fagan-Bradley, Krishnamurti, Raman) is standard, and mandatory for any Vedic use.
+A6
+Heliocentric charts
+Missing
+Geocentric only.
+A7
+Topocentric positions
+Partial
+ChartFrame.compute takes a topocentric flag and an altitude; nothing in the UI sets either.
+A8
+True vs mean node, true vs mean Lilith
+Built
+Settings-backed variant toggles.
+A9
+Timezone & DST from history
+Partial
+Zone resolved from the geocoded location. Historic DST rules, war time, and pre-1970 local mean time are where birth charts silently go wrong by an hour; no evidence of a historic-rules test corpus.
+A10
+Atlas / geocoding
+Partial
+Geocoder exists and resolves names online. No offline atlas, so the app cannot cast a chart without a network — every comparable product ships one.
+A11
+Declination & out-of-bounds
+Partial
+ChartFrame.Body carries dec and outOfBounds. No declination chart, no parallel/contraparallel aspects, no out-of-bounds report.
+A12
+Antiscia & contra-antiscia
+Missing
+Standard in traditional practice, which this app otherwise serves well.
+A13
+Fixed stars
+Missing
+No star catalogue, no conjunctions to stars, no parans. Swiss Ephemeris supplies the data already.
+A14
+Asteroid breadth
+Partial
+29 registry points including Eris, Eros, Hygiea, Nessus, Pholus. Psyche is documented as blocked on an unsourceable ephemeris file — a real, recorded limit rather than an oversight.
+B
+Chart types
+11 items
+What the wheel can be asked to draw. The relationship charts are unusually complete; the derived charts are the gap.
+
+B1
+Natal
+Built
+Single wheel, full placement and aspect reporting.
+B2
+Transits bi-wheel
+Built
+Outer ring, with transits as an explicit choice rather than implied by mode.
+B3
+Synastry bi-wheel
+Built
+Cross-aspects at halved orbs, house overlays, dedicated interpretation corpus.
+B4
+Composite (midpoint)
+Built
+With a selectable reference place for the house frame, and an unstable-midpoint flag near oppositions.
+B5
+Composite (Davison)
+Built
+A real chart for the midpoint in time and space.
+B6
+Tri-wheel
+Partial
+Sky ring around a composite works. The natal + progressed + transit tri-wheel the work plan asks for is computed but not offered as a mode.
+B7
+Harmonic charts
+Built
+H1–H360 dial, angles deliberately untransformed, applied exactly once across wheel, grid and reading.
+B8
+Harmonic resonance ranking
+No door
+HarmonicResonance ranks the five tightest contacts across the dial. 58 checks. Zero UI references — nothing in the app can show it.
+B9
+Draconic charts
+Missing
+Node-relocated zodiac. Cheap to add given the harmonic machinery already rotates longitudes.
+B10
+Relocation & astrocartography
+Missing
+Relocated angles for a new place, and the world map of planetary lines. A headline feature in every commercial competitor.
+B11
+Horary & electional framing
+Partial
+The traditional apparatus exists — dignity, sect, joys, transfer of light, collection. There is no horary mode that presents it as a judgement.
+C
+Predictive techniques
+12 items
+The deepest engine work in the project, and the least reachable. Most of this section is doors, not mathematics.
+
+C1
+Transit calculation
+Built
+Transits with event hits and perfections.
+C2
+Transit search / date range report
+Missing
+"When does Saturn square my Moon, between 2026 and 2030?" — a list with exact dates, stations and retrograde passes. The single most-used feature in comparable software.
+C3
+Secondary progressions
+Partial
+Progressions is implemented; one UI reference. No progressed wheel, no progressed-to-natal aspect grid, no progressed lunation cycle.
+C4
+Solar arc directions
+Partial
+SolarArc implemented, one UI reference, no dedicated view.
+C5
+Solar & lunar returns
+Partial
+Returns is well referenced. Needs a return chart as a first-class mode, with the relocated-return option practitioners expect.
+C6
+Annual profections
+Partial
+Profection is computed and appears in readings. No year-by-year table, no time-lord highlighting on the wheel.
+C7
+Zodiacal releasing
+Partial
+Engine computes L1–L4 with peak periods and loosing of the bond. ReleasingPanel exists but is a table, not the timeline dashboard the technique needs to be readable.
+C8
+Firdaria
+Missing
+The other major Hellenistic/Persian time-lord system. Natural companion to what is already here.
+C9
+Primary directions
+Missing
+The hardest predictive technique to implement correctly, and the one traditional practitioners ask for.
+C10
+Annual calendar / almanac
+Built
+Almanac drives the Calendar reading: ingresses, stations, lunations, mundane aspects.
+C11
+Eclipses & prenatal syzygy
+Partial
+Prenatal syzygy is computed per chart. No eclipse series, no saros, no eclipse-to-natal contacts.
+C12
+Personal transit calendar
+Missing
+A month view flagging high-intensity days for the loaded chart, rather than the sky in general.
+D
+Interpretation & reading
+10 items
+The corpus is the app's real asset — DataCheck alone validates 611,464 entries. The gap is in what selects from it.
+
+D1
+Placement, aspect & house corpus
+Built
+Signs, houses, aspects, minor aspects, decans, Sabian symbols, lunar mansions, dignities, tarot, natal, synastry and composite variants.
+D2
+Five reading tiers
+Built
+Snapshot, Report, Synthesize, Predict, Calendar.
+D3
+Chart-shape & weighting synthesis
+Built
+Gestalt, Themes, BodyScore, AspectPatterns — Jones patterns, stelliums, hemispheres, elements, the rule of three.
+D4
+Browsable reference index
+Built
+Bodies, signs, houses, aspects, dignities, decans, Sabians, tarot, mansions — reachable from the placements panel.
+D5
+Midpoint trees & direct midpoints
+No door
+Midpoints is implemented with zero UI references. Ebertin-style midpoint work is a whole school of practice sitting behind no button.
+D6
+Rulership & dispositor trees
+No door
+Rulership has zero UI references. The dispositor tree is referenced in project notes as implemented — it is not reachable.
+D7
+Decan system
+No door
+DecanSystem has zero UI references, though decan text exists in the corpus and the wheel draws a decan band.
+D8
+29° anaretic / critical degrees
+Missing
+Open in the work plan since 21 Aug. Needs a sourced orb decision, not code.
+D9
+Reading export & editing
+Missing
+Readings can be generated but not saved, copied as formatted text, or edited into a client document.
+D10
+Interpretation provenance
+Partial
+With a corpus this large, a reader cannot tell which text is authored, composed, or generated. A source marker per passage would protect the corpus's credibility.
+E
+The wheel
+12 items
+Rendering and direct manipulation. SkymapPanel is decompiler output with no original — the constraint that shapes everything here.
+
+E1
+Wheel rendering
+Built
+Sign band, decan band, mansion ring, houses, degree ticks, glyphs, aspect lines.
+E2
+Orb-faded, glowing aspect strands
+Built
+Alpha and stroke scale with exactness; glow driven off the same factor so it cannot brighten what the fade hides.
+E3
+Hover focus & click-to-pin
+Built
+Hovering a body lights its web and dims the rest; clicking pins it and opens its detail.
+E4
+Full colour control
+Built
+Six templates plus user-saved ones; per-aspect, per-body, element, ink, page, disc, mansion and leader-line colours.
+E5
+Body placement & sphere toggle
+Built
+Inside the sign ring, centre, or outside; spheres off for a traditional look.
+E6
+Zoom & pan
+Missing
+The wheel is fixed to the panel. No zoom, no pan, no fit-to-window.
+E7
+Drag-to-time scrubbing
+Missing
+Transport buttons step time. Dragging the wheel to scrub, or a timeline slider, is what makes a chart feel like an instrument.
+E8
+Aspect line filtering by body
+Partial
+Hover focus dims the rest, but there is no way to permanently hide a body's lines or show only selected pairs.
+E9
+Ring geometry duplication
+Partial
+Four call sites derive the same radius chain. The work plan says extract before adding a third wheel; still outstanding, and it blocks E6, E7 and B6.
+E10
+Glyph font coverage
+Partial
+Several UI glyphs render as empty boxes in the bundled font — the swap arrow, drawer chevrons. Astrological glyphs are fine; interface symbols are not.
+E11
+Declination / 90° dial views
+Missing
+The 90° dial is the standard surface for midpoint work and would give D5 its door.
+E12
+Grid Skymap is not a skymap
+Missing
+The menu entry named "Grid Skymap" shows the 2D wheel. A real horizon/celestial-sphere view does not exist.
+F
+Screens & navigation
+9 items
+Rebuilt this session into one right-hand drawer. What remains is what the drawer does not yet contain.
+
+F1
+Single side drawer with accordion
+Built
+Selection, Menu, Saved Charts, Natal, Transits, Aspect Grids, Readings.
+F2
+Two-step chart setup
+Built
+Subject then engine, with Midpoint and Davison as distinct choices and instructional hover text.
+F3
+Settings screen
+Built
+Chart settings, aspect visibility, colours, points, variants — with a way back out, which it lacked entirely until today.
+F4
+Share / export screen
+Missing
+Removed as an empty placeholder. Nothing behind it.
+F5
+Sync & cloud
+Missing
+Removed as an empty placeholder.
+F6
+Help & documentation
+Missing
+Removed as an empty placeholder. No in-app help, no glossary, no first-run guidance — for an app whose subject has a large vocabulary.
+F7
+Keyboard navigation & shortcuts
+Missing
+No shortcuts for step forward/back, play, today, or switching charts. No focus-visible styling audit.
+F8
+Window state persistence
+Missing
+Size, position, drawer open state and which sections were expanded are not remembered between launches.
+F9
+Accessibility
+Missing
+No screen-reader labelling, no high-contrast mode, no font scaling. The colour system now makes a colour-blind-safe template achievable cheaply.
+G
+Data management
+9 items
+The store works. Everything around it — import, backup, organisation — does not exist.
+
+G1
+Saved chart store
+Built
+SavedCharts in saved_charts.properties, with a real directory UI as of today.
+G2
+Load as Chart A / Chart B
+Built
+Per-entry, routed through Chart Setup so the mode follows.
+G3
+Delete & rename saved charts
+Missing
+Charts can be saved and loaded but never removed or renamed from the interface.
+G4
+Profile metadata
+Missing
+Name, date, time and place only. No notes, no tags, no relationship type, no birth-time accuracy rating — the last matters, since it governs how far a reading can be trusted.
+G5
+Import from other software
+Missing
+No CSV, no AAF, no Solar Fire or Astro Gold import. This is the single biggest barrier to a practitioner adopting the app.
+G6
+Export & backup of the chart book
+Missing
+Client data lives in one properties file with no backup path and no export.
+G7
+Search & grouping
+Partial
+Name search exists. No folders, tags, or filtering by chart attributes.
+G8
+Settings file robustness
+Partial
+A construction bug rewrote the body selection from 29 points to 5 today. Guarded now, but the file has no schema, no versioning and no validation on load.
+G9
+Multi-user / practitioner separation
+Missing
+One flat book. No separation between personal charts, clients and research sets.
+H
+Output: export, print, share
+7 items
+Verified absent: no ImageIO.write, no Printable, no PDF path anywhere in the GUI. This section is entirely unbuilt, and it is what turns an app into a working tool.
+
+H1
+Save chart as image
+Missing
+PNG or SVG at a chosen resolution. The most requested single feature in any chart app.
+H2
+Print the wheel
+Missing
+No print support at all, including page setup and scaling.
+H3
+PDF report
+Missing
+Wheel plus placements plus reading as a client-ready document. The corpus makes this the app's most commercially distinctive possible output.
+H4
+Copy chart data to clipboard
+Missing
+Positions as text or CSV for use elsewhere.
+H5
+Export aspect grid
+Missing
+The grid is HTML already; a table export is nearly free.
+H6
+Report templates & branding
+Missing
+Practitioners send readings to clients under their own name.
+H7
+Batch output
+Missing
+Generate charts or reports for a whole set — needed for research use, which the corpus invites.
+I
+Configuration
+6 items
+Substantially advanced this session. What remains is orbs, which is the setting practitioners argue about most.
+
+I1
+Point selection
+Built
+Per-body, grouped, with select all / none / defaults.
+I2
+Aspect visibility
+Built
+All 15 aspect types, through one gate shared by the wheel and the grid.
+I3
+Custom orbs
+Missing
+Orbs are code constants with a documented, measured scheme. There is no UI to set orbs per aspect, per body, or per chart type — the most-requested professional setting.
+I4
+Colour system
+Built
+Templates, per-item chips, user-saved palettes.
+I5
+Chart defaults
+Partial
+House system and home location persist. No default chart type, aspect set, or startup behaviour.
+I6
+Settings search & reset
+Missing
+The screen is now long enough to need both, and a full reset-to-defaults.
+J
+Quality & engineering
+8 items
+The check-suite discipline here is genuinely unusual. The gaps are in what the suites cannot see.
+
+J1
+Check suites
+Built
+24 suites, 725,224 checks, stamped by a script that runs them rather than trusting a typed number.
+J2
+Settings-dependent check counts
+Partial
+A standing defect: several suites' totals move with the user's body selection. Two suites are now written to be immune; the rest are not.
+J3
+Ephemeris accuracy corpus
+Partial
+Spot-checked against astro.com. No systematic regression corpus of known charts with expected positions across eras and latitudes.
+J4
+Decompiled source
+Partial
+SkymapPanel is CFR output with no original: 4,400 lines, machine-named locals. Every wheel change costs more than it should.
+J5
+Error handling & logging
+Missing
+Failures print stack traces to a console the user never sees. No log file, no error dialog, no crash report.
+J6
+Startup validation
+Missing
+Nothing verifies the ephemeris directory, the data files, or the settings file before the window opens.
+J7
+Performance under load
+Partial
+Animation recomputes the frame each tick. No profiling of the 29-body, all-aspects, tri-wheel worst case.
+J8
+CI
+Missing
+The suites run only when someone remembers. With two agents on one tree, that is the weakest link in the process.
+K
+Distribution & release
+7 items
+Nothing here exists. The app runs from a source tree on one machine.
+
+K1
+Runnable artifact
+Missing
+No jar. build.ps1 compiles to a directory and the app runs from src\main\java.
+K2
+Bundled runtime & installer
+Missing
+Requires a hand-configured JDK path. No jpackage bundle, no installer, no signing.
+K3
+Commits pushed
+Missing
+Tohickon/Ourania is configured as origin. Today's five commits are local only; nothing is backed up off this machine.
+K4
+Versioning
+Missing
+No version number in the app, no tags, no changelog a user could read.
+K5
+Licensing
+Missing
+Swiss Ephemeris is dual-licensed: AGPL, or a paid commercial licence. This must be settled before any distribution, and it constrains whether the app can ever be sold closed-source.
+K6
+Corpus rights
+Missing
+600,000+ interpretation entries with no recorded provenance or licence status. Same gate as K5, and less obvious.
+K7
+Cross-platform
+Missing
+Windows paths and the system look-and-feel are assumed in several places. Swing itself is portable; the app is not yet.
+If only five things get done
+Push to GitHub (K3). Five commits and an irreplaceable corpus exist on one machine with no off-site copy. A vault file was destroyed today with no recovery path; the same exposure applies to everything else.
+Settle the Swiss Ephemeris and corpus licensing (K5, K6). Every other decision about distribution depends on the answer, and the cost of finding out late is total.
+Build the doors (D5, D6, D7, B8, C3–C7). Midpoints, rulership, decans, harmonic resonance, progressions, solar arc, returns and profections are computed and checked. This is the highest ratio of value to effort in the whole list.
+Ship output (H1, H2, H3). No image, no print, no PDF. Nothing leaves the app, which caps its usefulness regardless of how good the engine is.
+Transit search across a date range (C2). The one feature a practitioner opens comparable software to use, and the engine already computes everything it needs.

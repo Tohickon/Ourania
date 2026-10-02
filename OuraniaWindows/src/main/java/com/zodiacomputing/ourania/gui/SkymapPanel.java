@@ -4063,8 +4063,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // The mode decides which prose the reading speaks. Captured from the
                     // panel rather than sniffed from the frame: syntheticMoment is true for
                     // a midpoint composite and false for a Davison, so it cannot answer this.
+                    // The mechanics tier is the reader's own call, read here rather than
+                    // remembered by the checkbox that sets it: this tab regenerates on every
+                    // open, so a state held in the widget would be lost the first time the
+                    // reader looked at another page.
                     return NarrativeSynthesizer.generateReport(chartFrame, result, list, result2, chartFrame2, profection, list2, yearScan, list3, bl,
-                        SkymapPanel.this.isRelationshipChart());
+                        SkymapPanel.this.isRelationshipChart(), Settings.readingMechanics());
                 }
                 object = PlainSnapshot.generate(chartFrame, result, list);
                 if (bl) {

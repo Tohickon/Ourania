@@ -308,7 +308,7 @@ public class OuraniaWindow extends JFrame {
         for (String[] r : READINGS) {
             javax.swing.JEditorPane pane = HtmlPanes.chartPane(this);
             readingPanes.put(r[0], pane);
-            chartRail.addPage(r[0], HtmlPanes.scroller(pane));
+            chartRail.addPage(r[0], readingPage(r[1], HtmlPanes.scroller(pane)));
         }
 
         // <b>Opening a tab has to produce the page, not just reveal it.</b> The readings were
@@ -1003,6 +1003,51 @@ public class OuraniaWindow extends JFrame {
             chartRail.setPageEnabled(SELECTION_PAGE, true);
             chartRail.reveal(SELECTION_PAGE);
         }
+    }
+
+    /**
+     * A reading's page: the scrolled pane, with a strip of controls above it where it has any.
+     *
+     * <b>Only Synthesize has one, and only because a Swing HTML pane cannot collapse a
+     * section.</b> The reading is four tiers of progressive disclosure and its fourth - the
+     * architecture, every placement, the patterns, the houses, the rankings and the transits -
+     * is the audit trail, which belongs behind a disclosure triangle. HTML 3.2 has no
+     * {@code <details>} and the pane runs no script, so the tier is chosen before the page is
+     * built and the triangle is this checkbox.
+     *
+     * <b>It writes to Settings and re-runs the reading rather than hiding anything.</b> The tab
+     * regenerates on every open - a reading is a snapshot of a moment, and the moment moves -
+     * so a choice held in the widget would be lost as soon as the reader looked elsewhere.
+     *
+     * Every other reading is returned exactly as it was, so this cannot become the place a
+     * control quietly appears on five pages.
+     */
+    private JComponent readingPage(String kind, JComponent body) {
+        if (!"SYNTHESIZE".equals(kind)) {
+            return body;
+        }
+        JPanel page = new JPanel(new BorderLayout());
+        page.setBackground(Color.BLACK);
+        JCheckBox mechanics = new JCheckBox("Show the mechanics",
+            Settings.readingMechanics());
+        mechanics.setForeground(Theme.TEXT);
+        mechanics.setBackground(Color.BLACK);
+        mechanics.setFont(Theme.BODY);
+        mechanics.setFocusPainted(false);
+        mechanics.setToolTipText("<html>On: the whole reading &mdash; the summary, the year's "
+            + "themes and dates, then tier 4, which is the architecture, every placement, the "
+            + "patterns, the houses, the convergence rankings and the current transits.<br>"
+            + "Off: tiers 1 to 3 only. The same answers, without the working.</html>");
+        mechanics.addItemListener(e -> {
+            Settings.setReadingMechanics(mechanics.isSelected());
+            runReading("SYNTHESIZE");
+        });
+        JPanel strip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
+        strip.setBackground(Color.BLACK);
+        strip.add(mechanics);
+        page.add(strip, BorderLayout.NORTH);
+        page.add(body, BorderLayout.CENTER);
+        return page;
     }
 
     /** One reading, from the sidebar's Readings section. See {@code SkymapPanel.runReading}. */

@@ -289,6 +289,22 @@ public final class NavigationCheck {
         for (String[] r : OuraniaWindow.READINGS) {
             ok("the rail has a page for the reading " + r[0], pages.contains(r[0]));
         }
+        // <b>The synthesis's fourth tier is optional, and a Swing HTML pane cannot collapse
+        // it.</b> HTML 3.2 has no details element and the pane runs no script, so what would
+        // be a disclosure triangle is a checkbox on the page itself - which is a control that
+        // could be added, wired to nothing, and pass every check here on the strength of the
+        // tab existing. Asked of the page's own components, and asked of the other four too:
+        // one reading needing a control is not licence for five.
+        for (String[] r : OuraniaWindow.READINGS) {
+            java.util.List<String> boxes = facts.readingControls
+                .getOrDefault(r[0], java.util.Collections.emptyList());
+            if ("SYNTHESIZE".equals(r[1])) {
+                ok("the Synthesize page carries the mechanics checkbox",
+                    boxes.contains("Show the mechanics"));
+            } else {
+                ok("the reading " + r[0] + " carries no checkbox of its own", boxes.isEmpty());
+            }
+        }
         for (String p : new String[] {OuraniaWindow.CHART_PAGE, OuraniaWindow.TRANSITS_PAGE,
                                       OuraniaWindow.SYNASTRY_PAGE,
                                       OuraniaWindow.SELECTION_PAGE,
@@ -429,9 +445,24 @@ public final class NavigationCheck {
     }
 
     /** What only a whole window can answer, gathered in one construction. */
+    /** Every checkbox label under a component, however deeply nested. */
+    private static void collectCheckBoxes(java.awt.Component c, List<String> into) {
+        if (c instanceof javax.swing.JCheckBox) {
+            into.add(((javax.swing.JCheckBox) c).getText());
+        }
+        if (c instanceof java.awt.Container) {
+            for (java.awt.Component kid : ((java.awt.Container) c).getComponents()) {
+                collectCheckBoxes(kid, into);
+            }
+        }
+    }
+
     private static final class WindowFacts {
         final List<String> railPages = new ArrayList<>();
         final List<String> menuRailPages = new ArrayList<>();
+        /** Checkbox labels found on each reading page, by page name. */
+        final java.util.Map<String, List<String>> readingControls =
+            new java.util.LinkedHashMap<>();
         boolean eastIsOneRail;
         boolean nothingOnTop;
     }
@@ -451,6 +482,11 @@ public final class NavigationCheck {
                 DrawerRail rail = w.chartRail();
                 if (rail != null) {
                     f.railPages.addAll(rail.pageNames());
+                    for (String[] r : OuraniaWindow.READINGS) {
+                        List<String> boxes = new ArrayList<>();
+                        collectCheckBoxes(rail.page(r[0]), boxes);
+                        f.readingControls.put(r[0], boxes);
+                    }
                 }
                 DrawerRail menu = w.menuRail();
                 if (menu != null) {

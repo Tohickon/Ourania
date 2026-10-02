@@ -119,6 +119,7 @@ public final class DrawerRail extends JPanel {
      */
     public void addPage(String label, JComponent content, int pageWidth) {
         pages.add(content, label);
+        pageBodies.put(label, content);
         pageWidths.put(label, pageWidth);
         Tab tab = new Tab(label);
         tabs.add(tab);
@@ -232,6 +233,26 @@ public final class DrawerRail extends JPanel {
     public String selected() {
         return selected;
     }
+
+    /**
+     * The component behind a tab, or null when no page has that label.
+     *
+     * <b>Package-private, for the suites.</b> A page is added by name and then only ever shown
+     * by name, so a check that wanted to ask what is actually ON a page had no way to reach it
+     * and could only assert that the tab existed - which is how a control can be added to a
+     * page, wired to nothing, and pass. See NavigationCheck on the Synthesize checkbox.
+     */
+    JComponent page(String label) {
+        return pageBodies.get(label);
+    }
+
+    /**
+     * What was added under each label.
+     *
+     * A CardLayout keeps the label as a layout constraint, not on the component, so the
+     * container cannot be asked which card is which afterwards. Recorded on the way in.
+     */
+    private final java.util.Map<String, JComponent> pageBodies = new java.util.LinkedHashMap<>();
 
     /** The tab labels this rail carries, in the order they appear. */
     public List<String> pageNames() {
