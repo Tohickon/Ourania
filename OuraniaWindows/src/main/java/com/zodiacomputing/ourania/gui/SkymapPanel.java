@@ -1509,7 +1509,6 @@ implements WheelSource, GlobeSource {
      * the globe for the same reason it is absent from the wheel - otherwise the two views
      * disagree about what is in aspect, which is worse than either being wrong alone.
      */
-    @Override
     public Color aspectInkFor(double lonA, double lonB, int a, int b, boolean cross) {
         double sep = Math.abs(lonA - lonB);
         if (sep > 180.0) {
@@ -6405,6 +6404,36 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     /** GlobeSource: a ring's arrays by the renderer's numbering - 0 inner, 1 outer, 2 sky. */
     @Override public double[] ringLon(int ring) {
         return ring == 0 ? this.natalRing.lon : ring == 1 ? this.outerRing.lon : this.skyRing.lon;
+    }
+
+    /** GlobeSource: the desktop's colours as Inks, for the globe drawn without AWT (M11). */
+    @Override public Ink globeAspectInk(double lonA, double lonB, int a, int b, boolean cross) {
+        return AwtPen.ink(this.aspectInkFor(lonA, lonB, a, b, cross));
+    }
+
+    @Override public Ink globeRingInk(int body, AngleRole role) {
+        return AwtPen.ink(this.ringInk(body, role));
+    }
+
+    @Override public Ink elementInk(int element) {
+        return AwtPen.ink(SkymapPanel.elementColorFor(element));
+    }
+
+    @Override public Ink bodyInk(int body) {
+        return AwtPen.ink(SkymapPanel.bodyInkFor(body));
+    }
+
+    @Override public Ink mansionInk() {
+        return AwtPen.ink(ChartPalette.colorOr(ChartPalette.mansionHex(null),
+            new Color(181, 160, 227)));
+    }
+
+    @Override public Ink leaderInk() {
+        return AwtPen.ink(ChartPalette.colorOr(ChartPalette.leaderHex(null), Color.WHITE));
+    }
+
+    @Override public Ink beadInk(AngleRole role) {
+        return AwtPen.ink(SkymapPanel.ringBead(role));
     }
 
     @Override public boolean[] ringValid(int ring) {

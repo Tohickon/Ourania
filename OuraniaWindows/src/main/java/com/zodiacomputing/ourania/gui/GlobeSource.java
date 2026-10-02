@@ -2,8 +2,6 @@ package com.zodiacomputing.ourania.gui;
 
 import com.zodiacomputing.ourania.astro.LunarMansions;
 
-import java.awt.Color;
-
 /**
  * Everything the globe asks of the chart it draws (M11, stage 2).
  *
@@ -17,8 +15,8 @@ import java.awt.Color;
  * <p><b>Rings are numbered as the renderer always numbered them:</b> 0 the inner chart, 1 the
  * outer ring (a partner or transits), 2 the sky.
  *
- * <p>Colours, the layer enum and the angle roles are still the desktop's types; stage 3 takes
- * the renderer off AWT and they move with it.
+ * <p>Colours are {@link Ink}s since stage 3, so nothing here is AWT's; the layer enum and the
+ * angle roles are still the desktop panel's, and move out with stage 4.
  */
 interface GlobeSource {
 
@@ -83,7 +81,24 @@ interface GlobeSource {
 
     boolean lightsChord(int a, int b, int ring);
 
-    Color aspectInkFor(double lonA, double lonB, int a, int b, boolean cross);
+    Ink globeAspectInk(double lonA, double lonB, int a, int b, boolean cross);
 
-    Color ringInk(int body, SkymapPanel.AngleRole role);
+    // ------------------------------------------------------------ colour
+
+    Ink globeRingInk(int body, SkymapPanel.AngleRole role);
+
+    /** An element's colour - fire, earth, air, water by index - as the chart paints it. */
+    Ink elementInk(int element);
+
+    /** A body's own colour, for the ruling-planet glyphs on the bound and decan rings. */
+    Ink bodyInk(int body);
+
+    /** The lunar mansions' ring colour. */
+    Ink mansionInk();
+
+    /** The colour of the leader lines from a body down to the sign ring. */
+    Ink leaderInk();
+
+    /** The fill of a body's bead on a ring of this role. */
+    Ink beadInk(SkymapPanel.AngleRole role);
 }
