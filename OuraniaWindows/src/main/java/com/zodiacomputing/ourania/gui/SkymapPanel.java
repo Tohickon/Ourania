@@ -3346,10 +3346,12 @@ implements WheelSource, GlobeSource {
         this.installMode(chartMode, transits);
         final boolean bl2 = this.isPlaying;
         this.isPlaying = false;
-        SwingWorker<Void, Void> swingWorker = new SwingWorker<Void, Void>(){
+        SwingWorker<com.zodiacomputing.ourania.astro.ChartSubject[], Void> swingWorker =
+                new SwingWorker<com.zodiacomputing.ourania.astro.ChartSubject[], Void>(){
 
             @Override
-            protected Void doInBackground() throws Exception {
+            protected com.zodiacomputing.ourania.astro.ChartSubject[] doInBackground()
+                    throws Exception {
                 // <b>Two subjects are built here and installed together.</b> This method used
                 // to write fourteen fields one at a time, interleaved with the lookups that
                 // produced them, and which field a value landed in was decided by where in the
@@ -3365,12 +3367,28 @@ implements WheelSource, GlobeSource {
                         SkymapPanel.this.transitZoneOverride, "", false,
                         SkymapPanel.this.subjectB)
                     : SkymapPanel.this.subjectB;
-                SkymapPanel.this.installSubjects(a, b, SkymapPanel.this.subjectSky);
-                return null;
+                return new com.zodiacomputing.ourania.astro.ChartSubject[] {a, b};
             }
 
             @Override
             protected void done() {
+                // <b>Installed here, on the event thread, and not in doInBackground.</b> It
+                // was installed on the worker, which wrote the new moment and place into
+                // natalRing at once while the cusps and the instant were recast only here,
+                // later. In between, the panel held half of each chart: the 1990 time, the
+                // London latitude, today's cusps cast for the sky's place - and radixChart
+                // cast a third chart from today's instant at London. FrameAgreementCheck read
+                // in that gap about one run in three, 19 failures, 110-170 degrees apart.
+                // The lookups are the slow part and stay on the worker; the sky's geocoder
+                // above already installs this way.
+                try {
+                    com.zodiacomputing.ourania.astro.ChartSubject[] ab = get();
+                    SkymapPanel.this.installSubjects(ab[0], ab[1], SkymapPanel.this.subjectSky);
+                } catch (Exception e) {
+                    // As before: a failed lookup leaves the charts as they were, and the
+                    // wheel is still recast below so the mode the reader chose is drawn.
+                    System.out.println("Chart settings not applied: " + e);
+                }
                 SkymapPanel.this.updateChartData();
                 SkymapPanel.this.chartPanel.repaint();
                 SkymapPanel.this.isPlaying = bl2;
@@ -3387,9 +3405,24 @@ implements WheelSource, GlobeSource {
                         SkymapPanel.this.subjectA, SkymapPanel.this.subjectB);
                 }
                 SkymapPanel.this.refreshPrecisionNotice();
+                // Last, so a caller that sees the count move sees everything above.
+                SkymapPanel.this.castsApplied++;
             }
         };
         swingWorker.execute();
+    }
+
+    /**
+     * How many casts from the form have finished: subjects installed, wheel recast, sidebar told.
+     *
+     * <b>The completion signal ec44b792 said the suites were missing.</b> Without it a caller
+     * could only wait on some field it hoped was written last, and natalRing.time was written
+     * first. Written only on the event thread; volatile so a waiting thread sees it move.
+     */
+    private volatile int castsApplied;
+
+    int castsApplied() {
+        return this.castsApplied;
     }
 
     /** Hands the setup form what the ephemeris could not do for the charts now drawn. */

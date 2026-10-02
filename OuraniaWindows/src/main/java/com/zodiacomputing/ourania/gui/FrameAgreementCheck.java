@@ -50,6 +50,14 @@ public final class FrameAgreementCheck {
             System.out.println("=== Part A: no Chart A - the inner wheel is the sky ===");
             compare(sky, "sky only");
 
+            // <b>Waits on the cast finishing, not on a field the cast writes.</b> This waited for
+            // natalRing.time to read 1990, which the worker wrote BEFORE the wheel was recast -
+            // so about one run in three compared a wheel still holding the sky's cusps against
+            // a frame cast from today's instant at London, and failed 19 checks 110-170 degrees
+            // apart. The count moves last in the cast's done(), on the event thread, and is read
+            // there too, so seeing it move means the whole chart is in place.
+            final int[] before = new int[1];
+            SwingUtilities.invokeAndWait(() -> before[0] = sky.castsApplied());
             SwingUtilities.invokeAndWait(() -> {
                 try {
                     ChartSetupPanel form = w.chartSetup();
@@ -63,15 +71,17 @@ public final class FrameAgreementCheck {
                     throw new RuntimeException(e);
                 }
             });
-            waitFor(() -> {
-                try {
-                    java.time.ZonedDateTime t =
-                        (java.time.ZonedDateTime) CheckReflect.get(sky, "natalRing.time");
-                    return t != null && t.getYear() == 1990;
-                } catch (Exception e) {
-                    return false;
-                }
-            }, 25000);
+            // 90s bounds a hang, not a reasonable time - the same budget ec44b792 gave a cast
+            // under full-regression load. Reaching it is a failure, named, not a fall-through
+            // into nineteen comparisons against whatever happened to be there.
+            boolean cast = waitFor(() -> sky.castsApplied() > before[0], 90000);
+            yes("London 1990: the cast finished within 90s", cast);
+            if (cast) {
+                final boolean[] is1990 = new boolean[1];
+                SwingUtilities.invokeAndWait(() ->
+                    is1990[0] = sky.natalRing.time != null && sky.natalRing.time.getYear() == 1990);
+                yes("London 1990: the finished cast is the 1990 chart", is1990[0]);
+            }
 
             System.out.println();
             System.out.println("=== Part B: a chart cast - the inner wheel is Chart A ===");
@@ -146,16 +156,18 @@ public final class FrameAgreementCheck {
 
     // ---------------------------------------------------------------- harness
 
-    private static void waitFor(java.util.function.BooleanSupplier until, long limitMs)
+    /** True once {@code until} holds, false if the deadline passed first. */
+    private static boolean waitFor(java.util.function.BooleanSupplier until, long limitMs)
             throws Exception {
         long end = System.nanoTime() + limitMs * 1_000_000L;
         while (System.nanoTime() < end) {
             if (until.getAsBoolean()) {
                 SwingUtilities.invokeAndWait(() -> { });
-                return;
+                return true;
             }
             Thread.sleep(50);
         }
+        return false;
     }
 
     private static void yes(String label, boolean ok) {
