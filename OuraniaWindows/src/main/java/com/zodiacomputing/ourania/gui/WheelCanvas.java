@@ -400,6 +400,7 @@ final class WheelCanvas extends JPanel {
         int[] nArray = g.natalRadii();
         int[] nArray2 = g.transitRadii();
         int[] nArrayC = g.triRadii();
+        int[] nArrayArc = g.arcRadii();
         // The three aspect fields. Lines are drawn on these, not between the glyphs -
         // see SkymapPanel.Geometry.aspectDisc for why, and note that the hit test reads the same
         // three numbers, because a line you can see has to be a line you can hover.
@@ -650,6 +651,56 @@ final class WheelCanvas extends JPanel {
                 WheelShapes.drawBodyLabel(graphics2D, string, n4, n27, glyphSize2.baseline);
             }
             graphics2D.setComposite(outerWas);
+        }
+        // <b>The directed band (G17).</b> Every natal point moved by one arc, in a band of its
+        // own between the middle ring and the sky - so a reader can see the progressed chart
+        // and the directed chart at the same time, which is the comparison Convergence scores a
+        // period on and the one the wheel could not draw until now.
+        //
+        // <b>No moon phase here, deliberately.</b> The middle ring draws one because its Sun
+        // and Moon have moved at their own speeds; a directed Sun and Moon have both moved by
+        // the SAME arc, so the angle between them is the natal angle exactly. Drawing it would
+        // be the birth chart's phase wearing a directed ring's clothes.
+        graphics2D.setTransform(bodyTx);
+        if (panel.arcRingDrawn()) {
+            Composite arcWas = graphics2D.getComposite();
+            float arcA = SkymapPanel.ringAlpha(panel.arcOpenFraction());
+            if (arcA < 0.999f) {
+                graphics2D.setComposite(
+                    AlphaComposite.getInstance(AlphaComposite.SRC_OVER, arcA));
+            }
+            // A directed chart is never a person and never a moment, so the role it draws its
+            // angles in is the same one the middle ring uses outside a synastry.
+            final SkymapPanel.AngleRole arcRole = panel.angleRoleFor(false, true);
+            for (int ai = 0; ai < SkymapPanel.BODY_COUNT; ++ai) {
+                if (!panel.arcRing().valid[ai]) {
+                    continue;
+                }
+                double arcAt = Math.toRadians(180.0 + d4 - panel.arcRing().lon[ai]);
+                int ax = n12 + (int) ((double) nArrayArc[ai] * Math.cos(arcAt));
+                int ay = n13 + (int) ((double) nArrayArc[ai] * Math.sin(arcAt));
+                if (Bodies.at(ai).isAngle()) {
+                    graphics2D.setFont(SkymapPanel.ANGLE_FONT);
+                    WheelShapes.drawBodyMarker(graphics2D, ax, ay, 13,
+                        SkymapPanel.ringBead(arcRole),
+                        SkymapPanel.outerRingMarker(panel.chartMode()));
+                    graphics2D.setColor(panel.ringAngleInk(arcRole));
+                    String arcAngleGlyph = Bodies.at(ai).glyph;
+                    graphics2D.drawString(arcAngleGlyph,
+                        ax - graphics2D.getFontMetrics().stringWidth(arcAngleGlyph) / 2,
+                        ay + 4);
+                    continue;
+                }
+                WheelLayout.GlyphSize arcSize = WheelLayout.transitSize(ai);
+                graphics2D.setFont(glyphFont(arcSize));
+                WheelShapes.drawBodyMarker(graphics2D, ax, ay, arcSize.radius,
+                    SkymapPanel.ringBead(arcRole),
+                    SkymapPanel.outerRingMarker(panel.chartMode()));
+                graphics2D.setColor(panel.ringInk(ai, arcRole));
+                WheelShapes.drawBodyLabel(graphics2D,
+                    SkymapPanel.glyphFor(ai, glyphFont(arcSize)), ax, ay, arcSize.baseline);
+            }
+            graphics2D.setComposite(arcWas);
         }
         // Tri-wheel: sky positions in the outermost ring. Blue-tinted, and by default a
         // different shape from the synastry ring inside it - see Settings.MARKER_SHAPES

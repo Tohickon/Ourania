@@ -36,6 +36,15 @@ interface WheelSource {
 
     WheelRing skyRing();
 
+    /**
+     * The directed chart, in a band of its own between the middle ring and the sky (G17).
+     *
+     * <p>Empty unless {@link #arcRingDrawn} - the panel clears it when the directed chart is
+     * riding the middle ring instead, so a painter that forgot to ask would draw nothing
+     * rather than a stale chart.
+     */
+    WheelRing arcRing();
+
     /** The ring a wheel index names. */
     WheelRing ringAt(int wheel);
 
@@ -65,9 +74,14 @@ interface WheelSource {
 
     boolean triRingDrawn();
 
+    /** Whether the directed chart has a band of its own to be drawn in (G17). */
+    boolean arcRingDrawn();
+
     double outerOpenFraction();
 
     double triOpenFraction();
+
+    double arcOpenFraction();
 
     /** The radius chain and body placement for a panel this size. */
     SkymapPanel.Geometry geometry(int w, int h);

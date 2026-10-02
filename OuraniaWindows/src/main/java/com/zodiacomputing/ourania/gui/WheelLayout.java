@@ -491,6 +491,21 @@ public final class WheelLayout {
      * exactly as it did - which is what lets AspectGridCheck go on asserting its formula.
      */
     static final int RING_MANSION_INNER = 9;
+
+    /**
+     * Floor of the directed chart's band, whose ceiling is {@code RING_TRANSIT} (G17).
+     *
+     * <p><b>Appended rather than inserted, for the same reason the mansions were.</b> Every
+     * index before this one is read by name in dozens of places and by position in the suites,
+     * so renumbering to put the new band in its geometric order would move the bodies. The
+     * array's order is the order the edges were added; the wheel's order is the arithmetic in
+     * {@link #ringRadii}.
+     *
+     * <p>With the directed band shut this equals {@code RING_TRANSIT} exactly, because a shut
+     * band takes no room - so a wheel that is not showing a directed chart lays out to the
+     * pixel as it did before this existed.
+     */
+    public static final int RING_ARC_INNER = 10;
     /** How deep the bound band is. Two pixels shallower than the decans, being finer. */
     static final int TERM_BAND_DEPTH = 18;
     /** How deep the inner degree scale is. Ticks only, so it needs little. */
@@ -580,15 +595,52 @@ public final class WheelLayout {
     static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
                            double decanOpen, double signOpen, double boundOpen,
                            double degreeOpen, double mansionOpen) {
+        // The directed band shut, which is every layout that existed before G17 and is what
+        // every caller of this arity was written against.
+        return ringRadii(width, height, outerOpen, triOpen, decanOpen, signOpen, boundOpen,
+            degreeOpen, mansionOpen, 0.0);
+    }
+
+    /**
+     * The same chain with a third body band, between the sky and the middle ring (G17).
+     *
+     * <p><b>A new band goes in without any existing index changing meaning, because a shut band
+     * takes no room and its two edges coincide.</b> That is the property the whole chain is
+     * built on - it is what lets a single wheel lay out as it always has - and it is what makes
+     * this addition safe rather than a renumbering. {@code RING_TRANSIT} is still the floor of
+     * the sky's band and {@code RING_BODY_TOP} is still the ceiling of the natal wheel; the new
+     * {@link #RING_ARC_INNER} sits between them and, at {@code arcOpen == 0}, equals
+     * {@code RING_TRANSIT}. Every call site that predates this reads the same number it always
+     * read.
+     *
+     * <p><b>Why the directed chart gets a band of its own rather than the middle one.</b> The
+     * middle ring already carries a partner, or the sky, or the progressed chart, and those are
+     * the things a directed chart is meant to be read <i>against</i>. Sharing one slot is what
+     * made {@code Settings.OUTER_WHEELS} a radio button, and
+     * {@link com.zodiacomputing.ourania.astro.Convergence} counts solar arc and progressions as
+     * two independent witnesses precisely because they are not the same technique.
+     *
+     * <p>It nests just inside the sky and outside the middle ring, which is
+     * {@link WheelStack#ORDER}: the person's own derived charts sit inside anyone else's, and
+     * the sky is outermost.
+     */
+    static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
+                           double decanOpen, double signOpen, double boundOpen,
+                           double degreeOpen, double mansionOpen, double arcOpen) {
         double o = Math.max(0.0, Math.min(1.0, outerOpen));
         double t = Math.max(0.0, Math.min(1.0, triOpen));
         double dc = Math.max(0.0, Math.min(1.0, decanOpen));
         double sg = Math.max(0.0, Math.min(1.0, signOpen));
         double bd = Math.max(0.0, Math.min(1.0, boundOpen));
         double dg = Math.max(0.0, Math.min(1.0, degreeOpen));
+        double ar = Math.max(0.0, Math.min(1.0, arcOpen));
         int outer = Math.min(width, height) / 2 - 10;
-        // Both body bands get the same depth, deep enough to hold their own sub-rings.
-        int depth = WheelLayout.outerBandDepth(outer);
+        // <b>Every body band gets the same depth, and the depth knows how many there are.</b>
+        // Counting the OPEN ones rather than the declared ones is what keeps a wheel with the
+        // directed band shut laying out to the pixel as it did before G17 - an always-three
+        // count would have narrowed the other two bands the moment this parameter existed.
+        int open = (t > 0.001 ? 1 : 0) + (ar > 0.001 ? 1 : 0) + (o > 0.001 ? 1 : 0);
+        int depth = WheelLayout.outerBandDepth(outer, open);
         // The zodiac sits at fixed radii just inside the rim; it no longer moves when a body
         // ring opens, which is the point of putting it outside them.
         int decanOuter = outer - 20;
@@ -596,17 +648,19 @@ public final class WheelLayout {
         int signInner = (int) Math.round(signOuter - 35 * sg);
         int termInner = (int) Math.round(signInner - TERM_BAND_DEPTH * bd);
         int degreeInner = (int) Math.round(termInner - DEGREE_RING_DEPTH * dg);
-        // The body bands hang below the inner degree scale, each opening downward. Two of
-        // them here; bodyBands is the same arithmetic for any number - see G17.
-        int[] body = WheelLayout.bodyBands(degreeInner, depth, new double[] {t, o});
-        int tri     = body[0];
-        int transit = body[1];
-        int bodyTop = body[2];
+        // The body bands hang below the inner degree scale, each opening downward, outermost
+        // first: the sky, then the directed chart, then the middle ring. A band at zero takes
+        // no room, so with the directed band shut this is the two-link chain it always was.
+        int[] body = WheelLayout.bodyBands(degreeInner, depth, new double[] {t, ar, o});
+        int tri      = body[0];
+        int transit  = body[1];
+        int arcInner = body[2];
+        int bodyTop  = body[3];
         double mn = Math.max(0.0, Math.min(1.0, mansionOpen));
         int mansionInner = (int) Math.round(outer - MANSION_BAND_DEPTH * mn);
         return new int[] {
             outer, tri, transit, decanOuter, signOuter, signInner, bodyTop,
-            termInner, degreeInner, mansionInner };
+            termInner, degreeInner, mansionInner, arcInner };
     }
     /**
      * Where each body band's edge falls, for any number of bands (G17).
