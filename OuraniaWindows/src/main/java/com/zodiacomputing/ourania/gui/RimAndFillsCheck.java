@@ -111,7 +111,14 @@ public final class RimAndFillsCheck {
                         1.0, 1.0, 1.0, 1.0);
                     int outer = open[WheelLayout.RING_OUTER];
 
-                    eq("the chain has ten radii" + at, 10, open.length);
+                    // Eleven since G17 step 3 appended the directed band's floor. Both
+                    // appended radii are pinned to what they must equal below rather than the
+                    // count being trusted on its own: a length assertion alone would pass on
+                    // an appended band that quietly took depth from the wheel, which is the
+                    // thing that would actually move the bodies.
+                    eq("the chain has eleven radii" + at, 11, open.length);
+                    eq("a shut directed band takes no room" + at,
+                        open[WheelLayout.RING_TRANSIT], open[WheelLayout.RING_ARC_INNER]);
                     eq("folded, the band has no depth" + at,
                         outer, shut[WheelLayout.RING_MANSION_INNER]);
                     eq("a caller that predates the band sees it folded" + at,

@@ -36,6 +36,18 @@ interface WheelSource {
 
     WheelRing skyRing();
 
+    /**
+     * The directed chart's own band, between the sky and the middle ring (G17 step 3).
+     *
+     * <p><b>Draw-only, and deliberately so.</b> The three wheel INDICES - natal, outer, sky -
+     * are what the aspect lines, the hover card, the hit test and the packed-hit encoding are
+     * written against, and a fourth would have to be threaded through all of them. A directed
+     * chart is a comparison a reader makes by eye against the ring beside it, so this band is
+     * painted and not yet clickable. An implementation with no directed chart returns a ring
+     * whose points are all invalid, which draws nothing.
+     */
+    WheelRing arcRing();
+
     /** The ring a wheel index names. */
     WheelRing ringAt(int wheel);
 
@@ -65,9 +77,14 @@ interface WheelSource {
 
     boolean triRingDrawn();
 
+    /** Whether the directed band is open far enough to draw. See {@link #arcRing}. */
+    boolean arcRingDrawn();
+
     double outerOpenFraction();
 
     double triOpenFraction();
+
+    double arcOpenFraction();
 
     /** The radius chain and body placement for a panel this size. */
     SkymapPanel.Geometry geometry(int w, int h);

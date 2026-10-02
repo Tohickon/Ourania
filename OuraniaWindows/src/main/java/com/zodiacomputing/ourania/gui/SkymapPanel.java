@@ -90,6 +90,28 @@ implements WheelSource, GlobeSource {
     public final WheelRing natalRing = WheelRing.of(WheelRing.Kind.CHART_A);
     public final WheelRing outerRing = WheelRing.of(WheelRing.Kind.TRANSIT);
     public final WheelRing skyRing = WheelRing.of(WheelRing.Kind.SKY);
+
+    /**
+     * The directed chart, when the middle ring is already carrying something else (G17 step 3).
+     *
+     * <p><b>A fourth ring, and the reason it is a ring rather than a setting.</b> Solar arc has
+     * always been able to ride the middle ring - but only by displacing whatever was there,
+     * because {@code Settings.OUTER_WHEELS} was a radio button. That put the app at odds with
+     * its own reading: {@link com.zodiacomputing.ourania.astro.Convergence} scores a period by
+     * how many INDEPENDENT techniques name the same natal point and counts solar arc and
+     * progressions as two of them, so the one comparison the reading is built on was the one
+     * the wheel could not draw.
+     *
+     * <p>It takes a band of its own only when it has to - see {@link #arcRingShown}. With solar
+     * arc alone the middle ring carries it exactly as before, so nothing about the commonest
+     * layouts changed.
+     *
+     * <p><b>No ephemeris call fills this.</b> A directed chart is the birth chart with one
+     * number added to every position, so nothing in it moves under its own power and every
+     * speed is zero - which is why {@code WheelRing.Kind.SOLAR_ARC} says a directed body is
+     * never retrograde.
+     */
+    public final WheelRing arcRing = WheelRing.of(WheelRing.Kind.SOLAR_ARC);
     private String baseLocationName = "Los Angeles, CA";
     private String baseTimeZoneId = ZoneId.systemDefault().getId();
     public boolean showTransitChart = false;
@@ -647,6 +669,7 @@ implements WheelSource, GlobeSource {
      */
     private final Bloom outerBloom = new Bloom(false, this::repaintWheel);
     private final Bloom triBloom = new Bloom(false, this::repaintWheel);
+    private final Bloom arcBloom = new Bloom(false, this::repaintWheel);
 
 
     /**
@@ -672,6 +695,25 @@ implements WheelSource, GlobeSource {
         return this.triOpenFraction() > 0.001;
     }
 
+    /** As above, for the directed band between them. */
+    public boolean arcRingDrawn() {
+        return this.arcOpenFraction() > 0.001;
+    }
+
+    /**
+     * Whether the directed chart needs a band of its own, rather than riding the middle ring.
+     *
+     * <p><b>Asked of the middle ring rather than re-derived.</b> {@link #assignRingKinds} is
+     * the one place that decides what that ring is carrying, and a second rule here saying
+     * "unless it is a synastry, or progressions are on" would be a copy of its precedence
+     * order that nothing keeps in step - which is the defect this file has recorded against
+     * itself more than once.
+     */
+    boolean arcRingShown() {
+        this.assignRingKinds();
+        return this.showSolarArc && this.outerRing.kind != WheelRing.Kind.SOLAR_ARC;
+    }
+
     /**
      * How far the outer ring is open, 0 to 1 - the one number every ring question resolves to.
      *
@@ -695,6 +737,24 @@ implements WheelSource, GlobeSource {
         }
         return this.triBloom.value();
     }
+
+    /** As above, for the directed band. */
+    public double arcOpenFraction() {
+        if (this.showArcRing && !this.arcBloom.opening()) {
+            return 1.0;
+        }
+        return this.arcBloom.value();
+    }
+
+    /**
+     * Whether the directed chart is on a band of its own. See {@link #arcRingShown}.
+     *
+     * <p>A field beside the other ring flags rather than the predicate called directly, for
+     * the reason recorded on {@code showProgressed}: the painter and the hit test must read the
+     * same answer as the layout did, and a predicate that consults Settings can change its mind
+     * between one and the next.
+     */
+    boolean showArcRing;
 
     /**
      * Where and when the sky is, from the Sky row of the setup form.
@@ -1297,8 +1357,10 @@ implements WheelSource, GlobeSource {
             this.showProgressed());
         // The rings open or fold to match. Set after the flags, so a bloom never disagrees
         // with the thing it is animating.
+        this.showArcRing = this.arcRingShown();
         this.outerBloom.set(this.showTransitChart);
         this.triBloom.set(this.showTriWheel);
+        this.arcBloom.set(this.showArcRing);
     }
 
     /**
@@ -1838,6 +1900,7 @@ implements WheelSource, GlobeSource {
         private int[] natal;
         private int[] transit;
         private int[] tri;
+        private int[] arc;
         private int[] discs;
 
         private Geometry(int w, int h) {
@@ -1852,7 +1915,8 @@ implements WheelSource, GlobeSource {
                 SkymapPanel.this.layerOpen(Layer.SIGNS),
                 SkymapPanel.this.layerOpen(Layer.BOUNDS),
                 SkymapPanel.this.layerOpen(Layer.DEGREES),
-                SkymapPanel.this.layerOpen(Layer.MANSIONS));
+                SkymapPanel.this.layerOpen(Layer.MANSIONS),
+                SkymapPanel.this.arcOpenFraction());
             this.bodyBase = SkymapPanel.this.bodyBaseRadius(this.rings);
             this.natalFloor = this.bodyBase
                 - WheelLayout.natalBandDepth(Math.max(1, this.bodyBase));
@@ -1876,7 +1940,7 @@ implements WheelSource, GlobeSource {
             if (this.transit == null) {
                 this.transit = WheelLayout.bloomed(
                     WheelLayout.bandRadii(SkymapPanel.this.outerRing.lon, SkymapPanel.this.outerRing.valid,
-                        this.rings[RING_TRANSIT], this.rings[RING_BODY_TOP]),
+                        this.rings[RING_ARC_INNER], this.rings[RING_BODY_TOP]),
                     this.rings[RING_BODY_TOP], SkymapPanel.this.outerOpenFraction());
             }
             return this.transit;
@@ -1912,12 +1976,34 @@ implements WheelSource, GlobeSource {
             return this.discs[Math.max(0, Math.min(this.discs.length - 1, level))];
         }
 
+        /**
+         * Where the directed chart's bodies sit, in the band between the sky and the middle
+         * ring (G17 step 3).
+         *
+         * <p>Built exactly as the other two are, from the band's own two edges - which is the
+         * point of having added an edge rather than special-cased a ring. At
+         * {@code arcOpenFraction() == 0} those edges coincide, the array collapses onto the
+         * band's floor, and nothing is drawn.
+         */
+        int[] arcRadii() {
+            if (this.arc == null) {
+                this.arc = WheelLayout.bloomed(
+                    WheelLayout.bandRadii(SkymapPanel.this.arcRing.lon,
+                        SkymapPanel.this.arcRing.valid,
+                        this.rings[RING_TRANSIT], this.rings[RING_ARC_INNER]),
+                    this.rings[RING_ARC_INNER], SkymapPanel.this.arcOpenFraction());
+            }
+            return this.arc;
+        }
+
         int[] triRadii() {
             if (this.tri == null) {
                 this.tri = WheelLayout.bloomed(
                     WheelLayout.bandRadii(SkymapPanel.this.skyRing.lon, SkymapPanel.this.skyRing.valid,
                         this.rings[RING_TRI], this.rings[RING_TRANSIT]),
                     this.rings[RING_TRANSIT], SkymapPanel.this.triOpenFraction());
+                // RING_TRANSIT is still the sky band's floor: the directed band was appended
+                // BELOW it, so the sky's own two edges are untouched by G17 step 3.
             }
             return this.tri;
         }
@@ -6402,6 +6488,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     @Override public WheelRing natalRing() { return this.natalRing; }
     @Override public WheelRing outerRing() { return this.outerRing; }
     @Override public WheelRing skyRing() { return this.skyRing; }
+    @Override public WheelRing arcRing() { return this.arcRing; }
     @Override public ChartMode chartMode() { return this.chartMode; }
     @Override public double[] activeCusps() { return this.activeCusps; }
 
@@ -6686,6 +6773,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * read in the birth frame.
      */
     private void directRing(SweDate at) {
+        this.directRing(at, this.outerRing);
+    }
+
+    /**
+     * The same arithmetic, into whichever ring is carrying the directed chart (G17 step 3).
+     *
+     * <p>One statement of it, because there are two rings that can hold it now: the middle one
+     * when nothing else wants it, and {@link #arcRing} when something does. Two copies of "add
+     * the arc to every natal position" would be two chances to direct one ring and not the
+     * other, and a wheel showing two directed charts a degree apart is a defect nothing would
+     * report - both would look plausible.
+     */
+    private void directRing(SweDate at, WheelRing into) {
         double natalSunLon = Double.NaN;
         int sunIndex = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Sun");
         if (sunIndex >= 0 && this.natalRing.valid[sunIndex]) {
@@ -6701,17 +6801,22 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // the natal positions unmoved would draw a directed chart identical to the birth
             // chart, which reads as "nothing has happened yet" rather than as "this could not
             // be computed".
-            Arrays.fill(this.outerRing.valid, false);
-            Arrays.fill(this.outerRing.ok, false);
+            Arrays.fill(into.valid, false);
+            Arrays.fill(into.ok, false);
             return;
         }
-        for (int i = 0; i < this.outerRing.lon.length; i++) {
-            this.outerRing.valid[i] = this.natalRing.valid[i];
-            this.outerRing.ok[i] = this.natalRing.ok[i];
-            this.outerRing.lon[i] = com.zodiacomputing.ourania.astro.Zodiac.normalise(
+        for (int i = 0; i < into.lon.length; i++) {
+            into.valid[i] = this.natalRing.valid[i];
+            into.ok[i] = this.natalRing.ok[i];
+            into.lon[i] = com.zodiacomputing.ourania.astro.Zodiac.normalise(
                 this.natalRing.lon[i] + arc);
-            this.outerRing.speed[i] = 0.0;
+            into.speed[i] = 0.0;
         }
+        // The houses are the birth chart's. A directed chart is directed BODIES in the natal
+        // frame - recomputing cusps for it would be a different technique, and it is the same
+        // rule the progressed ring follows.
+        System.arraycopy(this.natalRing.cusps, 0, into.cusps, 0, into.cusps.length);
+        into.ascendant = this.natalRing.ascendant;
     }
 
     /** The offset, over the top of the wheel while a scrub is running. */
@@ -6878,6 +6983,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // The third ring is only ever the sky - which is why it was the one name that never
         // caused trouble.
         this.skyRing.kind = WheelRing.Kind.SKY;
+        // The directed band is the same: it exists to carry one thing.
+        this.arcRing.kind = WheelRing.Kind.SOLAR_ARC;
     }
 
     public void updateChartData() {
@@ -6938,6 +7045,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         double outerLon = this.isSynastryChart() ? this.outerRing.longitude : this.skyRing.longitude;
         // A day of ephemeris for a year of life. Everything downstream - houses, bodies, the
         // ring, the aspect lines - is unchanged; only the moment it is asked about moves.
+        // <b>Kept before the progression moves it (G17 step 3).</b> A directed chart is
+        // measured from the date being asked about; the progressed ring's moment is a day in
+        // the reader's infancy. Sharing one variable was harmless while only one of the two
+        // could be on the wheel, and became a silent wrong answer the moment both could - the
+        // arc would have been worked out for a target about forty DAYS after birth.
+        final SweDate arcAt = outerSd;
         boolean progressedRing = this.showProgressed() && !relationship
             && this.natalRing.sd != null && outerSd != null;
         if (progressedRing) {
@@ -6963,15 +7076,32 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.natalRing.sd != null && !relationship) {
             this.computeBodies(this.natalRing.sd, this.natalRing.cusps, this.natalRing.lon, this.natalRing.speed, this.natalRing.ok, this.natalRing.valid);
         }
-        boolean directedRing = this.showSolarArc && !relationship
-            && this.natalRing.sd != null && outerSd != null;
+        // <b>Asked of the ring, not of the setting.</b> This read showSolarArc directly, which
+        // was the same question while solar arc could only be on the middle ring. With
+        // progressions up as well, assignRingKinds gives that ring to the progressed chart -
+        // and this went on filling it with DIRECTED positions, so the ring was labelled
+        // progressed and held a directed chart. Nothing would have reported it: both are
+        // plausible wheels of the same chart. Caught by FourWheelCheck Part B, which asserts
+        // that the middle ring and the directed band are not one shared offset.
+        boolean directedRing = this.outerRing.kind == WheelRing.Kind.SOLAR_ARC && !relationship
+            && this.natalRing.sd != null && arcAt != null;
         if (directedRing) {
-            directRing(outerSd);
+            directRing(arcAt);
         } else if (this.showTransitChart && outerSd != null) {
             this.computeBodies(outerSd, this.outerRing.cusps, this.outerRing.lon, this.outerRing.speed, this.outerRing.ok, this.outerRing.valid);
         } else {
             Arrays.fill(this.outerRing.valid, false);
             Arrays.fill(this.outerRing.ok, false);
+        }
+        // <b>The directed band, when the middle ring is carrying something else (G17 step
+        // 3).</b> Cast from the same moment the middle ring was, so the two rings are two
+        // techniques answering about one date rather than two dates - which is the whole point
+        // of putting them on the wheel together.
+        if (this.showArcRing && this.natalRing.sd != null && arcAt != null && !relationship) {
+            this.directRing(arcAt, this.arcRing);
+        } else {
+            Arrays.fill(this.arcRing.valid, false);
+            Arrays.fill(this.arcRing.ok, false);
         }
         // Tri-wheel: the sky at skyRing.time wrapped around the synastry pair.
         // skyRing.time defaults to now and is driven by the same Now/Play controls,
