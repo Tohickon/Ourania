@@ -117,23 +117,28 @@ public final class MainActivity extends Activity {
         form.setOrientation(LinearLayout.VERTICAL);
         form.setPadding(48, 64, 48, 64);
 
-        // The title, and the chart book beside it (M6).
-        LinearLayout top = new LinearLayout(this);
-        top.setOrientation(LinearLayout.HORIZONTAL);
-        top.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        // The title, then the chart book (M6), the settings (M9) and the glossary on a row of
+        // their own - three buttons beside the title would not fit a phone's width.
         TextView title = new TextView(this);
         title.setText("Ourania");
         title.setTextSize(26f);
-        top.addView(title, new LinearLayout.LayoutParams(0,
-            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        form.addView(title);
+        LinearLayout top = new LinearLayout(this);
+        top.setOrientation(LinearLayout.HORIZONTAL);
         Button book = new Button(this);
         book.setText("Chart book");
         book.setOnClickListener(v -> this.showBook());
-        top.addView(book);
+        top.addView(book, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         Button settings = new Button(this);
         settings.setText("Settings");
         settings.setOnClickListener(v -> this.showSettings());
-        top.addView(settings);
+        top.addView(settings, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        Button glossary = new Button(this);
+        glossary.setText("Glossary");
+        glossary.setOnClickListener(v -> this.showGlossary());
+        top.addView(glossary, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         form.addView(top);
 
         this.dateField = field("Birth date - tap to choose");
@@ -508,6 +513,88 @@ public final class MainActivity extends Activity {
         } catch (NumberFormatException notANumber) {
             return fallback;
         }
+    }
+
+    /**
+     * The glossary: a search box over David's 827 terms, with the chapters listed while it is
+     * empty. Tapping a term shows its definition; tapping a chapter lists its terms.
+     */
+    private void showGlossary() {
+        LinearLayout f = new LinearLayout(this);
+        f.setOrientation(LinearLayout.VERTICAL);
+        f.setPadding(32, 16, 32, 0);
+        final android.widget.EditText search = new android.widget.EditText(this);
+        search.setHint("Search " + com.zodiacomputing.ourania.gui.Glossary.all().size()
+            + " terms");
+        search.setSingleLine(true);
+        f.addView(search);
+        final android.widget.ListView list = new android.widget.ListView(this);
+        f.addView(list, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+            (int) (getResources().getDisplayMetrics().heightPixels * 0.6)));
+        final java.util.List<Object> rows = new java.util.ArrayList<>();
+        final android.widget.ArrayAdapter<Object> adapter = new android.widget.ArrayAdapter<>(this,
+            android.R.layout.simple_list_item_1, rows);
+        list.setAdapter(adapter);
+        final Runnable refresh = () -> {
+            rows.clear();
+            String q = search.getText().toString();
+            if (q.trim().isEmpty()) {
+                rows.addAll(com.zodiacomputing.ourania.gui.Glossary.chapters());
+            } else {
+                rows.addAll(com.zodiacomputing.ourania.gui.Glossary.search(q, 80));
+            }
+            adapter.notifyDataSetChanged();
+        };
+        search.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) { }
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) { }
+            @Override public void afterTextChanged(android.text.Editable e) {
+                refresh.run();
+            }
+        });
+        list.setOnItemClickListener((parent, view, pos, id) -> {
+            Object row = rows.get(pos);
+            if (row instanceof com.zodiacomputing.ourania.gui.Glossary.Term) {
+                this.showTerm((com.zodiacomputing.ourania.gui.Glossary.Term) row);
+            } else {
+                this.showGlossaryChapter((String) row);
+            }
+        });
+        refresh.run();
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Glossary")
+            .setView(f)
+            .setNegativeButton("Close", null)
+            .show();
+    }
+
+    private void showGlossaryChapter(String chapter) {
+        final java.util.List<com.zodiacomputing.ourania.gui.Glossary.Term> terms =
+            com.zodiacomputing.ourania.gui.Glossary.chapter(chapter);
+        String[] names = new String[terms.size()];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = terms.get(i).term;
+        }
+        new android.app.AlertDialog.Builder(this)
+            .setTitle(chapter)
+            .setItems(names, (d, i) -> this.showTerm(terms.get(i)))
+            .setNegativeButton("Back", null)
+            .show();
+    }
+
+    private void showTerm(com.zodiacomputing.ourania.gui.Glossary.Term t) {
+        TextView body = new TextView(this);
+        body.setPadding(48, 24, 48, 24);
+        body.setTextSize(16f);
+        body.setTextIsSelectable(true);
+        body.setText(Html.fromHtml(PhoneGlossary.html(t), Html.FROM_HTML_MODE_COMPACT));
+        ScrollView sc = new ScrollView(this);
+        sc.addView(body);
+        new android.app.AlertDialog.Builder(this)
+            .setTitle(t.term)
+            .setView(sc)
+            .setNegativeButton("Back", null)
+            .show();
     }
 
     /** Names the shown chart and saves it into the book, asking before replacing one. */
