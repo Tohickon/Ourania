@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The app's theme. Before this file the manifest declared none, so the app took the bare
+  platform default: stock grey buttons, and a background that followed the device's light
+  or dark setting.
+
+  PARENT IS android:Theme.Material, NOT .DayNight OR .Light. The dark variant, pinned. The
+  app has no AppCompat or Material-components dependency - it is platform widgets only
+  (see build.gradle: the one dependency is JUnit, for tests) - so the parent has to be a
+  platform theme, and Theme.Material is the dark one.
+
+  THE BUTTON STYLE IS SET HERE RATHER THAN IN JAVA, and that is the point of doing this as
+  a theme at all. MainActivity builds twelve buttons with `new Button(this)`, scattered
+  across eight screens; a Button constructed from a Context reads `buttonStyle` off that
+  context's theme, so one line below restyles all twelve without touching one of them. The
+  alternative was twelve edits in the one file that breaks the whole app build if it is
+  wrong.
+-->
+<resources>
+
+    <style name="Theme.Ourania" parent="android:Theme.Material.NoActionBar">
+
+        <!-- The ground, in both the places Android asks for it: windowBackground is what is
+             actually drawn, colorBackground is what widgets read when they need to know what
+             they are sitting on. Setting one and not the other is a common way to get a
+             dark page with light-grey widget edges. -->
+        <item name="android:windowBackground">@color/ground</item>
+        <item name="android:colorBackground">@color/ground</item>
+
+        <item name="android:colorAccent">@color/accent</item>
+
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+        <item name="android:textColorLink">@color/accent</item>
+
+        <!-- All twelve buttons, from one line. -->
+        <item name="android:buttonStyle">@style/Widget.Ourania.Button</item>
+
+        <!-- The system bars join the page rather than framing it in black. -->
+        <item name="android:statusBarColor">@color/ground</item>
+        <item name="android:navigationBarColor">@color/ground</item>
+
+    </style>
+
+    <style name="Widget.Ourania.Button" parent="android:Widget.Material.Button">
+        <item name="android:background">@drawable/btn_surface</item>
+        <item name="android:textColor">@color/accent</item>
+
+        <!-- Stock Android shouts. These are labels like "Chart book" and "Releasing": words,
+             not commands, and three of them have to share a phone's width. -->
+        <item name="android:textAllCaps">false</item>
+
+        <!-- AUTO-SIZING, because the labels on one row differ wildly in length and the rows
+             are weight-1 thirds and halves of whatever width the phone has. "Whole-chart
+             reading" shares a row with "Patterns"; at a fixed size one of them decides the
+             size for both, or ellipsizes. Each button now takes 15sp when it fits and shrinks
+             only as far as it must, so a long label stays readable instead of becoming
+             "Whole-chart rea...". Platform support for this starts at API 26 and minSdk here
+             is 33, so it needs no support library. -->
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMinTextSize">11sp</item>
+        <item name="android:autoSizeMaxTextSize">15sp</item>
+        <item name="android:maxLines">2</item>
+
+        <!-- A thumb is about 48dp wide and that is the whole reason for this number. -->
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+
+        <!-- Material lifts a button on press with a shadow animation. These are flat, and a
+             shadow under a flat button on a near-black ground is a grey smudge. -->
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+</resources>

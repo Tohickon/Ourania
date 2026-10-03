@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The phone's chrome, in the chart's own colours.
+
+  GROUND IS NOT AN ARBITRARY DARK GREY. It is #0C0E14, which is the fallback in
+  PhonePalette.background() and ChartPalette.BACKGROUND_KEY - the ground the wheel paints
+  itself on. Page and chart being the same colour is what lets the wheel sit in the page
+  without a visible seam, and it means one answer to "what colour is the app" rather than
+  two that happen to look close.
+
+  ACCENT IS THE DESKTOP'S LAVENDER, #B5A0E3 - the lunar mansions' ring default, already in
+  the palette. Picking a new accent would have been a colour this app uses nowhere else.
+
+  The app is pinned dark rather than following the device. The chart has a dark ground
+  either way, so a light chrome would frame a black disc in white, and the reading's own
+  colour hierarchy - white headings, coloured sparks - is written for a dark ground. The
+  reading currently has every colour stripped out of it precisely BECAUSE the phone
+  declared no theme and could not promise a background. This file is what makes that
+  promise.
+-->
+<resources>
+
+    <!-- The ground: the chart's own background, so the wheel has no seam. -->
+    <color name="ground">#FF0C0E14</color>
+
+    <!-- A surface lifted off the ground: button faces, rows, cards. -->
+    <color name="surface">#FF161922</color>
+
+    <!-- A one-pixel edge. Visible against both ground and surface, loud against neither. -->
+    <color name="hairline">#FF2A2F3D</color>
+
+    <!-- The accent: the desktop's lunar-mansion lavender. -->
+    <color name="accent">#FFB5A0E3</color>
+
+    <!-- Text on an accent-filled surface. The ground, so a filled button reads as a hole. -->
+    <color name="on_accent">#FF0C0E14</color>
+
+    <color name="text_primary">#FFECEEF3</color>
+    <color name="text_secondary">#FF9AA1B2</color>
+    <color name="text_hint">#FF6B7385</color>
+
+    <!-- The press ripple, at the alpha a ripple wants: felt, not seen. -->
+    <color name="ripple">#33B5A0E3</color>
+
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  An 8dp hole, used as a LinearLayout divider to put air between buttons on a row.
+
+  Five rows on this app have two or three buttons sharing the width with weight 1 and
+  nothing between them, so with rounded faces they would touch. A divider drawable costs
+  two lines per row; margins would have meant editing every addView call that builds one,
+  and there are eleven of those.
+
+  It needs a <size> because a divider is laid out at its intrinsic width, and a plain
+  colour drawable has none - a transparent ColorDrawable here would be a 0dp gap and look
+  exactly like the bug it fixes.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <size
+        android:width="8dp"
+        android:height="8dp" />
+    <solid android:color="@android:color/transparent" />
+</shape>

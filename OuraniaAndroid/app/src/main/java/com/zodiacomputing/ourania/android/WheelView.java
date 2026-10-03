@@ -198,7 +198,12 @@ final class WheelView extends View {
 
     @Override
     protected void onDraw(Canvas c) {
-        c.drawColor(Color.rgb(12, 14, 20));
+        // The reader's chart ground, not a literal. This was Color.rgb(12, 14, 20) - the same
+        // three numbers as PhonePalette.background()'s fallback, written out a second time -
+        // so PhonePalette.background() existed and nothing called it, and a reader who chose
+        // their own chart background on the desktop got it everywhere except here.
+        Ink ground = PhonePalette.background();
+        c.drawColor(Color.rgb(ground.getRed(), ground.getGreen(), ground.getBlue()));
         PhoneWheel w = wheel();
         if (w == null) {
             return;

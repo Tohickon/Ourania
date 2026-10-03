@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The one filled button: Cast. The screen's whole purpose is to cast a chart, and until
+  today every button on it looked equally important, which is the same as none of them
+  being important.
+
+  Filled with the accent, text in the ground colour, so it reads as a lit hole rather than
+  a raised block. Its ripple is dark for the same reason - a light ripple on a light fill
+  is invisible.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33000000">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="12dp" />
+            <solid android:color="@color/accent" />
+        </shape>
+    </item>
+</ripple>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A tappable field: the birth date, the time, the sky's day.
+
+  These are TextViews, not EditTexts - they open a picker rather than a keyboard - so they
+  inherited no field styling at all and were bare text on the ground. Nothing said they
+  could be tapped. This gives them the one thing that does: an edge and a face.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="10dp" />
+            <solid android:color="@color/surface" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/hairline" />
+        </shape>
+    </item>
+</ripple>

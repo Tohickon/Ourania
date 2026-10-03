@@ -115,16 +115,20 @@ public final class MainActivity extends Activity {
 
         LinearLayout form = new LinearLayout(this);
         form.setOrientation(LinearLayout.VERTICAL);
-        form.setPadding(48, 64, 48, 64);
+        form.setPadding(dp(20), dp(20), dp(20), dp(32));
 
         // The title, then the chart book (M6), the settings (M9) and the glossary on a row of
         // their own - three buttons beside the title would not fit a phone's width.
         TextView title = new TextView(this);
         title.setText("Ourania");
-        title.setTextSize(26f);
+        title.setTextSize(32f);
+        title.setLetterSpacing(0.04f);
+        title.setTextColor(getColor(R.color.accent));
+        title.setPadding(0, 0, 0, dp(16));
         form.addView(title);
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
+        spaceOut(top);
         Button book = new Button(this);
         book.setText("Chart book");
         book.setOnClickListener(v -> this.showBook());
@@ -168,12 +172,25 @@ public final class MainActivity extends Activity {
             this.placeField.dismissDropDown();
         });
         form.addView(label("Place of birth"));
-        form.addView(this.placeField);
+        // Full width for the same reason as field() - it was WRAP_CONTENT, so the one typed
+        // field on the screen was as wide as whatever had been typed into it.
+        form.addView(this.placeField, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
+        // The one filled button on the screen. Casting a chart is what this screen is FOR, and
+        // until now it looked exactly like "Glossary".
         this.cast = new Button(this);
         this.cast.setText("Cast the chart");
+        this.cast.setBackgroundResource(R.drawable.btn_primary);
+        this.cast.setTextColor(getColor(R.color.on_accent));
+        // After the background, never before: setBackgroundResource adopts the new drawable's
+        // own padding when it declares any, so padding set first can be silently discarded.
+        this.cast.setPadding(dp(16), dp(14), dp(16), dp(14));
         this.cast.setOnClickListener(v -> this.castChart());
-        form.addView(this.cast);
+        LinearLayout.LayoutParams castParams = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        castParams.topMargin = dp(24);
+        form.addView(this.cast, castParams);
 
         // The wheel (M4), hidden until there is a chart; a tapped planet's lines under it.
         this.wheel = new WheelView(this);
@@ -186,6 +203,7 @@ public final class MainActivity extends Activity {
         this.skyRow.setOrientation(LinearLayout.HORIZONTAL);
         this.skyRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
         this.skyRow.setVisibility(View.GONE);
+        spaceOut(this.skyRow);
         this.skyOn = new CheckBox(this);
         this.skyOn.setText("Sky on");
         this.skyOn.setOnCheckedChangeListener((b, on) -> {
@@ -196,7 +214,6 @@ public final class MainActivity extends Activity {
         });
         this.skyRow.addView(this.skyOn);
         this.skyDateField = field("today");
-        this.skyDateField.setPadding(24, 12, 24, 12);
         this.skyDateField.setOnClickListener(v -> this.chooseSkyDate());
         this.skyRow.addView(this.skyDateField, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -223,6 +240,7 @@ public final class MainActivity extends Activity {
         LinearLayout rel = new LinearLayout(this);
         rel.setOrientation(LinearLayout.HORIZONTAL);
         rel.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        spaceOut(rel);
         this.partnerButton = new Button(this);
         this.partnerButton.setText("Compare with...");
         this.partnerButton.setOnClickListener(v -> this.choosePartner());
@@ -248,7 +266,7 @@ public final class MainActivity extends Activity {
         form.addView(this.relRow);
         this.tapped = new TextView(this);
         this.tapped.setTextSize(16f);
-        this.tapped.setPadding(0, 16, 0, 0);
+        this.tapped.setPadding(0, dp(12), 0, 0);
         this.tapped.setVisibility(View.GONE);
         form.addView(this.tapped);
 
@@ -256,6 +274,7 @@ public final class MainActivity extends Activity {
         this.readings = new LinearLayout(this);
         this.readings.setOrientation(LinearLayout.HORIZONTAL);
         this.readings.setVisibility(View.GONE);
+        spaceOut(this.readings);
         Button whole = new Button(this);
         whole.setText("Whole-chart reading");
         whole.setOnClickListener(v -> this.showReading(false));
@@ -274,6 +293,7 @@ public final class MainActivity extends Activity {
         this.timing = new LinearLayout(this);
         this.timing.setOrientation(LinearLayout.HORIZONTAL);
         this.timing.setVisibility(View.GONE);
+        spaceOut(this.timing);
         Button calendar = new Button(this);
         calendar.setText("Calendar");
         calendar.setOnClickListener(v -> this.showCalendar());
@@ -295,13 +315,22 @@ public final class MainActivity extends Activity {
 
         this.result = new TextView(this);
         this.result.setTextSize(15f);
-        this.result.setPadding(0, 32, 0, 0);
+        this.result.setLineSpacing(0f, 1.3f);
+        this.result.setPadding(0, dp(20), 0, 0);
         this.result.setTextIsSelectable(true);
         form.addView(this.result);
 
         ScrollView scroll = new ScrollView(this);
         scroll.addView(form);
         setContentView(scroll);
+
+        // ONE answer to "what colour is this app", and it is the reader's. colors.xml carries
+        // the same value as the window's declared default so there is no pale flash before this
+        // line runs; from here on the page is whatever ground the chart is painting on, which
+        // is why the wheel has no visible seam against it.
+        com.zodiacomputing.ourania.gui.Ink ground = PhonePalette.background();
+        getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(
+            android.graphics.Color.rgb(ground.getRed(), ground.getGreen(), ground.getBlue())));
 
         // The ephemeris copy and the corpus are seconds of work; neither belongs on the main
         // thread, and both are needed before the first chart, so they start now.
@@ -311,10 +340,38 @@ public final class MainActivity extends Activity {
         }).start();
     }
 
+    /**
+     * Density-independent pixels into real ones.
+     *
+     * <p><b>Every {@code setPadding} on this screen used to be in raw pixels</b>, with no
+     * conversion anywhere in the file, while {@code WheelView} multiplied by density
+     * correctly - so the chart and the page it sits on disagreed about how big a gap is, and
+     * the whole layout was tuned for whatever phone it was last looked at. {@code setTextSize}
+     * was never affected: its one-argument form is already in sp.
+     *
+     * <p>The numbers passed in are a fresh choice rather than the old ones divided by three.
+     * Dividing would have preserved a layout the complaint was about.
+     */
+    private int dp(float value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    /** Puts air between the buttons on a horizontal row. See {@code drawable/gap_h}. */
+    private void spaceOut(LinearLayout row) {
+        row.setDividerDrawable(getDrawable(R.drawable.gap_h));
+        row.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+    }
+
     private TextView label(String text) {
         TextView t = new TextView(this);
         t.setText(text);
-        t.setPadding(0, 28, 0, 4);
+        // Quiet, not shouted. Deliberately NOT all-caps: this method also labels the settings
+        // screen, where the text is a whole sentence - "Transit orb, in degrees (how close a
+        // transit must be to count)" - and caps with letter spacing would wrap it over three
+        // lines and read as an error message.
+        t.setTextSize(13f);
+        t.setTextColor(getColor(R.color.text_secondary));
+        t.setPadding(0, dp(18), 0, dp(6));
         return t;
     }
 
@@ -322,7 +379,15 @@ public final class MainActivity extends Activity {
         TextView t = new TextView(this);
         t.setHint(hint);
         t.setTextSize(18f);
-        t.setPadding(0, 12, 0, 12);
+        t.setBackgroundResource(R.drawable.field_bg);
+        t.setPadding(dp(14), dp(13), dp(14), dp(13));
+        // FULL WIDTH, and it has to be set here. A field added with addView(view) and no
+        // params gets WRAP_CONTENT, which was invisible while these had no background and
+        // would now draw each one as a small box shrunk to its own hint. The one caller that
+        // wants a different width - the sky's date, which shares a row - passes its own params
+        // to addView, and those win.
+        t.setLayoutParams(new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return t;
     }
 
@@ -402,7 +467,7 @@ public final class MainActivity extends Activity {
         final PhoneSettings.Values v = PhoneSettings.read();
         LinearLayout f = new LinearLayout(this);
         f.setOrientation(LinearLayout.VERTICAL);
-        f.setPadding(48, 16, 48, 16);
+        f.setPadding(dp(20), dp(8), dp(20), dp(8));
 
         f.addView(label("House system"));
         final android.widget.Spinner houses = spinner(PhoneSettings.houseSystems(), v.houseSystem);
@@ -522,7 +587,7 @@ public final class MainActivity extends Activity {
     private void showGlossary() {
         LinearLayout f = new LinearLayout(this);
         f.setOrientation(LinearLayout.VERTICAL);
-        f.setPadding(32, 16, 32, 0);
+        f.setPadding(dp(16), dp(8), dp(16), 0);
         final android.widget.EditText search = new android.widget.EditText(this);
         search.setHint("Search " + com.zodiacomputing.ourania.gui.Glossary.all().size()
             + " terms");
@@ -584,8 +649,9 @@ public final class MainActivity extends Activity {
 
     private void showTerm(com.zodiacomputing.ourania.gui.Glossary.Term t) {
         TextView body = new TextView(this);
-        body.setPadding(48, 24, 48, 24);
+        body.setPadding(dp(20), dp(12), dp(20), dp(20));
         body.setTextSize(16f);
+        body.setLineSpacing(0f, 1.35f);
         body.setTextIsSelectable(true);
         body.setText(Html.fromHtml(PhoneGlossary.html(t), Html.FROM_HTML_MODE_COMPACT));
         ScrollView sc = new ScrollView(this);
@@ -853,7 +919,7 @@ public final class MainActivity extends Activity {
         final Atlas.Place[] where = {null};
         LinearLayout f = new LinearLayout(this);
         f.setOrientation(LinearLayout.VERTICAL);
-        f.setPadding(48, 16, 48, 16);
+        f.setPadding(dp(20), dp(8), dp(20), dp(8));
         final android.widget.EditText name = new android.widget.EditText(this);
         name.setHint("Their name");
         name.setSingleLine(true);
@@ -934,7 +1000,7 @@ public final class MainActivity extends Activity {
         final Atlas.Place[] where = {null};
         LinearLayout f = new LinearLayout(this);
         f.setOrientation(LinearLayout.VERTICAL);
-        f.setPadding(48, 16, 48, 16);
+        f.setPadding(dp(20), dp(8), dp(20), dp(8));
         TextView note = new TextView(this);
         note.setText("Now: " + PhoneRelationship.compositePlace() + ". Only the latitude moves "
             + "the composite's houses; the planets stay where they are.");
@@ -1273,7 +1339,7 @@ public final class MainActivity extends Activity {
         public View getView(int position, View convert, ViewGroup parent) {
             TextView t = convert instanceof TextView ? (TextView) convert
                 : new TextView(MainActivity.this);
-            t.setPadding(32, 24, 32, 24);
+            t.setPadding(dp(16), dp(14), dp(16), dp(14));
             t.setTextSize(16f);
             t.setText(PhoneChart.label(getItem(position)));
             return t;
