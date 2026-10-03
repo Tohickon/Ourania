@@ -17,6 +17,10 @@ import javax.swing.SwingUtilities;
 /**
  * Four wheels at once: natal, progressed, directed and the sky (G17).
  *
+ * <p><b>The geometry this asks about lives in {@link WheelLayout}</b>, which is where J13 moved
+ * it. This suite was written against {@code SkymapPanel} the day before that landed, and was
+ * re-pointed rather than rewritten: the arithmetic did not change, only its address.
+ *
  * <pre>
  *  Part A - when the directed chart earns a band of its own, and when it rides the middle ring.
  *  Part B - the arithmetic in the new band. ONE arc added to everything, and demonstrably not
@@ -33,14 +37,6 @@ import javax.swing.SwingUtilities;
  * <p>The fixture is deliberately not the app's usual 1982 test chart. Nothing here needs to be
  * comparable with another suite's numbers, and there was no reason to add a twenty-sixth file
  * carrying that date.
- *
- * <p><b>Written for G17 step 3 before J13 took the wheel apart, and ported onto what J13
- * left.</b> The radius chain is {@link WheelLayout}'s now and the painting is
- * {@link WheelCanvas}'s, so Part C asks WheelLayout for its arithmetic and Part D renders the
- * canvas - but every assertion is the one the original made, because what is being guarded is
- * the astrology and the geometry, neither of which moved. The band is draw-only: the three
- * wheel indices the aspect lines, the hover card and the hit test are written against did not
- * gain a fourth, which is recorded on {@link WheelSource#arcRing}.
  */
 public final class FourWheelCheck {
 
@@ -311,23 +307,40 @@ public final class FourWheelCheck {
         // is a directed glyph, because nothing else moved.
         show(sky, true, true);
         settleAll(sky, true);
-        BufferedImage with = render(chart, w, h);
 
-        boolean[] held = sky.arcRing.valid.clone();
-        java.util.Arrays.fill(sky.arcRing.valid, false);
-        BufferedImage blank = render(chart, w, h);
-        System.arraycopy(held, 0, sky.arcRing.valid, 0, held.length);
-
-        int differing = 0;
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                if (blank.getRGB(x, y) != with.getRGB(x, y)) {
-                    differing++;
-                }
-            }
-        }
-        ok("the directed ring's own bodies are painted (" + differing + " pixels)",
-            differing > 500);
+        // <b>Both paints happen inside ONE event-dispatch task, and that is the whole trick.</b>
+        // Two renders taken as separate tasks were not comparable: with the bloom measured at
+        // 1.0 for both, and so the directed band provably unmoved, they still differed by tens
+        // of thousands of pixels - and a mutation that stopped the band being painted at all
+        // SURVIVED, because the drift was an order of magnitude larger than the glyphs. Two
+        // narrowings of the comparison both failed to fix that, and the second one survived
+        // the mutation too.
+        //
+        // Nothing can fire between the two paints below, because the event thread is inside
+        // this one Runnable for the whole of it. Nothing else can get a turn.
+        //
+        // <b>And what was drifting is now known: the other two blooms.</b> This part settled
+        // arcBloom and measured it at 1.0, which proved the DIRECTED band unmoved and said
+        // nothing about the rest - and show() flips the transit and sky flags too, so their
+        // blooms were left travelling. Measured on the 900px fixture: both sat at 0.17 open and
+        // the radius chain went from [..323..267..275] to [..308..237..260] across one render,
+        // 76,187 pixels differing with two thirds of them nowhere near the directed band. That
+        // is the drift, it is not the play timer, and settleAll above removes it at the source.
+        // The one-task paint stays: a known cause removed and an unknown one denied a turn are
+        // two different defences, and this part has already been fooled twice.
+        final BufferedImage with = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        final BufferedImage blank = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        final boolean[] held = sky.arcRing.valid.clone();
+        SwingUtilities.invokeAndWait(() -> {
+            Graphics2D g1 = with.createGraphics();
+            chart.printAll(g1);
+            g1.dispose();
+            java.util.Arrays.fill(sky.arcRing.valid, false);
+            Graphics2D g2 = blank.createGraphics();
+            chart.printAll(g2);
+            g2.dispose();
+            System.arraycopy(held, 0, sky.arcRing.valid, 0, held.length);
+        });
 
         int[] radii = WheelLayout.ringRadii(w, h, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0);
         double inner = radii[WheelLayout.RING_ARC_INNER];
@@ -335,12 +348,20 @@ public final class FourWheelCheck {
         ok("the directed band has real depth (" + (int) (outer - inner) + " pixels)",
             outer - inner >= WheelLayout.MIN_BAND_DEPTH);
 
-        // <b>And they are painted in their OWN band.</b> Glyphs drawn from the wrong pair of
-        // edges still appear, still differ, and land on top of another ring - which reads as a
-        // crowded wheel rather than as a defect. A margin either side, because a bead and a
-        // halo legitimately overhang the band they sit on.
+        // With the two paints taken back to back, every differing pixel is a directed glyph.
+        // So both halves can be asserted: that they are drawn at all, and that they are drawn
+        // in their OWN band - glyphs taken from the wrong pair of edges still appear, and land
+        // on top of another ring, which reads as a crowded wheel rather than as a defect.
+        // A margin either side, because a bead and a halo overhang the band they sit on.
+        // <b>Bounded to the wheel, because the drawer below it carries a clock.</b> Even
+        // inside one event-dispatch task the two paints occasionally disagree by twenty to
+        // sixty pixels down there - a seconds digit, on the runs where the two paints straddle
+        // a millisecond. That is the time readout doing its job and has nothing to do with any
+        // ring, so the question is asked of the wheel: nothing of the directed chart may be
+        // painted anywhere else ON THE WHEEL.
         int cx = w / 2;
         int cy = h / 2;
+        double wheel = radii[WheelLayout.RING_OUTER];
         int inBand = 0;
         int strayed = 0;
         for (int y = 0; y < h; y++) {
@@ -349,6 +370,9 @@ public final class FourWheelCheck {
                     continue;
                 }
                 double r = Math.hypot(x - cx, y - cy);
+                if (r > wheel) {
+                    continue;
+                }
                 if (r >= inner - 16 && r <= outer + 16) {
                     inBand++;
                 } else {
@@ -356,14 +380,36 @@ public final class FourWheelCheck {
                 }
             }
         }
-        ok("and they are painted in the directed band (" + inBand + " in, " + strayed
-            + " out)", inBand > 500 && strayed * 10 < inBand);
+        ok("the directed ring's own bodies are painted (" + inBand + " pixels)", inBand > 500);
+        ok("and nothing of it is painted elsewhere on the wheel (" + strayed + " stray pixels)",
+            strayed == 0);
 
-        // <b>Turning it off again must put the wheel back, or the band has leaked.</b> Taken
-        // against a render made BEFORE the band was ever opened, so this is a round trip and
-        // not a comparison with itself. The fold is an animation, so the bloom is settled at
-        // each end - comparing pixels mid-fold would be asserting the frame rate, which is a
-        // flake rather than a check.
+        // <b>There is no pixel round trip here, and that is a decision rather than an
+        // omission.</b> Two versions of one were written and both flaked: with the bloom
+        // measured at 1.0 for both renders, and so the directed band provably unmoved, renders
+        // seconds apart still differed by tens of thousands of pixels - first across the whole
+        // wheel, then inside this band's own annulus on one run in three. Something is moving
+        // the other rings between renders and it is NOT the play timer, which only steps while
+        // isPlaying. I did not find what, and a check nobody can explain the failures of is
+        // worse than no check.
+        //
+        // The claim it was making is covered without pixels and more strictly: Part A asserts
+        // that switching the directed chart off leaves the ring with no valid bodies, and the
+        // painter's first statement for every body is to skip an invalid one. A ring with
+        // nothing in it cannot draw, which is an argument rather than a measurement.
+        //
+        // <b>The round trip is BACK, because the drift was found and removed.</b> Switching the
+        // band off again must put the wheel back, or the band has leaked. This was dropped as a
+        // flake - "renders seconds apart still differed by tens of thousands of pixels", one run
+        // in three inside the band's own annulus - and the cause was the two unsettled blooms
+        // named above: between the two shut renders the chain was still travelling, so the
+        // comparison was of two different layouts. With settleAll pinning all three at each end
+        // there is nothing left to travel.
+        //
+        // It cannot be one event-dispatch task like the pair above, because show() has to run
+        // between the renders. That is exactly why it was the half that flaked - and why it is
+        // only restored now that the thing which used a turn has been taken away rather than
+        // merely denied one. Measured ten consecutive runs before restoring it.
         show(sky, true, false);
         settleAll(sky, false);
         BufferedImage shut = render(chart, w, h);
@@ -381,26 +427,19 @@ public final class FourWheelCheck {
                 }
             }
         }
-        ok("and switching it off puts the wheel back (" + lingering + " pixels left over)",
-            lingering == 0);
+        ok("and switching the directed band off puts the wheel back (" + lingering
+            + " pixels left over)", lingering == 0);
     }
+
 
     /**
      * Put ALL THREE body-band blooms where they are going, so the layout is genuinely still.
      *
-     * <b>Settling only the directed bloom is not holding the layout still, and that is what
-     * this part was doing.</b> Part D's whole method is to render twice at identical radii and
-     * attribute every differing pixel to a directed glyph - but {@link #show} flips the
-     * transit and sky flags too, so their blooms were left travelling and the radius chain
-     * moved between one render and the next. Measured on the 900px fixture: the sky and middle
-     * bands sat at 0.17 open, the chain went from {@code [..323..267..275]} to
-     * {@code [..308..237..260]} across one render, and 76,187 pixels differed - two thirds of
-     * them nowhere near the directed band. It was measuring reflow and reporting it as
-     * drawing, which is the mistake the comment above says it was written to avoid; it just
-     * did not go far enough.
-     *
-     * Each bloom is settled to the flag that drives it, so this fixes the layout without
-     * deciding what the layout should be.
+     * <b>Settling only the directed bloom is not holding the layout still.</b> It proves the
+     * directed band unmoved and leaves the sky's and the middle ring's travelling, which moves
+     * the chain every band hangs from - see the measurement on Part D's second paint. Each is
+     * settled to the flag that drives it, so this fixes the layout without deciding what the
+     * layout should be.
      */
     private static void settleAll(SkymapPanel sky, boolean arcOpen) throws Exception {
         settle(sky, "outerBloom", sky.showTransitChart);
