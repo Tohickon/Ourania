@@ -1,6 +1,7 @@
 package com.zodiacomputing.ourania.gui;
 
 import com.zodiacomputing.ourania.astro.Bodies;
+import com.zodiacomputing.ourania.astro.Zodiac;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -853,5 +854,102 @@ public final class WheelLayout {
             (int) Math.round(top * 0.76),
             top,
         };
+    }
+
+    // ------------------------------------------------------------ which wheel, and what it packs
+    //
+    // <b>Moved here whole from SkymapPanel for M11 stage 4.</b> The globe renderer reads
+    // WHEEL_OUTER and packHit, and it has to run on the phone, where there is no Swing
+    // component for them to live inside. The three indices and the packed-hit encoding came
+    // together because they ARE one thing: packHit writes the two bits, hitBody and hitRing
+    // read them back, and the three indices are the alphabet all three speak. Moving packHit
+    // alone would have put one half of an encoding in each file, which is the shape of defect
+    // this project logs more than any other.
+
+    /**
+     * The wheel a hit or an aspect line was found on.
+     *
+     * <p>These are the wheel a line leaves from; every line still lands on the natal wheel.
+     * Before there was a third index, a natal aspect and a sky aspect on the same pair could
+     * not be told apart, because nothing in the highlight knew there was a third ring.
+     */
+    public static final int WHEEL_NATAL = 0;
+    public static final int WHEEL_OUTER = 1;
+    public static final int WHEEL_SKY = 2;
+
+    /** Marks a packed hit as belonging to the outer wheel. Above any registry index. */
+    public static final int TRANSIT_BIT = 1 << 16;
+
+    /**
+     * Marks a packed hit as belonging to the sky ring, on top of {@link #TRANSIT_BIT}.
+     *
+     * A second bit rather than a new encoding, so that every existing reader of TRANSIT_BIT
+     * still answers the question it was asking; the ring is available to whoever needs the
+     * finer answer.
+     */
+    public static final int SKY_BIT = 1 << 17;
+
+    /** Packs a body index and the ring it was found on, the way every hit test returns it. */
+    public static int packHit(int body, int ring) {
+        if (ring == WHEEL_NATAL) {
+            return body;
+        }
+        return ring == WHEEL_SKY ? (body | TRANSIT_BIT | SKY_BIT) : (body | TRANSIT_BIT);
+    }
+
+    /** The body index out of a packed hit. */
+    public static int hitBody(int packed) {
+        return packed & (TRANSIT_BIT - 1);
+    }
+
+    /** Which wheel a packed hit was on - WHEEL_NATAL, WHEEL_OUTER or WHEEL_SKY. */
+    public static int hitRing(int packed) {
+        if ((packed & TRANSIT_BIT) == 0) {
+            return WHEEL_NATAL;
+        }
+        return (packed & SKY_BIT) != 0 ? WHEEL_SKY : WHEEL_OUTER;
+    }
+
+    // ------------------------------------------------------------ glyphs, houses, aspect gating
+    //
+    // Also M11 stage 4, and all four read the engine rather than the panel - which is what
+    // lets them be here at all. SkymapPanel's BODY_GLYPHS and ZODIAC_SYMBOLS are a static
+    // cache of exactly these two sources, filled once in a static initialiser and never
+    // written again, so reading Bodies and Zodiac directly is the same answer from one place
+    // instead of two.
+
+    /** Whether the wheel should draw an aspect line from this point: computed, and not an angle. */
+    public static boolean aspecting(int body, boolean[] valid) {
+        return valid[body] && !Bodies.at(body).isAngle();
+    }
+
+    /** A body's glyph, by registry index. */
+    public static String glyphOf(int body) {
+        return body >= 0 && body < Bodies.count() ? Bodies.at(body).glyph : "?";
+    }
+
+    /** A sign's glyph, by index, wrapping so a caller may count past Pisces. */
+    public static String zodiacSymbol(int signIndex) {
+        return Zodiac.SIGN_GLYPHS[((signIndex % 12) + 12) % 12];
+    }
+
+    /**
+     * Where a house begins, in degrees.
+     *
+     * <p>Cusps are 1-based with index 0 unused, which is the shape {@code activeCusps} has
+     * always had.
+     */
+    public static double houseStart(double[] cusps, int house) {
+        return cusps[house];
+    }
+
+    /** How wide a house is, in degrees, from its cusp to the next one round. */
+    public static double houseSpan(double[] cusps, int house) {
+        double to = cusps[house == 12 ? 1 : house + 1];
+        double span = ((to - cusps[house]) % 360.0 + 360.0) % 360.0;
+        // A zero span would report nothing in the house at all rather than saying something is
+        // wrong; it can only happen from a degenerate cusp array, and the whole circle is the
+        // honest answer to "which bodies are in this house" when the cusps cannot say.
+        return span == 0.0 ? 360.0 : span;
     }
 }

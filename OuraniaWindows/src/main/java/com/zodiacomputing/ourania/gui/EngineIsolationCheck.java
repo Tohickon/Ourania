@@ -45,12 +45,15 @@ public final class EngineIsolationCheck {
      * the phone's wheel draws from (M4), and the globe's camera and projection, which the phone's
      * globe turns and projects with (M11), and the globe's pen and the
      * colours it is handed, which the phone implements against Android's canvas (M11,
-     * stage 4).
+     * stage 4), and the globe renderer itself with the two enums it asks its questions in
+     * terms of - the foldable layers and an angle's role - which is what M11 stage 4
+     * finished: the renderer had seventy references into {@code SkymapPanel} and one AWT
+     * import, and has neither now.
      */
     static final Set<String> SHARED = new TreeSet<>(List.of(
         "Settings", "SavedCharts", "InterpretationService", "ErrorLog", "Json",
         "NarrativeSynthesizer", "Atlas", "WheelLayout", "Globe", "Glossary",
-        "Pen", "Ink"));
+        "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer"));
 
     /** The Java level Android builds accept. */
     static final String RELEASE = "17";

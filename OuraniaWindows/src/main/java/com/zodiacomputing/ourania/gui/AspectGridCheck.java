@@ -171,9 +171,9 @@ public final class AspectGridCheck {
             String col = Bodies.at((i + 1) % Bodies.count()).name;
             for (String type : types) {
                 // Every row the grid builds: natal, partner and sky, each on its own wheel.
-                for (int wheel : new int[] {SkymapPanel.WHEEL_NATAL, SkymapPanel.WHEEL_OUTER,
-                                            SkymapPanel.WHEEL_SKY}) {
-                    String label = wheel == SkymapPanel.WHEEL_NATAL
+                for (int wheel : new int[] {WheelLayout.WHEEL_NATAL, WheelLayout.WHEEL_OUTER,
+                                            WheelLayout.WHEEL_SKY}) {
+                    String label = wheel == WheelLayout.WHEEL_NATAL
                         ? row : "transit_" + row.toLowerCase();
                     String href = SkymapPanel.aspectHref(label, col, type, wheel);
                     String[] p = (String[]) parse.invoke(null, href);
@@ -194,8 +194,8 @@ public final class AspectGridCheck {
                     ok(href + " parses without a wheel given", p != null);
                     if (p != null) {
                         String want = label.startsWith("transit_")
-                            ? String.valueOf(SkymapPanel.WHEEL_OUTER)
-                            : String.valueOf(SkymapPanel.WHEEL_NATAL);
+                            ? String.valueOf(WheelLayout.WHEEL_OUTER)
+                            : String.valueOf(WheelLayout.WHEEL_NATAL);
                         ok(href + " takes its wheel from the prefix", want.equals(p[3]));
                     }
                 }
@@ -595,7 +595,7 @@ public final class AspectGridCheck {
         // The other half. A pair the grid left blank must really have no aspect at the orb
         // the mode implies - this is what fails if a call site kept the full orb.
         // <b>The sweep has to use the grid's own inclusion rule, not raw validity.</b> The
-        // grid draws a row or column only when SkymapPanel.aspecting() says so, and that
+        // grid draws a row or column only when WheelLayout.aspecting() says so, and that
         // excludes the four angles - they are drawn on the wheel as labelled axes, not as
         // grid bodies. Sweeping raw bValid asserted about 140 cells the grid never emits and
         // reported every one of them as a miss, in BOTH modes, which is the signature of a
@@ -1340,20 +1340,20 @@ public final class AspectGridCheck {
         innerOwner.setAccessible(true);
 
         ok("in a synastry the outer ring is Chart B",
-            "Chart B".equals(ringWord.invoke(sky, SkymapPanel.WHEEL_OUTER)));
+            "Chart B".equals(ringWord.invoke(sky, WheelLayout.WHEEL_OUTER)));
         ok("and the sky ring is still the sky",
-            "sky".equals(ringWord.invoke(sky, SkymapPanel.WHEEL_SKY)));
+            "sky".equals(ringWord.invoke(sky, WheelLayout.WHEEL_SKY)));
         ok("and the inner wheel is Chart A's, because natal does not say whose",
             "Chart A's".equals(innerOwner.invoke(sky)));
 
         // The consumer, in the mode where the bug lived.
         String cardB = sky.aspectHoverHtml(
-            "aspect|transit_Uranus|Saturn|Conjunction|" + SkymapPanel.WHEEL_OUTER);
+            "aspect|transit_Uranus|Saturn|Conjunction|" + WheelLayout.WHEEL_OUTER);
         ok("the aspect card names Chart B's body Chart B", cardB.contains("(Chart B)"));
         ok("and does not call a person a transit", !cardB.contains("(transiting)"));
 
         String cardSky = sky.aspectHoverHtml(
-            "aspect|transit_Jupiter|Sun|Conjunction|" + SkymapPanel.WHEEL_SKY);
+            "aspect|transit_Jupiter|Sun|Conjunction|" + WheelLayout.WHEEL_SKY);
         ok("a sky body is called the sky, in the same chart", cardSky.contains("(sky)"));
         ok("and is not called Chart B", !cardSky.contains("(Chart B)"));
 
@@ -1362,7 +1362,7 @@ public final class AspectGridCheck {
         ok("outside a synastry the inner wheel is just natal",
             "natal".equals(innerOwner.invoke(sky)));
         ok("and the outer ring is a moment again",
-            "transiting".equals(ringWord.invoke(sky, SkymapPanel.WHEEL_OUTER)));
+            "transiting".equals(ringWord.invoke(sky, WheelLayout.WHEEL_OUTER)));
         setField(sky, "chartMode", ChartMode.SYNASTRY);
 
         Method gen = SkymapPanel.class.getDeclaredMethod("generatePlanetPlacementsHtml");
@@ -1920,8 +1920,8 @@ public final class AspectGridCheck {
             "onHighlightedLine", int.class, int.class);
         onLine.setAccessible(true);
 
-        int[] wheels = {SkymapPanel.WHEEL_NATAL, SkymapPanel.WHEEL_OUTER,
-                        SkymapPanel.WHEEL_SKY};
+        int[] wheels = {WheelLayout.WHEEL_NATAL, WheelLayout.WHEEL_OUTER,
+                        WheelLayout.WHEEL_SKY};
         String[] named = {"natal", "partner", "sky"};
 
         // The grid emits a whole ring's worth of rows; hovering any of them is the same
@@ -1933,7 +1933,7 @@ public final class AspectGridCheck {
                 }
                 for (int wi = 0; wi < wheels.length; wi++) {
                     int wheel = wheels[wi];
-                    String row = wheel == SkymapPanel.WHEEL_NATAL
+                    String row = wheel == WheelLayout.WHEEL_NATAL
                         ? Bodies.at(a).name
                         : "transit_" + Bodies.at(a).name.toLowerCase();
                     String href = SkymapPanel.aspectHref(
@@ -1951,20 +1951,20 @@ public final class AspectGridCheck {
 
                     // And the glyphs at its two ends. A cross-chart line leaves the hovered
                     // ring and lands on the natal one, so those are the two that light.
-                    if (wheel == SkymapPanel.WHEEL_NATAL) {
+                    if (wheel == WheelLayout.WHEEL_NATAL) {
                         ok("natal " + a + " lights", (Boolean) onLine.invoke(sky, a, wheel));
                         ok("natal " + b + " lights", (Boolean) onLine.invoke(sky, b, wheel));
                         ok("partner " + a + " stays dark", !(Boolean) onLine.invoke(
-                            sky, a, SkymapPanel.WHEEL_OUTER));
+                            sky, a, WheelLayout.WHEEL_OUTER));
                         ok("sky " + a + " stays dark", !(Boolean) onLine.invoke(
-                            sky, a, SkymapPanel.WHEEL_SKY));
+                            sky, a, WheelLayout.WHEEL_SKY));
                     } else {
-                        int other = wheel == SkymapPanel.WHEEL_OUTER
-                            ? SkymapPanel.WHEEL_SKY : SkymapPanel.WHEEL_OUTER;
+                        int other = wheel == WheelLayout.WHEEL_OUTER
+                            ? WheelLayout.WHEEL_SKY : WheelLayout.WHEEL_OUTER;
                         ok(named[wi] + " " + a + " lights",
                             (Boolean) onLine.invoke(sky, a, wheel));
                         ok("natal " + b + " lights at the far end",
-                            (Boolean) onLine.invoke(sky, b, SkymapPanel.WHEEL_NATAL));
+                            (Boolean) onLine.invoke(sky, b, WheelLayout.WHEEL_NATAL));
                         ok("the other cross ring's " + a + " stays dark",
                             !(Boolean) onLine.invoke(sky, a, other));
                     }
@@ -1983,8 +1983,8 @@ public final class AspectGridCheck {
             "generatePlanetPlacementsHtml", partType);
         grid.setAccessible(true);
         String withSky = (String) grid.invoke(sky, whole);
-        int skyCells = countOccurrences(withSky, "|" + SkymapPanel.WHEEL_SKY + "'");
-        int outerCells = countOccurrences(withSky, "|" + SkymapPanel.WHEEL_OUTER + "'");
+        int skyCells = countOccurrences(withSky, "|" + WheelLayout.WHEEL_SKY + "'");
+        int outerCells = countOccurrences(withSky, "|" + WheelLayout.WHEEL_OUTER + "'");
         System.out.println("  tri-wheel grid: " + outerCells + " partner cells, "
             + skyCells + " sky cells");
         ok("the tri-wheel grid carries sky cells", skyCells > 0);
@@ -2005,9 +2005,9 @@ public final class AspectGridCheck {
         sky.updateChartData();
         String noSky = (String) grid.invoke(sky, whole);
         ok("a two-wheel grid carries no sky cells",
-            countOccurrences(noSky, "|" + SkymapPanel.WHEEL_SKY + "'") == 0);
+            countOccurrences(noSky, "|" + WheelLayout.WHEEL_SKY + "'") == 0);
         ok("a two-wheel grid still carries partner cells",
-            countOccurrences(noSky, "|" + SkymapPanel.WHEEL_OUTER + "'") > 0);
+            countOccurrences(noSky, "|" + WheelLayout.WHEEL_OUTER + "'") > 0);
 
         // And the reader's aspect filter reaches the sky rows, as it reaches the sky chords.
         // Listing a pair the wheel refuses to draw is the grid and the wheel disagreeing.
@@ -2016,11 +2016,11 @@ public final class AspectGridCheck {
         sky.updateChartData();
         String natalOnly = (String) grid.invoke(sky, whole);
         ok("a natal-only filter drops the sky rows",
-            countOccurrences(natalOnly, "|" + SkymapPanel.WHEEL_SKY + "'") == 0);
+            countOccurrences(natalOnly, "|" + WheelLayout.WHEEL_SKY + "'") == 0);
         ok("a natal-only filter drops the partner rows too",
-            countOccurrences(natalOnly, "|" + SkymapPanel.WHEEL_OUTER + "'") == 0);
+            countOccurrences(natalOnly, "|" + WheelLayout.WHEEL_OUTER + "'") == 0);
         ok("a natal-only filter keeps the natal rows",
-            countOccurrences(natalOnly, "|" + SkymapPanel.WHEEL_NATAL + "'") > 0);
+            countOccurrences(natalOnly, "|" + WheelLayout.WHEEL_NATAL + "'") > 0);
     }
 
     private static int countOccurrences(String haystack, String needle) {

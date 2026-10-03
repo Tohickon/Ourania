@@ -205,16 +205,16 @@ public final class RimAndFillsCheck {
         int cx = intField(g, "cx");
         int cy = intField(g, "cy");
 
-        on(sky, SkymapPanel.Layer.MANSIONS, true);
+        on(sky, Layer.MANSIONS, true);
         int[] rings = ringsOf(sky);
         int outer = rings[WheelLayout.RING_OUTER];
         int mansionInner = rings[WheelLayout.RING_MANSION_INNER];
         int decanOuter = rings[WheelLayout.RING_DECAN_OUTER];
         ok("the painted wheel has the band open", mansionInner < outer);
 
-        on(sky, SkymapPanel.Layer.DEGREES, true);
+        on(sky, Layer.DEGREES, true);
         BufferedImage withScale = stable(chart);
-        on(sky, SkymapPanel.Layer.DEGREES, false);
+        on(sky, Layer.DEGREES, false);
         BufferedImage without = stable(chart);
         double[] reach = inkRadii(withScale, without, cx, cy, decanOuter + 2, outer + 3);
         System.out.printf("  mansions open: outer scale ink from %.1f to %.1f px, band %d to %d%n",
@@ -224,10 +224,10 @@ public final class RimAndFillsCheck {
             + ", band starts " + mansionInner, reach[1] <= mansionInner + 2.0);
 
         // And folded, the scale has the rim back - the layout before the band existed.
-        on(sky, SkymapPanel.Layer.MANSIONS, false);
-        on(sky, SkymapPanel.Layer.DEGREES, true);
+        on(sky, Layer.MANSIONS, false);
+        on(sky, Layer.DEGREES, true);
         BufferedImage foldedWith = stable(chart);
-        on(sky, SkymapPanel.Layer.DEGREES, false);
+        on(sky, Layer.DEGREES, false);
         BufferedImage foldedWithout = stable(chart);
         double[] back = inkRadii(foldedWith, foldedWithout, cx, cy, decanOuter + 2, outer + 3);
         System.out.printf("  mansions folded: outer scale ink reaches %.1f px, rim %d%n",
@@ -235,15 +235,15 @@ public final class RimAndFillsCheck {
         ok("with the mansions folded the scale reaches the rim again: " + back[1],
             back[1] >= outer - 2.0);
 
-        on(sky, SkymapPanel.Layer.DEGREES, true);
-        on(sky, SkymapPanel.Layer.MANSIONS, true);
+        on(sky, Layer.DEGREES, true);
+        on(sky, Layer.MANSIONS, true);
     }
 
     // ------------------------------------------------------------------ D
 
     private static void leaders(SkymapPanel sky, Component chart) throws Exception {
-        on(sky, SkymapPanel.Layer.MANSIONS, true);
-        on(sky, SkymapPanel.Layer.DEGREES, true);
+        on(sky, Layer.MANSIONS, true);
+        on(sky, Layer.DEGREES, true);
         Object g = geometry(sky);
         int cx = intField(g, "cx");
         int cy = intField(g, "cy");
@@ -272,20 +272,20 @@ public final class RimAndFillsCheck {
     // ------------------------------------------------------------------ E
 
     private static void globeFills(SkymapPanel sky) throws Exception {
-        on(sky, SkymapPanel.Layer.MANSIONS, true);
-        on(sky, SkymapPanel.Layer.DEGREES, true);
-        on(sky, SkymapPanel.Layer.HOUSES, true);
+        on(sky, Layer.MANSIONS, true);
+        on(sky, Layer.DEGREES, true);
+        on(sky, Layer.HOUSES, true);
 
         // The mansions carry a standing wash, so no focus is needed to see it.
         fill("mansions", Settings::setGlobeMansionFill, sky,
-            SkymapPanel.Layer.MANSIONS, () -> { });
+            Layer.MANSIONS, () -> { });
 
         // The house and degree washes are on the item being pointed at.
         fill("house", Settings::setGlobeHouseFill, sky,
-            SkymapPanel.Layer.HOUSES, () -> sky.setFocusHouse(5));
+            Layer.HOUSES, () -> sky.setFocusHouse(5));
         sky.setFocusHouse(-1);
         fill("degree", Settings::setGlobeDegreeFill, sky,
-            SkymapPanel.Layer.DEGREES, () -> sky.setFocusDegree(100));
+            Layer.DEGREES, () -> sky.setFocusDegree(100));
         sky.setFocusDegree(-1);
 
         // <b>Off is not folded.</b> With the mansion fill off the band keeps its edges, its 28
@@ -293,9 +293,9 @@ public final class RimAndFillsCheck {
         // again under another name.
         Settings.setGlobeMansionFill(false);
         BufferedImage unfilled = stableGlobe(sky);
-        on(sky, SkymapPanel.Layer.MANSIONS, false);
+        on(sky, Layer.MANSIONS, false);
         BufferedImage folded = stableGlobe(sky);
-        on(sky, SkymapPanel.Layer.MANSIONS, true);
+        on(sky, Layer.MANSIONS, true);
         Settings.setGlobeMansionFill(true);
         ok("the mansion band without its fill is still a band, not a folded layer",
             differing(unfilled, folded) > 500);
@@ -322,7 +322,7 @@ public final class RimAndFillsCheck {
      * 0</b>, and neither number has to be written down.
      */
     private static void fill(String name, java.util.function.Consumer<Boolean> set,
-                             SkymapPanel sky, SkymapPanel.Layer layer, Runnable focus)
+                             SkymapPanel sky, Layer layer, Runnable focus)
             throws Exception {
         focus.run();
         set.accept(true);
@@ -479,7 +479,7 @@ public final class RimAndFillsCheck {
 
     // ------------------------------------------------------------------ painting
 
-    private static void on(SkymapPanel sky, SkymapPanel.Layer layer, boolean open)
+    private static void on(SkymapPanel sky, Layer layer, boolean open)
             throws Exception {
         SwingUtilities.invokeAndWait(() -> sky.setLayer(layer, open));
         Thread.sleep(80);
@@ -536,7 +536,7 @@ public final class RimAndFillsCheck {
         Graphics2D g = im.createGraphics();
         g.setColor(new Color(10, 12, 16));
         g.fillRect(0, 0, GLOBE, GLOBE);
-        GlobeRenderer.paint(g, new Globe(), GLOBE, GLOBE, sky, false);
+        AwtPen.paint(g, new Globe(), GLOBE, GLOBE, sky, false);
         g.dispose();
         return im;
     }

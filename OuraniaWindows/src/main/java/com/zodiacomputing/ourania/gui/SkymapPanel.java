@@ -489,19 +489,9 @@ implements WheelSource, GlobeSource {
      */
     boolean globeMode;
 
-    /**
-     * The layers of the chart the reader can fold away, each with its own bloom.
-     *
-     * <b>Partner and Sky are not here, and that is the distinction.</b> Those two change what
-     * the chart <i>is</i> - opening the partner ring makes it a synastry, and the engine has to
-     * be told - so they go through ChartMode and keep the blooms that already drive the bands.
-     * These change only what is <i>drawn</i>. Mixing the two would put a second writer on the
-     * mode, which is the defect this panel has shipped twice.
-     *
-     * Natal is here rather than fixed because David asked for it to fold like the others, and
-     * it can: hiding the natal glyphs does not stop the chart being a natal chart.
-     */
-    enum Layer { NATAL, DEGREES, SIGNS, DECANS, BOUNDS, MANSIONS, HOUSES, ASPECTS }
+    // The foldable layers are {@link Layer}, a file of their own since M11 stage 4 - the globe
+    // renderer asks for them forty-four times and has to run on the phone, where there is no
+    // Swing component for them to live inside.
 
     private final java.util.EnumMap<Layer, Bloom> layerBlooms =
         new java.util.EnumMap<>(Layer.class);
@@ -1532,14 +1522,7 @@ implements WheelSource, GlobeSource {
      * Each one already existed in some form - as a private method, an instance colour lookup,
      * or a static array - and is exposed here rather than reimplemented there.
      */
-    static String zodiacSymbol(int signIndex) {
-        return ZODIAC_SYMBOLS[((signIndex % 12) + 12) % 12];
-    }
 
-    /** A body's glyph, by registry index. */
-    static String glyphOf(int body) {
-        return body >= 0 && body < BODY_GLYPHS.length ? BODY_GLYPHS[body] : "?";
-    }
 
     /** An element's colour, for surfaces that have no panel instance to hand. */
     static Color elementColorFor(int elementIndex) {
@@ -1725,9 +1708,6 @@ implements WheelSource, GlobeSource {
         return this.focusBody == body && this.focusTransit == outer;
     }
 
-    static boolean aspecting(int n, boolean[] blArray) {
-        return blArray[n] && !Bodies.at(n).isAngle();
-    }
 
 
     // ---------------------------------------------------------------- concentric rings
@@ -2067,8 +2047,6 @@ implements WheelSource, GlobeSource {
             g.natalRadii(), false);
     }
 
-    /** Marks a packed hit as belonging to the outer wheel. Above any registry index. */
-    static final int TRANSIT_BIT = 1 << 16;
 
     /**
      * Set alongside {@link #TRANSIT_BIT} when the hit was on the sky ring.
@@ -2080,28 +2058,9 @@ implements WheelSource, GlobeSource {
      * than a new encoding so that every existing reader of TRANSIT_BIT still answers the
      * question it was asking; the ring is available to whoever needs the finer answer.
      */
-    static final int SKY_BIT = 1 << 17;
 
-    /** Packs a body index and the ring it was found on, the way every hit test returns it. */
-    static int packHit(int body, int ring) {
-        if (ring == WHEEL_NATAL) {
-            return body;
-        }
-        return ring == WHEEL_SKY ? (body | TRANSIT_BIT | SKY_BIT) : (body | TRANSIT_BIT);
-    }
 
-    /** The body index out of a packed hit. */
-    static int hitBody(int packed) {
-        return packed & (TRANSIT_BIT - 1);
-    }
 
-    /** Which wheel a packed hit was on - WHEEL_NATAL, WHEEL_OUTER or WHEEL_SKY. */
-    static int hitRing(int packed) {
-        if ((packed & TRANSIT_BIT) == 0) {
-            return WHEEL_NATAL;
-        }
-        return (packed & SKY_BIT) != 0 ? WHEEL_SKY : WHEEL_OUTER;
-    }
 
     /**
      * The body the cursor is resting on, or -1.
@@ -4883,18 +4842,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             boolean bl3 = bl = (this.aspectFilter.equals("Transit-Natal") || this.aspectFilter.equals("Both")) && this.showTransitChart;
             if (n3 != 0) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
-                    if (!SkymapPanel.aspecting(n18, this.natalRing.valid)) continue;
+                    if (!WheelLayout.aspecting(n18, this.natalRing.valid)) continue;
                     for (int i = n18 + 1; i < BODY_COUNT; ++i) {
-                        if (!SkymapPanel.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(0), g.aspectDisc(0), this.natalRing.lon[n18], this.natalRing.lon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
+                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(0), g.aspectDisc(0), this.natalRing.lon[n18], this.natalRing.lon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
                         return;
                     }
                 }
             }
             if (bl) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
-                    if (!SkymapPanel.aspecting(n18, this.outerRing.valid)) continue;
+                    if (!WheelLayout.aspecting(n18, this.outerRing.valid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
-                        if (!SkymapPanel.aspecting(i, this.natalRing.valid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(1), g.aspectDisc(1), this.outerRing.lon[n18], this.natalRing.lon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
+                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(1), g.aspectDisc(1), this.outerRing.lon[n18], this.natalRing.lon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
                         return;
                     }
                 }
@@ -4904,9 +4863,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // sky aspect and get whatever happened to be behind it.
             if (bl && this.triRingDrawn()) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
-                    if (!SkymapPanel.aspecting(n18, this.skyRing.valid)) continue;
+                    if (!WheelLayout.aspecting(n18, this.skyRing.valid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
-                        if (!SkymapPanel.aspecting(i, this.natalRing.valid)
+                        if (!WheelLayout.aspecting(i, this.natalRing.valid)
                             || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(2),
                                 g.aspectDisc(2), this.skyRing.lon[n18], this.natalRing.lon[i],
                                 "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) {
@@ -5085,28 +5044,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** An angle click from any wheel except the tri-wheel's sky ring. */
-    /**
-     * Which chart a clicked angle belongs to, and therefore what the card is claiming.
-     *
-     * <b>The K7 decision: the asymmetry is a relational law, not a bug.</b> Chart A owns the
-     * twelve houses on screen, so clicking Chart A's angle reads natally - it is the baseline
-     * the whole session is framed by. Chart B has no house boundaries here; its angles are
-     * visiting, falling into Chart A's houses, so clicking one is inherently a cross-chart
-     * event. Forcing symmetry breaks it either way: "both natal" makes the reader work out by
-     * hand where B's Ascendant lands, and "both cross-chart" denies A their own baseline.
-     *
-     * <b>The behaviour was already right; what was missing was saying so.</b> The two cards
-     * were identical in appearance while making different claims, which is the one thing a
-     * deliberate asymmetry cannot afford - indistinguishable, it reads as inconsistency.
-     */
-    enum AngleRole {
-        /** Chart A's own angle: the frame everything else is measured against. */
-        ANCHOR,
-        /** Chart B's angle, projected into Chart A's houses. */
-        BRIDGE,
-        /** A transit or sky angle - a moment passing over the chart, not a person. */
-        SKY
-    }
+    // An angle's role is {@link AngleRole}, a file of their own since M11 stage 4, for the
+    // reason recorded there. The K7 rule that makes it three constants and not two is in its
+    // javadoc.
 
     /**
      * Which chart an angle belongs to, asked once for both surfaces that can open one.
@@ -5216,7 +5156,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         ArrayList<String[]> arrayList = new ArrayList<String[]>();
         for (int i = 0; i < BODY_COUNT; ++i) {
             String string;
-            if (!SkymapPanel.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
+            if (!WheelLayout.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
             double d2 = Math.abs(d - this.natalRing.lon[i]);
             if (d2 > 180.0) {
                 d2 = 360.0 - d2;
@@ -5234,7 +5174,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (bothCharts) {
             for (int i = 0; i < BODY_COUNT; ++i) {
                 String string;
-                if (!SkymapPanel.aspecting(i, this.outerRing.valid) || Bodies.isOppositePair(n, i)) continue;
+                if (!WheelLayout.aspecting(i, this.outerRing.valid) || Bodies.isOppositePair(n, i)) continue;
                 double d2 = Math.abs(d - this.outerRing.lon[i]);
                 if (d2 > 180.0) {
                     d2 = 360.0 - d2;
@@ -5428,14 +5368,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      *
      * These are the wheel a line leaves from; every line still lands on the natal wheel.
      */
-    static final int WHEEL_NATAL = 0;
-    static final int WHEEL_OUTER = 1;
-    static final int WHEEL_SKY = 2;
+    // The three wheel indices are WheelLayout's since M11 stage 4, with the packed-hit
+    // encoding that speaks them.
 
-    /** The globe's three decks: this chart in the middle, Chart B below, the sky above. */
-    static final int DECK_MIDDLE = 0;
-    static final int DECK_LOWER = 1;
-    static final int DECK_UPPER = 2;
+    // The three deck names are GlobeRenderer's since M11 stage 4 - they index its DECK_RADIUS.
+    // ringDeck still decides which deck a wheel belongs on.
 
     /**
      * Which deck of the globe a wheel's bodies belong on.
@@ -5477,33 +5414,33 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     @Override
     public int ringDeck(int wheel) {
         if (wheel == WHEEL_SKY) {
-            return DECK_MIDDLE;
+            return GlobeRenderer.DECK_MIDDLE;
         }
         if (wheel == WHEEL_OUTER) {
             // The outer slot is a second person in a synastry and the sky in every other mode
             // - the same rule outerRingMarker states, read here for the same reason.
             if (this.isSynastryChart()) {
-                return DECK_LOWER;
+                return GlobeRenderer.DECK_LOWER;
             }
             // <b>Unless the inner wheel is already the sky.</b> With both people out, the sky
             // is the chart and sits on the inner wheel in the middle, while this ring is the
             // sky at the scrubbed moment - two different moments of the same sky, and two
             // rings on one deck would draw them at one radius in one plane as a single ring
             // holding both.
-            return (!this.ringAOn && !this.ringBOn) ? DECK_UPPER : DECK_MIDDLE;
+            return (!this.ringAOn && !this.ringBOn) ? GlobeRenderer.DECK_UPPER : GlobeRenderer.DECK_MIDDLE;
         }
         // <b>The sky keeps the middle even when it is the chart.</b> With both people out, the
         // sky is not transits over anything - it is the thing being read - and it moves to the
         // inner wheel. It must not take Chart A's upper deck with it: a lone ribbon floating
         // above an empty middle says there is something underneath it that is not there.
         if (!this.ringAOn && !this.ringBOn) {
-            return DECK_MIDDLE;
+            return GlobeRenderer.DECK_MIDDLE;
         }
         // The inner slot is Chart A, which now rides above the sky - unless Chart B has been
         // promoted into it, and then it keeps the lower deck that belongs to Chart B.
         boolean chartBIsTheChart = !this.isRelationshipChart()
             && this.anchorSubject != null && this.anchorSubject == this.subjectB;
-        return chartBIsTheChart && !this.isSynastryChart() ? DECK_LOWER : DECK_UPPER;
+        return chartBIsTheChart && !this.isSynastryChart() ? GlobeRenderer.DECK_LOWER : GlobeRenderer.DECK_UPPER;
     }
 
     /** The wheel a grid row label names, for the rows that predate the wheel field. */
@@ -6120,7 +6057,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             } else {
                 for (int i = 0; i < BODY_COUNT; ++i) {
                     String string2;
-                    if (n == i || !SkymapPanel.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
+                    if (n == i || !WheelLayout.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
                     double d6 = Math.abs(d2 - this.natalRing.lon[i]);
                     if (d6 > 180.0) {
                         d6 = 360.0 - d6;
@@ -6157,7 +6094,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         for (int i = 0; i < BODY_COUNT; ++i) {
             String string;
-            if (n == i || !SkymapPanel.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
+            if (n == i || !WheelLayout.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n, i)) continue;
             double d4 = Math.abs(d2 - this.natalRing.lon[i]);
             if (d4 > 180.0) {
                 d4 = 360.0 - d4;
@@ -6284,11 +6221,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.drawsNatalAspects()) {
             int disc = g.aspectDisc(0);
             for (int a = 0; a < BODY_COUNT; a++) {
-                if (!SkymapPanel.aspecting(a, this.natalRing.valid)) {
+                if (!WheelLayout.aspecting(a, this.natalRing.valid)) {
                     continue;
                 }
                 for (int b = a + 1; b < BODY_COUNT; b++) {
-                    if (!SkymapPanel.aspecting(b, this.natalRing.valid)
+                    if (!WheelLayout.aspecting(b, this.natalRing.valid)
                         || Bodies.isOppositePair(a, b)
                         || this.aspectInkFor(this.natalRing.lon[a], this.natalRing.lon[b], a, b, false) == null) {
                         continue;
@@ -6311,11 +6248,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 double[] lon = this.wheelLon(wheel);
                 boolean[] valid = this.wheelValid(wheel);
                 for (int a = 0; a < BODY_COUNT; a++) {
-                    if (!SkymapPanel.aspecting(a, valid)) {
+                    if (!WheelLayout.aspecting(a, valid)) {
                         continue;
                     }
                     for (int b = 0; b < BODY_COUNT; b++) {
-                        if (!SkymapPanel.aspecting(b, this.natalRing.valid)
+                        if (!WheelLayout.aspecting(b, this.natalRing.valid)
                             || this.aspectInkFor(lon[a], this.natalRing.lon[b], a, b,
                                 wheel == WHEEL_OUTER) == null) {
                             continue;
@@ -6556,7 +6493,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      */
     @Override
     public void paintGlobe(Graphics2D g, int w, int h) {
-        GlobeRenderer.paint(g, this.globe, w, h, this,
+        AwtPen.paint(g, this.globe, w, h, this,
             this.globeDragging || this.globe.coasting());
     }
 
@@ -6676,19 +6613,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      *
      * <p>Cusps are 1-based with index 0 unused, which is the shape {@code activeCusps} has always had.
      */
-    static double houseStart(double[] cusps, int house) {
-        return cusps[house];
-    }
 
     /** How wide a house is, in degrees, from its cusp to the next one round. */
-    static double houseSpan(double[] cusps, int house) {
-        double to = cusps[house == 12 ? 1 : house + 1];
-        double span = ((to - cusps[house]) % 360.0 + 360.0) % 360.0;
-        // A zero span would report nothing in the house at all rather than saying something is wrong;
-        // it can only happen from a degenerate cusp array, and the whole circle is the honest answer
-        // to "which bodies are in this house" when the cusps cannot say.
-        return span == 0.0 ? 360.0 : span;
-    }
 
     // ---- the transport, as methods (G13) ------------------------------------------------
     // Named so a keyboard shortcut and a button can call the same thing. Before 27 Sep these were

@@ -77,7 +77,7 @@ final class AspectGrid {
         // to drag sideways to finish one row is worse than a small one you can take in whole.
         int gridCols = 0;
         for (n = 0; n < SkymapPanel.BODY_COUNT; ++n) {
-            if (SkymapPanel.aspecting(n, columns.valid)) {
+            if (WheelLayout.aspecting(n, columns.valid)) {
                 gridCols++;
             }
         }
@@ -88,7 +88,7 @@ final class AspectGrid {
         stringBuilder.append("<table border='1' cellspacing='0' cellpadding='0' style='border-collapse: collapse; border-color: #555; text-align:center;'>");
         stringBuilder.append("<tr><td style='width:").append(cell).append("px;'></td>");
         for (n = 0; n < SkymapPanel.BODY_COUNT; ++n) {
-            if (!SkymapPanel.aspecting(n, columns.valid)) continue;
+            if (!WheelLayout.aspecting(n, columns.valid)) continue;
             stringBuilder.append("<td style='color:").append(SkymapPanel.bodyColorHex(n)).append("; font-size:").append(glyph).append("px; width:").append(cell).append("px;'>").append(SkymapPanel.BODY_GLYPHS[n]).append("</td>");
         }
         stringBuilder.append("</tr>");
@@ -140,14 +140,14 @@ final class AspectGrid {
         double[] lon = band.ring().lon;
         boolean[] valid = band.ring().valid;
         for (int n = 0; n < SkymapPanel.BODY_COUNT; ++n) {
-            if (!SkymapPanel.aspecting(n, valid)) continue;
+            if (!WheelLayout.aspecting(n, valid)) continue;
             out.append("<tr>");
             out.append("<td style='color:").append(SkymapPanel.bodyColorHex(n))
                .append("; font-size:").append(glyph).append("px; width:").append(cell)
                .append("px;'>").append(SkymapPanel.BODY_GLYPHS[n]).append("</td>");
             for (int i = 0; i < SkymapPanel.BODY_COUNT; ++i) {
-                if (!SkymapPanel.aspecting(i, columns.valid)) continue;
-                if ((wheel == SkymapPanel.WHEEL_NATAL && i >= n) || Bodies.isOppositePair(n, i)) {
+                if (!WheelLayout.aspecting(i, columns.valid)) continue;
+                if ((wheel == WheelLayout.WHEEL_NATAL && i >= n) || Bodies.isOppositePair(n, i)) {
                     out.append("<td style='background-color:#111;'></td>");
                     continue;
                 }
@@ -160,7 +160,7 @@ final class AspectGrid {
                     out.append("<td style='background-color:#222;'></td>");
                     continue;
                 }
-                String row = wheel == SkymapPanel.WHEEL_NATAL ? SkymapPanel.BODY_NAMES[n]
+                String row = wheel == WheelLayout.WHEEL_NATAL ? SkymapPanel.BODY_NAMES[n]
                     : SkymapPanel.TRANSIT_PREFIX + SkymapPanel.BODY_NAMES[n].toLowerCase();
                 // Through aspectHref, never formatted inline: the parser is the only other
                 // place that knows this format and the two must not be able to drift.

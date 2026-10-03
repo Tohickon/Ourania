@@ -71,7 +71,7 @@ interface WheelSource {
 
     // ------------------------------------------------------------ what is shown
 
-    boolean layerShown(SkymapPanel.Layer layer);
+    boolean layerShown(Layer layer);
 
     boolean outerRingDrawn();
 
@@ -143,11 +143,11 @@ interface WheelSource {
 
     Color getElementColor(int element);
 
-    Color ringInk(int body, SkymapPanel.AngleRole role);
+    Color ringInk(int body, AngleRole role);
 
-    Color ringAngleInk(SkymapPanel.AngleRole role);
+    Color ringAngleInk(AngleRole role);
 
-    SkymapPanel.AngleRole angleRoleFor(boolean isSky, boolean isTransit);
+    AngleRole angleRoleFor(boolean isSky, boolean isTransit);
 
     // ------------------------------------------------------------ the desktop view
 

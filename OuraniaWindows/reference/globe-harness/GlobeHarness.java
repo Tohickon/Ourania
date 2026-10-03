@@ -13,7 +13,7 @@ public class GlobeHarness {
   static BufferedImage frame(SkymapPanel sky, Globe cam, boolean turning) {
     BufferedImage im = new BufferedImage(W, H, BufferedImage.TYPE_INT_RGB);
     java.awt.Graphics2D g = im.createGraphics(); g.setColor(new java.awt.Color(10, 12, 16)); g.fillRect(0, 0, W, H);
-    GlobeRenderer.paint(g, cam, W, H, sky, turning); g.dispose(); return im;
+    GlobeRenderer.paint(new AwtPen(g), cam, W, H, sky, turning); g.dispose(); return im;
   }
   static BufferedImage stable(SkymapPanel sky, Globe cam, boolean turning) throws Exception {
     BufferedImage last = frame(sky, cam, turning);

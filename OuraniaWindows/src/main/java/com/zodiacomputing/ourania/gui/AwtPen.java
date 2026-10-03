@@ -141,4 +141,17 @@ final class AwtPen implements Pen {
 
     /** A stand-in for "no clip", since the stack cannot hold null. */
     private static final Shape NO_CLIP = new java.awt.Rectangle();
+
+    /**
+     * The globe drawn onto a {@code Graphics2D}, which is what every desktop caller wants.
+     *
+     * <p><b>Here rather than on the renderer (M11, stage 4).</b> This one line was the last
+     * {@code java.awt} reference in {@link GlobeRenderer}, and a renderer that imports AWT
+     * cannot be in the phone's build however clean the rest of it is. So the wrapping lives
+     * with the pen that does the wrapping.
+     */
+    static void paint(Graphics2D g, Globe cam, int w, int h, GlobeSource panel,
+                      boolean turning) {
+        GlobeRenderer.paint(new AwtPen(g), cam, w, h, panel, turning);
+    }
 }

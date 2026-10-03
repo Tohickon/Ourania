@@ -80,7 +80,7 @@ public final class GlobeOptionsCheck {
         Graphics2D g = im.createGraphics();
         g.setColor(new Color(10, 12, 16));
         g.fillRect(0, 0, SIZE, SIZE);
-        GlobeRenderer.paint(g, new Globe(), SIZE, SIZE, panel, false);
+        AwtPen.paint(g, new Globe(), SIZE, SIZE, panel, false);
         g.dispose();
         return im;
     }
@@ -156,15 +156,15 @@ public final class GlobeOptionsCheck {
         // <b>Off is not the same as hiding the signs.</b> The boundaries, the band at the equator
         // and the degree scale stay; only the wash goes. Hiding the layer takes all of them, so
         // the two frames must differ.
-        boolean signsOn = panel.layerShown(SkymapPanel.Layer.SIGNS);
-        panel.setLayer(SkymapPanel.Layer.SIGNS, false);
+        boolean signsOn = panel.layerShown(Layer.SIGNS);
+        panel.setLayer(Layer.SIGNS, false);
         // <b>Folding a layer is animated.</b> Painted straight after the call, the signs are still
         // most of the way open and the frame is the one we already have - which is how this read
         // "0 pixels apart" the first time it ran. Wait for the fold to finish before looking.
-        settle(() -> !panel.layerShown(SkymapPanel.Layer.SIGNS));
+        settle(() -> !panel.layerShown(Layer.SIGNS));
         BufferedImage hidden = stableFrame(panel);
-        panel.setLayer(SkymapPanel.Layer.SIGNS, signsOn);
-        settle(() -> panel.layerShown(SkymapPanel.Layer.SIGNS) == signsOn);
+        panel.setLayer(Layer.SIGNS, signsOn);
+        settle(() -> panel.layerShown(Layer.SIGNS) == signsOn);
         ok("and the shell off still draws the signs, unlike hiding them, "
                 + differingPixels(off, hidden) + " pixels apart",
             differingPixels(off, hidden) > 500);

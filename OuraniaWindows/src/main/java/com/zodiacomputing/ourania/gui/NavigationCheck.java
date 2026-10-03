@@ -1660,9 +1660,9 @@ public final class NavigationCheck {
                 "ringWord", int.class);
             word.setAccessible(true);
             ok("the middle ring is called progressed",
-                "progressed".equals(word.invoke(panel, SkymapPanel.WHEEL_OUTER)));
+                "progressed".equals(word.invoke(panel, WheelLayout.WHEEL_OUTER)));
             ok("and the outer one is still the sky",
-                "sky".equals(word.invoke(panel, SkymapPanel.WHEEL_SKY)));
+                "sky".equals(word.invoke(panel, WheelLayout.WHEEL_SKY)));
 
             // <b>And back.</b> Turning progressions off has to give the ring back to the sky,
             // or the reader is left with a third ring and nothing on it.
@@ -1748,8 +1748,8 @@ public final class NavigationCheck {
                 });
 
                 ok("the mansion layer starts open",
-                    sky.layerWanted(SkymapPanel.Layer.MANSIONS)
-                        && sky.layerShown(SkymapPanel.Layer.MANSIONS));
+                    sky.layerWanted(Layer.MANSIONS)
+                        && sky.layerShown(Layer.MANSIONS));
 
                 // <b>Leaders off for this measurement, and that is not hiding anything.</b> Since
                 // 2026-09-16 a leader line ends at the outer degree scale, and the outer scale
@@ -1763,8 +1763,8 @@ public final class NavigationCheck {
                 Settings.setShowDegreeLines(false);
                 java.awt.image.BufferedImage open = flatFrame(wheel, size);
                 SwingUtilities.invokeAndWait(
-                    () -> sky.setLayer(SkymapPanel.Layer.MANSIONS, false));
-                ok("the chip folds it", !sky.layerShown(SkymapPanel.Layer.MANSIONS));
+                    () -> sky.setLayer(Layer.MANSIONS, false));
+                ok("the chip folds it", !sky.layerShown(Layer.MANSIONS));
                 java.awt.image.BufferedImage folded = flatFrame(wheel, size);
 
                 // Where the two frames differ, and how far out those pixels are.
@@ -1834,8 +1834,8 @@ public final class NavigationCheck {
                     GlobeRenderer.mansionAt(cam, size, size, sky, px, py) < 0);
 
                 SwingUtilities.invokeAndWait(
-                    () -> sky.setLayer(SkymapPanel.Layer.MANSIONS, true));
-                ok("the chip brings it back", sky.layerShown(SkymapPanel.Layer.MANSIONS));
+                    () -> sky.setLayer(Layer.MANSIONS, true));
+                ok("the chip brings it back", sky.layerShown(Layer.MANSIONS));
                 ok("and the globe answers again",
                     GlobeRenderer.mansionAt(cam, size, size, sky, px, py) >= 1);
 
@@ -2080,11 +2080,11 @@ public final class NavigationCheck {
             for (int ring = 0; ring < 3; ring++) {
                 int d = (Integer) disc.invoke(g, ring);
                 for (int a = 0; a < SkymapPanel.BODY_COUNT; a++) {
-                    if (!SkymapPanel.aspecting(a, valids[ring])) {
+                    if (!WheelLayout.aspecting(a, valids[ring])) {
                         continue;
                     }
                     for (int b = ring == 0 ? a + 1 : 0; b < SkymapPanel.BODY_COUNT; b++) {
-                        if (!SkymapPanel.aspecting(b, sky.natalRing.valid)
+                        if (!WheelLayout.aspecting(b, sky.natalRing.valid)
                             || (ring == 0 && com.zodiacomputing.ourania.astro.Bodies.isOppositePair(a, b))
                             || inkFor.invoke(sky, lons[ring][a], sky.natalRing.lon[b], a, b,
                                 ring == 1) == null) {
@@ -2144,9 +2144,9 @@ public final class NavigationCheck {
             java.lang.reflect.Method lit = SkymapPanel.class.getDeclaredMethod(
                 "onHighlightedLine", int.class, int.class);
             lit.setAccessible(true);
-            final int natal = SkymapPanel.WHEEL_NATAL;
-            final int outer = SkymapPanel.WHEEL_OUTER;
-            final int sky3 = SkymapPanel.WHEEL_SKY;
+            final int natal = WheelLayout.WHEEL_NATAL;
+            final int outer = WheelLayout.WHEEL_OUTER;
+            final int sky3 = WheelLayout.WHEEL_SKY;
 
             // Nothing hovered: nothing lights, on any ring.
             set(sky, "highlightA", -1);
@@ -2221,10 +2221,10 @@ public final class NavigationCheck {
             fs.setAccessible(true);
             SkymapPanel sky = (SkymapPanel) fs.get(w[0]);
             java.lang.reflect.Method ink = SkymapPanel.class.getDeclaredMethod(
-                "ringInk", int.class, SkymapPanel.AngleRole.class);
+                "ringInk", int.class, AngleRole.class);
             ink.setAccessible(true);
             java.lang.reflect.Method bead = SkymapPanel.class.getDeclaredMethod(
-                "ringBead", SkymapPanel.AngleRole.class);
+                "ringBead", AngleRole.class);
             bead.setAccessible(true);
             java.lang.reflect.Method bodyColor = SkymapPanel.class.getDeclaredMethod(
                 "bodyColor", int.class);
@@ -2232,11 +2232,11 @@ public final class NavigationCheck {
 
             for (int i = 0; i < com.zodiacomputing.ourania.astro.Bodies.count(); i++) {
                 java.awt.Color anchor =
-                    (java.awt.Color) ink.invoke(sky, i, SkymapPanel.AngleRole.ANCHOR);
+                    (java.awt.Color) ink.invoke(sky, i, AngleRole.ANCHOR);
                 java.awt.Color bridge =
-                    (java.awt.Color) ink.invoke(sky, i, SkymapPanel.AngleRole.BRIDGE);
+                    (java.awt.Color) ink.invoke(sky, i, AngleRole.BRIDGE);
                 java.awt.Color skyInk =
-                    (java.awt.Color) ink.invoke(sky, i, SkymapPanel.AngleRole.SKY);
+                    (java.awt.Color) ink.invoke(sky, i, AngleRole.SKY);
                 String name = com.zodiacomputing.ourania.astro.Bodies.at(i).name;
 
                 // The natal wheel is where element colour earns its place - untouched.
@@ -2253,8 +2253,8 @@ public final class NavigationCheck {
 
             // The beads under the glyphs have to agree with them, or a gold glyph on the
             // sky ring's bead is two claims about the same point.
-            java.awt.Color bBridge = (java.awt.Color) bead.invoke(null, SkymapPanel.AngleRole.BRIDGE);
-            java.awt.Color bSky = (java.awt.Color) bead.invoke(null, SkymapPanel.AngleRole.SKY);
+            java.awt.Color bBridge = (java.awt.Color) bead.invoke(null, AngleRole.BRIDGE);
+            java.awt.Color bSky = (java.awt.Color) bead.invoke(null, AngleRole.SKY);
             ok("the beads differ between the two outer rings", rgbGap(bBridge, bSky) > 20);
             ok("the partner bead is the warmer of the two",
                 bBridge.getRed() - bBridge.getBlue() > bSky.getRed() - bSky.getBlue());

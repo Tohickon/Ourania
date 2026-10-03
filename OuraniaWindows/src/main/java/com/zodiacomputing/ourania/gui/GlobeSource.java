@@ -18,7 +18,7 @@ import com.zodiacomputing.ourania.astro.LunarMansions;
  * <p>Colours are {@link Ink}s since stage 3, so nothing here is AWT's; the layer enum and the
  * angle roles are still the desktop panel's, and move out with stage 4.
  */
-interface GlobeSource {
+public interface GlobeSource {
 
     // ------------------------------------------------------------ the chart
 
@@ -49,12 +49,12 @@ interface GlobeSource {
 
     // ------------------------------------------------------------ what is shown
 
-    boolean layerShown(SkymapPanel.Layer layer);
+    boolean layerShown(Layer layer);
 
     /** How far a layer has opened, 0..1, while it blooms. */
-    double layerOpen(SkymapPanel.Layer layer);
+    double layerOpen(Layer layer);
 
-    SkymapPanel.AngleRole angleRoleFor(boolean isSky, boolean isTransit);
+    AngleRole angleRoleFor(boolean isSky, boolean isTransit);
 
     // ------------------------------------------------------------ focus
 
@@ -85,7 +85,7 @@ interface GlobeSource {
 
     // ------------------------------------------------------------ colour
 
-    Ink globeRingInk(int body, SkymapPanel.AngleRole role);
+    Ink globeRingInk(int body, AngleRole role);
 
     /** An element's colour - fire, earth, air, water by index - as the chart paints it. */
     Ink elementInk(int element);
@@ -100,5 +100,5 @@ interface GlobeSource {
     Ink leaderInk();
 
     /** The fill of a body's bead on a ring of this role. */
-    Ink beadInk(SkymapPanel.AngleRole role);
+    Ink beadInk(AngleRole role);
 }

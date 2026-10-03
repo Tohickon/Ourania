@@ -3,7 +3,6 @@ package com.zodiacomputing.ourania.gui;
 import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.LunarMansions;
 import com.zodiacomputing.ourania.astro.Zodiac;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ import java.util.List;
  * pieces which genuinely interpenetrate - a line passing through a sphere - resolve by their
  * midpoint rather than per pixel, and nothing in this scene does that.
  */
-final class GlobeRenderer {
+public final class GlobeRenderer {
 
     /** One thing to draw, and how far away it is. */
     private static final class Piece implements Comparable<Piece> {
@@ -67,32 +66,31 @@ final class GlobeRenderer {
      * ring blooms do to the bands, applied to everything else that is drawn. At zero the layer
      * is skipped entirely, so a folded layer costs nothing to draw.
      */
-    private Ink faded(Ink c, SkymapPanel.Layer layer) {
+    private Ink faded(Ink c, Layer layer) {
         double open = this.panel.layerOpen(layer);
         return new Ink(c.getRed(), c.getGreen(), c.getBlue(),
             (int) Math.round(c.getAlpha() * open));
     }
 
-    private boolean shown(SkymapPanel.Layer layer) {
+    private boolean shown(Layer layer) {
         return this.panel.layerShown(layer);
     }
 
     /**
-     * Draws the whole scene.
+     * Draws the whole scene, with any {@link Pen}: AWT's on the desktop, the canvas on the
+     * phone.
+     *
+     * <p><b>The {@code Graphics2D} overload is {@link AwtPen#paint} now (M11, stage 4).</b> It
+     * was one line - {@code paint(new AwtPen(g), ...)} - and it was the last thing in this file
+     * that needed {@code java.awt}. A renderer that imports AWT cannot be in the phone's build
+     * however clean the rest of it is, so the convenience sits on the desktop pen and this file
+     * knows only about Pen.
      *
      * @param panel the chart this is a view of - read only, and read rather than copied so the
      *     two views cannot disagree about what the chart is
-     */
-    /**
      * @param turning true while the reader is dragging the globe
      */
-    static void paint(Graphics2D g, Globe cam, int w, int h, GlobeSource panel,
-                      boolean turning) {
-        paint(new AwtPen(g), cam, w, h, panel, turning);
-    }
-
-    /** The globe drawn with any {@link Pen}: AWT's on the desktop, the canvas on the phone. */
-    static void paint(Pen g, Globe cam, int w, int h, GlobeSource panel, boolean turning) {
+    public static void paint(Pen g, Globe cam, int w, int h, GlobeSource panel, boolean turning) {
         GlobeRenderer r = new GlobeRenderer(g, cam, w, h, panel.pinLongitude(), panel);
         r.turning = turning;
         r.stacked = Settings.globeStackedRings();
@@ -115,35 +113,35 @@ final class GlobeRenderer {
         // drag from forty frames a second to twenty. Twenty is not a slow globe, it is a
         // globe that fights the hand moving it. The shells come back the moment the drag ends,
         // which is when a reader is actually looking at them rather than at the motion.
-        if (!turning && r.shown(SkymapPanel.Layer.SIGNS) && Settings.globeSignPlane()) {
+        if (!turning && r.shown(Layer.SIGNS) && Settings.globeSignPlane()) {
             r.signPlane();
         }
         // <b>And the houses as twelve faces of the same kind, inside them.</b> David,
         // 2026-09-20: "the houses should always be a stationary globe with all 12 sections
         // going in wedges around the globe." Left out while turning for the same reason the
         // sign shell is - the fills are what cost a drag its frame rate.
-        if (!turning && r.shown(SkymapPanel.Layer.HOUSES) && Settings.globeHouseFill()) {
+        if (!turning && r.shown(Layer.HOUSES) && Settings.globeHouseFill()) {
             r.housePlane(panel.activeCusps());
         }
 
         r.focusWedges(panel);
-        if (r.shown(SkymapPanel.Layer.DEGREES)) {
+        if (r.shown(Layer.DEGREES)) {
             r.degreeRing();
         }
-        if (r.shown(SkymapPanel.Layer.MANSIONS)) {
+        if (r.shown(Layer.MANSIONS)) {
             r.mansionRing();
         }
-        if (r.shown(SkymapPanel.Layer.SIGNS)) {
+        if (r.shown(Layer.SIGNS)) {
             r.zodiacBand();
             r.signMeridians();
         }
-        if (r.shown(SkymapPanel.Layer.BOUNDS)) {
+        if (r.shown(Layer.BOUNDS)) {
             r.boundRing();
         }
-        if (r.shown(SkymapPanel.Layer.DECANS)) {
+        if (r.shown(Layer.DECANS)) {
             r.decanRing();
         }
-        if (r.shown(SkymapPanel.Layer.HOUSES)) {
+        if (r.shown(Layer.HOUSES)) {
             r.houseMeridians(panel.activeCusps());
             r.houseNumbers(panel.activeCusps());
         }
@@ -162,15 +160,15 @@ final class GlobeRenderer {
                 liftFor(triDeck, r.stacked, r.cam), turning);
         }
 
-        if (r.shown(SkymapPanel.Layer.ASPECTS)) {
+        if (r.shown(Layer.ASPECTS)) {
             r.aspectChords(panel, shells);
         }
-        if (r.shown(SkymapPanel.Layer.NATAL)) {
+        if (r.shown(Layer.NATAL)) {
             int innerDeck = panel.ringDeck(0);
-            r.ribbon(natalR, r.faded(shade(deckInk(innerDeck), 54), SkymapPanel.Layer.NATAL),
+            r.ribbon(natalR, r.faded(shade(deckInk(innerDeck), 54), Layer.NATAL),
                 inclinationFor(innerDeck, r.stacked, r.cam),
                 liftFor(innerDeck, r.stacked, r.cam), turning);
-            r.bodies(panel.ringLon(0), panel.ringValid(0), natalR, SkymapPanel.AngleRole.ANCHOR, panel,
+            r.bodies(panel.ringLon(0), panel.ringValid(0), natalR, AngleRole.ANCHOR, panel,
                 false, 0);
         }
         if (panel.outerRingDrawn()) {
@@ -178,7 +176,7 @@ final class GlobeRenderer {
                 panel.angleRoleFor(false, true), panel, true, 1);
         }
         if (panel.triRingDrawn()) {
-            r.bodies(panel.ringLon(2), panel.ringValid(2), skyR, SkymapPanel.AngleRole.SKY, panel, true, 2);
+            r.bodies(panel.ringLon(2), panel.ringValid(2), skyR, AngleRole.SKY, panel, true, 2);
         }
 
         r.flush();
@@ -289,6 +287,19 @@ final class GlobeRenderer {
     }
 
     /** The radius of each deck, middle then lower then upper. */
+    /**
+     * The globe's three decks: this chart in the middle, Chart B below, the sky above.
+     *
+     * <p><b>Moved here from SkymapPanel for M11 stage 4.</b> They index
+     * {@link #DECK_RADIUS}, which was already in this file - so the names and the radii they
+     * select were in two classes, and the renderer has to run on the phone where the panel
+     * does not exist. {@code GlobeSource.ringDeck} still decides WHICH deck a wheel belongs on;
+     * this is only what the three of them are called.
+     */
+    public static final int DECK_MIDDLE = 0;
+    public static final int DECK_LOWER = 1;
+    public static final int DECK_UPPER = 2;
+
     private static final double[] DECK_RADIUS = {
         Globe.SHELL_NATAL, Globe.SHELL_PARTNER, Globe.SHELL_SKY,
     };
@@ -312,8 +323,8 @@ final class GlobeRenderer {
         if (stacked) {
             return 0.0;
         }
-        return deck == SkymapPanel.DECK_LOWER ? Globe.INCLINE_PARTNER
-            : (deck == SkymapPanel.DECK_UPPER ? Globe.INCLINE_SKY : 0.0);
+        return deck == GlobeRenderer.DECK_LOWER ? Globe.INCLINE_PARTNER
+            : (deck == GlobeRenderer.DECK_UPPER ? Globe.INCLINE_SKY : 0.0);
     }
 
     /**
@@ -400,8 +411,8 @@ final class GlobeRenderer {
         if (!stacked) {
             return 0.0;
         }
-        return deck == SkymapPanel.DECK_LOWER ? Globe.LIFT_LOWER
-            : (deck == SkymapPanel.DECK_UPPER ? Globe.LIFT_UPPER : 0.0);
+        return deck == GlobeRenderer.DECK_LOWER ? Globe.LIFT_LOWER
+            : (deck == GlobeRenderer.DECK_UPPER ? Globe.LIFT_UPPER : 0.0);
     }
 
     /**
@@ -435,7 +446,7 @@ final class GlobeRenderer {
                 continue;
             }
             int[] level = Globe.stackLevels(lon, valid, 7.0);
-            for (int i = 0; i < SkymapPanel.BODY_COUNT && i < lon.length; i++) {
+            for (int i = 0; i < Bodies.count() && i < lon.length; i++) {
                 if (!valid[i]) {
                     continue;
                 }
@@ -450,7 +461,7 @@ final class GlobeRenderer {
                 double d = Math.hypot(q.x - px, q.y - py);
                 if (d < bestDist) {
                     bestDist = d;
-                    best = SkymapPanel.packHit(i, ring);
+                    best = WheelLayout.packHit(i, ring);
                 }
             }
         }
@@ -658,10 +669,10 @@ final class GlobeRenderer {
      * answers with.
      */
     static Ink deckInk(int deck) {
-        if (deck == SkymapPanel.DECK_LOWER) {
+        if (deck == GlobeRenderer.DECK_LOWER) {
             return chartInk(1);                     // Chart B, blue
         }
-        if (deck == SkymapPanel.DECK_MIDDLE) {
+        if (deck == GlobeRenderer.DECK_MIDDLE) {
             return chartInk(2);                     // the sky, silver
         }
         return chartInk(0);                         // Chart A, gold
@@ -695,7 +706,7 @@ final class GlobeRenderer {
                     Globe.SHELL_SIGN_OUTER, 0.0);
             }
             polyline(arc, faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 190),
-                SkymapPanel.Layer.SIGNS), 2.4f);
+                Layer.SIGNS), 2.4f);
 
             // The division at the sign's start, drawn across the band's depth.
             double[] a = Globe.onShell(from, this.origin, Globe.SHELL_SIGN_INNER, 0.0);
@@ -704,7 +715,7 @@ final class GlobeRenderer {
 
             double[] mid = Globe.onShell(from + 15.0, this.origin,
                 (Globe.SHELL_SIGN_INNER + Globe.SHELL_SIGN_OUTER) / 2, 0.0);
-            billboard(mid, SkymapPanel.zodiacSymbol(sign), ink, 15);
+            billboard(mid, WheelLayout.zodiacSymbol(sign), ink, 15);
         }
         // The degree scale, at every ten, on the tick shell just inside the signs.
         for (int d = 0; d < 360; d += 10) {
@@ -750,16 +761,16 @@ final class GlobeRenderer {
         // shape the body is actually standing in, and selecting it lit something else. The
         // wedge brightens and swells past the surface, so it reads as the slice of sky coming
         // forward rather than as a patch of colour changing.
-        if (this.shown(SkymapPanel.Layer.SIGNS)) {
+        if (this.shown(Layer.SIGNS)) {
             wedgeOnSphere(sign * 30.0, sign * 30.0 + 30.0, Globe.SHELL_SIGN_INNER + 0.09,
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 74),
-                    SkymapPanel.Layer.SIGNS));
+                    Layer.SIGNS));
             // And its segment of the flat ring, so the answer is legible from edge-on too -
             // seen along the plane the sphere wedge is a sliver and the ring is not.
             quadRing(sign * 30.0, sign * 30.0 + 30.0,
                 Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER + 0.07,
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 150),
-                    SkymapPanel.Layer.SIGNS));
+                    Layer.SIGNS));
         }
 
         double[] cusps = panel.activeCusps();
@@ -767,17 +778,17 @@ final class GlobeRenderer {
             return;
         }
         int house = Zodiac.houseOf(lon, cusps);
-        if (house >= 1 && house <= 12 && this.shown(SkymapPanel.Layer.HOUSES)
+        if (house >= 1 && house <= 12 && this.shown(Layer.HOUSES)
                 && Settings.globeHouseFill()) {
             // Through SkymapPanel since 27 Sep, so the wedge the globe lights and the occupants the
             // house reading lists cannot disagree about where a house starts and ends.
-            double from = SkymapPanel.houseStart(cusps, house);
-            double span = SkymapPanel.houseSpan(cusps, house);
+            double from = WheelLayout.houseStart(cusps, house);
+            double span = WheelLayout.houseSpan(cusps, house);
             // The house stays flat because the houses are: they are spokes in the plane, and
             // a house wedge standing up out of it would be claiming a shape nothing else in
             // the view gives them.
             wedge(from, from + span, 0.10, Globe.SHELL_HOUSE + 0.06,
-                faded(new Ink(236, 224, 188, 70), SkymapPanel.Layer.HOUSES));
+                faded(new Ink(236, 224, 188, 70), Layer.HOUSES));
         }
     }
 
@@ -842,7 +853,7 @@ final class GlobeRenderer {
             // the aspect network to be read through it.
             quadRing(from, from + 30.0, Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER,
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 96),
-                    SkymapPanel.Layer.SIGNS));
+                    Layer.SIGNS));
         }
     }
 
@@ -888,7 +899,7 @@ final class GlobeRenderer {
             Ink ink = angular ? new Ink(226, 214, 184) : new Ink(150, 152, 164);
             wedgeOnSphere(from, from + span, Globe.SHELL_HOUSE,
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), alpha),
-                    SkymapPanel.Layer.HOUSES));
+                    Layer.HOUSES));
         }
     }
 
@@ -1101,7 +1112,7 @@ final class GlobeRenderer {
     static int houseNumberAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         double[] cusps = panel.activeCusps();
         if (cusps == null || cusps.length < 13
-            || !panel.layerShown(SkymapPanel.Layer.HOUSES)) {
+            || !panel.layerShown(Layer.HOUSES)) {
             return -1;
         }
         double origin = panel.pinLongitude();
@@ -1133,7 +1144,7 @@ final class GlobeRenderer {
         for (int i = 1; i <= 12; i++) {
             boolean here = i == lit;
             Ink ink = faded(here ? new Ink(255, 238, 170) : new Ink(206, 208, 216),
-                SkymapPanel.Layer.HOUSES);
+                Layer.HOUSES);
             billboard(houseLabelAt(cusps, i, this.origin, true), String.valueOf(i),
                 ink, here ? 15 : 12);
             billboard(houseLabelAt(cusps, i, this.origin, false), String.valueOf(i),
@@ -1149,9 +1160,9 @@ final class GlobeRenderer {
         if (lit >= 1 && lit <= 12 && Settings.globeHouseFill()) {
             double span = arc(cusps[lit], cusps[lit == 12 ? 1 : lit + 1]);
             wedgeOnSphere(cusps[lit], cusps[lit] + span, Globe.SHELL_SIGN_INNER + 0.11,
-                faded(new Ink(236, 224, 188, 66), SkymapPanel.Layer.HOUSES));
+                faded(new Ink(236, 224, 188, 66), Layer.HOUSES));
             wedge(cusps[lit], cusps[lit] + span, 0.10, Globe.SHELL_HOUSE + 0.06,
-                faded(new Ink(236, 224, 188, 74), SkymapPanel.Layer.HOUSES));
+                faded(new Ink(236, 224, 188, 74), Layer.HOUSES));
         }
     }
 
@@ -1177,7 +1188,7 @@ final class GlobeRenderer {
      * the way an independently derived angle would.
      */
     static int degreeAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
-        if (!panel.layerShown(SkymapPanel.Layer.DEGREES)) {
+        if (!panel.layerShown(Layer.DEGREES)) {
             return -1;
         }
         double origin = panel.pinLongitude();
@@ -1223,7 +1234,7 @@ final class GlobeRenderer {
      * never be clicked. The radius is tight for the same reason.
      */
     static int decanAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
-        if (!panel.layerShown(SkymapPanel.Layer.DECANS)) {
+        if (!panel.layerShown(Layer.DECANS)) {
             return -1;
         }
         // <b>The whole decan band, not the glyph.</b> David: "each click should be the entire
@@ -1265,7 +1276,7 @@ final class GlobeRenderer {
 
     /** The bound under a point: its longitude in whole degrees, or -1. The bounds band's width. */
     static int boundAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
-        if (!panel.layerShown(SkymapPanel.Layer.BOUNDS)) {
+        if (!panel.layerShown(Layer.BOUNDS)) {
             return -1;
         }
         return bandAt(cam, w, h, panel, px, py, Globe.SHELL_HOUSE + 0.03,
@@ -1282,7 +1293,7 @@ final class GlobeRenderer {
      */
     static int houseAreaAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         double[] cusps = panel.activeCusps();
-        if (cusps == null || cusps.length < 13 || !panel.layerShown(SkymapPanel.Layer.HOUSES)) {
+        if (cusps == null || cusps.length < 13 || !panel.layerShown(Layer.HOUSES)) {
             return -1;
         }
         double origin = panel.pinLongitude();
@@ -1315,7 +1326,7 @@ final class GlobeRenderer {
      * width and along every two degrees, the way {@link #mansionAt} samples its band.
      */
     static int signAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
-        if (!panel.layerShown(SkymapPanel.Layer.SIGNS)) {
+        if (!panel.layerShown(Layer.SIGNS)) {
             return -1;
         }
         double origin = panel.pinLongitude();
@@ -1342,7 +1353,7 @@ final class GlobeRenderer {
     }
 
     static int mansionAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
-        if (!panel.layerShown(SkymapPanel.Layer.MANSIONS)) {
+        if (!panel.layerShown(Layer.MANSIONS)) {
             return -1;
         }
         double origin = panel.pinLongitude();
@@ -1442,7 +1453,7 @@ final class GlobeRenderer {
 
     /** One of the mansion band's inks, at the alpha it wants and the bloom it is at. */
     private Ink wash(Ink c, int alpha) {
-        return faded(shade(c, alpha), SkymapPanel.Layer.MANSIONS);
+        return faded(shade(c, alpha), Layer.MANSIONS);
     }
 
     private void degreeRing() {
@@ -1466,7 +1477,7 @@ final class GlobeRenderer {
                     : (ten ? new Ink(172, 178, 190, 195) : new Ink(138, 144, 156, 150)));
             segment(Globe.onShell(d, this.origin, inner, 0.0),
                 Globe.onShell(d, this.origin, inner + depth, 0.0),
-                faded(ink, SkymapPanel.Layer.DEGREES),
+                faded(ink, Layer.DEGREES),
                 here ? 2.2f : (sign ? 1.4f : (ten ? 1.0f : 0.6f)));
         }
 
@@ -1479,13 +1490,13 @@ final class GlobeRenderer {
         // so a degree that lights only the disc is pointing at half of itself.
         if (lit >= 0 && Settings.globeDegreeFill()) {
             wedgeOnSphere(lit, lit + 1.0, Globe.SHELL_SIGN_INNER + 0.09,
-                faded(new Ink(255, 238, 170, 96), SkymapPanel.Layer.DEGREES));
+                faded(new Ink(255, 238, 170, 96), Layer.DEGREES));
             quadRing(lit, lit + 1.0, 0.10, inner + Globe.TICK_HOVER_REACH,
-                faded(new Ink(255, 238, 170, 70), SkymapPanel.Layer.DEGREES));
+                faded(new Ink(255, 238, 170, 70), Layer.DEGREES));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
         polyline(Globe.equator(this.origin, inner, 144),
-            faded(new Ink(158, 164, 176, 170), SkymapPanel.Layer.DEGREES), 1.0f);
+            faded(new Ink(158, 164, 176, 170), Layer.DEGREES), 1.0f);
     }
 
     /** One tessellation cell, filled flat. */
@@ -1532,8 +1543,8 @@ final class GlobeRenderer {
                     continue;
                 }
                 billboard(Globe.onShell(mid, this.origin, Globe.SHELL_BOUND, 0.0),
-                    SkymapPanel.glyphOf(bi),
-                    faded(panel.bodyInk(bi), SkymapPanel.Layer.BOUNDS), 10);
+                    WheelLayout.glyphOf(bi),
+                    faded(panel.bodyInk(bi), Layer.BOUNDS), 10);
             }
         }
     }
@@ -1549,16 +1560,16 @@ final class GlobeRenderer {
                 int bi = Bodies.indexOfName(ruler);
                 if (bi >= 0) {
                     billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
-                        SkymapPanel.glyphOf(bi),
-                        faded(panel.bodyInk(bi), SkymapPanel.Layer.DECANS), 10);
+                        WheelLayout.glyphOf(bi),
+                        faded(panel.bodyInk(bi), Layer.DECANS), 10);
                     continue;
                 }
             }
             int face = Zodiac.triplicityDecanSignIndex(sign, d % 3 + 1);
             billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
-                SkymapPanel.zodiacSymbol(face),
+                WheelLayout.zodiacSymbol(face),
                 faded(panel.elementInk(Zodiac.elementIndex(face)),
-                    SkymapPanel.Layer.DECANS), 10);
+                    Layer.DECANS), 10);
         }
     }
 
@@ -1585,11 +1596,11 @@ final class GlobeRenderer {
             segment(Globe.onShell(cusps[i], this.origin, 0.02, 0.0),
                 Globe.onShell(cusps[i], this.origin, Globe.SHELL_HOUSE, 0.0),
                 faded(angle ? new Ink(226, 214, 184, 220) : new Ink(150, 152, 164, 140),
-                    SkymapPanel.Layer.HOUSES), angle ? 1.8f : 1.0f);
+                    Layer.HOUSES), angle ? 1.8f : 1.0f);
         }
         // The rim the spokes end on, so the houses read as a ring rather than as loose lines.
         polyline(Globe.equator(this.origin, Globe.SHELL_HOUSE, 96),
-            faded(new Ink(150, 152, 164, 120), SkymapPanel.Layer.HOUSES), 0.9f);
+            faded(new Ink(150, 152, 164, 120), Layer.HOUSES), 0.9f);
     }
 
     /**
@@ -1608,7 +1619,7 @@ final class GlobeRenderer {
         for (int sign = 0; sign < 12; sign++) {
             segment(Globe.onShell(sign * 30.0, this.origin, Globe.SHELL_SIGN_INNER, 0.0),
                 Globe.onShell(sign * 30.0, this.origin, Globe.SHELL_SIGN_OUTER, 0.0),
-                faded(new Ink(196, 204, 216, 190), SkymapPanel.Layer.SIGNS), 1.1f);
+                faded(new Ink(196, 204, 216, 190), Layer.SIGNS), 1.1f);
         }
     }
 
@@ -1687,10 +1698,10 @@ final class GlobeRenderer {
             double rise = riseFor(panel, ring, this.bowed);
             if (lit) {
                 chord(from, to, rise, faded(new Ink(255, 255, 255, 110),
-                    SkymapPanel.Layer.ASPECTS), 4.0f, false);
+                    Layer.ASPECTS), 4.0f, false);
                 ink = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 255);
             }
-            chord(from, to, rise, faded(ink, SkymapPanel.Layer.ASPECTS), lit ? 2.4f : 1.0f,
+            chord(from, to, rise, faded(ink, Layer.ASPECTS), lit ? 2.4f : 1.0f,
                 !lit);
         }
     }
@@ -1707,12 +1718,12 @@ final class GlobeRenderer {
         boolean[][] valids = {panel.ringValid(0), panel.ringValid(1), panel.ringValid(2)};
         for (int ring = 0; ring < 3; ring++) {
             boolean cross = ring > 0;
-            for (int a = 0; a < SkymapPanel.BODY_COUNT && a < lons[ring].length; a++) {
-                if (!SkymapPanel.aspecting(a, valids[ring])) {
+            for (int a = 0; a < Bodies.count() && a < lons[ring].length; a++) {
+                if (!WheelLayout.aspecting(a, valids[ring])) {
                     continue;
                 }
-                for (int b = cross ? 0 : a + 1; b < SkymapPanel.BODY_COUNT; b++) {
-                    if (!SkymapPanel.aspecting(b, panel.ringValid(0))) {
+                for (int b = cross ? 0 : a + 1; b < Bodies.count(); b++) {
+                    if (!WheelLayout.aspecting(b, panel.ringValid(0))) {
                         continue;
                     }
                     if (!cross && Bodies.isOppositePair(a, b)) {
@@ -1723,7 +1734,7 @@ final class GlobeRenderer {
                     // it. Passing "cross" for both halved the sky ring's orbs in a synastry
                     // chart and dropped chords the flat view was drawing.
                     Ink ink = panel.globeAspectInk(lons[ring][a], panel.ringLon(0)[b], a, b,
-                        ring == SkymapPanel.WHEEL_OUTER);
+                        ring == WheelLayout.WHEEL_OUTER);
                     if (ink != null) {
                         out.add(new int[] {ring, a, b, ink.getRGB()});
                     }
@@ -1735,10 +1746,10 @@ final class GlobeRenderer {
 
     /** One ring of bodies on its shell, stacked up the shell where longitudes crowd. */
     private void bodies(double[] lon, boolean[] valid, double radius,
-                        SkymapPanel.AngleRole role, GlobeSource panel, boolean outer,
+                        AngleRole role, GlobeSource panel, boolean outer,
                         int ring) {
         int[] level = Globe.stackLevels(lon, valid, 7.0);
-        for (int i = 0; i < SkymapPanel.BODY_COUNT && i < lon.length; i++) {
+        for (int i = 0; i < Bodies.count() && i < lon.length; i++) {
             if (!valid[i]) {
                 continue;
             }
@@ -1780,7 +1791,7 @@ final class GlobeRenderer {
             boolean lit = panel.onGlobeFocus(i, outer);
             Ink ink = panel.globeRingInk(i, role);
             Ink bead = panel.beadInk(role);
-            String glyph = SkymapPanel.glyphOf(i);
+            String glyph = WheelLayout.glyphOf(i);
             // Bodies on the far side of their own shell are dimmed rather than hidden: a
             // reader turning the globe should see what is coming round, not have it appear.
             // Far enough back to read as behind, near enough to still be legible - at 0.38
@@ -1859,7 +1870,7 @@ final class GlobeRenderer {
     private static final int[] PLANET_FACE = buildFaces();
 
     private static int[] buildFaces() {
-        int[] faces = new int[SkymapPanel.BODY_COUNT];
+        int[] faces = new int[Bodies.count()];
         for (int i = 0; i < faces.length; i++) {
             switch (Bodies.at(i).name) {
                 case "Sun":
@@ -2172,7 +2183,7 @@ final class GlobeRenderer {
         if (!bowed) {
             return 0.0;
         }
-        return panel.ringDeck(ring) == SkymapPanel.DECK_LOWER ? -1.0 : 1.0;
+        return panel.ringDeck(ring) == GlobeRenderer.DECK_LOWER ? -1.0 : 1.0;
     }
 
     /** True while the reader is dragging - what every "draw less" decision here reads. */

@@ -995,7 +995,7 @@ public class InterpretationPanel extends JPanel {
      * claims. A deliberate asymmetry that the reader cannot see is indistinguishable from an
      * inconsistency, which is the one way this design could fail.
      *
-     * @param role       ANCHOR, BRIDGE or SKY - see {@code SkymapPanel.AngleRole}
+     * @param role       ANCHOR, BRIDGE or SKY - see {@code AngleRole}
      * @param hostHouse  for a BRIDGE, which of Chart A's houses the visiting angle falls in
      */
     public void showAngleInterpretation(String angleName, String signName, int degree,
@@ -1673,7 +1673,7 @@ public class InterpretationPanel extends JPanel {
      * cannot describe a house: houses come from their own cusps, are unequal in most systems, and one
      * of them crosses 0 degrees of Aries in most charts. {@code Occupants.inSpan} normalises the start
      * and is half-open, so a cusp span goes straight in - and the span itself comes from
-     * {@code SkymapPanel.houseSpan}, which the globe's focus wedge now shares.
+     * {@code WheelLayout.houseSpan}, which the globe's focus wedge now shares.
      */
     private String houseOccupantsHtml(int houseNum) {
         if (skymapPanel == null || houseNum < 1 || houseNum > 12) {
@@ -1684,8 +1684,8 @@ public class InterpretationPanel extends JPanel {
             return "";
         }
         try {
-            double from = SkymapPanel.houseStart(cusps, houseNum);
-            double span = SkymapPanel.houseSpan(cusps, houseNum);
+            double from = WheelLayout.houseStart(cusps, houseNum);
+            double span = WheelLayout.houseSpan(cusps, houseNum);
             return Occupants.html(
                 Occupants.inSpan(skymapPanel.getCurrentChart(), from, span),
                 skymapPanel.transitOccupants(from, span),

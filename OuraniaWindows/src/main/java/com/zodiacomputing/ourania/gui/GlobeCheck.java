@@ -1314,7 +1314,7 @@ public final class GlobeCheck {
             java.awt.Graphics2D g = im.createGraphics();
             g.setColor(new java.awt.Color(10, 12, 16));
             g.fillRect(0, 0, side, side);
-            GlobeRenderer.paint(g, cam, side, side, panel, false);
+            AwtPen.paint(g, cam, side, side, panel, false);
             g.dispose();
             out[0] = im;
         });
@@ -1357,7 +1357,7 @@ public final class GlobeCheck {
             fm.setAccessible(true);
 
             // Everything starts open; a reader who has folded nothing sees the whole chart.
-            for (SkymapPanel.Layer layer : SkymapPanel.Layer.values()) {
+            for (Layer layer : Layer.values()) {
                 yes(layer + " starts open", panel.layerWanted(layer));
                 yes(layer + " starts drawn", panel.layerShown(layer));
                 near(layer + " starts fully open", 1.0, panel.layerOpen(layer), 1e-9);
@@ -1365,7 +1365,7 @@ public final class GlobeCheck {
 
             Settings.setAnimateRings(false);
             try {
-                for (SkymapPanel.Layer layer : SkymapPanel.Layer.values()) {
+                for (Layer layer : Layer.values()) {
                     Object modeBefore = fm.get(panel);
 
                     panel.setLayer(layer, false);
@@ -1379,7 +1379,7 @@ public final class GlobeCheck {
                         fm.get(panel) == modeBefore);
 
                     // Its neighbours are untouched, so one chip cannot fold two things.
-                    for (SkymapPanel.Layer other : SkymapPanel.Layer.values()) {
+                    for (Layer other : Layer.values()) {
                         if (other != layer) {
                             yes("folding " + layer + " leaves " + other + " open",
                                 panel.layerWanted(other));
@@ -1397,11 +1397,11 @@ public final class GlobeCheck {
             // <b>It folds rather than blinking out.</b> With motion on, a layer caught
             // mid-fold is partly there - which is what tells the reader it is leaving rather
             // than that something failed to draw.
-            panel.setLayer(SkymapPanel.Layer.DECANS, false);
+            panel.setLayer(Layer.DECANS, false);
             double partway = -1;
             long deadline = System.currentTimeMillis() + 1500;
             while (System.currentTimeMillis() < deadline) {
-                double v = panel.layerOpen(SkymapPanel.Layer.DECANS);
+                double v = panel.layerOpen(Layer.DECANS);
                 if (v > 0.05 && v < 0.95) {
                     partway = v;
                     break;
@@ -1409,7 +1409,7 @@ public final class GlobeCheck {
                 Thread.sleep(8);
             }
             yes("a folding layer passes through the middle, saw " + partway, partway > 0);
-            panel.setLayer(SkymapPanel.Layer.DECANS, true);
+            panel.setLayer(Layer.DECANS, true);
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
@@ -1542,23 +1542,23 @@ public final class GlobeCheck {
             }
 
             cam.yaw = 0;
-            panel.setLayer(SkymapPanel.Layer.HOUSES, false);
+            panel.setLayer(Layer.HOUSES, false);
             Thread.sleep(1200);
             double[] one = (double[]) labelAt.invoke(null, cusps, 1, origin, true);
             Globe.Projected qh = cam.project(one[0], one[1], one[2], w, h);
             eq("folded houses answer nothing", -1, GlobeRenderer.houseNumberAt(cam, w, h,
                 panel, (int) Math.round(qh.x), (int) Math.round(qh.y)));
-            panel.setLayer(SkymapPanel.Layer.HOUSES, true);
+            panel.setLayer(Layer.HOUSES, true);
 
             // <b>Folded means unclickable.</b> A target the reader cannot see is worse than
             // no target: it answers when they meant to click through it.
-            panel.setLayer(SkymapPanel.Layer.DEGREES, false);
+            panel.setLayer(Layer.DEGREES, false);
             Thread.sleep(1200);
             double[] pt = Globe.onShell(90.5, origin, inner + 0.09, 0.0);
             Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
             eq("a folded scale answers nothing", -1, GlobeRenderer.degreeAt(cam, w, h, panel,
                 (int) Math.round(q.x), (int) Math.round(q.y)));
-            panel.setLayer(SkymapPanel.Layer.DEGREES, true);
+            panel.setLayer(Layer.DEGREES, true);
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
@@ -1606,14 +1606,14 @@ public final class GlobeCheck {
             // 1. The hover reaches the globe, and reaches one ring.
             for (int a = 0; a < 12; a += 3) {
                 for (int b = 1; b < 12; b += 4) {
-                    for (int wheel : new int[] {SkymapPanel.WHEEL_NATAL,
-                            SkymapPanel.WHEEL_OUTER, SkymapPanel.WHEEL_SKY}) {
-                        String row = wheel == SkymapPanel.WHEEL_NATAL
+                    for (int wheel : new int[] {WheelLayout.WHEEL_NATAL,
+                            WheelLayout.WHEEL_OUTER, WheelLayout.WHEEL_SKY}) {
+                        String row = wheel == WheelLayout.WHEEL_NATAL
                             ? com.zodiacomputing.ourania.astro.Bodies.at(a).name : "transit_" + com.zodiacomputing.ourania.astro.Bodies.at(a).name.toLowerCase();
                         panel.setHighlightedAspect(
                             SkymapPanel.aspectHref(row, com.zodiacomputing.ourania.astro.Bodies.at(b).name, "Trine", wheel));
-                        for (int other : new int[] {SkymapPanel.WHEEL_NATAL,
-                                SkymapPanel.WHEEL_OUTER, SkymapPanel.WHEEL_SKY}) {
+                        for (int other : new int[] {WheelLayout.WHEEL_NATAL,
+                                WheelLayout.WHEEL_OUTER, WheelLayout.WHEEL_SKY}) {
                             yes("globe chord " + a + "-" + b + " on ring " + other
                                 + (other == wheel ? " lights" : " stays dark")
                                 + " when ring " + wheel + " is hovered",
@@ -1629,11 +1629,11 @@ public final class GlobeCheck {
             int atSynastry = 0;
             int built = 0;
             for (int a = 0; a < SkymapPanel.BODY_COUNT; a++) {
-                if (!SkymapPanel.aspecting(a, panel.skyRing.valid)) {
+                if (!WheelLayout.aspecting(a, panel.skyRing.valid)) {
                     continue;
                 }
                 for (int b = 0; b < SkymapPanel.BODY_COUNT; b++) {
-                    if (!SkymapPanel.aspecting(b, panel.natalRing.valid)) {
+                    if (!WheelLayout.aspecting(b, panel.natalRing.valid)) {
                         continue;
                     }
                     if (panel.aspectInkFor(panel.skyRing.lon[a], panel.natalRing.lon[b], a, b, false) != null) {
@@ -1649,7 +1649,7 @@ public final class GlobeCheck {
             // from, not a second computation of it that could agree while the first is wrong.
             java.awt.image.BufferedImage frame = globeFrame(panel);
             for (int[] c : panel.globeChords(() -> new int[0][])) {
-                if (c[0] == SkymapPanel.WHEEL_SKY) {
+                if (c[0] == WheelLayout.WHEEL_SKY) {
                     built++;
                 }
             }
@@ -1665,7 +1665,7 @@ public final class GlobeCheck {
             int a0 = -1;
             int b0 = -1;
             for (int[] c : panel.globeChords(() -> new int[0][])) {
-                if (c[0] == SkymapPanel.WHEEL_SKY) {
+                if (c[0] == WheelLayout.WHEEL_SKY) {
                     a0 = c[1];
                     b0 = c[2];
                     break;
@@ -1679,7 +1679,7 @@ public final class GlobeCheck {
                     "transit_" + com.zodiacomputing.ourania.astro.Bodies.at(a0).name
                         .toLowerCase(),
                     com.zodiacomputing.ourania.astro.Bodies.at(b0).name, "Trine",
-                    SkymapPanel.WHEEL_SKY));
+                    WheelLayout.WHEEL_SKY));
                 java.awt.image.BufferedImage bright = globeFrame(panel);
                 panel.setHighlightedAspect(null);
                 System.out.println("  hovering a sky chord changes "
@@ -1724,8 +1724,8 @@ public final class GlobeCheck {
             Thread.sleep(1500);
 
             // Everything that is not a band, out of the frame.
-            for (SkymapPanel.Layer layer : SkymapPanel.Layer.values()) {
-                if (layer != SkymapPanel.Layer.NATAL) {
+            for (Layer layer : Layer.values()) {
+                if (layer != Layer.NATAL) {
                     panel.setLayer(layer, false);
                 }
             }
@@ -1742,7 +1742,7 @@ public final class GlobeCheck {
 
             // What is left when the bands are gone entirely - so what the turning frame still
             // paints over it is the rims, with nothing else able to account for it.
-            panel.setLayer(SkymapPanel.Layer.NATAL, false);
+            panel.setLayer(Layer.NATAL, false);
             set(panel, "showTransitChart", Boolean.FALSE);
             set(panel, "showTriWheel", Boolean.FALSE);
             Thread.sleep(900);
@@ -1762,7 +1762,7 @@ public final class GlobeCheck {
         java.awt.Graphics2D gg = frame.createGraphics();
         gg.setColor(new java.awt.Color(10, 12, 16));
         gg.fillRect(0, 0, 700, 700);
-        GlobeRenderer.paint(gg, new Globe(), 700, 700, panel, turning);
+        AwtPen.paint(gg, new Globe(), 700, 700, panel, turning);
         gg.dispose();
         return frame;
     }
@@ -1830,9 +1830,9 @@ public final class GlobeCheck {
                     String state = "A " + (chartA ? "in" : "out")
                         + ", B " + (chartB ? "in" : "out");
 
-                    int inner = panel.ringDeck(SkymapPanel.WHEEL_NATAL);
-                    int outer = panel.ringDeck(SkymapPanel.WHEEL_OUTER);
-                    int tri = panel.ringDeck(SkymapPanel.WHEEL_SKY);
+                    int inner = panel.ringDeck(WheelLayout.WHEEL_NATAL);
+                    int outer = panel.ringDeck(WheelLayout.WHEEL_OUTER);
+                    int tri = panel.ringDeck(WheelLayout.WHEEL_SKY);
 
                     // <b>The sky holds the middle, and the people float either side of it.</b>
                     // Reversed on 2026-09-21, David's call: the sky is the one ring that is
@@ -1842,28 +1842,28 @@ public final class GlobeCheck {
                     // people onto one side of the sky.
                     if (chartA || chartB) {
                         eq("with " + state + " the sky ring takes the middle deck",
-                            SkymapPanel.DECK_MIDDLE, chartA && chartB ? tri : outer);
+                            GlobeRenderer.DECK_MIDDLE, chartA && chartB ? tri : outer);
                     } else {
                         // <b>Both people out, so there are two skies.</b> The sky is the chart
                         // and holds the middle on the inner wheel; this ring is the sky at the
                         // scrubbed moment and has to go somewhere else, or two rings draw at
                         // one radius in one plane as a single ring holding both.
                         eq("with " + state + " the transiting sky rides above the sky chart",
-                            SkymapPanel.DECK_UPPER, outer);
+                            GlobeRenderer.DECK_UPPER, outer);
                     }
                     if (chartA) {
                         eq("with " + state + " Chart A rides above the sky",
-                            SkymapPanel.DECK_UPPER, inner);
+                            GlobeRenderer.DECK_UPPER, inner);
                     } else if (chartB) {
                         eq("with " + state + " Chart B keeps the lower deck",
-                            SkymapPanel.DECK_LOWER, inner);
+                            GlobeRenderer.DECK_LOWER, inner);
                     } else {
                         eq("with " + state + " the sky is the chart and still takes the middle",
-                            SkymapPanel.DECK_MIDDLE, inner);
+                            GlobeRenderer.DECK_MIDDLE, inner);
                     }
                     if (chartA && chartB) {
                         eq("with " + state + " Chart B is on the lower deck",
-                            SkymapPanel.DECK_LOWER, outer);
+                            GlobeRenderer.DECK_LOWER, outer);
                     }
 
                     // <b>And never two wheels on one deck.</b> Two rings at one radius in one
@@ -1884,7 +1884,7 @@ public final class GlobeCheck {
                     // the chart on a wheel, up for everything else - the sky's transits to a
                     // promoted Chart B included, because those are the sky's lines.
                     for (int wheel = 0; wheel < 3; wheel++) {
-                        boolean partner = panel.ringDeck(wheel) == SkymapPanel.DECK_LOWER;
+                        boolean partner = panel.ringDeck(wheel) == GlobeRenderer.DECK_LOWER;
                         double rise = GlobeRenderer.riseFor(panel, wheel, true);
                         yes("with " + state + " wheel " + wheel + " bows "
                             + (partner ? "down, toward Chart B" : "up"),
@@ -1897,8 +1897,8 @@ public final class GlobeCheck {
                     // place - which is the whole of what was asked for.
                     double[] shells = GlobeRenderer.shellRadii(panel);
                     near("with " + state + " the inner wheel sits at its deck's radius",
-                        inner == SkymapPanel.DECK_MIDDLE ? Globe.SHELL_NATAL
-                            : (inner == SkymapPanel.DECK_LOWER ? Globe.SHELL_PARTNER
+                        inner == GlobeRenderer.DECK_MIDDLE ? Globe.SHELL_NATAL
+                            : (inner == GlobeRenderer.DECK_LOWER ? Globe.SHELL_PARTNER
                                 : Globe.SHELL_SKY), shells[0], 1e-12);
                 }
             }
@@ -2325,8 +2325,8 @@ public final class GlobeCheck {
             panel.updateChartData();
             Thread.sleep(1500);
 
-            for (SkymapPanel.Layer layer : SkymapPanel.Layer.values()) {
-                if (layer != SkymapPanel.Layer.ASPECTS && layer != SkymapPanel.Layer.NATAL) {
+            for (Layer layer : Layer.values()) {
+                if (layer != Layer.ASPECTS && layer != Layer.NATAL) {
                     panel.setLayer(layer, false);
                 }
             }
@@ -2454,7 +2454,7 @@ public final class GlobeCheck {
                 java.awt.Graphics2D gg = frame.createGraphics();
                 gg.setColor(new java.awt.Color(10, 12, 16));
                 gg.fillRect(0, 0, size, size);
-                GlobeRenderer.paint(gg, cam, size, size, panel, false);
+                AwtPen.paint(gg, cam, size, size, panel, false);
                 gg.dispose();
 
                 // <b>Sampled along the arc the painter drew, not along the straight line
@@ -2676,7 +2676,7 @@ public final class GlobeCheck {
         java.awt.image.BufferedImage frame = new java.awt.image.BufferedImage(
             600, 600, java.awt.image.BufferedImage.TYPE_INT_ARGB);
         java.awt.Graphics2D gg = frame.createGraphics();
-        GlobeRenderer.paint(gg, new Globe(), 600, 600, panel, false);
+        AwtPen.paint(gg, new Globe(), 600, 600, panel, false);
         gg.dispose();
         return frame;
     }
@@ -3028,20 +3028,20 @@ public final class GlobeCheck {
         // that one rule answers both callers.
         near("Chart A's deck is inked gold",
             GlobeRenderer.chartInk(0).getRGB(),
-            GlobeRenderer.deckInk(SkymapPanel.DECK_UPPER).getRGB(), 0.0);
+            GlobeRenderer.deckInk(GlobeRenderer.DECK_UPPER).getRGB(), 0.0);
         near("Chart B's deck is inked blue",
             GlobeRenderer.chartInk(1).getRGB(),
-            GlobeRenderer.deckInk(SkymapPanel.DECK_LOWER).getRGB(), 0.0);
+            GlobeRenderer.deckInk(GlobeRenderer.DECK_LOWER).getRGB(), 0.0);
         near("and the sky's deck is inked silver",
             GlobeRenderer.chartInk(2).getRGB(),
-            GlobeRenderer.deckInk(SkymapPanel.DECK_MIDDLE).getRGB(), 0.0);
+            GlobeRenderer.deckInk(GlobeRenderer.DECK_MIDDLE).getRGB(), 0.0);
         yes("and the three decks are told apart by their ink",
-            GlobeRenderer.deckInk(SkymapPanel.DECK_UPPER).getRGB()
-                != GlobeRenderer.deckInk(SkymapPanel.DECK_MIDDLE).getRGB()
-            && GlobeRenderer.deckInk(SkymapPanel.DECK_MIDDLE).getRGB()
-                != GlobeRenderer.deckInk(SkymapPanel.DECK_LOWER).getRGB()
-            && GlobeRenderer.deckInk(SkymapPanel.DECK_UPPER).getRGB()
-                != GlobeRenderer.deckInk(SkymapPanel.DECK_LOWER).getRGB());
+            GlobeRenderer.deckInk(GlobeRenderer.DECK_UPPER).getRGB()
+                != GlobeRenderer.deckInk(GlobeRenderer.DECK_MIDDLE).getRGB()
+            && GlobeRenderer.deckInk(GlobeRenderer.DECK_MIDDLE).getRGB()
+                != GlobeRenderer.deckInk(GlobeRenderer.DECK_LOWER).getRGB()
+            && GlobeRenderer.deckInk(GlobeRenderer.DECK_UPPER).getRGB()
+                != GlobeRenderer.deckInk(GlobeRenderer.DECK_LOWER).getRGB());
         yes("and the houses inside the bounds", Globe.SHELL_HOUSE < Globe.SHELL_BOUND);
 
         // ---- the decks are a share of the radius apart, and symmetric about the middle
@@ -3083,11 +3083,11 @@ public final class GlobeCheck {
         // folded; this is the assertion that says so, across the class boundary where it
         // matters, rather than a comment hoping it stays true.
         near("and the painter lifts the upper deck to the same height", Globe.LIFT_UPPER,
-            GlobeRenderer.liftOf(SkymapPanel.DECK_UPPER, true), 1e-12);
+            GlobeRenderer.liftOf(GlobeRenderer.DECK_UPPER, true), 1e-12);
         near("and the lower deck likewise", Globe.LIFT_LOWER,
-            GlobeRenderer.liftOf(SkymapPanel.DECK_LOWER, true), 1e-12);
+            GlobeRenderer.liftOf(GlobeRenderer.DECK_LOWER, true), 1e-12);
         near("with the middle deck flat on the plane", 0.0,
-            GlobeRenderer.liftOf(SkymapPanel.DECK_MIDDLE, true), 1e-12);
+            GlobeRenderer.liftOf(GlobeRenderer.DECK_MIDDLE, true), 1e-12);
 
         // ---- the order, swept across the whole allowed range and both sides of the plane
         int tilts = 0;
@@ -3100,9 +3100,9 @@ public final class GlobeCheck {
             Globe cam = new Globe();
             cam.pitch = pitch;
             cam.yaw = 0.0;
-            double upper = ribbonMiddle(cam, GlobeRenderer.liftOf(SkymapPanel.DECK_UPPER, true));
-            double middle = ribbonMiddle(cam, GlobeRenderer.liftOf(SkymapPanel.DECK_MIDDLE, true));
-            double lower = ribbonMiddle(cam, GlobeRenderer.liftOf(SkymapPanel.DECK_LOWER, true));
+            double upper = ribbonMiddle(cam, GlobeRenderer.liftOf(GlobeRenderer.DECK_UPPER, true));
+            double middle = ribbonMiddle(cam, GlobeRenderer.liftOf(GlobeRenderer.DECK_MIDDLE, true));
+            double lower = ribbonMiddle(cam, GlobeRenderer.liftOf(GlobeRenderer.DECK_LOWER, true));
             ordered &= upper < middle && middle < lower;
             tilts++;
         }
@@ -3369,8 +3369,8 @@ public final class GlobeCheck {
             top.pitch = -Globe.MAX_PITCH;
             double origin = panel.pinLongitude();
             for (boolean stacked : new boolean[] {true, false}) {
-                for (int deck : new int[] {SkymapPanel.DECK_UPPER, SkymapPanel.DECK_MIDDLE,
-                        SkymapPanel.DECK_LOWER}) {
+                for (int deck : new int[] {GlobeRenderer.DECK_UPPER, GlobeRenderer.DECK_MIDDLE,
+                        GlobeRenderer.DECK_LOWER}) {
                     near("overhead, " + (stacked ? "stacked" : "crossed") + " deck " + deck
                         + " lies in the middle plane", 0.0, GlobeRenderer.liftFor(deck, stacked, top), 1e-12);
                     near("and is not tilted", 0.0, GlobeRenderer.inclinationFor(deck, stacked, top), 1e-12);

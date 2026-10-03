@@ -44,7 +44,7 @@ public final class RingBar extends JPanel {
     private final Chip directed;
     private final Chip globe;
     private final java.util.List<Chip> layerChips = new java.util.ArrayList<>();
-    private final java.util.Map<Chip, SkymapPanel.Layer> layerOf =
+    private final java.util.Map<Chip, Layer> layerOf =
         new java.util.HashMap<>();
 
     private boolean chartAOpen = true;
@@ -156,24 +156,24 @@ public final class RingBar extends JPanel {
         add(globe);
 
         // The scaffolding layers. These change nothing about the chart, only what is drawn of
-        // it, so they never touch the mode - see the note on SkymapPanel.Layer.
-        addLayer("Degrees", SkymapPanel.Layer.DEGREES,
+        // it, so they never touch the mode - see the note on Layer.
+        addLayer("Degrees", Layer.DEGREES,
             "The 360-degree scale around the outside.");
-        addLayer("Signs", SkymapPanel.Layer.SIGNS,
+        addLayer("Signs", Layer.SIGNS,
             "The zodiac: its colour, its glyphs and its twelve boundaries.");
-        addLayer("Decans", SkymapPanel.Layer.DECANS,
+        addLayer("Decans", Layer.DECANS,
             "The thirty-six decans, in whichever scheme Settings has chosen.");
-        addLayer("Bounds", SkymapPanel.Layer.BOUNDS,
+        addLayer("Bounds", Layer.BOUNDS,
             "The Egyptian terms - five rulers to a sign.");
-        addLayer("Mansions", SkymapPanel.Layer.MANSIONS,
+        addLayer("Mansions", Layer.MANSIONS,
             "The 28 lunar mansions - the Moon's nightly stations.");
-        addLayer("Houses", SkymapPanel.Layer.HOUSES,
+        addLayer("Houses", Layer.HOUSES,
             "The twelve cusps and their numbers.");
-        addLayer("Aspects", SkymapPanel.Layer.ASPECTS,
+        addLayer("Aspects", Layer.ASPECTS,
             "Every line between bodies in aspect.");
     }
 
-    private void addLayer(String label, SkymapPanel.Layer layer, String what) {
+    private void addLayer(String label, Layer layer, String what) {
         Chip c = layerChip(label, layer);
         c.setToolTipText("<html><b>" + label + "</b><br>" + what
             + "<br><i>Folds away without changing the chart.</i></html>");
@@ -192,7 +192,7 @@ public final class RingBar extends JPanel {
     }
 
     /** A chip that folds one drawn layer. Its state lives on the panel, not here. */
-    private Chip layerChip(String label, SkymapPanel.Layer layer) {
+    private Chip layerChip(String label, Layer layer) {
         Chip c = new Chip(label, null);
         c.layer = layer;
         c.onLayerClick = () -> {
@@ -322,7 +322,7 @@ public final class RingBar extends JPanel {
         /** How this chip knows it is lit, when it is not one of the four the chain names. */
         java.util.function.BooleanSupplier openState;
         /** Set on a chip that folds a drawn layer rather than opening a ring. */
-        SkymapPanel.Layer layer;
+        Layer layer;
         Runnable onLayerClick;
         private final Runnable onClick;
         private boolean hover;
