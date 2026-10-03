@@ -58,8 +58,27 @@ final class WheelView extends View {
     private final ScaleGestureDetector pinch;
     private final GestureDetector gestures;
 
+    /**
+     * This screen's pixels per dp, held as a field rather than fetched where it is needed.
+     *
+     * <p><b>Every stroke width in this file was a bare number</b> - 1f for a planet's rim, 1.2f
+     * for the sky's boundary, 1f for an unlit aspect line - and a bare number is a PHYSICAL
+     * pixel. These are the desktop's widths, chosen against a window at about 96 dpi; this
+     * phone has about 500, so a "1 pixel" rim came out at a fifth of a dp and the circle it
+     * was meant to draw around a planet was invisible. That is most of why the planets read as
+     * blobs: the gradient fill and the halo were all there was, with no edge anywhere.
+     *
+     * <p>Positions and radii are NOT scaled here and must not be. They come from WheelLayout
+     * against the real pixel width, and the wheel needs those pixels: the sign, decan, degree
+     * and mansion bands have fixed depths, so laying the wheel out in dp collapses the natal
+     * band to its 22px minimum. Measured, not assumed - at 308dp wide the natal band is 22
+     * deep where at 1080 it is 78. So the geometry stays in pixels and the INK scales.
+     */
+    private final float density;
+
     WheelView(Context context) {
         super(context);
+        this.density = context.getResources().getDisplayMetrics().density;
         this.line.setStyle(Paint.Style.STROKE);
         this.text.setTextAlign(Paint.Align.CENTER);
         this.pinch = new ScaleGestureDetector(context,
@@ -210,14 +229,13 @@ final class WheelView extends View {
         }
         c.save();
         c.concat(this.view);
-        float density = getResources().getDisplayMetrics().density;
         int[] r = w.rings;
         int signOuter = r[WheelLayout.RING_SIGN_OUTER];
         int signInner = r[WheelLayout.RING_SIGN_INNER];
 
         // The sign band: twelve sectors, each glyph in its element's colour.
         this.line.setColor(Color.rgb(90, 96, 112));
-        this.line.setStrokeWidth(1.2f);
+        this.line.setStrokeWidth(1.2f * this.density);
         c.drawCircle(w.cx, w.cy, signOuter, this.line);
         c.drawCircle(w.cx, w.cy, signInner, this.line);
         c.drawCircle(w.cx, w.cy, r[WheelLayout.RING_OUTER], this.line);
@@ -244,7 +262,7 @@ final class WheelView extends View {
             for (int h = 1; h <= 12; h++) {
                 boolean angle = h == 1 || h == 4 || h == 7 || h == 10;
                 this.line.setColor(angle ? Color.rgb(220, 220, 230) : Color.rgb(70, 76, 90));
-                this.line.setStrokeWidth(angle ? 2.2f : 1f);
+                this.line.setStrokeWidth((angle ? 2.2f : 1f) * this.density);
                 float[] a = w.point(f.cusps[h], w.aspectDisc);
                 float[] b = w.point(f.cusps[h], signInner);
                 c.drawLine(a[0], a[1], b[0], b[1], this.line);
@@ -266,7 +284,7 @@ final class WheelView extends View {
         for (PhoneWheel.Line l : w.aspects()) {
             boolean lit = this.selected < 0 || l.a == this.selected || l.b == this.selected;
             this.line.setColor(aspectColour(l.type, lit ? 210 : 45));
-            this.line.setStrokeWidth(lit && this.selected >= 0 ? 2.4f : 1.3f);
+            this.line.setStrokeWidth((lit && this.selected >= 0 ? 2.4f : 1.3f) * this.density);
             float[] a = w.point(f.bodies[l.a].lon, w.aspectDisc);
             float[] b = w.point(f.bodies[l.b].lon, w.aspectDisc);
             c.drawLine(a[0], a[1], b[0], b[1], this.line);
@@ -281,7 +299,7 @@ final class WheelView extends View {
                 boolean lit = this.selected < 0 || this.selected == PhoneWheel.SKY + t
                     || this.selected == n;
                 this.line.setColor(aspectColour(h.type, lit ? 230 : 40));
-                this.line.setStrokeWidth(lit && this.selected >= 0 ? 2.6f : 1.6f);
+                this.line.setStrokeWidth((lit && this.selected >= 0 ? 2.6f : 1.6f) * this.density);
                 float[] a = w.point(w.sky.bodies[t].lon, w.aspectDisc);
                 float[] b = w.point(f.bodies[n].lon, w.aspectDisc);
                 c.drawLine(a[0], a[1], b[0], b[1], this.line);
@@ -289,7 +307,7 @@ final class WheelView extends View {
             this.line.setPathEffect(null);
             // The sky's ring: the boundary it shares with the natal planets.
             this.line.setColor(Color.rgb(70, 90, 130));
-            this.line.setStrokeWidth(1.2f);
+            this.line.setStrokeWidth(1.2f * this.density);
             c.drawCircle(w.cx, w.cy, w.rings[WheelLayout.RING_BODY_TOP], this.line);
             for (int i = 0; i < PhoneWheel.PLANETS; i++) {
                 float[] p = w.skyBody(i);
@@ -346,9 +364,13 @@ final class WheelView extends View {
         PhoneWheel.Face face = PhoneWheel.face(i);
         this.fill.setShader(null);
         if (face == PhoneWheel.Face.SUN) {
+            // The corona, which reached 2.4x the disc: five passes at 0.28 of the radius each.
+            // On a phone that is six millimetres of haze around a two-millimetre Sun, and the
+            // Sun was the blobbiest of the ten for exactly that reason. Same five passes,
+            // tightened to half again rather than two and a half times.
             for (int k = 5; k >= 1; k--) {
                 this.fill.setColor(Color.argb((int) (255 * 0.16 / k), 255, 186, 82));
-                c.drawCircle(x, y, rad + k * rad * 0.28f, this.fill);
+                c.drawCircle(x, y, rad + k * rad * 0.10f, this.fill);
             }
             this.fill.setShader(new RadialGradient(x - rad * 0.22f, y - rad * 0.22f, rad * 1.5f,
                 new int[] {Color.rgb(255, 255, 246), Color.rgb(255, 232, 158),
@@ -368,7 +390,13 @@ final class WheelView extends View {
             c.drawArc(ringBox, 180, 180, false, this.line);     // the back of the ring
         }
         // A soft halo in the planet's own colour, so it reads as a light above the band.
-        for (float[] pass : new float[][] {{0.7f, 0.06f}, {0.42f, 0.10f}, {0.2f, 0.16f}}) {
+        //
+        // IT USED TO REACH 1.7x THE DISC and that is the other half of the blob. A glow two
+        // thirds wider than the thing glowing works on the desktop, where the disc is 6mm
+        // across; at the 2.4mm a phone gives it, the glow IS the planet and the disc inside it
+        // has no edge of its own. It reaches a quarter past the rim now - still a light above
+        // the band, no longer a cloud with something in it.
+        for (float[] pass : new float[][] {{0.26f, 0.07f}, {0.16f, 0.11f}, {0.08f, 0.17f}}) {
             this.fill.setColor(Color.argb((int) (255 * pass[1]), lighten(base[0], 0.35),
                 lighten(base[1], 0.35), lighten(base[2], 0.35)));
             c.drawCircle(x, y, rad * (1 + pass[0]), this.fill);
@@ -417,14 +445,22 @@ final class WheelView extends View {
     }
 
     /** A planet's rim; a bright ring, and a second fainter one, around the tapped planet. */
+    /**
+     * A planet's rim, and the lit halo around a selected one.
+     *
+     * <p><b>This is the edge that was missing.</b> The unlit rim was {@code 1f} - one physical
+     * pixel, a fifth of a dp on this screen - so every planet was a soft gradient with a
+     * halo and no circumference at all. It is a dp and a bit now, which is what a hairline
+     * means, and it is the line that makes a small disc read as a disc.
+     */
     private void ring(Canvas c, float x, float y, float rad, boolean lit, int rim) {
         this.line.setColor(lit ? Color.rgb(255, 238, 170) : rim);
-        this.line.setStrokeWidth(lit ? 3f : 1f);
+        this.line.setStrokeWidth((lit ? 2.4f : 1.2f) * this.density);
         c.drawCircle(x, y, rad, this.line);
         if (lit) {
             this.line.setColor(Color.argb(110, 255, 238, 170));
-            this.line.setStrokeWidth(2f);
-            c.drawCircle(x, y, rad + 8, this.line);
+            this.line.setStrokeWidth(1.6f * this.density);
+            c.drawCircle(x, y, rad + 5 * this.density, this.line);
         }
     }
 

@@ -119,9 +119,15 @@ final class PhoneWheel {
         return this.point(this.sky.bodies[i].lon, this.skyRadius[i]);
     }
 
-    /** How big a sky planet is drawn: the desktop's transit glyph, a third larger. */
+    /**
+     * How big a sky planet is drawn: the desktop's transit glyph, half again.
+     *
+     * <p>1.35 to 1.55, the same change as {@link #planetRadius} and for the same reason, kept
+     * smaller than a natal planet because the sky's band is shallower than the natal one and
+     * because the chart being read is the natal one.
+     */
     static int skyPlanetRadius(int i) {
-        return Math.round(WheelLayout.transitSize(i).radius * 1.35f);
+        return Math.round(WheelLayout.transitSize(i).radius * 1.55f);
     }
 
     /** The screen angle of a longitude, in radians. */
@@ -150,13 +156,24 @@ final class PhoneWheel {
     }
 
     /**
-     * How big a planet is drawn on the phone: the desktop's glyph radius, seven tenths larger. The
+     * How big a planet is drawn on the phone: the desktop's glyph radius, doubled. The
      * desktop's beads carry a glyph; the phone's are pictures of the planets, which need the
      * room to read as Saturn's rings or Jupiter's belts (reported 30 Sep: "basic glyphs in
      * circles"). The band spreads crowded planets by the same spacing either way.
+     *
+     * <p><b>1.7 to 2.0, and the ceiling is the band rather than taste.</b> Measured at the
+     * 1080px width a phone lays this out at: the natal band is 78 deep, and it does not grow
+     * with width beyond that - 72 at 700, 78 from 900 up. At 1.7 the disc was 48 across, 62%
+     * of its band; at 2.0 it is 56, 72%. Going further is tempting and wrong: NATAL_SPACING is
+     * 32, so planets pushed onto neighbouring sub-rings are 32 apart, and a disc much over 60
+     * buries its neighbour instead of overlapping it.
+     *
+     * <p>Size was the SMALL half of the blob problem, not the fuzzy half. A disc this size
+     * reads perfectly well once it has an edge; what it had instead was a one-physical-pixel
+     * rim and a halo reaching 1.7 times its own radius. Both are fixed in {@code WheelView}.
      */
     int planetRadius(int i) {
-        return Math.round(glyphRadius(i) * 1.7f);
+        return Math.round(glyphRadius(i) * 2.0f);
     }
 
     /** How a planet is pictured: the globe's faces (GlobeRenderer.drawPlanet), and the Moon's. */
