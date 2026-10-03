@@ -65,7 +65,7 @@ final class PhoneWheel {
         // the sky's planets ride between the signs and the natal planets, as on the desktop.
         this.rings = WheelLayout.ringRadii(width, height, sky != null);
         this.natalTop = WheelLayout.bodyBase(this.rings, Settings.bodyRing());
-        this.natalFloor = this.natalTop - WheelLayout.natalBandDepth(Math.max(1, this.natalTop));
+        this.natalFloor = Math.max(1, this.natalTop - phoneBandDepth(this.natalTop));
         this.aspectDisc = WheelLayout.aspectDiscs(this.natalFloor)[0];
         this.pin = frame.timeUnknown ? 0.0 : frame.asc;
         double[] lon = new double[Bodies.count()];
@@ -77,8 +77,13 @@ final class PhoneWheel {
                 drawn[i] = true;
             }
         }
+        // THE CLEARANCE AND THE SPACING ARE THE DISC'S, not the desktop's. NATAL_EDGE is 15 and
+        // NATAL_SPACING 32, both sized for a bead of radius 14 carrying a glyph; the phone
+        // draws a 24-radius picture at the same place, so with the desktop's numbers the outer
+        // sub-ring sat at natalTop - 15 and every disc on it overhung the band by 9.
+        int disc = maxPlanetRadius();
         int[] radii = WheelLayout.bandRadii(lon, drawn, this.natalTop, this.natalFloor,
-            WheelLayout.NATAL_EDGE, WheelLayout.NATAL_SPACING);
+            disc, 2.0 * disc);
         this.bodyRadius = new int[Bodies.count()];
         for (int i = 0; i < radii.length && i < this.bodyRadius.length; i++) {
             this.bodyRadius[i] = drawn[i] ? radii[i] : 0;
@@ -161,19 +166,69 @@ final class PhoneWheel {
      * room to read as Saturn's rings or Jupiter's belts (reported 30 Sep: "basic glyphs in
      * circles"). The band spreads crowded planets by the same spacing either way.
      *
-     * <p><b>1.7 to 2.0, and the ceiling is the band rather than taste.</b> Measured at the
-     * 1080px width a phone lays this out at: the natal band is 78 deep, and it does not grow
-     * with width beyond that - 72 at 700, 78 from 900 up. At 1.7 the disc was 48 across, 62%
-     * of its band; at 2.0 it is 56, 72%. Going further is tempting and wrong: NATAL_SPACING is
-     * 32, so planets pushed onto neighbouring sub-rings are 32 apart, and a disc much over 60
-     * buries its neighbour instead of overlapping it.
-     *
-     * <p>Size was the SMALL half of the blob problem, not the fuzzy half. A disc this size
-     * reads perfectly well once it has an edge; what it had instead was a one-physical-pixel
-     * rim and a halo reaching 1.7 times its own radius. Both are fixed in {@code WheelView}.
+     * <p><b>Back to 1.7 from a brief 2.0, and the size was never the real problem.</b> Making
+     * the disc bigger inside a band that could not hold it made it worse, not better -
+     * "oversized for the area they encompass" was the report, and the harness agreed: a disc
+     * at the outer sub-ring reached radius 420 against a {@code natalTop} of 407, so it
+     * overhung the band into the sign ring. The band is what changed; see {@link #BAND_TIERS}.
      */
     int planetRadius(int i) {
-        return Math.round(glyphRadius(i) * 2.0f);
+        return Math.round(glyphRadius(i) * DISC_SCALE);
+    }
+
+    /** The phone's discs against the desktop's glyph radius. */
+    private static final float DISC_SCALE = 1.7f;
+
+    /** The sub-rings a natal band is laid out on: {@code WheelLayout.RING_COUNT}. */
+    static final int BAND_TIERS = 3;
+
+    /**
+     * How deep the phone's natal band is, and why it is not the desktop's.
+     *
+     * <p><b>The desktop's band is 78 deep and 165 pixels sat empty inside it.</b> Measured on a
+     * real chart at the 1080px width a phone lays this out at: planets on sub-rings at 368 and
+     * 392 - twenty-four apart - with nothing at all between the band's floor at 329 and the
+     * aspect circle at 164. So the phone was crowding ten discs into the thinnest ring it
+     * could while a third of its own radius went unused. That is the whole reason the discs
+     * looked wrong at every size tried: too small to see, or too big for the band.
+     *
+     * <p>The depth is DERIVED from what the band must hold rather than chosen. {@code
+     * bandRadii} keeps {@code edge} at each boundary and lays {@code BAND_TIERS} sub-rings
+     * across what is left, so with the clearance and the gap both equal to a disc's diameter:
+     *
+     * <pre>  usable  = depth - 2*edge          (edge = one disc radius)
+     *   gap     = usable / (TIERS - 1)
+     *   want      gap &gt;= 2*radius           so neighbouring tiers cannot touch
+     *   hence     depth &gt;= 6*radius</pre>
+     *
+     * <p>Six and a half rather than six, so the tiers clear rather than just touch. At radius
+     * 24 that is 156, against the desktop's 78 - and it still stops well short of the aspect
+     * circle, which is derived from the floor and so moves with it.
+     *
+     * <p>Never shallower than the desktop's answer, and never more than half the radius it is
+     * drawn in: a band deeper than that on a small wheel would leave no middle for the aspect
+     * lines to cross.
+     */
+    static int phoneBandDepth(int natalTop) {
+        int wanted = Math.round(6.5f * maxPlanetRadius());
+        int desktop = WheelLayout.natalBandDepth(Math.max(1, natalTop));
+        return Math.min(Math.max(wanted, desktop), Math.max(1, natalTop / 2));
+    }
+
+    /**
+     * The largest disc the phone draws, which is what the band has to be built around.
+     *
+     * <p>The lights are the biggest at radius 14, so this is 24. Every clearance and spacing
+     * below is expressed in it rather than in a number, because the one thing that must stay
+     * true is that the band fits the disc - and the last attempt broke precisely by changing
+     * the disc and leaving the band alone.
+     *
+     * <p>Read through {@code glyphRadius(0)} - body 0 is the Sun, and the lights are the
+     * largest of the four tiers - rather than by indexing {@code NATAL_SIZES}, which is
+     * package-private to the desktop's gui package and not ours to widen.
+     */
+    static int maxPlanetRadius() {
+        return Math.round(glyphRadius(0) * DISC_SCALE);
     }
 
     /** How a planet is pictured: the globe's faces (GlobeRenderer.drawPlanet), and the Moon's. */

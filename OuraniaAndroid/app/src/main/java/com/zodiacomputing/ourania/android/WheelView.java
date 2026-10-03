@@ -372,7 +372,10 @@ final class WheelView extends View {
                 this.fill.setColor(Color.argb((int) (255 * 0.16 / k), 255, 186, 82));
                 c.drawCircle(x, y, rad + k * rad * 0.10f, this.fill);
             }
-            this.fill.setShader(new RadialGradient(x - rad * 0.22f, y - rad * 0.22f, rad * 1.5f,
+            // rad * 1.5 to rad * 1.05, for the reason given on the gradient below: at 1.5 the
+            // last stop - the deep orange limb that makes the Sun a ball rather than a dot -
+            // fell outside the circle being filled and never appeared.
+            this.fill.setShader(new RadialGradient(x - rad * 0.22f, y - rad * 0.22f, rad * 1.05f,
                 new int[] {Color.rgb(255, 255, 246), Color.rgb(255, 232, 158),
                     Color.rgb(255, 168, 56), Color.rgb(214, 96, 28)},
                 new float[] {0f, 0.35f, 0.75f, 1f}, Shader.TileMode.CLAMP));
@@ -401,7 +404,18 @@ final class WheelView extends View {
                 lighten(base[1], 0.35), lighten(base[2], 0.35)));
             c.drawCircle(x, y, rad * (1 + pass[0]), this.fill);
         }
-        this.fill.setShader(new RadialGradient(x - rad * 0.35f, y - rad * 0.35f, rad * 1.5f,
+        // THE SHADING HAS TO FINISH INSIDE THE DISC, and this is the last of the fuzz.
+        //
+        // The gradient ran to rad * 1.5 from a centre offset by 0.35 of the radius, so the far
+        // side of the disc was only about two thirds of the way along it: the dark end was off
+        // the edge of the planet and never drawn. What landed was a pale wash from light to
+        // middling with no terminator anywhere in it - lit from the upper left in intent, flat
+        // in fact, and flat with soft edges is the definition of a blob.
+        //
+        // At rad * 1.08 the sweep completes just past the far rim, so the disc runs all the
+        // way from highlight to shadow and reads as a sphere. Nothing else about it changes:
+        // same offset, same two colours.
+        this.fill.setShader(new RadialGradient(x - rad * 0.35f, y - rad * 0.35f, rad * 1.08f,
             Color.rgb(lighten(base[0], 0.45), lighten(base[1], 0.45), lighten(base[2], 0.45)),
             Color.rgb((int) (base[0] * 0.5), (int) (base[1] * 0.5), (int) (base[2] * 0.5)),
             Shader.TileMode.CLAMP));
