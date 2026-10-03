@@ -39,6 +39,8 @@ final class PhoneWheel {
 
     /** {@link WheelLayout#ringRadii} at this size, with the sky's band open when it is shown. */
     final int[] rings;
+    /** Whether the lunar mansion band is open at the rim. */
+    final boolean mansions;
     /** The top and floor of the natal band. */
     final int natalTop;
     final int natalFloor;
@@ -63,7 +65,13 @@ final class PhoneWheel {
         this.cy = height / 2;
         // The desktop's transit band: with it open, the natal band moves in to make room, and
         // the sky's planets ride between the signs and the natal planets, as on the desktop.
-        this.rings = WheelLayout.ringRadii(width, height, sky != null);
+        //
+        // The zodiac's own bands - decans, signs, bounds, the inner degree scale - are open, as
+        // the desktop's are by default. The mansions open only when the reader asks: their band
+        // is carved out of the rim, not the planets' room, so the natal band does not move.
+        this.mansions = PhoneSettings.wheelMansions();
+        this.rings = WheelLayout.ringRadii(width, height, sky != null ? 1.0 : 0.0, 0.0,
+            1.0, 1.0, 1.0, 1.0, this.mansions ? 1.0 : 0.0);
         this.natalTop = WheelLayout.bodyBase(this.rings, Settings.bodyRing());
         this.natalFloor = Math.max(1, this.natalTop - phoneBandDepth(this.natalTop));
         this.aspectDisc = WheelLayout.aspectDiscs(this.natalFloor)[0];

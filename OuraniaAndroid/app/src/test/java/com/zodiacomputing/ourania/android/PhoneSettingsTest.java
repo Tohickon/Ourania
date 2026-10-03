@@ -162,4 +162,31 @@ public class PhoneSettingsTest {
         aFreshInstallHasTheDesktopsDefaults();
         assertEquals('P', PhoneChart.houseSystem());
     }
+
+    @Test
+    public void theMansionsAreOffUntilAskedForAndOpenAtTheRimNotInThePlanets() {
+        assertFalse("off on a fresh install", PhoneSettings.read().wheelMansions);
+        PhoneWheel shut = PhoneWheel.of(sydney().frame, 1080, 1080);
+        assertEquals("shut, the band has no depth",
+            shut.rings[com.zodiacomputing.ourania.gui.WheelLayout.RING_OUTER],
+            shut.rings[com.zodiacomputing.ourania.gui.WheelLayout.RING_MANSION_INNER]);
+        org.junit.Assert.assertArrayEquals("and the wheel is the layout it always was",
+            com.zodiacomputing.ourania.gui.WheelLayout.ringRadii(1080, 1080, false),
+            shut.rings);
+
+        PhoneSettings.Values v = PhoneSettings.read();
+        v.wheelMansions = true;
+        PhoneSettings.save(v);
+        assertTrue("saved", PhoneSettings.read().wheelMansions);
+        PhoneWheel open = PhoneWheel.of(sydney().frame, 1080, 1080);
+        int outer = open.rings[com.zodiacomputing.ourania.gui.WheelLayout.RING_OUTER];
+        int band = open.rings[com.zodiacomputing.ourania.gui.WheelLayout.RING_MANSION_INNER];
+        assertTrue("open, the band is carved out of the rim",
+            band < outer && band > open.rings[com.zodiacomputing.ourania.gui.WheelLayout.RING_DECAN_OUTER]);
+        assertEquals("and the planets do not move", shut.natalTop, open.natalTop);
+        assertEquals(shut.natalFloor, open.natalFloor);
+
+        PhoneSettings.reset();
+        assertFalse("reset puts them away", PhoneSettings.read().wheelMansions);
+    }
 }

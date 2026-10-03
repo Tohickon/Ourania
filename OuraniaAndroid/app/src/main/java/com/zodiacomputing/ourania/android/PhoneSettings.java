@@ -46,6 +46,19 @@ final class PhoneSettings {
          * thing into one TextView in one narrow column.
          */
         boolean readingMechanics;
+        /** Whether the wheel draws the 28 lunar mansions at its rim; off unless asked for. */
+        boolean wheelMansions;
+    }
+
+    /**
+     * The phone's own key, not a desktop one: the desktop's mansion band is a layer of its
+     * window, opened and shut there and never saved, so there is no shared setting to read.
+     */
+    static final String WHEEL_MANSIONS_KEY = "phone.wheel.mansions";
+
+    /** Whether the wheel draws the lunar mansions. Off by default. */
+    static boolean wheelMansions() {
+        return "true".equals(Settings.get(WHEEL_MANSIONS_KEY, "false"));
     }
 
     /** The house systems offered, by name - the desktop picker's list. */
@@ -77,6 +90,7 @@ final class PhoneSettings {
         }
         v.aspects = Settings.loadAspectSelection();
         v.readingMechanics = Settings.readingMechanics();
+        v.wheelMansions = wheelMansions();
         return v;
     }
 
@@ -93,6 +107,7 @@ final class PhoneSettings {
         }
         Settings.saveAspectSelection(v.aspects);
         Settings.setReadingMechanics(v.readingMechanics);
+        Settings.set(WHEEL_MANSIONS_KEY, v.wheelMansions ? "true" : "false");
         Settings.applyToEngine();
     }
 
@@ -113,6 +128,7 @@ final class PhoneSettings {
         // The whole reading, which is the desktop's default too - turning a section off unasked
         // is the app deciding what a reader may see.
         Settings.setReadingMechanics(true);
+        Settings.set(WHEEL_MANSIONS_KEY, "false");
         Settings.applyToEngine();
     }
 }
