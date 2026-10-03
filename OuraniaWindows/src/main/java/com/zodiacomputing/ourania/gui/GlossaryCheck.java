@@ -25,6 +25,10 @@ public final class GlossaryCheck {
     }
 
     public static void main(String[] args) {
+        // Never the reader's own settings file: a suite that generates a chart persists it, and
+        // one of these once overwrote a saved birth chart. SettingsIsolationCheck holds every
+        // suite to this and was red by one because this suite was missing it.
+        Settings.useScratchFile();
         try {
             loads();
             readable();

@@ -446,9 +446,18 @@ public final class InterpretationHierarchyCheck {
             !score.matches("(?s).*\\b(LunarMansions|[Ss]abian|[Dd]ecan)\\w*.*"));
 
         String syn = code(base + "gui/NarrativeSynthesizer.java");
-        int a = syn.indexOf("2. Planetary Placements");
-        int b = syn.indexOf("3. Structural Tensions");
-        ok("H2: the placements section is where it was", a > 0 && b > a);
+        // <b>Found by name, not by number, and that is the fix rather than a loosening.</b>
+        // These read "2. Planetary Placements" and "3. Structural Tensions" until the reading
+        // was restructured into four tiers and the old ten sections became 4.1 to 4.10. What
+        // this part guards is the ORDER inside a body's block - sign, then house, then aspects -
+        // and that nothing from Level 4 is in it; the number in the heading was never the
+        // claim. Worse, both of those guards sit behind the `if` below, so pinning the number
+        // meant a deliberate renumbering did not merely fail here: it took two live guards
+        // dark and reported one red instead of three. A section heading can be renumbered
+        // again; it cannot stop being called what it is called.
+        int a = syn.indexOf("Planetary Placements");
+        int b = syn.indexOf("Structural Tensions");
+        ok("H2: the placements section is still before the tensions section", a > 0 && b > a);
         if (a > 0 && b > a) {
             String block = syn.substring(a, b);
             int sign = block.indexOf("getPlanetInSign");
