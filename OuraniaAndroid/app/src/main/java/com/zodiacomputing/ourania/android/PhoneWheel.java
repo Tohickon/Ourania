@@ -132,7 +132,11 @@ final class PhoneWheel {
      * because the chart being read is the natal one.
      */
     static int skyPlanetRadius(int i) {
-        return Math.round(WheelLayout.transitSize(i).radius * 1.55f);
+        float scale = sizeFactor(i);
+        if (scale <= 0) {
+            return Math.round(WheelLayout.transitSize(i).radius * 1.55f);
+        }
+        return Math.round(WheelLayout.transitSize(0).radius * 1.55f * scale);
     }
 
     /** The screen angle of a longitude, in radians. */
@@ -173,7 +177,94 @@ final class PhoneWheel {
      * overhung the band into the sign ring. The band is what changed; see {@link #BAND_TIERS}.
      */
     int planetRadius(int i) {
-        return Math.round(glyphRadius(i) * DISC_SCALE);
+        float scale = sizeFactor(i);
+        if (scale <= 0) {
+            return Math.round(glyphRadius(i) * DISC_SCALE);
+        }
+        return Math.round(maxPlanetRadius() * scale);
+    }
+
+    /**
+     * How big a body is drawn against the Sun's disc, from how big it really is.
+     *
+     * <p>Logarithmic, and squeezed into 0.72 to 1: the Sun is four hundred Moons across, and
+     * drawn to scale everything but the Sun would vanish. On a log of the true diameter the
+     * order survives - the Sun, then Jupiter and Saturn, the ice giants, Venus, Mars, Mercury,
+     * the Moon, Pluto - and the smallest is still most of the largest, so a glance tells
+     * Jupiter from Mercury without either outgrowing the band.
+     *
+     * <p><b>Never above 1</b>, because the band is built around {@link #maxPlanetRadius} - the
+     * Sun's disc - and a body larger than that would overhang it, which is the exact defect
+     * the band was rebuilt to remove.
+     *
+     * @return the factor, or 0 for a body with no known diameter, which keeps its tier size
+     */
+    static float sizeFactor(int i) {
+        double km = diameterKm(Bodies.at(i).name);
+        if (km <= 0) {
+            return 0f;
+        }
+        double t = (Math.log(km) - Math.log(SMALLEST_KM)) / (Math.log(SUN_KM) - Math.log(SMALLEST_KM));
+        return (float) (MIN_SIZE + (1 - MIN_SIZE) * Math.max(0, Math.min(1, t)));
+    }
+
+    private static final double SUN_KM = 1_392_700;
+    private static final double SMALLEST_KM = 2_377;     // Pluto
+    private static final float MIN_SIZE = 0.72f;
+
+    /** Mean diameters in kilometres; 0 for anything without one worth drawing to. */
+    static double diameterKm(String name) {
+        switch (name) {
+            case "Sun": return SUN_KM;
+            case "Moon": return 3_474;
+            case "Mercury": return 4_879;
+            case "Venus": return 12_104;
+            case "Mars": return 6_779;
+            case "Jupiter": return 139_820;
+            case "Saturn": return 116_460;
+            case "Uranus": return 50_724;
+            case "Neptune": return 49_244;
+            case "Pluto": return SMALLEST_KM;
+            default: return 0;
+        }
+    }
+
+    /**
+     * How far the Moon has run ahead of the Sun, 0 to 360: 0 new, 90 first quarter, 180 full,
+     * 270 last quarter. The desktop's wheel computes its phase disc from the same difference.
+     */
+    static double moonElongation(ChartFrame frame) {
+        int sun = Bodies.indexOfName("Sun");
+        int moon = Bodies.indexOfName("Moon");
+        double d = (frame.bodies[moon].lon - frame.bodies[sun].lon) % 360.0;
+        return d < 0 ? d + 360.0 : d;
+    }
+
+    /**
+     * The outline of the Moon's lit part, as x,y pairs: down the bright limb, then back up
+     * the terminator.
+     *
+     * <p>The terminator is the limb squashed by cos(elongation) - at new Moon it lies on the
+     * limb and nothing is lit, at the quarters it is a straight line, at full it lies on the
+     * other limb and the whole disc is lit. Waxing lights the right-hand side and waning the
+     * left, as seen from the northern hemisphere and as the desktop's phase disc draws it.
+     */
+    static float[] moonLitOutline(float x, float y, float rad, double elongation, int steps) {
+        double e = Math.toRadians(elongation);
+        float side = elongation <= 180 ? 1f : -1f;
+        float squash = (float) Math.cos(e);
+        float[] pts = new float[4 * (steps + 1)];
+        for (int k = 0; k <= steps; k++) {
+            double t = -Math.PI / 2 + Math.PI * k / steps;          // top to bottom
+            float c = (float) Math.cos(t);
+            float s = (float) Math.sin(t);
+            pts[2 * k] = x + side * rad * c;                        // the limb
+            pts[2 * k + 1] = y + rad * s;
+            int back = 2 * (2 * steps + 1 - k);                     // the terminator, reversed
+            pts[back] = x + side * rad * squash * c;
+            pts[back + 1] = y + rad * s;
+        }
+        return pts;
     }
 
     /** The phone's discs against the desktop's glyph radius. */
