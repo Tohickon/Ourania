@@ -1526,7 +1526,7 @@ implements WheelSource, GlobeSource {
 
     /** An element's colour, for surfaces that have no panel instance to hand. */
     static Color elementColorFor(int elementIndex) {
-        Color c = ChartPalette.colorOr(SkymapPanel.elementTextHex(elementIndex), null);
+        Color c = AwtPen.colorOr(SkymapPanel.elementTextHex(elementIndex), null);
         return c == null ? new Color(228, 229, 234) : c;
     }
 
@@ -2946,7 +2946,7 @@ implements WheelSource, GlobeSource {
      * was one colour on the wheel and another in the table.
      */
     public Color bodyColor(int bodyIndex) {
-        return ChartPalette.colorOr(
+        return AwtPen.colorOr(
             ChartPalette.bodyHex(Bodies.at(bodyIndex).id),
             this.getElementColor(BODY_ELEMENTS[bodyIndex]));
     }
@@ -2964,7 +2964,7 @@ implements WheelSource, GlobeSource {
         // constants stay as the last word on what Classic means; what changed is that they are
         // no longer the ONLY word - Settings now shows the same four colours the wheel paints,
         // which it did not before.
-        return ChartPalette.colorOr(
+        return AwtPen.colorOr(
             ChartPalette.elementHex(n, hex(ELEMENT_COLORS[n])), ELEMENT_COLORS[n]);
     }
 
@@ -2982,7 +2982,7 @@ implements WheelSource, GlobeSource {
     }
 
     static Color inkColor() {
-        return ChartPalette.colorOr(ChartPalette.inkHex("#DCDCDC"), new Color(220, 220, 220));
+        return AwtPen.colorOr(ChartPalette.inkHex("#DCDCDC"), new Color(220, 220, 220));
     }
 
     /** A Color as #RRGGBB, for handing this panel's constants to the palette as fallbacks. */
@@ -6438,12 +6438,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     @Override public Ink mansionInk() {
-        return AwtPen.ink(ChartPalette.colorOr(ChartPalette.mansionHex(null),
+        return AwtPen.ink(AwtPen.colorOr(ChartPalette.mansionHex(null),
             new Color(181, 160, 227)));
     }
 
     @Override public Ink leaderInk() {
-        return AwtPen.ink(ChartPalette.colorOr(ChartPalette.leaderHex(null), Color.WHITE));
+        return AwtPen.ink(AwtPen.colorOr(ChartPalette.leaderHex(null), Color.WHITE));
     }
 
     @Override public Ink beadInk(AngleRole role) {

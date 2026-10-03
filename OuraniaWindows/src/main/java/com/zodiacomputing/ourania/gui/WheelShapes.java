@@ -342,7 +342,7 @@ final class WheelShapes {
                 int r = (bandOuter + bandInner) / 2;
                 // The mansion ring's colour, overridable in Settings. Alpha kept here: the
                 // ring sits under the glyphs and a solid band would bury them.
-                Color mansion = ChartPalette.colorOr(ChartPalette.mansionHex(null),
+                Color mansion = AwtPen.colorOr(ChartPalette.mansionHex(null),
                     new Color(181, 160, 227));
                 g.setColor(new Color(mansion.getRed(), mansion.getGreen(), mansion.getBlue(), 110));
                 g.setStroke(new BasicStroke(bandOuter - bandInner));

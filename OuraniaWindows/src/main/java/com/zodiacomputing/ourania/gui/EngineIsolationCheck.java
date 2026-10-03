@@ -54,7 +54,7 @@ public final class EngineIsolationCheck {
         "Settings", "SavedCharts", "InterpretationService", "ErrorLog", "Json",
         "NarrativeSynthesizer", "Atlas", "WheelLayout", "Globe", "Glossary",
         "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer",
-        "AspectGate"));
+        "AspectGate", "ChartPalette"));
 
     /** The Java level Android builds accept. */
     static final String RELEASE = "17";

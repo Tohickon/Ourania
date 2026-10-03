@@ -147,7 +147,7 @@ final class WheelCanvas extends JPanel {
         // window once everything around it moved to a navy ground. Overridable in
         // Settings; black is still what it falls back to, so a reader who never opens
         // Settings sees the chart they had yesterday.
-        graphics.setColor(ChartPalette.colorOr(ChartPalette.backgroundHex(null),
+        graphics.setColor(AwtPen.colorOr(ChartPalette.backgroundHex(null),
             Color.BLACK));
         graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
         if (!panel.chartReady()) {
@@ -203,7 +203,7 @@ final class WheelCanvas extends JPanel {
         // <b>The disc, filled separately from the page.</b> One colour used to do both -
         // "Wheel" repainted the whole panel - so the chart could never sit ON anything.
         // Filled before any ring is drawn, so every stroke below lands on top of it.
-        Color disc = ChartPalette.colorOr(ChartPalette.wheelHex(null), null);
+        Color disc = AwtPen.colorOr(ChartPalette.wheelHex(null), null);
         if (disc != null) {
             graphics2D.setColor(disc);
             graphics2D.fillOval(n12 - n14, n13 - n14, n14 * 2, n14 * 2);
@@ -530,7 +530,7 @@ final class WheelCanvas extends JPanel {
                 graphics2D.setFont(SkymapPanel.ANGLE_FONT);
                 // The angle marker follows the template: gold is invisible on a white
                 // ground and is the only warm thing in a cool palette.
-                Color angle = ChartPalette.colorOr(ChartPalette.angleHex("#D4AF37"),
+                Color angle = AwtPen.colorOr(ChartPalette.angleHex("#D4AF37"),
                     new Color(212, 175, 55));
                 WheelShapes.drawBodyMarker(graphics2D, n4, n26, 13, angle,
                     Settings.natalMarker());
@@ -586,7 +586,7 @@ final class WheelCanvas extends JPanel {
                 // solid and the rest stay a background.
                 boolean lit = panel.focusBody() == n7
                     && !panel.focusTransit();
-                Color leader = ChartPalette.colorOr(ChartPalette.leaderHex(null),
+                Color leader = AwtPen.colorOr(ChartPalette.leaderHex(null),
                     Color.WHITE);
                 Stroke priorLeader = graphics2D.getStroke();
                 graphics2D.setColor(new Color(leader.getRed(), leader.getGreen(),

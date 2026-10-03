@@ -18,6 +18,45 @@ public final class Ink {
 
     public static final Ink WHITE = new Ink(255, 255, 255);
 
+    /**
+     * A {@code #rrggbb} or {@code 0xrrggbb} hex string, or the fallback when it will not parse.
+     *
+     * <p><b>Here because the palette had to stop needing AWT (M11).</b> Every colour the reader
+     * chooses is stored as a hex string, and {@code ChartPalette} is forty methods returning
+     * those strings plus two that called {@code Color.decode} - and those two were the whole
+     * reason the phone could not read the reader's palette. Decoding belongs with the colour
+     * type rather than with the window toolkit, and this is the colour type both devices have.
+     *
+     * <p>Accepts the two forms {@code Color.decode} accepts, so a stored value written by the
+     * desktop before this existed still reads. A null, a blank or a malformed string is not an
+     * error - a missing setting is not a reason to have no colour - so it gives the fallback.
+     */
+    public static Ink of(String hex, Ink fallback) {
+        if (hex == null) {
+            return fallback;
+        }
+        String t = hex.trim();
+        if (t.startsWith("#")) {
+            t = t.substring(1);
+        } else if (t.startsWith("0x") || t.startsWith("0X")) {
+            t = t.substring(2);
+        }
+        if (t.length() != 6) {
+            return fallback;
+        }
+        try {
+            int v = Integer.parseInt(t, 16);
+            return new Ink((v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF);
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
+    }
+
+    /** The same, giving white where nothing parses - the palette's own fallback of last resort. */
+    public static Ink of(String hex) {
+        return of(hex, WHITE);
+    }
+
     private final int argb;
 
     public Ink(int r, int g, int b) {

@@ -381,9 +381,16 @@ final class PhoneGlobeSource implements GlobeSource {
         return PhonePalette.element(element);
     }
 
+    /**
+     * A body's colour for the globe's bound and decan rings.
+     *
+     * <p>{@link PhonePalette#globeBody} rather than {@code body}, because the desktop's globe
+     * reads the element alone here and ignores the reader's per-body override - see that
+     * method for the measurement and why the phone copies it rather than improving on it.
+     */
     @Override
     public Ink bodyInk(int body) {
-        return PhonePalette.body(body);
+        return PhonePalette.globeBody(body);
     }
 
     @Override

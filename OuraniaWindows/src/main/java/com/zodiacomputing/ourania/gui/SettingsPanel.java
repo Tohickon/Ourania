@@ -522,7 +522,7 @@ public class SettingsPanel extends JPanel {
         degreeRow.setBackground(Color.BLACK);
         degreeRow.setAlignmentX(Component.LEFT_ALIGNMENT);
         degreeRow.add(chip(
-            () -> ChartPalette.colorOr(ChartPalette.leaderHex(null), Color.WHITE),
+            () -> AwtPen.colorOr(ChartPalette.leaderHex(null), Color.WHITE),
             hex -> ChartPalette.setLeaderColor(hex),
             "Degree line colour",
             "The colour of the line from a body to its degree. Right-click to reset.",
@@ -2069,7 +2069,7 @@ public class SettingsPanel extends JPanel {
             // <b>The name wears the colour the chart draws it in.</b> The list was fifteen
             // identical white labels beside a coloured wheel, which makes a reader match name
             // to line by counting rather than by looking. As on the chart, so in the list.
-            box.setForeground(ChartPalette.colorFor(t.label));
+            box.setForeground(AwtPen.colorFor(t.label));
             box.setBackground(Theme.SURFACE);
             box.setFont(Theme.BODY);
             box.setFocusPainted(false);
@@ -2083,13 +2083,13 @@ public class SettingsPanel extends JPanel {
             seen++;
 
             gc.gridx = base;
-            panel.add(chip(() -> ChartPalette.colorFor(t.label),
+            panel.add(chip(() -> AwtPen.colorFor(t.label),
                 hex -> ChartPalette.setOverride(t.label, hex),
                 t.label + " colour",
                 "<html>The colour " + t.label + " is drawn in."
                     + "<br>Click to choose another; right-click to go back to the "
                     + "template.</html>",
-                () -> box.setForeground(ChartPalette.colorFor(t.label))), gc);
+                () -> box.setForeground(AwtPen.colorFor(t.label))), gc);
             gc.gridx = base + 1;
             panel.add(box, gc);
             gc.gridx = base + 2;
@@ -2523,7 +2523,7 @@ public class SettingsPanel extends JPanel {
     private Color bodyDisplayColor(int bodyIndex) {
         String own = ChartPalette.bodyHex(Bodies.at(bodyIndex).id);
         return own != null
-            ? ChartPalette.colorOr(own, Color.WHITE)
+            ? AwtPen.colorOr(own, Color.WHITE)
             : elementDisplayColor(Bodies.at(bodyIndex).element);
     }
 
@@ -2536,7 +2536,7 @@ public class SettingsPanel extends JPanel {
      * now; this asks it and nothing else.
      */
     private Color elementDisplayColor(int element) {
-        return ChartPalette.colorOr(ChartPalette.elementHex(element, "#E2E8F0"), Color.WHITE);
+        return AwtPen.colorOr(ChartPalette.elementHex(element, "#E2E8F0"), Color.WHITE);
     }
 
     /**
@@ -2564,24 +2564,24 @@ public class SettingsPanel extends JPanel {
                     + "it.<br>Right-click to reset.</html>"));
         }
         row.add(labelledChip("Mansions",
-            () -> ChartPalette.colorOr(ChartPalette.mansionHex(null), new Color(181, 160, 227)),
+            () -> AwtPen.colorOr(ChartPalette.mansionHex(null), new Color(181, 160, 227)),
             hex -> ChartPalette.setMansionColor(hex),
             "Lunar mansion ring colour",
             "The band of the 28 lunar mansions. Right-click to reset."));
         row.add(labelledChip("Lines",
-            () -> ChartPalette.colorOr(ChartPalette.inkHex("#DCDCDC"), Color.LIGHT_GRAY),
+            () -> AwtPen.colorOr(ChartPalette.inkHex("#DCDCDC"), Color.LIGHT_GRAY),
             hex -> ChartPalette.setInkColor(hex),
             "Chart line colour",
             "<html>The rings, spokes and centre crosshair.<br>This has to move with the wheel "
                 + "background - light lines on a light ground are an invisible chart.</html>"));
         row.add(labelledChip("Page",
-            () -> ChartPalette.colorOr(ChartPalette.backgroundHex(null), Color.BLACK),
+            () -> AwtPen.colorOr(ChartPalette.backgroundHex(null), Color.BLACK),
             hex -> ChartPalette.setBackgroundColor(hex),
             "Page background colour",
             "Everything behind the wheel. Right-click to go back to the template."));
         row.add(labelledChip("Wheel",
-            () -> ChartPalette.colorOr(ChartPalette.wheelHex(null),
-                ChartPalette.colorOr(ChartPalette.backgroundHex(null), Color.BLACK)),
+            () -> AwtPen.colorOr(ChartPalette.wheelHex(null),
+                AwtPen.colorOr(ChartPalette.backgroundHex(null), Color.BLACK)),
             hex -> ChartPalette.setWheelColor(hex),
             "Wheel disc colour",
             "<html>The disc the chart is drawn on, as distinct from the page behind it."

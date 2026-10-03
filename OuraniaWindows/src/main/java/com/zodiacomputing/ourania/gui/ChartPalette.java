@@ -2,7 +2,6 @@ package com.zodiacomputing.ourania.gui;
 
 import com.zodiacomputing.ourania.astro.Aspects;
 
-import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -490,17 +489,18 @@ public final class ChartPalette {
 
     /** One step away from the page: lighter on a dark ground, darker on a light one. */
     private static String lift(String pageHex) {
-        try {
-            Color c = Color.decode(pageHex);
-            double luma = 0.299 * c.getRed() + 0.587 * c.getGreen() + 0.114 * c.getBlue();
-            int step = luma > 140 ? -14 : 16;
-            return String.format("#%02X%02X%02X",
-                Math.max(0, Math.min(255, c.getRed() + step)),
-                Math.max(0, Math.min(255, c.getGreen() + step)),
-                Math.max(0, Math.min(255, c.getBlue() + step)));
-        } catch (NumberFormatException e) {
+        // Through Ink rather than Color.decode: this was one of the two places that kept the
+        // whole palette out of the phone's build (M11).
+        Ink c = Ink.of(pageHex, null);
+        if (c == null) {
             return pageHex;
         }
+        double luma = 0.299 * c.getRed() + 0.587 * c.getGreen() + 0.114 * c.getBlue();
+        int step = luma > 140 ? -14 : 16;
+        return String.format("#%02X%02X%02X",
+            Math.max(0, Math.min(255, c.getRed() + step)),
+            Math.max(0, Math.min(255, c.getGreen() + step)),
+            Math.max(0, Math.min(255, c.getBlue() + step)));
     }
 
     public static void setWheelColor(String hex) {
@@ -570,7 +570,6 @@ public final class ChartPalette {
         Settings.set(key, sb.toString());
     }
 
-    /** Any stored hex, as a Color, or the fallback when it is absent or malformed. */
     // ---------------------------------------------------------------- saved templates
 
     /** Settings key holding the names of the reader's own templates. */
@@ -696,23 +695,12 @@ public final class ChartPalette {
         return userTemplateNames().contains(name);
     }
 
-    public static Color colorOr(String hex, Color fallback) {
-        try {
-            return hex == null ? fallback : Color.decode(hex);
-        } catch (NumberFormatException e) {
-            return fallback;
-        }
-    }
+    // <b>colorOr and colorFor are AwtPen's now (M11).</b> They were the only two methods in
+    // this file that returned an AWT Color, and they were the whole reason the reader's chosen
+    // palette could not reach the phone: forty methods here return hex strings, which any
+    // device can read. Decoding one into a colour is the toolkit's business, so it sits with
+    // the toolkit - see AwtPen.colorOr and AwtPen.colorFor, and Ink.of for the shared decode.
 
-    public static Color colorFor(String aspectLabel) {
-        try {
-            return Color.decode(aspectHex(aspectLabel));
-        } catch (NumberFormatException e) {
-            // A malformed stored value must not take the chart down; white is the same answer
-            // an unknown label gets.
-            return Color.WHITE;
-        }
-    }
 
     /** #RRGGBB, and nothing else - this string is written into HTML and parsed by decode. */
     static boolean isHex(String s) {

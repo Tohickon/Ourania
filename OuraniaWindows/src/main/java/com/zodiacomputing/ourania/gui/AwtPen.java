@@ -154,4 +154,24 @@ final class AwtPen implements Pen {
                       boolean turning) {
         GlobeRenderer.paint(new AwtPen(g), cam, w, h, panel, turning);
     }
+
+    /**
+     * A stored hex as an AWT colour, or the fallback when it is absent or malformed.
+     *
+     * <p><b>Moved here from {@code ChartPalette} (M11).</b> It and {@link #colorFor} were the
+     * only two methods in that file that returned a {@code Color}, and they were the whole
+     * reason the reader's chosen palette could not reach the phone - forty methods there
+     * return hex strings, which any device can read, and these two turned one into a toolkit
+     * type. So they live with the toolkit, and the shared decode is {@link Ink#of}.
+     */
+    static Color colorOr(String hex, Color fallback) {
+        Ink ink = Ink.of(hex, null);
+        return ink == null ? fallback
+            : new Color(ink.getRed(), ink.getGreen(), ink.getBlue());
+    }
+
+    /** An aspect's colour from the reader's palette, white when it will not parse. */
+    static Color colorFor(String aspectLabel) {
+        return colorOr(ChartPalette.aspectHex(aspectLabel), Color.WHITE);
+    }
 }
