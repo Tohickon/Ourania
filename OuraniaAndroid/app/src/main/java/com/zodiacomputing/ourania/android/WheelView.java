@@ -19,6 +19,7 @@ import com.zodiacomputing.ourania.astro.Aspects;
 import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.ChartFrame;
 import com.zodiacomputing.ourania.astro.Zodiac;
+import com.zodiacomputing.ourania.gui.Ink;
 import com.zodiacomputing.ourania.gui.WheelLayout;
 
 /**
@@ -318,13 +319,16 @@ final class WheelView extends View {
         return Color.rgb(c[0], c[1], c[2]);
     }
 
+    /**
+     * The phone's element colours, from {@link PhonePalette} since the globe needed them too.
+     *
+     * <p>They were four hard-coded arrays here. The globe is asked for the same four, and a
+     * second copy for it would have made three tables on one device - so the values moved to
+     * PhonePalette unchanged and this reads them.
+     */
     private static int[] elementRgb(int element) {
-        switch (element) {
-            case 0: return new int[] {255, 120, 90};
-            case 1: return new int[] {120, 200, 110};
-            case 2: return new int[] {240, 214, 90};
-            default: return new int[] {110, 170, 255};
-        }
+        Ink ink = PhonePalette.element(element);
+        return new int[] {ink.getRed(), ink.getGreen(), ink.getBlue()};
     }
 
     /**

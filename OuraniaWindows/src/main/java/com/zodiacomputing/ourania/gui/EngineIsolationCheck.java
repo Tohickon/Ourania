@@ -53,7 +53,8 @@ public final class EngineIsolationCheck {
     static final Set<String> SHARED = new TreeSet<>(List.of(
         "Settings", "SavedCharts", "InterpretationService", "ErrorLog", "Json",
         "NarrativeSynthesizer", "Atlas", "WheelLayout", "Globe", "Glossary",
-        "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer"));
+        "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer",
+        "AspectGate"));
 
     /** The Java level Android builds accept. */
     static final String RELEASE = "17";

@@ -5250,23 +5250,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * per body pair per repaint, and reading a properties file inside that loop would be felt.
      */
     public boolean drawsPair(int a, int b) {
-        if (Settings.ASPECTS_ESOTERIC.equals(this.aspectMode)) {
-            return true;
-        }
-        boolean angles = Settings.ASPECTS_MANIFESTATION.equals(this.aspectMode);
-        return SkymapPanel.drawable(a, angles) && SkymapPanel.drawable(b, angles);
-    }
-
-    /** A classical planet always; an angle too once Manifestation is chosen. */
-    private static boolean drawable(int index, boolean anglesCount) {
-        Bodies.Def d = Bodies.at(index);
-        if (d == null) {
-            return false;
-        }
-        if (d.kind == Bodies.Kind.LUMINARY || d.kind == Bodies.Kind.PLANET) {
-            return true;
-        }
-        return anglesCount && d.kind == Bodies.Kind.ANGLE;
+        // AspectGate's since M11: the phone's globe has to answer this the same way, and one
+        // gate asked twice is the only way that is true rather than coincidental.
+        return AspectGate.draws(a, b, this.aspectMode);
     }
 
     /** The Settings screen changed which aspects are drawn. */
