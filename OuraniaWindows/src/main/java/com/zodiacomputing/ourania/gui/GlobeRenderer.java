@@ -425,8 +425,16 @@ public final class GlobeRenderer {
      *
      * Nearest wins rather than first, and only within a glyph's radius, so a click on empty
      * sky selects nothing instead of the closest thing on the far side of the world.
+     *
+     * <b>Public because a tap is not a desktop idea.</b> M11 stage 4 made {@code paint} public
+     * so the phone could draw the globe and left this one package-private, which let the phone
+     * draw a globe it could not touch. Both halves of a view belong on the same side of the
+     * line: a renderer that can only be looked at is half a renderer, and the alternative was
+     * the phone writing a second hit test - which is exactly what the note above says must not
+     * happen, since a hit test that recomputes the shells is the defect {@code Geometry}
+     * exists to prevent.
      */
-    static int bodyAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
+    public static int bodyAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
         double origin = panel.pinLongitude();
         double[] shells = shellRadii(panel, cam, w, h);
         // Once for the whole hit test, for the reason set out on inclinationOf.

@@ -63,6 +63,10 @@ public final class MainActivity extends Activity {
     private AutoCompleteTextView placeField;
     private TextView result;
     private WheelView wheel;
+    /** The same chart as a globe (M11); it and the wheel share one slot. */
+    private GlobeView globe;
+    private Button viewToggle;
+    private boolean globeShown;
     private TextView tapped;
     private LinearLayout readings;
     private LinearLayout timing;
@@ -197,6 +201,23 @@ public final class MainActivity extends Activity {
         this.wheel.setVisibility(View.GONE);
         this.wheel.setOnBody(this::showBody);
         form.addView(this.wheel);
+
+        // The same chart as a globe (M11). One slot, two views: they show the same thing from
+        // two angles and both want the full width, so they take turns rather than stack.
+        this.globe = new GlobeView(this);
+        this.globe.setVisibility(View.GONE);
+        this.globe.setOnBody(this::showBody);
+        form.addView(this.globe, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        this.viewToggle = new Button(this);
+        this.viewToggle.setText("Show the globe");
+        this.viewToggle.setVisibility(View.GONE);
+        this.viewToggle.setOnClickListener(v -> {
+            this.globeShown = !this.globeShown;
+            this.viewToggle.setText(this.globeShown ? "Show the wheel" : "Show the globe");
+            this.applyViewChoice();
+        });
+        form.addView(this.viewToggle);
 
         // The sky over the chart (M7): on or off, and on which day.
         this.skyRow = new LinearLayout(this);
@@ -356,6 +377,41 @@ public final class MainActivity extends Activity {
         return Math.round(value * getResources().getDisplayMetrics().density);
     }
 
+    /**
+     * Show this chart on BOTH surfaces, which is why every caller goes through here.
+     *
+     * <p>{@code redraw} decides what is on screen across five branches - the birth chart, a
+     * partner's on the outer ring, a composite, a Davison, the sky over the chart - and that
+     * branching is hard-won. Feeding the globe from a sixth branch would have been the same
+     * decision taken twice, and the two would have drifted the first time either changed. So
+     * both views take the same call, and only the one on screen is drawn.
+     *
+     * <p>The globe's second shell IS the wheel's outer ring: the sky for transits, the
+     * partner's chart for synastry. One idea that the two surfaces happen to name differently.
+     */
+    private void draw(com.zodiacomputing.ourania.astro.ChartFrame frame) {
+        this.draw(frame, null, null);
+    }
+
+    private void draw(com.zodiacomputing.ourania.astro.ChartFrame frame,
+            com.zodiacomputing.ourania.astro.ChartFrame outer,
+            java.util.List<PhoneWheel.Cross> contacts) {
+        if (outer == null) {
+            this.wheel.show(frame);
+        } else {
+            this.wheel.show(frame, outer, contacts);
+        }
+        this.globe.show(frame, outer);
+    }
+
+    /** Which of the two surfaces is on screen. Neither, until a chart has been cast. */
+    private void applyViewChoice() {
+        boolean haveChart = this.shownCast != null;
+        this.viewToggle.setVisibility(haveChart ? View.VISIBLE : View.GONE);
+        this.wheel.setVisibility(haveChart && !this.globeShown ? View.VISIBLE : View.GONE);
+        this.globe.setVisibility(haveChart && this.globeShown ? View.VISIBLE : View.GONE);
+    }
+
     /** Puts air between the buttons on a horizontal row. See {@code drawable/gap_h}. */
     private void spaceOut(LinearLayout row) {
         row.setDividerDrawable(getDrawable(R.drawable.gap_h));
@@ -435,7 +491,7 @@ public final class MainActivity extends Activity {
             final PhoneChart.Cast cast = c;
             runOnUiThread(() -> {
                 this.shownCast = cast;
-                this.wheel.setVisibility(cast == null ? View.GONE : View.VISIBLE);
+                this.applyViewChoice();     // owns the wheel's and the globe's visibility
                 this.tapped.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.readings.setVisibility(cast == null ? View.GONE : View.VISIBLE);
                 this.timing.setVisibility(cast == null ? View.GONE : View.VISIBLE);
@@ -449,7 +505,7 @@ public final class MainActivity extends Activity {
                 if (cast != null) {
                     this.shownSky = null;
                     this.compositeFrame = null;
-                    this.wheel.show(cast.frame);
+                    this.draw(cast.frame);
                     showBody(-1);
                     this.redraw();
                 }
@@ -1084,7 +1140,7 @@ public final class MainActivity extends Activity {
         }
         if (this.mode == SYNASTRY && this.partner != null) {
             this.shownSky = null;
-            this.wheel.show(c.frame, this.partner.frame, PhoneRelationship.crosses(
+            this.draw(c.frame, this.partner.frame, PhoneRelationship.crosses(
                 PhoneRelationship.contacts(c.frame, this.partner.frame)));
             this.skyCaption.setText(PhoneRelationship.possessive(this.partnerName).trim()
                 + " planets are on the outer ring. Tap one, or Whole-chart reading for the "
@@ -1115,7 +1171,7 @@ public final class MainActivity extends Activity {
                         return;
                     }
                     this.compositeFrame = shown;
-                    this.wheel.show(shown);
+                    this.draw(shown);
                     this.skyCaption.setText(davison
                         ? "The Davison chart of " + this.chartName() + " and " + this.partnerName
                             + ": the moment and place halfway between the two births."
@@ -1141,7 +1197,7 @@ public final class MainActivity extends Activity {
         }
         if (!this.skyOn.isChecked()) {
             this.shownSky = null;
-            this.wheel.show(c.frame);
+            this.draw(c.frame);
             this.skyCaption.setText("Turn the sky on to see today's planets around the chart.");
             return;
         }
@@ -1167,7 +1223,7 @@ public final class MainActivity extends Activity {
                     return;
                 }
                 this.shownSky = shown;
-                this.wheel.show(c.frame, shown.frame,
+                this.draw(c.frame, shown.frame,
                     PhoneWheel.crosses(shown.hits, shown.frame, c.frame));
                 this.skyDateField.setText(day == null ? "now" : day.toString());
                 this.skyCaption.setText(PhoneTransits.headline(shown)

@@ -392,4 +392,57 @@ public class PhoneGlobeSourceTest {
     public void theMoonGetsAMansion() {
         assertNotNull(PhoneGlobeSource.of(chart()).moonMansion());
     }
+
+    // ------------------------------------------------------- the tap, which GlobeView relies on
+
+    /**
+     * A tap on the globe finds planets, and every hit decodes to a real one.
+     *
+     * <p><b>This is the path {@code GlobeView} is made of</b>, and all of it except the
+     * MotionEvent runs here: {@code GlobeRenderer.bodyAt} against the same camera and source
+     * the painter used, then {@code WheelLayout.hitBody} to unpack what it returns. Both are
+     * the desktop's, which is the point - the alternative was the phone writing a second hit
+     * test, and {@code bodyAt}'s own comment says why that would be worse here than anywhere
+     * else: on a globe, a reader who taps and gets the wrong planet assumes they missed.
+     *
+     * <p>It sweeps a grid rather than aiming at a known pixel, because where a planet lands
+     * depends on the camera, the shells and the chart, and a test that hard-coded a coordinate
+     * would be asserting today's arithmetic rather than the contract.
+     */
+    @Test
+    public void aTapOnTheGlobeSelectsThePlanetUnderIt() {
+        PhoneGlobeSource source = PhoneGlobeSource.of(chart());
+        Globe cam = new Globe();
+        java.util.Set<Integer> found = new java.util.TreeSet<>();
+        for (int px = 0; px < SIZE; px += 4) {
+            for (int py = 0; py < SIZE; py += 4) {
+                int hit = GlobeRenderer.bodyAt(cam, SIZE, SIZE, source, px, py);
+                if (hit < 0) {
+                    continue;
+                }
+                int body = com.zodiacomputing.ourania.gui.WheelLayout.hitBody(hit);
+                assertTrue("a hit decoded to body " + body + ", which is not a body",
+                    body >= 0 && body < Bodies.count());
+                found.add(body);
+            }
+        }
+        // Ten planets are drawn and the camera starts nearly edge-on, so the far side of the
+        // globe hides some of them. Several is the claim; all ten would be asserting the
+        // camera's opening angle, which is Globe's business and changes when it is retuned.
+        assertTrue("a swept tap found only " + found.size() + " bodies: " + found,
+            found.size() >= 3);
+    }
+
+    @Test
+    public void focusingABodyChangesWhatTheRendererIsTold() {
+        PhoneGlobeSource s = PhoneGlobeSource.of(chart());
+        assertEquals("nothing is focused until a tap lands", -1, s.focusedBody());
+        assertTrue("focusing a new body asks for a redraw", s.focusBody(3));
+        assertFalse("focusing the same body again does not", s.focusBody(3));
+        assertEquals(3, s.focusedBody());
+        assertTrue("and the renderer lights it on the chart's own ring", s.onGlobeFocus(3, false));
+        assertFalse("but not the sky's copy of it", s.onGlobeFocus(3, true));
+        assertTrue("tapping empty sky clears it", s.focusBody(-1));
+        assertEquals(-1, s.focusedBody());
+    }
 }
