@@ -49,12 +49,18 @@ final class PhonePalette {
     }
 
     /**
-     * A body's colour on the WHEEL: the reader's override, else its element's colour.
+     * A body's colour: the reader's override, else its element's colour.
      *
-     * <p>The desktop's {@code SkymapPanel.bodyColor} order exactly - a body given a colour of
-     * its own wins, everything else takes its element's. A point with no element at all (the
-     * south node, the lots, the asteroids beyond the four) falls to white, as the desktop's
-     * own no-element fallback does on a dark ground.
+     * <p>The desktop's order exactly - a body given a colour of its own wins, everything else
+     * takes its element's. A point with no element at all (the south node, the lots, the
+     * asteroids beyond the four) falls to white, as the desktop's own no-element fallback does
+     * on a dark ground.
+     *
+     * <p><b>One method, where there were briefly two.</b> The desktop used to resolve this two
+     * different ways - its wheel took the override and its globe's bound and decan rings did
+     * not - so the phone mirrored both rather than pick a side and look like neither surface.
+     * {@code SkymapPanel.bodyInkFor} takes the override now, so there is one rule on both
+     * devices and this is it.
      */
     static Ink body(int index) {
         Bodies.Def d = index >= 0 && index < Bodies.count() ? Bodies.at(index) : null;
@@ -64,37 +70,6 @@ final class PhonePalette {
         Ink own = Ink.of(ChartPalette.bodyHex(d.id), null);
         if (own != null) {
             return own;
-        }
-        return d.element >= 0 ? element(d.element) : Ink.WHITE;
-    }
-
-    /**
-     * A body's colour on the GLOBE's bound and decan rings: its element's, override ignored.
-     *
-     * <h3>Why this is a second method and not a mistake</h3>
-     *
-     * <p><b>The desktop resolves a body's colour two different ways, and the phone mirrors
-     * both deliberately.</b> {@code SkymapPanel.bodyColor} - the wheel's glyphs and the grid -
-     * takes the reader's per-body override first. {@code SkymapPanel.bodyInkFor} - which is
-     * what its globe hands to {@code GlobeSource.bodyInk} for the ruling-planet glyphs on the
-     * bound and decan rings - reads the element alone and never looks at the override.
-     *
-     * <p>Measured on the desktop rather than inferred: with Mars overridden to {@code #FF00FF},
-     * the wheel draws {@code #FF00FF} and the globe draws {@code #FF8659}. That is the defect
-     * the comment on {@code bodyColor} warns about - "a per-body override added to some of them
-     * would have produced a chart where a body was one colour on the wheel and another in the
-     * table" - reaching the one surface that comment did not cover.
-     *
-     * <p><b>It is the desktop's to settle, not the phone's.</b> Changing {@code bodyInkFor}
-     * would change what the desktop draws, so it stays as it is and the phone copies it, which
-     * is what "the phone looks like the desktop" has to mean while the desktop looks like this.
-     * If the desktop's globe is taught the override, this method becomes {@link #body} and the
-     * two collapse into one.
-     */
-    static Ink globeBody(int index) {
-        Bodies.Def d = index >= 0 && index < Bodies.count() ? Bodies.at(index) : null;
-        if (d == null) {
-            return Ink.WHITE;
         }
         return d.element >= 0 ? element(d.element) : Ink.WHITE;
     }
@@ -115,7 +90,7 @@ final class PhonePalette {
 
     /** A glyph's colour on a ring of this role: the body's own, quieter on a visiting ring. */
     static Ink ring(int index, AngleRole role) {
-        Ink base = globeBody(index);
+        Ink base = body(index);
         if (role == AngleRole.ANCHOR) {
             return base;
         }

@@ -1537,7 +1537,21 @@ implements WheelSource, GlobeSource {
      * colour that planet is everywhere else - the same element lookup the wheel's glyphs use.
      */
     static Color bodyInkFor(int body) {
-        return SkymapPanel.elementColorFor(SkymapPanel.elementOfBody(body));
+        // <b>The reader's override first, then the element - the same two steps bodyColor
+        // takes.</b> This read the element alone, so a reader who gave Chiron a colour of its
+        // own saw it on the wheel and in the grid and NOT on the globe's bound and decan
+        // rings, where the ruling planet's glyph kept the element colour. Measured before
+        // changing it: Mars set to #FF00FF came out #FF00FF on the wheel and #FF8659 on the
+        // globe. That is precisely what the comment on bodyColor warns about - "a per-body
+        // override added to some of them would have produced a chart where a body was one
+        // colour on the wheel and another in the table" - arriving in the one surface that
+        // comment did not cover.
+        //
+        // <b>With no override set this is the colour it always was</b>: bodyHex is null and
+        // the fallback is the element, which is why the globe harness is unmoved across all
+        // 234 states. It shows only for a reader who actually set one.
+        return AwtPen.colorOr(ChartPalette.bodyHex(Bodies.at(body).id),
+            SkymapPanel.elementColorFor(SkymapPanel.elementOfBody(body)));
     }
 
     /** Longitude the view is pinned to - the Ascendant unless the reader chose otherwise. */
