@@ -11,6 +11,7 @@ import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.astro.ZodiacalReleasing;
 import com.zodiacomputing.ourania.astro.Themes;
 import com.zodiacomputing.ourania.astro.Topics;
+import com.zodiacomputing.ourania.gui.Settings;
 import com.zodiacomputing.ourania.gui.InterpretationService;
 import com.zodiacomputing.ourania.gui.NarrativeSynthesizer;
 
@@ -366,8 +367,10 @@ final class PhoneTransits {
         List<BodyScore.Vector> ranked = BodyScore.rank(f, g);
         Themes.Result themes = Themes.extract(f, g, ranked, Topics.analyse(f, ranked));
         Chronometry t = sky.time;
+        // The mechanics tier is the reader's, the same setting the untimed reading reads.
         return PhoneReading.forPhone(NarrativeSynthesizer.generateReport(f, g, ranked, themes,
-            t.transit, t.profection, t.hits, t.scan, t.convergence, true, false));
+            t.transit, t.profection, t.hits, t.scan, t.convergence, true, false,
+            Settings.readingMechanics()));
     }
 
     /** The local time now at a place. */

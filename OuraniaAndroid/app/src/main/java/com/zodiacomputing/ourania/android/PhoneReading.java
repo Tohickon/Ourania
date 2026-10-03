@@ -11,6 +11,7 @@ import com.zodiacomputing.ourania.astro.Topics;
 import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.gui.InterpretationService;
 import com.zodiacomputing.ourania.gui.NarrativeSynthesizer;
+import com.zodiacomputing.ourania.gui.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -215,15 +216,66 @@ final class PhoneReading {
         Gestalt.Result g = Gestalt.compute(f);
         List<BodyScore.Vector> ranked = BodyScore.rank(f, g);
         Themes.Result themes = Themes.extract(f, g, ranked, Topics.analyse(f, ranked));
+        // <b>The mechanics tier is the reader's call, read from the setting the desktop's
+        // checkbox writes.</b> It is the audit trail - every placement, the patterns, the
+        // houses, the rankings - and on the 1984 fixture it is 93,000 of the reading's 102,000
+        // characters. A phone has one narrow column and Html.fromHtml builds the whole thing
+        // into one TextView, so the cost of carrying it is higher here than on the desktop,
+        // not lower. One setting, both devices: the alternative is the phone deciding for
+        // itself what the reader may see, differently from the desktop.
         String html = NarrativeSynthesizer.generateReport(f, g, ranked, themes, null, null, null,
-            null, null, false, false);
+            null, null, false, false, Settings.readingMechanics());
         return forPhone(html);
     }
 
-    /** A desktop reading's HTML without its page wrapper and its colours for a black pane. */
+    /**
+     * A desktop reading's HTML, adapted to what the phone can actually render.
+     *
+     * <p><b>The colours go, and they have to.</b> They are written for the desktop's guaranteed
+     * black pane - white headings, gold section titles, grey asides - and the phone declares no
+     * theme, so its page follows the device's light or dark setting. White on white is not a
+     * style problem, it is a reading nobody can see.
+     *
+     * <p><b>So the hierarchy has to come from structure, and this is where it is restored.</b>
+     * The reading has four levels: the title, the four tiers, the ten mechanics sections inside
+     * the fourth, and each section's own sub-headings - a body's name, a pattern's, a theme's.
+     * On the desktop the first three are told apart by colour and size; strip that and the
+     * tiers rendered identically to the sections, so "1. At a glance" looked exactly like
+     * "4.2 Planetary Placements" and the shape of the reading - the whole point of the tiers -
+     * was invisible.
+     *
+     * <p>{@code Html.fromHtml} sizes {@code h1} through {@code h6}, which is the one structural
+     * lever the phone has, so the four levels are mapped onto four of them:
+     *
+     * <pre>
+     *   title            h1  -&gt;  h1
+     *   the four tiers   h2  -&gt;  h2   (found by class='tier')
+     *   the ten sections h2  -&gt;  h3
+     *   sub-headings     h3  -&gt;  h4
+     * </pre>
+     *
+     * <p><b>The order of the rewrites is the whole trick.</b> Tiers and sections are both
+     * {@code h2} on the desktop, so the tiers are tokenised first, then the levels below them
+     * are pushed down from the bottom up - h3 before h2, or an h2 demoted to h3 would be
+     * demoted again to h4 in the same pass - and the tiers are restored last.
+     *
+     * <p>Tiers are found by the {@code class='tier'} the synthesizer marks them with, not by
+     * matching their wording: a heading's text is not an interface, and "1. At a glance" is
+     * exactly the sort of thing that gets reworded.
+     */
     static String forPhone(String html) {
-        return html.replaceAll("(?i)</?(html|body)[^>]*>", "")
-            .replaceAll("(?i)\\s(style|color|bgcolor)\\s*=\\s*('[^']*'|\"[^\"]*\")", "");
+        return html
+            .replaceAll("(?i)</?(html|body)[^>]*>", "")
+            // 1. the tiers out of the way, so demoting the sections cannot touch them
+            .replaceAll("(?is)<h2[^>]*\\bclass=['\"]tier['\"][^>]*>(.*?)</h2>",
+                "\u0001TIER\u0001$1\u0002TIER\u0002")
+            // 2. bottom up: sub-headings, then sections
+            .replaceAll("(?is)<h3([^>]*)>(.*?)</h3>", "<h4$1>$2</h4>")
+            .replaceAll("(?is)<h2([^>]*)>(.*?)</h2>", "<h3$1>$2</h3>")
+            // 3. the tiers back, one level under the title
+            .replace("\u0001TIER\u0001", "<h2>")
+            .replace("\u0002TIER\u0002", "</h2>")
+            .replaceAll("(?i)\\s(style|color|bgcolor|class)\\s*=\\s*('[^']*'|\"[^\"]*\")", "");
     }
 
     private static void section(StringBuilder h, String heading, String prose) {

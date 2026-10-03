@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import com.zodiacomputing.ourania.astro.Ephemeris;
 import com.zodiacomputing.ourania.gui.Atlas;
 import com.zodiacomputing.ourania.gui.InterpretationService;
+import com.zodiacomputing.ourania.gui.Settings;
 
 import de.thmac.swisseph.SwissEph;
 
@@ -162,5 +163,123 @@ public class PhoneReadingTest {
         assertFalse("no colours written for a black pane", r.contains("style=")
             || r.contains("<body") || r.contains("<html"));
         assertTrue("and is long", r.length() > 10000);
+    }
+
+    // ------------------------------------------------------------ the reading's four levels
+
+    @Test
+    public void theReadingKeepsItsFourLevelsOnThePhone() {
+        // <b>The tiers and the mechanics sections are both h2 on the desktop</b>, told apart
+        // there by colour and size - and the phone strips colour, because its page follows the
+        // device's light or dark setting. So the levels have to be re-expressed as sizes, which
+        // is the one structural lever Html.fromHtml offers.
+        String r = PhoneReading.synthesis(sydney(LocalTime.of(14, 15)));
+
+        assertTrue("the title is the top level", r.startsWith("<h1>Chart Synthesis</h1>"));
+        assertEquals("exactly one h1 - the title", 1, count(r, "<h1>"));
+
+        // the four tiers, one level under it
+        for (String tier : new String[] {"1. At a glance", "2. The year by theme",
+                                         "3. Dates to watch", "4. The mechanics"}) {
+            assertTrue("tier is an h2: " + tier, r.contains("<h2>" + tier));
+        }
+        assertEquals("four tiers and no more", 4, count(r, "<h2>"));
+
+        // the mechanics' sections, one level under the tiers
+        assertTrue("a section is an h3", r.contains("<h3>4.1 Core Architecture"));
+        assertTrue("and the last one too", r.contains("<h3>4.10 Current Transits"));
+        assertFalse("no section is left at h2", r.contains("<h2>4.1"));
+    }
+
+    @Test
+    public void aSectionsOwnSubHeadingsSitUnderIt() {
+        // A body's name inside the placements section was an h3 on the desktop - the same level
+        // the sections themselves now take on the phone. Pushed to h4 so it stays underneath.
+        String r = PhoneReading.synthesis(sydney(LocalTime.of(14, 15)));
+        int section = r.indexOf("<h3>4.2 Planetary Placements");
+        assertTrue("the placements section is there", section > 0);
+        int sub = r.indexOf("<h4>", section);
+        assertTrue("and a body's name under it is an h4", sub > section);
+        assertTrue("which is a planet: " + r.substring(sub, Math.min(sub + 40, r.length())),
+            r.substring(sub, Math.min(sub + 40, r.length())).contains("Prominence")
+                || r.substring(sub, Math.min(sub + 60, r.length())).contains("%"));
+    }
+
+    @Test
+    public void everyHeadingIsPushedDownAndNothingIsPushedTwice() {
+        // <b>The order of the rewrites is the whole trick.</b> Demote h2 before h3 and a
+        // section lands at h4 with the sub-headings; tokenise the tiers after demoting and
+        // they land at h3 with the sections. Either way the levels collapse and the page looks
+        // plausible, which is why this asserts the counts rather than eyeballing one heading.
+        String r = PhoneReading.synthesis(sydney(LocalTime.of(14, 15)));
+        assertEquals("nothing is left at h5", 0, count(r, "<h5>"));
+        assertTrue("there are sections", count(r, "<h3>") >= 8);
+        assertTrue("and sub-headings beneath them", count(r, "<h4>") > 0);
+        assertTrue("more sub-headings than sections, since each section has several",
+            count(r, "<h4>") > count(r, "<h3>"));
+    }
+
+    @Test
+    public void noClassSurvivesToConfuseTheRenderer() {
+        // class='tier' is how the tiers are found; Html.fromHtml does nothing with it, so it
+        // is gone by the time the phone sees the reading.
+        String r = PhoneReading.synthesis(sydney(LocalTime.of(14, 15)));
+        assertFalse("no class attribute", r.contains("class="));
+        assertFalse("and no sentinel leaked", r.contains("TIER"));
+    }
+
+    // ------------------------------------------------------------ the mechanics tier
+
+    @Test
+    public void theMechanicsTierFollowsTheReadersSetting() {
+        PhoneChart.Cast c = sydney(LocalTime.of(14, 15));
+        boolean kept = Settings.readingMechanics();
+        try {
+            Settings.setReadingMechanics(true);
+            String full = PhoneReading.synthesis(c);
+            Settings.setReadingMechanics(false);
+            String lean = PhoneReading.synthesis(c);
+
+            assertTrue("the full reading carries the sections", full.contains("4.1 Core"));
+            assertFalse("the lean one does not", lean.contains("4.1 Core"));
+            assertTrue("and is much shorter: " + lean.length() + " vs " + full.length(),
+                lean.length() * 4 < full.length());
+            // It must still SAY the tier exists, or a reader who forgot the setting sees a
+            // reading that looks like it ran out.
+            assertTrue("the tier is still named", lean.contains("<h2>4. The mechanics"));
+            assertTrue("and says how to get it back", lean.contains("Show the mechanics"));
+            // The tiers above it are untouched either way - the reader chooses whether to be
+            // handed the working, not which answer they get.
+            int fullMech = full.indexOf("4. The mechanics");
+            int leanMech = lean.indexOf("4. The mechanics");
+            assertEquals("tiers 1 to 3 are identical", full.substring(0, fullMech),
+                lean.substring(0, leanMech));
+        } finally {
+            Settings.setReadingMechanics(kept);
+        }
+    }
+
+    @Test
+    public void theSettingsScreenCarriesTheToggle() {
+        boolean kept = Settings.readingMechanics();
+        try {
+            PhoneSettings.Values v = PhoneSettings.read();
+            assertEquals("read from the shared setting", kept, v.readingMechanics);
+            v.readingMechanics = !kept;
+            PhoneSettings.save(v);
+            assertEquals("and saved to it", !kept, Settings.readingMechanics());
+            PhoneSettings.reset();
+            assertTrue("reset gives the whole reading back", Settings.readingMechanics());
+        } finally {
+            Settings.setReadingMechanics(kept);
+        }
+    }
+
+    private static int count(String s, String needle) {
+        int n = 0;
+        for (int i = s.indexOf(needle); i >= 0; i = s.indexOf(needle, i + needle.length())) {
+            n++;
+        }
+        return n;
     }
 }

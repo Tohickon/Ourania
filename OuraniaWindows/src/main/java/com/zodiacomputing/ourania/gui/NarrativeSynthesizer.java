@@ -766,7 +766,15 @@ public class NarrativeSynthesizer {
      * look alike, spelled out at four call sites, is the shape of thing that drifts.
      */
     private static String tier(String title) {
-        return "<h2 style='color:#FFFFFF; font-size:19px; margin-top:26px;"
+        // <b>The class is for the phone, which cannot see the style.</b> Android's
+        // Html.fromHtml takes no stylesheet and no class, and the phone's page follows the
+        // device's light or dark setting - so PhoneReading.forPhone strips every colour, white
+        // headings on a light page being invisible. That left the four tiers rendering
+        // identically to the ten mechanics sections beneath them, which is the whole hierarchy
+        // gone. The class is what lets the phone find a tier heading and promote it to an h1,
+        // so the levels read apart by SIZE rather than by colour. Marked here rather than
+        // matched by its text on the phone: a heading's wording is not an interface.
+        return "<h2 class='tier' style='color:#FFFFFF; font-size:19px; margin-top:26px;"
             + " border-bottom:1px solid #444; padding-bottom:3px;'>" + title + "</h2>";
     }
 

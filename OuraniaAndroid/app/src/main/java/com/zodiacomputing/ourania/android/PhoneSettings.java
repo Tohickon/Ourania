@@ -37,6 +37,15 @@ final class PhoneSettings {
         final double[] orbs = new double[PhoneChart.PLANETS];
         /** Whether each {@link Aspects.Type}, by ordinal, is drawn. */
         boolean[] aspects;
+        /**
+         * Whether the synthesized reading carries its mechanics tier.
+         *
+         * <p>The same setting the desktop's Synthesize checkbox writes, so a reader who turned
+         * the audit trail off there finds it off here. It matters more on a phone than on the
+         * desktop: the tier is most of the reading's length, and the phone builds the whole
+         * thing into one TextView in one narrow column.
+         */
+        boolean readingMechanics;
     }
 
     /** The house systems offered, by name - the desktop picker's list. */
@@ -67,6 +76,7 @@ final class PhoneSettings {
             v.orbs[i] = Settings.bodyOrb(planet(i));
         }
         v.aspects = Settings.loadAspectSelection();
+        v.readingMechanics = Settings.readingMechanics();
         return v;
     }
 
@@ -82,12 +92,13 @@ final class PhoneSettings {
             }
         }
         Settings.saveAspectSelection(v.aspects);
+        Settings.setReadingMechanics(v.readingMechanics);
         Settings.applyToEngine();
     }
 
     /**
      * Back to the defaults for everything on this screen: Placidus, tropical, the one-degree
-     * transit orb, the engine's own natal orbs, every aspect drawn. Nothing else in the file -
+     * transit orb, the engine's own natal orbs, every aspect drawn, the whole reading. Nothing else in the file -
      * the transit, synastry and composite orbs are the desktop's to set,
      * the chart book lives elsewhere, and the desktop's other choices are left alone.
      */
@@ -99,6 +110,9 @@ final class PhoneSettings {
         boolean[] all = new boolean[Aspects.Type.values().length];
         java.util.Arrays.fill(all, true);
         Settings.saveAspectSelection(all);
+        // The whole reading, which is the desktop's default too - turning a section off unasked
+        // is the app deciding what a reader may see.
+        Settings.setReadingMechanics(true);
         Settings.applyToEngine();
     }
 }
