@@ -176,8 +176,29 @@ final class PhoneWheel {
         return Math.round(glyphRadius(i) * DISC_SCALE);
     }
 
-    /** The phone's discs against the desktop's glyph radius. */
-    private static final float DISC_SCALE = 1.7f;
+    /**
+     * The phone's discs against the desktop's glyph radius.
+     *
+     * <p><b>1.7 to 1.25, decided from a picture of the whole wheel rather than of the band.</b>
+     * The first harness drew the natal band and the discs and nothing else, so it approved a
+     * change that was starving everything it could not see: at 1.7 the band wants 156px, which
+     * drags the aspect circle down to radius 123 and squeezes the house numbers into what is
+     * left. A reader looking at the result sees planets colliding with the sign ring and a
+     * tangle of aspect lines in a thumbnail at the centre - which is what was reported.
+     *
+     * <p>The band is sized for three tiers and a chart commonly uses two, so the cost is paid
+     * whether or not the room is used. Measured across the sweep:
+     *
+     * <pre>  x1.7   disc r=24   band 156   aspect circle 123
+     *   x1.4   disc r=20   band 130   aspect circle 137
+     *   x1.25  disc r=18   band 117   aspect circle 144
+     *   x1.0   disc r=14   band  91   aspect circle 157</pre>
+     *
+     * <p>1.25 keeps the discs plainly planets - Saturn's rings and Jupiter's belts still read -
+     * while giving the centre back most of what 1.7 took. Going to 1.0 would be the desktop's
+     * bead, and the pictures were asked for.
+     */
+    private static final float DISC_SCALE = 1.25f;
 
     /** The sub-rings a natal band is laid out on: {@code WheelLayout.RING_COUNT}. */
     static final int BAND_TIERS = 3;
