@@ -304,9 +304,13 @@ final class WheelView extends View {
             }
         }
 
-        // The planets as themselves - the globe's pictures of them - with each one's glyph
-        // small just inside it, so Mercury and Pluto are told apart without a tap.
-        this.text.setTextSize(12f * density);
+        // The planets as themselves, each carrying its own glyph - as the desktop's beads do.
+        //
+        // <b>The glyph used to sit beside the planet, a radius and 9dp further in.</b> That put
+        // ten labels in the open ring between the planets and the aspect circle, which is
+        // where the house numbers live, and made every body two marks instead of one:
+        // "cluttered with the glyphs and the spheres being separated", and exactly right. A
+        // label that has to be matched to its planet by eye is worse than no label.
         double phase = PhoneWheel.moonElongation(f);
         for (int i = 0; i < PhoneWheel.PLANETS; i++) {
             float[] p = w.body(i);
@@ -315,10 +319,7 @@ final class WheelView extends View {
             }
             int rad = w.planetRadius(i);
             drawPlanet(c, i, p[0], p[1], rad, i == this.selected, phase);
-            float[] g = w.point(f.bodies[i].lon, w.bodyRadius[i] - rad - 9 * density);
-            int[] rgb = PhoneWheel.faceColour(i);
-            this.text.setColor(Color.rgb(rgb[0], rgb[1], rgb[2]));
-            c.drawText(Bodies.at(i).glyph, g[0], g[1] + 4 * density, this.text);
+            glyphOn(c, Bodies.at(i).glyph, p[0], p[1], rad, PhoneWheel.faceColour(i));
         }
         c.restore();
     }
@@ -726,6 +727,43 @@ final class WheelView extends View {
             this.line.setStrokeWidth(1.6f * this.density);
             c.drawCircle(x, y, rad + 5 * this.density, this.line);
         }
+    }
+
+    /**
+     * A body's glyph, centred on its disc in whichever of black or white reads against it.
+     *
+     * <p><b>The contrast is computed, not chosen.</b> Ten bodies carry ten face colours, from
+     * the Sun's near-white to Pluto's slate, and one fixed glyph colour would be invisible on
+     * roughly half of them. Rec. 709 luminance decides: a pale planet takes a dark glyph, a
+     * dark one takes a light glyph.
+     *
+     * <p>It is drawn twice - a stroke of the opposite colour, then the fill - because a disc
+     * is shaded and the Moon is drawn in its phase, so one flat colour will always cross a
+     * region it cannot be seen against. The outline costs a second draw and removes the whole
+     * class of problem.
+     *
+     * <p>Sized at 1.45 of the radius rather than a fixed dp: the bodies now differ in size
+     * (PhoneWheel.sizeFactor), and a fixed glyph would overflow Pluto while swimming in the
+     * Sun. At 1.45 the glyph's ink is about the radius tall, which leaves it clear of the rim.
+     * Centred on the metrics, not on a guessed offset, so it sits true in the disc.
+     */
+    private void glyphOn(Canvas c, String glyph, float x, float y, float rad, int[] face) {
+        if (glyph == null || glyph.isEmpty() || rad <= 0) {
+            return;
+        }
+        double lum = (0.2126 * face[0] + 0.7152 * face[1] + 0.0722 * face[2]) / 255.0;
+        int ink = lum > 0.55 ? Color.rgb(16, 18, 24) : Color.rgb(246, 248, 252);
+        int edge = lum > 0.55 ? Color.argb(170, 255, 255, 255) : Color.argb(170, 0, 0, 0);
+        this.text.setTextSize(rad * 1.45f);
+        Paint.FontMetrics fm = this.text.getFontMetrics();
+        float baseline = y - (fm.ascent + fm.descent) / 2f;
+        this.text.setStyle(Paint.Style.STROKE);
+        this.text.setStrokeWidth(Math.max(1f, rad * 0.14f));
+        this.text.setColor(edge);
+        c.drawText(glyph, x, baseline, this.text);
+        this.text.setStyle(Paint.Style.FILL);
+        this.text.setColor(ink);
+        c.drawText(glyph, x, baseline, this.text);
     }
 
     private static int lighten(int v, double t) {
