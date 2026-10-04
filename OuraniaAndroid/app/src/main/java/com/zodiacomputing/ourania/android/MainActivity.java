@@ -67,6 +67,12 @@ public final class MainActivity extends Activity {
     private View chartRoot;
     private TextView chartTitle;
     private boolean onChartScreen;
+    /** Where the reader has drilled to, and the text for it. Null until a chart is cast. */
+    private PhoneFocus focus;
+    private LinearLayout crumbRow;
+    private TextView crumb;
+    private Button upOne;
+    private TextView focusText;
     private WheelView wheel;
     /** The same chart as a globe (M11); it and the wheel share one slot. */
     private GlobeView globe;
@@ -232,10 +238,49 @@ public final class MainActivity extends Activity {
         bar.addView(backToForm);
         chart.addView(bar);
 
+        // The breadcrumb: where the reader is, and the way back up one level. Hidden at the
+        // chart's own level, where there is nothing to go back to and nothing to name.
+        LinearLayout crumbRow = new LinearLayout(this);
+        crumbRow.setOrientation(LinearLayout.HORIZONTAL);
+        crumbRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        crumbRow.setPadding(dp(16), 0, dp(16), dp(6));
+        spaceOut(crumbRow);
+        this.crumb = new TextView(this);
+        this.crumb.setTextSize(14f);
+        this.crumb.setTextColor(getColor(R.color.text_secondary));
+        crumbRow.addView(this.crumb, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        this.upOne = new Button(this);
+        this.upOne.setText("Back");
+        this.upOne.setOnClickListener(v -> {
+            if (this.focus != null) {
+                this.focus.ascend();
+                this.applyFocus();
+            }
+        });
+        crumbRow.addView(this.upOne);
+        this.crumbRow = crumbRow;
+        this.crumbRow.setVisibility(View.GONE);
+        chart.addView(this.crumbRow);
+
         // The wheel (M4), hidden until there is a chart; a tapped planet's lines under it.
         this.wheel = new WheelView(this);
         this.wheel.setVisibility(View.GONE);
         this.wheel.setOnBody(this::showBody);
+        this.wheel.setOnPick(new WheelView.OnPick() {
+            @Override
+            public void picked(int body, int house, int sign, int degree) {
+                MainActivity.this.picked(body, house, sign, degree);
+            }
+
+            @Override
+            public void cleared() {
+                if (MainActivity.this.focus != null) {
+                    MainActivity.this.focus.reset();
+                    MainActivity.this.applyFocus();
+                }
+            }
+        });
         chart.addView(this.wheel);
 
         // The same chart as a globe (M11). One slot, two views: they show the same thing from
@@ -340,6 +385,15 @@ public final class MainActivity extends Activity {
         this.tapped.setPadding(0, dp(12), 0, 0);
         this.tapped.setVisibility(View.GONE);
         panel.addView(this.tapped);
+        // What the drill-down is reading. Above the buttons, because when a reader has chosen
+        // a house or a planet that text IS the screen, not a footnote under the controls.
+        this.focusText = new TextView(this);
+        this.focusText.setTextSize(16f);
+        this.focusText.setLineSpacing(0f, 1.35f);
+        this.focusText.setPadding(0, dp(8), 0, dp(12));
+        this.focusText.setTextIsSelectable(true);
+        this.focusText.setVisibility(View.GONE);
+        panel.addView(this.focusText);
 
         // The whole chart's readings (M5): the synthesis, and the aspect patterns.
         this.readings = new LinearLayout(this);
@@ -496,10 +550,99 @@ public final class MainActivity extends Activity {
     @SuppressWarnings("deprecation")
     public void onBackPressed() {
         if (this.onChartScreen) {
+            // Back climbs OUT of the drill-down first and only then leaves the chart. A back
+            // that jumped straight to the form from four levels deep would throw away
+            // everything the reader had navigated to.
+            if (this.focus != null && this.focus.canAscend()) {
+                this.focus.ascend();
+                this.applyFocus();
+                return;
+            }
             this.showFormScreen();
             return;
         }
         super.onBackPressed();
+    }
+
+    /**
+     * What the reader meant by a tap, decided from how deep they already are.
+     *
+     * <p>A tap lands on a point that is in a house, in a sign, on a degree, and sometimes on a
+     * planet, all at once. Which of those they meant is not in the tap - it is in where they
+     * were standing when they made it:
+     *
+     * <ul>
+     *   <li>a planet under the finger is always that planet, at any depth: it is the most
+     *       specific thing there and the hardest to hit by accident;</li>
+     *   <li>otherwise, from the whole chart, a tap means the house - the first division a
+     *       reader looks for;</li>
+     *   <li>otherwise they are already inside something, and the next thing down is the
+     *       degree.</li>
+     * </ul>
+     */
+    private void picked(int body, int house, int sign, int degree) {
+        if (this.focus == null) {
+            return;
+        }
+        if (body >= 0 && body < PhoneWheel.PLANETS) {
+            this.focus.toBody(body);
+        } else if (this.focus.level() == PhoneFocus.Level.CHART && house >= 1) {
+            this.focus.toHouse(house);
+        } else if (sign >= 0 && degree >= 1) {
+            this.focus.toDegree(sign, degree);
+        } else {
+            return;
+        }
+        this.applyFocus();
+    }
+
+    /**
+     * Point the camera, the breadcrumb and the reading at wherever the focus now is.
+     *
+     * <p><b>One method so the three cannot disagree.</b> A wheel showing a house while the
+     * text describes a planet is worse than either being wrong on its own, and keeping three
+     * updates in step across four entry points - a tap, Back, a double tap, a fresh cast -
+     * is exactly the sort of thing that drifts.
+     *
+     * <p>The wheel COMPACTS as soon as there is something to read. Looking and reading want
+     * opposite shapes: with nothing focused the chart is the point and takes its full square,
+     * and the moment the reader is inside a house the text is the point and a square wheel
+     * would leave it in the window that was reported as too small.
+     */
+    private void applyFocus() {
+        if (this.focus == null) {
+            return;
+        }
+        boolean deep = this.focus.level() != PhoneFocus.Level.CHART;
+        this.crumbRow.setVisibility(deep ? View.VISIBLE : View.GONE);
+        this.crumb.setText(this.focus.trail());
+        this.wheel.compactTo(deep ? 0.62f : 1f);
+
+        switch (this.focus.level()) {
+            case HOUSE:
+                this.wheel.frameHouse(this.focus.house());
+                break;
+            case PLANET:
+                this.wheel.frameBody(this.focus.body());
+                break;
+            case DEGREE:
+                this.wheel.frameDegree(this.focus.sign(), this.focus.degree());
+                break;
+            default:
+                this.wheel.frameAll();
+                break;
+        }
+
+        String html = deep ? this.focus.reading(InterpretationService.getInstance()) : "";
+        if (html == null || html.trim().isEmpty()) {
+            this.focusText.setVisibility(deep ? View.VISIBLE : View.GONE);
+            this.focusText.setText(deep
+                ? "Nothing is written about this one yet." : "");
+            return;
+        }
+        this.focusText.setVisibility(View.VISIBLE);
+        this.focusText.setText(Html.fromHtml(PhoneReading.forPhone(html),
+            Html.FROM_HTML_MODE_COMPACT));
     }
 
     /** Which of the two surfaces is on screen. Neither, until a chart has been cast. */
@@ -604,6 +747,8 @@ public final class MainActivity extends Activity {
                     this.shownSky = null;
                     this.compositeFrame = null;
                     this.draw(cast.frame);
+                    this.focus = new PhoneFocus(cast.frame);
+                    this.applyFocus();          // a new chart starts at its own top level
                     showBody(-1);
                     this.redraw();
                     this.showChartScreen();     // the chart has a screen of its own now

@@ -54,6 +54,23 @@ final class WheelView extends View {
     private final Matrix inverse = new Matrix();
     private float zoom = 1f;
 
+    /** The camera's glide: where it came from, where it is going, and when it started. */
+    private static final long GLIDE_MS = 280L;
+    private float fromZoom = 1f;
+    private float fromX;
+    private float fromY;
+    private float toZoom = 1f;
+    private float toX;
+    private float toY;
+    private long animStart;
+    private boolean animating;
+
+    /** How much of its square the wheel's viewport takes. See {@link #compactTo}. */
+    private float heightFraction = 1f;
+
+    /** What a tap resolved to, reported whole. See {@link OnPick}. */
+    private OnPick picker;
+
     private final Paint line = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint text = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -116,9 +133,12 @@ final class WheelView extends View {
 
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                zoom = 1f;
-                view.reset();
-                invalidate();
+                // All the way out, and tell the screen so the breadcrumb and the reading
+                // follow. A reset that only moved the camera would leave the two disagreeing.
+                if (picker != null) {
+                    picker.cleared();
+                }
+                frameAll();
                 return true;
             }
         });
@@ -152,15 +172,19 @@ final class WheelView extends View {
     @Override
     protected void onMeasure(int w, int h) {
         int width = MeasureSpec.getSize(w);
-        setMeasuredDimension(width, width);         // square: the wheel is a circle
+        setMeasuredDimension(width, Math.round(width * this.heightFraction));
     }
 
     private PhoneWheel wheel() {
         if (this.frame == null || getWidth() == 0) {
             return null;
         }
+        // SQUARE AT THE WIDTH, not at the view's height. The chart is a square drawing and
+        // the view is a window onto it; once the wheel compacts, the window is shorter than
+        // the drawing, and laying the chart out to the short height would shrink the whole
+        // wheel instead of showing more of the focused part of it.
         if (this.wheel == null || this.wheel.width != getWidth()) {
-            this.wheel = PhoneWheel.of(this.frame, this.sky, getWidth(), getHeight());
+            this.wheel = PhoneWheel.of(this.frame, this.sky, getWidth(), getWidth());
         }
         return this.wheel;
     }
@@ -188,17 +212,169 @@ final class WheelView extends View {
         invalidate();
     }
 
-    /** Keeps the zoomed wheel covering the view, so it cannot be dragged off-screen. */
+    /**
+     * Keeps the zoomed wheel covering the view, so it cannot be dragged off-screen.
+     *
+     * <p><b>The content is square at the view's WIDTH, which is not the view's height.</b> It
+     * was, while the view was always square; once the wheel compacts to give the reading room
+     * the viewport is shorter than the chart, and a clamp that assumed otherwise would fight
+     * the camera - pinning the focused house back to the top edge the moment it was framed.
+     */
     private void clampPan() {
         float[] v = new float[9];
         this.view.getValues(v);
-        float w = getWidth();
-        float h = getHeight();
-        float minX = w - w * this.zoom;
-        float minY = h - h * this.zoom;
-        v[Matrix.MTRANS_X] = Math.max(minX, Math.min(0f, v[Matrix.MTRANS_X]));
-        v[Matrix.MTRANS_Y] = Math.max(minY, Math.min(0f, v[Matrix.MTRANS_Y]));
+        float content = getWidth() * this.zoom;
+        float minX = getWidth() - content;
+        float minY = getHeight() - content;
+        v[Matrix.MTRANS_X] = Math.max(Math.min(minX, 0f), Math.min(0f, v[Matrix.MTRANS_X]));
+        v[Matrix.MTRANS_Y] = Math.max(Math.min(minY, 0f), Math.min(0f, v[Matrix.MTRANS_Y]));
         this.view.setValues(v);
+    }
+
+    // ------------------------------------------------------------------- the camera
+
+    /**
+     * Frame a wedge of the wheel: an angular span between two radii, centred and filled.
+     *
+     * <p>The box is measured rather than derived from a formula - the corners of a wedge are
+     * not where trigonometry on the mid-angle would put them, because the arc bulges past the
+     * chord. Sampling the two arcs at a degree a step and taking the extremes is exact enough
+     * and cannot be wrong about a wedge that crosses 0 Aries, which a min/max on raw
+     * longitudes would be.
+     */
+    void frameRegion(double lonFrom, double lonTo, float rInner, float rOuter) {
+        PhoneWheel w = wheel();
+        if (w == null || getWidth() == 0) {
+            return;
+        }
+        double span = (((lonTo - lonFrom) % 360.0) + 360.0) % 360.0;
+        if (span <= 0.0) {
+            span = 360.0;
+        }
+        float minX = Float.MAX_VALUE;
+        float minY = Float.MAX_VALUE;
+        float maxX = -Float.MAX_VALUE;
+        float maxY = -Float.MAX_VALUE;
+        int steps = Math.max(2, (int) Math.ceil(span));
+        for (int k = 0; k <= steps; k++) {
+            double lon = lonFrom + span * k / steps;
+            for (float r : new float[] {rInner, rOuter}) {
+                float[] p = w.point(lon, r);
+                minX = Math.min(minX, p[0]);
+                maxX = Math.max(maxX, p[0]);
+                minY = Math.min(minY, p[1]);
+                maxY = Math.max(maxY, p[1]);
+            }
+        }
+        float boxW = Math.max(1f, maxX - minX);
+        float boxH = Math.max(1f, maxY - minY);
+        // A tenth of margin so the focused thing is not jammed against the edges.
+        float fit = Math.min(getWidth() / (boxW * 1.12f), getHeight() / (boxH * 1.12f));
+        animateTo(Math.max(1f, Math.min(MAX_ZOOM, fit)),
+            (minX + maxX) / 2f, (minY + maxY) / 2f);
+    }
+
+    /** Back to the whole wheel. */
+    void frameAll() {
+        animateTo(1f, getWidth() / 2f, getWidth() / 2f);
+    }
+
+    /**
+     * Frame one house: its own two cusps, from the aspect circle out to the sign ring.
+     *
+     * <p>Houses are unequal, so this takes the cusps rather than a twelfth of the circle - a
+     * wide house framed as thirty degrees would cut its own planets off.
+     */
+    void frameHouse(int h) {
+        PhoneWheel w = wheel();
+        if (w == null || h < 1 || h > 12 || w.frame.timeUnknown) {
+            return;
+        }
+        frameRegion(w.frame.cusps[h], w.frame.cusps[h == 12 ? 1 : h + 1],
+            w.aspectDisc, w.rings[WheelLayout.RING_SIGN_INNER]);
+    }
+
+    /** Frame one planet, with enough room around it to see what it is standing among. */
+    void frameBody(int i) {
+        PhoneWheel w = wheel();
+        if (w == null || i < 0 || i >= w.bodyRadius.length || w.bodyRadius[i] <= 0) {
+            return;
+        }
+        double lon = w.frame.bodies[i].lon;
+        float r = w.planetRadius(i) * 3f;
+        frameRegion(lon - 9, lon + 9, Math.max(1, w.bodyRadius[i] - r), w.bodyRadius[i] + r);
+    }
+
+    /** Frame a single degree of a sign: a one-degree wedge from the planets to the signs. */
+    void frameDegree(int sign, int degree) {
+        PhoneWheel w = wheel();
+        if (w == null || sign < 0 || sign > 11 || degree < 1 || degree > 30) {
+            return;
+        }
+        double from = sign * 30.0 + (degree - 1);
+        // Three degrees of context rather than one: a single degree framed alone fills the
+        // screen with an empty sliver and tells the reader nothing about where it sits.
+        frameRegion(from - 1, from + 2, w.aspectDisc, w.rings[WheelLayout.RING_SIGN_OUTER]);
+    }
+
+    /**
+     * Glide the camera so that a point of the chart sits in the middle of the view at a zoom.
+     *
+     * <p>It animates rather than jumping because a cut gives the reader no idea where they
+     * went: the whole point of magnifying a house is that it is THAT house, and a quarter of a
+     * second of travel is what says so.
+     */
+    private void animateTo(float zoomTo, float focusX, float focusY) {
+        float[] v = new float[9];
+        this.view.getValues(v);
+        this.fromZoom = this.zoom;
+        this.fromX = v[Matrix.MTRANS_X];
+        this.fromY = v[Matrix.MTRANS_Y];
+        this.toZoom = zoomTo;
+        this.toX = getWidth() / 2f - zoomTo * focusX;
+        this.toY = getHeight() / 2f - zoomTo * focusY;
+        this.animStart = android.os.SystemClock.uptimeMillis();
+        this.animating = true;
+        invalidate();
+    }
+
+    private void stepCamera() {
+        float t = (android.os.SystemClock.uptimeMillis() - this.animStart) / (float) GLIDE_MS;
+        if (t >= 1f) {
+            t = 1f;
+            this.animating = false;
+        }
+        float e = t * t * (3f - 2f * t);         // ease in and out, so it starts and stops soft
+        this.zoom = this.fromZoom + (this.toZoom - this.fromZoom) * e;
+        float[] v = new float[9];
+        v[Matrix.MSCALE_X] = this.zoom;
+        v[Matrix.MSCALE_Y] = this.zoom;
+        v[Matrix.MTRANS_X] = this.fromX + (this.toX - this.fromX) * e;
+        v[Matrix.MTRANS_Y] = this.fromY + (this.toY - this.fromY) * e;
+        v[Matrix.MPERSP_2] = 1f;
+        this.view.setValues(v);
+        clampPan();
+        if (this.animating) {
+            postInvalidateOnAnimation();
+        }
+    }
+
+    /**
+     * How much of its square the wheel takes, so the reading can have the rest.
+     *
+     * <p>Looking and reading want opposite shapes. With nothing focused the chart is the point
+     * and takes its full square; once the reader has drilled into a house the TEXT is the
+     * point, and a wheel still taking a screen's width of height leaves the reading in the
+     * "little window" that was reported. The chart stays square underneath either way - only
+     * the window onto it changes - so nothing is re-laid-out and the camera keeps its aim.
+     */
+    void compactTo(float fraction) {
+        float f = Math.max(0.35f, Math.min(1f, fraction));
+        if (Math.abs(f - this.heightFraction) < 0.001f) {
+            return;
+        }
+        this.heightFraction = f;
+        requestLayout();
     }
 
     private void tap(float x, float y) {
@@ -216,6 +392,26 @@ final class WheelView extends View {
         if (this.listener != null) {
             this.listener.tapped(this.selected);
         }
+        // ONE TAP, ALL FOUR FACTS. A tap lands on a point of the chart, and that point is in a
+        // house, in a sign, on a degree, and sometimes on a planet - all at once. Reporting
+        // them together lets the screen decide which one the reader meant from how deep they
+        // already are, rather than this view guessing on its behalf.
+        if (this.picker != null) {
+            this.picker.picked(this.selected, w.houseAt(p[0], p[1]),
+                w.signAt(p[0], p[1]), w.degreeAt(p[0], p[1]));
+        }
+    }
+
+    void setOnPick(OnPick p) {
+        this.picker = p;
+    }
+
+    /** What a tap resolved to. Any of them may be -1 when the tap landed on nothing. */
+    interface OnPick {
+        void picked(int body, int house, int sign, int degree);
+
+        /** A double tap: out of the drill-down altogether. */
+        void cleared();
     }
 
     @Override
@@ -229,6 +425,11 @@ final class WheelView extends View {
         PhoneWheel w = wheel();
         if (w == null) {
             return;
+        }
+        // The camera's glide runs on the frame clock, so it advances before the frame it
+        // affects is drawn rather than one behind it.
+        if (this.animating) {
+            stepCamera();
         }
         c.save();
         c.concat(this.view);
