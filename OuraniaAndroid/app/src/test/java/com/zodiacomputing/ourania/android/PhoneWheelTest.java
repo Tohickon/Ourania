@@ -116,4 +116,56 @@ public class PhoneWheelTest {
             assertTrue("house " + h + " clear of the planets", r + size / 2 < w.natalFloor);
         }
     }
+
+    @Test
+    public void planetsAreSizedInTheirTrueOrderAndNoneOutgrowsTheBand() {
+        PhoneWheel w = wheel();
+        String[] bigToSmall = {"Sun", "Jupiter", "Saturn", "Uranus", "Neptune", "Venus",
+            "Mars", "Mercury", "Moon", "Pluto"};
+        float last = Float.MAX_VALUE;
+        for (String name : bigToSmall) {
+            int i = com.zodiacomputing.ourania.astro.Bodies.indexOfName(name);
+            float f = PhoneWheel.sizeFactor(i);
+            assertTrue(name + " is smaller than the one before it", f < last);
+            assertTrue(name + " is a slight variance, not a vanishing one", f >= 0.72f);
+            assertTrue(name + " fits the band built round the Sun",
+                w.planetRadius(i) <= PhoneWheel.maxPlanetRadius());
+            last = f;
+        }
+        assertEquals("the Sun is the band's own disc", PhoneWheel.maxPlanetRadius(),
+            w.planetRadius(com.zodiacomputing.ourania.astro.Bodies.indexOfName("Sun")));
+    }
+
+    @Test
+    public void theMoonsLitAreaFollowsItsPhase() {
+        float rad = 20f;
+        double disc = Math.PI * rad * rad;
+        assertEquals("new: nothing lit", 0.0, litArea(0) / disc, 0.01);
+        assertEquals("first quarter: half", 0.5, litArea(90) / disc, 0.01);
+        assertEquals("full: all of it", 1.0, litArea(180) / disc, 0.01);
+        assertEquals("last quarter: half", 0.5, litArea(270) / disc, 0.01);
+        assertEquals("crescent at 45 degrees: (1 - cos e) / 2",
+            (1 - Math.cos(Math.toRadians(45))) / 2, litArea(45) / disc, 0.01);
+        assertTrue("waxing is lit on the right", centroidX(90) > 0);
+        assertTrue("waning is lit on the left", centroidX(270) < 0);
+    }
+
+    private static double litArea(double elongation) {
+        float[] p = PhoneWheel.moonLitOutline(0, 0, 20f, elongation, 400);
+        double a = 0;
+        for (int k = 0; k < p.length; k += 2) {
+            int n = (k + 2) % p.length;
+            a += p[k] * p[n + 1] - p[n] * p[k + 1];
+        }
+        return Math.abs(a) / 2;
+    }
+
+    private static double centroidX(double elongation) {
+        float[] p = PhoneWheel.moonLitOutline(0, 0, 20f, elongation, 400);
+        double sum = 0;
+        for (int k = 0; k < p.length; k += 2) {
+            sum += p[k];
+        }
+        return sum / (p.length / 2);
+    }
 }

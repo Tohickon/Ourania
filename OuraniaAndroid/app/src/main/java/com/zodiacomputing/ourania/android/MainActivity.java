@@ -564,6 +564,12 @@ public final class MainActivity extends Activity {
             f.addView(cb);
         }
 
+        f.addView(label("The wheel"));
+        final CheckBox mansions = new CheckBox(this);
+        mansions.setText("Lunar mansions at the rim");
+        mansions.setChecked(v.wheelMansions);
+        f.addView(mansions);
+
         ScrollView scroll = new ScrollView(this);
         scroll.addView(f);
         new android.app.AlertDialog.Builder(this)
@@ -581,6 +587,7 @@ public final class MainActivity extends Activity {
                     on[i] = aspects[i].isChecked();
                 }
                 v.aspects = on;
+                v.wheelMansions = mansions.isChecked();
                 PhoneSettings.save(v);
                 this.settingsChanged("Saved.");
             })

@@ -490,8 +490,11 @@ public final class WheelLayout {
      * caller that knows nothing about mansions gets {@code outer} back, which is where the rim
      * scale has always sat. With the layer folded the two are equal, so the wheel lays out
      * exactly as it did - which is what lets AspectGridCheck go on asserting its formula.
+     *
+     * <p>Public, with the mansion-aware {@code ringRadii}, because the phone draws the band too
+     * and must read its edge from this chain rather than restate the depth.
      */
-    static final int RING_MANSION_INNER = 9;
+    public static final int RING_MANSION_INNER = 9;
     /**
      * Floor of the directed chart's band, whose ceiling is {@code RING_TRANSIT} (G17 step 3).
      *
@@ -592,7 +595,7 @@ public final class WheelLayout {
      * is left. At {@code mansionOpen == 0} the two edges coincide and this is the old layout
      * to the pixel.
      */
-    static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
+    public static int[] ringRadii(int width, int height, double outerOpen, double triOpen,
                            double decanOpen, double signOpen, double boundOpen,
                            double degreeOpen, double mansionOpen) {
         // The directed band shut, which is every layout that existed before G17 step 3 and is
