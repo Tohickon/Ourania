@@ -62,6 +62,11 @@ public final class MainActivity extends Activity {
     private CheckBox timeUnknown;
     private AutoCompleteTextView placeField;
     private TextView result;
+    /** The birth form and the chart, swapped by setContentView. */
+    private View formRoot;
+    private View chartRoot;
+    private TextView chartTitle;
+    private boolean onChartScreen;
     private WheelView wheel;
     /** The same chart as a globe (M11); it and the wheel share one slot. */
     private GlobeView globe;
@@ -196,19 +201,62 @@ public final class MainActivity extends Activity {
         castParams.topMargin = dp(24);
         form.addView(this.cast, castParams);
 
+        // ---------------------------------------------------------------- the chart screen
+        //
+        // <b>The chart gets a screen of its own, and this is the whole reason for it.</b> The
+        // wheel used to be one item in a single scrolling column with the birth form above it
+        // and six reading buttons below, so it competed for the screen with everything else
+        // and, as reported, "got lost in the size of the screen mixed with everything else".
+        // A chart is the thing this app is for; it should not have to share.
+        //
+        // The wheel is pinned at the top at full width and the reading scrolls BENEATH it,
+        // rather than the whole screen scrolling. That keeps the wheel on screen while the
+        // interpretation is read - which is what makes a selection and its text one thing
+        // rather than two, and is what the drill-down will need.
+        LinearLayout chart = new LinearLayout(this);
+        chart.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout bar = new LinearLayout(this);
+        bar.setOrientation(LinearLayout.HORIZONTAL);
+        bar.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        bar.setPadding(dp(16), dp(8), dp(16), dp(8));
+        spaceOut(bar);
+        this.chartTitle = new TextView(this);
+        this.chartTitle.setTextSize(19f);
+        this.chartTitle.setTextColor(getColor(R.color.accent));
+        bar.addView(this.chartTitle, new LinearLayout.LayoutParams(0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        Button backToForm = new Button(this);
+        backToForm.setText("Birth data");
+        backToForm.setOnClickListener(v -> this.showFormScreen());
+        bar.addView(backToForm);
+        chart.addView(bar);
+
         // The wheel (M4), hidden until there is a chart; a tapped planet's lines under it.
         this.wheel = new WheelView(this);
         this.wheel.setVisibility(View.GONE);
         this.wheel.setOnBody(this::showBody);
-        form.addView(this.wheel);
+        chart.addView(this.wheel);
 
         // The same chart as a globe (M11). One slot, two views: they show the same thing from
         // two angles and both want the full width, so they take turns rather than stack.
         this.globe = new GlobeView(this);
         this.globe.setVisibility(View.GONE);
         this.globe.setOnBody(this::showBody);
-        form.addView(this.globe, new LinearLayout.LayoutParams(
+        chart.addView(this.globe, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // The controls that act on what is drawn stay with the drawing; the reading scrolls
+        // below them.
+        LinearLayout controls = new LinearLayout(this);
+        controls.setOrientation(LinearLayout.VERTICAL);
+        controls.setPadding(dp(16), dp(8), dp(16), 0);
+
+        // The reading, beneath the wheel and scrolling under it. Declared here because the
+        // sky's caption below belongs to the reading rather than to the controls.
+        LinearLayout panel = new LinearLayout(this);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setPadding(dp(16), dp(4), dp(16), dp(28));
         this.viewToggle = new Button(this);
         this.viewToggle.setText("Show the globe");
         this.viewToggle.setVisibility(View.GONE);
@@ -217,7 +265,8 @@ public final class MainActivity extends Activity {
             this.viewToggle.setText(this.globeShown ? "Show the wheel" : "Show the globe");
             this.applyViewChoice();
         });
-        form.addView(this.viewToggle);
+        controls.addView(this.viewToggle, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         // The sky over the chart (M7): on or off, and on which day.
         this.skyRow = new LinearLayout(this);
@@ -246,7 +295,7 @@ public final class MainActivity extends Activity {
             this.refreshSky();
         });
         this.skyRow.addView(skyNow);
-        form.addView(this.skyRow);
+        controls.addView(this.skyRow);
         this.skyCaption = new TextView(this);
         this.skyCaption.setTextSize(14f);
         this.skyCaption.setVisibility(View.GONE);
@@ -255,7 +304,7 @@ public final class MainActivity extends Activity {
                 this.chooseCompositePlace();
             }
         });
-        form.addView(this.skyCaption);
+        panel.addView(this.skyCaption);
 
         // Two charts (M10): whose chart to compare with, and how.
         LinearLayout rel = new LinearLayout(this);
@@ -284,12 +333,13 @@ public final class MainActivity extends Activity {
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         this.relRow = rel;
         this.relRow.setVisibility(View.GONE);
-        form.addView(this.relRow);
+        controls.addView(this.relRow);
+        chart.addView(controls);
         this.tapped = new TextView(this);
         this.tapped.setTextSize(16f);
         this.tapped.setPadding(0, dp(12), 0, 0);
         this.tapped.setVisibility(View.GONE);
-        form.addView(this.tapped);
+        panel.addView(this.tapped);
 
         // The whole chart's readings (M5): the synthesis, and the aspect patterns.
         this.readings = new LinearLayout(this);
@@ -309,7 +359,7 @@ public final class MainActivity extends Activity {
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         this.readings.addView(patterns, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        form.addView(this.readings);
+        panel.addView(this.readings);
         // Timing (M7): the transits now, and the calendar of the year ahead.
         this.timing = new LinearLayout(this);
         this.timing.setOrientation(LinearLayout.HORIZONTAL);
@@ -327,23 +377,32 @@ public final class MainActivity extends Activity {
         releasing.setOnClickListener(v -> this.showReleasing());
         this.timing.addView(releasing, new LinearLayout.LayoutParams(0,
             ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        form.addView(this.timing);
+        panel.addView(this.timing);
         this.save = new Button(this);
         this.save.setText("Save this chart");
         this.save.setVisibility(View.GONE);
         this.save.setOnClickListener(v -> this.saveChart());
-        form.addView(this.save);
+        panel.addView(this.save);
 
         this.result = new TextView(this);
         this.result.setTextSize(15f);
         this.result.setLineSpacing(0f, 1.3f);
         this.result.setPadding(0, dp(20), 0, 0);
         this.result.setTextIsSelectable(true);
-        form.addView(this.result);
+        panel.addView(this.result);
+
+        // The reading takes the height the wheel and its controls leave, and scrolls inside
+        // it. Weight 1 against a height of 0 is how a LinearLayout says "whatever is left".
+        ScrollView panelScroll = new ScrollView(this);
+        panelScroll.addView(panel);
+        chart.addView(panelScroll, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+        this.chartRoot = chart;
 
         ScrollView scroll = new ScrollView(this);
         scroll.addView(form);
-        setContentView(scroll);
+        this.formRoot = scroll;
+        setContentView(this.formRoot);
 
         // ONE answer to "what colour is this app", and it is the reader's. colors.xml carries
         // the same value as the window's declared default so there is no pale flash before this
@@ -402,6 +461,45 @@ public final class MainActivity extends Activity {
             this.wheel.show(frame, outer, contacts);
         }
         this.globe.show(frame, outer);
+    }
+
+    /**
+     * The birth form, and the chart. Two roots, swapped by {@code setContentView}.
+     *
+     * <p>Both are built once in {@code onCreate} and kept, so switching costs no layout
+     * inflation and neither screen forgets its state - the typed place stays typed, the wheel
+     * keeps its zoom. {@code setContentView} detaches whichever root was showing, so the other
+     * is always parentless when it goes back in.
+     *
+     * <p>No fragments and no second Activity: this app has neither AppCompat nor the fragment
+     * library, and a screen that is one view swapped for another does not need them.
+     */
+    private void showFormScreen() {
+        setContentView(this.formRoot);
+        this.onChartScreen = false;
+    }
+
+    private void showChartScreen() {
+        this.chartTitle.setText(this.chartName());
+        setContentView(this.chartRoot);
+        this.onChartScreen = true;
+    }
+
+    /**
+     * Back goes to the birth form before it leaves the app.
+     *
+     * <p>Deprecated on API 33 and still the callback a plain {@code Activity} receives: the
+     * replacement is {@code OnBackPressedDispatcher}, which lives in AndroidX, and this app
+     * depends on no support library at all (build.gradle: the one dependency is JUnit).
+     */
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onBackPressed() {
+        if (this.onChartScreen) {
+            this.showFormScreen();
+            return;
+        }
+        super.onBackPressed();
     }
 
     /** Which of the two surfaces is on screen. Neither, until a chart has been cast. */
@@ -508,8 +606,17 @@ public final class MainActivity extends Activity {
                     this.draw(cast.frame);
                     showBody(-1);
                     this.redraw();
+                    this.showChartScreen();     // the chart has a screen of its own now
                 }
                 this.result.setText(shown);
+                // A FAILED CAST NEVER LEAVES THE FORM, so its message cannot be written only
+                // into `result` - that TextView now lives on the chart screen, which a failed
+                // cast never reaches. The reader would have pressed Cast and seen nothing
+                // happen at all. The text still goes to `result` for the successful case; a
+                // failure says so where the reader is standing.
+                if (cast == null) {
+                    toast(shown);
+                }
                 this.cast.setEnabled(true);
             });
         }).start();
