@@ -409,6 +409,70 @@ final class PhoneWheel {
      * A planet on the sky's ring answers {@link #SKY} plus its index.
      * Nearest wins so two planets close together are each still reachable.
      */
+    /**
+     * The longitude a point on the wheel stands at, or NaN outside it.
+     *
+     * <p>The inverse of {@link #angle}, and written as its inverse rather than re-derived:
+     * {@code angle} is {@code 180 + pin - lon}, so {@code lon} is {@code 180 + pin - angle}.
+     * A hit test that worked the geometry out again is the defect this project logs most, and
+     * it is worse here than usual - a reader who taps a degree and is told about its neighbour
+     * has no way to know they were misled.
+     *
+     * <p>Outside the outermost ring it answers NaN rather than a longitude, so a tap on the
+     * black beyond the wheel selects nothing instead of whatever lies on that bearing.
+     */
+    double longitudeAt(float x, float y) {
+        double dx = x - this.cx;
+        double dy = y - this.cy;
+        double r = Math.hypot(dx, dy);
+        if (r > this.rings[WheelLayout.RING_OUTER] + 1) {
+            return Double.NaN;
+        }
+        double a = Math.toDegrees(Math.atan2(dy, dx));
+        double lon = 180.0 + this.pin - a;
+        return ((lon % 360.0) + 360.0) % 360.0;
+    }
+
+    /**
+     * The house a point falls in, 1 to 12, or -1 outside the wheel or without a birth time.
+     *
+     * <p>Houses are unequal, so this walks the cusps rather than dividing by thirty: a house
+     * runs from its own cusp to the next one in increasing longitude, and the one containing
+     * the tap is the one whose span the tap's longitude falls inside. With no birth time there
+     * are no houses to find, and saying so is better than answering 1 for everything.
+     */
+    int houseAt(float x, float y) {
+        if (this.frame.timeUnknown) {
+            return -1;
+        }
+        double lon = this.longitudeAt(x, y);
+        if (Double.isNaN(lon)) {
+            return -1;
+        }
+        for (int h = 1; h <= 12; h++) {
+            double from = this.frame.cusps[h];
+            double to = this.frame.cusps[h == 12 ? 1 : h + 1];
+            double span = (((to - from) % 360.0) + 360.0) % 360.0;
+            double into = (((lon - from) % 360.0) + 360.0) % 360.0;
+            if (into < span) {
+                return h;
+            }
+        }
+        return -1;
+    }
+
+    /** The whole degree of its sign a point stands on, 1 to 30, or -1 outside the wheel. */
+    int degreeAt(float x, float y) {
+        double lon = this.longitudeAt(x, y);
+        return Double.isNaN(lon) ? -1 : (int) (lon % 30.0) + 1;
+    }
+
+    /** The sign index a point stands in, 0 to 11, or -1 outside the wheel. */
+    int signAt(float x, float y) {
+        double lon = this.longitudeAt(x, y);
+        return Double.isNaN(lon) ? -1 : (int) (lon / 30.0) % 12;
+    }
+
     int bodyAt(float x, float y, float grab) {
         int best = -1;
         double bestDistance = Double.MAX_VALUE;
