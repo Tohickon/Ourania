@@ -7540,8 +7540,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // method already asks triRingDrawn() a hundred lines further down, which is the
         // question both places wanted.
         if (wantTransits && this.triRingDrawn()) {
-            // Title and colour from the ring, for the reason the outer ring's now are.
-            stringBuilder.append(PlacementsPage.ringSection(this.skyRing.kind.heading,
+            // <b>Colour from the ring; the name keeps its qualifier, and that is not an
+            // oversight.</b> This read "Sky (Transiting)" and was briefly reduced to the kind's
+            // heading, "Sky", which AspectGridCheck Part P caught - rightly, and its companion
+            // assertion shows why: the NEGATIVE test that a synastry without transits does not
+            // contain this heading would have started passing against "The Sky Now", which the
+            // same page prints when there is no Chart A. A distinctive string was carrying real
+            // information. The heading is the tab's name and the tab is "Sky"; this section sits
+            // on the same page as the transit ring, where which of the two is moving NOW is the
+            // question, so it says so. The name comes from the kind and only the qualifier is
+            // written here.
+            stringBuilder.append(PlacementsPage.ringSection(
+                this.skyRing.kind.heading + " (Transiting)",
                 this.skyRing.kind.hueHex,
                 this.skyRing.time != null ? this.skyRing.time.format(dateTimeFormatter) : "",
                 this.skyRing, "sky_", this.activeCusps));
