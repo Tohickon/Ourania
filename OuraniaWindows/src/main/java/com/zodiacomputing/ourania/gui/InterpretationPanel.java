@@ -1028,9 +1028,17 @@ public class InterpretationPanel extends JPanel {
         }
         StringBuilder h = new StringBuilder();
         if ("BRIDGE".equals(role)) {
-            h.append("<div style='border-left:3px solid #7FB3FF; padding-left:10px; ")
+            // <b>The ring's own colour, not a hex chosen here.</b> This banner said Chart B in
+            // #7FB3FF blue while the wheel drew Chart B's ring in gold, and said SKY in lilac
+            // where the wheel draws it blue - so a reader comparing the card with the chart
+            // beside it was handed two colour schemes for one fact. WheelRing.Kind holds the
+            // colour now, for the reason it already holds the heading and the dash pattern.
+            String bridgeHue = WheelRing.Kind.CHART_B.hueHex;
+            h.append("<div style='border-left:3px solid ").append(bridgeHue)
+             .append("; padding-left:10px; ")
              .append("margin-bottom:14px;'>")
-             .append("<div style='color:#7FB3FF; font-size:12px; font-weight:bold;'>")
+             .append("<div style='color:").append(bridgeHue)
+             .append("; font-size:12px; font-weight:bold;'>")
              .append("Chart B &rarr; Chart A &middot; ").append(angleName.toUpperCase())
              .append(" OVERLAY</div>")
              .append("<div style='color:#9AA5B1; font-size:11px;'>")
@@ -1044,17 +1052,23 @@ public class InterpretationPanel extends JPanel {
             return h.toString();
         }
         if ("SKY".equals(role)) {
-            h.append("<div style='border-left:3px solid #B9B2D6; padding-left:10px; ")
+            String skyHue = WheelRing.Kind.SKY.hueHex;
+            h.append("<div style='border-left:3px solid ").append(skyHue)
+             .append("; padding-left:10px; ")
              .append("margin-bottom:14px;'>")
-             .append("<div style='color:#B9B2D6; font-size:12px; font-weight:bold;'>")
+             .append("<div style='color:").append(skyHue)
+             .append("; font-size:12px; font-weight:bold;'>")
              .append("SKY &middot; ").append(angleName.toUpperCase()).append("</div>")
              .append("<div style='color:#9AA5B1; font-size:11px;'>")
              .append("A moment passing over the chart, not a person's angle.</div></div>");
             return h.toString();
         }
-        h.append("<div style='border-left:3px solid #FFD166; padding-left:10px; ")
+        String anchorHue = WheelRing.Kind.CHART_A.hueHex;
+        h.append("<div style='border-left:3px solid ").append(anchorHue)
+         .append("; padding-left:10px; ")
          .append("margin-bottom:14px;'>")
-         .append("<div style='color:#FFD166; font-size:12px; font-weight:bold;'>")
+         .append("<div style='color:").append(anchorHue)
+         .append("; font-size:12px; font-weight:bold;'>")
          .append("Chart A &middot; ").append(angleName.toUpperCase()).append("</div>")
          .append("<div style='color:#9AA5B1; font-size:11px;'>")
          .append("Natal anchor - the sovereign host. The twelve houses on screen are Chart ")
@@ -1209,9 +1223,10 @@ public class InterpretationPanel extends JPanel {
     /**
      * What stands in a slice of the zodiac, ready to append to an interpretation panel.
      *
-     * Both wheels. The natal side comes from the computed frame; the transit side from
-     * SkymapPanel.transitOccupants, because the transit wheel is held as parallel arrays
-     * and is never assembled into a frame.
+     * Every ring on the wheel, each named by which ring it is - see
+     * {@code SkymapPanel.occupantGroups}, which owns the question of what is on screen. The
+     * inner wheel comes from the computed frame; the outer rings are held as parallel arrays
+     * and are never assembled into frames.
      *
      * Takes the sign by name and the offset within it rather than an absolute longitude,
      * so the one place that can fail - an unrecognised sign name - is checked once here.
@@ -1230,10 +1245,7 @@ public class InterpretationPanel extends JPanel {
         }
         double start = sign * 30.0 + offset;
         try {
-            return Occupants.html(
-                Occupants.inSpan(skymapPanel.getCurrentChart(), start, span),
-                skymapPanel.transitOccupants(start, span),
-                what);
+            return Occupants.html(skymapPanel.occupantGroups(start, span), what);
         } catch (Exception e) {
             // A panel that cannot show its extras is worth far less than one that throws
             // out of a click handler and leaves the interpretation blank.
@@ -1686,10 +1698,7 @@ public class InterpretationPanel extends JPanel {
         try {
             double from = WheelLayout.houseStart(cusps, houseNum);
             double span = WheelLayout.houseSpan(cusps, houseNum);
-            return Occupants.html(
-                Occupants.inSpan(skymapPanel.getCurrentChart(), from, span),
-                skymapPanel.transitOccupants(from, span),
-                "house");
+            return Occupants.html(skymapPanel.occupantGroups(from, span), "house");
         } catch (Exception e) {
             // Same reason as occupantsHtml: a panel that cannot show its extras is worth far more
             // than one that throws out of a click handler and leaves the reading blank.

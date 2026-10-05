@@ -3735,18 +3735,53 @@ implements WheelSource, GlobeSource {
     }
 
     /**
-     * What stands in a span of the zodiac on the TRANSIT wheel; empty when none is shown.
+     * What stands in a span of the zodiac, one group per ring that is actually on the wheel.
      *
-     * One method rather than three accessors on purpose. outerRing.lon/outerRing.speed/outerRing.valid are public and
-     * a caller could read them directly, but three parallel arrays are three chances to
-     * index one of them differently, and the interpretation panel has no business knowing
-     * how the transit wheel stores itself.
+     * One method rather than accessors per ring on purpose. Each ring's lon/speed/valid are
+     * public and a caller could read them directly, but three parallel arrays are three
+     * chances to index one of them differently, and the interpretation panel has no business
+     * knowing how a ring stores itself.
+     *
+     * <p><b>It answered only two rings until 2026-10-05, and the second one was misnamed.</b>
+     * The method was {@code transitOccupants} and the panel paired it with the natal frame
+     * under the headings "Natal" and "Transiting now". {@link #showTransitChart} is true in a
+     * synastry - it means "there is an outer wheel", not "there are transits", as its own
+     * javadoc says - so <b>Chart B's placements were listed as transits</b>. And since G17 the
+     * wheel can carry a directed band and a sky ring as well, neither of which this reported
+     * at all, so a directed Mars standing on the degree you clicked went unmentioned.
+     *
+     * <p>Each group carries its {@link WheelRing.Kind}, which is the one thing that knows what
+     * a ring is and what to call it, so nothing downstream has to guess. The gates are the
+     * same ones the painter uses - {@code showTransitChart}, {@link #arcRingDrawn} and
+     * {@link #showTriWheel} - rather than a second reading of the modes, because a list that
+     * disagrees with the drawing about which rings exist is worse than no list.
+     *
+     * @return inner wheel first, then outward, in the order a reader meets the rings
      */
-    public java.util.List<Occupants.Hit> transitOccupants(double start, double span) {
-        if (!this.showTransitChart) {
-            return java.util.Collections.emptyList();
+    public java.util.List<Occupants.Group> occupantGroups(double start, double span) {
+        this.assignRingKinds();
+        java.util.List<Occupants.Group> out = new java.util.ArrayList<>();
+        // The inner wheel through getCurrentChart, so the selected harmonic is respected -
+        // the outer rings are read from the wheel's own arrays, which are already harmonic.
+        out.add(new Occupants.Group(this.natalRing.kind,
+            Occupants.inSpan(this.getCurrentChart(), start, span)));
+        if (this.showTransitChart) {
+            out.add(new Occupants.Group(this.outerRing.kind, Occupants.inSpan(
+                this.outerRing.lon, this.outerRing.valid, this.outerRing.speed, start, span)));
         }
-        return Occupants.inSpan(this.outerRing.lon, this.outerRing.valid, this.outerRing.speed, start, span);
+        // Speed deliberately null: a directed body is the natal position plus one arc, so
+        // nothing in that ring moves at its own rate and none of it is ever retrograde.
+        // arcRingShown() is false whenever the middle ring is already the directed one, so
+        // this cannot double-count it.
+        if (this.arcRingDrawn()) {
+            out.add(new Occupants.Group(this.arcRing.kind, Occupants.inSpan(
+                this.arcRing.lon, this.arcRing.valid, null, start, span)));
+        }
+        if (this.showTriWheel) {
+            out.add(new Occupants.Group(this.skyRing.kind, Occupants.inSpan(
+                this.skyRing.lon, this.skyRing.valid, this.skyRing.speed, start, span)));
+        }
+        return out;
     }
 
     /**
@@ -5124,8 +5159,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * read. On an outer ring it was close to redundant anyway: a transiting Mars is fire
      * because it is Mars, and the glyph already says so.
      */
-    private static final Color BRIDGE_HUE = new Color(255, 210, 122);
-    private static final Color SKY_HUE = new Color(143, 208, 255);
+    /*
+     * <b>Decoded from WheelRing.Kind rather than written out again here.</b> These were literal
+     * Colors, and the reading panel's banner had its own hex literals for the same three rings,
+     * which disagreed with these - Chart B gold here and blue there. The kind is the one thing
+     * that knows what a ring is, so it holds the colour and everything that paints a ring reads
+     * it from there. Same values as before to the byte, so no pixel moves.
+     */
+    private static final Color BRIDGE_HUE =
+        AwtPen.colorOr(WheelRing.Kind.CHART_B.hueHex, new Color(255, 210, 122));
+    private static final Color SKY_HUE =
+        AwtPen.colorOr(WheelRing.Kind.SKY.hueHex, new Color(143, 208, 255));
 
     /** A body's glyph colour on a given ring. ANCHOR keeps the element colour untouched. */
     public Color ringInk(int body, AngleRole role) {

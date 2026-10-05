@@ -45,17 +45,19 @@ public final class WheelRing {
      */
     public enum Kind {
         /** The chart being read: the inner wheel, and the thing everything else is read against. */
-        CHART_A("Chart A", null, false, null, "Chart A"),
+        CHART_A("Chart A", null, false, null, "Chart A", "#FFE4A0"),
         /** One chart made out of two. Still the inner wheel, but it belongs to nobody. */
-        COMPOSITE("the composite", null, false, null, "Composite"),
+        COMPOSITE("the composite", null, false, null, "Composite", "#FFD166"),
         /** A second person, in a synastry. Their placements are their NATAL placements. */
-        CHART_B("Chart B", "Chart B", true, new float[] {9.0f, 4.0f}, "Chart B"),
+        CHART_B("Chart B", "Chart B", true, new float[] {9.0f, 4.0f}, "Chart B", "#FFD27A"),
         /** The same person, moved on. A placement, not a passing event. */
-        PROGRESSED("progressed", "progressed", false, new float[] {2.0f, 3.0f}, "Progressed"),
+        PROGRESSED("progressed", "progressed", false, new float[] {2.0f, 3.0f}, "Progressed",
+            "#8FD0FF"),
         /** The sky at a chosen moment, laid over the chart. */
-        TRANSIT("transiting", "transiting", false, new float[] {5.0f, 5.0f}, "Transits"),
+        TRANSIT("transiting", "transiting", false, new float[] {5.0f, 5.0f}, "Transits",
+            "#8FD0FF"),
         /** The sky now, wrapped around everything else. */
-        SKY("sky", SkymapPanel.SKY_RING_WORD, false, new float[] {1.0f, 4.0f}, "Sky"),
+        SKY("sky", SkymapPanel.SKY_RING_WORD, false, new float[] {1.0f, 4.0f}, "Sky", "#8FD0FF"),
         /**
          * Every natal point moved forward by one arc - the distance the progressed Sun has
          * travelled since birth.
@@ -65,7 +67,8 @@ public final class WheelRing {
          * chart itself with one number added to every position. Nothing in it moves at its own
          * speed, so a directed body has no speed and is never retrograde.
          */
-        SOLAR_ARC("directed", "directed", false, new float[] {7.0f, 3.0f}, "Solar Arc");
+        SOLAR_ARC("directed", "directed", false, new float[] {7.0f, 3.0f}, "Solar Arc",
+            "#8FD0FF");
 
         /** How a reader refers to this ring in running prose. */
         public final String label;
@@ -103,12 +106,37 @@ public final class WheelRing {
          */
         public final String heading;
 
-        Kind(String label, String ringWord, boolean isPerson, float[] dash, String heading) {
+        /**
+         * The colour that means "this ring", as a CSS hex.
+         *
+         * <b>The third copy of a mapping this enum exists to hold once.</b> {@code dash} and
+         * {@link #heading} are both here because the same rule had been written out in several
+         * places and the copies drifted; ring colour was in that state too, and worse, because
+         * the copies contradicted each other on screen at the same time. The wheel held
+         * {@code BRIDGE_HUE} and {@code SKY_HUE} keyed on {@link AngleRole} - three values for
+         * seven kinds - while {@code InterpretationPanel}'s angle banner had its own literals,
+         * so <b>Chart B was gold on the wheel and blue in the card beside it</b>, and the sky
+         * was blue on the wheel and lilac in the card. A reader comparing the two was being
+         * given two different colour schemes for one fact.
+         *
+         * <p><b>These are the wheel's values, not new ones.</b> The wheel is where the reader
+         * meets a ring, so the lists and banners follow it rather than the other way round -
+         * which is also why PROGRESSED, TRANSIT, SKY and SOLAR_ARC all carry the same blue:
+         * {@code ringInk} paints every non-Chart-B outer ring alike, and giving them separate
+         * colours here would invent a distinction the drawing does not make. They are separated
+         * by their {@link #heading}, which says which ring in words. When the wheel learns to
+         * tell them apart, this is the one place that has to change.
+         */
+        public final String hueHex;
+
+        Kind(String label, String ringWord, boolean isPerson, float[] dash, String heading,
+                String hueHex) {
             this.label = label;
             this.ringWord = ringWord;
             this.isPerson = isPerson;
             this.heading = heading;
             this.dash = dash;
+            this.hueHex = hueHex;
         }
 
         /** A copy, because a caller handing this to BasicStroke must not be able to edit it. */

@@ -105,6 +105,21 @@ public final class Occupants {
         return hits;
     }
 
+    /** One ring's occupants, carrying the ring they came from so they can be named. */
+    public static final class Group {
+        public final WheelRing.Kind kind;
+        public final List<Hit> hits;
+
+        public Group(WheelRing.Kind kind, List<Hit> hits) {
+            this.kind = kind;
+            this.hits = hits == null ? Collections.emptyList() : hits;
+        }
+
+        boolean any() {
+            return this.kind != null && !this.hits.isEmpty();
+        }
+    }
+
     /**
      * An HTML block naming what stands in the span, or "" when nothing does.
      *
@@ -112,26 +127,44 @@ public final class Occupants {
      * of zodiac with nothing in it is the ordinary case, and saying so every time would
      * add a line of noise to eleven panels out of twelve.
      *
-     * The two wheels are listed separately and labelled, because "Saturn is here" means
+     * The rings are listed separately and labelled, because "Saturn is here" means
      * something quite different depending on whether it has been there since birth or
      * arrived last week.
      *
-     * @param transit may be empty - it always is when no transit wheel is displayed
+     * <p><b>One group per ring, and it took two labels to see why that matters.</b> This
+     * method used to take exactly two lists and head them "Natal" and "Transiting now".
+     * {@code outerWheelShown} returns true in a synastry, so <b>Chart B's bodies listed
+     * under "Transiting now"</b> - a second person's standing natal placements announced as
+     * a passing moment. That is the same defect the body-click path was fixed for, where the
+     * comment reads "the outer ring is not always a transit"; this surface was left behind,
+     * and it feeds six detail views - house, sign, decan, Sabian degree and bound.
+     *
+     * <p>Two lists could not have been right since G17 either: the wheel carries up to four
+     * outer bands now - a partner, the progressed chart, the directed chart and the sky - and
+     * a progressed or directed body appeared in no list at all. Nothing here decides what a
+     * ring is called: {@link WheelRing.Kind#heading} does, so a ring added later cannot be
+     * silently mislabelled by this method.
+     *
+     * @param groups in the order they should be read; empty ones and nulls are skipped
      */
-    public static String html(List<Hit> natal, List<Hit> transit, String what) {
-        boolean hasNatal = natal != null && !natal.isEmpty();
-        boolean hasTransit = transit != null && !transit.isEmpty();
-        if (!hasNatal && !hasTransit) {
+    public static String html(List<Group> groups, String what) {
+        if (groups == null) {
+            return "";
+        }
+        List<Group> shown = new ArrayList<>();
+        for (Group g : groups) {
+            if (g != null && g.any()) {
+                shown.add(g);
+            }
+        }
+        if (shown.isEmpty()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
         sb.append("<h2 style='color:#00BFFF; margin-top:20px;'>In this ").append(what)
           .append("</h2>");
-        if (hasNatal) {
-            section(sb, natal, "Natal", "#E0E0E0");
-        }
-        if (hasTransit) {
-            section(sb, transit, "Transiting now", "#B9D4FF");
+        for (Group g : shown) {
+            section(sb, g.hits, g.kind.heading, g.kind.hueHex);
         }
         return sb.toString();
     }
