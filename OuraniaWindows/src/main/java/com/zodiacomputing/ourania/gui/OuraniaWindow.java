@@ -43,6 +43,7 @@ public class OuraniaWindow extends JFrame {
     private OverviewPanel overviewPanel;
     private javax.swing.JEditorPane natalPane;
     private javax.swing.JEditorPane transitPane;
+    private javax.swing.JEditorPane chartBPane;
     private javax.swing.JEditorPane synastryPane;
     private javax.swing.JEditorPane selectionPane;
     /** The right rail: what the app can do, and the grid that is read against the wheel. */
@@ -74,6 +75,15 @@ public class OuraniaWindow extends JFrame {
      * thing that belongs to neither chart alone was filed under one of them. David asked for
      * the tab; the astrology was already there.
      */
+    /**
+     * The second person's own chart, in their own houses.
+     *
+     * <b>Not the same page as Synastry and not the same page as Transits.</b> Their placements
+     * used to be emitted onto the Transits page whatever the outer ring was carrying, and the
+     * tab was renamed "Chart B" to cover for it - which is how David came to ask, on 27 Sep,
+     * "where did the transit tab go in a synastry transits chart". One tab was doing two jobs.
+     */
+    public static final String CHART_B_PAGE = "Chart B";
     public static final String SYNASTRY_PAGE = "Synastry";
     public static final String SELECTION_PAGE = "Selection";
     /** What kind of chart this is, before any of the detail. */
@@ -252,13 +262,21 @@ public class OuraniaWindow extends JFrame {
         // content area, so opening it takes width from the wheel and closing gives it back,
         // exactly as the right-hand drawer behaves.
         natalPane = HtmlPanes.chartPane(this);
+        chartBPane = HtmlPanes.chartPane(this);
         transitPane = HtmlPanes.chartPane(this);
         synastryPane = HtmlPanes.chartPane(this);
         selectionPane = HtmlPanes.chartPane(this);
         chartRail = new DrawerRail(Drawer.Side.LEFT, 340);
+        // <b>The two charts, then what they do to each other, then the moment.</b> Chart B sits
+        // beside Chart A because it is the same kind of thing - a person's chart in their own
+        // houses - while Synastry is a question about the pair and Transits is a moment passing
+        // over them. Read in that order a reader meets one fact at a time; with Chart B's
+        // placements on the Transits page, which is where they were, the order said that a
+        // second person was a kind of transit.
         chartRail.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
-        chartRail.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
+        chartRail.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
         chartRail.addPage(SYNASTRY_PAGE, HtmlPanes.scroller(synastryPane));
+        chartRail.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
         // <b>Selection and the reading join the chart's own side.</b> All four answer "what
         // am I looking at" - the chart, the sky over it, the body just clicked, and what that
         // means - so they belong on one edge, leaving the right for what the app can do.
@@ -778,8 +796,14 @@ public class OuraniaWindow extends JFrame {
             return;
         }
         chartRail.setPageLabel(CHART_PAGE, pageTitleOf(skymapPanel.natalRing.kind));
+        // <b>A person is no longer one of the rings this page can hold.</b> Chart B has a page
+        // of its own now, so the outer ring reaches this one only when it is a moment - and
+        // {@code secondPageTitle} is left exactly as it was, because it is a general rule about
+        // naming a page after the rings on it and Part P of NavigationCheck pins it. What
+        // changed is which rings are handed to it.
         chartRail.setPageLabel(TRANSITS_PAGE, secondPageTitle(
-            skymapPanel.outerRing.kind, skymapPanel.outerRingDrawn(),
+            skymapPanel.outerRing.kind,
+            outerReachesSecondPage(skymapPanel.outerRing.kind, skymapPanel.outerRingDrawn()),
             skymapPanel.skyRing.kind, skymapPanel.triRingDrawn()));
     }
 
@@ -804,6 +828,23 @@ public class OuraniaWindow extends JFrame {
      * asserted this rule when it was written, which is why the missing case shipped; Part P of
      * {@link NavigationCheck} asserts it now.
      */
+    /**
+     * Whether the outer ring is one of the rings the second page can hold.
+     *
+     * <b>A person has a page of their own, so they do not reach this one.</b> Chart B's
+     * placements used to be emitted onto the second page whatever the outer ring was carrying,
+     * and this method's neighbour renamed the tab to cover for it - which is how one tab came
+     * to be doing two jobs and how the Transits tab came to look, to David on 27 Sep, as
+     * though it had disappeared.
+     *
+     * <p>Static and given its ring, for the reason {@link #secondPageTitle} is: the rule can be
+     * asserted without building a window, and the one line that was NOT extracted this way
+     * when this split was first written had nothing holding it.
+     */
+    static boolean outerReachesSecondPage(WheelRing.Kind outer, boolean outerDrawn) {
+        return outerDrawn && outer != null && !outer.isPerson;
+    }
+
     static String secondPageTitle(WheelRing.Kind outer, boolean outerDrawn,
                                   WheelRing.Kind sky, boolean skyDrawn) {
         StringBuilder held = new StringBuilder();
@@ -837,8 +878,22 @@ public class OuraniaWindow extends JFrame {
         updateChartSections(natalHtml, transitHtml, gridHtml, "");
     }
 
+    /** Kept so anything still calling the four-part form goes on working. */
     public void updateChartSections(String natalHtml, String transitHtml, String gridHtml,
             String synastryHtml) {
+        updateChartSections(natalHtml, transitHtml, gridHtml, synastryHtml, "");
+    }
+
+    public void updateChartSections(String natalHtml, String transitHtml, String gridHtml,
+            String synastryHtml, String chartBHtml) {
+        if (chartBPane != null) {
+            HtmlPanes.setHtml(chartBPane, chartBHtml);
+        }
+        if (chartRail != null) {
+            // Greyed without a second person, for the same reason Transits is greyed without
+            // transits: a tab that opens onto nothing reads as broken rather than as empty.
+            chartRail.setPageEnabled(CHART_B_PAGE, hasContent(chartBHtml));
+        }
         if (synastryPane != null) {
             HtmlPanes.setHtml(synastryPane, synastryHtml);
         }

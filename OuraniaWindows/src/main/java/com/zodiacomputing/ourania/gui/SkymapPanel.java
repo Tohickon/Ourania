@@ -7181,7 +7181,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.generatePlanetPlacementsHtml(PlacementPart.NATAL),
                 this.generatePlanetPlacementsHtml(PlacementPart.TRANSITS),
                 this.generatePlanetPlacementsHtml(PlacementPart.GRID),
-                this.generatePlanetPlacementsHtml(PlacementPart.SYNASTRY));
+                this.generatePlanetPlacementsHtml(PlacementPart.SYNASTRY),
+                this.generatePlanetPlacementsHtml(PlacementPart.CHART_B));
         }
         this.refreshTimeReadout();
         this.refreshReadingIfShown();
@@ -7429,6 +7430,23 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
          * panel about the outer ring - David, 26 Sep, asked for it to have a tab.
          */
         SYNASTRY,
+        /**
+         * Chart B's own placements, read in Chart B's own houses.
+         *
+         * <b>A person is not a moment, and the Transits page is for moments.</b> The outer
+         * ring's placements lived under {@link #TRANSITS} whatever that ring was carrying, so
+         * in a synastry a reader looking for the second person's chart had to open a tab
+         * called Transits to find it - the same confusion the SYNASTRY part was split out to
+         * end on 26 Sep, left half-finished because only the cross-contacts moved.
+         *
+         * <p><b>Their houses, not yours.</b> {@link #SYNASTRY} answers "where does their Venus
+         * fall in my houses"; this answers "what is their chart". Those are different
+         * questions, and reading this page against {@code activeCusps} would make it a second,
+         * worse copy of the cross-chart page. The cusps come from {@code outerRing.cusps},
+         * which is already computed - the "Chart B" house-alignment option draws the wheel
+         * from them.
+         */
+        CHART_B,
         /** The aspect grid and its legend. */
         GRID
     }
@@ -7443,6 +7461,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         final boolean wantTransits = part == PlacementPart.ALL || part == PlacementPart.TRANSITS;
         final boolean wantGrid = part == PlacementPart.ALL || part == PlacementPart.GRID;
         final boolean wantSynastry = part == PlacementPart.ALL || part == PlacementPart.SYNASTRY;
+        final boolean wantChartB = part == PlacementPart.ALL || part == PlacementPart.CHART_B;
         int n;
         String stringArray;
         int n3;
@@ -7485,17 +7504,34 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             stringBuilder.append(PlacementsPage.natalSection(string, this.natalRing,
                 dateTimeFormatter, this.currentPatterns, this.activeCusps));
         }
-        if (wantTransits && this.showTransitChart) {
-            // The third copy of the same choice, and the one that called a progressed ring a
-            // transit chart. ringWord is the statement of it; this only capitalises.
-            String string4 = this.chartMode == ChartMode.SYNASTRY ? "Chart B (Outer)"
-                : (this.showProgressed() ? "Progressed Chart" : "Transit Chart");
+        // <b>Which PAGE the outer ring belongs on is decided by what it is carrying.</b> A
+        // second person goes on their own page and a moment goes on the Transits page; this
+        // block used to emit the ring onto Transits either way, which is why a reader after
+        // the second person's chart had to open a tab called Transits to find it.
+        //
+        // The title and the colour were the third copy of a choice WheelRing.Kind already
+        // holds - the comment that stood here said so, and that copy was the one that called a
+        // progressed ring a transit chart. Asked of the ring now, so a ring added later cannot
+        // be mislabelled by this method.
+        this.assignRingKinds();
+        final boolean outerIsPerson = this.outerRing.kind.isPerson;
+        if (this.showTransitChart && (outerIsPerson ? wantChartB : wantTransits)) {
             stringArray = this.outerCastLabel();
             if (stringArray.isEmpty() && this.outerRing.time != null) {
                 stringArray = this.outerRing.time.format(dateTimeFormatter);
             }
-            stringBuilder.append(PlacementsPage.ringSection(string4, "#ffa500", stringArray,
-                this.outerRing, "transit_", this.activeCusps));
+            // <b>Their houses on their own page.</b> Everywhere else the outer ring is read
+            // against activeCusps, because everywhere else the question is what it does to
+            // Chart A. On Chart B's own page the question is what their chart is, and reading
+            // it in somebody else's houses would make this page a worse copy of the synastry
+            // one. Falls back to activeCusps if Chart B's own cusps were never cast, which is
+            // what a bi-wheel with no second moment leaves behind.
+            double[] outerCusps = outerIsPerson && this.outerRing.cusps != null
+                && this.outerRing.cusps.length >= 13
+                ? this.outerRing.cusps : this.activeCusps;
+            stringBuilder.append(PlacementsPage.ringSection(this.outerRing.kind.heading,
+                this.outerRing.kind.hueHex, stringArray, this.outerRing, "transit_",
+                outerCusps));
         }
         // <b>Whether the sky ring is DRAWN, not whether it is wrapped around two people.</b>
         // This asked showTriWheel, whose own javadoc says it means "the sky is wrapped around
@@ -7504,7 +7540,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // method already asks triRingDrawn() a hundred lines further down, which is the
         // question both places wanted.
         if (wantTransits && this.triRingDrawn()) {
-            stringBuilder.append(PlacementsPage.ringSection("Sky (Transiting)", "#a0d2ff",
+            // Title and colour from the ring, for the reason the outer ring's now are.
+            stringBuilder.append(PlacementsPage.ringSection(this.skyRing.kind.heading,
+                this.skyRing.kind.hueHex,
                 this.skyRing.time != null ? this.skyRing.time.format(dateTimeFormatter) : "",
                 this.skyRing, "sky_", this.activeCusps));
         }

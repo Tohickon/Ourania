@@ -43,6 +43,8 @@ public final class RingIdentityCheck {
         part("B: the hues did not move", RingIdentityCheck::hues);
         part("C: a group is labelled by its ring", RingIdentityCheck::grouping);
         part("D: the panel lists the rings it is drawing", RingIdentityCheck::panel);
+        part("E: a person and a moment are on different pages", RingIdentityCheck::pages);
+        part("F: a page with nothing on it is greyed out", RingIdentityCheck::greying);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -233,6 +235,181 @@ public final class RingIdentityCheck {
         ok("no outer wheel, no outer groups, stale arrays or not",
             !off.contains(WheelRing.Kind.CHART_B) && !off.contains(WheelRing.Kind.TRANSIT)
                 && !off.contains(WheelRing.Kind.SKY));
+    }
+
+    // ---- Part E
+
+    /**
+     * Chart B's page, the Transits page, and the houses each is read in.
+     *
+     * <p>Reflection into the real {@code generatePlanetPlacementsHtml}, which is how
+     * {@code AspectGridCheck} and {@code NavigationCheck} already reach it. The rings are
+     * written directly rather than cast, and the two sets of cusps are given deliberately
+     * incompatible origins - Chart A's houses starting at 0 degrees and Chart B's at 180 - so
+     * that one body at 15 degrees lands in house I under one and house VII under the other.
+     * That is the only way to tell, from the markup, WHOSE houses a page is reading.
+     */
+    private static void pages() throws Exception {
+        SkymapPanel[] hold = new SkymapPanel[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new SkymapPanel(null));
+        SkymapPanel sp = hold[0];
+
+        Class<?> partType = Class.forName(
+            "com.zodiacomputing.ourania.gui.SkymapPanel$PlacementPart");
+        java.lang.reflect.Method gen = SkymapPanel.class.getDeclaredMethod(
+            "generatePlanetPlacementsHtml", partType);
+        gen.setAccessible(true);
+        Object chartB = Enum.valueOf(partType.asSubclass(Enum.class), "CHART_B");
+        Object transits = Enum.valueOf(partType.asSubclass(Enum.class), "TRANSITS");
+
+        Arrays.fill(sp.outerRing.valid, false);
+        sp.outerRing.lon[0] = 15.0;
+        sp.outerRing.valid[0] = true;
+        sp.showTransitChart = true;
+        sp.showTriWheel = false;
+        for (int i = 1; i <= 12; i++) {
+            sp.activeCusps[i] = (i - 1) * 30.0;
+            sp.outerRing.cusps[i] = ((i - 1) * 30.0 + 180.0) % 360.0;
+        }
+
+        sp.chartMode = ChartMode.SYNASTRY;
+        String bPage = (String) gen.invoke(sp, chartB);
+        String tPage = (String) gen.invoke(sp, transits);
+
+        ok("a synastry's Chart B page carries their placements",
+            bPage.contains("Placements"));
+        ok("headed by the ring's own name", bPage.contains(WheelRing.Kind.CHART_B.heading));
+        // THE SPLIT. Their placements were emitted onto the Transits page whatever the outer
+        // ring was carrying, and the tab was renamed to cover for it.
+        ok("and the Transits page does not carry them at all",
+            !tPage.contains("Placements"));
+        ok("so the Transits page is empty enough to be greyed out",
+            !OuraniaWindow.hasContent(tPage));
+
+        // Whose houses. "House VII" is Chart B's own cusps; "House I" would be Chart A's.
+        ok("Chart B is read in Chart B's houses (House VII)",
+            bPage.contains("House VII</a>"));
+        ok("and not in Chart A's (House I)", !bPage.contains("House I</a>"));
+
+        // A moment goes the other way round: on Transits, and in the houses on screen.
+        sp.chartMode = ChartMode.TRANSIT;
+        sp.showProgressed = false;
+        sp.showSolarArc = false;
+        String bEmpty = (String) gen.invoke(sp, chartB);
+        String tFull = (String) gen.invoke(sp, transits);
+        ok("a transit chart puts nothing on the Chart B page",
+            !bEmpty.contains("Placements"));
+        ok("so that page is greyed out instead", !OuraniaWindow.hasContent(bEmpty));
+        ok("and the Transits page carries the moment", tFull.contains("Placements"));
+        ok("headed Transits", tFull.contains(WheelRing.Kind.TRANSIT.heading));
+        ok("read in the houses on screen (House I)", tFull.contains("House I</a>"));
+
+        // And the tab stops having to stand in for a page that now exists. This is the 27 Sep
+        // complaint - "where did the transit tab go in a synastry transits chart" - which was
+        // one tab doing two jobs.
+        ok("the second tab is never called Chart B now",
+            !OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, false,
+                WheelRing.Kind.SKY, true).contains("Chart B"));
+        ok("and still names the sky when the sky is what it holds",
+            OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, false,
+                WheelRing.Kind.SKY, true).contains(WheelRing.Kind.SKY.heading));
+        ok("and still names a transit ring when that is what it holds",
+            OuraniaWindow.secondPageTitle(WheelRing.Kind.TRANSIT, true,
+                WheelRing.Kind.SKY, false).contains(WheelRing.Kind.TRANSIT.heading));
+
+        // <b>The rule that decides which rings reach that page, asserted on its own.</b> It was
+        // one condition inside the caller, where nothing could reach it: every assertion above
+        // hands secondPageTitle its arguments directly, so the caller could have gone on
+        // sending a person to the second page and all of them would still pass.
+        ok("a drawn second person does not reach the second page",
+            !OuraniaWindow.outerReachesSecondPage(WheelRing.Kind.CHART_B, true));
+        ok("a drawn transit ring does",
+            OuraniaWindow.outerReachesSecondPage(WheelRing.Kind.TRANSIT, true));
+        ok("and so does a drawn progressed ring, which is a moment of the same person",
+            OuraniaWindow.outerReachesSecondPage(WheelRing.Kind.PROGRESSED, true));
+        ok("and a directed ring", OuraniaWindow.outerReachesSecondPage(
+            WheelRing.Kind.SOLAR_ARC, true));
+        ok("an undrawn ring reaches nothing, whatever it is",
+            !OuraniaWindow.outerReachesSecondPage(WheelRing.Kind.TRANSIT, false)
+                && !OuraniaWindow.outerReachesSecondPage(WheelRing.Kind.CHART_B, false));
+        ok("and a ring with no kind at all does not crash the naming",
+            !OuraniaWindow.outerReachesSecondPage(null, true));
+    }
+
+    // ---- Part F
+
+    /**
+     * The tab is actually told, and not merely told something true.
+     *
+     * <p><b>This part exists because a mutation survived.</b> Part E asserts that the markup
+     * for an absent Chart B is empty, and {@code hasContent} agrees it is empty - but nothing
+     * joined those two facts to the rail, so {@code setPageEnabled(CHART_B_PAGE, true)}
+     * unconditionally passed every assertion in this suite. A tab that opens onto a blank
+     * panel reads as broken rather than as empty, which is the whole reason the greying is
+     * there.
+     *
+     * <p>It builds the window, which the rest of this suite avoids, because the wiring is the
+     * claim: the emptiness test and the rail call are two lines apart and either one can be
+     * right while the pair is wrong. The Synastry page is asserted alongside it - its greying
+     * had nothing holding it either, which is how this gap came to be inherited rather than
+     * introduced.
+     */
+    private static void greying() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            // No "the page exists" assertion here: it would be a tautology, and this project
+            // has found a guard no failure can reach seven times in one month. The page's
+            // existence is proved below by its lighting UP - setPageEnabled on a label the
+            // rail does not have leaves isPageEnabled false, so that assertion fails if the
+            // page was never added.
+            final DrawerRail rail = w[0].chartRail();
+
+            String body = "<html><body>Chart B<br>Placements</body></html>";
+            String blank = "<html><body></body></html>";
+
+            javax.swing.SwingUtilities.invokeAndWait(
+                () -> w[0].updateChartSections(blank, blank, blank, blank, blank));
+            ok("with no second person the Chart B tab is greyed out",
+                !rail.isPageEnabled(OuraniaWindow.CHART_B_PAGE));
+            ok("and so is Synastry", !rail.isPageEnabled(OuraniaWindow.SYNASTRY_PAGE));
+            ok("and so is Transits", !rail.isPageEnabled(OuraniaWindow.TRANSITS_PAGE));
+
+            javax.swing.SwingUtilities.invokeAndWait(
+                () -> w[0].updateChartSections(blank, blank, blank, blank, body));
+            ok("with a second person the Chart B tab lights up",
+                rail.isPageEnabled(OuraniaWindow.CHART_B_PAGE));
+
+            // <b>And the page behind it actually holds the section.</b> Also found by a
+            // surviving mutation: dropping the setHtml call left the tab lighting up over an
+            // empty pane, and every assertion about the greying still passed. A lit tab and a
+            // blank page is a worse failure than a greyed tab, because it looks like the app
+            // has nothing to say about the second person rather than like a bug.
+            final javax.swing.JEditorPane pane =
+                (javax.swing.JEditorPane) CheckReflect.get(w[0], "chartBPane");
+            final String[] shown = new String[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> shown[0] = pane.getText());
+            ok("and the Chart B page holds Chart B's section",
+                shown[0] != null && shown[0].contains("Placements"));
+            ok("and Synastry stays greyed until it has its own content",
+                !rail.isPageEnabled(OuraniaWindow.SYNASTRY_PAGE));
+
+            javax.swing.SwingUtilities.invokeAndWait(
+                () -> w[0].updateChartSections(blank, body, blank, body, body));
+            ok("and each page lights from its OWN section, not from any of them",
+                rail.isPageEnabled(OuraniaWindow.CHART_B_PAGE)
+                    && rail.isPageEnabled(OuraniaWindow.SYNASTRY_PAGE)
+                    && rail.isPageEnabled(OuraniaWindow.TRANSITS_PAGE));
+
+            // Back to empty, because a tab that lights up and never goes dark again is the
+            // same defect with a longer fuse - the rail would stay lit from a chart ago.
+            javax.swing.SwingUtilities.invokeAndWait(
+                () -> w[0].updateChartSections(blank, blank, blank, blank, blank));
+            ok("and goes dark again when the second person is removed",
+                !rail.isPageEnabled(OuraniaWindow.CHART_B_PAGE));
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
     }
 
     /** The kinds of the groups that actually have somebody in them. */
