@@ -127,6 +127,45 @@ public final class DrawerRail extends JPanel {
         rail.revalidate();
     }
 
+    /**
+     * A rule between two runs of tabs, so the rail reads as groups rather than a list.
+     *
+     * <b>Twelve tabs in one column is a list, and a list says every item is the same kind of
+     * thing.</b> They are not: four of them are charts on the wheel, three are what you are
+     * looking at and what it means, and five are long documents the app generates. A reader
+     * had to learn that by opening them. David, 2026-10-06: "fix the tabs on the left to be
+     * more coherent".
+     *
+     * <p><b>A rule and not a caption.</b> Tab text runs vertically here - {@code rename}'s
+     * comment says a longer word needs a taller tab - so a group heading would be rotated,
+     * would cost height the column does not have at twelve tabs, and would compete with the
+     * tabs for the same reading direction. A rule groups without naming, which is what a
+     * toolbar separator has always done, and it cannot be out of date the way a name can.
+     *
+     * <p>Not focusable and not a tab: it is added to the rail only, never to {@code tabs} or
+     * the card layout, so nothing can select it and {@code setPageEnabled} cannot reach it.
+     */
+    public void addSeparator() {
+        JComponent rule = new JComponent() {
+            @Override
+            protected void paintComponent(java.awt.Graphics g) {
+                Color ink = SkymapPanel.inkColor();
+                g.setColor(new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), 70));
+                int y = getHeight() / 2;
+                g.drawLine(5, y, Math.max(6, getWidth() - 5), y);
+            }
+        };
+        rule.setAlignmentX(0.5f);
+        rule.setMaximumSize(new Dimension(RAIL_WIDTH, SEPARATOR_HEIGHT));
+        rule.setPreferredSize(new Dimension(RAIL_WIDTH, SEPARATOR_HEIGHT));
+        rule.setMinimumSize(new Dimension(RAIL_WIDTH, SEPARATOR_HEIGHT));
+        rail.add(rule);
+        rail.revalidate();
+    }
+
+    /** Tall enough to read as a gap, short enough that twelve tabs still fit a laptop. */
+    private static final int SEPARATOR_HEIGHT = 11;
+
     /** How wide a page opens: its own width, or the rail's when it did not ask for one. */
     private int widthFor(String label) {
         Integer w = pageWidths.get(label);

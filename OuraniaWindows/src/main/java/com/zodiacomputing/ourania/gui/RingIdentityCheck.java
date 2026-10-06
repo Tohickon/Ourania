@@ -47,6 +47,8 @@ public final class RingIdentityCheck {
         part("F: a page with nothing on it is greyed out", RingIdentityCheck::greying);
         part("G: an aspect list is asked of a ring, not of a boolean",
             RingIdentityCheck::ringAspects);
+        part("H: the rail reads as three groups, not twelve items",
+            RingIdentityCheck::railGroups);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -502,6 +504,73 @@ public final class RingIdentityCheck {
         // so a caller that wants the contacts without the drawing can still have them.
         ok("directedAspects says nothing while the band is not drawn",
             !sp.arcRingDrawn() && sp.directedAspects(1).isEmpty());
+    }
+
+    // ---- Part H
+
+    /**
+     * The rail's running order, and that a rule is not a tab.
+     *
+     * <p><b>The order IS the claim.</b> A separator asserted only by its presence would pass on
+     * a rail that put both rules at the bottom; what makes the rail coherent is which runs they
+     * divide. So this pins the whole sequence - every tab, in order, with a null where each
+     * rule falls - rather than counting components.
+     *
+     * <p>The second claim is that a rule cannot be mistaken for a page. It goes into the rail's
+     * own column but never into the tab list or the card layout, so nothing can select it and
+     * {@code setPageEnabled} cannot reach it. A rule that could be clicked would open a blank
+     * card, which is the failure the greying exists to prevent, arriving by a different door.
+     */
+    private static void railGroups() throws Exception {
+        final OuraniaWindow[] w = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            DrawerRail rail = w[0].chartRail();
+            javax.swing.JPanel column = (javax.swing.JPanel) CheckReflect.get(rail, "rail");
+            List<String> seen = new ArrayList<>();
+            for (java.awt.Component c : column.getComponents()) {
+                seen.add(c.getName());
+            }
+
+            List<String> want = Arrays.asList(
+                OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
+                OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.TRANSITS_PAGE,
+                null,
+                OuraniaWindow.OVERVIEW_PAGE, OuraniaWindow.READING_PAGE,
+                OuraniaWindow.SELECTION_PAGE,
+                null,
+                "Snapshot", "Report", "Synthesize", "Predict", "Calendar");
+            ok("the rail runs charts, then what is said about them, then the documents "
+                + seen, want.equals(seen));
+
+            // The two rules, in the two places that make the three groups.
+            ok("there are exactly two rules", Collections.frequency(seen, null) == 2);
+            ok("one closes the charts", seen.indexOf(null) == 4);
+            ok("and one opens the documents", seen.lastIndexOf(null) == 8);
+
+            // <b>A rule is not a tab, asked of the list that decides.</b> The first version of
+            // this assertion called setPageEnabled(null, false) to show a rule had no page -
+            // and that throws inside the rail, because a label is never null for a real page.
+            // A probe that cannot run is not evidence. The rail keeps its tabs in one list and
+            // its drawn column in another, so the question is simply whether the two differ by
+            // the rules: fourteen things in the column, twelve of them selectable.
+            java.util.Collection<?> tabs = (java.util.Collection<?>) CheckReflect.get(rail, "tabs");
+            ok("the column holds the rules and the tab list does not ("
+                + column.getComponents().length + " drawn, " + tabs.size() + " selectable)",
+                column.getComponents().length == tabs.size() + 2);
+
+            // And every real page is still addressable after the move - Selection in
+            // particular, which changed position.
+            for (String page : want) {
+                if (page == null) {
+                    continue;
+                }
+                rail.setPageEnabled(page, true);
+                ok(page + " is still a page the rail knows", rail.isPageEnabled(page));
+            }
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
     }
 
     /** Two aspect lists holding the same rows, compared cell by cell. */

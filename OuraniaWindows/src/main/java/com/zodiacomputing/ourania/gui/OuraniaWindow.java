@@ -277,10 +277,19 @@ public class OuraniaWindow extends JFrame {
         chartRail.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
         chartRail.addPage(SYNASTRY_PAGE, HtmlPanes.scroller(synastryPane));
         chartRail.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
+        // <b>The end of the charts, and the start of what is said about them.</b> See
+        // DrawerRail.addSeparator: twelve tabs in one column read as a list, and a list claims
+        // every item is the same kind of thing. These four are charts on the wheel; what
+        // follows is what the reader is looking at, and after that the documents the app
+        // writes. The order inside this group runs outward exactly as the wheel does - the
+        // person, the other person, what they do to each other, then the moment passing over
+        // both - which is also the order the sources give for reading them.
+        chartRail.addSeparator();
         // <b>Selection and the reading join the chart's own side.</b> All four answer "what
         // am I looking at" - the chart, the sky over it, the body just clicked, and what that
         // means - so they belong on one edge, leaving the right for what the app can do.
-        chartRail.addPage(SELECTION_PAGE, HtmlPanes.scroller(selectionPane));
+        // Selection itself is added further down, with Overview and Interpretation, because it
+        // belongs to that group rather than to the charts; it is only built here.
         // Open on Chart at launch, without animating - the Natal section used to be the one
         // section open when the app started, and this is where that content went.
         chartRail.prepare(CHART_PAGE);
@@ -323,6 +332,16 @@ public class OuraniaWindow extends JFrame {
         // "make sure the information panel on the left is scrollable it was giving me quite a
         // few glitches". NavigationCheck Part R holds the rail to one visible card.
         chartRail.addPage(READING_PAGE, interpretationPanel);
+        // <b>Selection sits with these two, not with the charts.</b> Overview is the shape of
+        // the whole chart, Interpretation is the reading of the whole chart, and Selection is
+        // the one body you just clicked - so the group runs from the widest scope to the
+        // narrowest, which is the order the sources give for reading a chart at all ("macro
+        // scope down to granular dynamics"). It was added up with the chart pages before, where
+        // it read as a fifth chart.
+        chartRail.addPage(SELECTION_PAGE, HtmlPanes.scroller(selectionPane));
+        // And the last boundary: everything below is a document the app writes, not a view of
+        // what is on the wheel.
+        chartRail.addSeparator();
         for (String[] r : READINGS) {
             javax.swing.JEditorPane pane = HtmlPanes.chartPane(this);
             readingPanes.put(r[0], pane);
