@@ -6169,17 +6169,48 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
     }
 
-    public List<String[]> getActiveAspectsFor(int n, boolean bl) {
+    /**
+     * The aspects one body makes to the natal chart, asked of a ring rather than a boolean.
+     *
+     * <b>A boolean could only say two of the rings there are.</b> {@code true} meant the outer
+     * ring and {@code false} the inner one, which was the whole world until G17 drew a fourth
+     * wheel - and it is the same shape as {@code profileForPair}, which "answered a boolean
+     * until 2026-09-24 and could only say two of the four things". The directed band has no
+     * aspects at all today, in the wheel or in any reading, because there was no way to ask
+     * this question about it. Now there is.
+     *
+     * <p>The sources settled what belongs here on 2026-10-05: a transiting body aspects the
+     * NATAL chart, and transit-to-transit is mundane weather that happens to everyone alive at
+     * once rather than a personal trigger. So the far side is always {@code natalRing}, which
+     * is what this method always did - that part was right and stays.
+     *
+     * @param from the ring the body stands on; natal, outer, sky or the directed band
+     */
+    public List<String[]> getActiveAspectsFor(int n, WheelRing from) {
         double d;
-        boolean[] blArray;
         ArrayList<String[]> arrayList = new ArrayList<String[]>();
-        double[] dArray = bl ? this.outerRing.lon : this.natalRing.lon;
-        boolean[] blArray2 = blArray = bl ? this.outerRing.valid : this.natalRing.valid;
+        if (from == null) {
+            return arrayList;
+        }
+        double[] dArray = from.lon;
+        boolean[] blArray = from.valid;
+        // No length test on the ring's own arrays: every WheelRing is built BODY_COUNT wide,
+        // so n >= BODY_COUNT has already excluded every index they could not hold. A mutation
+        // that deleted such a test SURVIVED, which is how it was found to be unreachable - a
+        // guard no failure can reach is not a guard, and this project has now recorded eight.
         if (n < 0 || n >= BODY_COUNT || !blArray[n]) {
             return arrayList;
         }
+        boolean bl = from != this.natalRing;
         double d2 = dArray[n];
-        double d3 = d = bl ? this.outerRing.speed[n] : this.natalRing.speed[n];
+        // <b>A directed body has no speed of its own</b> - it is the natal position plus one
+        // arc, so nothing in that ring moves at its own rate. The first version of this method
+        // special-cased SOLAR_ARC to the 361 an angle uses; a mutation deleting that branch
+        // SURVIVED, and the reason is that {@code arcRing.speed} is never written at all and
+        // stays zero, which is already how this codebase says "does not move". The branch was
+        // a second way of stating one fact - the defect this file names most often - so it is
+        // gone rather than asserted into existence.
+        d = from.speed[n];
         if (Bodies.at(n).isAngle()) {
             d = 361.0;
         }
@@ -6196,6 +6227,37 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             arrayList.add(new String[]{BODY_NAMES[i], string, string2});
         }
         return arrayList;
+    }
+
+    /**
+     * The older boolean form, kept so its four callers go on working unchanged.
+     *
+     * <b>Delegates rather than duplicating</b>, so there is still one implementation of what an
+     * aspect row is. A second copy here is exactly what this method was extracted to prevent,
+     * and the click paths that still build this list inline are the remaining instance.
+     */
+    public List<String[]> getActiveAspectsFor(int n, boolean outer) {
+        return this.getActiveAspectsFor(n, outer ? this.outerRing : this.natalRing);
+    }
+
+    /**
+     * The directed chart's aspects to the natal chart, which nothing could ask for until now.
+     *
+     * <b>G17 drew the fourth wheel and the band makes no lines.</b> Every chord loop in
+     * {@code WheelCanvas} compares a ring against {@code natalRing}, and the directed band is
+     * in none of them - so a directed Pluto on the natal Ascendant is a glyph in the right
+     * place and not a chord. Meanwhile {@code Convergence}'s SOLAR_ARC family is populated and
+     * scores that same contact as one of the three testimonies it converges. The reading and
+     * the wheel disagree about one fact, and the engine is the one that is right.
+     *
+     * <p>This is the half that can be answered without touching the painter: the contacts are
+     * computable and listable now. Drawing them needs the directed band to become a wheel
+     * identity of its own - {@code WheelLayout.packHit} encodes the ring in bits that the
+     * phone reads too - which is its own change and is not smuggled in here.
+     */
+    public List<String[]> directedAspects(int n) {
+        return this.arcRingDrawn() ? this.getActiveAspectsFor(n, this.arcRing)
+            : java.util.Collections.emptyList();
     }
 
     /**

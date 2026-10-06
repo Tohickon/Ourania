@@ -45,6 +45,8 @@ public final class RingIdentityCheck {
         part("D: the panel lists the rings it is drawing", RingIdentityCheck::panel);
         part("E: a person and a moment are on different pages", RingIdentityCheck::pages);
         part("F: a page with nothing on it is greyed out", RingIdentityCheck::greying);
+        part("G: an aspect list is asked of a ring, not of a boolean",
+            RingIdentityCheck::ringAspects);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -410,6 +412,109 @@ public final class RingIdentityCheck {
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
+    }
+
+    // ---- Part G
+
+    /**
+     * The aspect list, asked of a ring.
+     *
+     * <p><b>The assertion that carries this part is that a question can now be ASKED.</b> The
+     * old signature took a boolean - outer ring or inner ring - so there was no way to ask
+     * what the directed band aspects, and the answer to a question nobody could put is not
+     * wrong, it is absent. G17 drew that band and it has made no lines and appeared in no
+     * aspect list since.
+     *
+     * <p>The two equivalence assertions matter as much: the boolean form still has four
+     * callers, and if it stopped agreeing with the ring form there would be two definitions of
+     * what an aspect row is - which is what extracting this method was for.
+     */
+    private static void ringAspects() throws Exception {
+        SkymapPanel[] hold = new SkymapPanel[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new SkymapPanel(null));
+        SkymapPanel sp = hold[0];
+        sp.chartMode = ChartMode.TRANSIT;
+
+        // <b>Far from zero on purpose, and a mutation is why.</b> The first version of this
+        // fixture put everything at 10 degrees, where an unset longitude of 0.0 is still
+        // within a luminary's conjunction orb - so a mutation that ignored the ring argument
+        // entirely and read natalRing's positions SURVIVED, finding the "same" aspect by
+        // accident. At 100 degrees an unset 0.0 is no aspect at all, so reading the wrong
+        // ring's array can only produce an empty list.
+        Arrays.fill(sp.natalRing.valid, false);
+        Arrays.fill(sp.outerRing.valid, false);
+        Arrays.fill(sp.arcRing.valid, false);
+        Arrays.fill(sp.natalRing.lon, 0.0);
+        Arrays.fill(sp.outerRing.lon, 0.0);
+        Arrays.fill(sp.arcRing.lon, 0.0);
+        sp.natalRing.lon[0] = 100.0;
+        sp.natalRing.speed[0] = 1.0;
+        sp.natalRing.valid[0] = true;
+        sp.outerRing.lon[1] = 100.0;
+        sp.outerRing.speed[1] = 1.0;
+        sp.outerRing.valid[1] = true;
+        sp.arcRing.lon[1] = 100.0;
+        sp.arcRing.valid[1] = true;
+
+        List<String[]> byRing = sp.getActiveAspectsFor(0, sp.natalRing);
+        List<String[]> byFlag = sp.getActiveAspectsFor(0, false);
+        ok("the inner wheel answers the same either way (" + byRing.size() + " vs "
+            + byFlag.size() + ")", same(byRing, byFlag));
+
+        List<String[]> outRing = sp.getActiveAspectsFor(1, sp.outerRing);
+        List<String[]> outFlag = sp.getActiveAspectsFor(1, true);
+        ok("and so does the outer ring", same(outRing, outFlag));
+        ok("the outer ring finds its conjunction to the natal Sun", outFlag.size() == 1);
+        // <b>WHICH aspect, not how many.</b> Counting rows let a mutation that ignored the
+        // ring argument survive: it read natalRing's positions instead, found 100 degrees
+        // against a natal body at 100 - no, against an unset 0.0 - and landed within orb of a
+        // SQUARE to 90. One row either way, so the count agreed while the fact did not.
+        ok("and it is a conjunction, which only the right ring's longitude can give",
+            outFlag.size() == 1 && "Conjunction".equals(outFlag.get(0)[1]));
+
+        // THE POINT OF THE CHANGE. There was no argument that named this ring.
+        List<String[]> arc = sp.getActiveAspectsFor(1, sp.arcRing);
+        ok("the DIRECTED band can be asked at all, and finds its contact ("
+            + arc.size() + " row" + (arc.size() == 1 ? "" : "s") + ")", arc.size() == 1);
+        ok("the contact it finds is to the natal Sun",
+            arc.size() == 1 && "Sun".equals(arc.get(0)[0]));
+        ok("and it is the conjunction, read from the directed ring's own longitude",
+            arc.size() == 1 && "Conjunction".equals(arc.get(0)[1]));
+
+        // The far side is always the natal chart: transit-to-transit is mundane weather, which
+        // the sources confirmed on 2026-10-05 and the app has never drawn.
+        Arrays.fill(sp.natalRing.valid, false);
+        ok("with nothing in the natal chart, an outer body aspects nothing",
+            sp.getActiveAspectsFor(1, sp.outerRing).isEmpty());
+        ok("and neither does a directed one",
+            sp.getActiveAspectsFor(1, sp.arcRing).isEmpty());
+        sp.natalRing.valid[0] = true;
+
+        // Robustness: a ring that is not there, and a body that is not on it.
+        ok("a null ring answers empty rather than throwing",
+            sp.getActiveAspectsFor(0, (WheelRing) null).isEmpty());
+        ok("a body the ring does not carry answers empty",
+            sp.getActiveAspectsFor(2, sp.arcRing).isEmpty());
+        ok("and so does an index off the end",
+            sp.getActiveAspectsFor(9999, sp.arcRing).isEmpty());
+
+        // directedAspects gates on the band being drawn; the ring form deliberately does not,
+        // so a caller that wants the contacts without the drawing can still have them.
+        ok("directedAspects says nothing while the band is not drawn",
+            !sp.arcRingDrawn() && sp.directedAspects(1).isEmpty());
+    }
+
+    /** Two aspect lists holding the same rows, compared cell by cell. */
+    private static boolean same(List<String[]> a, List<String[]> b) {
+        if (a.size() != b.size()) {
+            return false;
+        }
+        for (int i = 0; i < a.size(); i++) {
+            if (!Arrays.equals(a.get(i), b.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** The kinds of the groups that actually have somebody in them. */
