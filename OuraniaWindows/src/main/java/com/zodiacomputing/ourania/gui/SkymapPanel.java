@@ -3639,10 +3639,22 @@ implements WheelSource, GlobeSource {
      * A are different readings about different people, and showing one direction would
      * silently privilege whoever happened to be entered first.
      *
-     * <b>The orb here is not the orb the grid below uses.</b> The angle contacts read at
-     * the halved synastry orb; the grid still reads at full natal orbs. See
-     * {@link Synastry#angleContacts} - the difference is deliberate, recorded, and David's
-     * to settle.
+     * <b>The orb here IS the orb the grid below uses, and that is now settled.</b> This note
+     * used to say the opposite - angle contacts at the halved synastry orb, the grid at full
+     * natal widths, "David's to settle". The grid stopped reading at natal widths on
+     * 2026-08-24: {@code gridBand} passes {@code profileForPair(wheel == WHEEL_OUTER)}, so a
+     * partner band is judged at {@link Aspects.Profile#SYNASTRY}, exactly as these contacts
+     * are. The note outlived the defect, which is the failure its own neighbours warn about.
+     *
+     * <b>David settled the question against the sources on 2026-10-05, and the answer is the
+     * behaviour that was already here:</b> one synastry profile everywhere - grid, wheels,
+     * globe and text - rather than a tighter rule for angles alone. Superimposing two charts
+     * doubles the active points from twelve to twenty-four, and at full natal widths that is
+     * an unreadable chart in which the genuine contacts cannot be picked out (Stellas);
+     * synastry wants significantly tighter orbs than natal work (Cunningham). Angles are
+     * zero-width points that cast nothing and only receive, so a contact is the planet's own
+     * reduced orb reaching the exact degree (Avelar and Ribeiro) - which is what
+     * {@link Synastry#angleContacts} computes.
      */
     /**
      * Which of chart A's angles this chart-B body sits on, or null.
@@ -3653,9 +3665,11 @@ implements WheelSource, GlobeSource {
      * second definition here would be the same rule implemented twice, which is the defect
      * this codebase names most often.
      *
-     * Note the orb caveat recorded on generateSynastryCrossHtml: these contacts read at the
-     * halved orb while the aspect grid reads at full natal orbs. That difference is open and
-     * David's to settle; this method inherits whichever answer angleContacts gives.
+     * There is no orb caveat any more. These contacts and the aspect grid both read
+     * cross-chart pairs at {@link Aspects.Profile#SYNASTRY}; the note that said otherwise
+     * described a state that ended on 2026-08-24. Settled by David against the sources on
+     * 2026-10-05 - one synastry profile everywhere - and the full reasoning is on
+     * {@code generateSynastryCrossHtml} above.
      */
     public String synastryAngleContact(String bodyName) {
         if (bodyName == null || !this.isSynastryChart()

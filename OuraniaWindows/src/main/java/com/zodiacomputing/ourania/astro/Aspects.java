@@ -708,6 +708,26 @@ public final class Aspects {
      * Note the four Ptolemaic majors and the conjunction declare {@code Double.MAX_VALUE},
      * so halving their cap is a no-op by construction: they are governed by the body orb and
      * always were.
+     *
+     * <p><b>Confirmed by the sources on 2026-10-05, in principle and NOT in its numbers.</b>
+     * David put the question to his research notebook and the principle came back exactly as
+     * implemented here: one synastry profile applied uniformly across grid, wheels and text,
+     * at roughly half natal width, because two charts put twenty-four points on one wheel and
+     * full natal orbs leave a chart in which the real contacts cannot be picked out.
+     *
+     * <p>The recommended <i>figures</i> are a different matter, and this is a disagreement
+     * rather than an oversight. The sources propose a per-aspect table - hard aspects 4-5
+     * degrees, trines and sextiles 3-4, minors 1.5-2 - which is Cunningham's scheme, the one
+     * measured above and found <b>worst of the ten</b> at 35% minor-weighted. The reason is
+     * arithmetic and does not depend on taste: cutting squares and trines to 3 or 4 degrees
+     * while the minors sit at a 1.0 degree cap that is <i>already</i> tighter than the
+     * proposed 1.5-2.0 floor does not tighten the minors at all - it widens them, and raises
+     * their share of the reading. Tightening a synastry means tightening it <b>in step</b>,
+     * which is what halving the body orb and the cap together does: 49-52% of every one of
+     * the eleven aspect types survives, and the minor share stays where natal has it.
+     *
+     * <p>So the numbers stay. If they are ever changed to the per-aspect table, the thing to
+     * measure is not the orb widths but the minor share of the resulting readings.
      */
     public static double effectiveOrb(String nameA, String nameB, Type t, Profile profile) {
         return Math.min(orbFor(nameA, nameB, profile), capOf(t, profile));
