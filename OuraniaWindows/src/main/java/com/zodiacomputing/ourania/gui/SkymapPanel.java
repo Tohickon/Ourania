@@ -1759,12 +1759,20 @@ implements WheelSource, GlobeSource {
      * How near the cursor has to be to count as pointing at a body.
      *
      * Was a flat 18.0 everywhere, which was right while every glyph was drawn at 15px and
-     * is wrong now that they run from 11px to 19px: too tight for the lights, and loose
+     * wrong the moment they stopped being one size: too tight for the lights, and loose
      * enough on the asteroids to let a neighbour answer for them.
+     *
+     * <b>Reading the drawn radius is the whole point, so this tracks a re-tiering without
+     * being edited.</b> The tables now run 14..8 natal and 12..7 transit (WheelLayout
+     * NATAL_SIZES), which is a wider spread than when this was written - so the smallest
+     * targets got smaller with their beads, by design: a click answers the body under the
+     * cursor, and an asteroid drawn at 8px that answered a 13px ring would be answering for
+     * its neighbours again.
      *
      * Capped at half the collision spacing its ring was laid out with, so two glyphs can
      * never both claim the same pixel - radialLevels guarantees 32px between natal glyphs
-     * and 28px between transit ones, so 16 and 14 are the largest safe values.
+     * and 28px between transit ones, so 16 and 14 are the largest safe values. Those caps
+     * now only bind the top tier, which is what a cap should do.
      */
     private static int hitRadius(int n, boolean transit) {
         if (Bodies.at(n).isAngle()) {

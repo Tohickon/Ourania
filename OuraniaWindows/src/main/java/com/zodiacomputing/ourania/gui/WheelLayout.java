@@ -101,12 +101,21 @@ public final class WheelLayout {
         }
         return out;
     }
-    /** The Sun and the Moon. */
+    /**
+     * The Sun and the Moon.
+     *
+     * <b>Grouped by APPARENT size, which is the one place this table is not physical.</b>
+     * The Moon is 1,737km across and Mercury 2,440km, so by diameter the Moon belongs two
+     * tiers down. But both lights subtend about half a degree from Earth and nothing else
+     * subtends more than a arcminute - they are the two objects in the sky with a visible
+     * disc, which is why every tradition reads them as the pair they are. Drawing them
+     * largest is reporting what the sky looks like, not overriding the physics.
+     */
     static final int TIER_LIGHT = 0;
-    /** Mercury, Venus, Mars - the rest of Group.LUMINARIES. */
-    static final int TIER_INNER = 1;
-    /** Jupiter through Pluto. */
-    static final int TIER_OUTER = 2;
+    /** Jupiter, Saturn, Uranus, Neptune - the gas and ice giants. */
+    static final int TIER_GIANT = 1;
+    /** Mercury, Venus, Mars, Ceres, Pluto - the rocky and icy bodies. */
+    static final int TIER_ROCKY = 2;
     /** Asteroids, centaurs, nodes and calculated points. */
     static final int TIER_SMALL = 3;
     public static final class GlyphSize {
@@ -127,57 +136,121 @@ public final class WheelLayout {
         }
     }
     /**
-     * <b>Four tiers, close together on purpose.</b> The lights used to be drawn at nearly
-     * twice an asteroid's radius, which read as a hierarchy of importance the chart does not
-     * actually claim - and, more practically, made a Sun and a Moon next to each other wide
-     * enough to push their neighbours out of the band they belong to. They are still the
-     * largest, by enough to find at a glance and no more.
+     * <b>Four tiers, spread so the order is visible - and spread DOWNWARD.</b>
      *
-     * The largest transit radius here is what BAND_EDGE is set from; raising one without the
-     * other is what lets a glyph overhang the ring it is drawn on.
+     * This table previously ran 14-13-12-11 and its own header defended being that flat: the
+     * lights had once been drawn at nearly twice an asteroid's radius, which "read as a
+     * hierarchy of importance the chart does not actually claim". David asked for the
+     * hierarchy back on 2026-10-06, and for a different one: not importance but <i>size</i> -
+     * the bead is the body, so the Sun should look like the Sun and Vesta like Vesta.
+     *
+     * <b>The flat version also had two defects the prose did not mention.</b> It claimed four
+     * tiers and TRANSIT_SIZES drew three - tiers 1 and 2 were both radius 11, so the giants
+     * and the inner planets were the same bead. And the order was inverted against the sky:
+     * Mercury was drawn LARGER than Jupiter, because the tier came from Bodies.Group, which
+     * sorts by what a body means rather than by how big it is. Those are different axes and
+     * neither derives from the other - Pluto is an outer planet and 1,188km across; Ceres is
+     * an asteroid and the largest one there is. So the mapping is stated as data below rather
+     * than switched out of a group.
+     *
+     * <b>The old header's second objection was practical and is answered by the direction of
+     * the spread, not by argument.</b> Large lights "made a Sun and a Moon next to each other
+     * wide enough to push their neighbours out of the band they belong to" - true, and the
+     * reason the maxima here are UNCHANGED at 14 and 12. The contrast is bought by shrinking
+     * the small tiers, which cannot crowd a band and cannot overhang one. That also means
+     * NATAL_EDGE, BAND_EDGE and NATAL_SPACING keep the values they were derived for, and no
+     * wheel-fitting arithmetic moves.
+     *
+     * The largest radius in each table is what its edge clearance is set from - NATAL_EDGE
+     * from this one and BAND_EDGE from TRANSIT_SIZES - and both are computed from the tables
+     * below rather than typed, because a comment asking the next editor to keep two numbers in
+     * step is how the glyph came to overhang the ring the first time.
+     *
+     * <b>The floor is the hit test, not the eye.</b> SkymapPanel.hitRadius is radius + 2, so
+     * every pixel off a bead is a pixel off its click target; tier 3 at 8 gives a 10px target,
+     * which is the smallest that still answers a click reliably on a crowded asteroid ring.
      */
     static final GlyphSize[] NATAL_SIZES = {
-        new GlyphSize(14, 24),      // lights
-        new GlyphSize(13, 22),      // inner planets
-        new GlyphSize(12, 21),      // outer planets
-        new GlyphSize(11, 20)       // asteroids and points
+        new GlyphSize(14, 24),      // lights:  Sun, Moon
+        new GlyphSize(12, 21),      // giants:  Jupiter, Saturn, Uranus, Neptune
+        new GlyphSize(10, 18),      // rocky:   Mercury, Venus, Mars, Ceres, Pluto
+        new GlyphSize(8, 15)        // asteroids, centaurs, nodes and points
     };
 
+    /**
+     * The same hierarchy in a thinner band. Strictly decreasing like the natal table - the
+     * version this replaced was not, and a tier that draws at its neighbour's size is a tier
+     * the reader cannot see.
+     */
     static final GlyphSize[] TRANSIT_SIZES = {
         new GlyphSize(12, 20),
-        new GlyphSize(11, 19),
-        new GlyphSize(11, 18),
-        new GlyphSize(10, 17)
+        new GlyphSize(10, 18),
+        new GlyphSize(9, 16),
+        new GlyphSize(7, 13)
     };
+
+    /**
+     * Which tier each registry point is drawn at, by index, built once.
+     *
+     * <b>Data, not a switch on Bodies.Group.</b> Group answers "what does this body mean",
+     * which is the axis the interpretation pages sort by and the wrong one here: it puts Pluto
+     * with Jupiter and Ceres with Vesta. Physical size is a fact about the object, so it is
+     * written down as one.
+     *
+     * Anything not named here is TIER_SMALL, which is the right default: a body added to the
+     * registry later is an asteroid or a calculated point unless someone says otherwise.
+     */
+    private static final int[] TIER = buildTiers();
+
+    private static int[] buildTiers() {
+        int[] t = new int[Bodies.ALL.length];
+        java.util.Arrays.fill(t, TIER_SMALL);
+        WheelLayout.tier(t, TIER_LIGHT, "sun", "moon");
+        WheelLayout.tier(t, TIER_GIANT, "jupiter", "saturn", "uranus", "neptune");
+        WheelLayout.tier(t, TIER_ROCKY, "mercury", "venus", "mars", "ceres", "pluto");
+        return t;
+    }
+
+    /**
+     * <b>Throws rather than skipping an id the registry does not have.</b> Bodies.indexOf
+     * answers -1 for an unknown id, and the quiet reading of that is to leave the body at
+     * TIER_SMALL - which would draw Jupiter the size of Juno and look like a styling choice.
+     * A renamed id is a wiring break and should read as one.
+     */
+    private static void tier(int[] t, int tier, String... ids) {
+        for (String id : ids) {
+            int n = Bodies.indexOf(id);
+            if (n < 0) {
+                throw new IllegalStateException(
+                    "WheelLayout size tier names a body the registry does not have: " + id);
+            }
+            t[n] = tier;
+        }
+    }
 
     /**
      * Size tier for a registry point, or -1 for the four angles, which are drawn as
      * labelled cubes at a fixed size and are not competing with the bodies for attention.
      */
     static int tierOf(int n) {
-        Bodies.Def def = Bodies.at(n);
-        if (def.isAngle()) {
-            return -1;
-        }
-        if (n == SUN || n == MOON) {
-            return TIER_LIGHT;
-        }
-        switch (def.group) {
-            case LUMINARIES:
-                return TIER_INNER;
-            case SOCIAL:
-                return TIER_OUTER;
-            default:
-                return TIER_SMALL;
-        }
+        return Bodies.at(n).isAngle() ? -1 : TIER[n];
     }
+    /**
+     * <b>The -1 fallback is a fallback, not a size for an angle.</b> Every path that draws a
+     * body - the natal ring, the partner ring, the directed ring, the sky ring - tests
+     * isAngle() first and draws the angle as a fixed 13px labelled cube, and hitRadius does
+     * the same, so no caller in the app reaches this branch with an angle. It answers the
+     * smallest body tier rather than throwing because these are public and an angle is a
+     * legal index; if an angle ever is drawn from this table, it should be drawn as the
+     * not-a-planet it is rather than at a planet's weight.
+     */
     public static GlyphSize natalSize(int n) {
         int n2 = WheelLayout.tierOf(n);
-        return NATAL_SIZES[n2 < 0 ? TIER_INNER : n2];
+        return NATAL_SIZES[n2 < 0 ? TIER_SMALL : n2];
     }
     public static GlyphSize transitSize(int n) {
         int n2 = WheelLayout.tierOf(n);
-        return TRANSIT_SIZES[n2 < 0 ? TIER_INNER : n2];
+        return TRANSIT_SIZES[n2 < 0 ? TIER_SMALL : n2];
     }
     /** Outermost ring: Sun through Mars - the fast, personal bodies. */
     static final int RING_INNER_PLANETS = 0;
@@ -189,9 +262,22 @@ public final class WheelLayout {
     /**
      * Clearance kept at each edge of an outer band, so a glyph on the outermost sub-ring
      * does not overhang the boundary it is drawn against. One more than the largest radius
-     * in TRANSIT_SIZES.
+     * in TRANSIT_SIZES - <b>computed from that table rather than typed to agree with it.</b>
+     * The rule was already written in this comment and the number was still maintained by
+     * hand, which is the project's most expensive defect in miniature: a rule stated in prose
+     * and implemented somewhere else. Re-tiering the glyphs is exactly the edit that would
+     * have broken it.
      */
-    static final int BAND_EDGE = 13;
+    static final int BAND_EDGE = WheelLayout.maxRadius(TRANSIT_SIZES) + 1;
+
+    /** The largest bead any tier in a table draws, which is what its clearance must clear. */
+    private static int maxRadius(GlyphSize[] sizes) {
+        int max = 0;
+        for (GlyphSize s : sizes) {
+            max = Math.max(max, s.radius);
+        }
+        return max;
+    }
     /** Shallowest an outer band is allowed to get before the wheel is simply too small. */
     static final int MIN_BAND_DEPTH = 22;
     /**
@@ -248,7 +334,7 @@ public final class WheelLayout {
      * Wider than the outer rings' on both counts, because the natal wheel carries the largest
      * glyphs and is the thing being read - the outer rings are context around it.
      */
-    public static final int NATAL_EDGE = 15;
+    public static final int NATAL_EDGE = WheelLayout.maxRadius(NATAL_SIZES) + 1;
     static final int NATAL_SUB_RING_GAP = 24;
     public static final double NATAL_SPACING = 32.0;
     /**
