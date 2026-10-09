@@ -103,6 +103,41 @@ public final class Ink {
         return this.argb;
     }
 
+    /**
+     * The same colour at a given alpha, clamped to 0..255.
+     *
+     * <b>These three were private helpers inside GlobeRenderer</b>, which was the only place
+     * that drew anything lit. They moved here when the wheel started drawing the planets too:
+     * shading and tinting a colour is the colour's own business, and a second copy next to the
+     * second caller is the defect this project spends most of its time removing. GlobeRenderer
+     * keeps its one-line {@code shade}/{@code lighten}/{@code darken} wrappers so its fifty-odd
+     * call sites did not all have to change to say the same thing.
+     */
+    public Ink withAlpha(int alpha) {
+        return new Ink(this.getRed(), this.getGreen(), this.getBlue(),
+            Math.max(0, Math.min(255, alpha)));
+    }
+
+    /** This colour mixed {@code t} of the way toward white; alpha is not carried. */
+    public Ink lighter(double t) {
+        return new Ink((int) (this.getRed() + (255 - this.getRed()) * t),
+            (int) (this.getGreen() + (255 - this.getGreen()) * t),
+            (int) (this.getBlue() + (255 - this.getBlue()) * t));
+    }
+
+    /**
+     * This colour scaled toward black by {@code t}; alpha is not carried.
+     *
+     * <b>{@code t} is the fraction KEPT, not the fraction removed</b> - {@code darker(0.5)} is
+     * half as bright. That is the sense GlobeRenderer's private version had and every call
+     * site was written against, so inverting it here to read more naturally would have
+     * silently changed every lit body on the globe.
+     */
+    public Ink darker(double t) {
+        return new Ink((int) (this.getRed() * t), (int) (this.getGreen() * t),
+            (int) (this.getBlue() * t));
+    }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof Ink && ((Ink) o).argb == this.argb;

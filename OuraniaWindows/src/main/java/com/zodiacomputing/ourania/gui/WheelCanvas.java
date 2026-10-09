@@ -552,8 +552,7 @@ final class WheelCanvas extends JPanel {
             }
             WheelLayout.GlyphSize glyphSize = WheelLayout.natalSize(n7);
             graphics2D.setFont(glyphFont(glyphSize));
-            WheelShapes.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
-                new Color(192, 192, 192), Settings.natalMarker());
+            WheelShapes.drawNatalBody(graphics2D, n7, n4, n26, glyphSize.radius);
             if (n7 == SkymapPanel.MOON && panel.natalRing().valid[SkymapPanel.SUN]) {
                 double d11 = (panel.natalRing().lon[SkymapPanel.MOON] - panel.natalRing().lon[SkymapPanel.SUN]) % 360.0;
                 if (d11 < 0.0) {
@@ -561,7 +560,12 @@ final class WheelCanvas extends JPanel {
                 }
                 WheelShapes.drawMoonPhase(graphics2D, n4, n26, Math.round((float)glyphSize.radius * 0.47f), d11 / 360.0);
             } else {
-                graphics2D.setColor(panel.bodyColor(n7));
+                // <b>The ink is chosen against what the glyph is standing on.</b> While every
+                // bead was the same neutral grey the body's element colour read on all of
+                // them; on the body's own face it does not - the Sun's glyph is fire red, and
+                // red on a bright orange disc is a smudge rather than a symbol. Bodies with
+                // no face keep the element ink, which is where that colour does its work.
+                graphics2D.setColor(WheelShapes.natalGlyphInk(n7, panel.bodyColor(n7)));
                 object = SkymapPanel.glyphFor(n7, glyphFont(glyphSize));
                 WheelShapes.drawBodyLabel(graphics2D, (String)object, n4, n26, glyphSize.baseline);
             }

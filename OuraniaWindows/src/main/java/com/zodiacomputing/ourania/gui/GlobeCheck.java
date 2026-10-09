@@ -3135,7 +3135,7 @@ public final class GlobeCheck {
 
         // <b>A body glows by the same rule its ribbon does.</b> One shape of falloff across the
         // scene is what stops it reading as two different drawings sharing a sphere.
-        float[][] halo = GlobeRenderer.bodyHaloPasses();
+        float[][] halo = Planets.bodyHaloPasses();
         yes("a body's halo is drawn in more than one pass", halo.length >= 3);
         fallsOffOutward("a body's halo", halo);
         yes("a halo reaches past the body it surrounds", halo[0][0] >= 3.0);

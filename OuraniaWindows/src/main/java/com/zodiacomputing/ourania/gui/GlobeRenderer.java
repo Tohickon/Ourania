@@ -1813,7 +1813,7 @@ public final class GlobeRenderer {
             // other two as beads but to keep the colour: a planet on Chart B or the sky is
             // circled in its own chart's ink below, so what it is and whose it is are two
             // different marks and neither has to carry the other.
-            final boolean asPlanet = Settings.globePlanets() && PLANET_FACE[i] != FACE_NONE
+            final boolean asPlanet = Settings.globePlanets() && Planets.hasFace(i)
                 && (!outer || Settings.globePlanetsAllRings());
             // By deck, so a body is circled in the ink of the ribbon it is standing on -
             // see deckInk for the two vocabularies that came apart here.
@@ -1856,204 +1856,33 @@ public final class GlobeRenderer {
 
     // ------------------------------------------------------------------ the planets
 
-    private static final int FACE_NONE = 0;
-    private static final int FACE_SUN = 1;
-    private static final int FACE_BANDED = 2;
-    private static final int FACE_RINGED = 3;
-    private static final int FACE_PLAIN = 4;
-
     /**
-     * Which bodies are drawn as themselves, and how.
+     * One body drawn as itself - the Sun's corona, Jupiter's belts, Saturn's rings.
      *
-     * <b>Only the ones that look like something.</b> A Sun with a corona, a banded Jupiter,
-     * Saturn with its rings and the plain worlds are recognisable at nine pixels. Much of the
-     * registry - the nodes, the Lots, the angles, most asteroids - is not a body anyone has a
-     * picture of, and inventing one would be worse than the glyph. Those keep the bead, and
-     * the two kinds sit on the ring together without the reader needing to be told which.
+     * <b>The drawing moved to {@link Planets} and this is what is left of it.</b> It was
+     * private here while the globe was the only thing that drew a planet; the wheel now draws
+     * them too, and a second copy behind a second caller is the defect this project spends
+     * most of its time removing. It took nothing with it but the {@link Pen} it always drew
+     * through, which is why the move was possible at all.
      *
-     * Built against the registry rather than written as a switch at the call site, so a body
-     * added later lands here as FACE_NONE and keeps its glyph instead of falling through to
-     * whatever the last case happened to be.
+     * <b>{@code !this.turning} is the one piece of globe state in it.</b> The halo is skipped
+     * mid-drag, where it costs more than it gives; a still wheel always wants it.
      */
-    private static final int[] PLANET_FACE = buildFaces();
-
-    private static int[] buildFaces() {
-        int[] faces = new int[Bodies.count()];
-        for (int i = 0; i < faces.length; i++) {
-            switch (Bodies.at(i).name) {
-                case "Sun":
-                    faces[i] = FACE_SUN;
-                    break;
-                case "Jupiter":
-                    faces[i] = FACE_BANDED;
-                    break;
-                case "Saturn":
-                    faces[i] = FACE_RINGED;
-                    break;
-                case "Mercury":
-                case "Venus":
-                case "Mars":
-                case "Uranus":
-                case "Neptune":
-                case "Pluto":
-                    faces[i] = FACE_PLAIN;
-                    break;
-                default:
-                    faces[i] = FACE_NONE;
-                    break;
-            }
-        }
-        return faces;
-    }
-
-    /** The face colour of a body, warm to cold. */
-    private static Ink faceColour(int body) {
-        switch (Bodies.at(body).name) {
-            case "Sun":
-                return new Ink(255, 196, 84);
-            case "Mercury":
-                return new Ink(178, 172, 160);
-            case "Venus":
-                return new Ink(226, 200, 148);
-            case "Mars":
-                return new Ink(198, 96, 66);
-            case "Jupiter":
-                return new Ink(206, 176, 138);
-            case "Saturn":
-                return new Ink(214, 194, 146);
-            case "Uranus":
-                return new Ink(150, 206, 208);
-            case "Neptune":
-                return new Ink(104, 138, 214);
-            case "Pluto":
-                return new Ink(164, 146, 132);
-            default:
-                return new Ink(190, 190, 196);
-        }
-    }
-
-    /**
-     * One body drawn as itself.
-     *
-     * <b>Lit from the upper left, all of them.</b> A disc needs a light to read as a sphere,
-     * and the direction has to be the same for every body - a ring of objects lit from
-     * different places reads as a mistake even when the reader could not say what is wrong.
-     */
-    /**
-     * A body's halo: pixels added to its radius, and the fraction of its alpha at that reach.
-     *
-     * <b>The same shape as {@link #rimPasses}, and asserted by the same rule</b> - each pass
-     * tighter than the last and brighter than the last, so the stack falls off outward and
-     * reads as light rather than as a fat ring round a disc. Shared with the suite rather than
-     * restated in it, for the reason a surviving mutation taught on 2026-09-21: a check holding
-     * its own copy of a rule can only prove the copy agrees with itself.
-     *
-     * The numbers are small on purpose. A body is 9 to 11 pixels; a halo that reached as far as
-     * the Sun's five-ring corona would make twenty-eight of them into one wash of light and the
-     * ribbon they sit on would be gone behind it.
-     */
-    static float[][] bodyHaloPasses() {
-        return new float[][] {
-            {10.0f, 0.06f},
-            {6.0f, 0.10f},
-            {3.0f, 0.16f},
-        };
-    }
-
     private void drawPlanet(int body, int x, int y, int rad, int alpha, boolean lit) {
-        int face = PLANET_FACE[body];
-        Ink base = faceColour(body);
-        int d = rad * 2;
-
-        if (face == FACE_SUN) {
-            // <b>The corona reaches further and the core is white.</b> It read as one more
-            // orange bead: the glow was three faint rings inside the disc's own radius, which
-            // is not a corona, it is a soft edge. Five rings out to twice the radius, and a
-            // near-white centre, so the Sun is the brightest thing on the ring - which is the
-            // one fact about it nobody has to be taught.
-            for (int i = 5; i >= 1; i--) {
-                int glow = rad + i * 5;
-                this.g.color(new Ink(255, 186, 82,
-                    Math.max(0, Math.min(255, (int) (alpha * 0.16 / i)))));
-                this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
-            }
-            this.g.fillOvalRadial(x - rad, y - rad, d, d, x - rad * 0.22f, y - rad * 0.22f,
-                Math.max(1f, rad * 1.5f), new float[] {0f, 0.35f, 0.75f, 1f},
-                new Ink[] {shade(new Ink(255, 255, 246), alpha),
-                    shade(new Ink(255, 232, 158), alpha),
-                    shade(new Ink(255, 168, 56), alpha),
-                    shade(new Ink(214, 96, 28), alpha)});
-            this.g.color(shade(new Ink(255, 214, 130), alpha));
-            this.g.stroke(lit ? 2.0f : 1.0f);
-            this.g.drawOval(x - rad, y - rad, d, d);
-            return;
-        }
-
-        int rw = (int) Math.round(rad * 2.15);
-        int rh = Math.max(2, (int) Math.round(rad * 0.52));
-        if (face == FACE_RINGED) {
-            // Behind the planet, then the planet, then in front - which is the whole reason
-            // Saturn reads as Saturn rather than as a disc with a line through it.
-            this.g.color(shade(new Ink(206, 186, 142), (int) (alpha * 0.72)));
-            this.g.stroke(1.4f);
-            this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 0, 180);
-        }
-
-        // <b>A halo in the body's own colour, before the disc.</b> The planets were already
-        // spheres - a radial gradient lit from the upper left, Jupiter's belts, Saturn's rings -
-        // but only the Sun glowed, so on a lit globe every other body read as a painted bead
-        // sitting on the band rather than a light sitting above it. The Sun keeps its own,
-        // stronger corona above: it should stay the brightest thing on the ring, which is the
-        // one fact about it nobody has to be taught.
-        if (!this.turning) {
-            for (float[] pass : bodyHaloPasses()) {
-                int glow = rad + Math.round(pass[0]);
-                this.g.color(shade(lighten(base, 0.35),
-                    (int) Math.round(alpha * pass[1])));
-                this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
-            }
-        }
-
-        this.g.fillOvalRadial(x - rad, y - rad, d, d, x - rad * 0.35f, y - rad * 0.35f,
-            Math.max(1f, rad * 1.5f), new float[] {0f, 1f},
-            new Ink[] {shade(lighten(base, 0.45), alpha), shade(darken(base, 0.5), alpha)});
-
-        if (face == FACE_BANDED) {
-            // Jupiter's belts, clipped to the disc so they end where it does.
-            this.g.clipOval(x - rad, y - rad, d, d);
-            this.g.stroke(1.0f);
-            for (int i = -2; i <= 2; i++) {
-                if (i == 0) {
-                    continue;
-                }
-                int by = y + (int) Math.round(i * rad * 0.34);
-                this.g.color(shade(i % 2 == 0 ? darken(base, 0.72) : lighten(base, 0.25),
-                    (int) (alpha * 0.85)));
-                this.g.drawLine(x - rad, by, x + rad, by);
-            }
-            this.g.unclip();
-        }
-
-        if (face == FACE_RINGED) {
-            this.g.color(shade(new Ink(232, 214, 170), alpha));
-            this.g.stroke(1.6f);
-            this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 180, 180);
-        }
-
-        this.g.color(shade(lit ? new Ink(255, 238, 170) : darken(base, 0.5), alpha));
-        this.g.stroke(lit ? 2.0f : 0.8f);
-        this.g.drawOval(x - rad, y - rad, d, d);
+        Planets.draw(this.g, body, x, y, rad, alpha, lit, !this.turning);
     }
 
+    /**
+     * <b>Three wrappers over {@link Ink}, kept because the call sites are many and the names
+     * are good.</b> The bodies moved to Ink when Planets needed them too; inlining Ink's names
+     * at fifty-odd call sites here would have been a large diff saying nothing.
+     */
     private static Ink lighten(Ink c, double t) {
-        return new Ink((int) (c.getRed() + (255 - c.getRed()) * t),
-            (int) (c.getGreen() + (255 - c.getGreen()) * t),
-            (int) (c.getBlue() + (255 - c.getBlue()) * t));
+        return c.lighter(t);
     }
 
     private static Ink darken(Ink c, double t) {
-        return new Ink((int) (c.getRed() * t), (int) (c.getGreen() * t),
-            (int) (c.getBlue() * t));
+        return c.darker(t);
     }
 
     // ------------------------------------------------------------------ drawing primitives
@@ -2504,8 +2333,7 @@ public final class GlobeRenderer {
     }
 
     private static Ink shade(Ink c, int alpha) {
-        return new Ink(c.getRed(), c.getGreen(), c.getBlue(),
-            Math.max(0, Math.min(255, alpha)));
+        return c.withAlpha(alpha);
     }
 
     private static double lerp(double a, double b, double t) {

@@ -427,16 +427,32 @@ public final class Settings {
         set(GLOBE_MANSION_FILL_KEY, on ? "true" : "false");
     }
 
-    /** Settings key for drawing the natal bodies as planets on the globe. */
+    /**
+     * Settings key for drawing the natal bodies as the planets themselves.
+     *
+     * <b>Named for the globe because that is where it started, and never renamed.</b> A
+     * published key is a promise to every settings.properties already on disk; the wheel
+     * joined the same preference rather than growing a second one.
+     */
     public static final String GLOBE_PLANETS_KEY = "chart.globePlanets";
 
     /**
-     * Whether the globe draws the natal bodies as the planets themselves.
+     * Whether the chart draws the natal bodies as the planets themselves.
      *
-     * <b>The globe is the one view where this is not a costume.</b> On the flat wheel a body
-     * is a position and a glyph says which; on a sphere the reader is looking at a sky, and a
-     * banded Jupiter or a ringed Saturn is what is actually up there. Off gives the plain
-     * beads, which stay easier to read when every point is switched on.
+     * <b>This javadoc used to say the opposite, and said it well.</b> "The globe is the one
+     * view where this is not a costume. On the flat wheel a body is a position and a glyph
+     * says which; on a sphere the reader is looking at a sky, and a banded Jupiter or a ringed
+     * Saturn is what is actually up there." That was a real argument and it lost to a real
+     * observation: asked on 2026-10-09 to make the wheel's bodies reflect their true sizes,
+     * David could not see a size change at all - because every natal bead was the same grey
+     * ball, so size was the only channel the drawing had and two pixels of it is nothing. The
+     * planets are not a costume on the wheel either; they are the other channel.
+     *
+     * Off gives the plain beads, which stay easier to read when every point is switched on.
+     *
+     * <b>One preference, not two.</b> It would be reasonable to want planets on the globe and
+     * beads on the wheel, and if that is ever asked for this is where it splits. Until then,
+     * "draw bodies as themselves" is one question and should not be answerable twice.
      */
     public static boolean globePlanets() {
         return !"false".equals(get(GLOBE_PLANETS_KEY, "true"));

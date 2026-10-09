@@ -44,6 +44,64 @@ final class WheelShapes {
      * on one ring out of three. Every marker now comes through here, so the switch means
      * what it says.
      */
+    /**
+     * The natal wheel's bead: the body drawn as itself where there is a picture of it, and
+     * the plain marker where there is not.
+     *
+     * <p><b>Every natal bead used to be the same grey.</b> {@code new Color(192, 192, 192)},
+     * for the Sun, for Jupiter and for Vesta alike - three sizes of one object, told apart
+     * only by the glyph stamped on top. The globe had the Sun's corona, Jupiter's belts and
+     * Saturn's rings the whole time, behind a {@link Pen} and on the shared list, and the
+     * wheel simply never called it. See {@link Planets}.
+     *
+     * <p><b>The natal ring only, and that is not caution.</b> The outer rings tint their beads
+     * to say whose body it is - chart B's Mars against the sky's Mars - and MarkerShapeCheck
+     * exists because two rings once differed by a tint alone. A planet face overwrites that
+     * tint with Mars's own red on every ring at once, which would undo the one distinction
+     * those rings have. The globe solved this by circling an outer body in its chart's ink;
+     * the wheel can do the same, but that is a change to how the outer rings are read and not
+     * a side effect of giving the natal wheel its planets.
+     *
+     * <p>Tied to {@code Settings.globePlanets()} rather than a new key: the preference is
+     * "draw bodies as themselves", and it should not be answerable twice. The key is named
+     * for the globe because that is where the feature started and a published key is never
+     * renamed.
+     */
+    static void drawNatalBody(Graphics2D graphics2D, int body, int x, int y, int radius) {
+        if (drawsFace(body)) {
+            // Opaque and unlit: the wheel has no light source and no selection rim of its
+            // own - a body being looked at is already answered by bulge() and the halo.
+            Planets.draw(new AwtPen(graphics2D), body, x, y, radius, 255, false, false);
+            return;
+        }
+        drawBodyMarker(graphics2D, x, y, radius, NATAL_BEAD, Settings.natalMarker());
+    }
+
+    /** The plain natal bead, for every body with no picture of its own. */
+    private static final Color NATAL_BEAD = new Color(192, 192, 192);
+
+    /**
+     * The ink for a natal glyph, given the ink it would have had.
+     *
+     * <b>Asked of the same method that decides whether a face is drawn at all.</b> The glyph
+     * and the bead under it are one decision taken twice if the painter answers it, and the
+     * two would drift the first time a condition changed on one side - a body drawn as a
+     * planet with its element ink on top is exactly the smudge this exists to prevent.
+     */
+    static Color natalGlyphInk(int body, Color element) {
+        if (!drawsFace(body)) {
+            return element;
+        }
+        return SkymapPanel.readableOn(new Color(Planets.faceColour(body).getRGB(), true));
+    }
+
+    /** Whether the natal ring draws this body as itself. One condition, asked twice. */
+    private static boolean drawsFace(int body) {
+        return Settings.showPlanetSpheres() && Settings.globePlanets()
+            && Settings.MARKER_SPHERE.equals(Settings.natalMarker())
+            && Planets.hasFace(body);
+    }
+
     static void drawBodyMarker(Graphics2D graphics2D, int n, int n2, int n3, Color color,
                                 String shape) {
         if (!Settings.showPlanetSpheres()) {
