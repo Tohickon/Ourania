@@ -1,4 +1,5 @@
-# Where each reading file came from (C7). CorpusCheck fails on a file the app opens with no row here.
+# Where each reading file came from (C7). CorpusCheck fails on a .json in this directory with no row here,
+# whichever class opens it - or none (since 10 Oct; before that only InterpretationService's own list was asked).
 # file<TAB>writer<TAB>shape<TAB>how this is known
 # writer: david | agent | external | unknown     shape: written (each entry its own text) | composed (built from shared sentences)
 # The shape is MEASURED by CorpusCheck Part B and must match; the writer is declared, so say how it is known.
@@ -58,3 +59,5 @@ body_decans.json	agent	composed	written in-project by an AI agent - inferred fro
 body_mansions.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
 body_technical_degrees.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
 body_degree_factors.json	agent	written	written by an agent from David's two transposition documents of 2026-08-31; the fourteen bodies those did not cover are standard meanings (InterpretationService.LAZY_FILES)
+glossary.json	david	written	built by generate_glossary.py from reference/glossary/Master_Glossary.txt, David's glossary, on 2 Oct (commit 9fceec5) - the definitions are his text, the script only reshapes them; David to confirm the source text is his own writing
+360_degrees_interpretations.json	unknown	written	NOTHING OPENS THIS FILE and it is not JSON: it begins with a ```json fence and its text carries citation marks like [18], so it is a pasted answer from a chat or notebook tool. Each degree summarises named authors (Sepharial, Janduz, Kozminsky, Henson, Matthews, Weber); whether the wording is theirs is not known. Arrived 24 Sep in 1f49900 with no mention. David to decide: remove it from the app's data, or keep it and say where it came from

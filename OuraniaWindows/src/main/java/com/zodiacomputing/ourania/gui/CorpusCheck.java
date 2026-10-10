@@ -27,7 +27,7 @@ import java.util.Set;
  * makes {@code unknown} say what is unknown. But whether a file was written entry by entry or
  * <i>composed</i> - the same sentences reassembled around a changing name - can be measured, and
  * Part B does: the share of a file's sentences that recur in three or more of its entries. Measured
- * on 28 Sep over the 55 files the app opens, written files sit at 0.000 to 0.051 and composed files
+ * on 28 Sep over the files the app opened then, written files sit at 0.000 to 0.051 and composed files
  * at 0.197 to 0.889, with nothing between, so 0.10 is a boundary in an empty gap rather than a line
  * drawn through a crowd. A file declared written that measures composed is a wrong row, and so is
  * the reverse.
@@ -120,11 +120,51 @@ public final class CorpusCheck {
         return out;
     }
 
+    // ---------------------------------------------------------------- what is guarded
+
+    /**
+     * Every file the guard answers for: what InterpretationService opens, and every other
+     * {@code .json} in the data directory.
+     *
+     * <p><b>The second half was missing until 10 Oct.</b> The list was the service's own, so a
+     * file read by any other class was outside the guard without anything saying so - and four
+     * days after the guard was written {@code glossary.json} arrived through {@code Glossary},
+     * 827 entries of reader-facing text with no row and no failure. A guard that asks "which
+     * files does this one loader open" is asking about the loader. The directory is the corpus.
+     * The service's names stay in the set as well, so a file it expects and cannot find is still
+     * named here rather than dropping out because it is absent from disk.
+     */
+    static Set<String> guarded() {
+        Set<String> out = new LinkedHashSet<>(List.of(InterpretationService.everyFileName()));
+        out.addAll(jsonIn(new File(InterpretationService.DATA_DIR)));
+        return out;
+    }
+
+    /** The {@code .json} files directly inside a directory, sorted so a run is repeatable. */
+    static List<String> jsonIn(File dir) {
+        List<String> out = new ArrayList<>();
+        String[] names = dir.list();
+        if (names != null) {
+            for (String n : names) {
+                if (n.endsWith(".json") && new File(dir, n).isFile()) {
+                    out.add(n);
+                }
+            }
+        }
+        java.util.Collections.sort(out);
+        return out;
+    }
+
     // ---------------------------------------------------------------- Part A
 
     private static void declared(Map<String, String[]> rows) {
         ok("the manifest exists at " + MANIFEST, new File(MANIFEST).isFile());
-        Set<String> opened = new LinkedHashSet<>(List.of(InterpretationService.everyFileName()));
+        // The sweep has to be able to see a file no loader lists, or it guards nothing new.
+        ok("the data directory is swept, not only the service's list ("
+            + Glossary.FILE_NAME + " is found)", guarded().contains(Glossary.FILE_NAME));
+        ok("the sweep takes .json and leaves the manifest and the atlas alone",
+            !guarded().contains("provenance.tsv") && !guarded().contains("atlas.tsv.gz"));
+        Set<String> opened = guarded();
         for (String name : opened) {
             String[] row = rows.get(name);
             ok(name + " has a provenance row", row != null);
@@ -142,7 +182,7 @@ public final class CorpusCheck {
         // The other direction: a row for a file the app no longer opens describes nothing, and
         // a manifest that keeps rows for deleted files stops being read as a statement of fact.
         for (String name : rows.keySet()) {
-            ok("the row for " + name + " names a file the app opens", opened.contains(name));
+            ok("the row for " + name + " names a file the app carries", opened.contains(name));
         }
         int unknown = 0;
         for (String[] row : rows.values()) {
@@ -157,20 +197,66 @@ public final class CorpusCheck {
     // ---------------------------------------------------------------- Part B
 
     private static void shapes(Map<String, String[]> rows) throws Exception {
-        for (String name : InterpretationService.everyFileName()) {
+        for (String name : guarded()) {
             String[] row = rows.get(name);
             File f = new File(InterpretationService.DATA_DIR + name);
             if (row == null || !f.isFile()) {
                 continue;    // Part A has already said so
             }
+            Object doc;
+            try {
+                doc = Json.parse(f);
+            } catch (RuntimeException notJson) {
+                // A file in the data directory that will not parse cannot be measured, and a
+                // thrown exception here would end the suite with no verdict on the files after
+                // it. Say which file and why, and go on.
+                ok(name + " reads as JSON (" + notJson.getMessage() + ")", false);
+                continue;
+            }
             List<String> texts = new ArrayList<>();
-            strings(Json.parse(f), texts);
+            readingTexts(name, doc, texts);
             double share = repeatedShare(texts);
             String measured = share >= COMPOSED_AT ? "composed" : "written";
             System.out.printf("  %-60s %6d entries  repeated %.3f  %s%n",
                 name, texts.size(), share, measured);
             ok(name + " is declared " + row[1] + " and measures " + measured
                 + String.format(" (%.3f)", share), measured.equals(row[1]));
+        }
+    }
+
+    /**
+     * The strings of a document that are reading text - what the shape is measured on.
+     *
+     * <p>For every file but one that is every string in it. The glossary is a list of records,
+     * and each record carries its chapter and section beside its definition: nineteen chapter
+     * names across 827 terms, each long enough to count as a sentence, so measured whole the
+     * file came out at 0.344 - composed - while its definitions alone measure 0.000. A label
+     * that says where an entry is filed is not something the entry was built from, so the
+     * glossary is measured on its {@code text} fields.
+     */
+    static void readingTexts(String name, Object doc, List<String> out) {
+        if (Glossary.FILE_NAME.equals(name)) {
+            valuesOf("text", doc, out);
+        } else {
+            strings(doc, out);
+        }
+    }
+
+    /** Every string held under one key, anywhere in a parsed document, in order. */
+    @SuppressWarnings("unchecked")
+    static void valuesOf(String key, Object node, List<String> out) {
+        if (node instanceof Map) {
+            for (Map.Entry<String, Object> e : ((Map<String, Object>) node).entrySet()) {
+                if (key.equals(e.getKey()) && e.getValue() instanceof String) {
+                    out.add((String) e.getValue());
+                } else {
+                    valuesOf(key, e.getValue(), out);
+                }
+            }
+        } else if (node instanceof List) {
+            for (Object v : (List<Object>) node) {
+                valuesOf(key, v, out);
+            }
         }
     }
 
@@ -254,6 +340,21 @@ public final class CorpusCheck {
             w < COMPOSED_AT);
         ok("a sentence shorter than " + MIN_WORDS + " words is not counted",
             sentences("Mars is here.").isEmpty());
+        List<Object> records = new ArrayList<>();
+        for (String n : names) {
+            Map<String, Object> r = new LinkedHashMap<>();
+            r.put("chapter", "A chapter name long enough to count as one");
+            r.put("text", "What " + n + " means is set down here and nowhere else at all.");
+            records.add(r);
+        }
+        List<String> whole = new ArrayList<>();
+        List<String> defs = new ArrayList<>();
+        strings(records, whole);
+        valuesOf("text", records, defs);
+        ok(String.format("records sharing a label measure composed whole (%.3f) and written on"
+            + " their text alone (%.3f)", repeatedShare(whole), repeatedShare(defs)),
+            repeatedShare(whole) >= COMPOSED_AT && repeatedShare(defs) < COMPOSED_AT
+                && defs.size() == names.length);
         ok("markup is not part of a sentence",
             sentences("<b>One two three four five six.</b>").get(0).equals("One two three four five six."));
     }
