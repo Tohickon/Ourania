@@ -13,6 +13,7 @@ import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.astro.Transits;
 import com.zodiacomputing.ourania.astro.Draconic;
 import com.zodiacomputing.ourania.astro.Rulership;
+import com.zodiacomputing.ourania.astro.ArcMidpoints;
 import com.zodiacomputing.ourania.astro.SolarArc;
 
 import de.thmac.swisseph.SweDate;
@@ -749,6 +750,7 @@ public final class ChartTables {
          .append("The arc is the same for every point, so what varies is what each one ")
          .append("arrives at.</i></p>");
         h.append(contactSection(natal, sw, natalJd, nowJd, true));
+        h.append(midpointSection(natal, sw, natalJd, nowJd));
         return h.toString();
     }
 
@@ -829,6 +831,63 @@ public final class ChartTables {
                  + "the arc moves about a degree a year, so a point either arrives or it does "
                  + "not.</i></p>";
         }
+        return h.toString();
+    }
+
+    /**
+     * The midpoint pictures: {@code SA Uranus = Sun/Moon}, and when each is live.
+     *
+     * <p><b>A different instrument from the table above, not more rows for it.</b> A directed
+     * planet reaching a natal planet is a chapter about a degree wide, which at a degree a year
+     * is a couple of years. A directed planet reaching a natal <i>midpoint</i> is read on a
+     * quarter-degree orb, so it dates a season rather than a chapter - and the midpoint is not a
+     * body but the fused matrix of two, which is why it gets its own notation and its own table
+     * instead of a fourth column here.
+     *
+     * <p><b>Why this exists at all is NavigationCheck.</b> {@link ArcMidpoints} was written,
+     * tested at 65 checks and nine mutations, and reachable from nothing - and this project has
+     * a guard that asserts every engine in the astro package is named somewhere in the
+     * interface, because "an engine with no way in is invisible in exactly the way a missing one
+     * is not: the suites stay green, so nothing reports it". It failed on ArcMidpoints by name,
+     * which is how this table came to be written.
+     *
+     * <p>The orb is stated on the screen rather than assumed, because it is ten times tighter
+     * than any other orb in the app and a reader who did not know that would read these rows as
+     * the same kind of claim as the rows above them.
+     */
+    private static String midpointSection(ChartFrame natal, SwissEph sw, double natalJd,
+                                          double nowJd) {
+        double from = nowJd - CONTACT_HALF_WINDOW;
+        double to = nowJd + CONTACT_HALF_WINDOW;
+        java.util.List<ArcMidpoints.Contact> hits;
+        try {
+            hits = ArcMidpoints.contacts(sw, natal, natalJd, from, to);
+        } catch (RuntimeException e) {
+            return "";
+        }
+        StringBuilder h = new StringBuilder();
+        h.append("<h2>Midpoint pictures</h2>");
+        h.append("<p>A directed point reaching the midpoint of two natal points, written the ")
+         .append("way a midpoint tree writes it. Read on the eighth harmonic, so a ")
+         .append("conjunction, semisquare, square, sesquiquadrate and opposition are one ")
+         .append("contact. The orb is ")
+         .append(String.format("%.2f", ArcMidpoints.ORB))
+         .append("&deg; of arc - about ten times tighter than the table above, and about six ")
+         .append("months wide at the arc's rate of a degree a year, with the strongest ")
+         .append(String.format("%.2f", ArcMidpoints.PEAK))
+         .append("&deg; of it near six weeks around the exact date.</p>");
+        if (hits.isEmpty()) {
+            return h.append("<p><i>No directed point reaches a natal midpoint inside this ")
+                    .append("window.</i></p>").toString();
+        }
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Exact", "Picture", "Active from", "until"));
+        for (ArcMidpoints.Contact c : hits) {
+            h.append(row4("td", dateOf(c.jd), c.picture(),
+                Double.isNaN(c.jdFrom) ? "&mdash;" : dateOf(c.jdFrom),
+                Double.isNaN(c.jdTo) ? "&mdash;" : dateOf(c.jdTo)));
+        }
+        h.append("</table>");
         return h.toString();
     }
 
