@@ -65,6 +65,20 @@ scrub cannot now be cleared from the repository alone.
 entries".** The word *sourced* implies an external origin that is not named. This
 needs the same treatment as the Sabian summaries.
 
+**5. `degree_interpretations.json` is not in-project writing, and half of it is copied.**
+Found 2026-10-10, when the guard began sweeping the data directory and turned up the file it was
+made from. That file is a pasted answer from a chat or notebook tool summarising eight
+degree-symbol authors (Charubel, Sepharial, Kozminsky, Janduz, Muir, Henson, Weber, Matthews).
+**181 of the app's 360 degree readings are that answer word for word** with its citation marks
+removed; 165 are rewritten from it with the authors' names dropped; 6 have no counterpart. The
+inference above - "most prose appears to be written in-project" - was wrong for this file and
+was an inference from style. How close the tool's summary runs to the books is not known and
+needs the books; which of those authors are still in copyright has not been checked. The source and the measurement are kept in `OuraniaWindows/reference/degrees/`.
+
+**6. This repository is public.** "Nothing is distributed yet. The repository is private", below,
+was true when written on 2 September. On 2026-10-10 `Tohickon/Ourania` is a public repository,
+so the corpus is already published. The window that paragraph describes has closed.
+
 ---
 
 ## Why this matters, concretely
@@ -86,7 +100,9 @@ is the window in which this is cheap to settle.
    Rewrite any that are adaptations rather than independent composition.
 2. Establish the origin of `relationship_prose.json`'s "sourced" entries.
 3. Record the origin of anything the attribution scrub touched, or rewrite it.
-4. Add a `_meta` block carrying origin and date to every new corpus file, so this
+4. Read the copied half of `degree_interpretations.json` (Virgo 20 to Pisces 30) against the
+   authors it summarises, starting with any still in copyright; rewrite or attribute.
+5. Add a `_meta` block carrying origin and date to every new corpus file, so this
    file never has to be written retrospectively again.
 
 Decision owner: David Sauerwald. Nothing here is legal advice.
