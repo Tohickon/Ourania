@@ -1544,7 +1544,9 @@ public final class NavigationCheck {
             OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, true, WheelRing.Kind.SKY, false));
         eq("the sky alone is named for itself", "Sky",
             OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, false, WheelRing.Kind.SKY, true));
-        eq("with no second ring the page wears its own identity", "Transits",
+        // <b>Its own identity is "Placements" now, not "Transits".</b> The tab above it
+        // is called Transits, and a page repeating its tab is a word spent saying nothing.
+        eq("with no second ring the page wears its own identity", "Placements",
             OuraniaWindow.secondPageTitle(WheelRing.Kind.CHART_B, false, WheelRing.Kind.SKY, false));
         // The rule rather than the six strings: a ring that is drawn is a ring that is named.
         for (WheelRing.Kind outer : new WheelRing.Kind[] {WheelRing.Kind.CHART_B,

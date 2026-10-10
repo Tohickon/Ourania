@@ -49,6 +49,8 @@ public final class RingIdentityCheck {
             RingIdentityCheck::ringAspects);
         part("H: the rail reads as three groups, not twelve items",
             RingIdentityCheck::railGroups);
+        part("I: a chart page is named for whose chart it is",
+            RingIdentityCheck::whoseChartPage);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -599,6 +601,79 @@ public final class RingIdentityCheck {
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
+    }
+
+    // ---- Part I
+
+    /**
+     * A chart page wears its subject's name.
+     *
+     * <p><b>David, on being shown a tab called Blueprint: "what is blueprint".</b> A tab you
+     * have to ask about is a bad tab; the rail became Chart / Synastry / Transits, and the
+     * page inside Chart then repeated the word above it. What a reader of a two-person app
+     * actually needs from that tab is which of the two they are looking at.
+     *
+     * <p><b>What would otherwise rot is the composite row.</b> The tempting test is
+     * {@code kind.isPerson}, whose own javadoc says "true when this ring is a person rather
+     * than a moment" - and CHART_A carries FALSE, because the flag is only ever asked of the
+     * outer ring, where being a person and being Chart B are the same question. Written that
+     * way, Chart B was named Erika and Chart A stayed "Chart A". The flag is correct for its
+     * own callers and must not change; this pins that the naming does not depend on it.
+     *
+     * <p>Asked of the method rather than through a window: it is a pure function of a subject
+     * and a ring, and a suite that built a window to test a string would be measuring the
+     * window.
+     */
+    private static void whoseChartPage() {
+        java.time.ZonedDateTime when = java.time.ZonedDateTime.of(1982, 8, 10, 7, 30, 0, 0,
+            java.time.ZoneId.of("America/New_York"));
+        com.zodiacomputing.ourania.astro.ChartSubject david =
+            com.zodiacomputing.ourania.astro.ChartSubject.of("David", when, "Philadelphia",
+                39.95, -75.16, "America/New_York", false);
+
+        eq("Chart A wears its subject's name", "David",
+            OuraniaWindow.whoseChart(david, WheelRing.Kind.CHART_A, "Placements"));
+        eq("and so does Chart B", "David",
+            OuraniaWindow.whoseChart(david, WheelRing.Kind.CHART_B, "Chart B"));
+
+        // <b>The negative that the isPerson version failed.</b> CHART_A reports isPerson
+        // false, so any naming rule that consults that flag answers the fallback here.
+        ok("CHART_A still reports isPerson false, which is why the flag is not asked",
+            !WheelRing.Kind.CHART_A.isPerson);
+
+        // A composite is a chart OF a relationship. Naming it after one partner would be a
+        // false claim about whose chart it is.
+        eq("a composite keeps its own heading rather than borrowing a name",
+            WheelRing.Kind.COMPOSITE.heading,
+            OuraniaWindow.whoseChart(david, WheelRing.Kind.COMPOSITE, "Placements"));
+
+        // A subject nobody has entered still carries a placeholder label, and putting that on
+        // the tab would be a name that is not a name.
+        eq("an unentered subject falls back rather than showing its placeholder", "Placements",
+            OuraniaWindow.whoseChart(
+                com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A"),
+                WheelRing.Kind.CHART_A, "Placements"));
+        eq("and so does no subject at all", "Placements",
+            OuraniaWindow.whoseChart(null, WheelRing.Kind.CHART_A, "Placements"));
+
+        // A chart saved with a blank name would otherwise leave the tab empty, which reads as
+        // a broken tab rather than an unnamed one.
+        com.zodiacomputing.ourania.astro.ChartSubject blank =
+            com.zodiacomputing.ourania.astro.ChartSubject.of("   ", when, "Philadelphia",
+                39.95, -75.16, "America/New_York", false);
+        eq("a blank name falls back rather than emptying the tab", "Placements",
+            OuraniaWindow.whoseChart(blank, WheelRing.Kind.CHART_A, "Placements"));
+
+        // Each page keeps its own fallback: Chart B's identity is not Chart A's.
+        eq("Chart B's fallback is its own", "Chart B",
+            OuraniaWindow.whoseChart(null, WheelRing.Kind.CHART_B, "Chart B"));
+
+        // And the name is trimmed, because a tab is centred on its text.
+        com.zodiacomputing.ourania.astro.ChartSubject padded =
+            com.zodiacomputing.ourania.astro.ChartSubject.of("  Erika  ", when, "Philadelphia",
+                39.95, -75.16, "America/New_York", false);
+        eq("a padded name is trimmed", "Erika",
+            OuraniaWindow.whoseChart(padded, WheelRing.Kind.CHART_B, "Chart B"));
     }
 
     /** Two aspect lists holding the same rows, compared cell by cell. */

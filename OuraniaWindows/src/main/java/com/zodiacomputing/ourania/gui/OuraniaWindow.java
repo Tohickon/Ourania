@@ -116,9 +116,9 @@ public class OuraniaWindow extends JFrame {
      * door with no room behind it teaches a reader: see the note on the four placeholder
      * cards pulled on 2 September.
      */
-    public static final String BLUEPRINT_PAGE = "Blueprint";
+    public static final String BLUEPRINT_PAGE = "Chart";
 
-    public static final String CHRONOMETRY_PAGE = "Chronometry";
+    public static final String CHRONOMETRY_PAGE = "Transits";
 
     /**
      * The five readings, each its own tab rather than rows inside a Readings section.
@@ -338,6 +338,13 @@ public class OuraniaWindow extends JFrame {
         // belongs to that group rather than to the charts; it is only built here.
         // Open on Chart at launch, without animating - the Natal section used to be the one
         // section open when the app started, and this is where that content went.
+        // <b>Their plain identity, before any chart exists to name them.</b> A SubRail tab
+        // shows its own key until something renames it, and updateChartSections - which sets
+        // these from the ring headings - returns early while skymapPanel is still being
+        // built. So the strip opened reading "Chart > Chart" on a cold start: the key leaking
+        // through as a label, in the one state a new reader sees first.
+        blueprint.setPageLabel(CHART_PAGE, PLACEMENTS_LABEL);
+        chronometry.setPageLabel(TRANSITS_PAGE, PLACEMENTS_LABEL);
         chartRail.prepare(BLUEPRINT_PAGE);
         blueprint.prepare(CHART_PAGE);
         chronometry.prepare(TRANSITS_PAGE);
@@ -880,7 +887,13 @@ public class OuraniaWindow extends JFrame {
         if (chartRail == null || skymapPanel == null) {
             return;
         }
-        setPageLabel(CHART_PAGE, pageTitleOf(skymapPanel.natalRing.kind));
+        setPageLabel(CHART_PAGE, whoseChart(skymapPanel.chartASubject(),
+            skymapPanel.natalRing.kind, PLACEMENTS_LABEL));
+        // <b>And the second person's page wears their name too.</b> It was the literal
+        // "Chart B" - which says what the page is for and nothing about whose it is, on the
+        // one page whose entire reason for existing is that it belongs to somebody else.
+        setPageLabel(CHART_B_PAGE, whoseChart(skymapPanel.chartBSubject(),
+            WheelRing.Kind.CHART_B, CHART_B_PAGE));
         // <b>A person is no longer one of the rings this page can hold.</b> Chart B has a page
         // of its own now, so the outer ring reaches this one only when it is a moment - and
         // {@code secondPageTitle} is left exactly as it was, because it is a general rule about
@@ -944,7 +957,7 @@ public class OuraniaWindow extends JFrame {
         }
         // No second ring drawn at all: the page is greyed out, and the name it wears while
         // unavailable is its own identity rather than whatever was last on the wheel.
-        return held.length() == 0 ? TRANSITS_PAGE : held.toString();
+        return held.length() == 0 ? PLACEMENTS_LABEL : held.toString();
     }
 
     /**
@@ -954,8 +967,64 @@ public class OuraniaWindow extends JFrame {
      * a ring kind added later is silently called "Chart" - and one was added the very next day.
      * {@code WheelRing.Kind.heading} is a constructor argument, so the compiler asks.
      */
+    /**
+     * What the chart's own page is called: the ring's heading, or its plain identity.
+     *
+     * <b>"Placements" rather than CHART_PAGE, because the tab above it is now called Chart.</b>
+     * A strip reading "Chart > Chart" tells a reader nothing twice. Placements is not a new
+     * word either - the wheel's own accessibility description has said "the Placements page of
+     * the left rail" since G14, so the app already called it that everywhere except on the tab.
+     *
+     * The key is untouched: CHART_PAGE is how every caller addresses this page and how the
+     * card is registered. Only the shown text changes. See SubRail.setPageLabel for why those
+     * are different things.
+     */
+    static final String PLACEMENTS_LABEL = "Placements";
+
+    /**
+     * A chart page is named for whose chart it is.
+     *
+     * <b>David, 2026-10-10: "under Chart have it named the name of the person whose chart it
+     * is".</b> The tab above it already says Chart; repeating that is a word spent saying
+     * nothing, and the one fact the reader of a two-person app actually needs from a tab is
+     * which of them they are looking at.
+     *
+     * <b>Three things have to be true before a name is used, and each has a failure behind
+     * it.</b> The ring must be somebody - a composite is a chart of a relationship and not of
+     * a person, so it keeps its own heading rather than borrowing one partner's name. The
+     * subject must have been entered - {@code moment == null} is how ChartSubject says nobody
+     * has, and an unentered subject still carries the placeholder label "Chart A", which
+     * would put a name on the tab that is not a name. And the label must have something in
+     * it, because a chart saved with a blank name would otherwise leave the tab empty, which
+     * reads as a broken tab rather than an unnamed one.
+     *
+     * @param fallback what the page is called when it has no person to be named for
+     */
+    static String whoseChart(com.zodiacomputing.ourania.astro.ChartSubject who,
+                             WheelRing.Kind kind, String fallback) {
+        // <b>Not kind.isPerson, however much it reads like the right question.</b> That flag
+        // is documented "true when this ring is a person rather than a moment" and CHART_A
+        // carries FALSE - it is only ever asked of the OUTER ring, where being a person and
+        // being Chart B are the same thing, so its values were never made true of the inner
+        // wheel. Using it here named Chart B after Erika and left Chart A as "Chart A".
+        // The flag is left alone: SkymapPanel's outer-ring routing and RingIdentityCheck
+        // depend on exactly these values.
+        //
+        // The question actually being asked is whether this chart belongs to somebody, and
+        // the composite is the one ring that does not - it is a chart OF a relationship, so
+        // naming it after either partner would be a false claim about whose it is.
+        if (kind == WheelRing.Kind.COMPOSITE) {
+            return kind.heading;
+        }
+        if (who != null && who.moment != null && who.label != null
+                && !who.label.trim().isEmpty()) {
+            return who.label.trim();
+        }
+        return fallback;
+    }
+
     static String pageTitleOf(WheelRing.Kind kind) {
-        return kind == null ? CHART_PAGE : kind.heading;
+        return kind == null ? PLACEMENTS_LABEL : kind.heading;
     }
 
     /** Kept so anything still calling the three-part form goes on working. */
