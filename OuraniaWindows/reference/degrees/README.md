@@ -35,3 +35,24 @@ How close the pasted text is to the books it summarises. That needs the books. T
 is the part to read first, because there the app prints the tool's sentences unchanged, and
 because the Sabian wording in it (Pisces 30's summary is the keynote line PROVENANCE.md item 2
 is about) reaches the reader through the degree file as well as the Sabian one.
+
+## The drafted replacements (10 Oct 2026)
+
+`rewrites.json` holds a new summary and reading for each of the 189 copied degrees, drafted in
+the voice of the half that was already rewritten. **They are drafts and are not in the app.**
+David approved the voice on a sample of ten; the rest are waiting on his read.
+`apply_rewrites.py` splices them into `data/degree_interpretations.json` and touches nothing
+else (run it with no arguments first: it reports and writes nothing).
+
+Measured on the drafts: the median reading shares 4% of its three-word runs with the pasted
+text and the most any shares is 15% - the same range as the rewritten half (5%, 18%). None
+shares a five-word run with the Sabian file. With the drafts applied on a trial basis,
+`DataCheck`, `JsonCheck` and `DataFilesCheck` are clear and `CorpusCheck` measures the file
+written at 0.000; the trial was then undone.
+
+What a rewrite does not fix: each draft keeps the traits of the reading it replaces, so it is
+only as true to the degree-symbol authors as the tool's summary was. And the ideas in some of
+the later degrees are Sabian in origin even with the wording gone - Sagittarius 11 to 20 and
+Pisces 21 to 30 most plainly (the groundhog, the Easter service, the harvest moon, the stone
+face). If the degree file is meant to be free of Sabian material, those need other sources,
+not other sentences.
