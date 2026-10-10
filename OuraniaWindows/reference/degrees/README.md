@@ -19,7 +19,7 @@ opens with a ```json fence and a second `{` begins at Cancer 21. 354 degrees; Ar
   them share wording with `Sabian_interpretations.json` (Sagittarius 15 and 18, Pisces 22, 25
   and 30), so some Sabian material is mixed into this half.
 
-## How the app's file relates to it
+## How the app's file related to it, before 10 Oct
 
 Measured by `compare_degrees.py` in this directory (run it again after any edit to either file):
 
@@ -39,16 +39,16 @@ is about) reaches the reader through the degree file as well as the Sabian one.
 ## The drafted replacements (10 Oct 2026)
 
 `rewrites.json` holds a new summary and reading for each of the 189 copied degrees, drafted in
-the voice of the half that was already rewritten. **They are drafts and are not in the app.**
-David approved the voice on a sample of ten; the rest are waiting on his read.
-`apply_rewrites.py` splices them into `data/degree_interpretations.json` and touches nothing
-else (run it with no arguments first: it reports and writes nothing).
+the voice of the half that was already rewritten. **They are in the app since 10 Oct 2026**: David approved the voice on a sample of ten, then
+the whole set ("your rewrites are good so use them"), and they were spliced in the same day.
+`apply_rewrites.py` is what spliced them into `data/degree_interpretations.json`; it touches
+nothing else, and run again it reports 0 fields differing.
 
 Measured on the drafts: the median reading shares 4% of its three-word runs with the pasted
 text and the most any shares is 15% - the same range as the rewritten half (5%, 18%). None
 shares a five-word run with the Sabian file. With the drafts applied on a trial basis,
 `DataCheck`, `JsonCheck` and `DataFilesCheck` are clear and `CorpusCheck` measures the file
-written at 0.000; the trial was then undone.
+written at 0.000; the same holds now that they are applied.
 
 What a rewrite does not fix: each draft keeps the traits of the reading it replaces, so it is
 only as true to the degree-symbol authors as the tool's summary was. And the ideas in some of
