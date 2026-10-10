@@ -76,7 +76,9 @@ was an inference from style. How close the tool's summary runs to the books is n
 needs the books; which of those authors are still in copyright has not been checked. The source and the measurement are kept in `OuraniaWindows/reference/degrees/`.
 **The copied half was redrafted and replaced the same day**, on David's approval, so no reading
 is now the tool's sentences. That settles the wording and nothing else: the content still
-descends from the summary, and twenty readings (Sagittarius 11-20, Pisces 21-30) are Sabian in idea.
+descends from the summary. The twenty readings that were Sabian in idea (Sagittarius 11-20,
+Pisces 21-30) and five filler Aries readings were then rewritten from a second pasted answer David
+supplied, **which names no author** - so its source is the next thing to establish. Aries 3 has none.
 
 **6. This repository is public.** "Nothing is distributed yet. The repository is private", below,
 was true when written on 2 September. On 2026-10-10 `Tohickon/Ourania` is a public repository,

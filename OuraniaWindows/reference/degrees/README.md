@@ -56,3 +56,26 @@ the later degrees are Sabian in origin even with the wording gone - Sagittarius 
 Pisces 21 to 30 most plainly (the groundhog, the Easter service, the harvest moon, the stone
 face). If the degree file is meant to be free of Sabian material, those need other sources,
 not other sentences.
+
+## The second source (10 Oct 2026, later)
+
+David supplied other material for the twenty Sabian-in-idea degrees and for Aries:
+`second_source.pasted.txt`, kept here as he attached it. It is again a chat or notebook
+tool's answer (it ends by offering more help) and **names no author**; its vocabulary - the
+south node of Uranus, the Midas touch, the forty days in the wilderness - is not the Sabian
+set's. Which book or books it summarises is not recorded. **Ask David.**
+
+`rewrites_second_source.json` holds 25 readings written from it and spliced in the same day:
+Sagittarius 11-20 and Pisces 21-30, replacing the redrafts above (those twenty keys were taken
+out of `rewrites.json` so that running the script again cannot put them back; they are in git
+at `5cbd92a`), and Aries 4, 6, 15, 24 and 25.
+
+- **The five Aries readings they replace were filler.** Each reasoned from where the degree
+  sits in the sign ("the middle of Aries stabilises the sign's fire") and described no image
+  or tradition. That is what "no counterpart in the pasted file" turned out to mean.
+- **Aries 3 is still filler.** The material covers Aries 5 and not Aries 3. Aries 5 already
+  had a reading from the first source and was left alone.
+- **These 25 are shorter** - 41 to 60 words where the rest run 57 to 89 - because the source
+  gives a sentence or two per degree and nothing was added to pad them.
+- Measured: at most 10% of a reading's three-word runs are in the new pasted text, and none
+  shares a five-word run with the Sabian file.

@@ -2,6 +2,7 @@
 
     python apply_rewrites.py          # report what would change, write nothing
     python apply_rewrites.py --write  # replace summary and fullText for each drafted degree
+    python apply_rewrites.py rewrites_second_source.json --write   # a named set, same rules
 
 rewrites.json holds a draft for each degree whose reading in degree_interpretations.json was
 the pasted tool answer (see README.md). Only those keys are touched, only their summary and
@@ -30,10 +31,13 @@ def main():
     if same_layout.rstrip() != text.rstrip():
         sys.exit("degree_interpretations.json is not in the layout this script writes; "
                  "stopping so that nothing but the readings can change.")
-    drafts = json.load(open(os.path.join(HERE, "rewrites.json"), encoding="utf-8"))
+    names = [a for a in sys.argv[1:] if not a.startswith("--")] or ["rewrites.json"]
+    drafts = {}
+    for name in names:
+        drafts.update(json.load(open(os.path.join(HERE, name), encoding="utf-8")))
     unknown = [k for k in drafts if k not in app]
     if unknown:
-        sys.exit("rewrites.json has degrees the app does not: " + ", ".join(unknown))
+        sys.exit("the drafts name degrees the app does not: " + ", ".join(unknown))
     changed = 0
     for key, draft in drafts.items():
         for field in ("summary", "fullText"):
