@@ -5,11 +5,17 @@ package com.zodiacomputing.ourania.gui;
  *
  * <p><b>The row said nothing verified the ephemeris directory, the data files or the settings
  * before the window opened. The first thing the new code measured was a defect four weeks old:</b>
- * {@code semo_18.se1} has never been in this machine's ephemeris directory, every
- * {@code swe_calc_ut} in the app carries "file 'semo_18.se1' not found" in its error buffer and
- * returns success anyway, and the North Node is computed by approximation on every chart cast
- * here. Part G is written so that a directory which grows the file makes this suite say so rather
- * than quietly pass.
+ * {@code semo_18.se1} was not in this machine's ephemeris directory, every {@code swe_calc_ut}
+ * in the app carried "file 'semo_18.se1' not found" in its error buffer and returned success
+ * anyway, and the North Node was computed by approximation on every chart cast here. Part G was
+ * written so that a directory which grew the file would make this suite say so rather than
+ * quietly pass.
+ *
+ * <p><b>On 2026-10-10 the file was put in place, and Part G said so.</b> It failed on the one
+ * assertion that pinned the absence, which is the whole of what it was for. Its assertions now
+ * read the other way round - the directory is complete - so a directory that loses a file again
+ * fails them. The corpus moved with it: {@code ephemeris-corpus.tsv} was re-recorded, the North
+ * Node went from approximation to files on 50 rows, and nothing went the other way.
  *
  * <p><b>Part B holds a defect this suite's own subject had.</b> The first
  * {@link Startup#namedFiles} looked for "not found" <i>before</i> the quoted filename; Swiss
@@ -318,18 +324,27 @@ public final class StartupCheck {
             ok("inside the files' era nothing is beyond computing",
                 only(now, "cannot be computed") == null);
 
-            // <b>Written to change when the directory does.</b> semo_18.se1 has been absent since
-            // before this project began; if it is ever put in place, the first of these fails and
-            // the second is what the machine then says. Both are stated so neither can be read as
-            // the check being satisfied by the defect.
+            // <b>Written to change when the directory does, and on 2026-10-10 it did.</b> The
+            // assertions here used to pin semo_18.se1's absence and what that absence cost; the
+            // absence ended, and they are what reported it rather than passing through it. They
+            // read the other way round now, so a directory that loses a file fails them again.
+            //
+            // <b>The pair they replace shows how a guard stops guarding.</b> The second one was
+            // "the North Node is what it costs", written as {@code !lacksMoon || ...} - so the
+            // moment the file arrived it passed vacuously, on a machine it no longer described.
+            // The three below are independent claims and not one leaning on another: no file is
+            // absent, start-up says the directory is whole, and nothing falls back here. A
+            // missing file is not the only way a body can fall back - being outside the files'
+            // era is another, which is what the 1500 half of this part asserts - so the third is
+            // not implied by the first.
             Startup.Finding missing = only(now, "missing");
             Startup.Finding fellNow = only(now, "approximation");
-            boolean lacksMoon = missing != null
-                && missing.detail.contains("semo_18.se1");
-            ok("this machine is still missing the Moon's file (" + (missing == null ? "no"
-                : "yes") + ") - see known-red.txt and the vault note", lacksMoon);
-            ok("and the North Node is what it costs on a modern chart",
-                !lacksMoon || (fellNow != null && fellNow.detail.contains("Node")));
+            Startup.Finding whole = only(now, "answered from the ephemeris files");
+            ok("no file is missing from this machine's ephemeris directory ("
+                + (missing == null ? "none" : missing.detail) + ")", missing == null);
+            ok("and start-up says the directory is whole in as many words", whole != null);
+            ok("and nothing on a modern chart falls back to approximation ("
+                + (fellNow == null ? "nothing" : fellNow.detail) + ")", fellNow == null);
         } finally {
             Startup.jdOverride = null;
         }
