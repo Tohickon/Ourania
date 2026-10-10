@@ -481,10 +481,10 @@ public final class NavigationCheck {
                 OuraniaWindow w = new OuraniaWindow();
                 DrawerRail rail = w.chartRail();
                 if (rail != null) {
-                    f.railPages.addAll(rail.pageNames());
+                    f.railPages.addAll(w.allPages());
                     for (String[] r : OuraniaWindow.READINGS) {
                         List<String> boxes = new ArrayList<>();
-                        collectCheckBoxes(rail.page(r[0]), boxes);
+                        collectCheckBoxes(w.pageComponent(r[0]), boxes);
                         f.readingControls.put(r[0], boxes);
                     }
                 }
@@ -2415,20 +2415,21 @@ public final class NavigationCheck {
                 String kind = h.equals("index") ? "the Index link"
                     : h.startsWith("pattern|") ? "a pattern link" : "the body link " + h;
                 ok(kind + " leaves the Chart page for the page it wrote to, showing "
-                    + rail.selected(), !OuraniaWindow.CHART_PAGE.equals(rail.selected()) && rail.isOpen());
+                    + w[0].currentPage(),
+                    !OuraniaWindow.CHART_PAGE.equals(w[0].currentPage()) && rail.isOpen());
                 if (!h.equals("index") && !h.startsWith("pattern|")) {
                     continue;
                 }
                 if (!isPattern) {
-                    ok(kind + " shows the Interpretation page, not " + rail.selected(),
-                        OuraniaWindow.READING_PAGE.equals(rail.selected()));
+                    ok(kind + " shows the Interpretation page, not " + w[0].currentPage(),
+                        OuraniaWindow.READING_PAGE.equals(w[0].currentPage()));
                     continue;
                 }
                 // <b>A figure is a selection.</b> David: "interpretation was meant to be a tab
                 // to interpret the entire chart, selection was meant to define and show what
                 // was selected" - and it should bloom out whole, not stop short.
-                ok(kind + " opens on the Selection page, not " + rail.selected(),
-                    OuraniaWindow.SELECTION_PAGE.equals(rail.selected()));
+                ok(kind + " opens on the Selection page, not " + w[0].currentPage(),
+                    OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage()));
                 // Two turns of the queue: setHtml restores the old position later, and the
                 // return to the top is queued behind that.
                 SwingUtilities.invokeAndWait(() -> { });
@@ -2514,7 +2515,7 @@ public final class NavigationCheck {
                     }
                 });
                 SwingUtilities.invokeAndWait(() -> { });
-                boolean opened = OuraniaWindow.SELECTION_PAGE.equals(rail.selected())
+                boolean opened = OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage())
                     && selectionPane.getText().toLowerCase().contains(owners.get(i).toLowerCase());
                 if (!opened) {
                     dead.computeIfAbsent(owners.get(i), k -> new StringBuilder()).append(glyphs.get(i));
@@ -2579,17 +2580,30 @@ public final class NavigationCheck {
                 });
                 SwingUtilities.invokeAndWait(() -> { });
                 java.util.List<String> visible = visibleCards(cards, pages);
-                ok("after the " + route + " route one page is visible, the selected " + rail.selected()
-                    + ", not " + visible, visible.size() == 1 && visible.get(0).equals(rail.selected()));
+                ok("after the " + route + " route one rail card is visible, the selected "
+                    + rail.selected() + ", not " + visible,
+                    visible.size() == 1 && visible.get(0).equals(rail.selected()));
+                // <b>And one card inside the strip, which is where the defect now lives.</b>
+                // This part exists because fourteen setVisible(true) calls kept the
+                // interpretation panel painted over whichever page was chosen. That panel is
+                // a card in Blueprint's own stack now, so a claim about the rail's three
+                // cards cannot reach it - the guard would still pass while the bug returned.
+                for (SubRail strip : new SubRail[] {w[0].blueprintRail(),
+                                                    w[0].chronometryRail()}) {
+                    java.util.List<String> inside = visibleCards(strip.cards(), strip.pages());
+                    ok("after the " + route + " route one card is visible inside the strip, "
+                        + "the selected " + strip.selected() + ", not " + inside,
+                        inside.size() == 1 && inside.get(0).equals(strip.selected()));
+                }
                 if (route.equals("index")) {
-                    ok("the index route opens on Interpretation, showing " + rail.selected(),
-                        OuraniaWindow.READING_PAGE.equals(rail.selected()) && rail.isOpen());
+                    ok("the index route opens on Interpretation, showing " + w[0].currentPage(),
+                        OuraniaWindow.READING_PAGE.equals(w[0].currentPage()) && rail.isOpen());
                 } else if (!route.equals("close")) {
                     // <b>A clicked thing is a selection.</b> David: "interpretation was meant to
                     // be a tab to interpret the entire chart, selection was meant to define and
                     // show what was selected". Every one of these wrote over Interpretation.
-                    ok("the " + route + " route opens on Selection, showing " + rail.selected(),
-                        OuraniaWindow.SELECTION_PAGE.equals(rail.selected()) && rail.isOpen());
+                    ok("the " + route + " route opens on Selection, showing " + w[0].currentPage(),
+                        OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage()) && rail.isOpen());
                     String sel = selection.getText();
                     ok("the " + route + " route put its reading there, " + sel.length() + " chars",
                         sel.length() > 400 && !sel.equals(lastSelection[0]));
@@ -2598,10 +2612,33 @@ public final class NavigationCheck {
                         reading.getText().equals(readingBefore[0]));
                 }
                 readingBefore[0] = reading.getText();
-                for (String page : pages) {
-                    SwingUtilities.invokeAndWait(() -> rail.reveal(page));
-                    java.util.List<String> shown = visibleCards(cards, pages);
-                    ok("after the " + route + " route, opening " + page + " shows it alone, not " + shown,
+                // <b>Every page, not every rail tab.</b> This loop opened all twelve pages
+                // when all twelve were rail tabs; after the restructure the rail has three,
+                // and iterating it silently dropped nine of them - the suite went green by
+                // testing less, which the check count caught and the verdict would not have.
+                // Each page is opened through the window and inspected at the level it lives
+                // on: the rail's own card for a tab, the strip's card for a page inside one.
+                for (String page : w[0].allPages()) {
+                    // <b>Only the pages a reader can actually open.</b> DrawerRail.reveal
+                    // shows a page whether or not it is greyed - it never consults its own
+                    // disabled set - and this loop used to rely on that to walk all twelve.
+                    // SubRail refuses a greyed page, which is what greying is for, so asking
+                    // whether opening Chart B shows Chart B on a chart with no second person
+                    // is asking the wrong question. That it CANNOT be opened is asserted in
+                    // SubRailCheck Part D, where it belongs.
+                    if (!w[0].isPageEnabled(page)) {
+                        continue;
+                    }
+                    SwingUtilities.invokeAndWait(() -> w[0].revealPage(page));
+                    SubRail home = w[0].blueprintRail().pages().contains(page)
+                        ? w[0].blueprintRail()
+                        : w[0].chronometryRail().pages().contains(page)
+                            ? w[0].chronometryRail() : null;
+                    java.util.List<String> shown = home == null
+                        ? visibleCards(cards, pages)
+                        : visibleCards(home.cards(), home.pages());
+                    ok("after the " + route + " route, opening " + page
+                        + " shows it alone, not " + shown,
                         shown.size() == 1 && shown.get(0).equals(page));
                 }
             }
@@ -2612,23 +2649,38 @@ public final class NavigationCheck {
                 w[0].handlePlacementClick("sign|Aquarius");
             });
             SwingUtilities.invokeAndWait(() -> { });
-            ok("a sign linked inside a Selection reading opens on Selection, showing " + rail.selected(),
-                OuraniaWindow.SELECTION_PAGE.equals(rail.selected())
+            ok("a sign linked inside a Selection reading opens on Selection, showing "
+                + w[0].currentPage(),
+                OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage())
                     && selection.getText().contains("Aquarius"));
             SwingUtilities.invokeAndWait(() -> w[0].handlePlacementClick("back"));
             SwingUtilities.invokeAndWait(() -> { });
-            ok("\"back\" goes to the whole chart on Interpretation, showing " + rail.selected(),
-                OuraniaWindow.READING_PAGE.equals(rail.selected()));
+            ok("\"back\" goes to the whole chart on Interpretation, showing "
+                + w[0].currentPage(),
+                OuraniaWindow.READING_PAGE.equals(w[0].currentPage()));
             // The Close button puts the rail away rather than hiding its own card, which left the
             // Interpretation tab opening onto a blank page afterwards.
+            // <b>Through the window, because Interpretation is not a rail tab any more.</b>
+            // DrawerRail.reveal takes a label it has no page for without complaint - it sets
+            // selected to the name and shows nothing - so asking the rail for a page that
+            // moved down a level leaves the rail claiming to show it while the card behind is
+            // whatever was there before. revealPage opens the tab AND the page.
             SwingUtilities.invokeAndWait(() -> {
-                rail.reveal(OuraniaWindow.READING_PAGE);
+                w[0].revealPage(OuraniaWindow.READING_PAGE);
                 w[0].closeInterpretationPanel();
             });
             ok("Close puts the rail away", !rail.isOpen());
-            SwingUtilities.invokeAndWait(() -> rail.reveal(OuraniaWindow.READING_PAGE));
-            ok("and the Interpretation page still opens onto its panel",
-                visibleCards(cards, pages).equals(java.util.List.of(OuraniaWindow.READING_PAGE)));
+            SwingUtilities.invokeAndWait(() -> w[0].revealPage(OuraniaWindow.READING_PAGE));
+            // <b>Asked at both levels, because the page is at the second one.</b> The rail's
+            // visible card is Blueprint - correctly - and the claim worth making is about
+            // what Blueprint is showing. Checking only the rail would assert that a container
+            // is on screen, which it always is.
+            ok("and the Interpretation page still opens onto its panel, rail showing "
+                + visibleCards(cards, pages),
+                visibleCards(cards, pages).equals(java.util.List.of(OuraniaWindow.BLUEPRINT_PAGE)));
+            ok("with the interpretation panel the one card visible inside Blueprint",
+                visibleCards(w[0].blueprintRail().cards(), w[0].blueprintRail().pages())
+                    .equals(java.util.List.of(OuraniaWindow.READING_PAGE)));
 
             // <b>Every reading door opens the rail, not just the one that was noticed.</b>
             // showSynthesis revealed the reading page and carried a comment saying why - a
@@ -2657,8 +2709,8 @@ public final class NavigationCheck {
                 });
                 SwingUtilities.invokeAndWait(() -> { });
                 ok("the " + door + " door opens the rail on the reading, showing "
-                    + rail.selected(),
-                    OuraniaWindow.READING_PAGE.equals(rail.selected()) && rail.isOpen());
+                    + w[0].currentPage(),
+                    OuraniaWindow.READING_PAGE.equals(w[0].currentPage()) && rail.isOpen());
             }
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());

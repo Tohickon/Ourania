@@ -40,6 +40,10 @@ public class OuraniaWindow extends JFrame {
     private SidePanel sidePanel;
     /** The left rail: what this chart is, opposite the menu that says what the app does. */
     private DrawerRail chartRail;
+    /** Blueprint's own pages: the two charts, the views of them, and the natal documents. */
+    private SubRail blueprint;
+    /** Chronometry's: the sky over the chart, and the documents about time. */
+    private SubRail chronometry;
     private OverviewPanel overviewPanel;
     private javax.swing.JEditorPane natalPane;
     private javax.swing.JEditorPane transitPane;
@@ -91,6 +95,32 @@ public class OuraniaWindow extends JFrame {
     public static final String READING_PAGE = "Interpretation";
 
     /**
+     * The three rail tabs, each holding a handful of pages.
+     *
+     * <b>Twelve tabs in one column was the complaint, and grouping them did not fix it.</b>
+     * An earlier pass put rules between the three kinds (caa68f9c) - charts, views of them,
+     * documents about them - which was the right reading at the wrong granularity: twelve
+     * items in three groups is still twelve items, and the rail still asks the reader to
+     * choose among all of them at once. David, 2026-10-09: "i just think the current tab
+     * structure is a bit bloated and confusing".
+     *
+     * Three doors, named for the question behind each rather than for the feature inside:
+     * who this person is, how two of them meet, and what time it is in a life. The pages
+     * themselves are unchanged and keep their own constants - they moved down a level, they
+     * did not go away.
+     *
+     * <b>There is no Lab tab, deliberately.</b> The fourth tab of the architecture David
+     * brought back would hold Horary, Electional, Rectify and the harmonics - and those are
+     * full centre-stack screens reached from the Menu, not rail panes. A Lab tab here would
+     * open onto nothing or duplicate the Menu, and this window has already learned what a
+     * door with no room behind it teaches a reader: see the note on the four placeholder
+     * cards pulled on 2 September.
+     */
+    public static final String BLUEPRINT_PAGE = "Blueprint";
+
+    public static final String CHRONOMETRY_PAGE = "Chronometry";
+
+    /**
      * The five readings, each its own tab rather than rows inside a Readings section.
      *
      * <b>The wrapper is gone for the same reason the Menu section went.</b> A section whose
@@ -107,6 +137,16 @@ public class OuraniaWindow extends JFrame {
         {"Predict", "TIMELINE"},
         {"Calendar", "CALENDAR"},
     };
+
+    /**
+     * The readings that describe time rather than a person, and so sit behind Chronometry.
+     *
+     * <b>Named, not indexed.</b> READINGS is an ordered table and the obvious split is "the
+     * last two" - which would silently re-home Synthesize the first time a sixth reading was
+     * appended. A reading belongs to a tab because of what it is about.
+     */
+    static final java.util.List<String> TIMED_READINGS =
+        java.util.List.of("Predict", "Calendar");
 
     private final java.util.Map<String, javax.swing.JEditorPane> readingPanes =
         new java.util.LinkedHashMap<>();
@@ -273,18 +313,24 @@ public class OuraniaWindow extends JFrame {
         // over them. Read in that order a reader meets one fact at a time; with Chart B's
         // placements on the Transits page, which is where they were, the order said that a
         // second person was a kind of transit.
-        chartRail.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
-        chartRail.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
+        blueprint = new SubRail();
+        chronometry = new SubRail();
+        blueprint.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
+        blueprint.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
+        chronometry.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
+        // <b>Synastry is a rail tab with one page, and that is not an oversight.</b> It is a
+        // question about a pair, which is neither of the two people and not a moment either -
+        // so it is its own door. A SubRail holding one tab would draw a strip with a single
+        // item in it, which is furniture claiming to be navigation.
+        chartRail.addPage(BLUEPRINT_PAGE, blueprint);
         chartRail.addPage(SYNASTRY_PAGE, HtmlPanes.scroller(synastryPane));
-        chartRail.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
-        // <b>The end of the charts, and the start of what is said about them.</b> See
-        // DrawerRail.addSeparator: twelve tabs in one column read as a list, and a list claims
-        // every item is the same kind of thing. These four are charts on the wheel; what
-        // follows is what the reader is looking at, and after that the documents the app
-        // writes. The order inside this group runs outward exactly as the wheel does - the
-        // person, the other person, what they do to each other, then the moment passing over
-        // both - which is also the order the sources give for reading them.
-        chartRail.addSeparator();
+        chartRail.addPage(CHRONOMETRY_PAGE, chronometry);
+        // <b>The separators are gone, and so is what they were for.</b> They drew the
+        // boundary between the charts, the views of them and the documents about them. That
+        // boundary is now the boundary between a rail tab and the strip inside it, which is a
+        // structure rather than a hint - a reader cannot mistake a page inside Blueprint for a
+        // sibling of Blueprint, which is exactly what a rule between twelve equals could not
+        // prevent. DrawerRail.addSeparator stays; nothing calls it here any more.
         // <b>Selection and the reading join the chart's own side.</b> All four answer "what
         // am I looking at" - the chart, the sky over it, the body just clicked, and what that
         // means - so they belong on one edge, leaving the right for what the app can do.
@@ -292,7 +338,9 @@ public class OuraniaWindow extends JFrame {
         // belongs to that group rather than to the charts; it is only built here.
         // Open on Chart at launch, without animating - the Natal section used to be the one
         // section open when the app started, and this is where that content went.
-        chartRail.prepare(CHART_PAGE);
+        chartRail.prepare(BLUEPRINT_PAGE);
+        blueprint.prepare(CHART_PAGE);
+        chronometry.prepare(TRANSITS_PAGE);
         add(chartRail, BorderLayout.WEST);
 
         // Built here rather than beside the rail below, because SkymapPanel's constructor
@@ -320,7 +368,7 @@ public class OuraniaWindow extends JFrame {
         // long document to find out. Added here rather than beside the other rail pages above
         // because it reads the wheel, and the wheel is built two lines up.
         overviewPanel = new OverviewPanel(skymapPanel, this);
-        chartRail.addPage(OVERVIEW_PAGE, overviewPanel);
+        blueprint.addPage(OVERVIEW_PAGE, overviewPanel);
 
         interpretationPanel = new InterpretationPanel(skymapPanel, this);
         // <b>The rail owns this panel's visibility, and nothing else may touch it.</b> The rail
@@ -331,28 +379,44 @@ public class OuraniaWindow extends JFrame {
         // wheel, and on every page its own repaints could land on top. David, 2026-09-14:
         // "make sure the information panel on the left is scrollable it was giving me quite a
         // few glitches". NavigationCheck Part R holds the rail to one visible card.
-        chartRail.addPage(READING_PAGE, interpretationPanel);
+        blueprint.addPage(READING_PAGE, interpretationPanel);
         // <b>Selection sits with these two, not with the charts.</b> Overview is the shape of
         // the whole chart, Interpretation is the reading of the whole chart, and Selection is
         // the one body you just clicked - so the group runs from the widest scope to the
         // narrowest, which is the order the sources give for reading a chart at all ("macro
         // scope down to granular dynamics"). It was added up with the chart pages before, where
         // it read as a fifth chart.
-        chartRail.addPage(SELECTION_PAGE, HtmlPanes.scroller(selectionPane));
-        // And the last boundary: everything below is a document the app writes, not a view of
-        // what is on the wheel.
-        chartRail.addSeparator();
+        blueprint.addPage(SELECTION_PAGE, HtmlPanes.scroller(selectionPane));
+        // <b>A document goes on the tab whose question it answers.</b> The five readings were
+        // five tabs of their own, which made them look like places rather than things the app
+        // writes. Snapshot, Report and Synthesize describe a person, so they belong behind
+        // Blueprint; Predict and Calendar describe a stretch of time, so they belong behind
+        // Chronometry. Nothing else about them changes - they are still regenerated on open,
+        // for the reason setOnSelect gives below.
         for (String[] r : READINGS) {
             javax.swing.JEditorPane pane = HtmlPanes.chartPane(this);
             readingPanes.put(r[0], pane);
-            chartRail.addPage(r[0], readingPage(r[1], HtmlPanes.scroller(pane)));
+            JComponent page = readingPage(r[1], HtmlPanes.scroller(pane));
+            (TIMED_READINGS.contains(r[0]) ? chronometry : blueprint).addPage(r[0], page);
         }
 
         // <b>Opening a tab has to produce the page, not just reveal it.</b> The readings were
         // buttons that ran something; turned into tabs they revealed panes nothing had ever
         // written to, so five of them opened onto blank panels and Interpretation opened onto
         // an empty one. A card swap is not a door - the thing behind the door has to be made.
-        chartRail.setOnSelect(page -> {
+        // <b>Opening a rail tab has to re-open the page inside it.</b> The sub-rail keeps
+        // showing whichever page was last chosen, and a reading is a snapshot of a moment the
+        // transport buttons keep moving - so coming back to Chronometry with Predict in front
+        // has to rebuild Predict, not reveal a stale card. The rail reports the tab; the tab
+        // asks its own strip to report the page, and the one listener below handles both.
+        chartRail.setOnSelect(tab -> {
+            SubRail inside = BLUEPRINT_PAGE.equals(tab) ? blueprint
+                : CHRONOMETRY_PAGE.equals(tab) ? chronometry : null;
+            if (inside != null) {
+                inside.refire();
+            }
+        });
+        java.util.function.Consumer<String> onPage = page -> {
             // The same rule as the readings below: a card swap is not a door, and a page built
             // once would go on describing a chart the transport buttons have already left.
             if (OVERVIEW_PAGE.equals(page)) {
@@ -376,10 +440,12 @@ public class OuraniaWindow extends JFrame {
                     return;
                 }
             }
-        });
+        };
+        blueprint.setOnSelect(onPage);
+        chronometry.setOnSelect(onPage);
 
         // Nothing has been clicked yet, so Selection has nothing to show.
-        chartRail.setPageEnabled(SELECTION_PAGE, false);
+        blueprint.setPageEnabled(SELECTION_PAGE, false);
 
         // <b>One strip on the east edge, with a tab each.</b> The grid was tried across the
         // top, where its handle was a bar lying between two vertical strips and read as a
@@ -679,7 +745,7 @@ public class OuraniaWindow extends JFrame {
             // does - press it again and the rail closes.
             interpretationPanel.updateInterpretations();
             if (chartRail != null) {
-                chartRail.select(READING_PAGE);
+                revealPage(READING_PAGE);
             }
             return;
         }
@@ -814,13 +880,13 @@ public class OuraniaWindow extends JFrame {
         if (chartRail == null || skymapPanel == null) {
             return;
         }
-        chartRail.setPageLabel(CHART_PAGE, pageTitleOf(skymapPanel.natalRing.kind));
+        setPageLabel(CHART_PAGE, pageTitleOf(skymapPanel.natalRing.kind));
         // <b>A person is no longer one of the rings this page can hold.</b> Chart B has a page
         // of its own now, so the outer ring reaches this one only when it is a moment - and
         // {@code secondPageTitle} is left exactly as it was, because it is a general rule about
         // naming a page after the rings on it and Part P of NavigationCheck pins it. What
         // changed is which rings are handed to it.
-        chartRail.setPageLabel(TRANSITS_PAGE, secondPageTitle(
+        setPageLabel(TRANSITS_PAGE, secondPageTitle(
             skymapPanel.outerRing.kind,
             outerReachesSecondPage(skymapPanel.outerRing.kind, skymapPanel.outerRingDrawn()),
             skymapPanel.skyRing.kind, skymapPanel.triRingDrawn()));
@@ -911,7 +977,7 @@ public class OuraniaWindow extends JFrame {
         if (chartRail != null) {
             // Greyed without a second person, for the same reason Transits is greyed without
             // transits: a tab that opens onto nothing reads as broken rather than as empty.
-            chartRail.setPageEnabled(CHART_B_PAGE, hasContent(chartBHtml));
+            setPageEnabled(CHART_B_PAGE, hasContent(chartBHtml));
         }
         if (synastryPane != null) {
             HtmlPanes.setHtml(synastryPane, synastryHtml);
@@ -919,7 +985,7 @@ public class OuraniaWindow extends JFrame {
         if (chartRail != null) {
             // Greyed unless there are two people, for the reason the Transits page is greyed
             // without transits: a tab that opens onto nothing reads as broken rather than empty.
-            chartRail.setPageEnabled(SYNASTRY_PAGE, hasContent(synastryHtml));
+            setPageEnabled(SYNASTRY_PAGE, hasContent(synastryHtml));
         }
         if (natalPane != null) {
             HtmlPanes.setHtml(natalPane, natalHtml);
@@ -933,7 +999,7 @@ public class OuraniaWindow extends JFrame {
         // the markup rather than asked of the wheel, because this method is the only thing
         // that sees the section and it already has it in hand.
         if (chartRail != null) {
-            chartRail.setPageEnabled(TRANSITS_PAGE, hasContent(transitHtml));
+            setPageEnabled(TRANSITS_PAGE, hasContent(transitHtml));
             nameTheChartPages();
         }
         if (gridPane != null) {
@@ -982,6 +1048,152 @@ public class OuraniaWindow extends JFrame {
         return overviewPanel;
     }
 
+    /**
+     * Which strip a page lives on, or null when the page is a rail tab in its own right.
+     *
+     * <b>Asked of the strips rather than listed here.</b> A second table saying which page is
+     * behind which tab would be the same list written twice, and the first edit that added a
+     * page to a strip without updating the table would send every caller holding that page's
+     * name to the wrong tab - silently, because revealing the wrong tab still reveals
+     * something.
+     */
+    private SubRail homeOf(String page) {
+        if (blueprint != null && blueprint.pages().contains(page)) {
+            return blueprint;
+        }
+        if (chronometry != null && chronometry.pages().contains(page)) {
+            return chronometry;
+        }
+        return null;
+    }
+
+    /** The rail tab that holds a page - the page itself, when it is a rail tab. */
+    private String tabOf(String page) {
+        SubRail home = homeOf(page);
+        return home == null ? page : home == blueprint ? BLUEPRINT_PAGE : CHRONOMETRY_PAGE;
+    }
+
+    /**
+     * Open a page, wherever it lives.
+     *
+     * <b>Every caller names a page and none of them should know the rail has two levels.</b>
+     * There were thirty-odd {@code chartRail.reveal(X)} calls across this window before the
+     * rail became three tabs, and rewriting each of them to open a tab and then a strip would
+     * be the structure written thirty times. One method knows; the callers go on naming pages.
+     */
+    void revealPage(String page) {
+        if (chartRail == null) {
+            return;
+        }
+        chartRail.reveal(tabOf(page));
+        SubRail home = homeOf(page);
+        if (home != null) {
+            home.reveal(page);
+        }
+    }
+
+    /** The page actually in front of the reader, a level down where there is one. */
+    String currentPage() {
+        if (chartRail == null) {
+            return null;
+        }
+        String tab = chartRail.selected();
+        if (BLUEPRINT_PAGE.equals(tab) && blueprint != null) {
+            return blueprint.selected();
+        }
+        if (CHRONOMETRY_PAGE.equals(tab) && chronometry != null) {
+            return chronometry.selected();
+        }
+        return tab;
+    }
+
+    /**
+     * Grey a page out, wherever it lives - and the tab above it when nothing inside is left.
+     *
+     * <b>A tab whose every page is greyed is a door to an empty room.</b> That is the defect
+     * the placeholder cards were pulled for on 2 September, arriving by a new route: the page
+     * greying was honest and the tab above it was not.
+     */
+    void setPageEnabled(String page, boolean on) {
+        SubRail home = homeOf(page);
+        if (home == null) {
+            if (chartRail != null) {
+                chartRail.setPageEnabled(page, on);
+            }
+            return;
+        }
+        home.setPageEnabled(page, on);
+        if (chartRail != null) {
+            chartRail.setPageEnabled(tabOf(page), !home.allDisabled());
+        }
+    }
+
+    boolean isPageEnabled(String page) {
+        SubRail home = homeOf(page);
+        if (home != null) {
+            return home.isPageEnabled(page);
+        }
+        return chartRail != null && chartRail.isPageEnabled(page);
+    }
+
+    /** Rename a tab, wherever it lives. The page's own name never changes; see SubRail. */
+    void setPageLabel(String page, String shown) {
+        SubRail home = homeOf(page);
+        if (home != null) {
+            home.setPageLabel(page, shown);
+        } else if (chartRail != null) {
+            chartRail.setPageLabel(page, shown);
+        }
+    }
+
+    String pageLabel(String page) {
+        SubRail home = homeOf(page);
+        return home != null ? home.pageLabel(page)
+            : chartRail != null ? chartRail.pageLabel(page) : null;
+    }
+
+    /**
+     * Every page a reader can reach on the left, across both levels.
+     *
+     * <b>For callers whose claim is "this page exists", which is most of them.</b> Asking the
+     * rail alone answers three names now, and a suite that checked the rail for Snapshot would
+     * report the reading missing when it had merely moved down a level - a false alarm that
+     * teaches the next reader to loosen the assertion.
+     */
+    java.util.List<String> allPages() {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        if (chartRail == null) {
+            return out;
+        }
+        for (String tab : chartRail.pageNames()) {
+            if (BLUEPRINT_PAGE.equals(tab) && blueprint != null) {
+                out.addAll(blueprint.pages());
+            } else if (CHRONOMETRY_PAGE.equals(tab) && chronometry != null) {
+                out.addAll(chronometry.pages());
+            } else {
+                out.add(tab);
+            }
+        }
+        return out;
+    }
+
+    /** The component behind a page, wherever it lives. */
+    JComponent pageComponent(String page) {
+        SubRail home = homeOf(page);
+        return home != null ? home.page(page)
+            : chartRail != null ? chartRail.page(page) : null;
+    }
+
+    /** Blueprint's strip, for the suites. */
+    SubRail blueprintRail() {
+        return blueprint;
+    }
+
+    /** Chronometry's strip, for the suites. */
+    SubRail chronometryRail() {
+        return chronometry;
+    }
+
     DrawerRail chartRail() {
         return chartRail;
     }
@@ -989,7 +1201,7 @@ public class OuraniaWindow extends JFrame {
     /** Opens the left rail on a page, for a caller that needs it visible. */
     public void showChartPage(String page) {
         if (chartRail != null) {
-            chartRail.reveal(page);
+            revealPage(page);
         }
     }
 
@@ -1027,7 +1239,7 @@ public class OuraniaWindow extends JFrame {
      */
     private void revealReading() {
         if (chartRail != null) {
-            chartRail.reveal(READING_PAGE);
+            revealPage(READING_PAGE);
         }
     }
 
@@ -1074,8 +1286,8 @@ public class OuraniaWindow extends JFrame {
         }
         if (chartRail != null) {
             // There is something selected now, so the tab stops being greyed out.
-            chartRail.setPageEnabled(SELECTION_PAGE, true);
-            chartRail.reveal(SELECTION_PAGE);
+            setPageEnabled(SELECTION_PAGE, true);
+            revealPage(SELECTION_PAGE);
         }
     }
 
@@ -1401,7 +1613,7 @@ public class OuraniaWindow extends JFrame {
             // It was applied to one of the three doors when the panel became a rail page and
             // not to the other two, which is why Synthesize worked and these did not.
             if (chartRail != null) {
-                chartRail.reveal(READING_PAGE);
+                revealPage(READING_PAGE);
             }
             revalidate();
             repaint();
@@ -1418,7 +1630,7 @@ public class OuraniaWindow extends JFrame {
             // It was applied to one of the three doors when the panel became a rail page and
             // not to the other two, which is why Synthesize worked and these did not.
             if (chartRail != null) {
-                chartRail.reveal(READING_PAGE);
+                revealPage(READING_PAGE);
             }
             revalidate();
             repaint();
@@ -1438,7 +1650,7 @@ public class OuraniaWindow extends JFrame {
             // reading generated into a shut rail is written and never shown, which reads as
             // a Readings button that does nothing.
             if (chartRail != null) {
-                chartRail.reveal(READING_PAGE);
+                revealPage(READING_PAGE);
             }
             revalidate();
             repaint();
@@ -1515,7 +1727,7 @@ public class OuraniaWindow extends JFrame {
         }
         HtmlPanes.setHtml(pane, html);
         if (chartRail != null) {
-            chartRail.reveal(page);
+            revealPage(page);
         }
         return true;
     }
@@ -1527,7 +1739,7 @@ public class OuraniaWindow extends JFrame {
      * blank page for the rest of the session - the card stayed hidden when the tab showed it.
      */
     public void closeInterpretationPanel() {
-        if (chartRail != null && READING_PAGE.equals(chartRail.selected())) {
+        if (chartRail != null && READING_PAGE.equals(currentPage())) {
             chartRail.setOpen(false);
         }
     }

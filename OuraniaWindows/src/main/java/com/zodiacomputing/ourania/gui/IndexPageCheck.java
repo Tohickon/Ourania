@@ -168,8 +168,12 @@ public final class IndexPageCheck {
         // 72d37af1; Interpretation is the whole chart, which is where "back" goes. So a body opened
         // from the index lands where a body opened from the wheel lands, which is the claim worth
         // making.
+        // <b>The window is asked, not the rail.</b> The rail answers "Blueprint" now -
+        // truthfully, and uselessly: the claim is about which PAGE the link opened, and the
+        // page is a level down. currentPage reports the deepest selection, which is what a
+        // reader is actually looking at.
         eq("a reading link opens where a single reading belongs",
-            OuraniaWindow.SELECTION_PAGE, left.selected());
+            OuraniaWindow.SELECTION_PAGE, w.currentPage());
         eq("and the index tab is still showing the section it was on",
             "bodies", w.indexPanel.category());
     }

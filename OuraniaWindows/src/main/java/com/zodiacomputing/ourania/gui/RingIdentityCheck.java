@@ -375,14 +375,14 @@ public final class RingIdentityCheck {
             javax.swing.SwingUtilities.invokeAndWait(
                 () -> w[0].updateChartSections(blank, blank, blank, blank, blank));
             ok("with no second person the Chart B tab is greyed out",
-                !rail.isPageEnabled(OuraniaWindow.CHART_B_PAGE));
-            ok("and so is Synastry", !rail.isPageEnabled(OuraniaWindow.SYNASTRY_PAGE));
-            ok("and so is Transits", !rail.isPageEnabled(OuraniaWindow.TRANSITS_PAGE));
+                !w[0].isPageEnabled(OuraniaWindow.CHART_B_PAGE));
+            ok("and so is Synastry", !w[0].isPageEnabled(OuraniaWindow.SYNASTRY_PAGE));
+            ok("and so is Transits", !w[0].isPageEnabled(OuraniaWindow.TRANSITS_PAGE));
 
             javax.swing.SwingUtilities.invokeAndWait(
                 () -> w[0].updateChartSections(blank, blank, blank, blank, body));
             ok("with a second person the Chart B tab lights up",
-                rail.isPageEnabled(OuraniaWindow.CHART_B_PAGE));
+                w[0].isPageEnabled(OuraniaWindow.CHART_B_PAGE));
 
             // <b>And the page behind it actually holds the section.</b> Also found by a
             // surviving mutation: dropping the setHtml call left the tab lighting up over an
@@ -396,21 +396,21 @@ public final class RingIdentityCheck {
             ok("and the Chart B page holds Chart B's section",
                 shown[0] != null && shown[0].contains("Placements"));
             ok("and Synastry stays greyed until it has its own content",
-                !rail.isPageEnabled(OuraniaWindow.SYNASTRY_PAGE));
+                !w[0].isPageEnabled(OuraniaWindow.SYNASTRY_PAGE));
 
             javax.swing.SwingUtilities.invokeAndWait(
                 () -> w[0].updateChartSections(blank, body, blank, body, body));
             ok("and each page lights from its OWN section, not from any of them",
-                rail.isPageEnabled(OuraniaWindow.CHART_B_PAGE)
-                    && rail.isPageEnabled(OuraniaWindow.SYNASTRY_PAGE)
-                    && rail.isPageEnabled(OuraniaWindow.TRANSITS_PAGE));
+                w[0].isPageEnabled(OuraniaWindow.CHART_B_PAGE)
+                    && w[0].isPageEnabled(OuraniaWindow.SYNASTRY_PAGE)
+                    && w[0].isPageEnabled(OuraniaWindow.TRANSITS_PAGE));
 
             // Back to empty, because a tab that lights up and never goes dark again is the
             // same defect with a longer fuse - the rail would stay lit from a chart ago.
             javax.swing.SwingUtilities.invokeAndWait(
                 () -> w[0].updateChartSections(blank, blank, blank, blank, blank));
             ok("and goes dark again when the second person is removed",
-                !rail.isPageEnabled(OuraniaWindow.CHART_B_PAGE));
+                !w[0].isPageEnabled(OuraniaWindow.CHART_B_PAGE));
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
@@ -509,65 +509,93 @@ public final class RingIdentityCheck {
     // ---- Part H
 
     /**
-     * The rail's running order, and that a rule is not a tab.
+     * The rail's two levels, and that every page is still reachable through them.
      *
-     * <p><b>The order IS the claim.</b> A separator asserted only by its presence would pass on
-     * a rail that put both rules at the bottom; what makes the rail coherent is which runs they
-     * divide. So this pins the whole sequence - every tab, in order, with a null where each
-     * rule falls - rather than counting components.
+     * <p><b>This part used to pin twelve tabs and two rules, and that was the right assertion
+     * for a rail that no longer exists.</b> Grouping twelve items with separators was a fix at
+     * the wrong granularity - twelve items in three groups is still twelve items - so the rail
+     * became three tabs with a strip inside two of them. The separators are gone and so is the
+     * assertion about where they fell.
      *
-     * <p>The second claim is that a rule cannot be mistaken for a page. It goes into the rail's
-     * own column but never into the tab list or the card layout, so nothing can select it and
-     * {@code setPageEnabled} cannot reach it. A rule that could be clicked would open a blank
-     * card, which is the failure the greying exists to prevent, arriving by a different door.
+     * <p><b>What replaces it is stronger, because the old claim could not have caught the new
+     * failure.</b> A rail of three tabs passes "is Blueprint present" trivially; what matters
+     * now is that nothing was LOST on the way down a level. Twelve pages went in and twelve
+     * have to come out, each addressable by the name its callers still hold - a page dropped
+     * from a strip would leave a constant pointing at nothing, and {@code revealPage} would
+     * quietly open the wrong tab rather than throw.
+     *
+     * <p>The second claim is unchanged in spirit: a reader must not be able to reach a door
+     * with no room behind it. Here that means Blueprint and Chronometry hold pages at all, and
+     * the rail greys a tab when everything inside it is greyed.
      */
     private static void railGroups() throws Exception {
         final OuraniaWindow[] w = new OuraniaWindow[1];
         javax.swing.SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
         try {
             DrawerRail rail = w[0].chartRail();
+
+            // Three doors, in the order a chart is read: the person, the pair, the moment.
+            eq("the rail is three tabs", Arrays.asList(OuraniaWindow.BLUEPRINT_PAGE,
+                OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHRONOMETRY_PAGE),
+                rail.pageNames());
+
+            // <b>No rules left, and that is asserted rather than assumed.</b> A separator
+            // still in the column would sit between two of three tabs and divide nothing -
+            // furniture left behind by the structure it used to explain.
             javax.swing.JPanel column = (javax.swing.JPanel) CheckReflect.get(rail, "rail");
-            List<String> seen = new ArrayList<>();
-            for (java.awt.Component c : column.getComponents()) {
-                seen.add(c.getName());
-            }
-
-            List<String> want = Arrays.asList(
-                OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
-                OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.TRANSITS_PAGE,
-                null,
-                OuraniaWindow.OVERVIEW_PAGE, OuraniaWindow.READING_PAGE,
-                OuraniaWindow.SELECTION_PAGE,
-                null,
-                "Snapshot", "Report", "Synthesize", "Predict", "Calendar");
-            ok("the rail runs charts, then what is said about them, then the documents "
-                + seen, want.equals(seen));
-
-            // The two rules, in the two places that make the three groups.
-            ok("there are exactly two rules", Collections.frequency(seen, null) == 2);
-            ok("one closes the charts", seen.indexOf(null) == 4);
-            ok("and one opens the documents", seen.lastIndexOf(null) == 8);
-
-            // <b>A rule is not a tab, asked of the list that decides.</b> The first version of
-            // this assertion called setPageEnabled(null, false) to show a rule had no page -
-            // and that throws inside the rail, because a label is never null for a real page.
-            // A probe that cannot run is not evidence. The rail keeps its tabs in one list and
-            // its drawn column in another, so the question is simply whether the two differ by
-            // the rules: fourteen things in the column, twelve of them selectable.
             java.util.Collection<?> tabs = (java.util.Collection<?>) CheckReflect.get(rail, "tabs");
-            ok("the column holds the rules and the tab list does not ("
+            ok("the drawn column holds the three tabs and nothing else ("
                 + column.getComponents().length + " drawn, " + tabs.size() + " selectable)",
-                column.getComponents().length == tabs.size() + 2);
+                column.getComponents().length == tabs.size());
 
-            // And every real page is still addressable after the move - Selection in
-            // particular, which changed position.
-            for (String page : want) {
-                if (page == null) {
+            // The pages, one level down, in the order they are read.
+            eq("Blueprint holds the two charts, the views of them, then the documents",
+                Arrays.asList(OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
+                    OuraniaWindow.OVERVIEW_PAGE, OuraniaWindow.READING_PAGE,
+                    OuraniaWindow.SELECTION_PAGE, "Snapshot", "Report", "Synthesize"),
+                w[0].blueprintRail().pages());
+            eq("Chronometry holds the sky, then the documents about time",
+                Arrays.asList(OuraniaWindow.TRANSITS_PAGE, "Predict", "Calendar"),
+                w[0].chronometryRail().pages());
+
+            // <b>Nothing was lost on the way down.</b> Twelve pages before, twelve now -
+            // eleven on the two strips and Synastry, which is a tab in its own right.
+            List<String> every = new ArrayList<>(w[0].blueprintRail().pages());
+            every.addAll(w[0].chronometryRail().pages());
+            every.add(OuraniaWindow.SYNASTRY_PAGE);
+            eq("twelve pages went in and twelve came out", 12, every.size());
+
+            // And each is still addressable by the name its callers hold. revealPage has to
+            // land on the page itself, not merely on the tab above it - opening the right
+            // door and the wrong room is the failure this whole routing exists to prevent.
+            for (String page : every) {
+                w[0].setPageEnabled(page, true);
+                ok(page + " is a page the window still knows", w[0].isPageEnabled(page));
+                // <b>The five readings are addressed but not opened.</b> Opening one runs it,
+                // and a reading is generated against a chart this fixture does not have - the
+                // first version of this loop revealed all twelve and the part died inside a
+                // SwingWorker. That a reading regenerates on open is NavigationCheck's claim
+                // and it has a cast chart to make it against; the claim here is only that the
+                // page still has an address.
+                if (OuraniaWindow.TIMED_READINGS.contains(page) || isReading(page)) {
                     continue;
                 }
-                rail.setPageEnabled(page, true);
-                ok(page + " is still a page the rail knows", rail.isPageEnabled(page));
+                final String want = page;
+                javax.swing.SwingUtilities.invokeAndWait(() -> w[0].revealPage(want));
+                eq("and revealPage lands on " + page, page, w[0].currentPage());
             }
+
+            // <b>A tab greys when there is nothing left inside it.</b> A door to an empty
+            // room is the defect the placeholder cards were pulled for; the page greying was
+            // always honest and the tab above it had no opinion at all.
+            for (String page : w[0].chronometryRail().pages()) {
+                w[0].setPageEnabled(page, false);
+            }
+            ok("Chronometry greys out when all of its pages are greyed",
+                !rail.isPageEnabled(OuraniaWindow.CHRONOMETRY_PAGE));
+            w[0].setPageEnabled(OuraniaWindow.TRANSITS_PAGE, true);
+            ok("and lights again as soon as one of them comes back",
+                rail.isPageEnabled(OuraniaWindow.CHRONOMETRY_PAGE));
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
@@ -618,6 +646,30 @@ public final class RingIdentityCheck {
             checks++;
             failures.add("Part " + name + " threw " + t);
             System.out.println("  THREW: " + t);
+        }
+    }
+
+    /**
+     * <b>Reports both values, which ok cannot.</b> An order assertion that fails with only
+     * its label tells the next reader that the rail is wrong and not how - and the whole
+     * point of pinning a sequence is to see what it became.
+     */
+    /** True for one of the five documents the app writes, which open by running. */
+    private static boolean isReading(String page) {
+        for (String[] r : OuraniaWindow.READINGS) {
+            if (r[0].equals(page)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void eq(String what, Object want, Object got) {
+        checks++;
+        if (want == null ? got != null : !want.equals(got)) {
+            String msg = what + ": got " + got + ", wanted " + want;
+            failures.add(msg);
+            System.out.println("  FAIL: " + msg);
         }
     }
 

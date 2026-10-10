@@ -103,9 +103,15 @@ public final class OverviewPageCheck {
         if (rail == null) {
             return;
         }
+        // <b>Overview is behind Blueprint, not beside it.</b> It was one of twelve rail
+        // tabs; it is one of Blueprint's eight pages. Both halves are asserted, because
+        // "reachable" needs the tab AND the page - a page on a strip nobody can open is as
+        // unreachable as no page at all.
         List<String> pages = pagesOf(rail);
-        yes("Overview is one of the rail's pages: " + pages,
-            pages.contains(OuraniaWindow.OVERVIEW_PAGE));
+        yes("Blueprint is one of the rail's three tabs: " + pages,
+            pages.contains(OuraniaWindow.BLUEPRINT_PAGE));
+        yes("Overview is one of Blueprint's pages: " + w.blueprintRail().pages(),
+            w.blueprintRail().pages().contains(OuraniaWindow.OVERVIEW_PAGE));
 
         SwingUtilities.invokeAndWait(() -> rail.select(OuraniaWindow.OVERVIEW_PAGE));
         SwingUtilities.invokeAndWait(() -> { });
