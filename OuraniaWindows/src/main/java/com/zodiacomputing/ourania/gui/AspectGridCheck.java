@@ -689,7 +689,10 @@ public final class AspectGridCheck {
         // of the five combos are fields on the panel, so they are read as fields; only the
         // Step combo is a local variable, and only that one has to be found in the tree.
         String[][] byField = {
-            {"animateCombo", "animateTarget"},
+            // The Animate combo was here until 2026-10-10. It chose which chart the transport
+            // advanced, installMode overwrote it on every chart with one of the two values
+            // that move a birth time, and it lived three screens from the buttons it governed.
+            // A checkbox beside the transport replaced it - see SkymapPanel.stepNatalBox.
             {"filterCombo", "aspectFilter"},
             {"alignCombo", "houseAlignment"},
             {"pinCombo", "wheelPin"},
