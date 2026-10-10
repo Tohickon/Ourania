@@ -61,11 +61,11 @@ not other sentences.
 
 David supplied other material for the twenty Sabian-in-idea degrees and for Aries:
 `second_source.pasted.txt`, kept here as he attached it. It is again a chat or notebook
-tool's answer (it ends by offering more help) and **names no author**; its vocabulary - the
+tool's answer (it ends by offering more help) and, as first sent, named no author; its vocabulary - the
 south node of Uranus, the Midas touch, the forty days in the wilderness - is not the Sabian
-set's. Which book or books it summarises is not recorded. **Ask David.**
+set's. See the last point below for the source David then gave.
 
-`rewrites_second_source.json` holds 25 readings written from it and spliced in the same day:
+`rewrites_second_source.json` holds 26 readings written from it and spliced in the same day:
 Sagittarius 11-20 and Pisces 21-30, replacing the redrafts above (those twenty keys were taken
 out of `rewrites.json` so that running the script again cannot put them back; they are in git
 at `5cbd92a`), and Aries 4, 6, 15, 24 and 25.
@@ -73,8 +73,12 @@ at `5cbd92a`), and Aries 4, 6, 15, 24 and 25.
 - **The five Aries readings they replace were filler.** Each reasoned from where the degree
   sits in the sign ("the middle of Aries stabilises the sign's fire") and described no image
   or tradition. That is what "no counterpart in the pasted file" turned out to mean.
-- **Aries 3 is still filler.** The material covers Aries 5 and not Aries 3. Aries 5 already
-  had a reading from the first source and was left alone.
+- **Aries 3 followed later the same day**, sent by David on its own, and was filler until then.
+  Aries 5 already had a reading from the first source and was left alone.
+- **The source has a name now.** David's Aries 3 entry ends `Degrees_Of_The_Zodiac_Esther V
+  Leinbach`, which reads as the notebook's source file: Esther V. Leinbach, *Degrees of the
+  Zodiac*. That is stated for Aries 3 and assumed for the other 25, which came from the same
+  notebook; David to confirm. Whether the book is in copyright has not been checked.
 - **These 25 are shorter** - 41 to 60 words where the rest run 57 to 89 - because the source
   gives a sentence or two per degree and nothing was added to pad them.
 - Measured: at most 10% of a reading's three-word runs are in the new pasted text, and none

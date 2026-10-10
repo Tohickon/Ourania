@@ -78,7 +78,8 @@ needs the books; which of those authors are still in copyright has not been chec
 is now the tool's sentences. That settles the wording and nothing else: the content still
 descends from the summary. The twenty readings that were Sabian in idea (Sagittarius 11-20,
 Pisces 21-30) and five filler Aries readings were then rewritten from a second pasted answer David
-supplied, **which names no author** - so its source is the next thing to establish. Aries 3 has none.
+supplied, and Aries 3 followed. He names the source as Esther V. Leinbach, *Degrees of the Zodiac*;
+whether that book is in copyright, and how close the notebook's summary runs to it, are not checked.
 
 **6. This repository is public.** "Nothing is distributed yet. The repository is private", below,
 was true when written on 2 September. On 2026-10-10 `Tohickon/Ourania` is a public repository,
