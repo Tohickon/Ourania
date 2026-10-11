@@ -52,7 +52,9 @@ Juno is the contract: vows, fairness, who carries what. Venus is the affection a
    their paragraph with the same two words or close on a sentence starting with the same two.
    Do not begin by naming the aspect ("A square between composite Eris and ...") and do not end
    on advice that starts "Continuing to ...". Do not open by defining a body
-   ("Eris embodies ..., while Mercury governs ..."): start inside the couple's life. Vary how each reading opens and closes.
+   ("Eris embodies ..., while Mercury governs ..."): start inside the couple's life. Name both bodies at least
+   once in every reading, in passing. Do not give an aspect a fixed mould (every sextile ending
+   "when you actively ...", every trine "Because this flows so smoothly, you might ..."). Vary how each reading opens and closes.
 5. **No double quotes, no angle brackets, no ampersands, no dashes used as punctuation.** Use
    commas, colons, full stops and parentheses. Apostrophes are fine.
 6. The lead ends with a full stop. The body ends with a full stop or question mark.

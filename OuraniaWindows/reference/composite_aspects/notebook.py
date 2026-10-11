@@ -201,6 +201,18 @@ def do_prompts():
                         "Let what each body means show through that, in different words every time. Do "
                         "not start a second sentence with the aspect name (A square, An opposition), and "
                         "do not give every trine the same shape (Because this comes easily, you risk).",
+                        "Name both bodies in every reading, at least once each, in passing and never as a "
+                        "definition: for example, Eris's bluntness lands on Mercury's everyday talk. A "
+                        "reader must be able to tell from the paragraph alone which two bodies it is about.",
+                        "Each aspect must not have its own fixed mould. In the last attempt nearly every "
+                        "sextile lead ended when you actively, every trine had Because this flows so "
+                        "smoothly, you might, most conjunctions turned on However, most squares had "
+                        "Arguments erupt and The pair struggles to, and most oppositions had One partner "
+                        "may, while the other and You risk. Use each of those phrases at most once per "
+                        "block, and build each reading's sentences differently from the one before it. Do "
+                        "not open more than one paragraph per block with The pair or The relationship. If "
+                        "a word is on the avoid list, rewrite the sentence in plain words; do not swap in "
+                        "an invented word (momentums is not a word). Also avoid effortlessly and catalytic.",
                         ""] + batch + [""]
             out.append("=====")
             with open(os.path.join(folder, f"{n:02d}_{a}.txt"), "w", encoding="utf-8") as fh:
