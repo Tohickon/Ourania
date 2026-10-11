@@ -1,0 +1,442 @@
+# composite: juno - 105 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# juno with ascendant: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction ascendant
+LEAD
+BODY
+
+=juno sextile ascendant
+LEAD
+BODY
+
+=juno square ascendant
+LEAD
+BODY
+
+=juno trine ascendant
+LEAD
+BODY
+
+=juno opposition ascendant
+LEAD
+BODY
+
+# juno with chiron: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction chiron
+LEAD
+BODY
+
+=juno sextile chiron
+LEAD
+BODY
+
+=juno square chiron
+LEAD
+BODY
+
+=juno trine chiron
+LEAD
+BODY
+
+=juno opposition chiron
+LEAD
+BODY
+
+# juno with jupiter: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction jupiter
+LEAD
+BODY
+
+=juno sextile jupiter
+LEAD
+BODY
+
+=juno square jupiter
+LEAD
+BODY
+
+=juno trine jupiter
+LEAD
+BODY
+
+=juno opposition jupiter
+LEAD
+BODY
+
+# juno with mars: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction mars
+LEAD
+BODY
+
+=juno sextile mars
+LEAD
+BODY
+
+=juno square mars
+LEAD
+BODY
+
+=juno trine mars
+LEAD
+BODY
+
+=juno opposition mars
+LEAD
+BODY
+
+# juno with mercury: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction mercury
+LEAD
+BODY
+
+=juno sextile mercury
+LEAD
+BODY
+
+=juno square mercury
+LEAD
+BODY
+
+=juno trine mercury
+LEAD
+BODY
+
+=juno opposition mercury
+LEAD
+BODY
+
+# juno with mc: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction mc
+LEAD
+BODY
+
+=juno sextile mc
+LEAD
+BODY
+
+=juno square mc
+LEAD
+BODY
+
+=juno trine mc
+LEAD
+BODY
+
+=juno opposition mc
+LEAD
+BODY
+
+# juno with moon: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction moon
+LEAD
+BODY
+
+=juno sextile moon
+LEAD
+BODY
+
+=juno square moon
+LEAD
+BODY
+
+=juno trine moon
+LEAD
+BODY
+
+=juno opposition moon
+LEAD
+BODY
+
+# juno with neptune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction neptune
+LEAD
+BODY
+
+=juno sextile neptune
+LEAD
+BODY
+
+=juno square neptune
+LEAD
+BODY
+
+=juno trine neptune
+LEAD
+BODY
+
+=juno opposition neptune
+LEAD
+BODY
+
+# juno with north_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction north_node
+LEAD
+BODY
+
+=juno sextile north_node
+LEAD
+BODY
+
+=juno square north_node
+LEAD
+BODY
+
+=juno trine north_node
+LEAD
+BODY
+
+=juno opposition north_node
+LEAD
+BODY
+
+# juno with pluto: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction pluto
+LEAD
+BODY
+
+=juno sextile pluto
+LEAD
+BODY
+
+=juno square pluto
+LEAD
+BODY
+
+=juno trine pluto
+LEAD
+BODY
+
+=juno opposition pluto
+LEAD
+BODY
+
+# juno with saturn: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction saturn
+LEAD
+BODY
+
+=juno sextile saturn
+LEAD
+BODY
+
+=juno square saturn
+LEAD
+BODY
+
+=juno trine saturn
+LEAD
+BODY
+
+=juno opposition saturn
+LEAD
+BODY
+
+# juno with sun: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction sun
+LEAD
+BODY
+
+=juno sextile sun
+LEAD
+BODY
+
+=juno square sun
+LEAD
+BODY
+
+=juno trine sun
+LEAD
+BODY
+
+=juno opposition sun
+LEAD
+BODY
+
+# juno with uranus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction uranus
+LEAD
+BODY
+
+=juno sextile uranus
+LEAD
+BODY
+
+=juno square uranus
+LEAD
+BODY
+
+=juno trine uranus
+LEAD
+BODY
+
+=juno opposition uranus
+LEAD
+BODY
+
+# juno with venus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction venus
+LEAD
+BODY
+
+=juno sextile venus
+LEAD
+BODY
+
+=juno square venus
+LEAD
+BODY
+
+=juno trine venus
+LEAD
+BODY
+
+=juno opposition venus
+LEAD
+BODY
+
+# juno with nessus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction nessus
+LEAD
+BODY
+
+=juno sextile nessus
+LEAD
+BODY
+
+=juno square nessus
+LEAD
+BODY
+
+=juno trine nessus
+LEAD
+BODY
+
+=juno opposition nessus
+LEAD
+BODY
+
+# juno with pallas: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction pallas
+LEAD
+BODY
+
+=juno sextile pallas
+LEAD
+BODY
+
+=juno square pallas
+LEAD
+BODY
+
+=juno trine pallas
+LEAD
+BODY
+
+=juno opposition pallas
+LEAD
+BODY
+
+# juno with fortune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction fortune
+LEAD
+BODY
+
+=juno sextile fortune
+LEAD
+BODY
+
+=juno square fortune
+LEAD
+BODY
+
+=juno trine fortune
+LEAD
+BODY
+
+=juno opposition fortune
+LEAD
+BODY
+
+# juno with spirit: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction spirit
+LEAD
+BODY
+
+=juno sextile spirit
+LEAD
+BODY
+
+=juno square spirit
+LEAD
+BODY
+
+=juno trine spirit
+LEAD
+BODY
+
+=juno opposition spirit
+LEAD
+BODY
+
+# juno with pholus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction pholus
+LEAD
+BODY
+
+=juno sextile pholus
+LEAD
+BODY
+
+=juno square pholus
+LEAD
+BODY
+
+=juno trine pholus
+LEAD
+BODY
+
+=juno opposition pholus
+LEAD
+BODY
+
+# juno with south_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction south_node
+LEAD
+BODY
+
+=juno sextile south_node
+LEAD
+BODY
+
+=juno square south_node
+LEAD
+BODY
+
+=juno trine south_node
+LEAD
+BODY
+
+=juno opposition south_node
+LEAD
+BODY
+
+# juno with vesta: 5 readings, one per aspect. Each must read differently from the others in this group.
+=juno conjunction vesta
+LEAD
+BODY
+
+=juno sextile vesta
+LEAD
+BODY
+
+=juno square vesta
+LEAD
+BODY
+
+=juno trine vesta
+LEAD
+BODY
+
+=juno opposition vesta
+LEAD
+BODY

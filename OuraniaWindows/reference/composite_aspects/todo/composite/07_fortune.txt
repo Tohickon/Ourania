@@ -1,0 +1,379 @@
+# composite: fortune - 90 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# fortune with ascendant: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction ascendant
+LEAD
+BODY
+
+=fortune sextile ascendant
+LEAD
+BODY
+
+=fortune square ascendant
+LEAD
+BODY
+
+=fortune trine ascendant
+LEAD
+BODY
+
+=fortune opposition ascendant
+LEAD
+BODY
+
+# fortune with chiron: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction chiron
+LEAD
+BODY
+
+=fortune sextile chiron
+LEAD
+BODY
+
+=fortune square chiron
+LEAD
+BODY
+
+=fortune trine chiron
+LEAD
+BODY
+
+=fortune opposition chiron
+LEAD
+BODY
+
+# fortune with jupiter: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction jupiter
+LEAD
+BODY
+
+=fortune sextile jupiter
+LEAD
+BODY
+
+=fortune square jupiter
+LEAD
+BODY
+
+=fortune trine jupiter
+LEAD
+BODY
+
+=fortune opposition jupiter
+LEAD
+BODY
+
+# fortune with mars: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction mars
+LEAD
+BODY
+
+=fortune sextile mars
+LEAD
+BODY
+
+=fortune square mars
+LEAD
+BODY
+
+=fortune trine mars
+LEAD
+BODY
+
+=fortune opposition mars
+LEAD
+BODY
+
+# fortune with mercury: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction mercury
+LEAD
+BODY
+
+=fortune sextile mercury
+LEAD
+BODY
+
+=fortune square mercury
+LEAD
+BODY
+
+=fortune trine mercury
+LEAD
+BODY
+
+=fortune opposition mercury
+LEAD
+BODY
+
+# fortune with mc: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction mc
+LEAD
+BODY
+
+=fortune sextile mc
+LEAD
+BODY
+
+=fortune square mc
+LEAD
+BODY
+
+=fortune trine mc
+LEAD
+BODY
+
+=fortune opposition mc
+LEAD
+BODY
+
+# fortune with moon: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction moon
+LEAD
+BODY
+
+=fortune sextile moon
+LEAD
+BODY
+
+=fortune square moon
+LEAD
+BODY
+
+=fortune trine moon
+LEAD
+BODY
+
+=fortune opposition moon
+LEAD
+BODY
+
+# fortune with neptune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction neptune
+LEAD
+BODY
+
+=fortune sextile neptune
+LEAD
+BODY
+
+=fortune square neptune
+LEAD
+BODY
+
+=fortune trine neptune
+LEAD
+BODY
+
+=fortune opposition neptune
+LEAD
+BODY
+
+# fortune with north_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction north_node
+LEAD
+BODY
+
+=fortune sextile north_node
+LEAD
+BODY
+
+=fortune square north_node
+LEAD
+BODY
+
+=fortune trine north_node
+LEAD
+BODY
+
+=fortune opposition north_node
+LEAD
+BODY
+
+# fortune with pluto: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction pluto
+LEAD
+BODY
+
+=fortune sextile pluto
+LEAD
+BODY
+
+=fortune square pluto
+LEAD
+BODY
+
+=fortune trine pluto
+LEAD
+BODY
+
+=fortune opposition pluto
+LEAD
+BODY
+
+# fortune with saturn: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction saturn
+LEAD
+BODY
+
+=fortune sextile saturn
+LEAD
+BODY
+
+=fortune square saturn
+LEAD
+BODY
+
+=fortune trine saturn
+LEAD
+BODY
+
+=fortune opposition saturn
+LEAD
+BODY
+
+# fortune with sun: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction sun
+LEAD
+BODY
+
+=fortune sextile sun
+LEAD
+BODY
+
+=fortune square sun
+LEAD
+BODY
+
+=fortune trine sun
+LEAD
+BODY
+
+=fortune opposition sun
+LEAD
+BODY
+
+# fortune with uranus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction uranus
+LEAD
+BODY
+
+=fortune sextile uranus
+LEAD
+BODY
+
+=fortune square uranus
+LEAD
+BODY
+
+=fortune trine uranus
+LEAD
+BODY
+
+=fortune opposition uranus
+LEAD
+BODY
+
+# fortune with venus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction venus
+LEAD
+BODY
+
+=fortune sextile venus
+LEAD
+BODY
+
+=fortune square venus
+LEAD
+BODY
+
+=fortune trine venus
+LEAD
+BODY
+
+=fortune opposition venus
+LEAD
+BODY
+
+# fortune with spirit: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction spirit
+LEAD
+BODY
+
+=fortune sextile spirit
+LEAD
+BODY
+
+=fortune square spirit
+LEAD
+BODY
+
+=fortune trine spirit
+LEAD
+BODY
+
+=fortune opposition spirit
+LEAD
+BODY
+
+# fortune with pholus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction pholus
+LEAD
+BODY
+
+=fortune sextile pholus
+LEAD
+BODY
+
+=fortune square pholus
+LEAD
+BODY
+
+=fortune trine pholus
+LEAD
+BODY
+
+=fortune opposition pholus
+LEAD
+BODY
+
+# fortune with south_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction south_node
+LEAD
+BODY
+
+=fortune sextile south_node
+LEAD
+BODY
+
+=fortune square south_node
+LEAD
+BODY
+
+=fortune trine south_node
+LEAD
+BODY
+
+=fortune opposition south_node
+LEAD
+BODY
+
+# fortune with vesta: 5 readings, one per aspect. Each must read differently from the others in this group.
+=fortune conjunction vesta
+LEAD
+BODY
+
+=fortune sextile vesta
+LEAD
+BODY
+
+=fortune square vesta
+LEAD
+BODY
+
+=fortune trine vesta
+LEAD
+BODY
+
+=fortune opposition vesta
+LEAD
+BODY

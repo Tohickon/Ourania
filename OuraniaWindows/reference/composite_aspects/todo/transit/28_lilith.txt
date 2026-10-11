@@ -1,0 +1,1261 @@
+# transit: lilith - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# lilith with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction ascendant
+LEAD
+BODY
+
+=transit lilith sextile ascendant
+LEAD
+BODY
+
+=transit lilith square ascendant
+LEAD
+BODY
+
+=transit lilith trine ascendant
+LEAD
+BODY
+
+=transit lilith opposition ascendant
+LEAD
+BODY
+
+=transit lilith quincunx ascendant
+LEAD
+BODY
+
+=transit lilith semisextile ascendant
+LEAD
+BODY
+
+=transit lilith semisquare ascendant
+LEAD
+BODY
+
+=transit lilith sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit lilith quintile ascendant
+LEAD
+BODY
+
+=transit lilith sesquiquintile ascendant
+LEAD
+BODY
+
+# lilith with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction descendant
+LEAD
+BODY
+
+=transit lilith sextile descendant
+LEAD
+BODY
+
+=transit lilith square descendant
+LEAD
+BODY
+
+=transit lilith trine descendant
+LEAD
+BODY
+
+=transit lilith opposition descendant
+LEAD
+BODY
+
+=transit lilith quincunx descendant
+LEAD
+BODY
+
+=transit lilith semisextile descendant
+LEAD
+BODY
+
+=transit lilith semisquare descendant
+LEAD
+BODY
+
+=transit lilith sesquiquadrate descendant
+LEAD
+BODY
+
+=transit lilith quintile descendant
+LEAD
+BODY
+
+=transit lilith sesquiquintile descendant
+LEAD
+BODY
+
+# lilith with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction mc
+LEAD
+BODY
+
+=transit lilith sextile mc
+LEAD
+BODY
+
+=transit lilith square mc
+LEAD
+BODY
+
+=transit lilith trine mc
+LEAD
+BODY
+
+=transit lilith opposition mc
+LEAD
+BODY
+
+=transit lilith quincunx mc
+LEAD
+BODY
+
+=transit lilith semisextile mc
+LEAD
+BODY
+
+=transit lilith semisquare mc
+LEAD
+BODY
+
+=transit lilith sesquiquadrate mc
+LEAD
+BODY
+
+=transit lilith quintile mc
+LEAD
+BODY
+
+=transit lilith sesquiquintile mc
+LEAD
+BODY
+
+# lilith with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction ic
+LEAD
+BODY
+
+=transit lilith sextile ic
+LEAD
+BODY
+
+=transit lilith square ic
+LEAD
+BODY
+
+=transit lilith trine ic
+LEAD
+BODY
+
+=transit lilith opposition ic
+LEAD
+BODY
+
+=transit lilith quincunx ic
+LEAD
+BODY
+
+=transit lilith semisextile ic
+LEAD
+BODY
+
+=transit lilith semisquare ic
+LEAD
+BODY
+
+=transit lilith sesquiquadrate ic
+LEAD
+BODY
+
+=transit lilith quintile ic
+LEAD
+BODY
+
+=transit lilith sesquiquintile ic
+LEAD
+BODY
+
+# lilith with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction south_node
+LEAD
+BODY
+
+=transit lilith sextile south_node
+LEAD
+BODY
+
+=transit lilith square south_node
+LEAD
+BODY
+
+=transit lilith trine south_node
+LEAD
+BODY
+
+=transit lilith opposition south_node
+LEAD
+BODY
+
+=transit lilith quincunx south_node
+LEAD
+BODY
+
+=transit lilith semisextile south_node
+LEAD
+BODY
+
+=transit lilith semisquare south_node
+LEAD
+BODY
+
+=transit lilith sesquiquadrate south_node
+LEAD
+BODY
+
+=transit lilith quintile south_node
+LEAD
+BODY
+
+=transit lilith sesquiquintile south_node
+LEAD
+BODY
+
+# lilith with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction ceres
+LEAD
+BODY
+
+=transit lilith sextile ceres
+LEAD
+BODY
+
+=transit lilith square ceres
+LEAD
+BODY
+
+=transit lilith trine ceres
+LEAD
+BODY
+
+=transit lilith opposition ceres
+LEAD
+BODY
+
+=transit lilith quincunx ceres
+LEAD
+BODY
+
+=transit lilith semisextile ceres
+LEAD
+BODY
+
+=transit lilith semisquare ceres
+LEAD
+BODY
+
+=transit lilith sesquiquadrate ceres
+LEAD
+BODY
+
+=transit lilith quintile ceres
+LEAD
+BODY
+
+=transit lilith sesquiquintile ceres
+LEAD
+BODY
+
+# lilith with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction pallas
+LEAD
+BODY
+
+=transit lilith sextile pallas
+LEAD
+BODY
+
+=transit lilith square pallas
+LEAD
+BODY
+
+=transit lilith trine pallas
+LEAD
+BODY
+
+=transit lilith opposition pallas
+LEAD
+BODY
+
+=transit lilith quincunx pallas
+LEAD
+BODY
+
+=transit lilith semisextile pallas
+LEAD
+BODY
+
+=transit lilith semisquare pallas
+LEAD
+BODY
+
+=transit lilith sesquiquadrate pallas
+LEAD
+BODY
+
+=transit lilith quintile pallas
+LEAD
+BODY
+
+=transit lilith sesquiquintile pallas
+LEAD
+BODY
+
+# lilith with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction juno
+LEAD
+BODY
+
+=transit lilith sextile juno
+LEAD
+BODY
+
+=transit lilith square juno
+LEAD
+BODY
+
+=transit lilith trine juno
+LEAD
+BODY
+
+=transit lilith opposition juno
+LEAD
+BODY
+
+=transit lilith quincunx juno
+LEAD
+BODY
+
+=transit lilith semisextile juno
+LEAD
+BODY
+
+=transit lilith semisquare juno
+LEAD
+BODY
+
+=transit lilith sesquiquadrate juno
+LEAD
+BODY
+
+=transit lilith quintile juno
+LEAD
+BODY
+
+=transit lilith sesquiquintile juno
+LEAD
+BODY
+
+# lilith with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction vesta
+LEAD
+BODY
+
+=transit lilith sextile vesta
+LEAD
+BODY
+
+=transit lilith square vesta
+LEAD
+BODY
+
+=transit lilith trine vesta
+LEAD
+BODY
+
+=transit lilith opposition vesta
+LEAD
+BODY
+
+=transit lilith quincunx vesta
+LEAD
+BODY
+
+=transit lilith semisextile vesta
+LEAD
+BODY
+
+=transit lilith semisquare vesta
+LEAD
+BODY
+
+=transit lilith sesquiquadrate vesta
+LEAD
+BODY
+
+=transit lilith quintile vesta
+LEAD
+BODY
+
+=transit lilith sesquiquintile vesta
+LEAD
+BODY
+
+# lilith with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction eris
+LEAD
+BODY
+
+=transit lilith sextile eris
+LEAD
+BODY
+
+=transit lilith square eris
+LEAD
+BODY
+
+=transit lilith trine eris
+LEAD
+BODY
+
+=transit lilith opposition eris
+LEAD
+BODY
+
+=transit lilith quincunx eris
+LEAD
+BODY
+
+=transit lilith semisextile eris
+LEAD
+BODY
+
+=transit lilith semisquare eris
+LEAD
+BODY
+
+=transit lilith sesquiquadrate eris
+LEAD
+BODY
+
+=transit lilith quintile eris
+LEAD
+BODY
+
+=transit lilith sesquiquintile eris
+LEAD
+BODY
+
+# lilith with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction eros
+LEAD
+BODY
+
+=transit lilith sextile eros
+LEAD
+BODY
+
+=transit lilith square eros
+LEAD
+BODY
+
+=transit lilith trine eros
+LEAD
+BODY
+
+=transit lilith opposition eros
+LEAD
+BODY
+
+=transit lilith quincunx eros
+LEAD
+BODY
+
+=transit lilith semisextile eros
+LEAD
+BODY
+
+=transit lilith semisquare eros
+LEAD
+BODY
+
+=transit lilith sesquiquadrate eros
+LEAD
+BODY
+
+=transit lilith quintile eros
+LEAD
+BODY
+
+=transit lilith sesquiquintile eros
+LEAD
+BODY
+
+# lilith with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction hygiea
+LEAD
+BODY
+
+=transit lilith sextile hygiea
+LEAD
+BODY
+
+=transit lilith square hygiea
+LEAD
+BODY
+
+=transit lilith trine hygiea
+LEAD
+BODY
+
+=transit lilith opposition hygiea
+LEAD
+BODY
+
+=transit lilith quincunx hygiea
+LEAD
+BODY
+
+=transit lilith semisextile hygiea
+LEAD
+BODY
+
+=transit lilith semisquare hygiea
+LEAD
+BODY
+
+=transit lilith sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit lilith quintile hygiea
+LEAD
+BODY
+
+=transit lilith sesquiquintile hygiea
+LEAD
+BODY
+
+# lilith with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction nessus
+LEAD
+BODY
+
+=transit lilith sextile nessus
+LEAD
+BODY
+
+=transit lilith square nessus
+LEAD
+BODY
+
+=transit lilith trine nessus
+LEAD
+BODY
+
+=transit lilith opposition nessus
+LEAD
+BODY
+
+=transit lilith quincunx nessus
+LEAD
+BODY
+
+=transit lilith semisextile nessus
+LEAD
+BODY
+
+=transit lilith semisquare nessus
+LEAD
+BODY
+
+=transit lilith sesquiquadrate nessus
+LEAD
+BODY
+
+=transit lilith quintile nessus
+LEAD
+BODY
+
+=transit lilith sesquiquintile nessus
+LEAD
+BODY
+
+# lilith with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction pholus
+LEAD
+BODY
+
+=transit lilith sextile pholus
+LEAD
+BODY
+
+=transit lilith square pholus
+LEAD
+BODY
+
+=transit lilith trine pholus
+LEAD
+BODY
+
+=transit lilith opposition pholus
+LEAD
+BODY
+
+=transit lilith quincunx pholus
+LEAD
+BODY
+
+=transit lilith semisextile pholus
+LEAD
+BODY
+
+=transit lilith semisquare pholus
+LEAD
+BODY
+
+=transit lilith sesquiquadrate pholus
+LEAD
+BODY
+
+=transit lilith quintile pholus
+LEAD
+BODY
+
+=transit lilith sesquiquintile pholus
+LEAD
+BODY
+
+# lilith with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction fortune
+LEAD
+BODY
+
+=transit lilith sextile fortune
+LEAD
+BODY
+
+=transit lilith square fortune
+LEAD
+BODY
+
+=transit lilith trine fortune
+LEAD
+BODY
+
+=transit lilith opposition fortune
+LEAD
+BODY
+
+=transit lilith quincunx fortune
+LEAD
+BODY
+
+=transit lilith semisextile fortune
+LEAD
+BODY
+
+=transit lilith semisquare fortune
+LEAD
+BODY
+
+=transit lilith sesquiquadrate fortune
+LEAD
+BODY
+
+=transit lilith quintile fortune
+LEAD
+BODY
+
+=transit lilith sesquiquintile fortune
+LEAD
+BODY
+
+# lilith with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction spirit
+LEAD
+BODY
+
+=transit lilith sextile spirit
+LEAD
+BODY
+
+=transit lilith square spirit
+LEAD
+BODY
+
+=transit lilith trine spirit
+LEAD
+BODY
+
+=transit lilith opposition spirit
+LEAD
+BODY
+
+=transit lilith quincunx spirit
+LEAD
+BODY
+
+=transit lilith semisextile spirit
+LEAD
+BODY
+
+=transit lilith semisquare spirit
+LEAD
+BODY
+
+=transit lilith sesquiquadrate spirit
+LEAD
+BODY
+
+=transit lilith quintile spirit
+LEAD
+BODY
+
+=transit lilith sesquiquintile spirit
+LEAD
+BODY
+
+# lilith with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction moon
+LEAD
+BODY
+
+=transit lilith sextile moon
+LEAD
+BODY
+
+=transit lilith square moon
+LEAD
+BODY
+
+=transit lilith trine moon
+LEAD
+BODY
+
+=transit lilith opposition moon
+LEAD
+BODY
+
+=transit lilith quincunx moon
+LEAD
+BODY
+
+=transit lilith semisextile moon
+LEAD
+BODY
+
+=transit lilith semisquare moon
+LEAD
+BODY
+
+=transit lilith sesquiquadrate moon
+LEAD
+BODY
+
+=transit lilith quintile moon
+LEAD
+BODY
+
+=transit lilith sesquiquintile moon
+LEAD
+BODY
+
+# lilith with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction sun
+LEAD
+BODY
+
+=transit lilith sextile sun
+LEAD
+BODY
+
+=transit lilith square sun
+LEAD
+BODY
+
+=transit lilith trine sun
+LEAD
+BODY
+
+=transit lilith opposition sun
+LEAD
+BODY
+
+=transit lilith quincunx sun
+LEAD
+BODY
+
+=transit lilith semisextile sun
+LEAD
+BODY
+
+=transit lilith semisquare sun
+LEAD
+BODY
+
+=transit lilith sesquiquadrate sun
+LEAD
+BODY
+
+=transit lilith quintile sun
+LEAD
+BODY
+
+=transit lilith sesquiquintile sun
+LEAD
+BODY
+
+# lilith with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction mercury
+LEAD
+BODY
+
+=transit lilith sextile mercury
+LEAD
+BODY
+
+=transit lilith square mercury
+LEAD
+BODY
+
+=transit lilith trine mercury
+LEAD
+BODY
+
+=transit lilith opposition mercury
+LEAD
+BODY
+
+=transit lilith quincunx mercury
+LEAD
+BODY
+
+=transit lilith semisextile mercury
+LEAD
+BODY
+
+=transit lilith semisquare mercury
+LEAD
+BODY
+
+=transit lilith sesquiquadrate mercury
+LEAD
+BODY
+
+=transit lilith quintile mercury
+LEAD
+BODY
+
+=transit lilith sesquiquintile mercury
+LEAD
+BODY
+
+# lilith with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction venus
+LEAD
+BODY
+
+=transit lilith sextile venus
+LEAD
+BODY
+
+=transit lilith square venus
+LEAD
+BODY
+
+=transit lilith trine venus
+LEAD
+BODY
+
+=transit lilith opposition venus
+LEAD
+BODY
+
+=transit lilith quincunx venus
+LEAD
+BODY
+
+=transit lilith semisextile venus
+LEAD
+BODY
+
+=transit lilith semisquare venus
+LEAD
+BODY
+
+=transit lilith sesquiquadrate venus
+LEAD
+BODY
+
+=transit lilith quintile venus
+LEAD
+BODY
+
+=transit lilith sesquiquintile venus
+LEAD
+BODY
+
+# lilith with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction mars
+LEAD
+BODY
+
+=transit lilith sextile mars
+LEAD
+BODY
+
+=transit lilith square mars
+LEAD
+BODY
+
+=transit lilith trine mars
+LEAD
+BODY
+
+=transit lilith opposition mars
+LEAD
+BODY
+
+=transit lilith quincunx mars
+LEAD
+BODY
+
+=transit lilith semisextile mars
+LEAD
+BODY
+
+=transit lilith semisquare mars
+LEAD
+BODY
+
+=transit lilith sesquiquadrate mars
+LEAD
+BODY
+
+=transit lilith quintile mars
+LEAD
+BODY
+
+=transit lilith sesquiquintile mars
+LEAD
+BODY
+
+# lilith with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction jupiter
+LEAD
+BODY
+
+=transit lilith sextile jupiter
+LEAD
+BODY
+
+=transit lilith square jupiter
+LEAD
+BODY
+
+=transit lilith trine jupiter
+LEAD
+BODY
+
+=transit lilith opposition jupiter
+LEAD
+BODY
+
+=transit lilith quincunx jupiter
+LEAD
+BODY
+
+=transit lilith semisextile jupiter
+LEAD
+BODY
+
+=transit lilith semisquare jupiter
+LEAD
+BODY
+
+=transit lilith sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit lilith quintile jupiter
+LEAD
+BODY
+
+=transit lilith sesquiquintile jupiter
+LEAD
+BODY
+
+# lilith with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction saturn
+LEAD
+BODY
+
+=transit lilith sextile saturn
+LEAD
+BODY
+
+=transit lilith square saturn
+LEAD
+BODY
+
+=transit lilith trine saturn
+LEAD
+BODY
+
+=transit lilith opposition saturn
+LEAD
+BODY
+
+=transit lilith quincunx saturn
+LEAD
+BODY
+
+=transit lilith semisextile saturn
+LEAD
+BODY
+
+=transit lilith semisquare saturn
+LEAD
+BODY
+
+=transit lilith sesquiquadrate saturn
+LEAD
+BODY
+
+=transit lilith quintile saturn
+LEAD
+BODY
+
+=transit lilith sesquiquintile saturn
+LEAD
+BODY
+
+# lilith with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction uranus
+LEAD
+BODY
+
+=transit lilith sextile uranus
+LEAD
+BODY
+
+=transit lilith square uranus
+LEAD
+BODY
+
+=transit lilith trine uranus
+LEAD
+BODY
+
+=transit lilith opposition uranus
+LEAD
+BODY
+
+=transit lilith quincunx uranus
+LEAD
+BODY
+
+=transit lilith semisextile uranus
+LEAD
+BODY
+
+=transit lilith semisquare uranus
+LEAD
+BODY
+
+=transit lilith sesquiquadrate uranus
+LEAD
+BODY
+
+=transit lilith quintile uranus
+LEAD
+BODY
+
+=transit lilith sesquiquintile uranus
+LEAD
+BODY
+
+# lilith with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction neptune
+LEAD
+BODY
+
+=transit lilith sextile neptune
+LEAD
+BODY
+
+=transit lilith square neptune
+LEAD
+BODY
+
+=transit lilith trine neptune
+LEAD
+BODY
+
+=transit lilith opposition neptune
+LEAD
+BODY
+
+=transit lilith quincunx neptune
+LEAD
+BODY
+
+=transit lilith semisextile neptune
+LEAD
+BODY
+
+=transit lilith semisquare neptune
+LEAD
+BODY
+
+=transit lilith sesquiquadrate neptune
+LEAD
+BODY
+
+=transit lilith quintile neptune
+LEAD
+BODY
+
+=transit lilith sesquiquintile neptune
+LEAD
+BODY
+
+# lilith with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction pluto
+LEAD
+BODY
+
+=transit lilith sextile pluto
+LEAD
+BODY
+
+=transit lilith square pluto
+LEAD
+BODY
+
+=transit lilith trine pluto
+LEAD
+BODY
+
+=transit lilith opposition pluto
+LEAD
+BODY
+
+=transit lilith quincunx pluto
+LEAD
+BODY
+
+=transit lilith semisextile pluto
+LEAD
+BODY
+
+=transit lilith semisquare pluto
+LEAD
+BODY
+
+=transit lilith sesquiquadrate pluto
+LEAD
+BODY
+
+=transit lilith quintile pluto
+LEAD
+BODY
+
+=transit lilith sesquiquintile pluto
+LEAD
+BODY
+
+# lilith with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction north_node
+LEAD
+BODY
+
+=transit lilith sextile north_node
+LEAD
+BODY
+
+=transit lilith square north_node
+LEAD
+BODY
+
+=transit lilith trine north_node
+LEAD
+BODY
+
+=transit lilith opposition north_node
+LEAD
+BODY
+
+=transit lilith quincunx north_node
+LEAD
+BODY
+
+=transit lilith semisextile north_node
+LEAD
+BODY
+
+=transit lilith semisquare north_node
+LEAD
+BODY
+
+=transit lilith sesquiquadrate north_node
+LEAD
+BODY
+
+=transit lilith quintile north_node
+LEAD
+BODY
+
+=transit lilith sesquiquintile north_node
+LEAD
+BODY
+
+# lilith with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit lilith conjunction chiron
+LEAD
+BODY
+
+=transit lilith sextile chiron
+LEAD
+BODY
+
+=transit lilith square chiron
+LEAD
+BODY
+
+=transit lilith trine chiron
+LEAD
+BODY
+
+=transit lilith opposition chiron
+LEAD
+BODY
+
+=transit lilith quincunx chiron
+LEAD
+BODY
+
+=transit lilith semisextile chiron
+LEAD
+BODY
+
+=transit lilith semisquare chiron
+LEAD
+BODY
+
+=transit lilith sesquiquadrate chiron
+LEAD
+BODY
+
+=transit lilith quintile chiron
+LEAD
+BODY
+
+=transit lilith sesquiquintile chiron
+LEAD
+BODY

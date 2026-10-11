@@ -1,0 +1,421 @@
+# composite: nessus - 100 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# nessus with ascendant: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction ascendant
+LEAD
+BODY
+
+=nessus sextile ascendant
+LEAD
+BODY
+
+=nessus square ascendant
+LEAD
+BODY
+
+=nessus trine ascendant
+LEAD
+BODY
+
+=nessus opposition ascendant
+LEAD
+BODY
+
+# nessus with chiron: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction chiron
+LEAD
+BODY
+
+=nessus sextile chiron
+LEAD
+BODY
+
+=nessus square chiron
+LEAD
+BODY
+
+=nessus trine chiron
+LEAD
+BODY
+
+=nessus opposition chiron
+LEAD
+BODY
+
+# nessus with jupiter: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction jupiter
+LEAD
+BODY
+
+=nessus sextile jupiter
+LEAD
+BODY
+
+=nessus square jupiter
+LEAD
+BODY
+
+=nessus trine jupiter
+LEAD
+BODY
+
+=nessus opposition jupiter
+LEAD
+BODY
+
+# nessus with mars: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction mars
+LEAD
+BODY
+
+=nessus sextile mars
+LEAD
+BODY
+
+=nessus square mars
+LEAD
+BODY
+
+=nessus trine mars
+LEAD
+BODY
+
+=nessus opposition mars
+LEAD
+BODY
+
+# nessus with mercury: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction mercury
+LEAD
+BODY
+
+=nessus sextile mercury
+LEAD
+BODY
+
+=nessus square mercury
+LEAD
+BODY
+
+=nessus trine mercury
+LEAD
+BODY
+
+=nessus opposition mercury
+LEAD
+BODY
+
+# nessus with mc: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction mc
+LEAD
+BODY
+
+=nessus sextile mc
+LEAD
+BODY
+
+=nessus square mc
+LEAD
+BODY
+
+=nessus trine mc
+LEAD
+BODY
+
+=nessus opposition mc
+LEAD
+BODY
+
+# nessus with moon: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction moon
+LEAD
+BODY
+
+=nessus sextile moon
+LEAD
+BODY
+
+=nessus square moon
+LEAD
+BODY
+
+=nessus trine moon
+LEAD
+BODY
+
+=nessus opposition moon
+LEAD
+BODY
+
+# nessus with neptune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction neptune
+LEAD
+BODY
+
+=nessus sextile neptune
+LEAD
+BODY
+
+=nessus square neptune
+LEAD
+BODY
+
+=nessus trine neptune
+LEAD
+BODY
+
+=nessus opposition neptune
+LEAD
+BODY
+
+# nessus with north_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction north_node
+LEAD
+BODY
+
+=nessus sextile north_node
+LEAD
+BODY
+
+=nessus square north_node
+LEAD
+BODY
+
+=nessus trine north_node
+LEAD
+BODY
+
+=nessus opposition north_node
+LEAD
+BODY
+
+# nessus with pluto: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction pluto
+LEAD
+BODY
+
+=nessus sextile pluto
+LEAD
+BODY
+
+=nessus square pluto
+LEAD
+BODY
+
+=nessus trine pluto
+LEAD
+BODY
+
+=nessus opposition pluto
+LEAD
+BODY
+
+# nessus with saturn: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction saturn
+LEAD
+BODY
+
+=nessus sextile saturn
+LEAD
+BODY
+
+=nessus square saturn
+LEAD
+BODY
+
+=nessus trine saturn
+LEAD
+BODY
+
+=nessus opposition saturn
+LEAD
+BODY
+
+# nessus with sun: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction sun
+LEAD
+BODY
+
+=nessus sextile sun
+LEAD
+BODY
+
+=nessus square sun
+LEAD
+BODY
+
+=nessus trine sun
+LEAD
+BODY
+
+=nessus opposition sun
+LEAD
+BODY
+
+# nessus with uranus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction uranus
+LEAD
+BODY
+
+=nessus sextile uranus
+LEAD
+BODY
+
+=nessus square uranus
+LEAD
+BODY
+
+=nessus trine uranus
+LEAD
+BODY
+
+=nessus opposition uranus
+LEAD
+BODY
+
+# nessus with venus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction venus
+LEAD
+BODY
+
+=nessus sextile venus
+LEAD
+BODY
+
+=nessus square venus
+LEAD
+BODY
+
+=nessus trine venus
+LEAD
+BODY
+
+=nessus opposition venus
+LEAD
+BODY
+
+# nessus with pallas: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction pallas
+LEAD
+BODY
+
+=nessus sextile pallas
+LEAD
+BODY
+
+=nessus square pallas
+LEAD
+BODY
+
+=nessus trine pallas
+LEAD
+BODY
+
+=nessus opposition pallas
+LEAD
+BODY
+
+# nessus with fortune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction fortune
+LEAD
+BODY
+
+=nessus sextile fortune
+LEAD
+BODY
+
+=nessus square fortune
+LEAD
+BODY
+
+=nessus trine fortune
+LEAD
+BODY
+
+=nessus opposition fortune
+LEAD
+BODY
+
+# nessus with spirit: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction spirit
+LEAD
+BODY
+
+=nessus sextile spirit
+LEAD
+BODY
+
+=nessus square spirit
+LEAD
+BODY
+
+=nessus trine spirit
+LEAD
+BODY
+
+=nessus opposition spirit
+LEAD
+BODY
+
+# nessus with pholus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction pholus
+LEAD
+BODY
+
+=nessus sextile pholus
+LEAD
+BODY
+
+=nessus square pholus
+LEAD
+BODY
+
+=nessus trine pholus
+LEAD
+BODY
+
+=nessus opposition pholus
+LEAD
+BODY
+
+# nessus with south_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction south_node
+LEAD
+BODY
+
+=nessus sextile south_node
+LEAD
+BODY
+
+=nessus square south_node
+LEAD
+BODY
+
+=nessus trine south_node
+LEAD
+BODY
+
+=nessus opposition south_node
+LEAD
+BODY
+
+# nessus with vesta: 5 readings, one per aspect. Each must read differently from the others in this group.
+=nessus conjunction vesta
+LEAD
+BODY
+
+=nessus sextile vesta
+LEAD
+BODY
+
+=nessus square vesta
+LEAD
+BODY
+
+=nessus trine vesta
+LEAD
+BODY
+
+=nessus opposition vesta
+LEAD
+BODY

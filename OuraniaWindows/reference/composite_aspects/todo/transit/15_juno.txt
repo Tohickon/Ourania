@@ -1,0 +1,1261 @@
+# transit: juno - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# juno with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction ascendant
+LEAD
+BODY
+
+=transit juno sextile ascendant
+LEAD
+BODY
+
+=transit juno square ascendant
+LEAD
+BODY
+
+=transit juno trine ascendant
+LEAD
+BODY
+
+=transit juno opposition ascendant
+LEAD
+BODY
+
+=transit juno quincunx ascendant
+LEAD
+BODY
+
+=transit juno semisextile ascendant
+LEAD
+BODY
+
+=transit juno semisquare ascendant
+LEAD
+BODY
+
+=transit juno sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit juno quintile ascendant
+LEAD
+BODY
+
+=transit juno sesquiquintile ascendant
+LEAD
+BODY
+
+# juno with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction descendant
+LEAD
+BODY
+
+=transit juno sextile descendant
+LEAD
+BODY
+
+=transit juno square descendant
+LEAD
+BODY
+
+=transit juno trine descendant
+LEAD
+BODY
+
+=transit juno opposition descendant
+LEAD
+BODY
+
+=transit juno quincunx descendant
+LEAD
+BODY
+
+=transit juno semisextile descendant
+LEAD
+BODY
+
+=transit juno semisquare descendant
+LEAD
+BODY
+
+=transit juno sesquiquadrate descendant
+LEAD
+BODY
+
+=transit juno quintile descendant
+LEAD
+BODY
+
+=transit juno sesquiquintile descendant
+LEAD
+BODY
+
+# juno with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction mc
+LEAD
+BODY
+
+=transit juno sextile mc
+LEAD
+BODY
+
+=transit juno square mc
+LEAD
+BODY
+
+=transit juno trine mc
+LEAD
+BODY
+
+=transit juno opposition mc
+LEAD
+BODY
+
+=transit juno quincunx mc
+LEAD
+BODY
+
+=transit juno semisextile mc
+LEAD
+BODY
+
+=transit juno semisquare mc
+LEAD
+BODY
+
+=transit juno sesquiquadrate mc
+LEAD
+BODY
+
+=transit juno quintile mc
+LEAD
+BODY
+
+=transit juno sesquiquintile mc
+LEAD
+BODY
+
+# juno with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction ic
+LEAD
+BODY
+
+=transit juno sextile ic
+LEAD
+BODY
+
+=transit juno square ic
+LEAD
+BODY
+
+=transit juno trine ic
+LEAD
+BODY
+
+=transit juno opposition ic
+LEAD
+BODY
+
+=transit juno quincunx ic
+LEAD
+BODY
+
+=transit juno semisextile ic
+LEAD
+BODY
+
+=transit juno semisquare ic
+LEAD
+BODY
+
+=transit juno sesquiquadrate ic
+LEAD
+BODY
+
+=transit juno quintile ic
+LEAD
+BODY
+
+=transit juno sesquiquintile ic
+LEAD
+BODY
+
+# juno with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction south_node
+LEAD
+BODY
+
+=transit juno sextile south_node
+LEAD
+BODY
+
+=transit juno square south_node
+LEAD
+BODY
+
+=transit juno trine south_node
+LEAD
+BODY
+
+=transit juno opposition south_node
+LEAD
+BODY
+
+=transit juno quincunx south_node
+LEAD
+BODY
+
+=transit juno semisextile south_node
+LEAD
+BODY
+
+=transit juno semisquare south_node
+LEAD
+BODY
+
+=transit juno sesquiquadrate south_node
+LEAD
+BODY
+
+=transit juno quintile south_node
+LEAD
+BODY
+
+=transit juno sesquiquintile south_node
+LEAD
+BODY
+
+# juno with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction ceres
+LEAD
+BODY
+
+=transit juno sextile ceres
+LEAD
+BODY
+
+=transit juno square ceres
+LEAD
+BODY
+
+=transit juno trine ceres
+LEAD
+BODY
+
+=transit juno opposition ceres
+LEAD
+BODY
+
+=transit juno quincunx ceres
+LEAD
+BODY
+
+=transit juno semisextile ceres
+LEAD
+BODY
+
+=transit juno semisquare ceres
+LEAD
+BODY
+
+=transit juno sesquiquadrate ceres
+LEAD
+BODY
+
+=transit juno quintile ceres
+LEAD
+BODY
+
+=transit juno sesquiquintile ceres
+LEAD
+BODY
+
+# juno with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction pallas
+LEAD
+BODY
+
+=transit juno sextile pallas
+LEAD
+BODY
+
+=transit juno square pallas
+LEAD
+BODY
+
+=transit juno trine pallas
+LEAD
+BODY
+
+=transit juno opposition pallas
+LEAD
+BODY
+
+=transit juno quincunx pallas
+LEAD
+BODY
+
+=transit juno semisextile pallas
+LEAD
+BODY
+
+=transit juno semisquare pallas
+LEAD
+BODY
+
+=transit juno sesquiquadrate pallas
+LEAD
+BODY
+
+=transit juno quintile pallas
+LEAD
+BODY
+
+=transit juno sesquiquintile pallas
+LEAD
+BODY
+
+# juno with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction vesta
+LEAD
+BODY
+
+=transit juno sextile vesta
+LEAD
+BODY
+
+=transit juno square vesta
+LEAD
+BODY
+
+=transit juno trine vesta
+LEAD
+BODY
+
+=transit juno opposition vesta
+LEAD
+BODY
+
+=transit juno quincunx vesta
+LEAD
+BODY
+
+=transit juno semisextile vesta
+LEAD
+BODY
+
+=transit juno semisquare vesta
+LEAD
+BODY
+
+=transit juno sesquiquadrate vesta
+LEAD
+BODY
+
+=transit juno quintile vesta
+LEAD
+BODY
+
+=transit juno sesquiquintile vesta
+LEAD
+BODY
+
+# juno with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction eris
+LEAD
+BODY
+
+=transit juno sextile eris
+LEAD
+BODY
+
+=transit juno square eris
+LEAD
+BODY
+
+=transit juno trine eris
+LEAD
+BODY
+
+=transit juno opposition eris
+LEAD
+BODY
+
+=transit juno quincunx eris
+LEAD
+BODY
+
+=transit juno semisextile eris
+LEAD
+BODY
+
+=transit juno semisquare eris
+LEAD
+BODY
+
+=transit juno sesquiquadrate eris
+LEAD
+BODY
+
+=transit juno quintile eris
+LEAD
+BODY
+
+=transit juno sesquiquintile eris
+LEAD
+BODY
+
+# juno with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction eros
+LEAD
+BODY
+
+=transit juno sextile eros
+LEAD
+BODY
+
+=transit juno square eros
+LEAD
+BODY
+
+=transit juno trine eros
+LEAD
+BODY
+
+=transit juno opposition eros
+LEAD
+BODY
+
+=transit juno quincunx eros
+LEAD
+BODY
+
+=transit juno semisextile eros
+LEAD
+BODY
+
+=transit juno semisquare eros
+LEAD
+BODY
+
+=transit juno sesquiquadrate eros
+LEAD
+BODY
+
+=transit juno quintile eros
+LEAD
+BODY
+
+=transit juno sesquiquintile eros
+LEAD
+BODY
+
+# juno with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction hygiea
+LEAD
+BODY
+
+=transit juno sextile hygiea
+LEAD
+BODY
+
+=transit juno square hygiea
+LEAD
+BODY
+
+=transit juno trine hygiea
+LEAD
+BODY
+
+=transit juno opposition hygiea
+LEAD
+BODY
+
+=transit juno quincunx hygiea
+LEAD
+BODY
+
+=transit juno semisextile hygiea
+LEAD
+BODY
+
+=transit juno semisquare hygiea
+LEAD
+BODY
+
+=transit juno sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit juno quintile hygiea
+LEAD
+BODY
+
+=transit juno sesquiquintile hygiea
+LEAD
+BODY
+
+# juno with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction nessus
+LEAD
+BODY
+
+=transit juno sextile nessus
+LEAD
+BODY
+
+=transit juno square nessus
+LEAD
+BODY
+
+=transit juno trine nessus
+LEAD
+BODY
+
+=transit juno opposition nessus
+LEAD
+BODY
+
+=transit juno quincunx nessus
+LEAD
+BODY
+
+=transit juno semisextile nessus
+LEAD
+BODY
+
+=transit juno semisquare nessus
+LEAD
+BODY
+
+=transit juno sesquiquadrate nessus
+LEAD
+BODY
+
+=transit juno quintile nessus
+LEAD
+BODY
+
+=transit juno sesquiquintile nessus
+LEAD
+BODY
+
+# juno with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction pholus
+LEAD
+BODY
+
+=transit juno sextile pholus
+LEAD
+BODY
+
+=transit juno square pholus
+LEAD
+BODY
+
+=transit juno trine pholus
+LEAD
+BODY
+
+=transit juno opposition pholus
+LEAD
+BODY
+
+=transit juno quincunx pholus
+LEAD
+BODY
+
+=transit juno semisextile pholus
+LEAD
+BODY
+
+=transit juno semisquare pholus
+LEAD
+BODY
+
+=transit juno sesquiquadrate pholus
+LEAD
+BODY
+
+=transit juno quintile pholus
+LEAD
+BODY
+
+=transit juno sesquiquintile pholus
+LEAD
+BODY
+
+# juno with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction fortune
+LEAD
+BODY
+
+=transit juno sextile fortune
+LEAD
+BODY
+
+=transit juno square fortune
+LEAD
+BODY
+
+=transit juno trine fortune
+LEAD
+BODY
+
+=transit juno opposition fortune
+LEAD
+BODY
+
+=transit juno quincunx fortune
+LEAD
+BODY
+
+=transit juno semisextile fortune
+LEAD
+BODY
+
+=transit juno semisquare fortune
+LEAD
+BODY
+
+=transit juno sesquiquadrate fortune
+LEAD
+BODY
+
+=transit juno quintile fortune
+LEAD
+BODY
+
+=transit juno sesquiquintile fortune
+LEAD
+BODY
+
+# juno with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction spirit
+LEAD
+BODY
+
+=transit juno sextile spirit
+LEAD
+BODY
+
+=transit juno square spirit
+LEAD
+BODY
+
+=transit juno trine spirit
+LEAD
+BODY
+
+=transit juno opposition spirit
+LEAD
+BODY
+
+=transit juno quincunx spirit
+LEAD
+BODY
+
+=transit juno semisextile spirit
+LEAD
+BODY
+
+=transit juno semisquare spirit
+LEAD
+BODY
+
+=transit juno sesquiquadrate spirit
+LEAD
+BODY
+
+=transit juno quintile spirit
+LEAD
+BODY
+
+=transit juno sesquiquintile spirit
+LEAD
+BODY
+
+# juno with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction lilith
+LEAD
+BODY
+
+=transit juno sextile lilith
+LEAD
+BODY
+
+=transit juno square lilith
+LEAD
+BODY
+
+=transit juno trine lilith
+LEAD
+BODY
+
+=transit juno opposition lilith
+LEAD
+BODY
+
+=transit juno quincunx lilith
+LEAD
+BODY
+
+=transit juno semisextile lilith
+LEAD
+BODY
+
+=transit juno semisquare lilith
+LEAD
+BODY
+
+=transit juno sesquiquadrate lilith
+LEAD
+BODY
+
+=transit juno quintile lilith
+LEAD
+BODY
+
+=transit juno sesquiquintile lilith
+LEAD
+BODY
+
+# juno with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction moon
+LEAD
+BODY
+
+=transit juno sextile moon
+LEAD
+BODY
+
+=transit juno square moon
+LEAD
+BODY
+
+=transit juno trine moon
+LEAD
+BODY
+
+=transit juno opposition moon
+LEAD
+BODY
+
+=transit juno quincunx moon
+LEAD
+BODY
+
+=transit juno semisextile moon
+LEAD
+BODY
+
+=transit juno semisquare moon
+LEAD
+BODY
+
+=transit juno sesquiquadrate moon
+LEAD
+BODY
+
+=transit juno quintile moon
+LEAD
+BODY
+
+=transit juno sesquiquintile moon
+LEAD
+BODY
+
+# juno with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction sun
+LEAD
+BODY
+
+=transit juno sextile sun
+LEAD
+BODY
+
+=transit juno square sun
+LEAD
+BODY
+
+=transit juno trine sun
+LEAD
+BODY
+
+=transit juno opposition sun
+LEAD
+BODY
+
+=transit juno quincunx sun
+LEAD
+BODY
+
+=transit juno semisextile sun
+LEAD
+BODY
+
+=transit juno semisquare sun
+LEAD
+BODY
+
+=transit juno sesquiquadrate sun
+LEAD
+BODY
+
+=transit juno quintile sun
+LEAD
+BODY
+
+=transit juno sesquiquintile sun
+LEAD
+BODY
+
+# juno with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction mercury
+LEAD
+BODY
+
+=transit juno sextile mercury
+LEAD
+BODY
+
+=transit juno square mercury
+LEAD
+BODY
+
+=transit juno trine mercury
+LEAD
+BODY
+
+=transit juno opposition mercury
+LEAD
+BODY
+
+=transit juno quincunx mercury
+LEAD
+BODY
+
+=transit juno semisextile mercury
+LEAD
+BODY
+
+=transit juno semisquare mercury
+LEAD
+BODY
+
+=transit juno sesquiquadrate mercury
+LEAD
+BODY
+
+=transit juno quintile mercury
+LEAD
+BODY
+
+=transit juno sesquiquintile mercury
+LEAD
+BODY
+
+# juno with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction venus
+LEAD
+BODY
+
+=transit juno sextile venus
+LEAD
+BODY
+
+=transit juno square venus
+LEAD
+BODY
+
+=transit juno trine venus
+LEAD
+BODY
+
+=transit juno opposition venus
+LEAD
+BODY
+
+=transit juno quincunx venus
+LEAD
+BODY
+
+=transit juno semisextile venus
+LEAD
+BODY
+
+=transit juno semisquare venus
+LEAD
+BODY
+
+=transit juno sesquiquadrate venus
+LEAD
+BODY
+
+=transit juno quintile venus
+LEAD
+BODY
+
+=transit juno sesquiquintile venus
+LEAD
+BODY
+
+# juno with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction mars
+LEAD
+BODY
+
+=transit juno sextile mars
+LEAD
+BODY
+
+=transit juno square mars
+LEAD
+BODY
+
+=transit juno trine mars
+LEAD
+BODY
+
+=transit juno opposition mars
+LEAD
+BODY
+
+=transit juno quincunx mars
+LEAD
+BODY
+
+=transit juno semisextile mars
+LEAD
+BODY
+
+=transit juno semisquare mars
+LEAD
+BODY
+
+=transit juno sesquiquadrate mars
+LEAD
+BODY
+
+=transit juno quintile mars
+LEAD
+BODY
+
+=transit juno sesquiquintile mars
+LEAD
+BODY
+
+# juno with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction jupiter
+LEAD
+BODY
+
+=transit juno sextile jupiter
+LEAD
+BODY
+
+=transit juno square jupiter
+LEAD
+BODY
+
+=transit juno trine jupiter
+LEAD
+BODY
+
+=transit juno opposition jupiter
+LEAD
+BODY
+
+=transit juno quincunx jupiter
+LEAD
+BODY
+
+=transit juno semisextile jupiter
+LEAD
+BODY
+
+=transit juno semisquare jupiter
+LEAD
+BODY
+
+=transit juno sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit juno quintile jupiter
+LEAD
+BODY
+
+=transit juno sesquiquintile jupiter
+LEAD
+BODY
+
+# juno with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction saturn
+LEAD
+BODY
+
+=transit juno sextile saturn
+LEAD
+BODY
+
+=transit juno square saturn
+LEAD
+BODY
+
+=transit juno trine saturn
+LEAD
+BODY
+
+=transit juno opposition saturn
+LEAD
+BODY
+
+=transit juno quincunx saturn
+LEAD
+BODY
+
+=transit juno semisextile saturn
+LEAD
+BODY
+
+=transit juno semisquare saturn
+LEAD
+BODY
+
+=transit juno sesquiquadrate saturn
+LEAD
+BODY
+
+=transit juno quintile saturn
+LEAD
+BODY
+
+=transit juno sesquiquintile saturn
+LEAD
+BODY
+
+# juno with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction uranus
+LEAD
+BODY
+
+=transit juno sextile uranus
+LEAD
+BODY
+
+=transit juno square uranus
+LEAD
+BODY
+
+=transit juno trine uranus
+LEAD
+BODY
+
+=transit juno opposition uranus
+LEAD
+BODY
+
+=transit juno quincunx uranus
+LEAD
+BODY
+
+=transit juno semisextile uranus
+LEAD
+BODY
+
+=transit juno semisquare uranus
+LEAD
+BODY
+
+=transit juno sesquiquadrate uranus
+LEAD
+BODY
+
+=transit juno quintile uranus
+LEAD
+BODY
+
+=transit juno sesquiquintile uranus
+LEAD
+BODY
+
+# juno with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction neptune
+LEAD
+BODY
+
+=transit juno sextile neptune
+LEAD
+BODY
+
+=transit juno square neptune
+LEAD
+BODY
+
+=transit juno trine neptune
+LEAD
+BODY
+
+=transit juno opposition neptune
+LEAD
+BODY
+
+=transit juno quincunx neptune
+LEAD
+BODY
+
+=transit juno semisextile neptune
+LEAD
+BODY
+
+=transit juno semisquare neptune
+LEAD
+BODY
+
+=transit juno sesquiquadrate neptune
+LEAD
+BODY
+
+=transit juno quintile neptune
+LEAD
+BODY
+
+=transit juno sesquiquintile neptune
+LEAD
+BODY
+
+# juno with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction pluto
+LEAD
+BODY
+
+=transit juno sextile pluto
+LEAD
+BODY
+
+=transit juno square pluto
+LEAD
+BODY
+
+=transit juno trine pluto
+LEAD
+BODY
+
+=transit juno opposition pluto
+LEAD
+BODY
+
+=transit juno quincunx pluto
+LEAD
+BODY
+
+=transit juno semisextile pluto
+LEAD
+BODY
+
+=transit juno semisquare pluto
+LEAD
+BODY
+
+=transit juno sesquiquadrate pluto
+LEAD
+BODY
+
+=transit juno quintile pluto
+LEAD
+BODY
+
+=transit juno sesquiquintile pluto
+LEAD
+BODY
+
+# juno with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction north_node
+LEAD
+BODY
+
+=transit juno sextile north_node
+LEAD
+BODY
+
+=transit juno square north_node
+LEAD
+BODY
+
+=transit juno trine north_node
+LEAD
+BODY
+
+=transit juno opposition north_node
+LEAD
+BODY
+
+=transit juno quincunx north_node
+LEAD
+BODY
+
+=transit juno semisextile north_node
+LEAD
+BODY
+
+=transit juno semisquare north_node
+LEAD
+BODY
+
+=transit juno sesquiquadrate north_node
+LEAD
+BODY
+
+=transit juno quintile north_node
+LEAD
+BODY
+
+=transit juno sesquiquintile north_node
+LEAD
+BODY
+
+# juno with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit juno conjunction chiron
+LEAD
+BODY
+
+=transit juno sextile chiron
+LEAD
+BODY
+
+=transit juno square chiron
+LEAD
+BODY
+
+=transit juno trine chiron
+LEAD
+BODY
+
+=transit juno opposition chiron
+LEAD
+BODY
+
+=transit juno quincunx chiron
+LEAD
+BODY
+
+=transit juno semisextile chiron
+LEAD
+BODY
+
+=transit juno semisquare chiron
+LEAD
+BODY
+
+=transit juno sesquiquadrate chiron
+LEAD
+BODY
+
+=transit juno quintile chiron
+LEAD
+BODY
+
+=transit juno sesquiquintile chiron
+LEAD
+BODY

@@ -1,0 +1,1274 @@
+# transit: jupiter - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# jupiter with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction descendant
+LEAD
+BODY
+
+=transit jupiter sextile descendant
+LEAD
+BODY
+
+=transit jupiter square descendant
+LEAD
+BODY
+
+=transit jupiter trine descendant
+LEAD
+BODY
+
+=transit jupiter opposition descendant
+LEAD
+BODY
+
+=transit jupiter quincunx descendant
+LEAD
+BODY
+
+=transit jupiter semisextile descendant
+LEAD
+BODY
+
+=transit jupiter semisquare descendant
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate descendant
+LEAD
+BODY
+
+=transit jupiter quintile descendant
+LEAD
+BODY
+
+=transit jupiter biquintile descendant
+LEAD
+BODY
+
+=transit jupiter sesquiquintile descendant
+LEAD
+BODY
+
+=transit jupiter septile descendant
+LEAD
+BODY
+
+=transit jupiter novile descendant
+LEAD
+BODY
+
+=transit jupiter decile descendant
+LEAD
+BODY
+
+# jupiter with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction ic
+LEAD
+BODY
+
+=transit jupiter sextile ic
+LEAD
+BODY
+
+=transit jupiter square ic
+LEAD
+BODY
+
+=transit jupiter trine ic
+LEAD
+BODY
+
+=transit jupiter opposition ic
+LEAD
+BODY
+
+=transit jupiter quincunx ic
+LEAD
+BODY
+
+=transit jupiter semisextile ic
+LEAD
+BODY
+
+=transit jupiter semisquare ic
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate ic
+LEAD
+BODY
+
+=transit jupiter quintile ic
+LEAD
+BODY
+
+=transit jupiter biquintile ic
+LEAD
+BODY
+
+=transit jupiter sesquiquintile ic
+LEAD
+BODY
+
+=transit jupiter septile ic
+LEAD
+BODY
+
+=transit jupiter novile ic
+LEAD
+BODY
+
+=transit jupiter decile ic
+LEAD
+BODY
+
+# jupiter with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction ascendant
+LEAD
+BODY
+
+=transit jupiter sextile ascendant
+LEAD
+BODY
+
+=transit jupiter square ascendant
+LEAD
+BODY
+
+=transit jupiter trine ascendant
+LEAD
+BODY
+
+=transit jupiter opposition ascendant
+LEAD
+BODY
+
+=transit jupiter quincunx ascendant
+LEAD
+BODY
+
+=transit jupiter semisextile ascendant
+LEAD
+BODY
+
+=transit jupiter semisquare ascendant
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit jupiter quintile ascendant
+LEAD
+BODY
+
+=transit jupiter biquintile ascendant
+LEAD
+BODY
+
+=transit jupiter sesquiquintile ascendant
+LEAD
+BODY
+
+=transit jupiter septile ascendant
+LEAD
+BODY
+
+=transit jupiter novile ascendant
+LEAD
+BODY
+
+=transit jupiter decile ascendant
+LEAD
+BODY
+
+# jupiter with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction mc
+LEAD
+BODY
+
+=transit jupiter sextile mc
+LEAD
+BODY
+
+=transit jupiter square mc
+LEAD
+BODY
+
+=transit jupiter trine mc
+LEAD
+BODY
+
+=transit jupiter opposition mc
+LEAD
+BODY
+
+=transit jupiter quincunx mc
+LEAD
+BODY
+
+=transit jupiter semisextile mc
+LEAD
+BODY
+
+=transit jupiter semisquare mc
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate mc
+LEAD
+BODY
+
+=transit jupiter quintile mc
+LEAD
+BODY
+
+=transit jupiter biquintile mc
+LEAD
+BODY
+
+=transit jupiter sesquiquintile mc
+LEAD
+BODY
+
+=transit jupiter septile mc
+LEAD
+BODY
+
+=transit jupiter novile mc
+LEAD
+BODY
+
+=transit jupiter decile mc
+LEAD
+BODY
+
+# jupiter with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction south_node
+LEAD
+BODY
+
+=transit jupiter sextile south_node
+LEAD
+BODY
+
+=transit jupiter square south_node
+LEAD
+BODY
+
+=transit jupiter trine south_node
+LEAD
+BODY
+
+=transit jupiter opposition south_node
+LEAD
+BODY
+
+=transit jupiter quincunx south_node
+LEAD
+BODY
+
+=transit jupiter semisextile south_node
+LEAD
+BODY
+
+=transit jupiter semisquare south_node
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate south_node
+LEAD
+BODY
+
+=transit jupiter quintile south_node
+LEAD
+BODY
+
+=transit jupiter sesquiquintile south_node
+LEAD
+BODY
+
+# jupiter with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction ceres
+LEAD
+BODY
+
+=transit jupiter sextile ceres
+LEAD
+BODY
+
+=transit jupiter square ceres
+LEAD
+BODY
+
+=transit jupiter trine ceres
+LEAD
+BODY
+
+=transit jupiter opposition ceres
+LEAD
+BODY
+
+=transit jupiter quincunx ceres
+LEAD
+BODY
+
+=transit jupiter semisextile ceres
+LEAD
+BODY
+
+=transit jupiter semisquare ceres
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate ceres
+LEAD
+BODY
+
+=transit jupiter quintile ceres
+LEAD
+BODY
+
+=transit jupiter sesquiquintile ceres
+LEAD
+BODY
+
+# jupiter with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction pallas
+LEAD
+BODY
+
+=transit jupiter sextile pallas
+LEAD
+BODY
+
+=transit jupiter square pallas
+LEAD
+BODY
+
+=transit jupiter trine pallas
+LEAD
+BODY
+
+=transit jupiter opposition pallas
+LEAD
+BODY
+
+=transit jupiter quincunx pallas
+LEAD
+BODY
+
+=transit jupiter semisextile pallas
+LEAD
+BODY
+
+=transit jupiter semisquare pallas
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate pallas
+LEAD
+BODY
+
+=transit jupiter quintile pallas
+LEAD
+BODY
+
+=transit jupiter sesquiquintile pallas
+LEAD
+BODY
+
+# jupiter with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction juno
+LEAD
+BODY
+
+=transit jupiter sextile juno
+LEAD
+BODY
+
+=transit jupiter square juno
+LEAD
+BODY
+
+=transit jupiter trine juno
+LEAD
+BODY
+
+=transit jupiter opposition juno
+LEAD
+BODY
+
+=transit jupiter quincunx juno
+LEAD
+BODY
+
+=transit jupiter semisextile juno
+LEAD
+BODY
+
+=transit jupiter semisquare juno
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate juno
+LEAD
+BODY
+
+=transit jupiter quintile juno
+LEAD
+BODY
+
+=transit jupiter sesquiquintile juno
+LEAD
+BODY
+
+# jupiter with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction vesta
+LEAD
+BODY
+
+=transit jupiter sextile vesta
+LEAD
+BODY
+
+=transit jupiter square vesta
+LEAD
+BODY
+
+=transit jupiter trine vesta
+LEAD
+BODY
+
+=transit jupiter opposition vesta
+LEAD
+BODY
+
+=transit jupiter quincunx vesta
+LEAD
+BODY
+
+=transit jupiter semisextile vesta
+LEAD
+BODY
+
+=transit jupiter semisquare vesta
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate vesta
+LEAD
+BODY
+
+=transit jupiter quintile vesta
+LEAD
+BODY
+
+=transit jupiter sesquiquintile vesta
+LEAD
+BODY
+
+# jupiter with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction eris
+LEAD
+BODY
+
+=transit jupiter sextile eris
+LEAD
+BODY
+
+=transit jupiter square eris
+LEAD
+BODY
+
+=transit jupiter trine eris
+LEAD
+BODY
+
+=transit jupiter opposition eris
+LEAD
+BODY
+
+=transit jupiter quincunx eris
+LEAD
+BODY
+
+=transit jupiter semisextile eris
+LEAD
+BODY
+
+=transit jupiter semisquare eris
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate eris
+LEAD
+BODY
+
+=transit jupiter quintile eris
+LEAD
+BODY
+
+=transit jupiter sesquiquintile eris
+LEAD
+BODY
+
+# jupiter with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction eros
+LEAD
+BODY
+
+=transit jupiter sextile eros
+LEAD
+BODY
+
+=transit jupiter square eros
+LEAD
+BODY
+
+=transit jupiter trine eros
+LEAD
+BODY
+
+=transit jupiter opposition eros
+LEAD
+BODY
+
+=transit jupiter quincunx eros
+LEAD
+BODY
+
+=transit jupiter semisextile eros
+LEAD
+BODY
+
+=transit jupiter semisquare eros
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate eros
+LEAD
+BODY
+
+=transit jupiter quintile eros
+LEAD
+BODY
+
+=transit jupiter sesquiquintile eros
+LEAD
+BODY
+
+# jupiter with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction hygiea
+LEAD
+BODY
+
+=transit jupiter sextile hygiea
+LEAD
+BODY
+
+=transit jupiter square hygiea
+LEAD
+BODY
+
+=transit jupiter trine hygiea
+LEAD
+BODY
+
+=transit jupiter opposition hygiea
+LEAD
+BODY
+
+=transit jupiter quincunx hygiea
+LEAD
+BODY
+
+=transit jupiter semisextile hygiea
+LEAD
+BODY
+
+=transit jupiter semisquare hygiea
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit jupiter quintile hygiea
+LEAD
+BODY
+
+=transit jupiter sesquiquintile hygiea
+LEAD
+BODY
+
+# jupiter with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction nessus
+LEAD
+BODY
+
+=transit jupiter sextile nessus
+LEAD
+BODY
+
+=transit jupiter square nessus
+LEAD
+BODY
+
+=transit jupiter trine nessus
+LEAD
+BODY
+
+=transit jupiter opposition nessus
+LEAD
+BODY
+
+=transit jupiter quincunx nessus
+LEAD
+BODY
+
+=transit jupiter semisextile nessus
+LEAD
+BODY
+
+=transit jupiter semisquare nessus
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate nessus
+LEAD
+BODY
+
+=transit jupiter quintile nessus
+LEAD
+BODY
+
+=transit jupiter sesquiquintile nessus
+LEAD
+BODY
+
+# jupiter with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction pholus
+LEAD
+BODY
+
+=transit jupiter sextile pholus
+LEAD
+BODY
+
+=transit jupiter square pholus
+LEAD
+BODY
+
+=transit jupiter trine pholus
+LEAD
+BODY
+
+=transit jupiter opposition pholus
+LEAD
+BODY
+
+=transit jupiter quincunx pholus
+LEAD
+BODY
+
+=transit jupiter semisextile pholus
+LEAD
+BODY
+
+=transit jupiter semisquare pholus
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate pholus
+LEAD
+BODY
+
+=transit jupiter quintile pholus
+LEAD
+BODY
+
+=transit jupiter sesquiquintile pholus
+LEAD
+BODY
+
+# jupiter with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction fortune
+LEAD
+BODY
+
+=transit jupiter sextile fortune
+LEAD
+BODY
+
+=transit jupiter square fortune
+LEAD
+BODY
+
+=transit jupiter trine fortune
+LEAD
+BODY
+
+=transit jupiter opposition fortune
+LEAD
+BODY
+
+=transit jupiter quincunx fortune
+LEAD
+BODY
+
+=transit jupiter semisextile fortune
+LEAD
+BODY
+
+=transit jupiter semisquare fortune
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate fortune
+LEAD
+BODY
+
+=transit jupiter quintile fortune
+LEAD
+BODY
+
+=transit jupiter sesquiquintile fortune
+LEAD
+BODY
+
+# jupiter with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction spirit
+LEAD
+BODY
+
+=transit jupiter sextile spirit
+LEAD
+BODY
+
+=transit jupiter square spirit
+LEAD
+BODY
+
+=transit jupiter trine spirit
+LEAD
+BODY
+
+=transit jupiter opposition spirit
+LEAD
+BODY
+
+=transit jupiter quincunx spirit
+LEAD
+BODY
+
+=transit jupiter semisextile spirit
+LEAD
+BODY
+
+=transit jupiter semisquare spirit
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate spirit
+LEAD
+BODY
+
+=transit jupiter quintile spirit
+LEAD
+BODY
+
+=transit jupiter sesquiquintile spirit
+LEAD
+BODY
+
+# jupiter with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction lilith
+LEAD
+BODY
+
+=transit jupiter sextile lilith
+LEAD
+BODY
+
+=transit jupiter square lilith
+LEAD
+BODY
+
+=transit jupiter trine lilith
+LEAD
+BODY
+
+=transit jupiter opposition lilith
+LEAD
+BODY
+
+=transit jupiter quincunx lilith
+LEAD
+BODY
+
+=transit jupiter semisextile lilith
+LEAD
+BODY
+
+=transit jupiter semisquare lilith
+LEAD
+BODY
+
+=transit jupiter sesquiquadrate lilith
+LEAD
+BODY
+
+=transit jupiter quintile lilith
+LEAD
+BODY
+
+=transit jupiter sesquiquintile lilith
+LEAD
+BODY
+
+# jupiter with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction sun
+LEAD
+BODY
+
+=transit jupiter sextile sun
+LEAD
+BODY
+
+=transit jupiter square sun
+LEAD
+BODY
+
+=transit jupiter trine sun
+LEAD
+BODY
+
+=transit jupiter opposition sun
+LEAD
+BODY
+
+=transit jupiter biquintile sun
+LEAD
+BODY
+
+=transit jupiter septile sun
+LEAD
+BODY
+
+=transit jupiter novile sun
+LEAD
+BODY
+
+=transit jupiter decile sun
+LEAD
+BODY
+
+# jupiter with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction moon
+LEAD
+BODY
+
+=transit jupiter sextile moon
+LEAD
+BODY
+
+=transit jupiter square moon
+LEAD
+BODY
+
+=transit jupiter trine moon
+LEAD
+BODY
+
+=transit jupiter opposition moon
+LEAD
+BODY
+
+=transit jupiter biquintile moon
+LEAD
+BODY
+
+=transit jupiter septile moon
+LEAD
+BODY
+
+=transit jupiter novile moon
+LEAD
+BODY
+
+=transit jupiter decile moon
+LEAD
+BODY
+
+# jupiter with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction mercury
+LEAD
+BODY
+
+=transit jupiter sextile mercury
+LEAD
+BODY
+
+=transit jupiter square mercury
+LEAD
+BODY
+
+=transit jupiter trine mercury
+LEAD
+BODY
+
+=transit jupiter opposition mercury
+LEAD
+BODY
+
+=transit jupiter biquintile mercury
+LEAD
+BODY
+
+=transit jupiter septile mercury
+LEAD
+BODY
+
+=transit jupiter novile mercury
+LEAD
+BODY
+
+=transit jupiter decile mercury
+LEAD
+BODY
+
+# jupiter with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction venus
+LEAD
+BODY
+
+=transit jupiter sextile venus
+LEAD
+BODY
+
+=transit jupiter square venus
+LEAD
+BODY
+
+=transit jupiter trine venus
+LEAD
+BODY
+
+=transit jupiter opposition venus
+LEAD
+BODY
+
+=transit jupiter biquintile venus
+LEAD
+BODY
+
+=transit jupiter septile venus
+LEAD
+BODY
+
+=transit jupiter novile venus
+LEAD
+BODY
+
+=transit jupiter decile venus
+LEAD
+BODY
+
+# jupiter with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction mars
+LEAD
+BODY
+
+=transit jupiter sextile mars
+LEAD
+BODY
+
+=transit jupiter square mars
+LEAD
+BODY
+
+=transit jupiter trine mars
+LEAD
+BODY
+
+=transit jupiter opposition mars
+LEAD
+BODY
+
+=transit jupiter biquintile mars
+LEAD
+BODY
+
+=transit jupiter septile mars
+LEAD
+BODY
+
+=transit jupiter novile mars
+LEAD
+BODY
+
+=transit jupiter decile mars
+LEAD
+BODY
+
+# jupiter with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction jupiter
+LEAD
+BODY
+
+=transit jupiter sextile jupiter
+LEAD
+BODY
+
+=transit jupiter square jupiter
+LEAD
+BODY
+
+=transit jupiter trine jupiter
+LEAD
+BODY
+
+=transit jupiter opposition jupiter
+LEAD
+BODY
+
+=transit jupiter biquintile jupiter
+LEAD
+BODY
+
+=transit jupiter septile jupiter
+LEAD
+BODY
+
+=transit jupiter novile jupiter
+LEAD
+BODY
+
+=transit jupiter decile jupiter
+LEAD
+BODY
+
+# jupiter with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction saturn
+LEAD
+BODY
+
+=transit jupiter sextile saturn
+LEAD
+BODY
+
+=transit jupiter square saturn
+LEAD
+BODY
+
+=transit jupiter trine saturn
+LEAD
+BODY
+
+=transit jupiter opposition saturn
+LEAD
+BODY
+
+=transit jupiter biquintile saturn
+LEAD
+BODY
+
+=transit jupiter septile saturn
+LEAD
+BODY
+
+=transit jupiter novile saturn
+LEAD
+BODY
+
+=transit jupiter decile saturn
+LEAD
+BODY
+
+# jupiter with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction uranus
+LEAD
+BODY
+
+=transit jupiter sextile uranus
+LEAD
+BODY
+
+=transit jupiter square uranus
+LEAD
+BODY
+
+=transit jupiter trine uranus
+LEAD
+BODY
+
+=transit jupiter opposition uranus
+LEAD
+BODY
+
+=transit jupiter biquintile uranus
+LEAD
+BODY
+
+=transit jupiter septile uranus
+LEAD
+BODY
+
+=transit jupiter novile uranus
+LEAD
+BODY
+
+=transit jupiter decile uranus
+LEAD
+BODY
+
+# jupiter with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction neptune
+LEAD
+BODY
+
+=transit jupiter sextile neptune
+LEAD
+BODY
+
+=transit jupiter square neptune
+LEAD
+BODY
+
+=transit jupiter trine neptune
+LEAD
+BODY
+
+=transit jupiter opposition neptune
+LEAD
+BODY
+
+=transit jupiter biquintile neptune
+LEAD
+BODY
+
+=transit jupiter septile neptune
+LEAD
+BODY
+
+=transit jupiter novile neptune
+LEAD
+BODY
+
+=transit jupiter decile neptune
+LEAD
+BODY
+
+# jupiter with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction pluto
+LEAD
+BODY
+
+=transit jupiter sextile pluto
+LEAD
+BODY
+
+=transit jupiter square pluto
+LEAD
+BODY
+
+=transit jupiter trine pluto
+LEAD
+BODY
+
+=transit jupiter opposition pluto
+LEAD
+BODY
+
+=transit jupiter biquintile pluto
+LEAD
+BODY
+
+=transit jupiter septile pluto
+LEAD
+BODY
+
+=transit jupiter novile pluto
+LEAD
+BODY
+
+=transit jupiter decile pluto
+LEAD
+BODY
+
+# jupiter with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction chiron
+LEAD
+BODY
+
+=transit jupiter sextile chiron
+LEAD
+BODY
+
+=transit jupiter square chiron
+LEAD
+BODY
+
+=transit jupiter trine chiron
+LEAD
+BODY
+
+=transit jupiter opposition chiron
+LEAD
+BODY
+
+=transit jupiter biquintile chiron
+LEAD
+BODY
+
+=transit jupiter septile chiron
+LEAD
+BODY
+
+=transit jupiter novile chiron
+LEAD
+BODY
+
+=transit jupiter decile chiron
+LEAD
+BODY
+
+# jupiter with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit jupiter conjunction north_node
+LEAD
+BODY
+
+=transit jupiter sextile north_node
+LEAD
+BODY
+
+=transit jupiter square north_node
+LEAD
+BODY
+
+=transit jupiter trine north_node
+LEAD
+BODY
+
+=transit jupiter opposition north_node
+LEAD
+BODY
+
+=transit jupiter biquintile north_node
+LEAD
+BODY
+
+=transit jupiter septile north_node
+LEAD
+BODY
+
+=transit jupiter novile north_node
+LEAD
+BODY
+
+=transit jupiter decile north_node
+LEAD
+BODY

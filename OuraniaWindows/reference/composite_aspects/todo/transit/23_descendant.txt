@@ -1,0 +1,1261 @@
+# transit: descendant - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# descendant with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction ascendant
+LEAD
+BODY
+
+=transit descendant sextile ascendant
+LEAD
+BODY
+
+=transit descendant square ascendant
+LEAD
+BODY
+
+=transit descendant trine ascendant
+LEAD
+BODY
+
+=transit descendant opposition ascendant
+LEAD
+BODY
+
+=transit descendant quincunx ascendant
+LEAD
+BODY
+
+=transit descendant semisextile ascendant
+LEAD
+BODY
+
+=transit descendant semisquare ascendant
+LEAD
+BODY
+
+=transit descendant sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit descendant quintile ascendant
+LEAD
+BODY
+
+=transit descendant sesquiquintile ascendant
+LEAD
+BODY
+
+# descendant with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction mc
+LEAD
+BODY
+
+=transit descendant sextile mc
+LEAD
+BODY
+
+=transit descendant square mc
+LEAD
+BODY
+
+=transit descendant trine mc
+LEAD
+BODY
+
+=transit descendant opposition mc
+LEAD
+BODY
+
+=transit descendant quincunx mc
+LEAD
+BODY
+
+=transit descendant semisextile mc
+LEAD
+BODY
+
+=transit descendant semisquare mc
+LEAD
+BODY
+
+=transit descendant sesquiquadrate mc
+LEAD
+BODY
+
+=transit descendant quintile mc
+LEAD
+BODY
+
+=transit descendant sesquiquintile mc
+LEAD
+BODY
+
+# descendant with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction ic
+LEAD
+BODY
+
+=transit descendant sextile ic
+LEAD
+BODY
+
+=transit descendant square ic
+LEAD
+BODY
+
+=transit descendant trine ic
+LEAD
+BODY
+
+=transit descendant opposition ic
+LEAD
+BODY
+
+=transit descendant quincunx ic
+LEAD
+BODY
+
+=transit descendant semisextile ic
+LEAD
+BODY
+
+=transit descendant semisquare ic
+LEAD
+BODY
+
+=transit descendant sesquiquadrate ic
+LEAD
+BODY
+
+=transit descendant quintile ic
+LEAD
+BODY
+
+=transit descendant sesquiquintile ic
+LEAD
+BODY
+
+# descendant with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction south_node
+LEAD
+BODY
+
+=transit descendant sextile south_node
+LEAD
+BODY
+
+=transit descendant square south_node
+LEAD
+BODY
+
+=transit descendant trine south_node
+LEAD
+BODY
+
+=transit descendant opposition south_node
+LEAD
+BODY
+
+=transit descendant quincunx south_node
+LEAD
+BODY
+
+=transit descendant semisextile south_node
+LEAD
+BODY
+
+=transit descendant semisquare south_node
+LEAD
+BODY
+
+=transit descendant sesquiquadrate south_node
+LEAD
+BODY
+
+=transit descendant quintile south_node
+LEAD
+BODY
+
+=transit descendant sesquiquintile south_node
+LEAD
+BODY
+
+# descendant with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction ceres
+LEAD
+BODY
+
+=transit descendant sextile ceres
+LEAD
+BODY
+
+=transit descendant square ceres
+LEAD
+BODY
+
+=transit descendant trine ceres
+LEAD
+BODY
+
+=transit descendant opposition ceres
+LEAD
+BODY
+
+=transit descendant quincunx ceres
+LEAD
+BODY
+
+=transit descendant semisextile ceres
+LEAD
+BODY
+
+=transit descendant semisquare ceres
+LEAD
+BODY
+
+=transit descendant sesquiquadrate ceres
+LEAD
+BODY
+
+=transit descendant quintile ceres
+LEAD
+BODY
+
+=transit descendant sesquiquintile ceres
+LEAD
+BODY
+
+# descendant with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction pallas
+LEAD
+BODY
+
+=transit descendant sextile pallas
+LEAD
+BODY
+
+=transit descendant square pallas
+LEAD
+BODY
+
+=transit descendant trine pallas
+LEAD
+BODY
+
+=transit descendant opposition pallas
+LEAD
+BODY
+
+=transit descendant quincunx pallas
+LEAD
+BODY
+
+=transit descendant semisextile pallas
+LEAD
+BODY
+
+=transit descendant semisquare pallas
+LEAD
+BODY
+
+=transit descendant sesquiquadrate pallas
+LEAD
+BODY
+
+=transit descendant quintile pallas
+LEAD
+BODY
+
+=transit descendant sesquiquintile pallas
+LEAD
+BODY
+
+# descendant with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction juno
+LEAD
+BODY
+
+=transit descendant sextile juno
+LEAD
+BODY
+
+=transit descendant square juno
+LEAD
+BODY
+
+=transit descendant trine juno
+LEAD
+BODY
+
+=transit descendant opposition juno
+LEAD
+BODY
+
+=transit descendant quincunx juno
+LEAD
+BODY
+
+=transit descendant semisextile juno
+LEAD
+BODY
+
+=transit descendant semisquare juno
+LEAD
+BODY
+
+=transit descendant sesquiquadrate juno
+LEAD
+BODY
+
+=transit descendant quintile juno
+LEAD
+BODY
+
+=transit descendant sesquiquintile juno
+LEAD
+BODY
+
+# descendant with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction vesta
+LEAD
+BODY
+
+=transit descendant sextile vesta
+LEAD
+BODY
+
+=transit descendant square vesta
+LEAD
+BODY
+
+=transit descendant trine vesta
+LEAD
+BODY
+
+=transit descendant opposition vesta
+LEAD
+BODY
+
+=transit descendant quincunx vesta
+LEAD
+BODY
+
+=transit descendant semisextile vesta
+LEAD
+BODY
+
+=transit descendant semisquare vesta
+LEAD
+BODY
+
+=transit descendant sesquiquadrate vesta
+LEAD
+BODY
+
+=transit descendant quintile vesta
+LEAD
+BODY
+
+=transit descendant sesquiquintile vesta
+LEAD
+BODY
+
+# descendant with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction eris
+LEAD
+BODY
+
+=transit descendant sextile eris
+LEAD
+BODY
+
+=transit descendant square eris
+LEAD
+BODY
+
+=transit descendant trine eris
+LEAD
+BODY
+
+=transit descendant opposition eris
+LEAD
+BODY
+
+=transit descendant quincunx eris
+LEAD
+BODY
+
+=transit descendant semisextile eris
+LEAD
+BODY
+
+=transit descendant semisquare eris
+LEAD
+BODY
+
+=transit descendant sesquiquadrate eris
+LEAD
+BODY
+
+=transit descendant quintile eris
+LEAD
+BODY
+
+=transit descendant sesquiquintile eris
+LEAD
+BODY
+
+# descendant with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction eros
+LEAD
+BODY
+
+=transit descendant sextile eros
+LEAD
+BODY
+
+=transit descendant square eros
+LEAD
+BODY
+
+=transit descendant trine eros
+LEAD
+BODY
+
+=transit descendant opposition eros
+LEAD
+BODY
+
+=transit descendant quincunx eros
+LEAD
+BODY
+
+=transit descendant semisextile eros
+LEAD
+BODY
+
+=transit descendant semisquare eros
+LEAD
+BODY
+
+=transit descendant sesquiquadrate eros
+LEAD
+BODY
+
+=transit descendant quintile eros
+LEAD
+BODY
+
+=transit descendant sesquiquintile eros
+LEAD
+BODY
+
+# descendant with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction hygiea
+LEAD
+BODY
+
+=transit descendant sextile hygiea
+LEAD
+BODY
+
+=transit descendant square hygiea
+LEAD
+BODY
+
+=transit descendant trine hygiea
+LEAD
+BODY
+
+=transit descendant opposition hygiea
+LEAD
+BODY
+
+=transit descendant quincunx hygiea
+LEAD
+BODY
+
+=transit descendant semisextile hygiea
+LEAD
+BODY
+
+=transit descendant semisquare hygiea
+LEAD
+BODY
+
+=transit descendant sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit descendant quintile hygiea
+LEAD
+BODY
+
+=transit descendant sesquiquintile hygiea
+LEAD
+BODY
+
+# descendant with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction nessus
+LEAD
+BODY
+
+=transit descendant sextile nessus
+LEAD
+BODY
+
+=transit descendant square nessus
+LEAD
+BODY
+
+=transit descendant trine nessus
+LEAD
+BODY
+
+=transit descendant opposition nessus
+LEAD
+BODY
+
+=transit descendant quincunx nessus
+LEAD
+BODY
+
+=transit descendant semisextile nessus
+LEAD
+BODY
+
+=transit descendant semisquare nessus
+LEAD
+BODY
+
+=transit descendant sesquiquadrate nessus
+LEAD
+BODY
+
+=transit descendant quintile nessus
+LEAD
+BODY
+
+=transit descendant sesquiquintile nessus
+LEAD
+BODY
+
+# descendant with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction pholus
+LEAD
+BODY
+
+=transit descendant sextile pholus
+LEAD
+BODY
+
+=transit descendant square pholus
+LEAD
+BODY
+
+=transit descendant trine pholus
+LEAD
+BODY
+
+=transit descendant opposition pholus
+LEAD
+BODY
+
+=transit descendant quincunx pholus
+LEAD
+BODY
+
+=transit descendant semisextile pholus
+LEAD
+BODY
+
+=transit descendant semisquare pholus
+LEAD
+BODY
+
+=transit descendant sesquiquadrate pholus
+LEAD
+BODY
+
+=transit descendant quintile pholus
+LEAD
+BODY
+
+=transit descendant sesquiquintile pholus
+LEAD
+BODY
+
+# descendant with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction fortune
+LEAD
+BODY
+
+=transit descendant sextile fortune
+LEAD
+BODY
+
+=transit descendant square fortune
+LEAD
+BODY
+
+=transit descendant trine fortune
+LEAD
+BODY
+
+=transit descendant opposition fortune
+LEAD
+BODY
+
+=transit descendant quincunx fortune
+LEAD
+BODY
+
+=transit descendant semisextile fortune
+LEAD
+BODY
+
+=transit descendant semisquare fortune
+LEAD
+BODY
+
+=transit descendant sesquiquadrate fortune
+LEAD
+BODY
+
+=transit descendant quintile fortune
+LEAD
+BODY
+
+=transit descendant sesquiquintile fortune
+LEAD
+BODY
+
+# descendant with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction spirit
+LEAD
+BODY
+
+=transit descendant sextile spirit
+LEAD
+BODY
+
+=transit descendant square spirit
+LEAD
+BODY
+
+=transit descendant trine spirit
+LEAD
+BODY
+
+=transit descendant opposition spirit
+LEAD
+BODY
+
+=transit descendant quincunx spirit
+LEAD
+BODY
+
+=transit descendant semisextile spirit
+LEAD
+BODY
+
+=transit descendant semisquare spirit
+LEAD
+BODY
+
+=transit descendant sesquiquadrate spirit
+LEAD
+BODY
+
+=transit descendant quintile spirit
+LEAD
+BODY
+
+=transit descendant sesquiquintile spirit
+LEAD
+BODY
+
+# descendant with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction lilith
+LEAD
+BODY
+
+=transit descendant sextile lilith
+LEAD
+BODY
+
+=transit descendant square lilith
+LEAD
+BODY
+
+=transit descendant trine lilith
+LEAD
+BODY
+
+=transit descendant opposition lilith
+LEAD
+BODY
+
+=transit descendant quincunx lilith
+LEAD
+BODY
+
+=transit descendant semisextile lilith
+LEAD
+BODY
+
+=transit descendant semisquare lilith
+LEAD
+BODY
+
+=transit descendant sesquiquadrate lilith
+LEAD
+BODY
+
+=transit descendant quintile lilith
+LEAD
+BODY
+
+=transit descendant sesquiquintile lilith
+LEAD
+BODY
+
+# descendant with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction moon
+LEAD
+BODY
+
+=transit descendant sextile moon
+LEAD
+BODY
+
+=transit descendant square moon
+LEAD
+BODY
+
+=transit descendant trine moon
+LEAD
+BODY
+
+=transit descendant opposition moon
+LEAD
+BODY
+
+=transit descendant quincunx moon
+LEAD
+BODY
+
+=transit descendant semisextile moon
+LEAD
+BODY
+
+=transit descendant semisquare moon
+LEAD
+BODY
+
+=transit descendant sesquiquadrate moon
+LEAD
+BODY
+
+=transit descendant quintile moon
+LEAD
+BODY
+
+=transit descendant sesquiquintile moon
+LEAD
+BODY
+
+# descendant with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction sun
+LEAD
+BODY
+
+=transit descendant sextile sun
+LEAD
+BODY
+
+=transit descendant square sun
+LEAD
+BODY
+
+=transit descendant trine sun
+LEAD
+BODY
+
+=transit descendant opposition sun
+LEAD
+BODY
+
+=transit descendant quincunx sun
+LEAD
+BODY
+
+=transit descendant semisextile sun
+LEAD
+BODY
+
+=transit descendant semisquare sun
+LEAD
+BODY
+
+=transit descendant sesquiquadrate sun
+LEAD
+BODY
+
+=transit descendant quintile sun
+LEAD
+BODY
+
+=transit descendant sesquiquintile sun
+LEAD
+BODY
+
+# descendant with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction mercury
+LEAD
+BODY
+
+=transit descendant sextile mercury
+LEAD
+BODY
+
+=transit descendant square mercury
+LEAD
+BODY
+
+=transit descendant trine mercury
+LEAD
+BODY
+
+=transit descendant opposition mercury
+LEAD
+BODY
+
+=transit descendant quincunx mercury
+LEAD
+BODY
+
+=transit descendant semisextile mercury
+LEAD
+BODY
+
+=transit descendant semisquare mercury
+LEAD
+BODY
+
+=transit descendant sesquiquadrate mercury
+LEAD
+BODY
+
+=transit descendant quintile mercury
+LEAD
+BODY
+
+=transit descendant sesquiquintile mercury
+LEAD
+BODY
+
+# descendant with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction venus
+LEAD
+BODY
+
+=transit descendant sextile venus
+LEAD
+BODY
+
+=transit descendant square venus
+LEAD
+BODY
+
+=transit descendant trine venus
+LEAD
+BODY
+
+=transit descendant opposition venus
+LEAD
+BODY
+
+=transit descendant quincunx venus
+LEAD
+BODY
+
+=transit descendant semisextile venus
+LEAD
+BODY
+
+=transit descendant semisquare venus
+LEAD
+BODY
+
+=transit descendant sesquiquadrate venus
+LEAD
+BODY
+
+=transit descendant quintile venus
+LEAD
+BODY
+
+=transit descendant sesquiquintile venus
+LEAD
+BODY
+
+# descendant with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction mars
+LEAD
+BODY
+
+=transit descendant sextile mars
+LEAD
+BODY
+
+=transit descendant square mars
+LEAD
+BODY
+
+=transit descendant trine mars
+LEAD
+BODY
+
+=transit descendant opposition mars
+LEAD
+BODY
+
+=transit descendant quincunx mars
+LEAD
+BODY
+
+=transit descendant semisextile mars
+LEAD
+BODY
+
+=transit descendant semisquare mars
+LEAD
+BODY
+
+=transit descendant sesquiquadrate mars
+LEAD
+BODY
+
+=transit descendant quintile mars
+LEAD
+BODY
+
+=transit descendant sesquiquintile mars
+LEAD
+BODY
+
+# descendant with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction jupiter
+LEAD
+BODY
+
+=transit descendant sextile jupiter
+LEAD
+BODY
+
+=transit descendant square jupiter
+LEAD
+BODY
+
+=transit descendant trine jupiter
+LEAD
+BODY
+
+=transit descendant opposition jupiter
+LEAD
+BODY
+
+=transit descendant quincunx jupiter
+LEAD
+BODY
+
+=transit descendant semisextile jupiter
+LEAD
+BODY
+
+=transit descendant semisquare jupiter
+LEAD
+BODY
+
+=transit descendant sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit descendant quintile jupiter
+LEAD
+BODY
+
+=transit descendant sesquiquintile jupiter
+LEAD
+BODY
+
+# descendant with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction saturn
+LEAD
+BODY
+
+=transit descendant sextile saturn
+LEAD
+BODY
+
+=transit descendant square saturn
+LEAD
+BODY
+
+=transit descendant trine saturn
+LEAD
+BODY
+
+=transit descendant opposition saturn
+LEAD
+BODY
+
+=transit descendant quincunx saturn
+LEAD
+BODY
+
+=transit descendant semisextile saturn
+LEAD
+BODY
+
+=transit descendant semisquare saturn
+LEAD
+BODY
+
+=transit descendant sesquiquadrate saturn
+LEAD
+BODY
+
+=transit descendant quintile saturn
+LEAD
+BODY
+
+=transit descendant sesquiquintile saturn
+LEAD
+BODY
+
+# descendant with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction uranus
+LEAD
+BODY
+
+=transit descendant sextile uranus
+LEAD
+BODY
+
+=transit descendant square uranus
+LEAD
+BODY
+
+=transit descendant trine uranus
+LEAD
+BODY
+
+=transit descendant opposition uranus
+LEAD
+BODY
+
+=transit descendant quincunx uranus
+LEAD
+BODY
+
+=transit descendant semisextile uranus
+LEAD
+BODY
+
+=transit descendant semisquare uranus
+LEAD
+BODY
+
+=transit descendant sesquiquadrate uranus
+LEAD
+BODY
+
+=transit descendant quintile uranus
+LEAD
+BODY
+
+=transit descendant sesquiquintile uranus
+LEAD
+BODY
+
+# descendant with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction neptune
+LEAD
+BODY
+
+=transit descendant sextile neptune
+LEAD
+BODY
+
+=transit descendant square neptune
+LEAD
+BODY
+
+=transit descendant trine neptune
+LEAD
+BODY
+
+=transit descendant opposition neptune
+LEAD
+BODY
+
+=transit descendant quincunx neptune
+LEAD
+BODY
+
+=transit descendant semisextile neptune
+LEAD
+BODY
+
+=transit descendant semisquare neptune
+LEAD
+BODY
+
+=transit descendant sesquiquadrate neptune
+LEAD
+BODY
+
+=transit descendant quintile neptune
+LEAD
+BODY
+
+=transit descendant sesquiquintile neptune
+LEAD
+BODY
+
+# descendant with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction pluto
+LEAD
+BODY
+
+=transit descendant sextile pluto
+LEAD
+BODY
+
+=transit descendant square pluto
+LEAD
+BODY
+
+=transit descendant trine pluto
+LEAD
+BODY
+
+=transit descendant opposition pluto
+LEAD
+BODY
+
+=transit descendant quincunx pluto
+LEAD
+BODY
+
+=transit descendant semisextile pluto
+LEAD
+BODY
+
+=transit descendant semisquare pluto
+LEAD
+BODY
+
+=transit descendant sesquiquadrate pluto
+LEAD
+BODY
+
+=transit descendant quintile pluto
+LEAD
+BODY
+
+=transit descendant sesquiquintile pluto
+LEAD
+BODY
+
+# descendant with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction north_node
+LEAD
+BODY
+
+=transit descendant sextile north_node
+LEAD
+BODY
+
+=transit descendant square north_node
+LEAD
+BODY
+
+=transit descendant trine north_node
+LEAD
+BODY
+
+=transit descendant opposition north_node
+LEAD
+BODY
+
+=transit descendant quincunx north_node
+LEAD
+BODY
+
+=transit descendant semisextile north_node
+LEAD
+BODY
+
+=transit descendant semisquare north_node
+LEAD
+BODY
+
+=transit descendant sesquiquadrate north_node
+LEAD
+BODY
+
+=transit descendant quintile north_node
+LEAD
+BODY
+
+=transit descendant sesquiquintile north_node
+LEAD
+BODY
+
+# descendant with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit descendant conjunction chiron
+LEAD
+BODY
+
+=transit descendant sextile chiron
+LEAD
+BODY
+
+=transit descendant square chiron
+LEAD
+BODY
+
+=transit descendant trine chiron
+LEAD
+BODY
+
+=transit descendant opposition chiron
+LEAD
+BODY
+
+=transit descendant quincunx chiron
+LEAD
+BODY
+
+=transit descendant semisextile chiron
+LEAD
+BODY
+
+=transit descendant semisquare chiron
+LEAD
+BODY
+
+=transit descendant sesquiquadrate chiron
+LEAD
+BODY
+
+=transit descendant quintile chiron
+LEAD
+BODY
+
+=transit descendant sesquiquintile chiron
+LEAD
+BODY

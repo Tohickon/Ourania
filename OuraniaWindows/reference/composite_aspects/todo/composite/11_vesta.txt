@@ -1,0 +1,295 @@
+# composite: vesta - 70 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# vesta with ascendant: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction ascendant
+LEAD
+BODY
+
+=vesta sextile ascendant
+LEAD
+BODY
+
+=vesta square ascendant
+LEAD
+BODY
+
+=vesta trine ascendant
+LEAD
+BODY
+
+=vesta opposition ascendant
+LEAD
+BODY
+
+# vesta with chiron: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction chiron
+LEAD
+BODY
+
+=vesta sextile chiron
+LEAD
+BODY
+
+=vesta square chiron
+LEAD
+BODY
+
+=vesta trine chiron
+LEAD
+BODY
+
+=vesta opposition chiron
+LEAD
+BODY
+
+# vesta with jupiter: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction jupiter
+LEAD
+BODY
+
+=vesta sextile jupiter
+LEAD
+BODY
+
+=vesta square jupiter
+LEAD
+BODY
+
+=vesta trine jupiter
+LEAD
+BODY
+
+=vesta opposition jupiter
+LEAD
+BODY
+
+# vesta with mars: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction mars
+LEAD
+BODY
+
+=vesta sextile mars
+LEAD
+BODY
+
+=vesta square mars
+LEAD
+BODY
+
+=vesta trine mars
+LEAD
+BODY
+
+=vesta opposition mars
+LEAD
+BODY
+
+# vesta with mercury: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction mercury
+LEAD
+BODY
+
+=vesta sextile mercury
+LEAD
+BODY
+
+=vesta square mercury
+LEAD
+BODY
+
+=vesta trine mercury
+LEAD
+BODY
+
+=vesta opposition mercury
+LEAD
+BODY
+
+# vesta with mc: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction mc
+LEAD
+BODY
+
+=vesta sextile mc
+LEAD
+BODY
+
+=vesta square mc
+LEAD
+BODY
+
+=vesta trine mc
+LEAD
+BODY
+
+=vesta opposition mc
+LEAD
+BODY
+
+# vesta with moon: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction moon
+LEAD
+BODY
+
+=vesta sextile moon
+LEAD
+BODY
+
+=vesta square moon
+LEAD
+BODY
+
+=vesta trine moon
+LEAD
+BODY
+
+=vesta opposition moon
+LEAD
+BODY
+
+# vesta with neptune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction neptune
+LEAD
+BODY
+
+=vesta sextile neptune
+LEAD
+BODY
+
+=vesta square neptune
+LEAD
+BODY
+
+=vesta trine neptune
+LEAD
+BODY
+
+=vesta opposition neptune
+LEAD
+BODY
+
+# vesta with north_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction north_node
+LEAD
+BODY
+
+=vesta sextile north_node
+LEAD
+BODY
+
+=vesta square north_node
+LEAD
+BODY
+
+=vesta trine north_node
+LEAD
+BODY
+
+=vesta opposition north_node
+LEAD
+BODY
+
+# vesta with pluto: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction pluto
+LEAD
+BODY
+
+=vesta sextile pluto
+LEAD
+BODY
+
+=vesta square pluto
+LEAD
+BODY
+
+=vesta trine pluto
+LEAD
+BODY
+
+=vesta opposition pluto
+LEAD
+BODY
+
+# vesta with saturn: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction saturn
+LEAD
+BODY
+
+=vesta sextile saturn
+LEAD
+BODY
+
+=vesta square saturn
+LEAD
+BODY
+
+=vesta trine saturn
+LEAD
+BODY
+
+=vesta opposition saturn
+LEAD
+BODY
+
+# vesta with sun: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction sun
+LEAD
+BODY
+
+=vesta sextile sun
+LEAD
+BODY
+
+=vesta square sun
+LEAD
+BODY
+
+=vesta trine sun
+LEAD
+BODY
+
+=vesta opposition sun
+LEAD
+BODY
+
+# vesta with uranus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction uranus
+LEAD
+BODY
+
+=vesta sextile uranus
+LEAD
+BODY
+
+=vesta square uranus
+LEAD
+BODY
+
+=vesta trine uranus
+LEAD
+BODY
+
+=vesta opposition uranus
+LEAD
+BODY
+
+# vesta with venus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=vesta conjunction venus
+LEAD
+BODY
+
+=vesta sextile venus
+LEAD
+BODY
+
+=vesta square venus
+LEAD
+BODY
+
+=vesta trine venus
+LEAD
+BODY
+
+=vesta opposition venus
+LEAD
+BODY

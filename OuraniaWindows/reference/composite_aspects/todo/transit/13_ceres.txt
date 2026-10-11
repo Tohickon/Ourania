@@ -1,0 +1,1437 @@
+# transit: ceres - 352 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# ceres with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction ascendant
+LEAD
+BODY
+
+=transit ceres sextile ascendant
+LEAD
+BODY
+
+=transit ceres square ascendant
+LEAD
+BODY
+
+=transit ceres trine ascendant
+LEAD
+BODY
+
+=transit ceres opposition ascendant
+LEAD
+BODY
+
+=transit ceres quincunx ascendant
+LEAD
+BODY
+
+=transit ceres semisextile ascendant
+LEAD
+BODY
+
+=transit ceres semisquare ascendant
+LEAD
+BODY
+
+=transit ceres sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit ceres quintile ascendant
+LEAD
+BODY
+
+=transit ceres sesquiquintile ascendant
+LEAD
+BODY
+
+# ceres with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction descendant
+LEAD
+BODY
+
+=transit ceres sextile descendant
+LEAD
+BODY
+
+=transit ceres square descendant
+LEAD
+BODY
+
+=transit ceres trine descendant
+LEAD
+BODY
+
+=transit ceres opposition descendant
+LEAD
+BODY
+
+=transit ceres quincunx descendant
+LEAD
+BODY
+
+=transit ceres semisextile descendant
+LEAD
+BODY
+
+=transit ceres semisquare descendant
+LEAD
+BODY
+
+=transit ceres sesquiquadrate descendant
+LEAD
+BODY
+
+=transit ceres quintile descendant
+LEAD
+BODY
+
+=transit ceres sesquiquintile descendant
+LEAD
+BODY
+
+# ceres with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction mc
+LEAD
+BODY
+
+=transit ceres sextile mc
+LEAD
+BODY
+
+=transit ceres square mc
+LEAD
+BODY
+
+=transit ceres trine mc
+LEAD
+BODY
+
+=transit ceres opposition mc
+LEAD
+BODY
+
+=transit ceres quincunx mc
+LEAD
+BODY
+
+=transit ceres semisextile mc
+LEAD
+BODY
+
+=transit ceres semisquare mc
+LEAD
+BODY
+
+=transit ceres sesquiquadrate mc
+LEAD
+BODY
+
+=transit ceres quintile mc
+LEAD
+BODY
+
+=transit ceres sesquiquintile mc
+LEAD
+BODY
+
+# ceres with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction ic
+LEAD
+BODY
+
+=transit ceres sextile ic
+LEAD
+BODY
+
+=transit ceres square ic
+LEAD
+BODY
+
+=transit ceres trine ic
+LEAD
+BODY
+
+=transit ceres opposition ic
+LEAD
+BODY
+
+=transit ceres quincunx ic
+LEAD
+BODY
+
+=transit ceres semisextile ic
+LEAD
+BODY
+
+=transit ceres semisquare ic
+LEAD
+BODY
+
+=transit ceres sesquiquadrate ic
+LEAD
+BODY
+
+=transit ceres quintile ic
+LEAD
+BODY
+
+=transit ceres sesquiquintile ic
+LEAD
+BODY
+
+# ceres with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction south_node
+LEAD
+BODY
+
+=transit ceres sextile south_node
+LEAD
+BODY
+
+=transit ceres square south_node
+LEAD
+BODY
+
+=transit ceres trine south_node
+LEAD
+BODY
+
+=transit ceres opposition south_node
+LEAD
+BODY
+
+=transit ceres quincunx south_node
+LEAD
+BODY
+
+=transit ceres semisextile south_node
+LEAD
+BODY
+
+=transit ceres semisquare south_node
+LEAD
+BODY
+
+=transit ceres sesquiquadrate south_node
+LEAD
+BODY
+
+=transit ceres quintile south_node
+LEAD
+BODY
+
+=transit ceres sesquiquintile south_node
+LEAD
+BODY
+
+# ceres with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction pallas
+LEAD
+BODY
+
+=transit ceres sextile pallas
+LEAD
+BODY
+
+=transit ceres square pallas
+LEAD
+BODY
+
+=transit ceres trine pallas
+LEAD
+BODY
+
+=transit ceres opposition pallas
+LEAD
+BODY
+
+=transit ceres quincunx pallas
+LEAD
+BODY
+
+=transit ceres semisextile pallas
+LEAD
+BODY
+
+=transit ceres semisquare pallas
+LEAD
+BODY
+
+=transit ceres sesquiquadrate pallas
+LEAD
+BODY
+
+=transit ceres quintile pallas
+LEAD
+BODY
+
+=transit ceres sesquiquintile pallas
+LEAD
+BODY
+
+# ceres with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction juno
+LEAD
+BODY
+
+=transit ceres sextile juno
+LEAD
+BODY
+
+=transit ceres square juno
+LEAD
+BODY
+
+=transit ceres trine juno
+LEAD
+BODY
+
+=transit ceres opposition juno
+LEAD
+BODY
+
+=transit ceres quincunx juno
+LEAD
+BODY
+
+=transit ceres semisextile juno
+LEAD
+BODY
+
+=transit ceres semisquare juno
+LEAD
+BODY
+
+=transit ceres sesquiquadrate juno
+LEAD
+BODY
+
+=transit ceres quintile juno
+LEAD
+BODY
+
+=transit ceres sesquiquintile juno
+LEAD
+BODY
+
+# ceres with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction vesta
+LEAD
+BODY
+
+=transit ceres sextile vesta
+LEAD
+BODY
+
+=transit ceres square vesta
+LEAD
+BODY
+
+=transit ceres trine vesta
+LEAD
+BODY
+
+=transit ceres opposition vesta
+LEAD
+BODY
+
+=transit ceres quincunx vesta
+LEAD
+BODY
+
+=transit ceres semisextile vesta
+LEAD
+BODY
+
+=transit ceres semisquare vesta
+LEAD
+BODY
+
+=transit ceres sesquiquadrate vesta
+LEAD
+BODY
+
+=transit ceres quintile vesta
+LEAD
+BODY
+
+=transit ceres sesquiquintile vesta
+LEAD
+BODY
+
+# ceres with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction eris
+LEAD
+BODY
+
+=transit ceres sextile eris
+LEAD
+BODY
+
+=transit ceres square eris
+LEAD
+BODY
+
+=transit ceres trine eris
+LEAD
+BODY
+
+=transit ceres opposition eris
+LEAD
+BODY
+
+=transit ceres quincunx eris
+LEAD
+BODY
+
+=transit ceres semisextile eris
+LEAD
+BODY
+
+=transit ceres semisquare eris
+LEAD
+BODY
+
+=transit ceres sesquiquadrate eris
+LEAD
+BODY
+
+=transit ceres quintile eris
+LEAD
+BODY
+
+=transit ceres sesquiquintile eris
+LEAD
+BODY
+
+# ceres with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction eros
+LEAD
+BODY
+
+=transit ceres sextile eros
+LEAD
+BODY
+
+=transit ceres square eros
+LEAD
+BODY
+
+=transit ceres trine eros
+LEAD
+BODY
+
+=transit ceres opposition eros
+LEAD
+BODY
+
+=transit ceres quincunx eros
+LEAD
+BODY
+
+=transit ceres semisextile eros
+LEAD
+BODY
+
+=transit ceres semisquare eros
+LEAD
+BODY
+
+=transit ceres sesquiquadrate eros
+LEAD
+BODY
+
+=transit ceres quintile eros
+LEAD
+BODY
+
+=transit ceres sesquiquintile eros
+LEAD
+BODY
+
+# ceres with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction hygiea
+LEAD
+BODY
+
+=transit ceres sextile hygiea
+LEAD
+BODY
+
+=transit ceres square hygiea
+LEAD
+BODY
+
+=transit ceres trine hygiea
+LEAD
+BODY
+
+=transit ceres opposition hygiea
+LEAD
+BODY
+
+=transit ceres quincunx hygiea
+LEAD
+BODY
+
+=transit ceres semisextile hygiea
+LEAD
+BODY
+
+=transit ceres semisquare hygiea
+LEAD
+BODY
+
+=transit ceres sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit ceres quintile hygiea
+LEAD
+BODY
+
+=transit ceres sesquiquintile hygiea
+LEAD
+BODY
+
+# ceres with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction nessus
+LEAD
+BODY
+
+=transit ceres sextile nessus
+LEAD
+BODY
+
+=transit ceres square nessus
+LEAD
+BODY
+
+=transit ceres trine nessus
+LEAD
+BODY
+
+=transit ceres opposition nessus
+LEAD
+BODY
+
+=transit ceres quincunx nessus
+LEAD
+BODY
+
+=transit ceres semisextile nessus
+LEAD
+BODY
+
+=transit ceres semisquare nessus
+LEAD
+BODY
+
+=transit ceres sesquiquadrate nessus
+LEAD
+BODY
+
+=transit ceres quintile nessus
+LEAD
+BODY
+
+=transit ceres sesquiquintile nessus
+LEAD
+BODY
+
+# ceres with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction pholus
+LEAD
+BODY
+
+=transit ceres sextile pholus
+LEAD
+BODY
+
+=transit ceres square pholus
+LEAD
+BODY
+
+=transit ceres trine pholus
+LEAD
+BODY
+
+=transit ceres opposition pholus
+LEAD
+BODY
+
+=transit ceres quincunx pholus
+LEAD
+BODY
+
+=transit ceres semisextile pholus
+LEAD
+BODY
+
+=transit ceres semisquare pholus
+LEAD
+BODY
+
+=transit ceres sesquiquadrate pholus
+LEAD
+BODY
+
+=transit ceres quintile pholus
+LEAD
+BODY
+
+=transit ceres sesquiquintile pholus
+LEAD
+BODY
+
+# ceres with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction fortune
+LEAD
+BODY
+
+=transit ceres sextile fortune
+LEAD
+BODY
+
+=transit ceres square fortune
+LEAD
+BODY
+
+=transit ceres trine fortune
+LEAD
+BODY
+
+=transit ceres opposition fortune
+LEAD
+BODY
+
+=transit ceres quincunx fortune
+LEAD
+BODY
+
+=transit ceres semisextile fortune
+LEAD
+BODY
+
+=transit ceres semisquare fortune
+LEAD
+BODY
+
+=transit ceres sesquiquadrate fortune
+LEAD
+BODY
+
+=transit ceres quintile fortune
+LEAD
+BODY
+
+=transit ceres sesquiquintile fortune
+LEAD
+BODY
+
+# ceres with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction spirit
+LEAD
+BODY
+
+=transit ceres sextile spirit
+LEAD
+BODY
+
+=transit ceres square spirit
+LEAD
+BODY
+
+=transit ceres trine spirit
+LEAD
+BODY
+
+=transit ceres opposition spirit
+LEAD
+BODY
+
+=transit ceres quincunx spirit
+LEAD
+BODY
+
+=transit ceres semisextile spirit
+LEAD
+BODY
+
+=transit ceres semisquare spirit
+LEAD
+BODY
+
+=transit ceres sesquiquadrate spirit
+LEAD
+BODY
+
+=transit ceres quintile spirit
+LEAD
+BODY
+
+=transit ceres sesquiquintile spirit
+LEAD
+BODY
+
+# ceres with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction lilith
+LEAD
+BODY
+
+=transit ceres sextile lilith
+LEAD
+BODY
+
+=transit ceres square lilith
+LEAD
+BODY
+
+=transit ceres trine lilith
+LEAD
+BODY
+
+=transit ceres opposition lilith
+LEAD
+BODY
+
+=transit ceres quincunx lilith
+LEAD
+BODY
+
+=transit ceres semisextile lilith
+LEAD
+BODY
+
+=transit ceres semisquare lilith
+LEAD
+BODY
+
+=transit ceres sesquiquadrate lilith
+LEAD
+BODY
+
+=transit ceres quintile lilith
+LEAD
+BODY
+
+=transit ceres sesquiquintile lilith
+LEAD
+BODY
+
+# ceres with moon: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction moon
+LEAD
+BODY
+
+=transit ceres sextile moon
+LEAD
+BODY
+
+=transit ceres square moon
+LEAD
+BODY
+
+=transit ceres trine moon
+LEAD
+BODY
+
+=transit ceres opposition moon
+LEAD
+BODY
+
+=transit ceres quincunx moon
+LEAD
+BODY
+
+=transit ceres semisextile moon
+LEAD
+BODY
+
+=transit ceres semisquare moon
+LEAD
+BODY
+
+=transit ceres sesquiquadrate moon
+LEAD
+BODY
+
+=transit ceres quintile moon
+LEAD
+BODY
+
+=transit ceres biquintile moon
+LEAD
+BODY
+
+=transit ceres sesquiquintile moon
+LEAD
+BODY
+
+=transit ceres septile moon
+LEAD
+BODY
+
+=transit ceres novile moon
+LEAD
+BODY
+
+=transit ceres decile moon
+LEAD
+BODY
+
+# ceres with sun: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction sun
+LEAD
+BODY
+
+=transit ceres sextile sun
+LEAD
+BODY
+
+=transit ceres square sun
+LEAD
+BODY
+
+=transit ceres trine sun
+LEAD
+BODY
+
+=transit ceres opposition sun
+LEAD
+BODY
+
+=transit ceres quincunx sun
+LEAD
+BODY
+
+=transit ceres semisextile sun
+LEAD
+BODY
+
+=transit ceres semisquare sun
+LEAD
+BODY
+
+=transit ceres sesquiquadrate sun
+LEAD
+BODY
+
+=transit ceres quintile sun
+LEAD
+BODY
+
+=transit ceres biquintile sun
+LEAD
+BODY
+
+=transit ceres sesquiquintile sun
+LEAD
+BODY
+
+=transit ceres septile sun
+LEAD
+BODY
+
+=transit ceres novile sun
+LEAD
+BODY
+
+=transit ceres decile sun
+LEAD
+BODY
+
+# ceres with mercury: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction mercury
+LEAD
+BODY
+
+=transit ceres sextile mercury
+LEAD
+BODY
+
+=transit ceres square mercury
+LEAD
+BODY
+
+=transit ceres trine mercury
+LEAD
+BODY
+
+=transit ceres opposition mercury
+LEAD
+BODY
+
+=transit ceres quincunx mercury
+LEAD
+BODY
+
+=transit ceres semisextile mercury
+LEAD
+BODY
+
+=transit ceres semisquare mercury
+LEAD
+BODY
+
+=transit ceres sesquiquadrate mercury
+LEAD
+BODY
+
+=transit ceres quintile mercury
+LEAD
+BODY
+
+=transit ceres biquintile mercury
+LEAD
+BODY
+
+=transit ceres sesquiquintile mercury
+LEAD
+BODY
+
+=transit ceres septile mercury
+LEAD
+BODY
+
+=transit ceres novile mercury
+LEAD
+BODY
+
+=transit ceres decile mercury
+LEAD
+BODY
+
+# ceres with venus: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction venus
+LEAD
+BODY
+
+=transit ceres sextile venus
+LEAD
+BODY
+
+=transit ceres square venus
+LEAD
+BODY
+
+=transit ceres trine venus
+LEAD
+BODY
+
+=transit ceres opposition venus
+LEAD
+BODY
+
+=transit ceres quincunx venus
+LEAD
+BODY
+
+=transit ceres semisextile venus
+LEAD
+BODY
+
+=transit ceres semisquare venus
+LEAD
+BODY
+
+=transit ceres sesquiquadrate venus
+LEAD
+BODY
+
+=transit ceres quintile venus
+LEAD
+BODY
+
+=transit ceres biquintile venus
+LEAD
+BODY
+
+=transit ceres sesquiquintile venus
+LEAD
+BODY
+
+=transit ceres septile venus
+LEAD
+BODY
+
+=transit ceres novile venus
+LEAD
+BODY
+
+=transit ceres decile venus
+LEAD
+BODY
+
+# ceres with mars: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction mars
+LEAD
+BODY
+
+=transit ceres sextile mars
+LEAD
+BODY
+
+=transit ceres square mars
+LEAD
+BODY
+
+=transit ceres trine mars
+LEAD
+BODY
+
+=transit ceres opposition mars
+LEAD
+BODY
+
+=transit ceres quincunx mars
+LEAD
+BODY
+
+=transit ceres semisextile mars
+LEAD
+BODY
+
+=transit ceres semisquare mars
+LEAD
+BODY
+
+=transit ceres sesquiquadrate mars
+LEAD
+BODY
+
+=transit ceres quintile mars
+LEAD
+BODY
+
+=transit ceres biquintile mars
+LEAD
+BODY
+
+=transit ceres sesquiquintile mars
+LEAD
+BODY
+
+=transit ceres septile mars
+LEAD
+BODY
+
+=transit ceres novile mars
+LEAD
+BODY
+
+=transit ceres decile mars
+LEAD
+BODY
+
+# ceres with jupiter: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction jupiter
+LEAD
+BODY
+
+=transit ceres sextile jupiter
+LEAD
+BODY
+
+=transit ceres square jupiter
+LEAD
+BODY
+
+=transit ceres trine jupiter
+LEAD
+BODY
+
+=transit ceres opposition jupiter
+LEAD
+BODY
+
+=transit ceres quincunx jupiter
+LEAD
+BODY
+
+=transit ceres semisextile jupiter
+LEAD
+BODY
+
+=transit ceres semisquare jupiter
+LEAD
+BODY
+
+=transit ceres sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit ceres quintile jupiter
+LEAD
+BODY
+
+=transit ceres biquintile jupiter
+LEAD
+BODY
+
+=transit ceres sesquiquintile jupiter
+LEAD
+BODY
+
+=transit ceres septile jupiter
+LEAD
+BODY
+
+=transit ceres novile jupiter
+LEAD
+BODY
+
+=transit ceres decile jupiter
+LEAD
+BODY
+
+# ceres with saturn: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction saturn
+LEAD
+BODY
+
+=transit ceres sextile saturn
+LEAD
+BODY
+
+=transit ceres square saturn
+LEAD
+BODY
+
+=transit ceres trine saturn
+LEAD
+BODY
+
+=transit ceres opposition saturn
+LEAD
+BODY
+
+=transit ceres quincunx saturn
+LEAD
+BODY
+
+=transit ceres semisextile saturn
+LEAD
+BODY
+
+=transit ceres semisquare saturn
+LEAD
+BODY
+
+=transit ceres sesquiquadrate saturn
+LEAD
+BODY
+
+=transit ceres quintile saturn
+LEAD
+BODY
+
+=transit ceres biquintile saturn
+LEAD
+BODY
+
+=transit ceres sesquiquintile saturn
+LEAD
+BODY
+
+=transit ceres septile saturn
+LEAD
+BODY
+
+=transit ceres novile saturn
+LEAD
+BODY
+
+=transit ceres decile saturn
+LEAD
+BODY
+
+# ceres with uranus: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction uranus
+LEAD
+BODY
+
+=transit ceres sextile uranus
+LEAD
+BODY
+
+=transit ceres square uranus
+LEAD
+BODY
+
+=transit ceres trine uranus
+LEAD
+BODY
+
+=transit ceres opposition uranus
+LEAD
+BODY
+
+=transit ceres quincunx uranus
+LEAD
+BODY
+
+=transit ceres semisextile uranus
+LEAD
+BODY
+
+=transit ceres semisquare uranus
+LEAD
+BODY
+
+=transit ceres sesquiquadrate uranus
+LEAD
+BODY
+
+=transit ceres quintile uranus
+LEAD
+BODY
+
+=transit ceres biquintile uranus
+LEAD
+BODY
+
+=transit ceres sesquiquintile uranus
+LEAD
+BODY
+
+=transit ceres septile uranus
+LEAD
+BODY
+
+=transit ceres novile uranus
+LEAD
+BODY
+
+=transit ceres decile uranus
+LEAD
+BODY
+
+# ceres with neptune: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction neptune
+LEAD
+BODY
+
+=transit ceres sextile neptune
+LEAD
+BODY
+
+=transit ceres square neptune
+LEAD
+BODY
+
+=transit ceres trine neptune
+LEAD
+BODY
+
+=transit ceres opposition neptune
+LEAD
+BODY
+
+=transit ceres quincunx neptune
+LEAD
+BODY
+
+=transit ceres semisextile neptune
+LEAD
+BODY
+
+=transit ceres semisquare neptune
+LEAD
+BODY
+
+=transit ceres sesquiquadrate neptune
+LEAD
+BODY
+
+=transit ceres quintile neptune
+LEAD
+BODY
+
+=transit ceres biquintile neptune
+LEAD
+BODY
+
+=transit ceres sesquiquintile neptune
+LEAD
+BODY
+
+=transit ceres septile neptune
+LEAD
+BODY
+
+=transit ceres novile neptune
+LEAD
+BODY
+
+=transit ceres decile neptune
+LEAD
+BODY
+
+# ceres with pluto: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction pluto
+LEAD
+BODY
+
+=transit ceres sextile pluto
+LEAD
+BODY
+
+=transit ceres square pluto
+LEAD
+BODY
+
+=transit ceres trine pluto
+LEAD
+BODY
+
+=transit ceres opposition pluto
+LEAD
+BODY
+
+=transit ceres quincunx pluto
+LEAD
+BODY
+
+=transit ceres semisextile pluto
+LEAD
+BODY
+
+=transit ceres semisquare pluto
+LEAD
+BODY
+
+=transit ceres sesquiquadrate pluto
+LEAD
+BODY
+
+=transit ceres quintile pluto
+LEAD
+BODY
+
+=transit ceres biquintile pluto
+LEAD
+BODY
+
+=transit ceres sesquiquintile pluto
+LEAD
+BODY
+
+=transit ceres septile pluto
+LEAD
+BODY
+
+=transit ceres novile pluto
+LEAD
+BODY
+
+=transit ceres decile pluto
+LEAD
+BODY
+
+# ceres with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction north_node
+LEAD
+BODY
+
+=transit ceres sextile north_node
+LEAD
+BODY
+
+=transit ceres square north_node
+LEAD
+BODY
+
+=transit ceres trine north_node
+LEAD
+BODY
+
+=transit ceres opposition north_node
+LEAD
+BODY
+
+=transit ceres quincunx north_node
+LEAD
+BODY
+
+=transit ceres semisextile north_node
+LEAD
+BODY
+
+=transit ceres semisquare north_node
+LEAD
+BODY
+
+=transit ceres sesquiquadrate north_node
+LEAD
+BODY
+
+=transit ceres quintile north_node
+LEAD
+BODY
+
+=transit ceres sesquiquintile north_node
+LEAD
+BODY
+
+# ceres with chiron: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ceres conjunction chiron
+LEAD
+BODY
+
+=transit ceres sextile chiron
+LEAD
+BODY
+
+=transit ceres square chiron
+LEAD
+BODY
+
+=transit ceres trine chiron
+LEAD
+BODY
+
+=transit ceres opposition chiron
+LEAD
+BODY
+
+=transit ceres quincunx chiron
+LEAD
+BODY
+
+=transit ceres semisextile chiron
+LEAD
+BODY
+
+=transit ceres semisquare chiron
+LEAD
+BODY
+
+=transit ceres sesquiquadrate chiron
+LEAD
+BODY
+
+=transit ceres quintile chiron
+LEAD
+BODY
+
+=transit ceres biquintile chiron
+LEAD
+BODY
+
+=transit ceres sesquiquintile chiron
+LEAD
+BODY
+
+=transit ceres septile chiron
+LEAD
+BODY
+
+=transit ceres novile chiron
+LEAD
+BODY
+
+=transit ceres decile chiron
+LEAD
+BODY

@@ -1,0 +1,1210 @@
+# transit: north_node - 295 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# north_node with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction descendant
+LEAD
+BODY
+
+=transit north_node sextile descendant
+LEAD
+BODY
+
+=transit north_node square descendant
+LEAD
+BODY
+
+=transit north_node trine descendant
+LEAD
+BODY
+
+=transit north_node opposition descendant
+LEAD
+BODY
+
+=transit north_node quincunx descendant
+LEAD
+BODY
+
+=transit north_node semisextile descendant
+LEAD
+BODY
+
+=transit north_node semisquare descendant
+LEAD
+BODY
+
+=transit north_node sesquiquadrate descendant
+LEAD
+BODY
+
+=transit north_node quintile descendant
+LEAD
+BODY
+
+=transit north_node sesquiquintile descendant
+LEAD
+BODY
+
+# north_node with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction ic
+LEAD
+BODY
+
+=transit north_node sextile ic
+LEAD
+BODY
+
+=transit north_node square ic
+LEAD
+BODY
+
+=transit north_node trine ic
+LEAD
+BODY
+
+=transit north_node opposition ic
+LEAD
+BODY
+
+=transit north_node quincunx ic
+LEAD
+BODY
+
+=transit north_node semisextile ic
+LEAD
+BODY
+
+=transit north_node semisquare ic
+LEAD
+BODY
+
+=transit north_node sesquiquadrate ic
+LEAD
+BODY
+
+=transit north_node quintile ic
+LEAD
+BODY
+
+=transit north_node sesquiquintile ic
+LEAD
+BODY
+
+# north_node with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction ascendant
+LEAD
+BODY
+
+=transit north_node sextile ascendant
+LEAD
+BODY
+
+=transit north_node square ascendant
+LEAD
+BODY
+
+=transit north_node trine ascendant
+LEAD
+BODY
+
+=transit north_node opposition ascendant
+LEAD
+BODY
+
+=transit north_node quincunx ascendant
+LEAD
+BODY
+
+=transit north_node semisextile ascendant
+LEAD
+BODY
+
+=transit north_node semisquare ascendant
+LEAD
+BODY
+
+=transit north_node sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit north_node quintile ascendant
+LEAD
+BODY
+
+=transit north_node sesquiquintile ascendant
+LEAD
+BODY
+
+# north_node with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction mc
+LEAD
+BODY
+
+=transit north_node sextile mc
+LEAD
+BODY
+
+=transit north_node square mc
+LEAD
+BODY
+
+=transit north_node trine mc
+LEAD
+BODY
+
+=transit north_node opposition mc
+LEAD
+BODY
+
+=transit north_node quincunx mc
+LEAD
+BODY
+
+=transit north_node semisextile mc
+LEAD
+BODY
+
+=transit north_node semisquare mc
+LEAD
+BODY
+
+=transit north_node sesquiquadrate mc
+LEAD
+BODY
+
+=transit north_node quintile mc
+LEAD
+BODY
+
+=transit north_node sesquiquintile mc
+LEAD
+BODY
+
+# north_node with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction south_node
+LEAD
+BODY
+
+=transit north_node sextile south_node
+LEAD
+BODY
+
+=transit north_node square south_node
+LEAD
+BODY
+
+=transit north_node trine south_node
+LEAD
+BODY
+
+=transit north_node opposition south_node
+LEAD
+BODY
+
+=transit north_node quincunx south_node
+LEAD
+BODY
+
+=transit north_node semisextile south_node
+LEAD
+BODY
+
+=transit north_node semisquare south_node
+LEAD
+BODY
+
+=transit north_node sesquiquadrate south_node
+LEAD
+BODY
+
+=transit north_node quintile south_node
+LEAD
+BODY
+
+=transit north_node sesquiquintile south_node
+LEAD
+BODY
+
+# north_node with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction ceres
+LEAD
+BODY
+
+=transit north_node sextile ceres
+LEAD
+BODY
+
+=transit north_node square ceres
+LEAD
+BODY
+
+=transit north_node trine ceres
+LEAD
+BODY
+
+=transit north_node opposition ceres
+LEAD
+BODY
+
+=transit north_node quincunx ceres
+LEAD
+BODY
+
+=transit north_node semisextile ceres
+LEAD
+BODY
+
+=transit north_node semisquare ceres
+LEAD
+BODY
+
+=transit north_node sesquiquadrate ceres
+LEAD
+BODY
+
+=transit north_node quintile ceres
+LEAD
+BODY
+
+=transit north_node sesquiquintile ceres
+LEAD
+BODY
+
+# north_node with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction pallas
+LEAD
+BODY
+
+=transit north_node sextile pallas
+LEAD
+BODY
+
+=transit north_node square pallas
+LEAD
+BODY
+
+=transit north_node trine pallas
+LEAD
+BODY
+
+=transit north_node opposition pallas
+LEAD
+BODY
+
+=transit north_node quincunx pallas
+LEAD
+BODY
+
+=transit north_node semisextile pallas
+LEAD
+BODY
+
+=transit north_node semisquare pallas
+LEAD
+BODY
+
+=transit north_node sesquiquadrate pallas
+LEAD
+BODY
+
+=transit north_node quintile pallas
+LEAD
+BODY
+
+=transit north_node sesquiquintile pallas
+LEAD
+BODY
+
+# north_node with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction juno
+LEAD
+BODY
+
+=transit north_node sextile juno
+LEAD
+BODY
+
+=transit north_node square juno
+LEAD
+BODY
+
+=transit north_node trine juno
+LEAD
+BODY
+
+=transit north_node opposition juno
+LEAD
+BODY
+
+=transit north_node quincunx juno
+LEAD
+BODY
+
+=transit north_node semisextile juno
+LEAD
+BODY
+
+=transit north_node semisquare juno
+LEAD
+BODY
+
+=transit north_node sesquiquadrate juno
+LEAD
+BODY
+
+=transit north_node quintile juno
+LEAD
+BODY
+
+=transit north_node sesquiquintile juno
+LEAD
+BODY
+
+# north_node with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction vesta
+LEAD
+BODY
+
+=transit north_node sextile vesta
+LEAD
+BODY
+
+=transit north_node square vesta
+LEAD
+BODY
+
+=transit north_node trine vesta
+LEAD
+BODY
+
+=transit north_node opposition vesta
+LEAD
+BODY
+
+=transit north_node quincunx vesta
+LEAD
+BODY
+
+=transit north_node semisextile vesta
+LEAD
+BODY
+
+=transit north_node semisquare vesta
+LEAD
+BODY
+
+=transit north_node sesquiquadrate vesta
+LEAD
+BODY
+
+=transit north_node quintile vesta
+LEAD
+BODY
+
+=transit north_node sesquiquintile vesta
+LEAD
+BODY
+
+# north_node with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction eris
+LEAD
+BODY
+
+=transit north_node sextile eris
+LEAD
+BODY
+
+=transit north_node square eris
+LEAD
+BODY
+
+=transit north_node trine eris
+LEAD
+BODY
+
+=transit north_node opposition eris
+LEAD
+BODY
+
+=transit north_node quincunx eris
+LEAD
+BODY
+
+=transit north_node semisextile eris
+LEAD
+BODY
+
+=transit north_node semisquare eris
+LEAD
+BODY
+
+=transit north_node sesquiquadrate eris
+LEAD
+BODY
+
+=transit north_node quintile eris
+LEAD
+BODY
+
+=transit north_node sesquiquintile eris
+LEAD
+BODY
+
+# north_node with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction eros
+LEAD
+BODY
+
+=transit north_node sextile eros
+LEAD
+BODY
+
+=transit north_node square eros
+LEAD
+BODY
+
+=transit north_node trine eros
+LEAD
+BODY
+
+=transit north_node opposition eros
+LEAD
+BODY
+
+=transit north_node quincunx eros
+LEAD
+BODY
+
+=transit north_node semisextile eros
+LEAD
+BODY
+
+=transit north_node semisquare eros
+LEAD
+BODY
+
+=transit north_node sesquiquadrate eros
+LEAD
+BODY
+
+=transit north_node quintile eros
+LEAD
+BODY
+
+=transit north_node sesquiquintile eros
+LEAD
+BODY
+
+# north_node with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction hygiea
+LEAD
+BODY
+
+=transit north_node sextile hygiea
+LEAD
+BODY
+
+=transit north_node square hygiea
+LEAD
+BODY
+
+=transit north_node trine hygiea
+LEAD
+BODY
+
+=transit north_node opposition hygiea
+LEAD
+BODY
+
+=transit north_node quincunx hygiea
+LEAD
+BODY
+
+=transit north_node semisextile hygiea
+LEAD
+BODY
+
+=transit north_node semisquare hygiea
+LEAD
+BODY
+
+=transit north_node sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit north_node quintile hygiea
+LEAD
+BODY
+
+=transit north_node sesquiquintile hygiea
+LEAD
+BODY
+
+# north_node with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction nessus
+LEAD
+BODY
+
+=transit north_node sextile nessus
+LEAD
+BODY
+
+=transit north_node square nessus
+LEAD
+BODY
+
+=transit north_node trine nessus
+LEAD
+BODY
+
+=transit north_node opposition nessus
+LEAD
+BODY
+
+=transit north_node quincunx nessus
+LEAD
+BODY
+
+=transit north_node semisextile nessus
+LEAD
+BODY
+
+=transit north_node semisquare nessus
+LEAD
+BODY
+
+=transit north_node sesquiquadrate nessus
+LEAD
+BODY
+
+=transit north_node quintile nessus
+LEAD
+BODY
+
+=transit north_node sesquiquintile nessus
+LEAD
+BODY
+
+# north_node with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction pholus
+LEAD
+BODY
+
+=transit north_node sextile pholus
+LEAD
+BODY
+
+=transit north_node square pholus
+LEAD
+BODY
+
+=transit north_node trine pholus
+LEAD
+BODY
+
+=transit north_node opposition pholus
+LEAD
+BODY
+
+=transit north_node quincunx pholus
+LEAD
+BODY
+
+=transit north_node semisextile pholus
+LEAD
+BODY
+
+=transit north_node semisquare pholus
+LEAD
+BODY
+
+=transit north_node sesquiquadrate pholus
+LEAD
+BODY
+
+=transit north_node quintile pholus
+LEAD
+BODY
+
+=transit north_node sesquiquintile pholus
+LEAD
+BODY
+
+# north_node with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction fortune
+LEAD
+BODY
+
+=transit north_node sextile fortune
+LEAD
+BODY
+
+=transit north_node square fortune
+LEAD
+BODY
+
+=transit north_node trine fortune
+LEAD
+BODY
+
+=transit north_node opposition fortune
+LEAD
+BODY
+
+=transit north_node quincunx fortune
+LEAD
+BODY
+
+=transit north_node semisextile fortune
+LEAD
+BODY
+
+=transit north_node semisquare fortune
+LEAD
+BODY
+
+=transit north_node sesquiquadrate fortune
+LEAD
+BODY
+
+=transit north_node quintile fortune
+LEAD
+BODY
+
+=transit north_node sesquiquintile fortune
+LEAD
+BODY
+
+# north_node with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction spirit
+LEAD
+BODY
+
+=transit north_node sextile spirit
+LEAD
+BODY
+
+=transit north_node square spirit
+LEAD
+BODY
+
+=transit north_node trine spirit
+LEAD
+BODY
+
+=transit north_node opposition spirit
+LEAD
+BODY
+
+=transit north_node quincunx spirit
+LEAD
+BODY
+
+=transit north_node semisextile spirit
+LEAD
+BODY
+
+=transit north_node semisquare spirit
+LEAD
+BODY
+
+=transit north_node sesquiquadrate spirit
+LEAD
+BODY
+
+=transit north_node quintile spirit
+LEAD
+BODY
+
+=transit north_node sesquiquintile spirit
+LEAD
+BODY
+
+# north_node with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction lilith
+LEAD
+BODY
+
+=transit north_node sextile lilith
+LEAD
+BODY
+
+=transit north_node square lilith
+LEAD
+BODY
+
+=transit north_node trine lilith
+LEAD
+BODY
+
+=transit north_node opposition lilith
+LEAD
+BODY
+
+=transit north_node quincunx lilith
+LEAD
+BODY
+
+=transit north_node semisextile lilith
+LEAD
+BODY
+
+=transit north_node semisquare lilith
+LEAD
+BODY
+
+=transit north_node sesquiquadrate lilith
+LEAD
+BODY
+
+=transit north_node quintile lilith
+LEAD
+BODY
+
+=transit north_node sesquiquintile lilith
+LEAD
+BODY
+
+# north_node with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction sun
+LEAD
+BODY
+
+=transit north_node sextile sun
+LEAD
+BODY
+
+=transit north_node square sun
+LEAD
+BODY
+
+=transit north_node trine sun
+LEAD
+BODY
+
+=transit north_node opposition sun
+LEAD
+BODY
+
+=transit north_node biquintile sun
+LEAD
+BODY
+
+=transit north_node septile sun
+LEAD
+BODY
+
+=transit north_node novile sun
+LEAD
+BODY
+
+=transit north_node decile sun
+LEAD
+BODY
+
+# north_node with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction moon
+LEAD
+BODY
+
+=transit north_node sextile moon
+LEAD
+BODY
+
+=transit north_node square moon
+LEAD
+BODY
+
+=transit north_node trine moon
+LEAD
+BODY
+
+=transit north_node opposition moon
+LEAD
+BODY
+
+=transit north_node biquintile moon
+LEAD
+BODY
+
+=transit north_node septile moon
+LEAD
+BODY
+
+=transit north_node novile moon
+LEAD
+BODY
+
+=transit north_node decile moon
+LEAD
+BODY
+
+# north_node with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction mercury
+LEAD
+BODY
+
+=transit north_node sextile mercury
+LEAD
+BODY
+
+=transit north_node square mercury
+LEAD
+BODY
+
+=transit north_node trine mercury
+LEAD
+BODY
+
+=transit north_node opposition mercury
+LEAD
+BODY
+
+=transit north_node biquintile mercury
+LEAD
+BODY
+
+=transit north_node septile mercury
+LEAD
+BODY
+
+=transit north_node novile mercury
+LEAD
+BODY
+
+=transit north_node decile mercury
+LEAD
+BODY
+
+# north_node with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction venus
+LEAD
+BODY
+
+=transit north_node sextile venus
+LEAD
+BODY
+
+=transit north_node square venus
+LEAD
+BODY
+
+=transit north_node trine venus
+LEAD
+BODY
+
+=transit north_node opposition venus
+LEAD
+BODY
+
+=transit north_node biquintile venus
+LEAD
+BODY
+
+=transit north_node septile venus
+LEAD
+BODY
+
+=transit north_node novile venus
+LEAD
+BODY
+
+=transit north_node decile venus
+LEAD
+BODY
+
+# north_node with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction mars
+LEAD
+BODY
+
+=transit north_node sextile mars
+LEAD
+BODY
+
+=transit north_node square mars
+LEAD
+BODY
+
+=transit north_node trine mars
+LEAD
+BODY
+
+=transit north_node opposition mars
+LEAD
+BODY
+
+=transit north_node biquintile mars
+LEAD
+BODY
+
+=transit north_node septile mars
+LEAD
+BODY
+
+=transit north_node novile mars
+LEAD
+BODY
+
+=transit north_node decile mars
+LEAD
+BODY
+
+# north_node with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction jupiter
+LEAD
+BODY
+
+=transit north_node sextile jupiter
+LEAD
+BODY
+
+=transit north_node square jupiter
+LEAD
+BODY
+
+=transit north_node trine jupiter
+LEAD
+BODY
+
+=transit north_node opposition jupiter
+LEAD
+BODY
+
+=transit north_node biquintile jupiter
+LEAD
+BODY
+
+=transit north_node septile jupiter
+LEAD
+BODY
+
+=transit north_node novile jupiter
+LEAD
+BODY
+
+=transit north_node decile jupiter
+LEAD
+BODY
+
+# north_node with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction saturn
+LEAD
+BODY
+
+=transit north_node sextile saturn
+LEAD
+BODY
+
+=transit north_node square saturn
+LEAD
+BODY
+
+=transit north_node trine saturn
+LEAD
+BODY
+
+=transit north_node opposition saturn
+LEAD
+BODY
+
+=transit north_node biquintile saturn
+LEAD
+BODY
+
+=transit north_node septile saturn
+LEAD
+BODY
+
+=transit north_node novile saturn
+LEAD
+BODY
+
+=transit north_node decile saturn
+LEAD
+BODY
+
+# north_node with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction uranus
+LEAD
+BODY
+
+=transit north_node sextile uranus
+LEAD
+BODY
+
+=transit north_node square uranus
+LEAD
+BODY
+
+=transit north_node trine uranus
+LEAD
+BODY
+
+=transit north_node opposition uranus
+LEAD
+BODY
+
+=transit north_node biquintile uranus
+LEAD
+BODY
+
+=transit north_node septile uranus
+LEAD
+BODY
+
+=transit north_node novile uranus
+LEAD
+BODY
+
+=transit north_node decile uranus
+LEAD
+BODY
+
+# north_node with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction neptune
+LEAD
+BODY
+
+=transit north_node sextile neptune
+LEAD
+BODY
+
+=transit north_node square neptune
+LEAD
+BODY
+
+=transit north_node trine neptune
+LEAD
+BODY
+
+=transit north_node opposition neptune
+LEAD
+BODY
+
+=transit north_node biquintile neptune
+LEAD
+BODY
+
+=transit north_node septile neptune
+LEAD
+BODY
+
+=transit north_node novile neptune
+LEAD
+BODY
+
+=transit north_node decile neptune
+LEAD
+BODY
+
+# north_node with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction pluto
+LEAD
+BODY
+
+=transit north_node sextile pluto
+LEAD
+BODY
+
+=transit north_node square pluto
+LEAD
+BODY
+
+=transit north_node trine pluto
+LEAD
+BODY
+
+=transit north_node opposition pluto
+LEAD
+BODY
+
+=transit north_node biquintile pluto
+LEAD
+BODY
+
+=transit north_node septile pluto
+LEAD
+BODY
+
+=transit north_node novile pluto
+LEAD
+BODY
+
+=transit north_node decile pluto
+LEAD
+BODY
+
+# north_node with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction chiron
+LEAD
+BODY
+
+=transit north_node sextile chiron
+LEAD
+BODY
+
+=transit north_node square chiron
+LEAD
+BODY
+
+=transit north_node trine chiron
+LEAD
+BODY
+
+=transit north_node opposition chiron
+LEAD
+BODY
+
+=transit north_node biquintile chiron
+LEAD
+BODY
+
+=transit north_node septile chiron
+LEAD
+BODY
+
+=transit north_node novile chiron
+LEAD
+BODY
+
+=transit north_node decile chiron
+LEAD
+BODY
+
+# north_node with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit north_node conjunction north_node
+LEAD
+BODY
+
+=transit north_node sextile north_node
+LEAD
+BODY
+
+=transit north_node square north_node
+LEAD
+BODY
+
+=transit north_node trine north_node
+LEAD
+BODY
+
+=transit north_node opposition north_node
+LEAD
+BODY
+
+=transit north_node biquintile north_node
+LEAD
+BODY
+
+=transit north_node septile north_node
+LEAD
+BODY
+
+=transit north_node novile north_node
+LEAD
+BODY
+
+=transit north_node decile north_node
+LEAD
+BODY

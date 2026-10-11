@@ -1,0 +1,1274 @@
+# transit: neptune - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# neptune with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction descendant
+LEAD
+BODY
+
+=transit neptune sextile descendant
+LEAD
+BODY
+
+=transit neptune square descendant
+LEAD
+BODY
+
+=transit neptune trine descendant
+LEAD
+BODY
+
+=transit neptune opposition descendant
+LEAD
+BODY
+
+=transit neptune quincunx descendant
+LEAD
+BODY
+
+=transit neptune semisextile descendant
+LEAD
+BODY
+
+=transit neptune semisquare descendant
+LEAD
+BODY
+
+=transit neptune sesquiquadrate descendant
+LEAD
+BODY
+
+=transit neptune quintile descendant
+LEAD
+BODY
+
+=transit neptune biquintile descendant
+LEAD
+BODY
+
+=transit neptune sesquiquintile descendant
+LEAD
+BODY
+
+=transit neptune septile descendant
+LEAD
+BODY
+
+=transit neptune novile descendant
+LEAD
+BODY
+
+=transit neptune decile descendant
+LEAD
+BODY
+
+# neptune with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction ic
+LEAD
+BODY
+
+=transit neptune sextile ic
+LEAD
+BODY
+
+=transit neptune square ic
+LEAD
+BODY
+
+=transit neptune trine ic
+LEAD
+BODY
+
+=transit neptune opposition ic
+LEAD
+BODY
+
+=transit neptune quincunx ic
+LEAD
+BODY
+
+=transit neptune semisextile ic
+LEAD
+BODY
+
+=transit neptune semisquare ic
+LEAD
+BODY
+
+=transit neptune sesquiquadrate ic
+LEAD
+BODY
+
+=transit neptune quintile ic
+LEAD
+BODY
+
+=transit neptune biquintile ic
+LEAD
+BODY
+
+=transit neptune sesquiquintile ic
+LEAD
+BODY
+
+=transit neptune septile ic
+LEAD
+BODY
+
+=transit neptune novile ic
+LEAD
+BODY
+
+=transit neptune decile ic
+LEAD
+BODY
+
+# neptune with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction ascendant
+LEAD
+BODY
+
+=transit neptune sextile ascendant
+LEAD
+BODY
+
+=transit neptune square ascendant
+LEAD
+BODY
+
+=transit neptune trine ascendant
+LEAD
+BODY
+
+=transit neptune opposition ascendant
+LEAD
+BODY
+
+=transit neptune quincunx ascendant
+LEAD
+BODY
+
+=transit neptune semisextile ascendant
+LEAD
+BODY
+
+=transit neptune semisquare ascendant
+LEAD
+BODY
+
+=transit neptune sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit neptune quintile ascendant
+LEAD
+BODY
+
+=transit neptune biquintile ascendant
+LEAD
+BODY
+
+=transit neptune sesquiquintile ascendant
+LEAD
+BODY
+
+=transit neptune septile ascendant
+LEAD
+BODY
+
+=transit neptune novile ascendant
+LEAD
+BODY
+
+=transit neptune decile ascendant
+LEAD
+BODY
+
+# neptune with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction mc
+LEAD
+BODY
+
+=transit neptune sextile mc
+LEAD
+BODY
+
+=transit neptune square mc
+LEAD
+BODY
+
+=transit neptune trine mc
+LEAD
+BODY
+
+=transit neptune opposition mc
+LEAD
+BODY
+
+=transit neptune quincunx mc
+LEAD
+BODY
+
+=transit neptune semisextile mc
+LEAD
+BODY
+
+=transit neptune semisquare mc
+LEAD
+BODY
+
+=transit neptune sesquiquadrate mc
+LEAD
+BODY
+
+=transit neptune quintile mc
+LEAD
+BODY
+
+=transit neptune biquintile mc
+LEAD
+BODY
+
+=transit neptune sesquiquintile mc
+LEAD
+BODY
+
+=transit neptune septile mc
+LEAD
+BODY
+
+=transit neptune novile mc
+LEAD
+BODY
+
+=transit neptune decile mc
+LEAD
+BODY
+
+# neptune with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction south_node
+LEAD
+BODY
+
+=transit neptune sextile south_node
+LEAD
+BODY
+
+=transit neptune square south_node
+LEAD
+BODY
+
+=transit neptune trine south_node
+LEAD
+BODY
+
+=transit neptune opposition south_node
+LEAD
+BODY
+
+=transit neptune quincunx south_node
+LEAD
+BODY
+
+=transit neptune semisextile south_node
+LEAD
+BODY
+
+=transit neptune semisquare south_node
+LEAD
+BODY
+
+=transit neptune sesquiquadrate south_node
+LEAD
+BODY
+
+=transit neptune quintile south_node
+LEAD
+BODY
+
+=transit neptune sesquiquintile south_node
+LEAD
+BODY
+
+# neptune with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction ceres
+LEAD
+BODY
+
+=transit neptune sextile ceres
+LEAD
+BODY
+
+=transit neptune square ceres
+LEAD
+BODY
+
+=transit neptune trine ceres
+LEAD
+BODY
+
+=transit neptune opposition ceres
+LEAD
+BODY
+
+=transit neptune quincunx ceres
+LEAD
+BODY
+
+=transit neptune semisextile ceres
+LEAD
+BODY
+
+=transit neptune semisquare ceres
+LEAD
+BODY
+
+=transit neptune sesquiquadrate ceres
+LEAD
+BODY
+
+=transit neptune quintile ceres
+LEAD
+BODY
+
+=transit neptune sesquiquintile ceres
+LEAD
+BODY
+
+# neptune with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction pallas
+LEAD
+BODY
+
+=transit neptune sextile pallas
+LEAD
+BODY
+
+=transit neptune square pallas
+LEAD
+BODY
+
+=transit neptune trine pallas
+LEAD
+BODY
+
+=transit neptune opposition pallas
+LEAD
+BODY
+
+=transit neptune quincunx pallas
+LEAD
+BODY
+
+=transit neptune semisextile pallas
+LEAD
+BODY
+
+=transit neptune semisquare pallas
+LEAD
+BODY
+
+=transit neptune sesquiquadrate pallas
+LEAD
+BODY
+
+=transit neptune quintile pallas
+LEAD
+BODY
+
+=transit neptune sesquiquintile pallas
+LEAD
+BODY
+
+# neptune with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction juno
+LEAD
+BODY
+
+=transit neptune sextile juno
+LEAD
+BODY
+
+=transit neptune square juno
+LEAD
+BODY
+
+=transit neptune trine juno
+LEAD
+BODY
+
+=transit neptune opposition juno
+LEAD
+BODY
+
+=transit neptune quincunx juno
+LEAD
+BODY
+
+=transit neptune semisextile juno
+LEAD
+BODY
+
+=transit neptune semisquare juno
+LEAD
+BODY
+
+=transit neptune sesquiquadrate juno
+LEAD
+BODY
+
+=transit neptune quintile juno
+LEAD
+BODY
+
+=transit neptune sesquiquintile juno
+LEAD
+BODY
+
+# neptune with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction vesta
+LEAD
+BODY
+
+=transit neptune sextile vesta
+LEAD
+BODY
+
+=transit neptune square vesta
+LEAD
+BODY
+
+=transit neptune trine vesta
+LEAD
+BODY
+
+=transit neptune opposition vesta
+LEAD
+BODY
+
+=transit neptune quincunx vesta
+LEAD
+BODY
+
+=transit neptune semisextile vesta
+LEAD
+BODY
+
+=transit neptune semisquare vesta
+LEAD
+BODY
+
+=transit neptune sesquiquadrate vesta
+LEAD
+BODY
+
+=transit neptune quintile vesta
+LEAD
+BODY
+
+=transit neptune sesquiquintile vesta
+LEAD
+BODY
+
+# neptune with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction eris
+LEAD
+BODY
+
+=transit neptune sextile eris
+LEAD
+BODY
+
+=transit neptune square eris
+LEAD
+BODY
+
+=transit neptune trine eris
+LEAD
+BODY
+
+=transit neptune opposition eris
+LEAD
+BODY
+
+=transit neptune quincunx eris
+LEAD
+BODY
+
+=transit neptune semisextile eris
+LEAD
+BODY
+
+=transit neptune semisquare eris
+LEAD
+BODY
+
+=transit neptune sesquiquadrate eris
+LEAD
+BODY
+
+=transit neptune quintile eris
+LEAD
+BODY
+
+=transit neptune sesquiquintile eris
+LEAD
+BODY
+
+# neptune with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction eros
+LEAD
+BODY
+
+=transit neptune sextile eros
+LEAD
+BODY
+
+=transit neptune square eros
+LEAD
+BODY
+
+=transit neptune trine eros
+LEAD
+BODY
+
+=transit neptune opposition eros
+LEAD
+BODY
+
+=transit neptune quincunx eros
+LEAD
+BODY
+
+=transit neptune semisextile eros
+LEAD
+BODY
+
+=transit neptune semisquare eros
+LEAD
+BODY
+
+=transit neptune sesquiquadrate eros
+LEAD
+BODY
+
+=transit neptune quintile eros
+LEAD
+BODY
+
+=transit neptune sesquiquintile eros
+LEAD
+BODY
+
+# neptune with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction hygiea
+LEAD
+BODY
+
+=transit neptune sextile hygiea
+LEAD
+BODY
+
+=transit neptune square hygiea
+LEAD
+BODY
+
+=transit neptune trine hygiea
+LEAD
+BODY
+
+=transit neptune opposition hygiea
+LEAD
+BODY
+
+=transit neptune quincunx hygiea
+LEAD
+BODY
+
+=transit neptune semisextile hygiea
+LEAD
+BODY
+
+=transit neptune semisquare hygiea
+LEAD
+BODY
+
+=transit neptune sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit neptune quintile hygiea
+LEAD
+BODY
+
+=transit neptune sesquiquintile hygiea
+LEAD
+BODY
+
+# neptune with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction nessus
+LEAD
+BODY
+
+=transit neptune sextile nessus
+LEAD
+BODY
+
+=transit neptune square nessus
+LEAD
+BODY
+
+=transit neptune trine nessus
+LEAD
+BODY
+
+=transit neptune opposition nessus
+LEAD
+BODY
+
+=transit neptune quincunx nessus
+LEAD
+BODY
+
+=transit neptune semisextile nessus
+LEAD
+BODY
+
+=transit neptune semisquare nessus
+LEAD
+BODY
+
+=transit neptune sesquiquadrate nessus
+LEAD
+BODY
+
+=transit neptune quintile nessus
+LEAD
+BODY
+
+=transit neptune sesquiquintile nessus
+LEAD
+BODY
+
+# neptune with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction pholus
+LEAD
+BODY
+
+=transit neptune sextile pholus
+LEAD
+BODY
+
+=transit neptune square pholus
+LEAD
+BODY
+
+=transit neptune trine pholus
+LEAD
+BODY
+
+=transit neptune opposition pholus
+LEAD
+BODY
+
+=transit neptune quincunx pholus
+LEAD
+BODY
+
+=transit neptune semisextile pholus
+LEAD
+BODY
+
+=transit neptune semisquare pholus
+LEAD
+BODY
+
+=transit neptune sesquiquadrate pholus
+LEAD
+BODY
+
+=transit neptune quintile pholus
+LEAD
+BODY
+
+=transit neptune sesquiquintile pholus
+LEAD
+BODY
+
+# neptune with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction fortune
+LEAD
+BODY
+
+=transit neptune sextile fortune
+LEAD
+BODY
+
+=transit neptune square fortune
+LEAD
+BODY
+
+=transit neptune trine fortune
+LEAD
+BODY
+
+=transit neptune opposition fortune
+LEAD
+BODY
+
+=transit neptune quincunx fortune
+LEAD
+BODY
+
+=transit neptune semisextile fortune
+LEAD
+BODY
+
+=transit neptune semisquare fortune
+LEAD
+BODY
+
+=transit neptune sesquiquadrate fortune
+LEAD
+BODY
+
+=transit neptune quintile fortune
+LEAD
+BODY
+
+=transit neptune sesquiquintile fortune
+LEAD
+BODY
+
+# neptune with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction spirit
+LEAD
+BODY
+
+=transit neptune sextile spirit
+LEAD
+BODY
+
+=transit neptune square spirit
+LEAD
+BODY
+
+=transit neptune trine spirit
+LEAD
+BODY
+
+=transit neptune opposition spirit
+LEAD
+BODY
+
+=transit neptune quincunx spirit
+LEAD
+BODY
+
+=transit neptune semisextile spirit
+LEAD
+BODY
+
+=transit neptune semisquare spirit
+LEAD
+BODY
+
+=transit neptune sesquiquadrate spirit
+LEAD
+BODY
+
+=transit neptune quintile spirit
+LEAD
+BODY
+
+=transit neptune sesquiquintile spirit
+LEAD
+BODY
+
+# neptune with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction lilith
+LEAD
+BODY
+
+=transit neptune sextile lilith
+LEAD
+BODY
+
+=transit neptune square lilith
+LEAD
+BODY
+
+=transit neptune trine lilith
+LEAD
+BODY
+
+=transit neptune opposition lilith
+LEAD
+BODY
+
+=transit neptune quincunx lilith
+LEAD
+BODY
+
+=transit neptune semisextile lilith
+LEAD
+BODY
+
+=transit neptune semisquare lilith
+LEAD
+BODY
+
+=transit neptune sesquiquadrate lilith
+LEAD
+BODY
+
+=transit neptune quintile lilith
+LEAD
+BODY
+
+=transit neptune sesquiquintile lilith
+LEAD
+BODY
+
+# neptune with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction sun
+LEAD
+BODY
+
+=transit neptune sextile sun
+LEAD
+BODY
+
+=transit neptune square sun
+LEAD
+BODY
+
+=transit neptune trine sun
+LEAD
+BODY
+
+=transit neptune opposition sun
+LEAD
+BODY
+
+=transit neptune biquintile sun
+LEAD
+BODY
+
+=transit neptune septile sun
+LEAD
+BODY
+
+=transit neptune novile sun
+LEAD
+BODY
+
+=transit neptune decile sun
+LEAD
+BODY
+
+# neptune with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction moon
+LEAD
+BODY
+
+=transit neptune sextile moon
+LEAD
+BODY
+
+=transit neptune square moon
+LEAD
+BODY
+
+=transit neptune trine moon
+LEAD
+BODY
+
+=transit neptune opposition moon
+LEAD
+BODY
+
+=transit neptune biquintile moon
+LEAD
+BODY
+
+=transit neptune septile moon
+LEAD
+BODY
+
+=transit neptune novile moon
+LEAD
+BODY
+
+=transit neptune decile moon
+LEAD
+BODY
+
+# neptune with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction mercury
+LEAD
+BODY
+
+=transit neptune sextile mercury
+LEAD
+BODY
+
+=transit neptune square mercury
+LEAD
+BODY
+
+=transit neptune trine mercury
+LEAD
+BODY
+
+=transit neptune opposition mercury
+LEAD
+BODY
+
+=transit neptune biquintile mercury
+LEAD
+BODY
+
+=transit neptune septile mercury
+LEAD
+BODY
+
+=transit neptune novile mercury
+LEAD
+BODY
+
+=transit neptune decile mercury
+LEAD
+BODY
+
+# neptune with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction venus
+LEAD
+BODY
+
+=transit neptune sextile venus
+LEAD
+BODY
+
+=transit neptune square venus
+LEAD
+BODY
+
+=transit neptune trine venus
+LEAD
+BODY
+
+=transit neptune opposition venus
+LEAD
+BODY
+
+=transit neptune biquintile venus
+LEAD
+BODY
+
+=transit neptune septile venus
+LEAD
+BODY
+
+=transit neptune novile venus
+LEAD
+BODY
+
+=transit neptune decile venus
+LEAD
+BODY
+
+# neptune with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction mars
+LEAD
+BODY
+
+=transit neptune sextile mars
+LEAD
+BODY
+
+=transit neptune square mars
+LEAD
+BODY
+
+=transit neptune trine mars
+LEAD
+BODY
+
+=transit neptune opposition mars
+LEAD
+BODY
+
+=transit neptune biquintile mars
+LEAD
+BODY
+
+=transit neptune septile mars
+LEAD
+BODY
+
+=transit neptune novile mars
+LEAD
+BODY
+
+=transit neptune decile mars
+LEAD
+BODY
+
+# neptune with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction jupiter
+LEAD
+BODY
+
+=transit neptune sextile jupiter
+LEAD
+BODY
+
+=transit neptune square jupiter
+LEAD
+BODY
+
+=transit neptune trine jupiter
+LEAD
+BODY
+
+=transit neptune opposition jupiter
+LEAD
+BODY
+
+=transit neptune biquintile jupiter
+LEAD
+BODY
+
+=transit neptune septile jupiter
+LEAD
+BODY
+
+=transit neptune novile jupiter
+LEAD
+BODY
+
+=transit neptune decile jupiter
+LEAD
+BODY
+
+# neptune with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction saturn
+LEAD
+BODY
+
+=transit neptune sextile saturn
+LEAD
+BODY
+
+=transit neptune square saturn
+LEAD
+BODY
+
+=transit neptune trine saturn
+LEAD
+BODY
+
+=transit neptune opposition saturn
+LEAD
+BODY
+
+=transit neptune biquintile saturn
+LEAD
+BODY
+
+=transit neptune septile saturn
+LEAD
+BODY
+
+=transit neptune novile saturn
+LEAD
+BODY
+
+=transit neptune decile saturn
+LEAD
+BODY
+
+# neptune with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction uranus
+LEAD
+BODY
+
+=transit neptune sextile uranus
+LEAD
+BODY
+
+=transit neptune square uranus
+LEAD
+BODY
+
+=transit neptune trine uranus
+LEAD
+BODY
+
+=transit neptune opposition uranus
+LEAD
+BODY
+
+=transit neptune biquintile uranus
+LEAD
+BODY
+
+=transit neptune septile uranus
+LEAD
+BODY
+
+=transit neptune novile uranus
+LEAD
+BODY
+
+=transit neptune decile uranus
+LEAD
+BODY
+
+# neptune with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction neptune
+LEAD
+BODY
+
+=transit neptune sextile neptune
+LEAD
+BODY
+
+=transit neptune square neptune
+LEAD
+BODY
+
+=transit neptune trine neptune
+LEAD
+BODY
+
+=transit neptune opposition neptune
+LEAD
+BODY
+
+=transit neptune biquintile neptune
+LEAD
+BODY
+
+=transit neptune septile neptune
+LEAD
+BODY
+
+=transit neptune novile neptune
+LEAD
+BODY
+
+=transit neptune decile neptune
+LEAD
+BODY
+
+# neptune with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction pluto
+LEAD
+BODY
+
+=transit neptune sextile pluto
+LEAD
+BODY
+
+=transit neptune square pluto
+LEAD
+BODY
+
+=transit neptune trine pluto
+LEAD
+BODY
+
+=transit neptune opposition pluto
+LEAD
+BODY
+
+=transit neptune biquintile pluto
+LEAD
+BODY
+
+=transit neptune septile pluto
+LEAD
+BODY
+
+=transit neptune novile pluto
+LEAD
+BODY
+
+=transit neptune decile pluto
+LEAD
+BODY
+
+# neptune with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction chiron
+LEAD
+BODY
+
+=transit neptune sextile chiron
+LEAD
+BODY
+
+=transit neptune square chiron
+LEAD
+BODY
+
+=transit neptune trine chiron
+LEAD
+BODY
+
+=transit neptune opposition chiron
+LEAD
+BODY
+
+=transit neptune biquintile chiron
+LEAD
+BODY
+
+=transit neptune septile chiron
+LEAD
+BODY
+
+=transit neptune novile chiron
+LEAD
+BODY
+
+=transit neptune decile chiron
+LEAD
+BODY
+
+# neptune with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit neptune conjunction north_node
+LEAD
+BODY
+
+=transit neptune sextile north_node
+LEAD
+BODY
+
+=transit neptune square north_node
+LEAD
+BODY
+
+=transit neptune trine north_node
+LEAD
+BODY
+
+=transit neptune opposition north_node
+LEAD
+BODY
+
+=transit neptune biquintile north_node
+LEAD
+BODY
+
+=transit neptune septile north_node
+LEAD
+BODY
+
+=transit neptune novile north_node
+LEAD
+BODY
+
+=transit neptune decile north_node
+LEAD
+BODY

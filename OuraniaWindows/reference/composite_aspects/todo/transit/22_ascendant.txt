@@ -1,0 +1,1437 @@
+# transit: ascendant - 352 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# ascendant with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction descendant
+LEAD
+BODY
+
+=transit ascendant sextile descendant
+LEAD
+BODY
+
+=transit ascendant square descendant
+LEAD
+BODY
+
+=transit ascendant trine descendant
+LEAD
+BODY
+
+=transit ascendant opposition descendant
+LEAD
+BODY
+
+=transit ascendant quincunx descendant
+LEAD
+BODY
+
+=transit ascendant semisextile descendant
+LEAD
+BODY
+
+=transit ascendant semisquare descendant
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate descendant
+LEAD
+BODY
+
+=transit ascendant quintile descendant
+LEAD
+BODY
+
+=transit ascendant sesquiquintile descendant
+LEAD
+BODY
+
+# ascendant with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction mc
+LEAD
+BODY
+
+=transit ascendant sextile mc
+LEAD
+BODY
+
+=transit ascendant square mc
+LEAD
+BODY
+
+=transit ascendant trine mc
+LEAD
+BODY
+
+=transit ascendant opposition mc
+LEAD
+BODY
+
+=transit ascendant quincunx mc
+LEAD
+BODY
+
+=transit ascendant semisextile mc
+LEAD
+BODY
+
+=transit ascendant semisquare mc
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate mc
+LEAD
+BODY
+
+=transit ascendant quintile mc
+LEAD
+BODY
+
+=transit ascendant sesquiquintile mc
+LEAD
+BODY
+
+# ascendant with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction ic
+LEAD
+BODY
+
+=transit ascendant sextile ic
+LEAD
+BODY
+
+=transit ascendant square ic
+LEAD
+BODY
+
+=transit ascendant trine ic
+LEAD
+BODY
+
+=transit ascendant opposition ic
+LEAD
+BODY
+
+=transit ascendant quincunx ic
+LEAD
+BODY
+
+=transit ascendant semisextile ic
+LEAD
+BODY
+
+=transit ascendant semisquare ic
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate ic
+LEAD
+BODY
+
+=transit ascendant quintile ic
+LEAD
+BODY
+
+=transit ascendant sesquiquintile ic
+LEAD
+BODY
+
+# ascendant with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction south_node
+LEAD
+BODY
+
+=transit ascendant sextile south_node
+LEAD
+BODY
+
+=transit ascendant square south_node
+LEAD
+BODY
+
+=transit ascendant trine south_node
+LEAD
+BODY
+
+=transit ascendant opposition south_node
+LEAD
+BODY
+
+=transit ascendant quincunx south_node
+LEAD
+BODY
+
+=transit ascendant semisextile south_node
+LEAD
+BODY
+
+=transit ascendant semisquare south_node
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate south_node
+LEAD
+BODY
+
+=transit ascendant quintile south_node
+LEAD
+BODY
+
+=transit ascendant sesquiquintile south_node
+LEAD
+BODY
+
+# ascendant with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction ceres
+LEAD
+BODY
+
+=transit ascendant sextile ceres
+LEAD
+BODY
+
+=transit ascendant square ceres
+LEAD
+BODY
+
+=transit ascendant trine ceres
+LEAD
+BODY
+
+=transit ascendant opposition ceres
+LEAD
+BODY
+
+=transit ascendant quincunx ceres
+LEAD
+BODY
+
+=transit ascendant semisextile ceres
+LEAD
+BODY
+
+=transit ascendant semisquare ceres
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate ceres
+LEAD
+BODY
+
+=transit ascendant quintile ceres
+LEAD
+BODY
+
+=transit ascendant sesquiquintile ceres
+LEAD
+BODY
+
+# ascendant with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction pallas
+LEAD
+BODY
+
+=transit ascendant sextile pallas
+LEAD
+BODY
+
+=transit ascendant square pallas
+LEAD
+BODY
+
+=transit ascendant trine pallas
+LEAD
+BODY
+
+=transit ascendant opposition pallas
+LEAD
+BODY
+
+=transit ascendant quincunx pallas
+LEAD
+BODY
+
+=transit ascendant semisextile pallas
+LEAD
+BODY
+
+=transit ascendant semisquare pallas
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate pallas
+LEAD
+BODY
+
+=transit ascendant quintile pallas
+LEAD
+BODY
+
+=transit ascendant sesquiquintile pallas
+LEAD
+BODY
+
+# ascendant with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction juno
+LEAD
+BODY
+
+=transit ascendant sextile juno
+LEAD
+BODY
+
+=transit ascendant square juno
+LEAD
+BODY
+
+=transit ascendant trine juno
+LEAD
+BODY
+
+=transit ascendant opposition juno
+LEAD
+BODY
+
+=transit ascendant quincunx juno
+LEAD
+BODY
+
+=transit ascendant semisextile juno
+LEAD
+BODY
+
+=transit ascendant semisquare juno
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate juno
+LEAD
+BODY
+
+=transit ascendant quintile juno
+LEAD
+BODY
+
+=transit ascendant sesquiquintile juno
+LEAD
+BODY
+
+# ascendant with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction vesta
+LEAD
+BODY
+
+=transit ascendant sextile vesta
+LEAD
+BODY
+
+=transit ascendant square vesta
+LEAD
+BODY
+
+=transit ascendant trine vesta
+LEAD
+BODY
+
+=transit ascendant opposition vesta
+LEAD
+BODY
+
+=transit ascendant quincunx vesta
+LEAD
+BODY
+
+=transit ascendant semisextile vesta
+LEAD
+BODY
+
+=transit ascendant semisquare vesta
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate vesta
+LEAD
+BODY
+
+=transit ascendant quintile vesta
+LEAD
+BODY
+
+=transit ascendant sesquiquintile vesta
+LEAD
+BODY
+
+# ascendant with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction eris
+LEAD
+BODY
+
+=transit ascendant sextile eris
+LEAD
+BODY
+
+=transit ascendant square eris
+LEAD
+BODY
+
+=transit ascendant trine eris
+LEAD
+BODY
+
+=transit ascendant opposition eris
+LEAD
+BODY
+
+=transit ascendant quincunx eris
+LEAD
+BODY
+
+=transit ascendant semisextile eris
+LEAD
+BODY
+
+=transit ascendant semisquare eris
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate eris
+LEAD
+BODY
+
+=transit ascendant quintile eris
+LEAD
+BODY
+
+=transit ascendant sesquiquintile eris
+LEAD
+BODY
+
+# ascendant with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction eros
+LEAD
+BODY
+
+=transit ascendant sextile eros
+LEAD
+BODY
+
+=transit ascendant square eros
+LEAD
+BODY
+
+=transit ascendant trine eros
+LEAD
+BODY
+
+=transit ascendant opposition eros
+LEAD
+BODY
+
+=transit ascendant quincunx eros
+LEAD
+BODY
+
+=transit ascendant semisextile eros
+LEAD
+BODY
+
+=transit ascendant semisquare eros
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate eros
+LEAD
+BODY
+
+=transit ascendant quintile eros
+LEAD
+BODY
+
+=transit ascendant sesquiquintile eros
+LEAD
+BODY
+
+# ascendant with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction hygiea
+LEAD
+BODY
+
+=transit ascendant sextile hygiea
+LEAD
+BODY
+
+=transit ascendant square hygiea
+LEAD
+BODY
+
+=transit ascendant trine hygiea
+LEAD
+BODY
+
+=transit ascendant opposition hygiea
+LEAD
+BODY
+
+=transit ascendant quincunx hygiea
+LEAD
+BODY
+
+=transit ascendant semisextile hygiea
+LEAD
+BODY
+
+=transit ascendant semisquare hygiea
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit ascendant quintile hygiea
+LEAD
+BODY
+
+=transit ascendant sesquiquintile hygiea
+LEAD
+BODY
+
+# ascendant with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction nessus
+LEAD
+BODY
+
+=transit ascendant sextile nessus
+LEAD
+BODY
+
+=transit ascendant square nessus
+LEAD
+BODY
+
+=transit ascendant trine nessus
+LEAD
+BODY
+
+=transit ascendant opposition nessus
+LEAD
+BODY
+
+=transit ascendant quincunx nessus
+LEAD
+BODY
+
+=transit ascendant semisextile nessus
+LEAD
+BODY
+
+=transit ascendant semisquare nessus
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate nessus
+LEAD
+BODY
+
+=transit ascendant quintile nessus
+LEAD
+BODY
+
+=transit ascendant sesquiquintile nessus
+LEAD
+BODY
+
+# ascendant with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction pholus
+LEAD
+BODY
+
+=transit ascendant sextile pholus
+LEAD
+BODY
+
+=transit ascendant square pholus
+LEAD
+BODY
+
+=transit ascendant trine pholus
+LEAD
+BODY
+
+=transit ascendant opposition pholus
+LEAD
+BODY
+
+=transit ascendant quincunx pholus
+LEAD
+BODY
+
+=transit ascendant semisextile pholus
+LEAD
+BODY
+
+=transit ascendant semisquare pholus
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate pholus
+LEAD
+BODY
+
+=transit ascendant quintile pholus
+LEAD
+BODY
+
+=transit ascendant sesquiquintile pholus
+LEAD
+BODY
+
+# ascendant with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction fortune
+LEAD
+BODY
+
+=transit ascendant sextile fortune
+LEAD
+BODY
+
+=transit ascendant square fortune
+LEAD
+BODY
+
+=transit ascendant trine fortune
+LEAD
+BODY
+
+=transit ascendant opposition fortune
+LEAD
+BODY
+
+=transit ascendant quincunx fortune
+LEAD
+BODY
+
+=transit ascendant semisextile fortune
+LEAD
+BODY
+
+=transit ascendant semisquare fortune
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate fortune
+LEAD
+BODY
+
+=transit ascendant quintile fortune
+LEAD
+BODY
+
+=transit ascendant sesquiquintile fortune
+LEAD
+BODY
+
+# ascendant with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction spirit
+LEAD
+BODY
+
+=transit ascendant sextile spirit
+LEAD
+BODY
+
+=transit ascendant square spirit
+LEAD
+BODY
+
+=transit ascendant trine spirit
+LEAD
+BODY
+
+=transit ascendant opposition spirit
+LEAD
+BODY
+
+=transit ascendant quincunx spirit
+LEAD
+BODY
+
+=transit ascendant semisextile spirit
+LEAD
+BODY
+
+=transit ascendant semisquare spirit
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate spirit
+LEAD
+BODY
+
+=transit ascendant quintile spirit
+LEAD
+BODY
+
+=transit ascendant sesquiquintile spirit
+LEAD
+BODY
+
+# ascendant with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction lilith
+LEAD
+BODY
+
+=transit ascendant sextile lilith
+LEAD
+BODY
+
+=transit ascendant square lilith
+LEAD
+BODY
+
+=transit ascendant trine lilith
+LEAD
+BODY
+
+=transit ascendant opposition lilith
+LEAD
+BODY
+
+=transit ascendant quincunx lilith
+LEAD
+BODY
+
+=transit ascendant semisextile lilith
+LEAD
+BODY
+
+=transit ascendant semisquare lilith
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate lilith
+LEAD
+BODY
+
+=transit ascendant quintile lilith
+LEAD
+BODY
+
+=transit ascendant sesquiquintile lilith
+LEAD
+BODY
+
+# ascendant with moon: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction moon
+LEAD
+BODY
+
+=transit ascendant sextile moon
+LEAD
+BODY
+
+=transit ascendant square moon
+LEAD
+BODY
+
+=transit ascendant trine moon
+LEAD
+BODY
+
+=transit ascendant opposition moon
+LEAD
+BODY
+
+=transit ascendant quincunx moon
+LEAD
+BODY
+
+=transit ascendant semisextile moon
+LEAD
+BODY
+
+=transit ascendant semisquare moon
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate moon
+LEAD
+BODY
+
+=transit ascendant quintile moon
+LEAD
+BODY
+
+=transit ascendant biquintile moon
+LEAD
+BODY
+
+=transit ascendant sesquiquintile moon
+LEAD
+BODY
+
+=transit ascendant septile moon
+LEAD
+BODY
+
+=transit ascendant novile moon
+LEAD
+BODY
+
+=transit ascendant decile moon
+LEAD
+BODY
+
+# ascendant with sun: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction sun
+LEAD
+BODY
+
+=transit ascendant sextile sun
+LEAD
+BODY
+
+=transit ascendant square sun
+LEAD
+BODY
+
+=transit ascendant trine sun
+LEAD
+BODY
+
+=transit ascendant opposition sun
+LEAD
+BODY
+
+=transit ascendant quincunx sun
+LEAD
+BODY
+
+=transit ascendant semisextile sun
+LEAD
+BODY
+
+=transit ascendant semisquare sun
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate sun
+LEAD
+BODY
+
+=transit ascendant quintile sun
+LEAD
+BODY
+
+=transit ascendant biquintile sun
+LEAD
+BODY
+
+=transit ascendant sesquiquintile sun
+LEAD
+BODY
+
+=transit ascendant septile sun
+LEAD
+BODY
+
+=transit ascendant novile sun
+LEAD
+BODY
+
+=transit ascendant decile sun
+LEAD
+BODY
+
+# ascendant with mercury: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction mercury
+LEAD
+BODY
+
+=transit ascendant sextile mercury
+LEAD
+BODY
+
+=transit ascendant square mercury
+LEAD
+BODY
+
+=transit ascendant trine mercury
+LEAD
+BODY
+
+=transit ascendant opposition mercury
+LEAD
+BODY
+
+=transit ascendant quincunx mercury
+LEAD
+BODY
+
+=transit ascendant semisextile mercury
+LEAD
+BODY
+
+=transit ascendant semisquare mercury
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate mercury
+LEAD
+BODY
+
+=transit ascendant quintile mercury
+LEAD
+BODY
+
+=transit ascendant biquintile mercury
+LEAD
+BODY
+
+=transit ascendant sesquiquintile mercury
+LEAD
+BODY
+
+=transit ascendant septile mercury
+LEAD
+BODY
+
+=transit ascendant novile mercury
+LEAD
+BODY
+
+=transit ascendant decile mercury
+LEAD
+BODY
+
+# ascendant with venus: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction venus
+LEAD
+BODY
+
+=transit ascendant sextile venus
+LEAD
+BODY
+
+=transit ascendant square venus
+LEAD
+BODY
+
+=transit ascendant trine venus
+LEAD
+BODY
+
+=transit ascendant opposition venus
+LEAD
+BODY
+
+=transit ascendant quincunx venus
+LEAD
+BODY
+
+=transit ascendant semisextile venus
+LEAD
+BODY
+
+=transit ascendant semisquare venus
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate venus
+LEAD
+BODY
+
+=transit ascendant quintile venus
+LEAD
+BODY
+
+=transit ascendant biquintile venus
+LEAD
+BODY
+
+=transit ascendant sesquiquintile venus
+LEAD
+BODY
+
+=transit ascendant septile venus
+LEAD
+BODY
+
+=transit ascendant novile venus
+LEAD
+BODY
+
+=transit ascendant decile venus
+LEAD
+BODY
+
+# ascendant with mars: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction mars
+LEAD
+BODY
+
+=transit ascendant sextile mars
+LEAD
+BODY
+
+=transit ascendant square mars
+LEAD
+BODY
+
+=transit ascendant trine mars
+LEAD
+BODY
+
+=transit ascendant opposition mars
+LEAD
+BODY
+
+=transit ascendant quincunx mars
+LEAD
+BODY
+
+=transit ascendant semisextile mars
+LEAD
+BODY
+
+=transit ascendant semisquare mars
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate mars
+LEAD
+BODY
+
+=transit ascendant quintile mars
+LEAD
+BODY
+
+=transit ascendant biquintile mars
+LEAD
+BODY
+
+=transit ascendant sesquiquintile mars
+LEAD
+BODY
+
+=transit ascendant septile mars
+LEAD
+BODY
+
+=transit ascendant novile mars
+LEAD
+BODY
+
+=transit ascendant decile mars
+LEAD
+BODY
+
+# ascendant with jupiter: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction jupiter
+LEAD
+BODY
+
+=transit ascendant sextile jupiter
+LEAD
+BODY
+
+=transit ascendant square jupiter
+LEAD
+BODY
+
+=transit ascendant trine jupiter
+LEAD
+BODY
+
+=transit ascendant opposition jupiter
+LEAD
+BODY
+
+=transit ascendant quincunx jupiter
+LEAD
+BODY
+
+=transit ascendant semisextile jupiter
+LEAD
+BODY
+
+=transit ascendant semisquare jupiter
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit ascendant quintile jupiter
+LEAD
+BODY
+
+=transit ascendant biquintile jupiter
+LEAD
+BODY
+
+=transit ascendant sesquiquintile jupiter
+LEAD
+BODY
+
+=transit ascendant septile jupiter
+LEAD
+BODY
+
+=transit ascendant novile jupiter
+LEAD
+BODY
+
+=transit ascendant decile jupiter
+LEAD
+BODY
+
+# ascendant with saturn: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction saturn
+LEAD
+BODY
+
+=transit ascendant sextile saturn
+LEAD
+BODY
+
+=transit ascendant square saturn
+LEAD
+BODY
+
+=transit ascendant trine saturn
+LEAD
+BODY
+
+=transit ascendant opposition saturn
+LEAD
+BODY
+
+=transit ascendant quincunx saturn
+LEAD
+BODY
+
+=transit ascendant semisextile saturn
+LEAD
+BODY
+
+=transit ascendant semisquare saturn
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate saturn
+LEAD
+BODY
+
+=transit ascendant quintile saturn
+LEAD
+BODY
+
+=transit ascendant biquintile saturn
+LEAD
+BODY
+
+=transit ascendant sesquiquintile saturn
+LEAD
+BODY
+
+=transit ascendant septile saturn
+LEAD
+BODY
+
+=transit ascendant novile saturn
+LEAD
+BODY
+
+=transit ascendant decile saturn
+LEAD
+BODY
+
+# ascendant with uranus: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction uranus
+LEAD
+BODY
+
+=transit ascendant sextile uranus
+LEAD
+BODY
+
+=transit ascendant square uranus
+LEAD
+BODY
+
+=transit ascendant trine uranus
+LEAD
+BODY
+
+=transit ascendant opposition uranus
+LEAD
+BODY
+
+=transit ascendant quincunx uranus
+LEAD
+BODY
+
+=transit ascendant semisextile uranus
+LEAD
+BODY
+
+=transit ascendant semisquare uranus
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate uranus
+LEAD
+BODY
+
+=transit ascendant quintile uranus
+LEAD
+BODY
+
+=transit ascendant biquintile uranus
+LEAD
+BODY
+
+=transit ascendant sesquiquintile uranus
+LEAD
+BODY
+
+=transit ascendant septile uranus
+LEAD
+BODY
+
+=transit ascendant novile uranus
+LEAD
+BODY
+
+=transit ascendant decile uranus
+LEAD
+BODY
+
+# ascendant with neptune: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction neptune
+LEAD
+BODY
+
+=transit ascendant sextile neptune
+LEAD
+BODY
+
+=transit ascendant square neptune
+LEAD
+BODY
+
+=transit ascendant trine neptune
+LEAD
+BODY
+
+=transit ascendant opposition neptune
+LEAD
+BODY
+
+=transit ascendant quincunx neptune
+LEAD
+BODY
+
+=transit ascendant semisextile neptune
+LEAD
+BODY
+
+=transit ascendant semisquare neptune
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate neptune
+LEAD
+BODY
+
+=transit ascendant quintile neptune
+LEAD
+BODY
+
+=transit ascendant biquintile neptune
+LEAD
+BODY
+
+=transit ascendant sesquiquintile neptune
+LEAD
+BODY
+
+=transit ascendant septile neptune
+LEAD
+BODY
+
+=transit ascendant novile neptune
+LEAD
+BODY
+
+=transit ascendant decile neptune
+LEAD
+BODY
+
+# ascendant with pluto: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction pluto
+LEAD
+BODY
+
+=transit ascendant sextile pluto
+LEAD
+BODY
+
+=transit ascendant square pluto
+LEAD
+BODY
+
+=transit ascendant trine pluto
+LEAD
+BODY
+
+=transit ascendant opposition pluto
+LEAD
+BODY
+
+=transit ascendant quincunx pluto
+LEAD
+BODY
+
+=transit ascendant semisextile pluto
+LEAD
+BODY
+
+=transit ascendant semisquare pluto
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate pluto
+LEAD
+BODY
+
+=transit ascendant quintile pluto
+LEAD
+BODY
+
+=transit ascendant biquintile pluto
+LEAD
+BODY
+
+=transit ascendant sesquiquintile pluto
+LEAD
+BODY
+
+=transit ascendant septile pluto
+LEAD
+BODY
+
+=transit ascendant novile pluto
+LEAD
+BODY
+
+=transit ascendant decile pluto
+LEAD
+BODY
+
+# ascendant with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction north_node
+LEAD
+BODY
+
+=transit ascendant sextile north_node
+LEAD
+BODY
+
+=transit ascendant square north_node
+LEAD
+BODY
+
+=transit ascendant trine north_node
+LEAD
+BODY
+
+=transit ascendant opposition north_node
+LEAD
+BODY
+
+=transit ascendant quincunx north_node
+LEAD
+BODY
+
+=transit ascendant semisextile north_node
+LEAD
+BODY
+
+=transit ascendant semisquare north_node
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate north_node
+LEAD
+BODY
+
+=transit ascendant quintile north_node
+LEAD
+BODY
+
+=transit ascendant sesquiquintile north_node
+LEAD
+BODY
+
+# ascendant with chiron: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit ascendant conjunction chiron
+LEAD
+BODY
+
+=transit ascendant sextile chiron
+LEAD
+BODY
+
+=transit ascendant square chiron
+LEAD
+BODY
+
+=transit ascendant trine chiron
+LEAD
+BODY
+
+=transit ascendant opposition chiron
+LEAD
+BODY
+
+=transit ascendant quincunx chiron
+LEAD
+BODY
+
+=transit ascendant semisextile chiron
+LEAD
+BODY
+
+=transit ascendant semisquare chiron
+LEAD
+BODY
+
+=transit ascendant sesquiquadrate chiron
+LEAD
+BODY
+
+=transit ascendant quintile chiron
+LEAD
+BODY
+
+=transit ascendant biquintile chiron
+LEAD
+BODY
+
+=transit ascendant sesquiquintile chiron
+LEAD
+BODY
+
+=transit ascendant septile chiron
+LEAD
+BODY
+
+=transit ascendant novile chiron
+LEAD
+BODY
+
+=transit ascendant decile chiron
+LEAD
+BODY

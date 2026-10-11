@@ -1,0 +1,463 @@
+# composite: hygiea - 110 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# hygiea with ascendant: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction ascendant
+LEAD
+BODY
+
+=hygiea sextile ascendant
+LEAD
+BODY
+
+=hygiea square ascendant
+LEAD
+BODY
+
+=hygiea trine ascendant
+LEAD
+BODY
+
+=hygiea opposition ascendant
+LEAD
+BODY
+
+# hygiea with chiron: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction chiron
+LEAD
+BODY
+
+=hygiea sextile chiron
+LEAD
+BODY
+
+=hygiea square chiron
+LEAD
+BODY
+
+=hygiea trine chiron
+LEAD
+BODY
+
+=hygiea opposition chiron
+LEAD
+BODY
+
+# hygiea with jupiter: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction jupiter
+LEAD
+BODY
+
+=hygiea sextile jupiter
+LEAD
+BODY
+
+=hygiea square jupiter
+LEAD
+BODY
+
+=hygiea trine jupiter
+LEAD
+BODY
+
+=hygiea opposition jupiter
+LEAD
+BODY
+
+# hygiea with mars: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction mars
+LEAD
+BODY
+
+=hygiea sextile mars
+LEAD
+BODY
+
+=hygiea square mars
+LEAD
+BODY
+
+=hygiea trine mars
+LEAD
+BODY
+
+=hygiea opposition mars
+LEAD
+BODY
+
+# hygiea with mercury: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction mercury
+LEAD
+BODY
+
+=hygiea sextile mercury
+LEAD
+BODY
+
+=hygiea square mercury
+LEAD
+BODY
+
+=hygiea trine mercury
+LEAD
+BODY
+
+=hygiea opposition mercury
+LEAD
+BODY
+
+# hygiea with mc: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction mc
+LEAD
+BODY
+
+=hygiea sextile mc
+LEAD
+BODY
+
+=hygiea square mc
+LEAD
+BODY
+
+=hygiea trine mc
+LEAD
+BODY
+
+=hygiea opposition mc
+LEAD
+BODY
+
+# hygiea with moon: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction moon
+LEAD
+BODY
+
+=hygiea sextile moon
+LEAD
+BODY
+
+=hygiea square moon
+LEAD
+BODY
+
+=hygiea trine moon
+LEAD
+BODY
+
+=hygiea opposition moon
+LEAD
+BODY
+
+# hygiea with neptune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction neptune
+LEAD
+BODY
+
+=hygiea sextile neptune
+LEAD
+BODY
+
+=hygiea square neptune
+LEAD
+BODY
+
+=hygiea trine neptune
+LEAD
+BODY
+
+=hygiea opposition neptune
+LEAD
+BODY
+
+# hygiea with north_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction north_node
+LEAD
+BODY
+
+=hygiea sextile north_node
+LEAD
+BODY
+
+=hygiea square north_node
+LEAD
+BODY
+
+=hygiea trine north_node
+LEAD
+BODY
+
+=hygiea opposition north_node
+LEAD
+BODY
+
+# hygiea with pluto: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction pluto
+LEAD
+BODY
+
+=hygiea sextile pluto
+LEAD
+BODY
+
+=hygiea square pluto
+LEAD
+BODY
+
+=hygiea trine pluto
+LEAD
+BODY
+
+=hygiea opposition pluto
+LEAD
+BODY
+
+# hygiea with saturn: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction saturn
+LEAD
+BODY
+
+=hygiea sextile saturn
+LEAD
+BODY
+
+=hygiea square saturn
+LEAD
+BODY
+
+=hygiea trine saturn
+LEAD
+BODY
+
+=hygiea opposition saturn
+LEAD
+BODY
+
+# hygiea with sun: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction sun
+LEAD
+BODY
+
+=hygiea sextile sun
+LEAD
+BODY
+
+=hygiea square sun
+LEAD
+BODY
+
+=hygiea trine sun
+LEAD
+BODY
+
+=hygiea opposition sun
+LEAD
+BODY
+
+# hygiea with uranus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction uranus
+LEAD
+BODY
+
+=hygiea sextile uranus
+LEAD
+BODY
+
+=hygiea square uranus
+LEAD
+BODY
+
+=hygiea trine uranus
+LEAD
+BODY
+
+=hygiea opposition uranus
+LEAD
+BODY
+
+# hygiea with venus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction venus
+LEAD
+BODY
+
+=hygiea sextile venus
+LEAD
+BODY
+
+=hygiea square venus
+LEAD
+BODY
+
+=hygiea trine venus
+LEAD
+BODY
+
+=hygiea opposition venus
+LEAD
+BODY
+
+# hygiea with juno: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction juno
+LEAD
+BODY
+
+=hygiea sextile juno
+LEAD
+BODY
+
+=hygiea square juno
+LEAD
+BODY
+
+=hygiea trine juno
+LEAD
+BODY
+
+=hygiea opposition juno
+LEAD
+BODY
+
+# hygiea with nessus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction nessus
+LEAD
+BODY
+
+=hygiea sextile nessus
+LEAD
+BODY
+
+=hygiea square nessus
+LEAD
+BODY
+
+=hygiea trine nessus
+LEAD
+BODY
+
+=hygiea opposition nessus
+LEAD
+BODY
+
+# hygiea with pallas: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction pallas
+LEAD
+BODY
+
+=hygiea sextile pallas
+LEAD
+BODY
+
+=hygiea square pallas
+LEAD
+BODY
+
+=hygiea trine pallas
+LEAD
+BODY
+
+=hygiea opposition pallas
+LEAD
+BODY
+
+# hygiea with fortune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction fortune
+LEAD
+BODY
+
+=hygiea sextile fortune
+LEAD
+BODY
+
+=hygiea square fortune
+LEAD
+BODY
+
+=hygiea trine fortune
+LEAD
+BODY
+
+=hygiea opposition fortune
+LEAD
+BODY
+
+# hygiea with spirit: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction spirit
+LEAD
+BODY
+
+=hygiea sextile spirit
+LEAD
+BODY
+
+=hygiea square spirit
+LEAD
+BODY
+
+=hygiea trine spirit
+LEAD
+BODY
+
+=hygiea opposition spirit
+LEAD
+BODY
+
+# hygiea with pholus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction pholus
+LEAD
+BODY
+
+=hygiea sextile pholus
+LEAD
+BODY
+
+=hygiea square pholus
+LEAD
+BODY
+
+=hygiea trine pholus
+LEAD
+BODY
+
+=hygiea opposition pholus
+LEAD
+BODY
+
+# hygiea with south_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction south_node
+LEAD
+BODY
+
+=hygiea sextile south_node
+LEAD
+BODY
+
+=hygiea square south_node
+LEAD
+BODY
+
+=hygiea trine south_node
+LEAD
+BODY
+
+=hygiea opposition south_node
+LEAD
+BODY
+
+# hygiea with vesta: 5 readings, one per aspect. Each must read differently from the others in this group.
+=hygiea conjunction vesta
+LEAD
+BODY
+
+=hygiea sextile vesta
+LEAD
+BODY
+
+=hygiea square vesta
+LEAD
+BODY
+
+=hygiea trine vesta
+LEAD
+BODY
+
+=hygiea opposition vesta
+LEAD
+BODY

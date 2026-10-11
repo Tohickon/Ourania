@@ -1,0 +1,1261 @@
+# transit: vesta - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# vesta with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction ascendant
+LEAD
+BODY
+
+=transit vesta sextile ascendant
+LEAD
+BODY
+
+=transit vesta square ascendant
+LEAD
+BODY
+
+=transit vesta trine ascendant
+LEAD
+BODY
+
+=transit vesta opposition ascendant
+LEAD
+BODY
+
+=transit vesta quincunx ascendant
+LEAD
+BODY
+
+=transit vesta semisextile ascendant
+LEAD
+BODY
+
+=transit vesta semisquare ascendant
+LEAD
+BODY
+
+=transit vesta sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit vesta quintile ascendant
+LEAD
+BODY
+
+=transit vesta sesquiquintile ascendant
+LEAD
+BODY
+
+# vesta with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction descendant
+LEAD
+BODY
+
+=transit vesta sextile descendant
+LEAD
+BODY
+
+=transit vesta square descendant
+LEAD
+BODY
+
+=transit vesta trine descendant
+LEAD
+BODY
+
+=transit vesta opposition descendant
+LEAD
+BODY
+
+=transit vesta quincunx descendant
+LEAD
+BODY
+
+=transit vesta semisextile descendant
+LEAD
+BODY
+
+=transit vesta semisquare descendant
+LEAD
+BODY
+
+=transit vesta sesquiquadrate descendant
+LEAD
+BODY
+
+=transit vesta quintile descendant
+LEAD
+BODY
+
+=transit vesta sesquiquintile descendant
+LEAD
+BODY
+
+# vesta with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction mc
+LEAD
+BODY
+
+=transit vesta sextile mc
+LEAD
+BODY
+
+=transit vesta square mc
+LEAD
+BODY
+
+=transit vesta trine mc
+LEAD
+BODY
+
+=transit vesta opposition mc
+LEAD
+BODY
+
+=transit vesta quincunx mc
+LEAD
+BODY
+
+=transit vesta semisextile mc
+LEAD
+BODY
+
+=transit vesta semisquare mc
+LEAD
+BODY
+
+=transit vesta sesquiquadrate mc
+LEAD
+BODY
+
+=transit vesta quintile mc
+LEAD
+BODY
+
+=transit vesta sesquiquintile mc
+LEAD
+BODY
+
+# vesta with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction ic
+LEAD
+BODY
+
+=transit vesta sextile ic
+LEAD
+BODY
+
+=transit vesta square ic
+LEAD
+BODY
+
+=transit vesta trine ic
+LEAD
+BODY
+
+=transit vesta opposition ic
+LEAD
+BODY
+
+=transit vesta quincunx ic
+LEAD
+BODY
+
+=transit vesta semisextile ic
+LEAD
+BODY
+
+=transit vesta semisquare ic
+LEAD
+BODY
+
+=transit vesta sesquiquadrate ic
+LEAD
+BODY
+
+=transit vesta quintile ic
+LEAD
+BODY
+
+=transit vesta sesquiquintile ic
+LEAD
+BODY
+
+# vesta with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction south_node
+LEAD
+BODY
+
+=transit vesta sextile south_node
+LEAD
+BODY
+
+=transit vesta square south_node
+LEAD
+BODY
+
+=transit vesta trine south_node
+LEAD
+BODY
+
+=transit vesta opposition south_node
+LEAD
+BODY
+
+=transit vesta quincunx south_node
+LEAD
+BODY
+
+=transit vesta semisextile south_node
+LEAD
+BODY
+
+=transit vesta semisquare south_node
+LEAD
+BODY
+
+=transit vesta sesquiquadrate south_node
+LEAD
+BODY
+
+=transit vesta quintile south_node
+LEAD
+BODY
+
+=transit vesta sesquiquintile south_node
+LEAD
+BODY
+
+# vesta with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction ceres
+LEAD
+BODY
+
+=transit vesta sextile ceres
+LEAD
+BODY
+
+=transit vesta square ceres
+LEAD
+BODY
+
+=transit vesta trine ceres
+LEAD
+BODY
+
+=transit vesta opposition ceres
+LEAD
+BODY
+
+=transit vesta quincunx ceres
+LEAD
+BODY
+
+=transit vesta semisextile ceres
+LEAD
+BODY
+
+=transit vesta semisquare ceres
+LEAD
+BODY
+
+=transit vesta sesquiquadrate ceres
+LEAD
+BODY
+
+=transit vesta quintile ceres
+LEAD
+BODY
+
+=transit vesta sesquiquintile ceres
+LEAD
+BODY
+
+# vesta with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction pallas
+LEAD
+BODY
+
+=transit vesta sextile pallas
+LEAD
+BODY
+
+=transit vesta square pallas
+LEAD
+BODY
+
+=transit vesta trine pallas
+LEAD
+BODY
+
+=transit vesta opposition pallas
+LEAD
+BODY
+
+=transit vesta quincunx pallas
+LEAD
+BODY
+
+=transit vesta semisextile pallas
+LEAD
+BODY
+
+=transit vesta semisquare pallas
+LEAD
+BODY
+
+=transit vesta sesquiquadrate pallas
+LEAD
+BODY
+
+=transit vesta quintile pallas
+LEAD
+BODY
+
+=transit vesta sesquiquintile pallas
+LEAD
+BODY
+
+# vesta with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction juno
+LEAD
+BODY
+
+=transit vesta sextile juno
+LEAD
+BODY
+
+=transit vesta square juno
+LEAD
+BODY
+
+=transit vesta trine juno
+LEAD
+BODY
+
+=transit vesta opposition juno
+LEAD
+BODY
+
+=transit vesta quincunx juno
+LEAD
+BODY
+
+=transit vesta semisextile juno
+LEAD
+BODY
+
+=transit vesta semisquare juno
+LEAD
+BODY
+
+=transit vesta sesquiquadrate juno
+LEAD
+BODY
+
+=transit vesta quintile juno
+LEAD
+BODY
+
+=transit vesta sesquiquintile juno
+LEAD
+BODY
+
+# vesta with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction eris
+LEAD
+BODY
+
+=transit vesta sextile eris
+LEAD
+BODY
+
+=transit vesta square eris
+LEAD
+BODY
+
+=transit vesta trine eris
+LEAD
+BODY
+
+=transit vesta opposition eris
+LEAD
+BODY
+
+=transit vesta quincunx eris
+LEAD
+BODY
+
+=transit vesta semisextile eris
+LEAD
+BODY
+
+=transit vesta semisquare eris
+LEAD
+BODY
+
+=transit vesta sesquiquadrate eris
+LEAD
+BODY
+
+=transit vesta quintile eris
+LEAD
+BODY
+
+=transit vesta sesquiquintile eris
+LEAD
+BODY
+
+# vesta with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction eros
+LEAD
+BODY
+
+=transit vesta sextile eros
+LEAD
+BODY
+
+=transit vesta square eros
+LEAD
+BODY
+
+=transit vesta trine eros
+LEAD
+BODY
+
+=transit vesta opposition eros
+LEAD
+BODY
+
+=transit vesta quincunx eros
+LEAD
+BODY
+
+=transit vesta semisextile eros
+LEAD
+BODY
+
+=transit vesta semisquare eros
+LEAD
+BODY
+
+=transit vesta sesquiquadrate eros
+LEAD
+BODY
+
+=transit vesta quintile eros
+LEAD
+BODY
+
+=transit vesta sesquiquintile eros
+LEAD
+BODY
+
+# vesta with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction hygiea
+LEAD
+BODY
+
+=transit vesta sextile hygiea
+LEAD
+BODY
+
+=transit vesta square hygiea
+LEAD
+BODY
+
+=transit vesta trine hygiea
+LEAD
+BODY
+
+=transit vesta opposition hygiea
+LEAD
+BODY
+
+=transit vesta quincunx hygiea
+LEAD
+BODY
+
+=transit vesta semisextile hygiea
+LEAD
+BODY
+
+=transit vesta semisquare hygiea
+LEAD
+BODY
+
+=transit vesta sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit vesta quintile hygiea
+LEAD
+BODY
+
+=transit vesta sesquiquintile hygiea
+LEAD
+BODY
+
+# vesta with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction nessus
+LEAD
+BODY
+
+=transit vesta sextile nessus
+LEAD
+BODY
+
+=transit vesta square nessus
+LEAD
+BODY
+
+=transit vesta trine nessus
+LEAD
+BODY
+
+=transit vesta opposition nessus
+LEAD
+BODY
+
+=transit vesta quincunx nessus
+LEAD
+BODY
+
+=transit vesta semisextile nessus
+LEAD
+BODY
+
+=transit vesta semisquare nessus
+LEAD
+BODY
+
+=transit vesta sesquiquadrate nessus
+LEAD
+BODY
+
+=transit vesta quintile nessus
+LEAD
+BODY
+
+=transit vesta sesquiquintile nessus
+LEAD
+BODY
+
+# vesta with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction pholus
+LEAD
+BODY
+
+=transit vesta sextile pholus
+LEAD
+BODY
+
+=transit vesta square pholus
+LEAD
+BODY
+
+=transit vesta trine pholus
+LEAD
+BODY
+
+=transit vesta opposition pholus
+LEAD
+BODY
+
+=transit vesta quincunx pholus
+LEAD
+BODY
+
+=transit vesta semisextile pholus
+LEAD
+BODY
+
+=transit vesta semisquare pholus
+LEAD
+BODY
+
+=transit vesta sesquiquadrate pholus
+LEAD
+BODY
+
+=transit vesta quintile pholus
+LEAD
+BODY
+
+=transit vesta sesquiquintile pholus
+LEAD
+BODY
+
+# vesta with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction fortune
+LEAD
+BODY
+
+=transit vesta sextile fortune
+LEAD
+BODY
+
+=transit vesta square fortune
+LEAD
+BODY
+
+=transit vesta trine fortune
+LEAD
+BODY
+
+=transit vesta opposition fortune
+LEAD
+BODY
+
+=transit vesta quincunx fortune
+LEAD
+BODY
+
+=transit vesta semisextile fortune
+LEAD
+BODY
+
+=transit vesta semisquare fortune
+LEAD
+BODY
+
+=transit vesta sesquiquadrate fortune
+LEAD
+BODY
+
+=transit vesta quintile fortune
+LEAD
+BODY
+
+=transit vesta sesquiquintile fortune
+LEAD
+BODY
+
+# vesta with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction spirit
+LEAD
+BODY
+
+=transit vesta sextile spirit
+LEAD
+BODY
+
+=transit vesta square spirit
+LEAD
+BODY
+
+=transit vesta trine spirit
+LEAD
+BODY
+
+=transit vesta opposition spirit
+LEAD
+BODY
+
+=transit vesta quincunx spirit
+LEAD
+BODY
+
+=transit vesta semisextile spirit
+LEAD
+BODY
+
+=transit vesta semisquare spirit
+LEAD
+BODY
+
+=transit vesta sesquiquadrate spirit
+LEAD
+BODY
+
+=transit vesta quintile spirit
+LEAD
+BODY
+
+=transit vesta sesquiquintile spirit
+LEAD
+BODY
+
+# vesta with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction lilith
+LEAD
+BODY
+
+=transit vesta sextile lilith
+LEAD
+BODY
+
+=transit vesta square lilith
+LEAD
+BODY
+
+=transit vesta trine lilith
+LEAD
+BODY
+
+=transit vesta opposition lilith
+LEAD
+BODY
+
+=transit vesta quincunx lilith
+LEAD
+BODY
+
+=transit vesta semisextile lilith
+LEAD
+BODY
+
+=transit vesta semisquare lilith
+LEAD
+BODY
+
+=transit vesta sesquiquadrate lilith
+LEAD
+BODY
+
+=transit vesta quintile lilith
+LEAD
+BODY
+
+=transit vesta sesquiquintile lilith
+LEAD
+BODY
+
+# vesta with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction moon
+LEAD
+BODY
+
+=transit vesta sextile moon
+LEAD
+BODY
+
+=transit vesta square moon
+LEAD
+BODY
+
+=transit vesta trine moon
+LEAD
+BODY
+
+=transit vesta opposition moon
+LEAD
+BODY
+
+=transit vesta quincunx moon
+LEAD
+BODY
+
+=transit vesta semisextile moon
+LEAD
+BODY
+
+=transit vesta semisquare moon
+LEAD
+BODY
+
+=transit vesta sesquiquadrate moon
+LEAD
+BODY
+
+=transit vesta quintile moon
+LEAD
+BODY
+
+=transit vesta sesquiquintile moon
+LEAD
+BODY
+
+# vesta with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction sun
+LEAD
+BODY
+
+=transit vesta sextile sun
+LEAD
+BODY
+
+=transit vesta square sun
+LEAD
+BODY
+
+=transit vesta trine sun
+LEAD
+BODY
+
+=transit vesta opposition sun
+LEAD
+BODY
+
+=transit vesta quincunx sun
+LEAD
+BODY
+
+=transit vesta semisextile sun
+LEAD
+BODY
+
+=transit vesta semisquare sun
+LEAD
+BODY
+
+=transit vesta sesquiquadrate sun
+LEAD
+BODY
+
+=transit vesta quintile sun
+LEAD
+BODY
+
+=transit vesta sesquiquintile sun
+LEAD
+BODY
+
+# vesta with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction mercury
+LEAD
+BODY
+
+=transit vesta sextile mercury
+LEAD
+BODY
+
+=transit vesta square mercury
+LEAD
+BODY
+
+=transit vesta trine mercury
+LEAD
+BODY
+
+=transit vesta opposition mercury
+LEAD
+BODY
+
+=transit vesta quincunx mercury
+LEAD
+BODY
+
+=transit vesta semisextile mercury
+LEAD
+BODY
+
+=transit vesta semisquare mercury
+LEAD
+BODY
+
+=transit vesta sesquiquadrate mercury
+LEAD
+BODY
+
+=transit vesta quintile mercury
+LEAD
+BODY
+
+=transit vesta sesquiquintile mercury
+LEAD
+BODY
+
+# vesta with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction venus
+LEAD
+BODY
+
+=transit vesta sextile venus
+LEAD
+BODY
+
+=transit vesta square venus
+LEAD
+BODY
+
+=transit vesta trine venus
+LEAD
+BODY
+
+=transit vesta opposition venus
+LEAD
+BODY
+
+=transit vesta quincunx venus
+LEAD
+BODY
+
+=transit vesta semisextile venus
+LEAD
+BODY
+
+=transit vesta semisquare venus
+LEAD
+BODY
+
+=transit vesta sesquiquadrate venus
+LEAD
+BODY
+
+=transit vesta quintile venus
+LEAD
+BODY
+
+=transit vesta sesquiquintile venus
+LEAD
+BODY
+
+# vesta with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction mars
+LEAD
+BODY
+
+=transit vesta sextile mars
+LEAD
+BODY
+
+=transit vesta square mars
+LEAD
+BODY
+
+=transit vesta trine mars
+LEAD
+BODY
+
+=transit vesta opposition mars
+LEAD
+BODY
+
+=transit vesta quincunx mars
+LEAD
+BODY
+
+=transit vesta semisextile mars
+LEAD
+BODY
+
+=transit vesta semisquare mars
+LEAD
+BODY
+
+=transit vesta sesquiquadrate mars
+LEAD
+BODY
+
+=transit vesta quintile mars
+LEAD
+BODY
+
+=transit vesta sesquiquintile mars
+LEAD
+BODY
+
+# vesta with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction jupiter
+LEAD
+BODY
+
+=transit vesta sextile jupiter
+LEAD
+BODY
+
+=transit vesta square jupiter
+LEAD
+BODY
+
+=transit vesta trine jupiter
+LEAD
+BODY
+
+=transit vesta opposition jupiter
+LEAD
+BODY
+
+=transit vesta quincunx jupiter
+LEAD
+BODY
+
+=transit vesta semisextile jupiter
+LEAD
+BODY
+
+=transit vesta semisquare jupiter
+LEAD
+BODY
+
+=transit vesta sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit vesta quintile jupiter
+LEAD
+BODY
+
+=transit vesta sesquiquintile jupiter
+LEAD
+BODY
+
+# vesta with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction saturn
+LEAD
+BODY
+
+=transit vesta sextile saturn
+LEAD
+BODY
+
+=transit vesta square saturn
+LEAD
+BODY
+
+=transit vesta trine saturn
+LEAD
+BODY
+
+=transit vesta opposition saturn
+LEAD
+BODY
+
+=transit vesta quincunx saturn
+LEAD
+BODY
+
+=transit vesta semisextile saturn
+LEAD
+BODY
+
+=transit vesta semisquare saturn
+LEAD
+BODY
+
+=transit vesta sesquiquadrate saturn
+LEAD
+BODY
+
+=transit vesta quintile saturn
+LEAD
+BODY
+
+=transit vesta sesquiquintile saturn
+LEAD
+BODY
+
+# vesta with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction uranus
+LEAD
+BODY
+
+=transit vesta sextile uranus
+LEAD
+BODY
+
+=transit vesta square uranus
+LEAD
+BODY
+
+=transit vesta trine uranus
+LEAD
+BODY
+
+=transit vesta opposition uranus
+LEAD
+BODY
+
+=transit vesta quincunx uranus
+LEAD
+BODY
+
+=transit vesta semisextile uranus
+LEAD
+BODY
+
+=transit vesta semisquare uranus
+LEAD
+BODY
+
+=transit vesta sesquiquadrate uranus
+LEAD
+BODY
+
+=transit vesta quintile uranus
+LEAD
+BODY
+
+=transit vesta sesquiquintile uranus
+LEAD
+BODY
+
+# vesta with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction neptune
+LEAD
+BODY
+
+=transit vesta sextile neptune
+LEAD
+BODY
+
+=transit vesta square neptune
+LEAD
+BODY
+
+=transit vesta trine neptune
+LEAD
+BODY
+
+=transit vesta opposition neptune
+LEAD
+BODY
+
+=transit vesta quincunx neptune
+LEAD
+BODY
+
+=transit vesta semisextile neptune
+LEAD
+BODY
+
+=transit vesta semisquare neptune
+LEAD
+BODY
+
+=transit vesta sesquiquadrate neptune
+LEAD
+BODY
+
+=transit vesta quintile neptune
+LEAD
+BODY
+
+=transit vesta sesquiquintile neptune
+LEAD
+BODY
+
+# vesta with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction pluto
+LEAD
+BODY
+
+=transit vesta sextile pluto
+LEAD
+BODY
+
+=transit vesta square pluto
+LEAD
+BODY
+
+=transit vesta trine pluto
+LEAD
+BODY
+
+=transit vesta opposition pluto
+LEAD
+BODY
+
+=transit vesta quincunx pluto
+LEAD
+BODY
+
+=transit vesta semisextile pluto
+LEAD
+BODY
+
+=transit vesta semisquare pluto
+LEAD
+BODY
+
+=transit vesta sesquiquadrate pluto
+LEAD
+BODY
+
+=transit vesta quintile pluto
+LEAD
+BODY
+
+=transit vesta sesquiquintile pluto
+LEAD
+BODY
+
+# vesta with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction north_node
+LEAD
+BODY
+
+=transit vesta sextile north_node
+LEAD
+BODY
+
+=transit vesta square north_node
+LEAD
+BODY
+
+=transit vesta trine north_node
+LEAD
+BODY
+
+=transit vesta opposition north_node
+LEAD
+BODY
+
+=transit vesta quincunx north_node
+LEAD
+BODY
+
+=transit vesta semisextile north_node
+LEAD
+BODY
+
+=transit vesta semisquare north_node
+LEAD
+BODY
+
+=transit vesta sesquiquadrate north_node
+LEAD
+BODY
+
+=transit vesta quintile north_node
+LEAD
+BODY
+
+=transit vesta sesquiquintile north_node
+LEAD
+BODY
+
+# vesta with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit vesta conjunction chiron
+LEAD
+BODY
+
+=transit vesta sextile chiron
+LEAD
+BODY
+
+=transit vesta square chiron
+LEAD
+BODY
+
+=transit vesta trine chiron
+LEAD
+BODY
+
+=transit vesta opposition chiron
+LEAD
+BODY
+
+=transit vesta quincunx chiron
+LEAD
+BODY
+
+=transit vesta semisextile chiron
+LEAD
+BODY
+
+=transit vesta semisquare chiron
+LEAD
+BODY
+
+=transit vesta sesquiquadrate chiron
+LEAD
+BODY
+
+=transit vesta quintile chiron
+LEAD
+BODY
+
+=transit vesta sesquiquintile chiron
+LEAD
+BODY

@@ -1,0 +1,358 @@
+# composite: spirit - 85 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# spirit with ascendant: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction ascendant
+LEAD
+BODY
+
+=spirit sextile ascendant
+LEAD
+BODY
+
+=spirit square ascendant
+LEAD
+BODY
+
+=spirit trine ascendant
+LEAD
+BODY
+
+=spirit opposition ascendant
+LEAD
+BODY
+
+# spirit with chiron: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction chiron
+LEAD
+BODY
+
+=spirit sextile chiron
+LEAD
+BODY
+
+=spirit square chiron
+LEAD
+BODY
+
+=spirit trine chiron
+LEAD
+BODY
+
+=spirit opposition chiron
+LEAD
+BODY
+
+# spirit with jupiter: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction jupiter
+LEAD
+BODY
+
+=spirit sextile jupiter
+LEAD
+BODY
+
+=spirit square jupiter
+LEAD
+BODY
+
+=spirit trine jupiter
+LEAD
+BODY
+
+=spirit opposition jupiter
+LEAD
+BODY
+
+# spirit with mars: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction mars
+LEAD
+BODY
+
+=spirit sextile mars
+LEAD
+BODY
+
+=spirit square mars
+LEAD
+BODY
+
+=spirit trine mars
+LEAD
+BODY
+
+=spirit opposition mars
+LEAD
+BODY
+
+# spirit with mercury: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction mercury
+LEAD
+BODY
+
+=spirit sextile mercury
+LEAD
+BODY
+
+=spirit square mercury
+LEAD
+BODY
+
+=spirit trine mercury
+LEAD
+BODY
+
+=spirit opposition mercury
+LEAD
+BODY
+
+# spirit with mc: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction mc
+LEAD
+BODY
+
+=spirit sextile mc
+LEAD
+BODY
+
+=spirit square mc
+LEAD
+BODY
+
+=spirit trine mc
+LEAD
+BODY
+
+=spirit opposition mc
+LEAD
+BODY
+
+# spirit with moon: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction moon
+LEAD
+BODY
+
+=spirit sextile moon
+LEAD
+BODY
+
+=spirit square moon
+LEAD
+BODY
+
+=spirit trine moon
+LEAD
+BODY
+
+=spirit opposition moon
+LEAD
+BODY
+
+# spirit with neptune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction neptune
+LEAD
+BODY
+
+=spirit sextile neptune
+LEAD
+BODY
+
+=spirit square neptune
+LEAD
+BODY
+
+=spirit trine neptune
+LEAD
+BODY
+
+=spirit opposition neptune
+LEAD
+BODY
+
+# spirit with north_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction north_node
+LEAD
+BODY
+
+=spirit sextile north_node
+LEAD
+BODY
+
+=spirit square north_node
+LEAD
+BODY
+
+=spirit trine north_node
+LEAD
+BODY
+
+=spirit opposition north_node
+LEAD
+BODY
+
+# spirit with pluto: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction pluto
+LEAD
+BODY
+
+=spirit sextile pluto
+LEAD
+BODY
+
+=spirit square pluto
+LEAD
+BODY
+
+=spirit trine pluto
+LEAD
+BODY
+
+=spirit opposition pluto
+LEAD
+BODY
+
+# spirit with saturn: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction saturn
+LEAD
+BODY
+
+=spirit sextile saturn
+LEAD
+BODY
+
+=spirit square saturn
+LEAD
+BODY
+
+=spirit trine saturn
+LEAD
+BODY
+
+=spirit opposition saturn
+LEAD
+BODY
+
+# spirit with sun: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction sun
+LEAD
+BODY
+
+=spirit sextile sun
+LEAD
+BODY
+
+=spirit square sun
+LEAD
+BODY
+
+=spirit trine sun
+LEAD
+BODY
+
+=spirit opposition sun
+LEAD
+BODY
+
+# spirit with uranus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction uranus
+LEAD
+BODY
+
+=spirit sextile uranus
+LEAD
+BODY
+
+=spirit square uranus
+LEAD
+BODY
+
+=spirit trine uranus
+LEAD
+BODY
+
+=spirit opposition uranus
+LEAD
+BODY
+
+# spirit with venus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction venus
+LEAD
+BODY
+
+=spirit sextile venus
+LEAD
+BODY
+
+=spirit square venus
+LEAD
+BODY
+
+=spirit trine venus
+LEAD
+BODY
+
+=spirit opposition venus
+LEAD
+BODY
+
+# spirit with pholus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction pholus
+LEAD
+BODY
+
+=spirit sextile pholus
+LEAD
+BODY
+
+=spirit square pholus
+LEAD
+BODY
+
+=spirit trine pholus
+LEAD
+BODY
+
+=spirit opposition pholus
+LEAD
+BODY
+
+# spirit with south_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction south_node
+LEAD
+BODY
+
+=spirit sextile south_node
+LEAD
+BODY
+
+=spirit square south_node
+LEAD
+BODY
+
+=spirit trine south_node
+LEAD
+BODY
+
+=spirit opposition south_node
+LEAD
+BODY
+
+# spirit with vesta: 5 readings, one per aspect. Each must read differently from the others in this group.
+=spirit conjunction vesta
+LEAD
+BODY
+
+=spirit sextile vesta
+LEAD
+BODY
+
+=spirit square vesta
+LEAD
+BODY
+
+=spirit trine vesta
+LEAD
+BODY
+
+=spirit opposition vesta
+LEAD
+BODY

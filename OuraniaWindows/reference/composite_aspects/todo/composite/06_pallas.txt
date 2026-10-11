@@ -1,0 +1,400 @@
+# composite: pallas - 95 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# pallas with ascendant: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction ascendant
+LEAD
+BODY
+
+=pallas sextile ascendant
+LEAD
+BODY
+
+=pallas square ascendant
+LEAD
+BODY
+
+=pallas trine ascendant
+LEAD
+BODY
+
+=pallas opposition ascendant
+LEAD
+BODY
+
+# pallas with chiron: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction chiron
+LEAD
+BODY
+
+=pallas sextile chiron
+LEAD
+BODY
+
+=pallas square chiron
+LEAD
+BODY
+
+=pallas trine chiron
+LEAD
+BODY
+
+=pallas opposition chiron
+LEAD
+BODY
+
+# pallas with jupiter: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction jupiter
+LEAD
+BODY
+
+=pallas sextile jupiter
+LEAD
+BODY
+
+=pallas square jupiter
+LEAD
+BODY
+
+=pallas trine jupiter
+LEAD
+BODY
+
+=pallas opposition jupiter
+LEAD
+BODY
+
+# pallas with mars: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction mars
+LEAD
+BODY
+
+=pallas sextile mars
+LEAD
+BODY
+
+=pallas square mars
+LEAD
+BODY
+
+=pallas trine mars
+LEAD
+BODY
+
+=pallas opposition mars
+LEAD
+BODY
+
+# pallas with mercury: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction mercury
+LEAD
+BODY
+
+=pallas sextile mercury
+LEAD
+BODY
+
+=pallas square mercury
+LEAD
+BODY
+
+=pallas trine mercury
+LEAD
+BODY
+
+=pallas opposition mercury
+LEAD
+BODY
+
+# pallas with mc: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction mc
+LEAD
+BODY
+
+=pallas sextile mc
+LEAD
+BODY
+
+=pallas square mc
+LEAD
+BODY
+
+=pallas trine mc
+LEAD
+BODY
+
+=pallas opposition mc
+LEAD
+BODY
+
+# pallas with moon: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction moon
+LEAD
+BODY
+
+=pallas sextile moon
+LEAD
+BODY
+
+=pallas square moon
+LEAD
+BODY
+
+=pallas trine moon
+LEAD
+BODY
+
+=pallas opposition moon
+LEAD
+BODY
+
+# pallas with neptune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction neptune
+LEAD
+BODY
+
+=pallas sextile neptune
+LEAD
+BODY
+
+=pallas square neptune
+LEAD
+BODY
+
+=pallas trine neptune
+LEAD
+BODY
+
+=pallas opposition neptune
+LEAD
+BODY
+
+# pallas with north_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction north_node
+LEAD
+BODY
+
+=pallas sextile north_node
+LEAD
+BODY
+
+=pallas square north_node
+LEAD
+BODY
+
+=pallas trine north_node
+LEAD
+BODY
+
+=pallas opposition north_node
+LEAD
+BODY
+
+# pallas with pluto: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction pluto
+LEAD
+BODY
+
+=pallas sextile pluto
+LEAD
+BODY
+
+=pallas square pluto
+LEAD
+BODY
+
+=pallas trine pluto
+LEAD
+BODY
+
+=pallas opposition pluto
+LEAD
+BODY
+
+# pallas with saturn: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction saturn
+LEAD
+BODY
+
+=pallas sextile saturn
+LEAD
+BODY
+
+=pallas square saturn
+LEAD
+BODY
+
+=pallas trine saturn
+LEAD
+BODY
+
+=pallas opposition saturn
+LEAD
+BODY
+
+# pallas with sun: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction sun
+LEAD
+BODY
+
+=pallas sextile sun
+LEAD
+BODY
+
+=pallas square sun
+LEAD
+BODY
+
+=pallas trine sun
+LEAD
+BODY
+
+=pallas opposition sun
+LEAD
+BODY
+
+# pallas with uranus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction uranus
+LEAD
+BODY
+
+=pallas sextile uranus
+LEAD
+BODY
+
+=pallas square uranus
+LEAD
+BODY
+
+=pallas trine uranus
+LEAD
+BODY
+
+=pallas opposition uranus
+LEAD
+BODY
+
+# pallas with venus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction venus
+LEAD
+BODY
+
+=pallas sextile venus
+LEAD
+BODY
+
+=pallas square venus
+LEAD
+BODY
+
+=pallas trine venus
+LEAD
+BODY
+
+=pallas opposition venus
+LEAD
+BODY
+
+# pallas with fortune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction fortune
+LEAD
+BODY
+
+=pallas sextile fortune
+LEAD
+BODY
+
+=pallas square fortune
+LEAD
+BODY
+
+=pallas trine fortune
+LEAD
+BODY
+
+=pallas opposition fortune
+LEAD
+BODY
+
+# pallas with spirit: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction spirit
+LEAD
+BODY
+
+=pallas sextile spirit
+LEAD
+BODY
+
+=pallas square spirit
+LEAD
+BODY
+
+=pallas trine spirit
+LEAD
+BODY
+
+=pallas opposition spirit
+LEAD
+BODY
+
+# pallas with pholus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction pholus
+LEAD
+BODY
+
+=pallas sextile pholus
+LEAD
+BODY
+
+=pallas square pholus
+LEAD
+BODY
+
+=pallas trine pholus
+LEAD
+BODY
+
+=pallas opposition pholus
+LEAD
+BODY
+
+# pallas with south_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction south_node
+LEAD
+BODY
+
+=pallas sextile south_node
+LEAD
+BODY
+
+=pallas square south_node
+LEAD
+BODY
+
+=pallas trine south_node
+LEAD
+BODY
+
+=pallas opposition south_node
+LEAD
+BODY
+
+# pallas with vesta: 5 readings, one per aspect. Each must read differently from the others in this group.
+=pallas conjunction vesta
+LEAD
+BODY
+
+=pallas sextile vesta
+LEAD
+BODY
+
+=pallas square vesta
+LEAD
+BODY
+
+=pallas trine vesta
+LEAD
+BODY
+
+=pallas opposition vesta
+LEAD
+BODY

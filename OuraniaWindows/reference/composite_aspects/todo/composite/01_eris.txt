@@ -1,0 +1,505 @@
+# composite: eris - 120 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# eris with ascendant: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction ascendant
+LEAD
+BODY
+
+=eris sextile ascendant
+LEAD
+BODY
+
+=eris square ascendant
+LEAD
+BODY
+
+=eris trine ascendant
+LEAD
+BODY
+
+=eris opposition ascendant
+LEAD
+BODY
+
+# eris with chiron: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction chiron
+LEAD
+BODY
+
+=eris sextile chiron
+LEAD
+BODY
+
+=eris square chiron
+LEAD
+BODY
+
+=eris trine chiron
+LEAD
+BODY
+
+=eris opposition chiron
+LEAD
+BODY
+
+# eris with jupiter: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction jupiter
+LEAD
+BODY
+
+=eris sextile jupiter
+LEAD
+BODY
+
+=eris square jupiter
+LEAD
+BODY
+
+=eris trine jupiter
+LEAD
+BODY
+
+=eris opposition jupiter
+LEAD
+BODY
+
+# eris with mars: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction mars
+LEAD
+BODY
+
+=eris sextile mars
+LEAD
+BODY
+
+=eris square mars
+LEAD
+BODY
+
+=eris trine mars
+LEAD
+BODY
+
+=eris opposition mars
+LEAD
+BODY
+
+# eris with mercury: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction mercury
+LEAD
+BODY
+
+=eris sextile mercury
+LEAD
+BODY
+
+=eris square mercury
+LEAD
+BODY
+
+=eris trine mercury
+LEAD
+BODY
+
+=eris opposition mercury
+LEAD
+BODY
+
+# eris with mc: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction mc
+LEAD
+BODY
+
+=eris sextile mc
+LEAD
+BODY
+
+=eris square mc
+LEAD
+BODY
+
+=eris trine mc
+LEAD
+BODY
+
+=eris opposition mc
+LEAD
+BODY
+
+# eris with moon: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction moon
+LEAD
+BODY
+
+=eris sextile moon
+LEAD
+BODY
+
+=eris square moon
+LEAD
+BODY
+
+=eris trine moon
+LEAD
+BODY
+
+=eris opposition moon
+LEAD
+BODY
+
+# eris with neptune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction neptune
+LEAD
+BODY
+
+=eris sextile neptune
+LEAD
+BODY
+
+=eris square neptune
+LEAD
+BODY
+
+=eris trine neptune
+LEAD
+BODY
+
+=eris opposition neptune
+LEAD
+BODY
+
+# eris with north_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction north_node
+LEAD
+BODY
+
+=eris sextile north_node
+LEAD
+BODY
+
+=eris square north_node
+LEAD
+BODY
+
+=eris trine north_node
+LEAD
+BODY
+
+=eris opposition north_node
+LEAD
+BODY
+
+# eris with pluto: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction pluto
+LEAD
+BODY
+
+=eris sextile pluto
+LEAD
+BODY
+
+=eris square pluto
+LEAD
+BODY
+
+=eris trine pluto
+LEAD
+BODY
+
+=eris opposition pluto
+LEAD
+BODY
+
+# eris with saturn: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction saturn
+LEAD
+BODY
+
+=eris sextile saturn
+LEAD
+BODY
+
+=eris square saturn
+LEAD
+BODY
+
+=eris trine saturn
+LEAD
+BODY
+
+=eris opposition saturn
+LEAD
+BODY
+
+# eris with sun: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction sun
+LEAD
+BODY
+
+=eris sextile sun
+LEAD
+BODY
+
+=eris square sun
+LEAD
+BODY
+
+=eris trine sun
+LEAD
+BODY
+
+=eris opposition sun
+LEAD
+BODY
+
+# eris with uranus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction uranus
+LEAD
+BODY
+
+=eris sextile uranus
+LEAD
+BODY
+
+=eris square uranus
+LEAD
+BODY
+
+=eris trine uranus
+LEAD
+BODY
+
+=eris opposition uranus
+LEAD
+BODY
+
+# eris with venus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction venus
+LEAD
+BODY
+
+=eris sextile venus
+LEAD
+BODY
+
+=eris square venus
+LEAD
+BODY
+
+=eris trine venus
+LEAD
+BODY
+
+=eris opposition venus
+LEAD
+BODY
+
+# eris with eros: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction eros
+LEAD
+BODY
+
+=eris sextile eros
+LEAD
+BODY
+
+=eris square eros
+LEAD
+BODY
+
+=eris trine eros
+LEAD
+BODY
+
+=eris opposition eros
+LEAD
+BODY
+
+# eris with hygiea: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction hygiea
+LEAD
+BODY
+
+=eris sextile hygiea
+LEAD
+BODY
+
+=eris square hygiea
+LEAD
+BODY
+
+=eris trine hygiea
+LEAD
+BODY
+
+=eris opposition hygiea
+LEAD
+BODY
+
+# eris with juno: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction juno
+LEAD
+BODY
+
+=eris sextile juno
+LEAD
+BODY
+
+=eris square juno
+LEAD
+BODY
+
+=eris trine juno
+LEAD
+BODY
+
+=eris opposition juno
+LEAD
+BODY
+
+# eris with nessus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction nessus
+LEAD
+BODY
+
+=eris sextile nessus
+LEAD
+BODY
+
+=eris square nessus
+LEAD
+BODY
+
+=eris trine nessus
+LEAD
+BODY
+
+=eris opposition nessus
+LEAD
+BODY
+
+# eris with pallas: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction pallas
+LEAD
+BODY
+
+=eris sextile pallas
+LEAD
+BODY
+
+=eris square pallas
+LEAD
+BODY
+
+=eris trine pallas
+LEAD
+BODY
+
+=eris opposition pallas
+LEAD
+BODY
+
+# eris with fortune: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction fortune
+LEAD
+BODY
+
+=eris sextile fortune
+LEAD
+BODY
+
+=eris square fortune
+LEAD
+BODY
+
+=eris trine fortune
+LEAD
+BODY
+
+=eris opposition fortune
+LEAD
+BODY
+
+# eris with spirit: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction spirit
+LEAD
+BODY
+
+=eris sextile spirit
+LEAD
+BODY
+
+=eris square spirit
+LEAD
+BODY
+
+=eris trine spirit
+LEAD
+BODY
+
+=eris opposition spirit
+LEAD
+BODY
+
+# eris with pholus: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction pholus
+LEAD
+BODY
+
+=eris sextile pholus
+LEAD
+BODY
+
+=eris square pholus
+LEAD
+BODY
+
+=eris trine pholus
+LEAD
+BODY
+
+=eris opposition pholus
+LEAD
+BODY
+
+# eris with south_node: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction south_node
+LEAD
+BODY
+
+=eris sextile south_node
+LEAD
+BODY
+
+=eris square south_node
+LEAD
+BODY
+
+=eris trine south_node
+LEAD
+BODY
+
+=eris opposition south_node
+LEAD
+BODY
+
+# eris with vesta: 5 readings, one per aspect. Each must read differently from the others in this group.
+=eris conjunction vesta
+LEAD
+BODY
+
+=eris sextile vesta
+LEAD
+BODY
+
+=eris square vesta
+LEAD
+BODY
+
+=eris trine vesta
+LEAD
+BODY
+
+=eris opposition vesta
+LEAD
+BODY

@@ -1,0 +1,1274 @@
+# transit: uranus - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# uranus with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction descendant
+LEAD
+BODY
+
+=transit uranus sextile descendant
+LEAD
+BODY
+
+=transit uranus square descendant
+LEAD
+BODY
+
+=transit uranus trine descendant
+LEAD
+BODY
+
+=transit uranus opposition descendant
+LEAD
+BODY
+
+=transit uranus quincunx descendant
+LEAD
+BODY
+
+=transit uranus semisextile descendant
+LEAD
+BODY
+
+=transit uranus semisquare descendant
+LEAD
+BODY
+
+=transit uranus sesquiquadrate descendant
+LEAD
+BODY
+
+=transit uranus quintile descendant
+LEAD
+BODY
+
+=transit uranus biquintile descendant
+LEAD
+BODY
+
+=transit uranus sesquiquintile descendant
+LEAD
+BODY
+
+=transit uranus septile descendant
+LEAD
+BODY
+
+=transit uranus novile descendant
+LEAD
+BODY
+
+=transit uranus decile descendant
+LEAD
+BODY
+
+# uranus with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction ic
+LEAD
+BODY
+
+=transit uranus sextile ic
+LEAD
+BODY
+
+=transit uranus square ic
+LEAD
+BODY
+
+=transit uranus trine ic
+LEAD
+BODY
+
+=transit uranus opposition ic
+LEAD
+BODY
+
+=transit uranus quincunx ic
+LEAD
+BODY
+
+=transit uranus semisextile ic
+LEAD
+BODY
+
+=transit uranus semisquare ic
+LEAD
+BODY
+
+=transit uranus sesquiquadrate ic
+LEAD
+BODY
+
+=transit uranus quintile ic
+LEAD
+BODY
+
+=transit uranus biquintile ic
+LEAD
+BODY
+
+=transit uranus sesquiquintile ic
+LEAD
+BODY
+
+=transit uranus septile ic
+LEAD
+BODY
+
+=transit uranus novile ic
+LEAD
+BODY
+
+=transit uranus decile ic
+LEAD
+BODY
+
+# uranus with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction ascendant
+LEAD
+BODY
+
+=transit uranus sextile ascendant
+LEAD
+BODY
+
+=transit uranus square ascendant
+LEAD
+BODY
+
+=transit uranus trine ascendant
+LEAD
+BODY
+
+=transit uranus opposition ascendant
+LEAD
+BODY
+
+=transit uranus quincunx ascendant
+LEAD
+BODY
+
+=transit uranus semisextile ascendant
+LEAD
+BODY
+
+=transit uranus semisquare ascendant
+LEAD
+BODY
+
+=transit uranus sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit uranus quintile ascendant
+LEAD
+BODY
+
+=transit uranus biquintile ascendant
+LEAD
+BODY
+
+=transit uranus sesquiquintile ascendant
+LEAD
+BODY
+
+=transit uranus septile ascendant
+LEAD
+BODY
+
+=transit uranus novile ascendant
+LEAD
+BODY
+
+=transit uranus decile ascendant
+LEAD
+BODY
+
+# uranus with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction mc
+LEAD
+BODY
+
+=transit uranus sextile mc
+LEAD
+BODY
+
+=transit uranus square mc
+LEAD
+BODY
+
+=transit uranus trine mc
+LEAD
+BODY
+
+=transit uranus opposition mc
+LEAD
+BODY
+
+=transit uranus quincunx mc
+LEAD
+BODY
+
+=transit uranus semisextile mc
+LEAD
+BODY
+
+=transit uranus semisquare mc
+LEAD
+BODY
+
+=transit uranus sesquiquadrate mc
+LEAD
+BODY
+
+=transit uranus quintile mc
+LEAD
+BODY
+
+=transit uranus biquintile mc
+LEAD
+BODY
+
+=transit uranus sesquiquintile mc
+LEAD
+BODY
+
+=transit uranus septile mc
+LEAD
+BODY
+
+=transit uranus novile mc
+LEAD
+BODY
+
+=transit uranus decile mc
+LEAD
+BODY
+
+# uranus with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction south_node
+LEAD
+BODY
+
+=transit uranus sextile south_node
+LEAD
+BODY
+
+=transit uranus square south_node
+LEAD
+BODY
+
+=transit uranus trine south_node
+LEAD
+BODY
+
+=transit uranus opposition south_node
+LEAD
+BODY
+
+=transit uranus quincunx south_node
+LEAD
+BODY
+
+=transit uranus semisextile south_node
+LEAD
+BODY
+
+=transit uranus semisquare south_node
+LEAD
+BODY
+
+=transit uranus sesquiquadrate south_node
+LEAD
+BODY
+
+=transit uranus quintile south_node
+LEAD
+BODY
+
+=transit uranus sesquiquintile south_node
+LEAD
+BODY
+
+# uranus with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction ceres
+LEAD
+BODY
+
+=transit uranus sextile ceres
+LEAD
+BODY
+
+=transit uranus square ceres
+LEAD
+BODY
+
+=transit uranus trine ceres
+LEAD
+BODY
+
+=transit uranus opposition ceres
+LEAD
+BODY
+
+=transit uranus quincunx ceres
+LEAD
+BODY
+
+=transit uranus semisextile ceres
+LEAD
+BODY
+
+=transit uranus semisquare ceres
+LEAD
+BODY
+
+=transit uranus sesquiquadrate ceres
+LEAD
+BODY
+
+=transit uranus quintile ceres
+LEAD
+BODY
+
+=transit uranus sesquiquintile ceres
+LEAD
+BODY
+
+# uranus with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction pallas
+LEAD
+BODY
+
+=transit uranus sextile pallas
+LEAD
+BODY
+
+=transit uranus square pallas
+LEAD
+BODY
+
+=transit uranus trine pallas
+LEAD
+BODY
+
+=transit uranus opposition pallas
+LEAD
+BODY
+
+=transit uranus quincunx pallas
+LEAD
+BODY
+
+=transit uranus semisextile pallas
+LEAD
+BODY
+
+=transit uranus semisquare pallas
+LEAD
+BODY
+
+=transit uranus sesquiquadrate pallas
+LEAD
+BODY
+
+=transit uranus quintile pallas
+LEAD
+BODY
+
+=transit uranus sesquiquintile pallas
+LEAD
+BODY
+
+# uranus with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction juno
+LEAD
+BODY
+
+=transit uranus sextile juno
+LEAD
+BODY
+
+=transit uranus square juno
+LEAD
+BODY
+
+=transit uranus trine juno
+LEAD
+BODY
+
+=transit uranus opposition juno
+LEAD
+BODY
+
+=transit uranus quincunx juno
+LEAD
+BODY
+
+=transit uranus semisextile juno
+LEAD
+BODY
+
+=transit uranus semisquare juno
+LEAD
+BODY
+
+=transit uranus sesquiquadrate juno
+LEAD
+BODY
+
+=transit uranus quintile juno
+LEAD
+BODY
+
+=transit uranus sesquiquintile juno
+LEAD
+BODY
+
+# uranus with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction vesta
+LEAD
+BODY
+
+=transit uranus sextile vesta
+LEAD
+BODY
+
+=transit uranus square vesta
+LEAD
+BODY
+
+=transit uranus trine vesta
+LEAD
+BODY
+
+=transit uranus opposition vesta
+LEAD
+BODY
+
+=transit uranus quincunx vesta
+LEAD
+BODY
+
+=transit uranus semisextile vesta
+LEAD
+BODY
+
+=transit uranus semisquare vesta
+LEAD
+BODY
+
+=transit uranus sesquiquadrate vesta
+LEAD
+BODY
+
+=transit uranus quintile vesta
+LEAD
+BODY
+
+=transit uranus sesquiquintile vesta
+LEAD
+BODY
+
+# uranus with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction eris
+LEAD
+BODY
+
+=transit uranus sextile eris
+LEAD
+BODY
+
+=transit uranus square eris
+LEAD
+BODY
+
+=transit uranus trine eris
+LEAD
+BODY
+
+=transit uranus opposition eris
+LEAD
+BODY
+
+=transit uranus quincunx eris
+LEAD
+BODY
+
+=transit uranus semisextile eris
+LEAD
+BODY
+
+=transit uranus semisquare eris
+LEAD
+BODY
+
+=transit uranus sesquiquadrate eris
+LEAD
+BODY
+
+=transit uranus quintile eris
+LEAD
+BODY
+
+=transit uranus sesquiquintile eris
+LEAD
+BODY
+
+# uranus with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction eros
+LEAD
+BODY
+
+=transit uranus sextile eros
+LEAD
+BODY
+
+=transit uranus square eros
+LEAD
+BODY
+
+=transit uranus trine eros
+LEAD
+BODY
+
+=transit uranus opposition eros
+LEAD
+BODY
+
+=transit uranus quincunx eros
+LEAD
+BODY
+
+=transit uranus semisextile eros
+LEAD
+BODY
+
+=transit uranus semisquare eros
+LEAD
+BODY
+
+=transit uranus sesquiquadrate eros
+LEAD
+BODY
+
+=transit uranus quintile eros
+LEAD
+BODY
+
+=transit uranus sesquiquintile eros
+LEAD
+BODY
+
+# uranus with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction hygiea
+LEAD
+BODY
+
+=transit uranus sextile hygiea
+LEAD
+BODY
+
+=transit uranus square hygiea
+LEAD
+BODY
+
+=transit uranus trine hygiea
+LEAD
+BODY
+
+=transit uranus opposition hygiea
+LEAD
+BODY
+
+=transit uranus quincunx hygiea
+LEAD
+BODY
+
+=transit uranus semisextile hygiea
+LEAD
+BODY
+
+=transit uranus semisquare hygiea
+LEAD
+BODY
+
+=transit uranus sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit uranus quintile hygiea
+LEAD
+BODY
+
+=transit uranus sesquiquintile hygiea
+LEAD
+BODY
+
+# uranus with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction nessus
+LEAD
+BODY
+
+=transit uranus sextile nessus
+LEAD
+BODY
+
+=transit uranus square nessus
+LEAD
+BODY
+
+=transit uranus trine nessus
+LEAD
+BODY
+
+=transit uranus opposition nessus
+LEAD
+BODY
+
+=transit uranus quincunx nessus
+LEAD
+BODY
+
+=transit uranus semisextile nessus
+LEAD
+BODY
+
+=transit uranus semisquare nessus
+LEAD
+BODY
+
+=transit uranus sesquiquadrate nessus
+LEAD
+BODY
+
+=transit uranus quintile nessus
+LEAD
+BODY
+
+=transit uranus sesquiquintile nessus
+LEAD
+BODY
+
+# uranus with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction pholus
+LEAD
+BODY
+
+=transit uranus sextile pholus
+LEAD
+BODY
+
+=transit uranus square pholus
+LEAD
+BODY
+
+=transit uranus trine pholus
+LEAD
+BODY
+
+=transit uranus opposition pholus
+LEAD
+BODY
+
+=transit uranus quincunx pholus
+LEAD
+BODY
+
+=transit uranus semisextile pholus
+LEAD
+BODY
+
+=transit uranus semisquare pholus
+LEAD
+BODY
+
+=transit uranus sesquiquadrate pholus
+LEAD
+BODY
+
+=transit uranus quintile pholus
+LEAD
+BODY
+
+=transit uranus sesquiquintile pholus
+LEAD
+BODY
+
+# uranus with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction fortune
+LEAD
+BODY
+
+=transit uranus sextile fortune
+LEAD
+BODY
+
+=transit uranus square fortune
+LEAD
+BODY
+
+=transit uranus trine fortune
+LEAD
+BODY
+
+=transit uranus opposition fortune
+LEAD
+BODY
+
+=transit uranus quincunx fortune
+LEAD
+BODY
+
+=transit uranus semisextile fortune
+LEAD
+BODY
+
+=transit uranus semisquare fortune
+LEAD
+BODY
+
+=transit uranus sesquiquadrate fortune
+LEAD
+BODY
+
+=transit uranus quintile fortune
+LEAD
+BODY
+
+=transit uranus sesquiquintile fortune
+LEAD
+BODY
+
+# uranus with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction spirit
+LEAD
+BODY
+
+=transit uranus sextile spirit
+LEAD
+BODY
+
+=transit uranus square spirit
+LEAD
+BODY
+
+=transit uranus trine spirit
+LEAD
+BODY
+
+=transit uranus opposition spirit
+LEAD
+BODY
+
+=transit uranus quincunx spirit
+LEAD
+BODY
+
+=transit uranus semisextile spirit
+LEAD
+BODY
+
+=transit uranus semisquare spirit
+LEAD
+BODY
+
+=transit uranus sesquiquadrate spirit
+LEAD
+BODY
+
+=transit uranus quintile spirit
+LEAD
+BODY
+
+=transit uranus sesquiquintile spirit
+LEAD
+BODY
+
+# uranus with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction lilith
+LEAD
+BODY
+
+=transit uranus sextile lilith
+LEAD
+BODY
+
+=transit uranus square lilith
+LEAD
+BODY
+
+=transit uranus trine lilith
+LEAD
+BODY
+
+=transit uranus opposition lilith
+LEAD
+BODY
+
+=transit uranus quincunx lilith
+LEAD
+BODY
+
+=transit uranus semisextile lilith
+LEAD
+BODY
+
+=transit uranus semisquare lilith
+LEAD
+BODY
+
+=transit uranus sesquiquadrate lilith
+LEAD
+BODY
+
+=transit uranus quintile lilith
+LEAD
+BODY
+
+=transit uranus sesquiquintile lilith
+LEAD
+BODY
+
+# uranus with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction sun
+LEAD
+BODY
+
+=transit uranus sextile sun
+LEAD
+BODY
+
+=transit uranus square sun
+LEAD
+BODY
+
+=transit uranus trine sun
+LEAD
+BODY
+
+=transit uranus opposition sun
+LEAD
+BODY
+
+=transit uranus biquintile sun
+LEAD
+BODY
+
+=transit uranus septile sun
+LEAD
+BODY
+
+=transit uranus novile sun
+LEAD
+BODY
+
+=transit uranus decile sun
+LEAD
+BODY
+
+# uranus with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction moon
+LEAD
+BODY
+
+=transit uranus sextile moon
+LEAD
+BODY
+
+=transit uranus square moon
+LEAD
+BODY
+
+=transit uranus trine moon
+LEAD
+BODY
+
+=transit uranus opposition moon
+LEAD
+BODY
+
+=transit uranus biquintile moon
+LEAD
+BODY
+
+=transit uranus septile moon
+LEAD
+BODY
+
+=transit uranus novile moon
+LEAD
+BODY
+
+=transit uranus decile moon
+LEAD
+BODY
+
+# uranus with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction mercury
+LEAD
+BODY
+
+=transit uranus sextile mercury
+LEAD
+BODY
+
+=transit uranus square mercury
+LEAD
+BODY
+
+=transit uranus trine mercury
+LEAD
+BODY
+
+=transit uranus opposition mercury
+LEAD
+BODY
+
+=transit uranus biquintile mercury
+LEAD
+BODY
+
+=transit uranus septile mercury
+LEAD
+BODY
+
+=transit uranus novile mercury
+LEAD
+BODY
+
+=transit uranus decile mercury
+LEAD
+BODY
+
+# uranus with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction venus
+LEAD
+BODY
+
+=transit uranus sextile venus
+LEAD
+BODY
+
+=transit uranus square venus
+LEAD
+BODY
+
+=transit uranus trine venus
+LEAD
+BODY
+
+=transit uranus opposition venus
+LEAD
+BODY
+
+=transit uranus biquintile venus
+LEAD
+BODY
+
+=transit uranus septile venus
+LEAD
+BODY
+
+=transit uranus novile venus
+LEAD
+BODY
+
+=transit uranus decile venus
+LEAD
+BODY
+
+# uranus with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction mars
+LEAD
+BODY
+
+=transit uranus sextile mars
+LEAD
+BODY
+
+=transit uranus square mars
+LEAD
+BODY
+
+=transit uranus trine mars
+LEAD
+BODY
+
+=transit uranus opposition mars
+LEAD
+BODY
+
+=transit uranus biquintile mars
+LEAD
+BODY
+
+=transit uranus septile mars
+LEAD
+BODY
+
+=transit uranus novile mars
+LEAD
+BODY
+
+=transit uranus decile mars
+LEAD
+BODY
+
+# uranus with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction jupiter
+LEAD
+BODY
+
+=transit uranus sextile jupiter
+LEAD
+BODY
+
+=transit uranus square jupiter
+LEAD
+BODY
+
+=transit uranus trine jupiter
+LEAD
+BODY
+
+=transit uranus opposition jupiter
+LEAD
+BODY
+
+=transit uranus biquintile jupiter
+LEAD
+BODY
+
+=transit uranus septile jupiter
+LEAD
+BODY
+
+=transit uranus novile jupiter
+LEAD
+BODY
+
+=transit uranus decile jupiter
+LEAD
+BODY
+
+# uranus with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction saturn
+LEAD
+BODY
+
+=transit uranus sextile saturn
+LEAD
+BODY
+
+=transit uranus square saturn
+LEAD
+BODY
+
+=transit uranus trine saturn
+LEAD
+BODY
+
+=transit uranus opposition saturn
+LEAD
+BODY
+
+=transit uranus biquintile saturn
+LEAD
+BODY
+
+=transit uranus septile saturn
+LEAD
+BODY
+
+=transit uranus novile saturn
+LEAD
+BODY
+
+=transit uranus decile saturn
+LEAD
+BODY
+
+# uranus with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction uranus
+LEAD
+BODY
+
+=transit uranus sextile uranus
+LEAD
+BODY
+
+=transit uranus square uranus
+LEAD
+BODY
+
+=transit uranus trine uranus
+LEAD
+BODY
+
+=transit uranus opposition uranus
+LEAD
+BODY
+
+=transit uranus biquintile uranus
+LEAD
+BODY
+
+=transit uranus septile uranus
+LEAD
+BODY
+
+=transit uranus novile uranus
+LEAD
+BODY
+
+=transit uranus decile uranus
+LEAD
+BODY
+
+# uranus with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction neptune
+LEAD
+BODY
+
+=transit uranus sextile neptune
+LEAD
+BODY
+
+=transit uranus square neptune
+LEAD
+BODY
+
+=transit uranus trine neptune
+LEAD
+BODY
+
+=transit uranus opposition neptune
+LEAD
+BODY
+
+=transit uranus biquintile neptune
+LEAD
+BODY
+
+=transit uranus septile neptune
+LEAD
+BODY
+
+=transit uranus novile neptune
+LEAD
+BODY
+
+=transit uranus decile neptune
+LEAD
+BODY
+
+# uranus with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction pluto
+LEAD
+BODY
+
+=transit uranus sextile pluto
+LEAD
+BODY
+
+=transit uranus square pluto
+LEAD
+BODY
+
+=transit uranus trine pluto
+LEAD
+BODY
+
+=transit uranus opposition pluto
+LEAD
+BODY
+
+=transit uranus biquintile pluto
+LEAD
+BODY
+
+=transit uranus septile pluto
+LEAD
+BODY
+
+=transit uranus novile pluto
+LEAD
+BODY
+
+=transit uranus decile pluto
+LEAD
+BODY
+
+# uranus with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction chiron
+LEAD
+BODY
+
+=transit uranus sextile chiron
+LEAD
+BODY
+
+=transit uranus square chiron
+LEAD
+BODY
+
+=transit uranus trine chiron
+LEAD
+BODY
+
+=transit uranus opposition chiron
+LEAD
+BODY
+
+=transit uranus biquintile chiron
+LEAD
+BODY
+
+=transit uranus septile chiron
+LEAD
+BODY
+
+=transit uranus novile chiron
+LEAD
+BODY
+
+=transit uranus decile chiron
+LEAD
+BODY
+
+# uranus with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit uranus conjunction north_node
+LEAD
+BODY
+
+=transit uranus sextile north_node
+LEAD
+BODY
+
+=transit uranus square north_node
+LEAD
+BODY
+
+=transit uranus trine north_node
+LEAD
+BODY
+
+=transit uranus opposition north_node
+LEAD
+BODY
+
+=transit uranus biquintile north_node
+LEAD
+BODY
+
+=transit uranus septile north_node
+LEAD
+BODY
+
+=transit uranus novile north_node
+LEAD
+BODY
+
+=transit uranus decile north_node
+LEAD
+BODY
