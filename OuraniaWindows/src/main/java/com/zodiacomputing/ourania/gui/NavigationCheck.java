@@ -1361,8 +1361,10 @@ public final class NavigationCheck {
                 ChartSetupPanel.class.getDeclaredMethod("generateChart");
             gen.setAccessible(true);
             final Exception[] blew = new Exception[1];
+            final int[] castsBefore = new int[1];
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 try {
+                    castsBefore[0] = panel.castsApplied();
                     setSubject.invoke(setup, ps);
                     gen.invoke(setup);
                 } catch (Exception e) {
@@ -1370,7 +1372,25 @@ public final class NavigationCheck {
                 }
             });
             ok("the two charts generate", blew[0] == null);
-            Thread.sleep(3000);
+            // <b>Wait for the cast to be applied, not for three seconds.</b> generateChart hands
+            // the form to a worker, and since b4640243 the worker installs the two subjects only
+            // when it finishes - so the two assertions below were a race between that worker and
+            // a flat Thread.sleep(3000). On the CI runner on 2026-10-10 this suite came back 12 of
+            // 815 and, on the next run of the same code, its known 10: two extra failures, once.
+            // SkymapPanel.castsApplied is the completion signal that fix added and
+            // FrameAgreementCheck already waits on; it moves last, after the subjects are in and
+            // the wheel is recast. A cast that never lands still fails, by name, at the deadline.
+            long askedAt = System.nanoTime();
+            long castBy = System.currentTimeMillis() + 90000;
+            while (System.currentTimeMillis() < castBy
+                    && panel.castsApplied() == castsBefore[0]) {
+                Thread.sleep(50);
+            }
+            javax.swing.SwingUtilities.invokeAndWait(() -> { });
+            System.out.println("  the form's cast was applied after "
+                + (System.nanoTime() - askedAt) / 1_000_000L + " ms");
+            ok("the cast the form asked for was applied within ninety seconds",
+                panel.castsApplied() > castsBefore[0]);
             ok("the wheel is holding a Chart A", hold[0].wheelHasChartA());
             ok("the wheel is holding a Chart B", hold[0].wheelHasChartB());
 
