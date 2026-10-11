@@ -47,7 +47,7 @@ Juno is the contract: vows, fairness, who carries what. Venus is the affection a
 2. **No two aspects of the same pair may share half their wording.** Do not write one
    paragraph and change a clause. Each aspect is a different situation and needs different
    sentences. Do not repeat the same definition sentence for a body across a pair's aspects.
-3. **No sentence of six or more words may appear in three readings.** No stock closing lines.
+3. **No sentence of six or more words may appear in two readings, even for different first bodies.** No stock closing lines.
 4. **No stock frame.** For any one first body, no more than a tenth of its readings may open
    their paragraph with the same two words or close on a sentence starting with the same two.
    Do not begin by naming the aspect ("A square between composite Eris and ...") and do not end

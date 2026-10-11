@@ -45,7 +45,7 @@ NAMES = {
     "juno": "juno", "vesta": "vesta", "lilith": "lilith", "black moon lilith": "lilith",
     "eris": "eris", "eros": "eros", "hygiea": "hygiea", "nessus": "nessus", "pholus": "pholus",
     "fortune": "fortune", "part of fortune": "fortune", "spirit": "spirit",
-    "part of spirit": "spirit",
+    "part of spirit": "spirit", "part_of_fortune": "fortune", "part_of_spirit": "spirit",
 }
 BODY = "|".join(sorted((re.escape(n) for n in NAMES), key=len, reverse=True))
 HEADING = re.compile(
@@ -118,6 +118,14 @@ def do_import():
                         key = None
                     else:
                         key = k
+                elif raw.lstrip().startswith("="):
+                    # A heading this cannot read. It used to be taken for prose and swallowed,
+                    # with every reading under it, into the reading before: ten Eros readings
+                    # headed part_of_fortune and part_of_spirit became 763 words of Pallas.
+                    flush()
+                    buf = []
+                    key = None
+                    unplaced.append(f"a heading this cannot read: {raw.strip()[:60]}")
                 elif key is not None:
                     buf.append(clean(raw))
             flush()
@@ -217,7 +225,18 @@ def do_prompts():
                         "do not always phrase it as Eris squaring X creates tension between: move it "
                         "around and word it differently each time. Every sentence must be complete and "
                         "grammatical: read each one back, never join two sentences with when or as, and "
-                        "write an before a vowel sound. Never reuse a closing sentence from another reading.",
+                        "write an before a vowel sound. Start every lead with a capital letter.",
+                        "The closing sentence is checked hardest. It must be about THIS pair of bodies and "
+                        "this aspect, and must not be a sentence you have written before in this chat or "
+                        "that appears in any earlier answer or saved note: no reading may share a sentence "
+                        "with any other reading, including readings for a different first body. Do not "
+                        "close on general advice that would fit any couple (Clear schedules restore "
+                        "domestic peace, Basic financial discipline ensures lasting abundance).",
+                        "More moulds to avoid: every sextile saying offers an opening when you "
+                        "intentionally, every trine saying feels easy because, every opposition saying "
+                        "sets up a pull where one partner. Copy each heading exactly as listed, with the "
+                        "same short names (mc, fortune, spirit, north_node), and write only the readings "
+                        "listed: do not add pairs that are not in the list.",
                         ""] + batch + [""]
             out.append("=====")
             with open(os.path.join(folder, f"{n:02d}_{a}.txt"), "w", encoding="utf-8") as fh:

@@ -29,7 +29,8 @@ CHECKS, because these replace text a template assembled and must not become one:
     twice the longest common word sequence over the two lengths - and where CorpusCheck
     compares only square with trine, this compares every aspect drafted for the pair;
   - every reading is 50 to 120 words;
-  - no sentence of six words or more appears in three readings of a set;
+  - no sentence of six words or more appears in two readings of a set (it was three until the
+    Eros batch closed 18 readings on the sentence that closed the matching Eris one);
   - for any one first body, no more than a tenth of its readings (eight at least) may open
     their paragraph with the same two words, or close on a sentence starting with the same two;
   - no double quote, angle bracket or ampersand (DataCheck forbids a quote inside a value),
@@ -184,7 +185,7 @@ def check(name, cfg, d, where):
             if len(s.split()) >= 6:
                 seen[s] += 1
     for s, n in seen.items():
-        if n >= 3:
+        if n >= 2:
             problems.append(f"a sentence used in {n} readings: {s[:70]}")
     # A stock frame is a template too, even when no whole sentence repeats: 21 of the first
     # 120 readings a notebook returned began "A square between composite Eris and", and 37
