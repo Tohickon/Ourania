@@ -35,6 +35,8 @@ CHECKS, because these replace text a template assembled and must not become one:
     their paragraph with the same two words, or close on a sentence starting with the same two;
   - no double quote, angle bracket or ampersand (DataCheck forbids a quote inside a value),
     no dash used as punctuation, and each part ends its sentence;
+  - two first bodies in the same aspect to the same second body may not share half their
+    wording either: a reading must not be another body's reading with the name changed;
   - a key the app does not have is refused.
 A pair is only spliced complete: --write refuses while any aspect of a drafted pair is missing.
 
@@ -179,6 +181,21 @@ def check(name, cfg, d, where):
                 worst = max(worst, s)
                 if s >= 0.5:
                     problems.append(f"{a}/{b}: {names[i]} and {names[j]} share {s:.0%}")
+    # The same aspect to the same second body, for two different first bodies. The first
+    # Nessus batch passed every check above while 32 of its 100 readings were the Juno
+    # reading with the name changed (Nessus and Juno opposite Vesta shared 87%).
+    twins = collections.defaultdict(list)
+    for k, (lead, body) in d.items():
+        if k in where:
+            _, a, asp, b = split_key(k)
+            twins[(asp, b)].append((a, lead + " " + body))
+    for (asp, b), group in twins.items():
+        for i in range(len(group)):
+            for j in range(i + 1, len(group)):
+                s = similarity(group[i][1], group[j][1])
+                if s >= 0.5:
+                    problems.append(f"{asp} {b}: the {group[i][0]} and {group[j][0]} readings "
+                                    f"share {s:.0%}")
     seen = collections.Counter()
     for k, (lead, body) in d.items():
         for s in set(x.strip() for x in re.split(r"(?<=[.!?])\s+", lead + " " + body)):

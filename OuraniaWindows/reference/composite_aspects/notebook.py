@@ -257,6 +257,10 @@ def do_prompts():
                         "around and word it differently each time. Every sentence must be complete and "
                         "grammatical: read each one back, never join two sentences with when or as, and "
                         "write an before a vowel sound. Start every lead with a capital letter.",
+                        "A program compares each reading with the readings already written for OTHER first "
+                        "bodies in the same aspect to the same second body, and rejects any that share "
+                        "half their words. Do not adapt, reword or reuse any earlier answer in this "
+                        "notebook: write each reading from nothing, about what THIS first body does. "
                         "Do not end a reading on a sentence of advice. End on what actually happens between "
                         "the two people. If you do give advice, it must be specific to this pair. "
                         "The closing sentence is checked hardest. It must be about THIS pair of bodies and "
