@@ -8,3 +8,15 @@
 
 SkyViewCheck     5      # 5: Eros and Eris cannot be placed, so the sky holds 17 of 19 chosen points
 ChartSetupCheck  1      # 1: "with the real directory every selectable body can be placed" (same four files)
+
+# Added 2026-10-10. CI had been red on every push since 2026-09-28 and these two are why. Both
+# were written on David's machine and hold the runner to that machine's ephemeris folder, which
+# is short of semo_18.se1 - the Moon's own file for 1800 to 2399 - so there the lunar nodes come
+# from the built-in approximation. The runner downloads that file, so here they come from it.
+# Measured with the five files CI fetches: the node differs by 0.0067 degrees at most (24
+# seconds of arc). THE FIX IS ON THAT MACHINE, NOT HERE: put semo_18.se1 in its ephemeris folder,
+# regenerate ephemeris-corpus.tsv, turn StartupCheck's "still missing the Moon's file" round as
+# its own comment says to, and take both lines out.
+
+EphemerisCorpusCheck 2   # 2 in Part A: 285 stored longitudes differ and 50 rows answer from files that were approximation in the corpus - the lunar nodes and what is derived from them in every era, because the corpus was generated without semo_18.se1; plus rows at 1500-1850 where the two folders hold different files
+StartupCheck     2      # 2: "this machine is still missing the Moon's file" is false here, by design of the assertion; and "inside the files' era nothing is beyond computing" fails on the four asteroid files CI cannot have (Eris, Eros, Hygiea, Nessus), the same cause as the two lines above

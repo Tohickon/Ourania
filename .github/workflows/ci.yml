@@ -46,6 +46,23 @@ jobs:
         # known-red-ci.txt: the suites red only here, for want of the four asteroid files.
         run: .\build.ps1 -Out out-ci -All -KnownRed known-red.txt,known-red-ci.txt
 
+      # A red run used to say "exit code 1" and nothing else unless the logs were downloaded,
+      # which is how CI stayed red from 28 September to 10 October with nobody knowing which
+      # suite it was. This puts each red suite's row on the run page itself.
+      - name: Say which suites were red
+        if: failure()
+        run: |
+          $s = "out-ci-logs\SUMMARY.txt"
+          if (Test-Path $s) {
+            foreach ($line in Get-Content $s) {
+              $t = $line.TrimStart([char] 0xFEFF)
+              if ($t -cmatch '^\S+\s+(RED|MORE RED THAN KNOWN|known red, NO COUNT)') { Write-Host "::error::$t" }
+              elseif ($t -cmatch '^\S+\s+(less red than known|pass \(listed)') { Write-Host "::warning::$t" }
+            }
+          } else {
+            Write-Host "::error::No SUMMARY.txt - the build failed before any suite ran."
+          }
+
       - name: Keep the suite logs
         if: always()
         uses: actions/upload-artifact@v4
