@@ -56,7 +56,22 @@ jobs:
           if (Test-Path $s) {
             foreach ($line in Get-Content $s) {
               $t = $line.TrimStart([char] 0xFEFF)
-              if ($t -cmatch '^\S+\s+(RED|MORE RED THAN KNOWN|known red, NO COUNT)') { Write-Host "::error::$t" }
+              if ($t -cmatch '^(\S+)\s+(RED|MORE RED THAN KNOWN|known red, NO COUNT)') {
+                # The row, then the suite's own list of what failed - one annotation for the
+                # suite, because a step may raise only ten and a suite can fail more than that.
+                $msg = $t
+                $log = "out-ci-logs\$($Matches[1]).txt"
+                if (Test-Path $log) {
+                  $all = @(Get-Content $log)
+                  $at = -1
+                  for ($i = 0; $i -lt $all.Count; $i++) { if ($all[$i] -cmatch '^FAILURES') { $at = $i } }
+                  if ($at -ge 0) {
+                    $last = [Math]::Min($all.Count - 1, $at + 40)
+                    foreach ($f in $all[($at + 1)..$last]) { if ($f.Trim()) { $msg += "%0A" + $f.Trim() } }
+                  }
+                }
+                Write-Host "::error::$msg"
+              }
               elseif ($t -cmatch '^\S+\s+(less red than known|pass \(listed)') { Write-Host "::warning::$t" }
             }
           } else {
