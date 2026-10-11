@@ -1,7 +1,7 @@
-composite: eros - 115 readings in 12 prompts.
+composite: pallas - 95 readings in 10 prompts.
 Copy ONE block (the lines between two ===== rows) into the notebook chat.
 
-===== eros 1 of 12 =====
+===== pallas 1 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -10,20 +10,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction ascendant
-eros sextile ascendant
-eros square ascendant
-eros trine ascendant
-eros opposition ascendant
-eros conjunction chiron
-eros sextile chiron
-eros square chiron
-eros trine chiron
-eros opposition chiron
+pallas conjunction ascendant
+pallas sextile ascendant
+pallas square ascendant
+pallas trine ascendant
+pallas opposition ascendant
+pallas conjunction chiron
+pallas sextile chiron
+pallas square chiron
+pallas trine chiron
+pallas opposition chiron
 
-===== eros 2 of 12 =====
+===== pallas 2 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -32,20 +32,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction jupiter
-eros sextile jupiter
-eros square jupiter
-eros trine jupiter
-eros opposition jupiter
-eros conjunction mars
-eros sextile mars
-eros square mars
-eros trine mars
-eros opposition mars
+pallas conjunction jupiter
+pallas sextile jupiter
+pallas square jupiter
+pallas trine jupiter
+pallas opposition jupiter
+pallas conjunction mars
+pallas sextile mars
+pallas square mars
+pallas trine mars
+pallas opposition mars
 
-===== eros 3 of 12 =====
+===== pallas 3 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -54,20 +54,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction mercury
-eros sextile mercury
-eros square mercury
-eros trine mercury
-eros opposition mercury
-eros conjunction mc
-eros sextile mc
-eros square mc
-eros trine mc
-eros opposition mc
+pallas conjunction mercury
+pallas sextile mercury
+pallas square mercury
+pallas trine mercury
+pallas opposition mercury
+pallas conjunction mc
+pallas sextile mc
+pallas square mc
+pallas trine mc
+pallas opposition mc
 
-===== eros 4 of 12 =====
+===== pallas 4 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -76,20 +76,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction moon
-eros sextile moon
-eros square moon
-eros trine moon
-eros opposition moon
-eros conjunction neptune
-eros sextile neptune
-eros square neptune
-eros trine neptune
-eros opposition neptune
+pallas conjunction moon
+pallas sextile moon
+pallas square moon
+pallas trine moon
+pallas opposition moon
+pallas conjunction neptune
+pallas sextile neptune
+pallas square neptune
+pallas trine neptune
+pallas opposition neptune
 
-===== eros 5 of 12 =====
+===== pallas 5 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -98,20 +98,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction north_node
-eros sextile north_node
-eros square north_node
-eros trine north_node
-eros opposition north_node
-eros conjunction pluto
-eros sextile pluto
-eros square pluto
-eros trine pluto
-eros opposition pluto
+pallas conjunction north_node
+pallas sextile north_node
+pallas square north_node
+pallas trine north_node
+pallas opposition north_node
+pallas conjunction pluto
+pallas sextile pluto
+pallas square pluto
+pallas trine pluto
+pallas opposition pluto
 
-===== eros 6 of 12 =====
+===== pallas 6 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -120,20 +120,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction saturn
-eros sextile saturn
-eros square saturn
-eros trine saturn
-eros opposition saturn
-eros conjunction sun
-eros sextile sun
-eros square sun
-eros trine sun
-eros opposition sun
+pallas conjunction saturn
+pallas sextile saturn
+pallas square saturn
+pallas trine saturn
+pallas opposition saturn
+pallas conjunction sun
+pallas sextile sun
+pallas square sun
+pallas trine sun
+pallas opposition sun
 
-===== eros 7 of 12 =====
+===== pallas 7 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -142,20 +142,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction uranus
-eros sextile uranus
-eros square uranus
-eros trine uranus
-eros opposition uranus
-eros conjunction venus
-eros sextile venus
-eros square venus
-eros trine venus
-eros opposition venus
+pallas conjunction uranus
+pallas sextile uranus
+pallas square uranus
+pallas trine uranus
+pallas opposition uranus
+pallas conjunction venus
+pallas sextile venus
+pallas square venus
+pallas trine venus
+pallas opposition venus
 
-===== eros 8 of 12 =====
+===== pallas 8 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -164,20 +164,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction hygiea
-eros sextile hygiea
-eros square hygiea
-eros trine hygiea
-eros opposition hygiea
-eros conjunction juno
-eros sextile juno
-eros square juno
-eros trine juno
-eros opposition juno
+pallas conjunction fortune
+pallas sextile fortune
+pallas square fortune
+pallas trine fortune
+pallas opposition fortune
+pallas conjunction spirit
+pallas sextile spirit
+pallas square spirit
+pallas trine spirit
+pallas opposition spirit
 
-===== eros 9 of 12 =====
+===== pallas 9 of 10 =====
 Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -186,64 +186,20 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction nessus
-eros sextile nessus
-eros square nessus
-eros trine nessus
-eros opposition nessus
-eros conjunction pallas
-eros sextile pallas
-eros square pallas
-eros trine pallas
-eros opposition pallas
+pallas conjunction pholus
+pallas sextile pholus
+pallas square pholus
+pallas trine pholus
+pallas opposition pholus
+pallas conjunction south_node
+pallas sextile south_node
+pallas square south_node
+pallas trine south_node
+pallas opposition south_node
 
-===== eros 10 of 12 =====
-Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
-For each reading give exactly three parts, in this order, as plain text:
-1. the heading, copied exactly as I list it, on a line by itself
-2. one lead sentence on its own line that states the whole dynamic plainly
-3. one paragraph of three to five sentences
-Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
-Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
-Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
-
-eros conjunction fortune
-eros sextile fortune
-eros square fortune
-eros trine fortune
-eros opposition fortune
-eros conjunction spirit
-eros sextile spirit
-eros square spirit
-eros trine spirit
-eros opposition spirit
-
-===== eros 11 of 12 =====
-Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
-For each reading give exactly three parts, in this order, as plain text:
-1. the heading, copied exactly as I list it, on a line by itself
-2. one lead sentence on its own line that states the whole dynamic plainly
-3. one paragraph of three to five sentences
-Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
-Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
-Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
-
-eros conjunction pholus
-eros sextile pholus
-eros square pholus
-eros trine pholus
-eros opposition pholus
-eros conjunction south_node
-eros sextile south_node
-eros square south_node
-eros trine south_node
-eros opposition south_node
-
-===== eros 12 of 12 =====
+===== pallas 10 of 10 =====
 Using the source titled Ourania writing brief, write the 5 readings listed below. Each describes a permanent feature of the relationship's own chart.
 For each reading give exactly three parts, in this order, as plain text:
 1. the heading, copied exactly as I list it, on a line by itself
@@ -252,12 +208,12 @@ For each reading give exactly three parts, in this order, as plain text:
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
 Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. Never write a sentence whose job is to define a body (Eris embodies X, while Mercury governs Y). Do not start a paragraph with the name of the first body followed by a verb like embodies, represents, channels, drives or governs. Start inside the couple's life instead: what the two of them do, argue about or avoid. Let what each body means show through that, in different words every time. Do not start a second sentence with the aspect name (A square, An opposition), and do not give every trine the same shape (Because this comes easily, you risk).
 Name both bodies in every reading, at least once each, in passing and never as a definition: for example, Eris's bluntness lands on Mercury's everyday talk. A reader must be able to tell from the paragraph alone which two bodies it is about.
-Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly and catalytic.
+Each aspect must not have its own fixed mould. In the last attempt nearly every sextile lead ended when you actively, every trine had Because this flows so smoothly, you might, most conjunctions turned on However, most squares had Arguments erupt and The pair struggles to, and most oppositions had One partner may, while the other and You risk. Use each of those phrases at most once per block, and build each reading's sentences differently from the one before it. Do not open more than one paragraph per block with The pair or The relationship. If a word is on the avoid list, rewrite the sentence in plain words; do not swap in an invented word (momentums is not a word). Also avoid effortlessly, catalytic and harmonious. Do not always put the sentence that names the two bodies second, and do not always phrase it as Eris squaring X creates tension between: move it around and word it differently each time. Every sentence must be complete and grammatical: read each one back, never join two sentences with when or as, and write an before a vowel sound. Never reuse a closing sentence from another reading.
 
-eros conjunction vesta
-eros sextile vesta
-eros square vesta
-eros trine vesta
-eros opposition vesta
+pallas conjunction vesta
+pallas sextile vesta
+pallas square vesta
+pallas trine vesta
+pallas opposition vesta
 
 =====

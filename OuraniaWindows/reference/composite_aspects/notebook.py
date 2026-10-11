@@ -212,7 +212,12 @@ def do_prompts():
                         "block, and build each reading's sentences differently from the one before it. Do "
                         "not open more than one paragraph per block with The pair or The relationship. If "
                         "a word is on the avoid list, rewrite the sentence in plain words; do not swap in "
-                        "an invented word (momentums is not a word). Also avoid effortlessly and catalytic.",
+                        "an invented word (momentums is not a word). Also avoid effortlessly, catalytic and "
+                        "harmonious. Do not always put the sentence that names the two bodies second, and "
+                        "do not always phrase it as Eris squaring X creates tension between: move it "
+                        "around and word it differently each time. Every sentence must be complete and "
+                        "grammatical: read each one back, never join two sentences with when or as, and "
+                        "write an before a vowel sound. Never reuse a closing sentence from another reading.",
                         ""] + batch + [""]
             out.append("=====")
             with open(os.path.join(folder, f"{n:02d}_{a}.txt"), "w", encoding="utf-8") as fh:
