@@ -1,0 +1,156 @@
+composite: pholus - 80 readings in 8 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== pholus 1 of 8 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+pholus conjunction ascendant
+pholus sextile ascendant
+pholus square ascendant
+pholus trine ascendant
+pholus opposition ascendant
+pholus conjunction chiron
+pholus sextile chiron
+pholus square chiron
+pholus trine chiron
+pholus opposition chiron
+
+===== pholus 2 of 8 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+pholus conjunction jupiter
+pholus sextile jupiter
+pholus square jupiter
+pholus trine jupiter
+pholus opposition jupiter
+pholus conjunction mars
+pholus sextile mars
+pholus square mars
+pholus trine mars
+pholus opposition mars
+
+===== pholus 3 of 8 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+pholus conjunction mercury
+pholus sextile mercury
+pholus square mercury
+pholus trine mercury
+pholus opposition mercury
+pholus conjunction mc
+pholus sextile mc
+pholus square mc
+pholus trine mc
+pholus opposition mc
+
+===== pholus 4 of 8 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+pholus conjunction moon
+pholus sextile moon
+pholus square moon
+pholus trine moon
+pholus opposition moon
+pholus conjunction neptune
+pholus sextile neptune
+pholus square neptune
+pholus trine neptune
+pholus opposition neptune
+
+===== pholus 5 of 8 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+pholus conjunction north_node
+pholus sextile north_node
+pholus square north_node
+pholus trine north_node
+pholus opposition north_node
+pholus conjunction pluto
+pholus sextile pluto
+pholus square pluto
+pholus trine pluto
+pholus opposition pluto
+
+===== pholus 6 of 8 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+pholus conjunction saturn
+pholus sextile saturn
+pholus square saturn
+pholus trine saturn
+pholus opposition saturn
+pholus conjunction sun
+pholus sextile sun
+pholus square sun
+pholus trine sun
+pholus opposition sun
+
+===== pholus 7 of 8 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+pholus conjunction uranus
+pholus sextile uranus
+pholus square uranus
+pholus trine uranus
+pholus opposition uranus
+pholus conjunction venus
+pholus sextile venus
+pholus square venus
+pholus trine venus
+pholus opposition venus
+
+===== pholus 8 of 8 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+pholus conjunction south_node
+pholus sextile south_node
+pholus square south_node
+pholus trine south_node
+pholus opposition south_node
+pholus conjunction vesta
+pholus sextile vesta
+pholus square vesta
+pholus trine vesta
+pholus opposition vesta
+
+=====

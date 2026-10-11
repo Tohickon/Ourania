@@ -1,0 +1,564 @@
+transit: pallas - 308 readings in 28 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== pallas 1 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction ascendant
+transit pallas sextile ascendant
+transit pallas square ascendant
+transit pallas trine ascendant
+transit pallas opposition ascendant
+transit pallas quincunx ascendant
+transit pallas semisextile ascendant
+transit pallas semisquare ascendant
+transit pallas sesquiquadrate ascendant
+transit pallas quintile ascendant
+transit pallas sesquiquintile ascendant
+
+===== pallas 2 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction descendant
+transit pallas sextile descendant
+transit pallas square descendant
+transit pallas trine descendant
+transit pallas opposition descendant
+transit pallas quincunx descendant
+transit pallas semisextile descendant
+transit pallas semisquare descendant
+transit pallas sesquiquadrate descendant
+transit pallas quintile descendant
+transit pallas sesquiquintile descendant
+
+===== pallas 3 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction mc
+transit pallas sextile mc
+transit pallas square mc
+transit pallas trine mc
+transit pallas opposition mc
+transit pallas quincunx mc
+transit pallas semisextile mc
+transit pallas semisquare mc
+transit pallas sesquiquadrate mc
+transit pallas quintile mc
+transit pallas sesquiquintile mc
+
+===== pallas 4 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction ic
+transit pallas sextile ic
+transit pallas square ic
+transit pallas trine ic
+transit pallas opposition ic
+transit pallas quincunx ic
+transit pallas semisextile ic
+transit pallas semisquare ic
+transit pallas sesquiquadrate ic
+transit pallas quintile ic
+transit pallas sesquiquintile ic
+
+===== pallas 5 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction south_node
+transit pallas sextile south_node
+transit pallas square south_node
+transit pallas trine south_node
+transit pallas opposition south_node
+transit pallas quincunx south_node
+transit pallas semisextile south_node
+transit pallas semisquare south_node
+transit pallas sesquiquadrate south_node
+transit pallas quintile south_node
+transit pallas sesquiquintile south_node
+
+===== pallas 6 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction ceres
+transit pallas sextile ceres
+transit pallas square ceres
+transit pallas trine ceres
+transit pallas opposition ceres
+transit pallas quincunx ceres
+transit pallas semisextile ceres
+transit pallas semisquare ceres
+transit pallas sesquiquadrate ceres
+transit pallas quintile ceres
+transit pallas sesquiquintile ceres
+
+===== pallas 7 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction juno
+transit pallas sextile juno
+transit pallas square juno
+transit pallas trine juno
+transit pallas opposition juno
+transit pallas quincunx juno
+transit pallas semisextile juno
+transit pallas semisquare juno
+transit pallas sesquiquadrate juno
+transit pallas quintile juno
+transit pallas sesquiquintile juno
+
+===== pallas 8 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction vesta
+transit pallas sextile vesta
+transit pallas square vesta
+transit pallas trine vesta
+transit pallas opposition vesta
+transit pallas quincunx vesta
+transit pallas semisextile vesta
+transit pallas semisquare vesta
+transit pallas sesquiquadrate vesta
+transit pallas quintile vesta
+transit pallas sesquiquintile vesta
+
+===== pallas 9 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction eris
+transit pallas sextile eris
+transit pallas square eris
+transit pallas trine eris
+transit pallas opposition eris
+transit pallas quincunx eris
+transit pallas semisextile eris
+transit pallas semisquare eris
+transit pallas sesquiquadrate eris
+transit pallas quintile eris
+transit pallas sesquiquintile eris
+
+===== pallas 10 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction eros
+transit pallas sextile eros
+transit pallas square eros
+transit pallas trine eros
+transit pallas opposition eros
+transit pallas quincunx eros
+transit pallas semisextile eros
+transit pallas semisquare eros
+transit pallas sesquiquadrate eros
+transit pallas quintile eros
+transit pallas sesquiquintile eros
+
+===== pallas 11 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction hygiea
+transit pallas sextile hygiea
+transit pallas square hygiea
+transit pallas trine hygiea
+transit pallas opposition hygiea
+transit pallas quincunx hygiea
+transit pallas semisextile hygiea
+transit pallas semisquare hygiea
+transit pallas sesquiquadrate hygiea
+transit pallas quintile hygiea
+transit pallas sesquiquintile hygiea
+
+===== pallas 12 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction nessus
+transit pallas sextile nessus
+transit pallas square nessus
+transit pallas trine nessus
+transit pallas opposition nessus
+transit pallas quincunx nessus
+transit pallas semisextile nessus
+transit pallas semisquare nessus
+transit pallas sesquiquadrate nessus
+transit pallas quintile nessus
+transit pallas sesquiquintile nessus
+
+===== pallas 13 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction pholus
+transit pallas sextile pholus
+transit pallas square pholus
+transit pallas trine pholus
+transit pallas opposition pholus
+transit pallas quincunx pholus
+transit pallas semisextile pholus
+transit pallas semisquare pholus
+transit pallas sesquiquadrate pholus
+transit pallas quintile pholus
+transit pallas sesquiquintile pholus
+
+===== pallas 14 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction fortune
+transit pallas sextile fortune
+transit pallas square fortune
+transit pallas trine fortune
+transit pallas opposition fortune
+transit pallas quincunx fortune
+transit pallas semisextile fortune
+transit pallas semisquare fortune
+transit pallas sesquiquadrate fortune
+transit pallas quintile fortune
+transit pallas sesquiquintile fortune
+
+===== pallas 15 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction spirit
+transit pallas sextile spirit
+transit pallas square spirit
+transit pallas trine spirit
+transit pallas opposition spirit
+transit pallas quincunx spirit
+transit pallas semisextile spirit
+transit pallas semisquare spirit
+transit pallas sesquiquadrate spirit
+transit pallas quintile spirit
+transit pallas sesquiquintile spirit
+
+===== pallas 16 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction lilith
+transit pallas sextile lilith
+transit pallas square lilith
+transit pallas trine lilith
+transit pallas opposition lilith
+transit pallas quincunx lilith
+transit pallas semisextile lilith
+transit pallas semisquare lilith
+transit pallas sesquiquadrate lilith
+transit pallas quintile lilith
+transit pallas sesquiquintile lilith
+
+===== pallas 17 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction moon
+transit pallas sextile moon
+transit pallas square moon
+transit pallas trine moon
+transit pallas opposition moon
+transit pallas quincunx moon
+transit pallas semisextile moon
+transit pallas semisquare moon
+transit pallas sesquiquadrate moon
+transit pallas quintile moon
+transit pallas sesquiquintile moon
+
+===== pallas 18 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction sun
+transit pallas sextile sun
+transit pallas square sun
+transit pallas trine sun
+transit pallas opposition sun
+transit pallas quincunx sun
+transit pallas semisextile sun
+transit pallas semisquare sun
+transit pallas sesquiquadrate sun
+transit pallas quintile sun
+transit pallas sesquiquintile sun
+
+===== pallas 19 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction mercury
+transit pallas sextile mercury
+transit pallas square mercury
+transit pallas trine mercury
+transit pallas opposition mercury
+transit pallas quincunx mercury
+transit pallas semisextile mercury
+transit pallas semisquare mercury
+transit pallas sesquiquadrate mercury
+transit pallas quintile mercury
+transit pallas sesquiquintile mercury
+
+===== pallas 20 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction venus
+transit pallas sextile venus
+transit pallas square venus
+transit pallas trine venus
+transit pallas opposition venus
+transit pallas quincunx venus
+transit pallas semisextile venus
+transit pallas semisquare venus
+transit pallas sesquiquadrate venus
+transit pallas quintile venus
+transit pallas sesquiquintile venus
+
+===== pallas 21 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction mars
+transit pallas sextile mars
+transit pallas square mars
+transit pallas trine mars
+transit pallas opposition mars
+transit pallas quincunx mars
+transit pallas semisextile mars
+transit pallas semisquare mars
+transit pallas sesquiquadrate mars
+transit pallas quintile mars
+transit pallas sesquiquintile mars
+
+===== pallas 22 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction jupiter
+transit pallas sextile jupiter
+transit pallas square jupiter
+transit pallas trine jupiter
+transit pallas opposition jupiter
+transit pallas quincunx jupiter
+transit pallas semisextile jupiter
+transit pallas semisquare jupiter
+transit pallas sesquiquadrate jupiter
+transit pallas quintile jupiter
+transit pallas sesquiquintile jupiter
+
+===== pallas 23 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction saturn
+transit pallas sextile saturn
+transit pallas square saturn
+transit pallas trine saturn
+transit pallas opposition saturn
+transit pallas quincunx saturn
+transit pallas semisextile saturn
+transit pallas semisquare saturn
+transit pallas sesquiquadrate saturn
+transit pallas quintile saturn
+transit pallas sesquiquintile saturn
+
+===== pallas 24 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction uranus
+transit pallas sextile uranus
+transit pallas square uranus
+transit pallas trine uranus
+transit pallas opposition uranus
+transit pallas quincunx uranus
+transit pallas semisextile uranus
+transit pallas semisquare uranus
+transit pallas sesquiquadrate uranus
+transit pallas quintile uranus
+transit pallas sesquiquintile uranus
+
+===== pallas 25 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction neptune
+transit pallas sextile neptune
+transit pallas square neptune
+transit pallas trine neptune
+transit pallas opposition neptune
+transit pallas quincunx neptune
+transit pallas semisextile neptune
+transit pallas semisquare neptune
+transit pallas sesquiquadrate neptune
+transit pallas quintile neptune
+transit pallas sesquiquintile neptune
+
+===== pallas 26 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction pluto
+transit pallas sextile pluto
+transit pallas square pluto
+transit pallas trine pluto
+transit pallas opposition pluto
+transit pallas quincunx pluto
+transit pallas semisextile pluto
+transit pallas semisquare pluto
+transit pallas sesquiquadrate pluto
+transit pallas quintile pluto
+transit pallas sesquiquintile pluto
+
+===== pallas 27 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction north_node
+transit pallas sextile north_node
+transit pallas square north_node
+transit pallas trine north_node
+transit pallas opposition north_node
+transit pallas quincunx north_node
+transit pallas semisextile north_node
+transit pallas semisquare north_node
+transit pallas sesquiquadrate north_node
+transit pallas quintile north_node
+transit pallas sesquiquintile north_node
+
+===== pallas 28 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pallas conjunction chiron
+transit pallas sextile chiron
+transit pallas square chiron
+transit pallas trine chiron
+transit pallas opposition chiron
+transit pallas quincunx chiron
+transit pallas semisextile chiron
+transit pallas semisquare chiron
+transit pallas sesquiquadrate chiron
+transit pallas quintile chiron
+transit pallas sesquiquintile chiron
+
+=====

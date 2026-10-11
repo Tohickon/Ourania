@@ -1,0 +1,232 @@
+composite: eris - 120 readings in 12 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== eris 1 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction ascendant
+eris sextile ascendant
+eris square ascendant
+eris trine ascendant
+eris opposition ascendant
+eris conjunction chiron
+eris sextile chiron
+eris square chiron
+eris trine chiron
+eris opposition chiron
+
+===== eris 2 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction jupiter
+eris sextile jupiter
+eris square jupiter
+eris trine jupiter
+eris opposition jupiter
+eris conjunction mars
+eris sextile mars
+eris square mars
+eris trine mars
+eris opposition mars
+
+===== eris 3 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction mercury
+eris sextile mercury
+eris square mercury
+eris trine mercury
+eris opposition mercury
+eris conjunction mc
+eris sextile mc
+eris square mc
+eris trine mc
+eris opposition mc
+
+===== eris 4 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction moon
+eris sextile moon
+eris square moon
+eris trine moon
+eris opposition moon
+eris conjunction neptune
+eris sextile neptune
+eris square neptune
+eris trine neptune
+eris opposition neptune
+
+===== eris 5 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction north_node
+eris sextile north_node
+eris square north_node
+eris trine north_node
+eris opposition north_node
+eris conjunction pluto
+eris sextile pluto
+eris square pluto
+eris trine pluto
+eris opposition pluto
+
+===== eris 6 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction saturn
+eris sextile saturn
+eris square saturn
+eris trine saturn
+eris opposition saturn
+eris conjunction sun
+eris sextile sun
+eris square sun
+eris trine sun
+eris opposition sun
+
+===== eris 7 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction uranus
+eris sextile uranus
+eris square uranus
+eris trine uranus
+eris opposition uranus
+eris conjunction venus
+eris sextile venus
+eris square venus
+eris trine venus
+eris opposition venus
+
+===== eris 8 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction eros
+eris sextile eros
+eris square eros
+eris trine eros
+eris opposition eros
+eris conjunction hygiea
+eris sextile hygiea
+eris square hygiea
+eris trine hygiea
+eris opposition hygiea
+
+===== eris 9 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction juno
+eris sextile juno
+eris square juno
+eris trine juno
+eris opposition juno
+eris conjunction nessus
+eris sextile nessus
+eris square nessus
+eris trine nessus
+eris opposition nessus
+
+===== eris 10 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction pallas
+eris sextile pallas
+eris square pallas
+eris trine pallas
+eris opposition pallas
+eris conjunction fortune
+eris sextile fortune
+eris square fortune
+eris trine fortune
+eris opposition fortune
+
+===== eris 11 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction spirit
+eris sextile spirit
+eris square spirit
+eris trine spirit
+eris opposition spirit
+eris conjunction pholus
+eris sextile pholus
+eris square pholus
+eris trine pholus
+eris opposition pholus
+
+===== eris 12 of 12 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+eris conjunction south_node
+eris sextile south_node
+eris square south_node
+eris trine south_node
+eris opposition south_node
+eris conjunction vesta
+eris sextile vesta
+eris square vesta
+eris trine vesta
+eris opposition vesta
+
+=====

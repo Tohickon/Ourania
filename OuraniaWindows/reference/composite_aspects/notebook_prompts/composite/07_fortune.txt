@@ -1,0 +1,175 @@
+composite: fortune - 90 readings in 9 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== fortune 1 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction ascendant
+fortune sextile ascendant
+fortune square ascendant
+fortune trine ascendant
+fortune opposition ascendant
+fortune conjunction chiron
+fortune sextile chiron
+fortune square chiron
+fortune trine chiron
+fortune opposition chiron
+
+===== fortune 2 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction jupiter
+fortune sextile jupiter
+fortune square jupiter
+fortune trine jupiter
+fortune opposition jupiter
+fortune conjunction mars
+fortune sextile mars
+fortune square mars
+fortune trine mars
+fortune opposition mars
+
+===== fortune 3 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction mercury
+fortune sextile mercury
+fortune square mercury
+fortune trine mercury
+fortune opposition mercury
+fortune conjunction mc
+fortune sextile mc
+fortune square mc
+fortune trine mc
+fortune opposition mc
+
+===== fortune 4 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction moon
+fortune sextile moon
+fortune square moon
+fortune trine moon
+fortune opposition moon
+fortune conjunction neptune
+fortune sextile neptune
+fortune square neptune
+fortune trine neptune
+fortune opposition neptune
+
+===== fortune 5 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction north_node
+fortune sextile north_node
+fortune square north_node
+fortune trine north_node
+fortune opposition north_node
+fortune conjunction pluto
+fortune sextile pluto
+fortune square pluto
+fortune trine pluto
+fortune opposition pluto
+
+===== fortune 6 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction saturn
+fortune sextile saturn
+fortune square saturn
+fortune trine saturn
+fortune opposition saturn
+fortune conjunction sun
+fortune sextile sun
+fortune square sun
+fortune trine sun
+fortune opposition sun
+
+===== fortune 7 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction uranus
+fortune sextile uranus
+fortune square uranus
+fortune trine uranus
+fortune opposition uranus
+fortune conjunction venus
+fortune sextile venus
+fortune square venus
+fortune trine venus
+fortune opposition venus
+
+===== fortune 8 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction spirit
+fortune sextile spirit
+fortune square spirit
+fortune trine spirit
+fortune opposition spirit
+fortune conjunction pholus
+fortune sextile pholus
+fortune square pholus
+fortune trine pholus
+fortune opposition pholus
+
+===== fortune 9 of 9 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+fortune conjunction south_node
+fortune sextile south_node
+fortune square south_node
+fortune trine south_node
+fortune opposition south_node
+fortune conjunction vesta
+fortune sextile vesta
+fortune square vesta
+fortune trine vesta
+fortune opposition vesta
+
+=====

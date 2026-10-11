@@ -1,0 +1,576 @@
+transit: sun - 311 readings in 29 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== sun 1 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction descendant
+transit sun sextile descendant
+transit sun square descendant
+transit sun trine descendant
+transit sun opposition descendant
+transit sun quincunx descendant
+transit sun semisextile descendant
+transit sun semisquare descendant
+transit sun sesquiquadrate descendant
+transit sun quintile descendant
+transit sun biquintile descendant
+transit sun sesquiquintile descendant
+transit sun septile descendant
+transit sun novile descendant
+transit sun decile descendant
+
+===== sun 2 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction ic
+transit sun sextile ic
+transit sun square ic
+transit sun trine ic
+transit sun opposition ic
+transit sun quincunx ic
+transit sun semisextile ic
+transit sun semisquare ic
+transit sun sesquiquadrate ic
+transit sun quintile ic
+transit sun biquintile ic
+transit sun sesquiquintile ic
+transit sun septile ic
+transit sun novile ic
+transit sun decile ic
+
+===== sun 3 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction ascendant
+transit sun sextile ascendant
+transit sun square ascendant
+transit sun trine ascendant
+transit sun opposition ascendant
+transit sun quincunx ascendant
+transit sun semisextile ascendant
+transit sun semisquare ascendant
+transit sun sesquiquadrate ascendant
+transit sun quintile ascendant
+transit sun biquintile ascendant
+transit sun sesquiquintile ascendant
+transit sun septile ascendant
+transit sun novile ascendant
+transit sun decile ascendant
+
+===== sun 4 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction mc
+transit sun sextile mc
+transit sun square mc
+transit sun trine mc
+transit sun opposition mc
+transit sun quincunx mc
+transit sun semisextile mc
+transit sun semisquare mc
+transit sun sesquiquadrate mc
+transit sun quintile mc
+transit sun biquintile mc
+transit sun sesquiquintile mc
+transit sun septile mc
+transit sun novile mc
+transit sun decile mc
+
+===== sun 5 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction south_node
+transit sun sextile south_node
+transit sun square south_node
+transit sun trine south_node
+transit sun opposition south_node
+transit sun quincunx south_node
+transit sun semisextile south_node
+transit sun semisquare south_node
+transit sun sesquiquadrate south_node
+transit sun quintile south_node
+transit sun sesquiquintile south_node
+
+===== sun 6 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction ceres
+transit sun sextile ceres
+transit sun square ceres
+transit sun trine ceres
+transit sun opposition ceres
+transit sun quincunx ceres
+transit sun semisextile ceres
+transit sun semisquare ceres
+transit sun sesquiquadrate ceres
+transit sun quintile ceres
+transit sun sesquiquintile ceres
+
+===== sun 7 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction pallas
+transit sun sextile pallas
+transit sun square pallas
+transit sun trine pallas
+transit sun opposition pallas
+transit sun quincunx pallas
+transit sun semisextile pallas
+transit sun semisquare pallas
+transit sun sesquiquadrate pallas
+transit sun quintile pallas
+transit sun sesquiquintile pallas
+
+===== sun 8 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction juno
+transit sun sextile juno
+transit sun square juno
+transit sun trine juno
+transit sun opposition juno
+transit sun quincunx juno
+transit sun semisextile juno
+transit sun semisquare juno
+transit sun sesquiquadrate juno
+transit sun quintile juno
+transit sun sesquiquintile juno
+
+===== sun 9 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction vesta
+transit sun sextile vesta
+transit sun square vesta
+transit sun trine vesta
+transit sun opposition vesta
+transit sun quincunx vesta
+transit sun semisextile vesta
+transit sun semisquare vesta
+transit sun sesquiquadrate vesta
+transit sun quintile vesta
+transit sun sesquiquintile vesta
+
+===== sun 10 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction eris
+transit sun sextile eris
+transit sun square eris
+transit sun trine eris
+transit sun opposition eris
+transit sun quincunx eris
+transit sun semisextile eris
+transit sun semisquare eris
+transit sun sesquiquadrate eris
+transit sun quintile eris
+transit sun sesquiquintile eris
+
+===== sun 11 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction eros
+transit sun sextile eros
+transit sun square eros
+transit sun trine eros
+transit sun opposition eros
+transit sun quincunx eros
+transit sun semisextile eros
+transit sun semisquare eros
+transit sun sesquiquadrate eros
+transit sun quintile eros
+transit sun sesquiquintile eros
+
+===== sun 12 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction hygiea
+transit sun sextile hygiea
+transit sun square hygiea
+transit sun trine hygiea
+transit sun opposition hygiea
+transit sun quincunx hygiea
+transit sun semisextile hygiea
+transit sun semisquare hygiea
+transit sun sesquiquadrate hygiea
+transit sun quintile hygiea
+transit sun sesquiquintile hygiea
+
+===== sun 13 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction nessus
+transit sun sextile nessus
+transit sun square nessus
+transit sun trine nessus
+transit sun opposition nessus
+transit sun quincunx nessus
+transit sun semisextile nessus
+transit sun semisquare nessus
+transit sun sesquiquadrate nessus
+transit sun quintile nessus
+transit sun sesquiquintile nessus
+
+===== sun 14 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction pholus
+transit sun sextile pholus
+transit sun square pholus
+transit sun trine pholus
+transit sun opposition pholus
+transit sun quincunx pholus
+transit sun semisextile pholus
+transit sun semisquare pholus
+transit sun sesquiquadrate pholus
+transit sun quintile pholus
+transit sun sesquiquintile pholus
+
+===== sun 15 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction fortune
+transit sun sextile fortune
+transit sun square fortune
+transit sun trine fortune
+transit sun opposition fortune
+transit sun quincunx fortune
+transit sun semisextile fortune
+transit sun semisquare fortune
+transit sun sesquiquadrate fortune
+transit sun quintile fortune
+transit sun sesquiquintile fortune
+
+===== sun 16 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction spirit
+transit sun sextile spirit
+transit sun square spirit
+transit sun trine spirit
+transit sun opposition spirit
+transit sun quincunx spirit
+transit sun semisextile spirit
+transit sun semisquare spirit
+transit sun sesquiquadrate spirit
+transit sun quintile spirit
+transit sun sesquiquintile spirit
+
+===== sun 17 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction lilith
+transit sun sextile lilith
+transit sun square lilith
+transit sun trine lilith
+transit sun opposition lilith
+transit sun quincunx lilith
+transit sun semisextile lilith
+transit sun semisquare lilith
+transit sun sesquiquadrate lilith
+transit sun quintile lilith
+transit sun sesquiquintile lilith
+
+===== sun 18 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction sun
+transit sun sextile sun
+transit sun square sun
+transit sun trine sun
+transit sun opposition sun
+transit sun biquintile sun
+transit sun septile sun
+transit sun novile sun
+transit sun decile sun
+
+===== sun 19 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction moon
+transit sun sextile moon
+transit sun square moon
+transit sun trine moon
+transit sun opposition moon
+transit sun biquintile moon
+transit sun septile moon
+transit sun novile moon
+transit sun decile moon
+
+===== sun 20 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction mercury
+transit sun sextile mercury
+transit sun square mercury
+transit sun trine mercury
+transit sun opposition mercury
+transit sun biquintile mercury
+transit sun septile mercury
+transit sun novile mercury
+transit sun decile mercury
+
+===== sun 21 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction venus
+transit sun sextile venus
+transit sun square venus
+transit sun trine venus
+transit sun opposition venus
+transit sun biquintile venus
+transit sun septile venus
+transit sun novile venus
+transit sun decile venus
+
+===== sun 22 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction mars
+transit sun sextile mars
+transit sun square mars
+transit sun trine mars
+transit sun opposition mars
+transit sun biquintile mars
+transit sun septile mars
+transit sun novile mars
+transit sun decile mars
+
+===== sun 23 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction jupiter
+transit sun sextile jupiter
+transit sun square jupiter
+transit sun trine jupiter
+transit sun opposition jupiter
+transit sun biquintile jupiter
+transit sun septile jupiter
+transit sun novile jupiter
+transit sun decile jupiter
+
+===== sun 24 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction saturn
+transit sun sextile saturn
+transit sun square saturn
+transit sun trine saturn
+transit sun opposition saturn
+transit sun biquintile saturn
+transit sun septile saturn
+transit sun novile saturn
+transit sun decile saturn
+
+===== sun 25 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction uranus
+transit sun sextile uranus
+transit sun square uranus
+transit sun trine uranus
+transit sun opposition uranus
+transit sun biquintile uranus
+transit sun septile uranus
+transit sun novile uranus
+transit sun decile uranus
+
+===== sun 26 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction neptune
+transit sun sextile neptune
+transit sun square neptune
+transit sun trine neptune
+transit sun opposition neptune
+transit sun biquintile neptune
+transit sun septile neptune
+transit sun novile neptune
+transit sun decile neptune
+
+===== sun 27 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction pluto
+transit sun sextile pluto
+transit sun square pluto
+transit sun trine pluto
+transit sun opposition pluto
+transit sun biquintile pluto
+transit sun septile pluto
+transit sun novile pluto
+transit sun decile pluto
+
+===== sun 28 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction chiron
+transit sun sextile chiron
+transit sun square chiron
+transit sun trine chiron
+transit sun opposition chiron
+transit sun biquintile chiron
+transit sun septile chiron
+transit sun novile chiron
+transit sun decile chiron
+
+===== sun 29 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit sun conjunction north_node
+transit sun sextile north_node
+transit sun square north_node
+transit sun trine north_node
+transit sun opposition north_node
+transit sun biquintile north_node
+transit sun septile north_node
+transit sun novile north_node
+transit sun decile north_node
+
+=====

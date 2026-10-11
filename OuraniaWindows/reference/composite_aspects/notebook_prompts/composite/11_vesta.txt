@@ -1,0 +1,137 @@
+composite: vesta - 70 readings in 7 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== vesta 1 of 7 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+vesta conjunction ascendant
+vesta sextile ascendant
+vesta square ascendant
+vesta trine ascendant
+vesta opposition ascendant
+vesta conjunction chiron
+vesta sextile chiron
+vesta square chiron
+vesta trine chiron
+vesta opposition chiron
+
+===== vesta 2 of 7 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+vesta conjunction jupiter
+vesta sextile jupiter
+vesta square jupiter
+vesta trine jupiter
+vesta opposition jupiter
+vesta conjunction mars
+vesta sextile mars
+vesta square mars
+vesta trine mars
+vesta opposition mars
+
+===== vesta 3 of 7 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+vesta conjunction mercury
+vesta sextile mercury
+vesta square mercury
+vesta trine mercury
+vesta opposition mercury
+vesta conjunction mc
+vesta sextile mc
+vesta square mc
+vesta trine mc
+vesta opposition mc
+
+===== vesta 4 of 7 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+vesta conjunction moon
+vesta sextile moon
+vesta square moon
+vesta trine moon
+vesta opposition moon
+vesta conjunction neptune
+vesta sextile neptune
+vesta square neptune
+vesta trine neptune
+vesta opposition neptune
+
+===== vesta 5 of 7 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+vesta conjunction north_node
+vesta sextile north_node
+vesta square north_node
+vesta trine north_node
+vesta opposition north_node
+vesta conjunction pluto
+vesta sextile pluto
+vesta square pluto
+vesta trine pluto
+vesta opposition pluto
+
+===== vesta 6 of 7 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+vesta conjunction saturn
+vesta sextile saturn
+vesta square saturn
+vesta trine saturn
+vesta opposition saturn
+vesta conjunction sun
+vesta sextile sun
+vesta square sun
+vesta trine sun
+vesta opposition sun
+
+===== vesta 7 of 7 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+vesta conjunction uranus
+vesta sextile uranus
+vesta square uranus
+vesta trine uranus
+vesta opposition uranus
+vesta conjunction venus
+vesta sextile venus
+vesta square venus
+vesta trine venus
+vesta opposition venus
+
+=====

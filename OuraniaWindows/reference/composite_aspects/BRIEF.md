@@ -192,6 +192,22 @@ Saturn brings structure and patience, and the composite Sun is the relationship'
 Twenty to thirty readings per request is a workable batch for a model. Asking for a whole
 skeleton file at once tends to produce repeated sentences by the end.
 
+## If the writer is a notebook chat (NotebookLM)
+
+A chat box cannot fill in a file, and it answers a screenful at a time with its own formatting.
+So use the ready-made requests instead of the skeleton files:
+
+1. Add this brief to the notebook as a source. Name it **Ourania writing brief**.
+2. Open a file in `notebook_prompts/`. Copy one block (between two `=====` rows) into the chat.
+   Each block asks for 10 composite readings or 15 transit readings.
+3. Copy the whole answer and paste it onto the end of any `.txt` file in `pasted/composite/`
+   or `pasted/transit/`. Many answers can go in one file.
+4. Run `python notebook.py import`, then `python build.py`.
+
+The import tolerates bold, bullets, numbering, citation marks such as [3], curly quotes and
+dashes, and removes them. It lists anything it could not place. `python notebook.py prompts`
+rewrites the requests to cover only what is still missing.
+
 ## What is already done
 
 `drafts/01` to `05`: Black Moon Lilith and Ceres against every other body in the composite

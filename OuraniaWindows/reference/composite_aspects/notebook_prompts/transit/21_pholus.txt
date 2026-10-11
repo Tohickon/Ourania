@@ -1,0 +1,564 @@
+transit: pholus - 308 readings in 28 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== pholus 1 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction ascendant
+transit pholus sextile ascendant
+transit pholus square ascendant
+transit pholus trine ascendant
+transit pholus opposition ascendant
+transit pholus quincunx ascendant
+transit pholus semisextile ascendant
+transit pholus semisquare ascendant
+transit pholus sesquiquadrate ascendant
+transit pholus quintile ascendant
+transit pholus sesquiquintile ascendant
+
+===== pholus 2 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction descendant
+transit pholus sextile descendant
+transit pholus square descendant
+transit pholus trine descendant
+transit pholus opposition descendant
+transit pholus quincunx descendant
+transit pholus semisextile descendant
+transit pholus semisquare descendant
+transit pholus sesquiquadrate descendant
+transit pholus quintile descendant
+transit pholus sesquiquintile descendant
+
+===== pholus 3 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction mc
+transit pholus sextile mc
+transit pholus square mc
+transit pholus trine mc
+transit pholus opposition mc
+transit pholus quincunx mc
+transit pholus semisextile mc
+transit pholus semisquare mc
+transit pholus sesquiquadrate mc
+transit pholus quintile mc
+transit pholus sesquiquintile mc
+
+===== pholus 4 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction ic
+transit pholus sextile ic
+transit pholus square ic
+transit pholus trine ic
+transit pholus opposition ic
+transit pholus quincunx ic
+transit pholus semisextile ic
+transit pholus semisquare ic
+transit pholus sesquiquadrate ic
+transit pholus quintile ic
+transit pholus sesquiquintile ic
+
+===== pholus 5 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction south_node
+transit pholus sextile south_node
+transit pholus square south_node
+transit pholus trine south_node
+transit pholus opposition south_node
+transit pholus quincunx south_node
+transit pholus semisextile south_node
+transit pholus semisquare south_node
+transit pholus sesquiquadrate south_node
+transit pholus quintile south_node
+transit pholus sesquiquintile south_node
+
+===== pholus 6 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction ceres
+transit pholus sextile ceres
+transit pholus square ceres
+transit pholus trine ceres
+transit pholus opposition ceres
+transit pholus quincunx ceres
+transit pholus semisextile ceres
+transit pholus semisquare ceres
+transit pholus sesquiquadrate ceres
+transit pholus quintile ceres
+transit pholus sesquiquintile ceres
+
+===== pholus 7 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction pallas
+transit pholus sextile pallas
+transit pholus square pallas
+transit pholus trine pallas
+transit pholus opposition pallas
+transit pholus quincunx pallas
+transit pholus semisextile pallas
+transit pholus semisquare pallas
+transit pholus sesquiquadrate pallas
+transit pholus quintile pallas
+transit pholus sesquiquintile pallas
+
+===== pholus 8 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction juno
+transit pholus sextile juno
+transit pholus square juno
+transit pholus trine juno
+transit pholus opposition juno
+transit pholus quincunx juno
+transit pholus semisextile juno
+transit pholus semisquare juno
+transit pholus sesquiquadrate juno
+transit pholus quintile juno
+transit pholus sesquiquintile juno
+
+===== pholus 9 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction vesta
+transit pholus sextile vesta
+transit pholus square vesta
+transit pholus trine vesta
+transit pholus opposition vesta
+transit pholus quincunx vesta
+transit pholus semisextile vesta
+transit pholus semisquare vesta
+transit pholus sesquiquadrate vesta
+transit pholus quintile vesta
+transit pholus sesquiquintile vesta
+
+===== pholus 10 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction eris
+transit pholus sextile eris
+transit pholus square eris
+transit pholus trine eris
+transit pholus opposition eris
+transit pholus quincunx eris
+transit pholus semisextile eris
+transit pholus semisquare eris
+transit pholus sesquiquadrate eris
+transit pholus quintile eris
+transit pholus sesquiquintile eris
+
+===== pholus 11 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction eros
+transit pholus sextile eros
+transit pholus square eros
+transit pholus trine eros
+transit pholus opposition eros
+transit pholus quincunx eros
+transit pholus semisextile eros
+transit pholus semisquare eros
+transit pholus sesquiquadrate eros
+transit pholus quintile eros
+transit pholus sesquiquintile eros
+
+===== pholus 12 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction hygiea
+transit pholus sextile hygiea
+transit pholus square hygiea
+transit pholus trine hygiea
+transit pholus opposition hygiea
+transit pholus quincunx hygiea
+transit pholus semisextile hygiea
+transit pholus semisquare hygiea
+transit pholus sesquiquadrate hygiea
+transit pholus quintile hygiea
+transit pholus sesquiquintile hygiea
+
+===== pholus 13 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction nessus
+transit pholus sextile nessus
+transit pholus square nessus
+transit pholus trine nessus
+transit pholus opposition nessus
+transit pholus quincunx nessus
+transit pholus semisextile nessus
+transit pholus semisquare nessus
+transit pholus sesquiquadrate nessus
+transit pholus quintile nessus
+transit pholus sesquiquintile nessus
+
+===== pholus 14 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction fortune
+transit pholus sextile fortune
+transit pholus square fortune
+transit pholus trine fortune
+transit pholus opposition fortune
+transit pholus quincunx fortune
+transit pholus semisextile fortune
+transit pholus semisquare fortune
+transit pholus sesquiquadrate fortune
+transit pholus quintile fortune
+transit pholus sesquiquintile fortune
+
+===== pholus 15 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction spirit
+transit pholus sextile spirit
+transit pholus square spirit
+transit pholus trine spirit
+transit pholus opposition spirit
+transit pholus quincunx spirit
+transit pholus semisextile spirit
+transit pholus semisquare spirit
+transit pholus sesquiquadrate spirit
+transit pholus quintile spirit
+transit pholus sesquiquintile spirit
+
+===== pholus 16 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction lilith
+transit pholus sextile lilith
+transit pholus square lilith
+transit pholus trine lilith
+transit pholus opposition lilith
+transit pholus quincunx lilith
+transit pholus semisextile lilith
+transit pholus semisquare lilith
+transit pholus sesquiquadrate lilith
+transit pholus quintile lilith
+transit pholus sesquiquintile lilith
+
+===== pholus 17 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction moon
+transit pholus sextile moon
+transit pholus square moon
+transit pholus trine moon
+transit pholus opposition moon
+transit pholus quincunx moon
+transit pholus semisextile moon
+transit pholus semisquare moon
+transit pholus sesquiquadrate moon
+transit pholus quintile moon
+transit pholus sesquiquintile moon
+
+===== pholus 18 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction sun
+transit pholus sextile sun
+transit pholus square sun
+transit pholus trine sun
+transit pholus opposition sun
+transit pholus quincunx sun
+transit pholus semisextile sun
+transit pholus semisquare sun
+transit pholus sesquiquadrate sun
+transit pholus quintile sun
+transit pholus sesquiquintile sun
+
+===== pholus 19 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction mercury
+transit pholus sextile mercury
+transit pholus square mercury
+transit pholus trine mercury
+transit pholus opposition mercury
+transit pholus quincunx mercury
+transit pholus semisextile mercury
+transit pholus semisquare mercury
+transit pholus sesquiquadrate mercury
+transit pholus quintile mercury
+transit pholus sesquiquintile mercury
+
+===== pholus 20 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction venus
+transit pholus sextile venus
+transit pholus square venus
+transit pholus trine venus
+transit pholus opposition venus
+transit pholus quincunx venus
+transit pholus semisextile venus
+transit pholus semisquare venus
+transit pholus sesquiquadrate venus
+transit pholus quintile venus
+transit pholus sesquiquintile venus
+
+===== pholus 21 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction mars
+transit pholus sextile mars
+transit pholus square mars
+transit pholus trine mars
+transit pholus opposition mars
+transit pholus quincunx mars
+transit pholus semisextile mars
+transit pholus semisquare mars
+transit pholus sesquiquadrate mars
+transit pholus quintile mars
+transit pholus sesquiquintile mars
+
+===== pholus 22 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction jupiter
+transit pholus sextile jupiter
+transit pholus square jupiter
+transit pholus trine jupiter
+transit pholus opposition jupiter
+transit pholus quincunx jupiter
+transit pholus semisextile jupiter
+transit pholus semisquare jupiter
+transit pholus sesquiquadrate jupiter
+transit pholus quintile jupiter
+transit pholus sesquiquintile jupiter
+
+===== pholus 23 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction saturn
+transit pholus sextile saturn
+transit pholus square saturn
+transit pholus trine saturn
+transit pholus opposition saturn
+transit pholus quincunx saturn
+transit pholus semisextile saturn
+transit pholus semisquare saturn
+transit pholus sesquiquadrate saturn
+transit pholus quintile saturn
+transit pholus sesquiquintile saturn
+
+===== pholus 24 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction uranus
+transit pholus sextile uranus
+transit pholus square uranus
+transit pholus trine uranus
+transit pholus opposition uranus
+transit pholus quincunx uranus
+transit pholus semisextile uranus
+transit pholus semisquare uranus
+transit pholus sesquiquadrate uranus
+transit pholus quintile uranus
+transit pholus sesquiquintile uranus
+
+===== pholus 25 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction neptune
+transit pholus sextile neptune
+transit pholus square neptune
+transit pholus trine neptune
+transit pholus opposition neptune
+transit pholus quincunx neptune
+transit pholus semisextile neptune
+transit pholus semisquare neptune
+transit pholus sesquiquadrate neptune
+transit pholus quintile neptune
+transit pholus sesquiquintile neptune
+
+===== pholus 26 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction pluto
+transit pholus sextile pluto
+transit pholus square pluto
+transit pholus trine pluto
+transit pholus opposition pluto
+transit pholus quincunx pluto
+transit pholus semisextile pluto
+transit pholus semisquare pluto
+transit pholus sesquiquadrate pluto
+transit pholus quintile pluto
+transit pholus sesquiquintile pluto
+
+===== pholus 27 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction north_node
+transit pholus sextile north_node
+transit pholus square north_node
+transit pholus trine north_node
+transit pholus opposition north_node
+transit pholus quincunx north_node
+transit pholus semisextile north_node
+transit pholus semisquare north_node
+transit pholus sesquiquadrate north_node
+transit pholus quintile north_node
+transit pholus sesquiquintile north_node
+
+===== pholus 28 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit pholus conjunction chiron
+transit pholus sextile chiron
+transit pholus square chiron
+transit pholus trine chiron
+transit pholus opposition chiron
+transit pholus quincunx chiron
+transit pholus semisextile chiron
+transit pholus semisquare chiron
+transit pholus sesquiquadrate chiron
+transit pholus quintile chiron
+transit pholus sesquiquintile chiron
+
+=====

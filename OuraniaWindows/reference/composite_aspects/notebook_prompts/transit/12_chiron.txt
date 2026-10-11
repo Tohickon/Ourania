@@ -1,0 +1,576 @@
+transit: chiron - 311 readings in 29 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== chiron 1 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction descendant
+transit chiron sextile descendant
+transit chiron square descendant
+transit chiron trine descendant
+transit chiron opposition descendant
+transit chiron quincunx descendant
+transit chiron semisextile descendant
+transit chiron semisquare descendant
+transit chiron sesquiquadrate descendant
+transit chiron quintile descendant
+transit chiron biquintile descendant
+transit chiron sesquiquintile descendant
+transit chiron septile descendant
+transit chiron novile descendant
+transit chiron decile descendant
+
+===== chiron 2 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction ic
+transit chiron sextile ic
+transit chiron square ic
+transit chiron trine ic
+transit chiron opposition ic
+transit chiron quincunx ic
+transit chiron semisextile ic
+transit chiron semisquare ic
+transit chiron sesquiquadrate ic
+transit chiron quintile ic
+transit chiron biquintile ic
+transit chiron sesquiquintile ic
+transit chiron septile ic
+transit chiron novile ic
+transit chiron decile ic
+
+===== chiron 3 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction ascendant
+transit chiron sextile ascendant
+transit chiron square ascendant
+transit chiron trine ascendant
+transit chiron opposition ascendant
+transit chiron quincunx ascendant
+transit chiron semisextile ascendant
+transit chiron semisquare ascendant
+transit chiron sesquiquadrate ascendant
+transit chiron quintile ascendant
+transit chiron biquintile ascendant
+transit chiron sesquiquintile ascendant
+transit chiron septile ascendant
+transit chiron novile ascendant
+transit chiron decile ascendant
+
+===== chiron 4 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction mc
+transit chiron sextile mc
+transit chiron square mc
+transit chiron trine mc
+transit chiron opposition mc
+transit chiron quincunx mc
+transit chiron semisextile mc
+transit chiron semisquare mc
+transit chiron sesquiquadrate mc
+transit chiron quintile mc
+transit chiron biquintile mc
+transit chiron sesquiquintile mc
+transit chiron septile mc
+transit chiron novile mc
+transit chiron decile mc
+
+===== chiron 5 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction south_node
+transit chiron sextile south_node
+transit chiron square south_node
+transit chiron trine south_node
+transit chiron opposition south_node
+transit chiron quincunx south_node
+transit chiron semisextile south_node
+transit chiron semisquare south_node
+transit chiron sesquiquadrate south_node
+transit chiron quintile south_node
+transit chiron sesquiquintile south_node
+
+===== chiron 6 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction ceres
+transit chiron sextile ceres
+transit chiron square ceres
+transit chiron trine ceres
+transit chiron opposition ceres
+transit chiron quincunx ceres
+transit chiron semisextile ceres
+transit chiron semisquare ceres
+transit chiron sesquiquadrate ceres
+transit chiron quintile ceres
+transit chiron sesquiquintile ceres
+
+===== chiron 7 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction pallas
+transit chiron sextile pallas
+transit chiron square pallas
+transit chiron trine pallas
+transit chiron opposition pallas
+transit chiron quincunx pallas
+transit chiron semisextile pallas
+transit chiron semisquare pallas
+transit chiron sesquiquadrate pallas
+transit chiron quintile pallas
+transit chiron sesquiquintile pallas
+
+===== chiron 8 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction juno
+transit chiron sextile juno
+transit chiron square juno
+transit chiron trine juno
+transit chiron opposition juno
+transit chiron quincunx juno
+transit chiron semisextile juno
+transit chiron semisquare juno
+transit chiron sesquiquadrate juno
+transit chiron quintile juno
+transit chiron sesquiquintile juno
+
+===== chiron 9 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction vesta
+transit chiron sextile vesta
+transit chiron square vesta
+transit chiron trine vesta
+transit chiron opposition vesta
+transit chiron quincunx vesta
+transit chiron semisextile vesta
+transit chiron semisquare vesta
+transit chiron sesquiquadrate vesta
+transit chiron quintile vesta
+transit chiron sesquiquintile vesta
+
+===== chiron 10 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction eris
+transit chiron sextile eris
+transit chiron square eris
+transit chiron trine eris
+transit chiron opposition eris
+transit chiron quincunx eris
+transit chiron semisextile eris
+transit chiron semisquare eris
+transit chiron sesquiquadrate eris
+transit chiron quintile eris
+transit chiron sesquiquintile eris
+
+===== chiron 11 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction eros
+transit chiron sextile eros
+transit chiron square eros
+transit chiron trine eros
+transit chiron opposition eros
+transit chiron quincunx eros
+transit chiron semisextile eros
+transit chiron semisquare eros
+transit chiron sesquiquadrate eros
+transit chiron quintile eros
+transit chiron sesquiquintile eros
+
+===== chiron 12 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction hygiea
+transit chiron sextile hygiea
+transit chiron square hygiea
+transit chiron trine hygiea
+transit chiron opposition hygiea
+transit chiron quincunx hygiea
+transit chiron semisextile hygiea
+transit chiron semisquare hygiea
+transit chiron sesquiquadrate hygiea
+transit chiron quintile hygiea
+transit chiron sesquiquintile hygiea
+
+===== chiron 13 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction nessus
+transit chiron sextile nessus
+transit chiron square nessus
+transit chiron trine nessus
+transit chiron opposition nessus
+transit chiron quincunx nessus
+transit chiron semisextile nessus
+transit chiron semisquare nessus
+transit chiron sesquiquadrate nessus
+transit chiron quintile nessus
+transit chiron sesquiquintile nessus
+
+===== chiron 14 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction pholus
+transit chiron sextile pholus
+transit chiron square pholus
+transit chiron trine pholus
+transit chiron opposition pholus
+transit chiron quincunx pholus
+transit chiron semisextile pholus
+transit chiron semisquare pholus
+transit chiron sesquiquadrate pholus
+transit chiron quintile pholus
+transit chiron sesquiquintile pholus
+
+===== chiron 15 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction fortune
+transit chiron sextile fortune
+transit chiron square fortune
+transit chiron trine fortune
+transit chiron opposition fortune
+transit chiron quincunx fortune
+transit chiron semisextile fortune
+transit chiron semisquare fortune
+transit chiron sesquiquadrate fortune
+transit chiron quintile fortune
+transit chiron sesquiquintile fortune
+
+===== chiron 16 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction spirit
+transit chiron sextile spirit
+transit chiron square spirit
+transit chiron trine spirit
+transit chiron opposition spirit
+transit chiron quincunx spirit
+transit chiron semisextile spirit
+transit chiron semisquare spirit
+transit chiron sesquiquadrate spirit
+transit chiron quintile spirit
+transit chiron sesquiquintile spirit
+
+===== chiron 17 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction lilith
+transit chiron sextile lilith
+transit chiron square lilith
+transit chiron trine lilith
+transit chiron opposition lilith
+transit chiron quincunx lilith
+transit chiron semisextile lilith
+transit chiron semisquare lilith
+transit chiron sesquiquadrate lilith
+transit chiron quintile lilith
+transit chiron sesquiquintile lilith
+
+===== chiron 18 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction sun
+transit chiron sextile sun
+transit chiron square sun
+transit chiron trine sun
+transit chiron opposition sun
+transit chiron biquintile sun
+transit chiron septile sun
+transit chiron novile sun
+transit chiron decile sun
+
+===== chiron 19 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction moon
+transit chiron sextile moon
+transit chiron square moon
+transit chiron trine moon
+transit chiron opposition moon
+transit chiron biquintile moon
+transit chiron septile moon
+transit chiron novile moon
+transit chiron decile moon
+
+===== chiron 20 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction mercury
+transit chiron sextile mercury
+transit chiron square mercury
+transit chiron trine mercury
+transit chiron opposition mercury
+transit chiron biquintile mercury
+transit chiron septile mercury
+transit chiron novile mercury
+transit chiron decile mercury
+
+===== chiron 21 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction venus
+transit chiron sextile venus
+transit chiron square venus
+transit chiron trine venus
+transit chiron opposition venus
+transit chiron biquintile venus
+transit chiron septile venus
+transit chiron novile venus
+transit chiron decile venus
+
+===== chiron 22 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction mars
+transit chiron sextile mars
+transit chiron square mars
+transit chiron trine mars
+transit chiron opposition mars
+transit chiron biquintile mars
+transit chiron septile mars
+transit chiron novile mars
+transit chiron decile mars
+
+===== chiron 23 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction jupiter
+transit chiron sextile jupiter
+transit chiron square jupiter
+transit chiron trine jupiter
+transit chiron opposition jupiter
+transit chiron biquintile jupiter
+transit chiron septile jupiter
+transit chiron novile jupiter
+transit chiron decile jupiter
+
+===== chiron 24 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction saturn
+transit chiron sextile saturn
+transit chiron square saturn
+transit chiron trine saturn
+transit chiron opposition saturn
+transit chiron biquintile saturn
+transit chiron septile saturn
+transit chiron novile saturn
+transit chiron decile saturn
+
+===== chiron 25 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction uranus
+transit chiron sextile uranus
+transit chiron square uranus
+transit chiron trine uranus
+transit chiron opposition uranus
+transit chiron biquintile uranus
+transit chiron septile uranus
+transit chiron novile uranus
+transit chiron decile uranus
+
+===== chiron 26 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction neptune
+transit chiron sextile neptune
+transit chiron square neptune
+transit chiron trine neptune
+transit chiron opposition neptune
+transit chiron biquintile neptune
+transit chiron septile neptune
+transit chiron novile neptune
+transit chiron decile neptune
+
+===== chiron 27 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction pluto
+transit chiron sextile pluto
+transit chiron square pluto
+transit chiron trine pluto
+transit chiron opposition pluto
+transit chiron biquintile pluto
+transit chiron septile pluto
+transit chiron novile pluto
+transit chiron decile pluto
+
+===== chiron 28 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction chiron
+transit chiron sextile chiron
+transit chiron square chiron
+transit chiron trine chiron
+transit chiron opposition chiron
+transit chiron biquintile chiron
+transit chiron septile chiron
+transit chiron novile chiron
+transit chiron decile chiron
+
+===== chiron 29 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit chiron conjunction north_node
+transit chiron sextile north_node
+transit chiron square north_node
+transit chiron trine north_node
+transit chiron opposition north_node
+transit chiron biquintile north_node
+transit chiron septile north_node
+transit chiron novile north_node
+transit chiron decile north_node
+
+=====

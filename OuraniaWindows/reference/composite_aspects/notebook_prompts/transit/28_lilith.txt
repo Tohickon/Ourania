@@ -1,0 +1,564 @@
+transit: lilith - 308 readings in 28 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== lilith 1 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction ascendant
+transit lilith sextile ascendant
+transit lilith square ascendant
+transit lilith trine ascendant
+transit lilith opposition ascendant
+transit lilith quincunx ascendant
+transit lilith semisextile ascendant
+transit lilith semisquare ascendant
+transit lilith sesquiquadrate ascendant
+transit lilith quintile ascendant
+transit lilith sesquiquintile ascendant
+
+===== lilith 2 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction descendant
+transit lilith sextile descendant
+transit lilith square descendant
+transit lilith trine descendant
+transit lilith opposition descendant
+transit lilith quincunx descendant
+transit lilith semisextile descendant
+transit lilith semisquare descendant
+transit lilith sesquiquadrate descendant
+transit lilith quintile descendant
+transit lilith sesquiquintile descendant
+
+===== lilith 3 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction mc
+transit lilith sextile mc
+transit lilith square mc
+transit lilith trine mc
+transit lilith opposition mc
+transit lilith quincunx mc
+transit lilith semisextile mc
+transit lilith semisquare mc
+transit lilith sesquiquadrate mc
+transit lilith quintile mc
+transit lilith sesquiquintile mc
+
+===== lilith 4 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction ic
+transit lilith sextile ic
+transit lilith square ic
+transit lilith trine ic
+transit lilith opposition ic
+transit lilith quincunx ic
+transit lilith semisextile ic
+transit lilith semisquare ic
+transit lilith sesquiquadrate ic
+transit lilith quintile ic
+transit lilith sesquiquintile ic
+
+===== lilith 5 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction south_node
+transit lilith sextile south_node
+transit lilith square south_node
+transit lilith trine south_node
+transit lilith opposition south_node
+transit lilith quincunx south_node
+transit lilith semisextile south_node
+transit lilith semisquare south_node
+transit lilith sesquiquadrate south_node
+transit lilith quintile south_node
+transit lilith sesquiquintile south_node
+
+===== lilith 6 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction ceres
+transit lilith sextile ceres
+transit lilith square ceres
+transit lilith trine ceres
+transit lilith opposition ceres
+transit lilith quincunx ceres
+transit lilith semisextile ceres
+transit lilith semisquare ceres
+transit lilith sesquiquadrate ceres
+transit lilith quintile ceres
+transit lilith sesquiquintile ceres
+
+===== lilith 7 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction pallas
+transit lilith sextile pallas
+transit lilith square pallas
+transit lilith trine pallas
+transit lilith opposition pallas
+transit lilith quincunx pallas
+transit lilith semisextile pallas
+transit lilith semisquare pallas
+transit lilith sesquiquadrate pallas
+transit lilith quintile pallas
+transit lilith sesquiquintile pallas
+
+===== lilith 8 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction juno
+transit lilith sextile juno
+transit lilith square juno
+transit lilith trine juno
+transit lilith opposition juno
+transit lilith quincunx juno
+transit lilith semisextile juno
+transit lilith semisquare juno
+transit lilith sesquiquadrate juno
+transit lilith quintile juno
+transit lilith sesquiquintile juno
+
+===== lilith 9 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction vesta
+transit lilith sextile vesta
+transit lilith square vesta
+transit lilith trine vesta
+transit lilith opposition vesta
+transit lilith quincunx vesta
+transit lilith semisextile vesta
+transit lilith semisquare vesta
+transit lilith sesquiquadrate vesta
+transit lilith quintile vesta
+transit lilith sesquiquintile vesta
+
+===== lilith 10 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction eris
+transit lilith sextile eris
+transit lilith square eris
+transit lilith trine eris
+transit lilith opposition eris
+transit lilith quincunx eris
+transit lilith semisextile eris
+transit lilith semisquare eris
+transit lilith sesquiquadrate eris
+transit lilith quintile eris
+transit lilith sesquiquintile eris
+
+===== lilith 11 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction eros
+transit lilith sextile eros
+transit lilith square eros
+transit lilith trine eros
+transit lilith opposition eros
+transit lilith quincunx eros
+transit lilith semisextile eros
+transit lilith semisquare eros
+transit lilith sesquiquadrate eros
+transit lilith quintile eros
+transit lilith sesquiquintile eros
+
+===== lilith 12 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction hygiea
+transit lilith sextile hygiea
+transit lilith square hygiea
+transit lilith trine hygiea
+transit lilith opposition hygiea
+transit lilith quincunx hygiea
+transit lilith semisextile hygiea
+transit lilith semisquare hygiea
+transit lilith sesquiquadrate hygiea
+transit lilith quintile hygiea
+transit lilith sesquiquintile hygiea
+
+===== lilith 13 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction nessus
+transit lilith sextile nessus
+transit lilith square nessus
+transit lilith trine nessus
+transit lilith opposition nessus
+transit lilith quincunx nessus
+transit lilith semisextile nessus
+transit lilith semisquare nessus
+transit lilith sesquiquadrate nessus
+transit lilith quintile nessus
+transit lilith sesquiquintile nessus
+
+===== lilith 14 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction pholus
+transit lilith sextile pholus
+transit lilith square pholus
+transit lilith trine pholus
+transit lilith opposition pholus
+transit lilith quincunx pholus
+transit lilith semisextile pholus
+transit lilith semisquare pholus
+transit lilith sesquiquadrate pholus
+transit lilith quintile pholus
+transit lilith sesquiquintile pholus
+
+===== lilith 15 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction fortune
+transit lilith sextile fortune
+transit lilith square fortune
+transit lilith trine fortune
+transit lilith opposition fortune
+transit lilith quincunx fortune
+transit lilith semisextile fortune
+transit lilith semisquare fortune
+transit lilith sesquiquadrate fortune
+transit lilith quintile fortune
+transit lilith sesquiquintile fortune
+
+===== lilith 16 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction spirit
+transit lilith sextile spirit
+transit lilith square spirit
+transit lilith trine spirit
+transit lilith opposition spirit
+transit lilith quincunx spirit
+transit lilith semisextile spirit
+transit lilith semisquare spirit
+transit lilith sesquiquadrate spirit
+transit lilith quintile spirit
+transit lilith sesquiquintile spirit
+
+===== lilith 17 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction moon
+transit lilith sextile moon
+transit lilith square moon
+transit lilith trine moon
+transit lilith opposition moon
+transit lilith quincunx moon
+transit lilith semisextile moon
+transit lilith semisquare moon
+transit lilith sesquiquadrate moon
+transit lilith quintile moon
+transit lilith sesquiquintile moon
+
+===== lilith 18 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction sun
+transit lilith sextile sun
+transit lilith square sun
+transit lilith trine sun
+transit lilith opposition sun
+transit lilith quincunx sun
+transit lilith semisextile sun
+transit lilith semisquare sun
+transit lilith sesquiquadrate sun
+transit lilith quintile sun
+transit lilith sesquiquintile sun
+
+===== lilith 19 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction mercury
+transit lilith sextile mercury
+transit lilith square mercury
+transit lilith trine mercury
+transit lilith opposition mercury
+transit lilith quincunx mercury
+transit lilith semisextile mercury
+transit lilith semisquare mercury
+transit lilith sesquiquadrate mercury
+transit lilith quintile mercury
+transit lilith sesquiquintile mercury
+
+===== lilith 20 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction venus
+transit lilith sextile venus
+transit lilith square venus
+transit lilith trine venus
+transit lilith opposition venus
+transit lilith quincunx venus
+transit lilith semisextile venus
+transit lilith semisquare venus
+transit lilith sesquiquadrate venus
+transit lilith quintile venus
+transit lilith sesquiquintile venus
+
+===== lilith 21 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction mars
+transit lilith sextile mars
+transit lilith square mars
+transit lilith trine mars
+transit lilith opposition mars
+transit lilith quincunx mars
+transit lilith semisextile mars
+transit lilith semisquare mars
+transit lilith sesquiquadrate mars
+transit lilith quintile mars
+transit lilith sesquiquintile mars
+
+===== lilith 22 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction jupiter
+transit lilith sextile jupiter
+transit lilith square jupiter
+transit lilith trine jupiter
+transit lilith opposition jupiter
+transit lilith quincunx jupiter
+transit lilith semisextile jupiter
+transit lilith semisquare jupiter
+transit lilith sesquiquadrate jupiter
+transit lilith quintile jupiter
+transit lilith sesquiquintile jupiter
+
+===== lilith 23 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction saturn
+transit lilith sextile saturn
+transit lilith square saturn
+transit lilith trine saturn
+transit lilith opposition saturn
+transit lilith quincunx saturn
+transit lilith semisextile saturn
+transit lilith semisquare saturn
+transit lilith sesquiquadrate saturn
+transit lilith quintile saturn
+transit lilith sesquiquintile saturn
+
+===== lilith 24 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction uranus
+transit lilith sextile uranus
+transit lilith square uranus
+transit lilith trine uranus
+transit lilith opposition uranus
+transit lilith quincunx uranus
+transit lilith semisextile uranus
+transit lilith semisquare uranus
+transit lilith sesquiquadrate uranus
+transit lilith quintile uranus
+transit lilith sesquiquintile uranus
+
+===== lilith 25 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction neptune
+transit lilith sextile neptune
+transit lilith square neptune
+transit lilith trine neptune
+transit lilith opposition neptune
+transit lilith quincunx neptune
+transit lilith semisextile neptune
+transit lilith semisquare neptune
+transit lilith sesquiquadrate neptune
+transit lilith quintile neptune
+transit lilith sesquiquintile neptune
+
+===== lilith 26 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction pluto
+transit lilith sextile pluto
+transit lilith square pluto
+transit lilith trine pluto
+transit lilith opposition pluto
+transit lilith quincunx pluto
+transit lilith semisextile pluto
+transit lilith semisquare pluto
+transit lilith sesquiquadrate pluto
+transit lilith quintile pluto
+transit lilith sesquiquintile pluto
+
+===== lilith 27 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction north_node
+transit lilith sextile north_node
+transit lilith square north_node
+transit lilith trine north_node
+transit lilith opposition north_node
+transit lilith quincunx north_node
+transit lilith semisextile north_node
+transit lilith semisquare north_node
+transit lilith sesquiquadrate north_node
+transit lilith quintile north_node
+transit lilith sesquiquintile north_node
+
+===== lilith 28 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit lilith conjunction chiron
+transit lilith sextile chiron
+transit lilith square chiron
+transit lilith trine chiron
+transit lilith opposition chiron
+transit lilith quincunx chiron
+transit lilith semisextile chiron
+transit lilith semisquare chiron
+transit lilith sesquiquadrate chiron
+transit lilith quintile chiron
+transit lilith sesquiquintile chiron
+
+=====

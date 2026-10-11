@@ -1,0 +1,194 @@
+composite: nessus - 100 readings in 10 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== nessus 1 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction ascendant
+nessus sextile ascendant
+nessus square ascendant
+nessus trine ascendant
+nessus opposition ascendant
+nessus conjunction chiron
+nessus sextile chiron
+nessus square chiron
+nessus trine chiron
+nessus opposition chiron
+
+===== nessus 2 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction jupiter
+nessus sextile jupiter
+nessus square jupiter
+nessus trine jupiter
+nessus opposition jupiter
+nessus conjunction mars
+nessus sextile mars
+nessus square mars
+nessus trine mars
+nessus opposition mars
+
+===== nessus 3 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction mercury
+nessus sextile mercury
+nessus square mercury
+nessus trine mercury
+nessus opposition mercury
+nessus conjunction mc
+nessus sextile mc
+nessus square mc
+nessus trine mc
+nessus opposition mc
+
+===== nessus 4 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction moon
+nessus sextile moon
+nessus square moon
+nessus trine moon
+nessus opposition moon
+nessus conjunction neptune
+nessus sextile neptune
+nessus square neptune
+nessus trine neptune
+nessus opposition neptune
+
+===== nessus 5 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction north_node
+nessus sextile north_node
+nessus square north_node
+nessus trine north_node
+nessus opposition north_node
+nessus conjunction pluto
+nessus sextile pluto
+nessus square pluto
+nessus trine pluto
+nessus opposition pluto
+
+===== nessus 6 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction saturn
+nessus sextile saturn
+nessus square saturn
+nessus trine saturn
+nessus opposition saturn
+nessus conjunction sun
+nessus sextile sun
+nessus square sun
+nessus trine sun
+nessus opposition sun
+
+===== nessus 7 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction uranus
+nessus sextile uranus
+nessus square uranus
+nessus trine uranus
+nessus opposition uranus
+nessus conjunction venus
+nessus sextile venus
+nessus square venus
+nessus trine venus
+nessus opposition venus
+
+===== nessus 8 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction pallas
+nessus sextile pallas
+nessus square pallas
+nessus trine pallas
+nessus opposition pallas
+nessus conjunction fortune
+nessus sextile fortune
+nessus square fortune
+nessus trine fortune
+nessus opposition fortune
+
+===== nessus 9 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction spirit
+nessus sextile spirit
+nessus square spirit
+nessus trine spirit
+nessus opposition spirit
+nessus conjunction pholus
+nessus sextile pholus
+nessus square pholus
+nessus trine pholus
+nessus opposition pholus
+
+===== nessus 10 of 10 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+nessus conjunction south_node
+nessus sextile south_node
+nessus square south_node
+nessus trine south_node
+nessus opposition south_node
+nessus conjunction vesta
+nessus sextile vesta
+nessus square vesta
+nessus trine vesta
+nessus opposition vesta
+
+=====

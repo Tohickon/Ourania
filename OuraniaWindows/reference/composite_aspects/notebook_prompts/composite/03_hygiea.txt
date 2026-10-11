@@ -1,0 +1,213 @@
+composite: hygiea - 110 readings in 11 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== hygiea 1 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction ascendant
+hygiea sextile ascendant
+hygiea square ascendant
+hygiea trine ascendant
+hygiea opposition ascendant
+hygiea conjunction chiron
+hygiea sextile chiron
+hygiea square chiron
+hygiea trine chiron
+hygiea opposition chiron
+
+===== hygiea 2 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction jupiter
+hygiea sextile jupiter
+hygiea square jupiter
+hygiea trine jupiter
+hygiea opposition jupiter
+hygiea conjunction mars
+hygiea sextile mars
+hygiea square mars
+hygiea trine mars
+hygiea opposition mars
+
+===== hygiea 3 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction mercury
+hygiea sextile mercury
+hygiea square mercury
+hygiea trine mercury
+hygiea opposition mercury
+hygiea conjunction mc
+hygiea sextile mc
+hygiea square mc
+hygiea trine mc
+hygiea opposition mc
+
+===== hygiea 4 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction moon
+hygiea sextile moon
+hygiea square moon
+hygiea trine moon
+hygiea opposition moon
+hygiea conjunction neptune
+hygiea sextile neptune
+hygiea square neptune
+hygiea trine neptune
+hygiea opposition neptune
+
+===== hygiea 5 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction north_node
+hygiea sextile north_node
+hygiea square north_node
+hygiea trine north_node
+hygiea opposition north_node
+hygiea conjunction pluto
+hygiea sextile pluto
+hygiea square pluto
+hygiea trine pluto
+hygiea opposition pluto
+
+===== hygiea 6 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction saturn
+hygiea sextile saturn
+hygiea square saturn
+hygiea trine saturn
+hygiea opposition saturn
+hygiea conjunction sun
+hygiea sextile sun
+hygiea square sun
+hygiea trine sun
+hygiea opposition sun
+
+===== hygiea 7 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction uranus
+hygiea sextile uranus
+hygiea square uranus
+hygiea trine uranus
+hygiea opposition uranus
+hygiea conjunction venus
+hygiea sextile venus
+hygiea square venus
+hygiea trine venus
+hygiea opposition venus
+
+===== hygiea 8 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction juno
+hygiea sextile juno
+hygiea square juno
+hygiea trine juno
+hygiea opposition juno
+hygiea conjunction nessus
+hygiea sextile nessus
+hygiea square nessus
+hygiea trine nessus
+hygiea opposition nessus
+
+===== hygiea 9 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction pallas
+hygiea sextile pallas
+hygiea square pallas
+hygiea trine pallas
+hygiea opposition pallas
+hygiea conjunction fortune
+hygiea sextile fortune
+hygiea square fortune
+hygiea trine fortune
+hygiea opposition fortune
+
+===== hygiea 10 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction spirit
+hygiea sextile spirit
+hygiea square spirit
+hygiea trine spirit
+hygiea opposition spirit
+hygiea conjunction pholus
+hygiea sextile pholus
+hygiea square pholus
+hygiea trine pholus
+hygiea opposition pholus
+
+===== hygiea 11 of 11 =====
+Using the source titled Ourania writing brief, write the 10 readings listed below. Each describes a permanent feature of the relationship's own chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+hygiea conjunction south_node
+hygiea sextile south_node
+hygiea square south_node
+hygiea trine south_node
+hygiea opposition south_node
+hygiea conjunction vesta
+hygiea sextile vesta
+hygiea square vesta
+hygiea trine vesta
+hygiea opposition vesta
+
+=====

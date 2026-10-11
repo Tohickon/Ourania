@@ -1,0 +1,564 @@
+transit: vesta - 308 readings in 28 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== vesta 1 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction ascendant
+transit vesta sextile ascendant
+transit vesta square ascendant
+transit vesta trine ascendant
+transit vesta opposition ascendant
+transit vesta quincunx ascendant
+transit vesta semisextile ascendant
+transit vesta semisquare ascendant
+transit vesta sesquiquadrate ascendant
+transit vesta quintile ascendant
+transit vesta sesquiquintile ascendant
+
+===== vesta 2 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction descendant
+transit vesta sextile descendant
+transit vesta square descendant
+transit vesta trine descendant
+transit vesta opposition descendant
+transit vesta quincunx descendant
+transit vesta semisextile descendant
+transit vesta semisquare descendant
+transit vesta sesquiquadrate descendant
+transit vesta quintile descendant
+transit vesta sesquiquintile descendant
+
+===== vesta 3 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction mc
+transit vesta sextile mc
+transit vesta square mc
+transit vesta trine mc
+transit vesta opposition mc
+transit vesta quincunx mc
+transit vesta semisextile mc
+transit vesta semisquare mc
+transit vesta sesquiquadrate mc
+transit vesta quintile mc
+transit vesta sesquiquintile mc
+
+===== vesta 4 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction ic
+transit vesta sextile ic
+transit vesta square ic
+transit vesta trine ic
+transit vesta opposition ic
+transit vesta quincunx ic
+transit vesta semisextile ic
+transit vesta semisquare ic
+transit vesta sesquiquadrate ic
+transit vesta quintile ic
+transit vesta sesquiquintile ic
+
+===== vesta 5 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction south_node
+transit vesta sextile south_node
+transit vesta square south_node
+transit vesta trine south_node
+transit vesta opposition south_node
+transit vesta quincunx south_node
+transit vesta semisextile south_node
+transit vesta semisquare south_node
+transit vesta sesquiquadrate south_node
+transit vesta quintile south_node
+transit vesta sesquiquintile south_node
+
+===== vesta 6 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction ceres
+transit vesta sextile ceres
+transit vesta square ceres
+transit vesta trine ceres
+transit vesta opposition ceres
+transit vesta quincunx ceres
+transit vesta semisextile ceres
+transit vesta semisquare ceres
+transit vesta sesquiquadrate ceres
+transit vesta quintile ceres
+transit vesta sesquiquintile ceres
+
+===== vesta 7 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction pallas
+transit vesta sextile pallas
+transit vesta square pallas
+transit vesta trine pallas
+transit vesta opposition pallas
+transit vesta quincunx pallas
+transit vesta semisextile pallas
+transit vesta semisquare pallas
+transit vesta sesquiquadrate pallas
+transit vesta quintile pallas
+transit vesta sesquiquintile pallas
+
+===== vesta 8 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction juno
+transit vesta sextile juno
+transit vesta square juno
+transit vesta trine juno
+transit vesta opposition juno
+transit vesta quincunx juno
+transit vesta semisextile juno
+transit vesta semisquare juno
+transit vesta sesquiquadrate juno
+transit vesta quintile juno
+transit vesta sesquiquintile juno
+
+===== vesta 9 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction eris
+transit vesta sextile eris
+transit vesta square eris
+transit vesta trine eris
+transit vesta opposition eris
+transit vesta quincunx eris
+transit vesta semisextile eris
+transit vesta semisquare eris
+transit vesta sesquiquadrate eris
+transit vesta quintile eris
+transit vesta sesquiquintile eris
+
+===== vesta 10 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction eros
+transit vesta sextile eros
+transit vesta square eros
+transit vesta trine eros
+transit vesta opposition eros
+transit vesta quincunx eros
+transit vesta semisextile eros
+transit vesta semisquare eros
+transit vesta sesquiquadrate eros
+transit vesta quintile eros
+transit vesta sesquiquintile eros
+
+===== vesta 11 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction hygiea
+transit vesta sextile hygiea
+transit vesta square hygiea
+transit vesta trine hygiea
+transit vesta opposition hygiea
+transit vesta quincunx hygiea
+transit vesta semisextile hygiea
+transit vesta semisquare hygiea
+transit vesta sesquiquadrate hygiea
+transit vesta quintile hygiea
+transit vesta sesquiquintile hygiea
+
+===== vesta 12 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction nessus
+transit vesta sextile nessus
+transit vesta square nessus
+transit vesta trine nessus
+transit vesta opposition nessus
+transit vesta quincunx nessus
+transit vesta semisextile nessus
+transit vesta semisquare nessus
+transit vesta sesquiquadrate nessus
+transit vesta quintile nessus
+transit vesta sesquiquintile nessus
+
+===== vesta 13 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction pholus
+transit vesta sextile pholus
+transit vesta square pholus
+transit vesta trine pholus
+transit vesta opposition pholus
+transit vesta quincunx pholus
+transit vesta semisextile pholus
+transit vesta semisquare pholus
+transit vesta sesquiquadrate pholus
+transit vesta quintile pholus
+transit vesta sesquiquintile pholus
+
+===== vesta 14 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction fortune
+transit vesta sextile fortune
+transit vesta square fortune
+transit vesta trine fortune
+transit vesta opposition fortune
+transit vesta quincunx fortune
+transit vesta semisextile fortune
+transit vesta semisquare fortune
+transit vesta sesquiquadrate fortune
+transit vesta quintile fortune
+transit vesta sesquiquintile fortune
+
+===== vesta 15 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction spirit
+transit vesta sextile spirit
+transit vesta square spirit
+transit vesta trine spirit
+transit vesta opposition spirit
+transit vesta quincunx spirit
+transit vesta semisextile spirit
+transit vesta semisquare spirit
+transit vesta sesquiquadrate spirit
+transit vesta quintile spirit
+transit vesta sesquiquintile spirit
+
+===== vesta 16 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction lilith
+transit vesta sextile lilith
+transit vesta square lilith
+transit vesta trine lilith
+transit vesta opposition lilith
+transit vesta quincunx lilith
+transit vesta semisextile lilith
+transit vesta semisquare lilith
+transit vesta sesquiquadrate lilith
+transit vesta quintile lilith
+transit vesta sesquiquintile lilith
+
+===== vesta 17 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction moon
+transit vesta sextile moon
+transit vesta square moon
+transit vesta trine moon
+transit vesta opposition moon
+transit vesta quincunx moon
+transit vesta semisextile moon
+transit vesta semisquare moon
+transit vesta sesquiquadrate moon
+transit vesta quintile moon
+transit vesta sesquiquintile moon
+
+===== vesta 18 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction sun
+transit vesta sextile sun
+transit vesta square sun
+transit vesta trine sun
+transit vesta opposition sun
+transit vesta quincunx sun
+transit vesta semisextile sun
+transit vesta semisquare sun
+transit vesta sesquiquadrate sun
+transit vesta quintile sun
+transit vesta sesquiquintile sun
+
+===== vesta 19 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction mercury
+transit vesta sextile mercury
+transit vesta square mercury
+transit vesta trine mercury
+transit vesta opposition mercury
+transit vesta quincunx mercury
+transit vesta semisextile mercury
+transit vesta semisquare mercury
+transit vesta sesquiquadrate mercury
+transit vesta quintile mercury
+transit vesta sesquiquintile mercury
+
+===== vesta 20 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction venus
+transit vesta sextile venus
+transit vesta square venus
+transit vesta trine venus
+transit vesta opposition venus
+transit vesta quincunx venus
+transit vesta semisextile venus
+transit vesta semisquare venus
+transit vesta sesquiquadrate venus
+transit vesta quintile venus
+transit vesta sesquiquintile venus
+
+===== vesta 21 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction mars
+transit vesta sextile mars
+transit vesta square mars
+transit vesta trine mars
+transit vesta opposition mars
+transit vesta quincunx mars
+transit vesta semisextile mars
+transit vesta semisquare mars
+transit vesta sesquiquadrate mars
+transit vesta quintile mars
+transit vesta sesquiquintile mars
+
+===== vesta 22 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction jupiter
+transit vesta sextile jupiter
+transit vesta square jupiter
+transit vesta trine jupiter
+transit vesta opposition jupiter
+transit vesta quincunx jupiter
+transit vesta semisextile jupiter
+transit vesta semisquare jupiter
+transit vesta sesquiquadrate jupiter
+transit vesta quintile jupiter
+transit vesta sesquiquintile jupiter
+
+===== vesta 23 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction saturn
+transit vesta sextile saturn
+transit vesta square saturn
+transit vesta trine saturn
+transit vesta opposition saturn
+transit vesta quincunx saturn
+transit vesta semisextile saturn
+transit vesta semisquare saturn
+transit vesta sesquiquadrate saturn
+transit vesta quintile saturn
+transit vesta sesquiquintile saturn
+
+===== vesta 24 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction uranus
+transit vesta sextile uranus
+transit vesta square uranus
+transit vesta trine uranus
+transit vesta opposition uranus
+transit vesta quincunx uranus
+transit vesta semisextile uranus
+transit vesta semisquare uranus
+transit vesta sesquiquadrate uranus
+transit vesta quintile uranus
+transit vesta sesquiquintile uranus
+
+===== vesta 25 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction neptune
+transit vesta sextile neptune
+transit vesta square neptune
+transit vesta trine neptune
+transit vesta opposition neptune
+transit vesta quincunx neptune
+transit vesta semisextile neptune
+transit vesta semisquare neptune
+transit vesta sesquiquadrate neptune
+transit vesta quintile neptune
+transit vesta sesquiquintile neptune
+
+===== vesta 26 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction pluto
+transit vesta sextile pluto
+transit vesta square pluto
+transit vesta trine pluto
+transit vesta opposition pluto
+transit vesta quincunx pluto
+transit vesta semisextile pluto
+transit vesta semisquare pluto
+transit vesta sesquiquadrate pluto
+transit vesta quintile pluto
+transit vesta sesquiquintile pluto
+
+===== vesta 27 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction north_node
+transit vesta sextile north_node
+transit vesta square north_node
+transit vesta trine north_node
+transit vesta opposition north_node
+transit vesta quincunx north_node
+transit vesta semisextile north_node
+transit vesta semisquare north_node
+transit vesta sesquiquadrate north_node
+transit vesta quintile north_node
+transit vesta sesquiquintile north_node
+
+===== vesta 28 of 28 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit vesta conjunction chiron
+transit vesta sextile chiron
+transit vesta square chiron
+transit vesta trine chiron
+transit vesta opposition chiron
+transit vesta quincunx chiron
+transit vesta semisextile chiron
+transit vesta semisquare chiron
+transit vesta sesquiquadrate chiron
+transit vesta quintile chiron
+transit vesta sesquiquintile chiron
+
+=====

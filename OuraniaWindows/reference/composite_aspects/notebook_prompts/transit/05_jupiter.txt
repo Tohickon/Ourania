@@ -1,0 +1,576 @@
+transit: jupiter - 311 readings in 29 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== jupiter 1 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction descendant
+transit jupiter sextile descendant
+transit jupiter square descendant
+transit jupiter trine descendant
+transit jupiter opposition descendant
+transit jupiter quincunx descendant
+transit jupiter semisextile descendant
+transit jupiter semisquare descendant
+transit jupiter sesquiquadrate descendant
+transit jupiter quintile descendant
+transit jupiter biquintile descendant
+transit jupiter sesquiquintile descendant
+transit jupiter septile descendant
+transit jupiter novile descendant
+transit jupiter decile descendant
+
+===== jupiter 2 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction ic
+transit jupiter sextile ic
+transit jupiter square ic
+transit jupiter trine ic
+transit jupiter opposition ic
+transit jupiter quincunx ic
+transit jupiter semisextile ic
+transit jupiter semisquare ic
+transit jupiter sesquiquadrate ic
+transit jupiter quintile ic
+transit jupiter biquintile ic
+transit jupiter sesquiquintile ic
+transit jupiter septile ic
+transit jupiter novile ic
+transit jupiter decile ic
+
+===== jupiter 3 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction ascendant
+transit jupiter sextile ascendant
+transit jupiter square ascendant
+transit jupiter trine ascendant
+transit jupiter opposition ascendant
+transit jupiter quincunx ascendant
+transit jupiter semisextile ascendant
+transit jupiter semisquare ascendant
+transit jupiter sesquiquadrate ascendant
+transit jupiter quintile ascendant
+transit jupiter biquintile ascendant
+transit jupiter sesquiquintile ascendant
+transit jupiter septile ascendant
+transit jupiter novile ascendant
+transit jupiter decile ascendant
+
+===== jupiter 4 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction mc
+transit jupiter sextile mc
+transit jupiter square mc
+transit jupiter trine mc
+transit jupiter opposition mc
+transit jupiter quincunx mc
+transit jupiter semisextile mc
+transit jupiter semisquare mc
+transit jupiter sesquiquadrate mc
+transit jupiter quintile mc
+transit jupiter biquintile mc
+transit jupiter sesquiquintile mc
+transit jupiter septile mc
+transit jupiter novile mc
+transit jupiter decile mc
+
+===== jupiter 5 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction south_node
+transit jupiter sextile south_node
+transit jupiter square south_node
+transit jupiter trine south_node
+transit jupiter opposition south_node
+transit jupiter quincunx south_node
+transit jupiter semisextile south_node
+transit jupiter semisquare south_node
+transit jupiter sesquiquadrate south_node
+transit jupiter quintile south_node
+transit jupiter sesquiquintile south_node
+
+===== jupiter 6 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction ceres
+transit jupiter sextile ceres
+transit jupiter square ceres
+transit jupiter trine ceres
+transit jupiter opposition ceres
+transit jupiter quincunx ceres
+transit jupiter semisextile ceres
+transit jupiter semisquare ceres
+transit jupiter sesquiquadrate ceres
+transit jupiter quintile ceres
+transit jupiter sesquiquintile ceres
+
+===== jupiter 7 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction pallas
+transit jupiter sextile pallas
+transit jupiter square pallas
+transit jupiter trine pallas
+transit jupiter opposition pallas
+transit jupiter quincunx pallas
+transit jupiter semisextile pallas
+transit jupiter semisquare pallas
+transit jupiter sesquiquadrate pallas
+transit jupiter quintile pallas
+transit jupiter sesquiquintile pallas
+
+===== jupiter 8 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction juno
+transit jupiter sextile juno
+transit jupiter square juno
+transit jupiter trine juno
+transit jupiter opposition juno
+transit jupiter quincunx juno
+transit jupiter semisextile juno
+transit jupiter semisquare juno
+transit jupiter sesquiquadrate juno
+transit jupiter quintile juno
+transit jupiter sesquiquintile juno
+
+===== jupiter 9 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction vesta
+transit jupiter sextile vesta
+transit jupiter square vesta
+transit jupiter trine vesta
+transit jupiter opposition vesta
+transit jupiter quincunx vesta
+transit jupiter semisextile vesta
+transit jupiter semisquare vesta
+transit jupiter sesquiquadrate vesta
+transit jupiter quintile vesta
+transit jupiter sesquiquintile vesta
+
+===== jupiter 10 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction eris
+transit jupiter sextile eris
+transit jupiter square eris
+transit jupiter trine eris
+transit jupiter opposition eris
+transit jupiter quincunx eris
+transit jupiter semisextile eris
+transit jupiter semisquare eris
+transit jupiter sesquiquadrate eris
+transit jupiter quintile eris
+transit jupiter sesquiquintile eris
+
+===== jupiter 11 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction eros
+transit jupiter sextile eros
+transit jupiter square eros
+transit jupiter trine eros
+transit jupiter opposition eros
+transit jupiter quincunx eros
+transit jupiter semisextile eros
+transit jupiter semisquare eros
+transit jupiter sesquiquadrate eros
+transit jupiter quintile eros
+transit jupiter sesquiquintile eros
+
+===== jupiter 12 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction hygiea
+transit jupiter sextile hygiea
+transit jupiter square hygiea
+transit jupiter trine hygiea
+transit jupiter opposition hygiea
+transit jupiter quincunx hygiea
+transit jupiter semisextile hygiea
+transit jupiter semisquare hygiea
+transit jupiter sesquiquadrate hygiea
+transit jupiter quintile hygiea
+transit jupiter sesquiquintile hygiea
+
+===== jupiter 13 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction nessus
+transit jupiter sextile nessus
+transit jupiter square nessus
+transit jupiter trine nessus
+transit jupiter opposition nessus
+transit jupiter quincunx nessus
+transit jupiter semisextile nessus
+transit jupiter semisquare nessus
+transit jupiter sesquiquadrate nessus
+transit jupiter quintile nessus
+transit jupiter sesquiquintile nessus
+
+===== jupiter 14 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction pholus
+transit jupiter sextile pholus
+transit jupiter square pholus
+transit jupiter trine pholus
+transit jupiter opposition pholus
+transit jupiter quincunx pholus
+transit jupiter semisextile pholus
+transit jupiter semisquare pholus
+transit jupiter sesquiquadrate pholus
+transit jupiter quintile pholus
+transit jupiter sesquiquintile pholus
+
+===== jupiter 15 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction fortune
+transit jupiter sextile fortune
+transit jupiter square fortune
+transit jupiter trine fortune
+transit jupiter opposition fortune
+transit jupiter quincunx fortune
+transit jupiter semisextile fortune
+transit jupiter semisquare fortune
+transit jupiter sesquiquadrate fortune
+transit jupiter quintile fortune
+transit jupiter sesquiquintile fortune
+
+===== jupiter 16 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction spirit
+transit jupiter sextile spirit
+transit jupiter square spirit
+transit jupiter trine spirit
+transit jupiter opposition spirit
+transit jupiter quincunx spirit
+transit jupiter semisextile spirit
+transit jupiter semisquare spirit
+transit jupiter sesquiquadrate spirit
+transit jupiter quintile spirit
+transit jupiter sesquiquintile spirit
+
+===== jupiter 17 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction lilith
+transit jupiter sextile lilith
+transit jupiter square lilith
+transit jupiter trine lilith
+transit jupiter opposition lilith
+transit jupiter quincunx lilith
+transit jupiter semisextile lilith
+transit jupiter semisquare lilith
+transit jupiter sesquiquadrate lilith
+transit jupiter quintile lilith
+transit jupiter sesquiquintile lilith
+
+===== jupiter 18 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction sun
+transit jupiter sextile sun
+transit jupiter square sun
+transit jupiter trine sun
+transit jupiter opposition sun
+transit jupiter biquintile sun
+transit jupiter septile sun
+transit jupiter novile sun
+transit jupiter decile sun
+
+===== jupiter 19 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction moon
+transit jupiter sextile moon
+transit jupiter square moon
+transit jupiter trine moon
+transit jupiter opposition moon
+transit jupiter biquintile moon
+transit jupiter septile moon
+transit jupiter novile moon
+transit jupiter decile moon
+
+===== jupiter 20 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction mercury
+transit jupiter sextile mercury
+transit jupiter square mercury
+transit jupiter trine mercury
+transit jupiter opposition mercury
+transit jupiter biquintile mercury
+transit jupiter septile mercury
+transit jupiter novile mercury
+transit jupiter decile mercury
+
+===== jupiter 21 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction venus
+transit jupiter sextile venus
+transit jupiter square venus
+transit jupiter trine venus
+transit jupiter opposition venus
+transit jupiter biquintile venus
+transit jupiter septile venus
+transit jupiter novile venus
+transit jupiter decile venus
+
+===== jupiter 22 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction mars
+transit jupiter sextile mars
+transit jupiter square mars
+transit jupiter trine mars
+transit jupiter opposition mars
+transit jupiter biquintile mars
+transit jupiter septile mars
+transit jupiter novile mars
+transit jupiter decile mars
+
+===== jupiter 23 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction jupiter
+transit jupiter sextile jupiter
+transit jupiter square jupiter
+transit jupiter trine jupiter
+transit jupiter opposition jupiter
+transit jupiter biquintile jupiter
+transit jupiter septile jupiter
+transit jupiter novile jupiter
+transit jupiter decile jupiter
+
+===== jupiter 24 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction saturn
+transit jupiter sextile saturn
+transit jupiter square saturn
+transit jupiter trine saturn
+transit jupiter opposition saturn
+transit jupiter biquintile saturn
+transit jupiter septile saturn
+transit jupiter novile saturn
+transit jupiter decile saturn
+
+===== jupiter 25 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction uranus
+transit jupiter sextile uranus
+transit jupiter square uranus
+transit jupiter trine uranus
+transit jupiter opposition uranus
+transit jupiter biquintile uranus
+transit jupiter septile uranus
+transit jupiter novile uranus
+transit jupiter decile uranus
+
+===== jupiter 26 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction neptune
+transit jupiter sextile neptune
+transit jupiter square neptune
+transit jupiter trine neptune
+transit jupiter opposition neptune
+transit jupiter biquintile neptune
+transit jupiter septile neptune
+transit jupiter novile neptune
+transit jupiter decile neptune
+
+===== jupiter 27 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction pluto
+transit jupiter sextile pluto
+transit jupiter square pluto
+transit jupiter trine pluto
+transit jupiter opposition pluto
+transit jupiter biquintile pluto
+transit jupiter septile pluto
+transit jupiter novile pluto
+transit jupiter decile pluto
+
+===== jupiter 28 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction chiron
+transit jupiter sextile chiron
+transit jupiter square chiron
+transit jupiter trine chiron
+transit jupiter opposition chiron
+transit jupiter biquintile chiron
+transit jupiter septile chiron
+transit jupiter novile chiron
+transit jupiter decile chiron
+
+===== jupiter 29 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit jupiter conjunction north_node
+transit jupiter sextile north_node
+transit jupiter square north_node
+transit jupiter trine north_node
+transit jupiter opposition north_node
+transit jupiter biquintile north_node
+transit jupiter septile north_node
+transit jupiter novile north_node
+transit jupiter decile north_node
+
+=====

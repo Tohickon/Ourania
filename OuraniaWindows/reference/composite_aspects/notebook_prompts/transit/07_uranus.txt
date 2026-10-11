@@ -1,0 +1,576 @@
+transit: uranus - 311 readings in 29 prompts.
+Copy ONE block (the lines between two ===== rows) into the notebook chat.
+
+===== uranus 1 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction descendant
+transit uranus sextile descendant
+transit uranus square descendant
+transit uranus trine descendant
+transit uranus opposition descendant
+transit uranus quincunx descendant
+transit uranus semisextile descendant
+transit uranus semisquare descendant
+transit uranus sesquiquadrate descendant
+transit uranus quintile descendant
+transit uranus biquintile descendant
+transit uranus sesquiquintile descendant
+transit uranus septile descendant
+transit uranus novile descendant
+transit uranus decile descendant
+
+===== uranus 2 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction ic
+transit uranus sextile ic
+transit uranus square ic
+transit uranus trine ic
+transit uranus opposition ic
+transit uranus quincunx ic
+transit uranus semisextile ic
+transit uranus semisquare ic
+transit uranus sesquiquadrate ic
+transit uranus quintile ic
+transit uranus biquintile ic
+transit uranus sesquiquintile ic
+transit uranus septile ic
+transit uranus novile ic
+transit uranus decile ic
+
+===== uranus 3 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction ascendant
+transit uranus sextile ascendant
+transit uranus square ascendant
+transit uranus trine ascendant
+transit uranus opposition ascendant
+transit uranus quincunx ascendant
+transit uranus semisextile ascendant
+transit uranus semisquare ascendant
+transit uranus sesquiquadrate ascendant
+transit uranus quintile ascendant
+transit uranus biquintile ascendant
+transit uranus sesquiquintile ascendant
+transit uranus septile ascendant
+transit uranus novile ascendant
+transit uranus decile ascendant
+
+===== uranus 4 of 29 =====
+Using the source titled Ourania writing brief, write the 15 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction mc
+transit uranus sextile mc
+transit uranus square mc
+transit uranus trine mc
+transit uranus opposition mc
+transit uranus quincunx mc
+transit uranus semisextile mc
+transit uranus semisquare mc
+transit uranus sesquiquadrate mc
+transit uranus quintile mc
+transit uranus biquintile mc
+transit uranus sesquiquintile mc
+transit uranus septile mc
+transit uranus novile mc
+transit uranus decile mc
+
+===== uranus 5 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction south_node
+transit uranus sextile south_node
+transit uranus square south_node
+transit uranus trine south_node
+transit uranus opposition south_node
+transit uranus quincunx south_node
+transit uranus semisextile south_node
+transit uranus semisquare south_node
+transit uranus sesquiquadrate south_node
+transit uranus quintile south_node
+transit uranus sesquiquintile south_node
+
+===== uranus 6 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction ceres
+transit uranus sextile ceres
+transit uranus square ceres
+transit uranus trine ceres
+transit uranus opposition ceres
+transit uranus quincunx ceres
+transit uranus semisextile ceres
+transit uranus semisquare ceres
+transit uranus sesquiquadrate ceres
+transit uranus quintile ceres
+transit uranus sesquiquintile ceres
+
+===== uranus 7 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction pallas
+transit uranus sextile pallas
+transit uranus square pallas
+transit uranus trine pallas
+transit uranus opposition pallas
+transit uranus quincunx pallas
+transit uranus semisextile pallas
+transit uranus semisquare pallas
+transit uranus sesquiquadrate pallas
+transit uranus quintile pallas
+transit uranus sesquiquintile pallas
+
+===== uranus 8 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction juno
+transit uranus sextile juno
+transit uranus square juno
+transit uranus trine juno
+transit uranus opposition juno
+transit uranus quincunx juno
+transit uranus semisextile juno
+transit uranus semisquare juno
+transit uranus sesquiquadrate juno
+transit uranus quintile juno
+transit uranus sesquiquintile juno
+
+===== uranus 9 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction vesta
+transit uranus sextile vesta
+transit uranus square vesta
+transit uranus trine vesta
+transit uranus opposition vesta
+transit uranus quincunx vesta
+transit uranus semisextile vesta
+transit uranus semisquare vesta
+transit uranus sesquiquadrate vesta
+transit uranus quintile vesta
+transit uranus sesquiquintile vesta
+
+===== uranus 10 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction eris
+transit uranus sextile eris
+transit uranus square eris
+transit uranus trine eris
+transit uranus opposition eris
+transit uranus quincunx eris
+transit uranus semisextile eris
+transit uranus semisquare eris
+transit uranus sesquiquadrate eris
+transit uranus quintile eris
+transit uranus sesquiquintile eris
+
+===== uranus 11 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction eros
+transit uranus sextile eros
+transit uranus square eros
+transit uranus trine eros
+transit uranus opposition eros
+transit uranus quincunx eros
+transit uranus semisextile eros
+transit uranus semisquare eros
+transit uranus sesquiquadrate eros
+transit uranus quintile eros
+transit uranus sesquiquintile eros
+
+===== uranus 12 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction hygiea
+transit uranus sextile hygiea
+transit uranus square hygiea
+transit uranus trine hygiea
+transit uranus opposition hygiea
+transit uranus quincunx hygiea
+transit uranus semisextile hygiea
+transit uranus semisquare hygiea
+transit uranus sesquiquadrate hygiea
+transit uranus quintile hygiea
+transit uranus sesquiquintile hygiea
+
+===== uranus 13 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction nessus
+transit uranus sextile nessus
+transit uranus square nessus
+transit uranus trine nessus
+transit uranus opposition nessus
+transit uranus quincunx nessus
+transit uranus semisextile nessus
+transit uranus semisquare nessus
+transit uranus sesquiquadrate nessus
+transit uranus quintile nessus
+transit uranus sesquiquintile nessus
+
+===== uranus 14 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction pholus
+transit uranus sextile pholus
+transit uranus square pholus
+transit uranus trine pholus
+transit uranus opposition pholus
+transit uranus quincunx pholus
+transit uranus semisextile pholus
+transit uranus semisquare pholus
+transit uranus sesquiquadrate pholus
+transit uranus quintile pholus
+transit uranus sesquiquintile pholus
+
+===== uranus 15 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction fortune
+transit uranus sextile fortune
+transit uranus square fortune
+transit uranus trine fortune
+transit uranus opposition fortune
+transit uranus quincunx fortune
+transit uranus semisextile fortune
+transit uranus semisquare fortune
+transit uranus sesquiquadrate fortune
+transit uranus quintile fortune
+transit uranus sesquiquintile fortune
+
+===== uranus 16 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction spirit
+transit uranus sextile spirit
+transit uranus square spirit
+transit uranus trine spirit
+transit uranus opposition spirit
+transit uranus quincunx spirit
+transit uranus semisextile spirit
+transit uranus semisquare spirit
+transit uranus sesquiquadrate spirit
+transit uranus quintile spirit
+transit uranus sesquiquintile spirit
+
+===== uranus 17 of 29 =====
+Using the source titled Ourania writing brief, write the 11 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction lilith
+transit uranus sextile lilith
+transit uranus square lilith
+transit uranus trine lilith
+transit uranus opposition lilith
+transit uranus quincunx lilith
+transit uranus semisextile lilith
+transit uranus semisquare lilith
+transit uranus sesquiquadrate lilith
+transit uranus quintile lilith
+transit uranus sesquiquintile lilith
+
+===== uranus 18 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction sun
+transit uranus sextile sun
+transit uranus square sun
+transit uranus trine sun
+transit uranus opposition sun
+transit uranus biquintile sun
+transit uranus septile sun
+transit uranus novile sun
+transit uranus decile sun
+
+===== uranus 19 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction moon
+transit uranus sextile moon
+transit uranus square moon
+transit uranus trine moon
+transit uranus opposition moon
+transit uranus biquintile moon
+transit uranus septile moon
+transit uranus novile moon
+transit uranus decile moon
+
+===== uranus 20 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction mercury
+transit uranus sextile mercury
+transit uranus square mercury
+transit uranus trine mercury
+transit uranus opposition mercury
+transit uranus biquintile mercury
+transit uranus septile mercury
+transit uranus novile mercury
+transit uranus decile mercury
+
+===== uranus 21 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction venus
+transit uranus sextile venus
+transit uranus square venus
+transit uranus trine venus
+transit uranus opposition venus
+transit uranus biquintile venus
+transit uranus septile venus
+transit uranus novile venus
+transit uranus decile venus
+
+===== uranus 22 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction mars
+transit uranus sextile mars
+transit uranus square mars
+transit uranus trine mars
+transit uranus opposition mars
+transit uranus biquintile mars
+transit uranus septile mars
+transit uranus novile mars
+transit uranus decile mars
+
+===== uranus 23 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction jupiter
+transit uranus sextile jupiter
+transit uranus square jupiter
+transit uranus trine jupiter
+transit uranus opposition jupiter
+transit uranus biquintile jupiter
+transit uranus septile jupiter
+transit uranus novile jupiter
+transit uranus decile jupiter
+
+===== uranus 24 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction saturn
+transit uranus sextile saturn
+transit uranus square saturn
+transit uranus trine saturn
+transit uranus opposition saturn
+transit uranus biquintile saturn
+transit uranus septile saturn
+transit uranus novile saturn
+transit uranus decile saturn
+
+===== uranus 25 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction uranus
+transit uranus sextile uranus
+transit uranus square uranus
+transit uranus trine uranus
+transit uranus opposition uranus
+transit uranus biquintile uranus
+transit uranus septile uranus
+transit uranus novile uranus
+transit uranus decile uranus
+
+===== uranus 26 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction neptune
+transit uranus sextile neptune
+transit uranus square neptune
+transit uranus trine neptune
+transit uranus opposition neptune
+transit uranus biquintile neptune
+transit uranus septile neptune
+transit uranus novile neptune
+transit uranus decile neptune
+
+===== uranus 27 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction pluto
+transit uranus sextile pluto
+transit uranus square pluto
+transit uranus trine pluto
+transit uranus opposition pluto
+transit uranus biquintile pluto
+transit uranus septile pluto
+transit uranus novile pluto
+transit uranus decile pluto
+
+===== uranus 28 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction chiron
+transit uranus sextile chiron
+transit uranus square chiron
+transit uranus trine chiron
+transit uranus opposition chiron
+transit uranus biquintile chiron
+transit uranus septile chiron
+transit uranus novile chiron
+transit uranus decile chiron
+
+===== uranus 29 of 29 =====
+Using the source titled Ourania writing brief, write the 9 readings listed below. Each describes a period of time: a moving body in the sky acting on a point in the relationship's chart.
+For each reading give exactly three parts, in this order, as plain text:
+1. the heading, copied exactly as I list it, on a line by itself
+2. one lead sentence on its own line that states the whole dynamic plainly
+3. one paragraph of three to five sentences
+Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+
+transit uranus conjunction north_node
+transit uranus sextile north_node
+transit uranus square north_node
+transit uranus trine north_node
+transit uranus opposition north_node
+transit uranus biquintile north_node
+transit uranus septile north_node
+transit uranus novile north_node
+transit uranus decile north_node
+
+=====
