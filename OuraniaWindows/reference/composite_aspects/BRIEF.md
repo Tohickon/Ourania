@@ -49,9 +49,10 @@ Juno is the contract: vows, fairness, who carries what. Venus is the affection a
    sentences. Do not repeat the same definition sentence for a body across a pair's aspects.
 3. **No sentence of six or more words may appear in three readings.** No stock closing lines.
 4. **No stock frame.** For any one first body, no more than a tenth of its readings may open
-   their paragraph with the same four words or close on a sentence starting with the same two.
+   their paragraph with the same two words or close on a sentence starting with the same two.
    Do not begin by naming the aspect ("A square between composite Eris and ...") and do not end
-   on advice that starts "Continuing to ...". Vary how each reading opens and closes.
+   on advice that starts "Continuing to ...". Do not open by defining a body
+   ("Eris embodies ..., while Mercury governs ..."): start inside the couple's life. Vary how each reading opens and closes.
 5. **No double quotes, no angle brackets, no ampersands, no dashes used as punctuation.** Use
    commas, colons, full stops and parentheses. Apostrophes are fine.
 6. The lead ends with a full stop. The body ends with a full stop or question mark.

@@ -194,7 +194,13 @@ def do_prompts():
                         "effort is. Use plain words about ordinary life (meals, money, rows, relatives, "
                         "work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, "
                         "evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. "
-                        "In every reading say in a few words what each of the two bodies stands for.",
+                        "Never write a sentence whose job is to define a body (Eris embodies X, while "
+                        "Mercury governs Y). Do not start a paragraph with the name of the first body "
+                        "followed by a verb like embodies, represents, channels, drives or governs. Start "
+                        "inside the couple's life instead: what the two of them do, argue about or avoid. "
+                        "Let what each body means show through that, in different words every time. Do "
+                        "not start a second sentence with the aspect name (A square, An opposition), and "
+                        "do not give every trine the same shape (Because this comes easily, you risk).",
                         ""] + batch + [""]
             out.append("=====")
             with open(os.path.join(folder, f"{n:02d}_{a}.txt"), "w", encoding="utf-8") as fh:

@@ -31,7 +31,7 @@ CHECKS, because these replace text a template assembled and must not become one:
   - every reading is 50 to 120 words;
   - no sentence of six words or more appears in three readings of a set;
   - for any one first body, no more than a tenth of its readings (eight at least) may open
-    their paragraph with the same four words, or close on a sentence starting with the same two;
+    their paragraph with the same two words, or close on a sentence starting with the same two;
   - no double quote, angle bracket or ampersand (DataCheck forbids a quote inside a value),
     no dash used as punctuation, and each part ends its sentence;
   - a key the app does not have is refused.
@@ -199,6 +199,9 @@ def check(name, cfg, d, where):
         first = split_key(k)[1]
         sents = re.split(r"(?<=[.!?])\s+", body.strip())
         opens[first][" ".join(sents[0].lower().split()[:4])] += 1
+        # The second batch varied the fourth word and kept the frame: all 120 began "Eris
+        # embodies / represents / channels / drives", a definition. Two words catch that.
+        opens[first][" ".join(sents[0].lower().split()[:2])] += 1
         closes[first][" ".join(sents[-1].lower().split()[:2])] += 1
         sizes[first] += 1
     for first, n in sizes.items():
