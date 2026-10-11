@@ -30,6 +30,8 @@ CHECKS, because these replace text a template assembled and must not become one:
     compares only square with trine, this compares every aspect drafted for the pair;
   - every reading is 50 to 120 words;
   - no sentence of six words or more appears in three readings of a set;
+  - for any one first body, no more than a tenth of its readings (eight at least) may open
+    their paragraph with the same four words, or close on a sentence starting with the same two;
   - no double quote, angle bracket or ampersand (DataCheck forbids a quote inside a value),
     no dash used as punctuation, and each part ends its sentence;
   - a key the app does not have is refused.
@@ -184,6 +186,30 @@ def check(name, cfg, d, where):
     for s, n in seen.items():
         if n >= 3:
             problems.append(f"a sentence used in {n} readings: {s[:70]}")
+    # A stock frame is a template too, even when no whole sentence repeats: 21 of the first
+    # 120 readings a notebook returned began "A square between composite Eris and", and 37
+    # ended on a sentence starting "Continuing to". Counted per first body, so the limit means
+    # the same thing for a set of 70 as for one of 311.
+    opens = collections.defaultdict(collections.Counter)
+    closes = collections.defaultdict(collections.Counter)
+    sizes = collections.Counter()
+    for k, (lead, body) in d.items():
+        if k not in where:
+            continue
+        first = split_key(k)[1]
+        sents = re.split(r"(?<=[.!?])\s+", body.strip())
+        opens[first][" ".join(sents[0].lower().split()[:4])] += 1
+        closes[first][" ".join(sents[-1].lower().split()[:2])] += 1
+        sizes[first] += 1
+    for first, n in sizes.items():
+        limit = max(8, n // 10)
+        for phrase, c in opens[first].items():
+            if c > limit:
+                problems.append(f"{first}: {c} of {n} bodies open with '{phrase} ...' (limit {limit})")
+        for phrase, c in closes[first].items():
+            if c > limit:
+                problems.append(f"{first}: {c} of {n} readings close on a sentence starting "
+                                f"'{phrase} ...' (limit {limit})")
     print(f"{name}: {len(d)} of {len(where)} readings drafted ({len(pairs)} pairs); "
           f"closest two aspects of one pair share {worst:.0%}.")
     if problems:

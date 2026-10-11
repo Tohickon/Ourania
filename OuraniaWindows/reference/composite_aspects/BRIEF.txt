@@ -48,10 +48,14 @@ Juno is the contract: vows, fairness, who carries what. Venus is the affection a
    paragraph and change a clause. Each aspect is a different situation and needs different
    sentences. Do not repeat the same definition sentence for a body across a pair's aspects.
 3. **No sentence of six or more words may appear in three readings.** No stock closing lines.
-4. **No double quotes, no angle brackets, no ampersands, no dashes used as punctuation.** Use
+4. **No stock frame.** For any one first body, no more than a tenth of its readings may open
+   their paragraph with the same four words or close on a sentence starting with the same two.
+   Do not begin by naming the aspect ("A square between composite Eris and ...") and do not end
+   on advice that starts "Continuing to ...". Vary how each reading opens and closes.
+5. **No double quotes, no angle brackets, no ampersands, no dashes used as punctuation.** Use
    commas, colons, full stops and parentheses. Apostrophes are fine.
-5. The lead ends with a full stop. The body ends with a full stop or question mark.
-6. Write every aspect listed for a pair. A pair with one aspect missing is refused.
+6. The lead ends with a full stop. The body ends with a full stop or question mark.
+7. Write every aspect listed for a pair. A pair with one aspect missing is refused.
 
 Check with `python build.py composite` or `python build.py transit`. Put finished files in
 `drafts/` (composite) or `transit_drafts/` (transit). `python build.py --write` splices them
@@ -64,8 +68,12 @@ into the app once every check passes.
 - Say what the two bodies stand for in a few words, worked into the sentence. Then say what
   this aspect between them looks like in ordinary life. Then name the usual way it goes wrong
   and what helps.
-- Be concrete: meals, money, arguments, in-laws, work, bed. Avoid abstractions such as
-  "energies", "vibrations", "evolutionary", "alchemical", "cosmic", "sacred journey".
+- Be concrete: meals, money, arguments, in-laws, work, bed. Do not use: sacred, holy,
+  spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless,
+  harmony, journey, destiny, energies, vibrations, alchemical, cosmic.
+- **A sextile is not a mild trine.** A trine works by itself and breeds complacency. A sextile
+  is a chance that only pays off when the pair makes an effort, and lies idle otherwise. Say
+  what the effort is.
 - No flattery and no doom. A hard aspect is workable and an easy one has a cost.
 - Do not invent facts about astronomy or cite authors. Stay with the meanings given below.
 - No rhetorical questions as leads, no exclamation marks, no lists inside a reading.

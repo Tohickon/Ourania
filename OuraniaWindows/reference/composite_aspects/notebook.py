@@ -57,7 +57,8 @@ HEADING = re.compile(
 def clean(line):
     s = line.strip()
     s = re.sub(r"\s*\[\s*\d+(?:\s*[-,–]\s*\d+)*\s*\]", "", s)      # [3], [1, 2], [1-3]
-    s = re.sub(r"[*_`]+", "", s)                                          # bold, italics, code
+    s = re.sub(r"[*`]+", "", s)                                           # bold, code
+    s = re.sub(r"(?<![A-Za-z])_+|_+(?![A-Za-z])", "", s)                  # _italics_, not north_node
     s = re.sub(r"^\s*(?:[-•>]+|#+|\d+[.)])\s*", "", s)               # bullets, headings, numbers
     s = re.sub(r"^(?:lead|body|reading|heading|key)\s*[:.]\s*", "", s, flags=re.I)
     s = s.replace("’", "'").replace("‘", "'")
@@ -104,6 +105,8 @@ def do_import():
                 got[key] = (lead, rest)
 
             for raw in open(path, encoding="utf-8").read().split("\n"):
+                if re.match(r"\s*(={3,}|-{3,}|#\s)", raw):
+                    continue   # a block separator or a title line the chat or the prompt file added
                 h = heading(raw)
                 if h:
                     flush()
@@ -182,6 +185,16 @@ def do_prompts():
                         "definition or a closing line. Use the meanings of the bodies and of each "
                         "aspect given in the brief. Write nothing before the first heading or after "
                         "the last paragraph.",
+                        "Avoid these habits, which make the readings sound machine-made: do not begin a "
+                        "paragraph by naming the aspect (A square between, Under a trine between, An "
+                        "opposition between); do not end on advice that starts with an -ing word "
+                        "(Continuing to, Practicing, Learning to, Maintaining); vary how each reading "
+                        "opens and closes. A sextile is NOT a mild trine: it is a chance that only pays "
+                        "off when the pair makes an effort, and lies idle otherwise, so say what the "
+                        "effort is. Use plain words about ordinary life (meals, money, rows, relatives, "
+                        "work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, "
+                        "evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. "
+                        "In every reading say in a few words what each of the two bodies stands for.",
                         ""] + batch + [""]
             out.append("=====")
             with open(os.path.join(folder, f"{n:02d}_{a}.txt"), "w", encoding="utf-8") as fh:

@@ -8,6 +8,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction descendant
 transit north_node sextile descendant
@@ -28,6 +29,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction ic
 transit north_node sextile ic
@@ -48,6 +50,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction ascendant
 transit north_node sextile ascendant
@@ -68,6 +71,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction mc
 transit north_node sextile mc
@@ -88,6 +92,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction south_node
 transit north_node sextile south_node
@@ -108,6 +113,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction ceres
 transit north_node sextile ceres
@@ -128,6 +134,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction pallas
 transit north_node sextile pallas
@@ -148,6 +155,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction juno
 transit north_node sextile juno
@@ -168,6 +176,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction vesta
 transit north_node sextile vesta
@@ -188,6 +197,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction eris
 transit north_node sextile eris
@@ -208,6 +218,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction eros
 transit north_node sextile eros
@@ -228,6 +239,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction hygiea
 transit north_node sextile hygiea
@@ -248,6 +260,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction nessus
 transit north_node sextile nessus
@@ -268,6 +281,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction pholus
 transit north_node sextile pholus
@@ -288,6 +302,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction fortune
 transit north_node sextile fortune
@@ -308,6 +323,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction spirit
 transit north_node sextile spirit
@@ -328,6 +344,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction lilith
 transit north_node sextile lilith
@@ -348,6 +365,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction sun
 transit north_node sextile sun
@@ -366,6 +384,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction moon
 transit north_node sextile moon
@@ -384,6 +403,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction mercury
 transit north_node sextile mercury
@@ -402,6 +422,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction venus
 transit north_node sextile venus
@@ -420,6 +441,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction mars
 transit north_node sextile mars
@@ -438,6 +460,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction jupiter
 transit north_node sextile jupiter
@@ -456,6 +479,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction saturn
 transit north_node sextile saturn
@@ -474,6 +498,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction uranus
 transit north_node sextile uranus
@@ -492,6 +517,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction neptune
 transit north_node sextile neptune
@@ -510,6 +536,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction pluto
 transit north_node sextile pluto
@@ -528,6 +555,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction chiron
 transit north_node sextile chiron
@@ -546,6 +574,7 @@ For each reading give exactly three parts, in this order, as plain text:
 2. one lead sentence on its own line that states the whole dynamic plainly
 3. one paragraph of three to five sentences
 Rules: 65 to 90 words per reading. No bullet points, no bold, no quotation marks, no dashes, no citations. Readings that share the same two bodies must use completely different sentences from one another: do not repeat a definition or a closing line. Use the meanings of the bodies and of each aspect given in the brief. Write nothing before the first heading or after the last paragraph.
+Avoid these habits, which make the readings sound machine-made: do not begin a paragraph by naming the aspect (A square between, Under a trine between, An opposition between); do not end on advice that starts with an -ing word (Continuing to, Practicing, Learning to, Maintaining); vary how each reading opens and closes. A sextile is NOT a mild trine: it is a chance that only pays off when the pair makes an effort, and lies idle otherwise, so say what the effort is. Use plain words about ordinary life (meals, money, rows, relatives, work, bed) and do not use: sacred, holy, spiritual, sanctuary, catalyst, evolutionary, profound, dynamic, vibrant, effortless, harmony, journey, destiny. In every reading say in a few words what each of the two bodies stands for.
 
 transit north_node conjunction north_node
 transit north_node sextile north_node
