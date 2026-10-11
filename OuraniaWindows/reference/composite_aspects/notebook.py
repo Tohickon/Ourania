@@ -76,6 +76,33 @@ def heading(line):
     return bool(m.group("t")), NAMES[m.group("a").lower()], m.group("asp").lower(), NAMES[m.group("b").lower()]
 
 
+def drop_recycled_closings(fresh, already):
+    """Cut a new reading's last sentence when it is the last sentence of an older one, reworded.
+
+    The notebook closes on advice that depends on the aspect and the second body alone: 71 of
+    115 Eros readings ended on a sentence at least 60% the same as the one ending the matching
+    Eris reading, 13 of them word for word. The cut is only made when a reading still has three
+    sentences and 50 words without it; otherwise it is left for build.py to judge.
+    """
+    split = lambda body: re.split(r"(?<=[.!?])\s+", body.strip())
+    closings = collections.defaultdict(list)
+    for k, (lead, body) in already.items():
+        _, _, asp, b = build.split_key(k)
+        closings[(asp, b)].append(split(body)[-1])
+    out, trimmed = collections.OrderedDict(), 0
+    for k, (lead, body) in fresh.items():
+        _, _, asp, b = build.split_key(k)
+        sents = split(body)
+        shorter = " ".join(sents[:-1])
+        if (len(sents) >= 4 and len(build.words(lead + " " + shorter)) >= 50
+                and any(build.similarity(sents[-1], old) >= 0.6 for old in closings[(asp, b)])):
+            body = shorter
+            trimmed += 1
+        closings[(asp, b)].append(split(body)[-1])
+        out[k] = (lead, body)
+    return out, trimmed
+
+
 def do_import():
     for name, cfg in build.SETS.items():
         where = build.app_keys(cfg)
@@ -130,6 +157,7 @@ def do_import():
                     buf.append(clean(raw))
             flush()
         fresh = collections.OrderedDict((k, v) for k, v in got.items() if k not in already)
+        fresh, trimmed = drop_recycled_closings(fresh, already)
         by_body = collections.OrderedDict()
         for k, v in fresh.items():
             by_body.setdefault(build.split_key(k)[1], []).append((k, v))
@@ -144,6 +172,9 @@ def do_import():
         print(f"{name}: {len(files)} pasted file(s), {len(got)} readings recognised, "
               f"{len(fresh)} new ones written to {cfg['drafts']}/, "
               f"{len(got) - len(fresh)} already drafted and left alone.")
+        if trimmed:
+            print(f"  {trimmed} closing sentence(s) dropped: each repeated the closing of a reading "
+                  f"already drafted for the same aspect and second body.")
         for u in unplaced[:30]:
             print("  could not place - " + u)
 
@@ -226,6 +257,8 @@ def do_prompts():
                         "around and word it differently each time. Every sentence must be complete and "
                         "grammatical: read each one back, never join two sentences with when or as, and "
                         "write an before a vowel sound. Start every lead with a capital letter.",
+                        "Do not end a reading on a sentence of advice. End on what actually happens between "
+                        "the two people. If you do give advice, it must be specific to this pair. "
                         "The closing sentence is checked hardest. It must be about THIS pair of bodies and "
                         "this aspect, and must not be a sentence you have written before in this chat or "
                         "that appears in any earlier answer or saved note: no reading may share a sentence "
