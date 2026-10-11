@@ -261,6 +261,8 @@ def do_prompts():
                         "bodies in the same aspect to the same second body, and rejects any that share "
                         "half their words. Do not adapt, reword or reuse any earlier answer in this "
                         "notebook: write each reading from nothing, about what THIS first body does. "
+                        "Apostrophes are allowed and required: write each other's moods, not each other moods. "
+                        "Sextiles and oppositions are where copying has been worst, so take most care there. "
                         "Do not end a reading on a sentence of advice. End on what actually happens between "
                         "the two people. If you do give advice, it must be specific to this pair. "
                         "The closing sentence is checked hardest. It must be about THIS pair of bodies and "
