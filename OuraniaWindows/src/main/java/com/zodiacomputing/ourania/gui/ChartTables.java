@@ -888,6 +888,52 @@ public final class ChartTables {
                 Double.isNaN(c.jdTo) ? "&mdash;" : dateOf(c.jdTo)));
         }
         h.append("</table>");
+        h.append(activePictures(natal, sw, natalJd, nowJd, hits));
+        return h.toString();
+    }
+
+    /**
+     * Readings for the pictures live right now, rather than for every one in the window.
+     *
+     * <b>Live, and not all of them.</b> The window is six months either side and the orb is a
+     * quarter of a degree, so a typical chart has thirty-eight pictures perfecting in it and
+     * two or three in force. A paragraph for each would bury the ones that are happening under
+     * thirty-five that are not, which is the cookbook dump this app's whole reading layer
+     * exists to avoid. The table above is the index; this is what is going on.
+     *
+     * <b>"Live" is asked of the same function that weighs it.</b> A picture counts when
+     * {@link ArcMidpoints#weight} of its offset is above zero, which is true exactly inside the
+     * orb - so this cannot drift from the strength line each reading prints, and moving the orb
+     * moves both.
+     */
+    private static String activePictures(ChartFrame natal, SwissEph sw, double natalJd,
+                                         double nowJd,
+                                         java.util.List<ArcMidpoints.Contact> hits) {
+        ChartFrame.Body sun = natal == null ? null : natal.body("Sun");
+        if (sun == null || !sun.ok || hits.isEmpty()) {
+            return "";
+        }
+        double arcNow = com.zodiacomputing.ourania.astro.SolarArc.arcAt(
+            sw, natalJd, sun.lon, nowJd);
+        if (Double.isNaN(arcNow)) {
+            return "";
+        }
+        StringBuilder h = new StringBuilder();
+        int live = 0;
+        for (ArcMidpoints.Contact c : hits) {
+            if (ArcMidpoints.weight(arcNow - c.arc) > 0.0) {
+                if (live == 0) {
+                    h.append("<h2>In force now</h2>");
+                }
+                h.append(ArcMidpointReading.of(c, nowJd, arcNow));
+                live++;
+            }
+        }
+        if (live == 0) {
+            return "<h2>In force now</h2><p><i>None of the pictures above is inside its orb "
+                 + "today. At a quarter of a degree that is the ordinary state - these are "
+                 + "dated events rather than a standing condition.</i></p>";
+        }
         return h.toString();
     }
 
