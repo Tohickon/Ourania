@@ -30,15 +30,18 @@ ChartSetupCheck  1      # 1: "with the real directory every selectable body can 
 # corpus now holds asteroid longitudes the runner cannot reproduce, and StartupCheck still
 # finds bodies it cannot compute inside the files' era.
 #
-# THE COUNTS BELOW ARE THE 2026-10-10 MEASUREMENT AND ARE EXPECTED TO FALL, NOT TO HOLD. They
-# were right for a corpus generated without the Moon's file; what they should be for the
-# regenerated one can only be measured on the runner, and nothing on David's machine can tell
-# you - it has all four asteroid files, so both suites are CLEAR there (StartupCheck 73 of 73,
-# EphemerisCorpusCheck 51 of 51, measured 2026-10-11). The first CI run after e6378e1e merges
-# is the measurement. The gate reports fewer-than-expected as a warning rather than a failure,
-# and the "Say which suites were red" step added in the same commit as this file prints each
-# red suite's row on the run page - so that run will state the true numbers outright. Tighten
-# these two lines to what it says, and do not guess them from a laptop.
+# THE COUNTS BELOW ARE MEASURED ON THE RUNNER, not guessed from a laptop. CI run 38200921189,
+# 2026-10-12, is where they come from - the first run after e6378e1e merged. Both fell to 1, and
+# both remaining failures have the same cause as the two lines at the top of this file: the four
+# numbered-asteroid files the runner cannot download. Nothing here is about the Moon any more.
+#
+# That run also caught a defect in e6378e1e itself. Its rewritten StartupCheck assertions said
+# "no file is missing from this machine's ephemeris directory" and "start-up says the directory
+# is whole" - true where they were written, false here, so StartupCheck went from one CI failure
+# to THREE and named the four asteroid files in the message. That is the complaint this file was
+# created over, reintroduced by the commit meant to end it. Fixed: the assertions now name the
+# two facts the Moon's file changes - it is not among the missing, and the North Node no longer
+# approximates - which hold on any folder that has it.
 
-EphemerisCorpusCheck 2   # 2 in Part A: 285 stored longitudes differ and 50 rows answer from files that were approximation in the corpus - the lunar nodes and what is derived from them in every era, because the corpus was generated without semo_18.se1; plus rows at 1500-1850 where the two folders hold different files
-StartupCheck     2      # 2: "this machine is still missing the Moon's file" is false here, by design of the assertion; and "inside the files' era nothing is beyond computing" fails on the four asteroid files CI cannot have (Eris, Eros, Hygiea, Nessus), the same cause as the two lines above
+EphemerisCorpusCheck 1   # 1 in Part A: rows carrying the four numbered-asteroid files, which this machine has and the runner cannot download. The Moon's half of this is gone - the corpus was regenerated with semo_18.se1 on 2026-10-11 (e6378e1e), and CI measured this at 1 of 51 the first time it ran against it
+StartupCheck     1      # 1: "inside the files' era nothing is beyond computing", on the same four asteroid files (Eris, Eros, Hygiea, Nessus). The other two failures this line used to cover are gone: the Moon's file is in place, and the assertions that read as "this whole directory is complete" were replaced with ones about the Moon's file alone

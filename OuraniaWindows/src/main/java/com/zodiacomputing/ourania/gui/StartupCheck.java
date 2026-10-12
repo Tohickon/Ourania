@@ -13,8 +13,10 @@ package com.zodiacomputing.ourania.gui;
  *
  * <p><b>On 2026-10-10 the file was put in place, and Part G said so.</b> It failed on the one
  * assertion that pinned the absence, which is the whole of what it was for. Its assertions now
- * read the other way round - the directory is complete - so a directory that loses a file again
- * fails them. The corpus moved with it: {@code ephemeris-corpus.tsv} was re-recorded, the North
+ * name the two facts that file changes - it is not among the missing, and the North Node no
+ * longer approximates - and nothing about the rest of the directory, because the first rewrite
+ * asserted the directory was COMPLETE and so failed on the CI runner, which cannot download the
+ * four numbered-asteroid files. The corpus moved with it: {@code ephemeris-corpus.tsv} was re-recorded, the North
  * Node went from approximation to files on 50 rows, and nothing went the other way.
  *
  * <p><b>Part B holds a defect this suite's own subject had.</b> The first
@@ -337,14 +339,29 @@ public final class StartupCheck {
             // missing file is not the only way a body can fall back - being outside the files'
             // era is another, which is what the 1500 half of this part asserts - so the third is
             // not implied by the first.
+            // <b>The first rewrite of these was wrong in the same way as the original, pointed
+            // the other way.</b> It asserted that NO file was missing and that start-up called
+            // the directory whole - true on the machine it was written on, false on the CI
+            // runner, which cannot download the four numbered-asteroid files (Hygiea, Eros,
+            // Nessus, Eris). StartupCheck went from one CI failure to three, naming those four
+            // files, which is exactly the complaint known-red-ci.txt was created over: a suite
+            // that "holds the runner to one machine's ephemeris folder". Measured on CI run
+            // 38200921189.
+            //
+            // <b>So these assert the two facts the Moon's file actually changes, and nothing
+            // about the rest of the directory.</b> Both are true of ANY folder holding
+            // semo_18.se1 - which the runner downloads and this machine now has. Whether some
+            // optional asteroid file is also there is a different question, and the 1500 half
+            // of this part plus BodyCheck are where it belongs.
             Startup.Finding missing = only(now, "missing");
             Startup.Finding fellNow = only(now, "approximation");
-            Startup.Finding whole = only(now, "answered from the ephemeris files");
-            ok("no file is missing from this machine's ephemeris directory ("
-                + (missing == null ? "none" : missing.detail) + ")", missing == null);
-            ok("and start-up says the directory is whole in as many words", whole != null);
-            ok("and nothing on a modern chart falls back to approximation ("
-                + (fellNow == null ? "nothing" : fellNow.detail) + ")", fellNow == null);
+            boolean moonMissing = missing != null && missing.detail.contains("semo_18.se1");
+            ok("the Moon's own file is no longer among the missing ("
+                + (missing == null ? "nothing is missing" : missing.detail) + ")",
+                !moonMissing);
+            ok("and the North Node is no longer computed by approximation ("
+                + (fellNow == null ? "nothing approximates" : fellNow.detail) + ")",
+                fellNow == null || !fellNow.detail.contains("Node"));
         } finally {
             Startup.jdOverride = null;
         }
