@@ -46,6 +46,38 @@ jobs:
         # known-red-ci.txt: the suites red only here, for want of the four asteroid files.
         run: .\build.ps1 -Out out-ci -All -KnownRed known-red.txt,known-red-ci.txt
 
+      # A red run used to say "exit code 1" and nothing else unless the logs were downloaded,
+      # which is how CI stayed red from 28 September to 10 October with nobody knowing which
+      # suite it was. This puts each red suite's row on the run page itself.
+      - name: Say which suites were red
+        if: failure()
+        run: |
+          $s = "out-ci-logs\SUMMARY.txt"
+          if (Test-Path $s) {
+            foreach ($line in Get-Content $s) {
+              $t = $line.TrimStart([char] 0xFEFF)
+              if ($t -cmatch '^(\S+)\s+(RED|MORE RED THAN KNOWN|known red, NO COUNT)') {
+                # The row, then the suite's own list of what failed - one annotation for the
+                # suite, because a step may raise only ten and a suite can fail more than that.
+                $msg = $t
+                $log = "out-ci-logs\$($Matches[1]).txt"
+                if (Test-Path $log) {
+                  $all = @(Get-Content $log)
+                  $at = -1
+                  for ($i = 0; $i -lt $all.Count; $i++) { if ($all[$i] -cmatch '^FAILURES') { $at = $i } }
+                  if ($at -ge 0) {
+                    $last = [Math]::Min($all.Count - 1, $at + 40)
+                    foreach ($f in $all[($at + 1)..$last]) { if ($f.Trim()) { $msg += "%0A" + $f.Trim() } }
+                  }
+                }
+                Write-Host "::error::$msg"
+              }
+              elseif ($t -cmatch '^\S+\s+(less red than known|pass \(listed)') { Write-Host "::warning::$t" }
+            }
+          } else {
+            Write-Host "::error::No SUMMARY.txt - the build failed before any suite ran."
+          }
+
       - name: Keep the suite logs
         if: always()
         uses: actions/upload-artifact@v4
