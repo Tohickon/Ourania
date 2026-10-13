@@ -212,8 +212,15 @@ public final class SolarArc {
      *
      * The arc is monotonic - the Sun never turns back - so this is a plain bisection with no
      * scanning. Reuses the Almanac bisector rather than writing a second one.
+     *
+     * <p><b>Package-visible for {@link ArcMidpoints}, which directs the same arc onto natal
+     * midpoints.</b> It needs this exact solve and a second copy is the defect this project
+     * keeps finding: the arc rate, the monotonicity argument and the not-bracketed guard would
+     * then exist twice and could disagree. Returns NaN rather than throwing when the wanted arc
+     * is outside the span, which is the normal case - most arcs are not reached in a given
+     * window - so every caller must check.
      */
-    private static double solveArc(SwissEph sw, double natalJd, double natalSunLon,
+    static double solveArc(SwissEph sw, double natalJd, double natalSunLon,
                                    double wanted, double jdFrom, double jdTo) {
         Almanac.OfTime f = jd -> arcAt(sw, natalJd, natalSunLon, jd) - wanted;
         double lo = f.at(jdFrom);
