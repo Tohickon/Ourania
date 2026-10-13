@@ -6821,11 +6821,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /**
-     * Stops, and moves whatever is being animated to this moment.
+     * Stops, and moves the sky to this moment - or the birth chart, if the box says so.
      *
-     * Which rings move follows {@code animateTarget}, unchanged from the button this came from: the
-     * natal ring unless only the transit is being animated, and the sky ring when the transit chart
-     * is shown and included.
+     * Which wheel moves is {@link #transportMovesNatal}, the same answer a tick of Play gets.
+     *
+     * <b>This javadoc outlived its own subject by two days and nothing failed.</b> It said
+     * "which rings move follows {@code animateTarget}" after that field had been deleted - the
+     * body below was rewritten and the sentence above it was not, so a reader was told to look
+     * for a field that is not there. It compiled because {@code @code} is not {@code @link}:
+     * javadoc checks the second and takes the first on trust. Found while merging chart-tabs,
+     * by counting occurrences of a name that should have been at zero.
      */
     void jumpToNow() {
         this.isPlaying = false;
