@@ -1,0 +1,1274 @@
+# transit: mars - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# mars with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction descendant
+LEAD
+BODY
+
+=transit mars sextile descendant
+LEAD
+BODY
+
+=transit mars square descendant
+LEAD
+BODY
+
+=transit mars trine descendant
+LEAD
+BODY
+
+=transit mars opposition descendant
+LEAD
+BODY
+
+=transit mars quincunx descendant
+LEAD
+BODY
+
+=transit mars semisextile descendant
+LEAD
+BODY
+
+=transit mars semisquare descendant
+LEAD
+BODY
+
+=transit mars sesquiquadrate descendant
+LEAD
+BODY
+
+=transit mars quintile descendant
+LEAD
+BODY
+
+=transit mars biquintile descendant
+LEAD
+BODY
+
+=transit mars sesquiquintile descendant
+LEAD
+BODY
+
+=transit mars septile descendant
+LEAD
+BODY
+
+=transit mars novile descendant
+LEAD
+BODY
+
+=transit mars decile descendant
+LEAD
+BODY
+
+# mars with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction ic
+LEAD
+BODY
+
+=transit mars sextile ic
+LEAD
+BODY
+
+=transit mars square ic
+LEAD
+BODY
+
+=transit mars trine ic
+LEAD
+BODY
+
+=transit mars opposition ic
+LEAD
+BODY
+
+=transit mars quincunx ic
+LEAD
+BODY
+
+=transit mars semisextile ic
+LEAD
+BODY
+
+=transit mars semisquare ic
+LEAD
+BODY
+
+=transit mars sesquiquadrate ic
+LEAD
+BODY
+
+=transit mars quintile ic
+LEAD
+BODY
+
+=transit mars biquintile ic
+LEAD
+BODY
+
+=transit mars sesquiquintile ic
+LEAD
+BODY
+
+=transit mars septile ic
+LEAD
+BODY
+
+=transit mars novile ic
+LEAD
+BODY
+
+=transit mars decile ic
+LEAD
+BODY
+
+# mars with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction ascendant
+LEAD
+BODY
+
+=transit mars sextile ascendant
+LEAD
+BODY
+
+=transit mars square ascendant
+LEAD
+BODY
+
+=transit mars trine ascendant
+LEAD
+BODY
+
+=transit mars opposition ascendant
+LEAD
+BODY
+
+=transit mars quincunx ascendant
+LEAD
+BODY
+
+=transit mars semisextile ascendant
+LEAD
+BODY
+
+=transit mars semisquare ascendant
+LEAD
+BODY
+
+=transit mars sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit mars quintile ascendant
+LEAD
+BODY
+
+=transit mars biquintile ascendant
+LEAD
+BODY
+
+=transit mars sesquiquintile ascendant
+LEAD
+BODY
+
+=transit mars septile ascendant
+LEAD
+BODY
+
+=transit mars novile ascendant
+LEAD
+BODY
+
+=transit mars decile ascendant
+LEAD
+BODY
+
+# mars with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction mc
+LEAD
+BODY
+
+=transit mars sextile mc
+LEAD
+BODY
+
+=transit mars square mc
+LEAD
+BODY
+
+=transit mars trine mc
+LEAD
+BODY
+
+=transit mars opposition mc
+LEAD
+BODY
+
+=transit mars quincunx mc
+LEAD
+BODY
+
+=transit mars semisextile mc
+LEAD
+BODY
+
+=transit mars semisquare mc
+LEAD
+BODY
+
+=transit mars sesquiquadrate mc
+LEAD
+BODY
+
+=transit mars quintile mc
+LEAD
+BODY
+
+=transit mars biquintile mc
+LEAD
+BODY
+
+=transit mars sesquiquintile mc
+LEAD
+BODY
+
+=transit mars septile mc
+LEAD
+BODY
+
+=transit mars novile mc
+LEAD
+BODY
+
+=transit mars decile mc
+LEAD
+BODY
+
+# mars with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction south_node
+LEAD
+BODY
+
+=transit mars sextile south_node
+LEAD
+BODY
+
+=transit mars square south_node
+LEAD
+BODY
+
+=transit mars trine south_node
+LEAD
+BODY
+
+=transit mars opposition south_node
+LEAD
+BODY
+
+=transit mars quincunx south_node
+LEAD
+BODY
+
+=transit mars semisextile south_node
+LEAD
+BODY
+
+=transit mars semisquare south_node
+LEAD
+BODY
+
+=transit mars sesquiquadrate south_node
+LEAD
+BODY
+
+=transit mars quintile south_node
+LEAD
+BODY
+
+=transit mars sesquiquintile south_node
+LEAD
+BODY
+
+# mars with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction ceres
+LEAD
+BODY
+
+=transit mars sextile ceres
+LEAD
+BODY
+
+=transit mars square ceres
+LEAD
+BODY
+
+=transit mars trine ceres
+LEAD
+BODY
+
+=transit mars opposition ceres
+LEAD
+BODY
+
+=transit mars quincunx ceres
+LEAD
+BODY
+
+=transit mars semisextile ceres
+LEAD
+BODY
+
+=transit mars semisquare ceres
+LEAD
+BODY
+
+=transit mars sesquiquadrate ceres
+LEAD
+BODY
+
+=transit mars quintile ceres
+LEAD
+BODY
+
+=transit mars sesquiquintile ceres
+LEAD
+BODY
+
+# mars with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction pallas
+LEAD
+BODY
+
+=transit mars sextile pallas
+LEAD
+BODY
+
+=transit mars square pallas
+LEAD
+BODY
+
+=transit mars trine pallas
+LEAD
+BODY
+
+=transit mars opposition pallas
+LEAD
+BODY
+
+=transit mars quincunx pallas
+LEAD
+BODY
+
+=transit mars semisextile pallas
+LEAD
+BODY
+
+=transit mars semisquare pallas
+LEAD
+BODY
+
+=transit mars sesquiquadrate pallas
+LEAD
+BODY
+
+=transit mars quintile pallas
+LEAD
+BODY
+
+=transit mars sesquiquintile pallas
+LEAD
+BODY
+
+# mars with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction juno
+LEAD
+BODY
+
+=transit mars sextile juno
+LEAD
+BODY
+
+=transit mars square juno
+LEAD
+BODY
+
+=transit mars trine juno
+LEAD
+BODY
+
+=transit mars opposition juno
+LEAD
+BODY
+
+=transit mars quincunx juno
+LEAD
+BODY
+
+=transit mars semisextile juno
+LEAD
+BODY
+
+=transit mars semisquare juno
+LEAD
+BODY
+
+=transit mars sesquiquadrate juno
+LEAD
+BODY
+
+=transit mars quintile juno
+LEAD
+BODY
+
+=transit mars sesquiquintile juno
+LEAD
+BODY
+
+# mars with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction vesta
+LEAD
+BODY
+
+=transit mars sextile vesta
+LEAD
+BODY
+
+=transit mars square vesta
+LEAD
+BODY
+
+=transit mars trine vesta
+LEAD
+BODY
+
+=transit mars opposition vesta
+LEAD
+BODY
+
+=transit mars quincunx vesta
+LEAD
+BODY
+
+=transit mars semisextile vesta
+LEAD
+BODY
+
+=transit mars semisquare vesta
+LEAD
+BODY
+
+=transit mars sesquiquadrate vesta
+LEAD
+BODY
+
+=transit mars quintile vesta
+LEAD
+BODY
+
+=transit mars sesquiquintile vesta
+LEAD
+BODY
+
+# mars with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction eris
+LEAD
+BODY
+
+=transit mars sextile eris
+LEAD
+BODY
+
+=transit mars square eris
+LEAD
+BODY
+
+=transit mars trine eris
+LEAD
+BODY
+
+=transit mars opposition eris
+LEAD
+BODY
+
+=transit mars quincunx eris
+LEAD
+BODY
+
+=transit mars semisextile eris
+LEAD
+BODY
+
+=transit mars semisquare eris
+LEAD
+BODY
+
+=transit mars sesquiquadrate eris
+LEAD
+BODY
+
+=transit mars quintile eris
+LEAD
+BODY
+
+=transit mars sesquiquintile eris
+LEAD
+BODY
+
+# mars with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction eros
+LEAD
+BODY
+
+=transit mars sextile eros
+LEAD
+BODY
+
+=transit mars square eros
+LEAD
+BODY
+
+=transit mars trine eros
+LEAD
+BODY
+
+=transit mars opposition eros
+LEAD
+BODY
+
+=transit mars quincunx eros
+LEAD
+BODY
+
+=transit mars semisextile eros
+LEAD
+BODY
+
+=transit mars semisquare eros
+LEAD
+BODY
+
+=transit mars sesquiquadrate eros
+LEAD
+BODY
+
+=transit mars quintile eros
+LEAD
+BODY
+
+=transit mars sesquiquintile eros
+LEAD
+BODY
+
+# mars with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction hygiea
+LEAD
+BODY
+
+=transit mars sextile hygiea
+LEAD
+BODY
+
+=transit mars square hygiea
+LEAD
+BODY
+
+=transit mars trine hygiea
+LEAD
+BODY
+
+=transit mars opposition hygiea
+LEAD
+BODY
+
+=transit mars quincunx hygiea
+LEAD
+BODY
+
+=transit mars semisextile hygiea
+LEAD
+BODY
+
+=transit mars semisquare hygiea
+LEAD
+BODY
+
+=transit mars sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit mars quintile hygiea
+LEAD
+BODY
+
+=transit mars sesquiquintile hygiea
+LEAD
+BODY
+
+# mars with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction nessus
+LEAD
+BODY
+
+=transit mars sextile nessus
+LEAD
+BODY
+
+=transit mars square nessus
+LEAD
+BODY
+
+=transit mars trine nessus
+LEAD
+BODY
+
+=transit mars opposition nessus
+LEAD
+BODY
+
+=transit mars quincunx nessus
+LEAD
+BODY
+
+=transit mars semisextile nessus
+LEAD
+BODY
+
+=transit mars semisquare nessus
+LEAD
+BODY
+
+=transit mars sesquiquadrate nessus
+LEAD
+BODY
+
+=transit mars quintile nessus
+LEAD
+BODY
+
+=transit mars sesquiquintile nessus
+LEAD
+BODY
+
+# mars with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction pholus
+LEAD
+BODY
+
+=transit mars sextile pholus
+LEAD
+BODY
+
+=transit mars square pholus
+LEAD
+BODY
+
+=transit mars trine pholus
+LEAD
+BODY
+
+=transit mars opposition pholus
+LEAD
+BODY
+
+=transit mars quincunx pholus
+LEAD
+BODY
+
+=transit mars semisextile pholus
+LEAD
+BODY
+
+=transit mars semisquare pholus
+LEAD
+BODY
+
+=transit mars sesquiquadrate pholus
+LEAD
+BODY
+
+=transit mars quintile pholus
+LEAD
+BODY
+
+=transit mars sesquiquintile pholus
+LEAD
+BODY
+
+# mars with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction fortune
+LEAD
+BODY
+
+=transit mars sextile fortune
+LEAD
+BODY
+
+=transit mars square fortune
+LEAD
+BODY
+
+=transit mars trine fortune
+LEAD
+BODY
+
+=transit mars opposition fortune
+LEAD
+BODY
+
+=transit mars quincunx fortune
+LEAD
+BODY
+
+=transit mars semisextile fortune
+LEAD
+BODY
+
+=transit mars semisquare fortune
+LEAD
+BODY
+
+=transit mars sesquiquadrate fortune
+LEAD
+BODY
+
+=transit mars quintile fortune
+LEAD
+BODY
+
+=transit mars sesquiquintile fortune
+LEAD
+BODY
+
+# mars with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction spirit
+LEAD
+BODY
+
+=transit mars sextile spirit
+LEAD
+BODY
+
+=transit mars square spirit
+LEAD
+BODY
+
+=transit mars trine spirit
+LEAD
+BODY
+
+=transit mars opposition spirit
+LEAD
+BODY
+
+=transit mars quincunx spirit
+LEAD
+BODY
+
+=transit mars semisextile spirit
+LEAD
+BODY
+
+=transit mars semisquare spirit
+LEAD
+BODY
+
+=transit mars sesquiquadrate spirit
+LEAD
+BODY
+
+=transit mars quintile spirit
+LEAD
+BODY
+
+=transit mars sesquiquintile spirit
+LEAD
+BODY
+
+# mars with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction lilith
+LEAD
+BODY
+
+=transit mars sextile lilith
+LEAD
+BODY
+
+=transit mars square lilith
+LEAD
+BODY
+
+=transit mars trine lilith
+LEAD
+BODY
+
+=transit mars opposition lilith
+LEAD
+BODY
+
+=transit mars quincunx lilith
+LEAD
+BODY
+
+=transit mars semisextile lilith
+LEAD
+BODY
+
+=transit mars semisquare lilith
+LEAD
+BODY
+
+=transit mars sesquiquadrate lilith
+LEAD
+BODY
+
+=transit mars quintile lilith
+LEAD
+BODY
+
+=transit mars sesquiquintile lilith
+LEAD
+BODY
+
+# mars with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction sun
+LEAD
+BODY
+
+=transit mars sextile sun
+LEAD
+BODY
+
+=transit mars square sun
+LEAD
+BODY
+
+=transit mars trine sun
+LEAD
+BODY
+
+=transit mars opposition sun
+LEAD
+BODY
+
+=transit mars biquintile sun
+LEAD
+BODY
+
+=transit mars septile sun
+LEAD
+BODY
+
+=transit mars novile sun
+LEAD
+BODY
+
+=transit mars decile sun
+LEAD
+BODY
+
+# mars with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction moon
+LEAD
+BODY
+
+=transit mars sextile moon
+LEAD
+BODY
+
+=transit mars square moon
+LEAD
+BODY
+
+=transit mars trine moon
+LEAD
+BODY
+
+=transit mars opposition moon
+LEAD
+BODY
+
+=transit mars biquintile moon
+LEAD
+BODY
+
+=transit mars septile moon
+LEAD
+BODY
+
+=transit mars novile moon
+LEAD
+BODY
+
+=transit mars decile moon
+LEAD
+BODY
+
+# mars with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction mercury
+LEAD
+BODY
+
+=transit mars sextile mercury
+LEAD
+BODY
+
+=transit mars square mercury
+LEAD
+BODY
+
+=transit mars trine mercury
+LEAD
+BODY
+
+=transit mars opposition mercury
+LEAD
+BODY
+
+=transit mars biquintile mercury
+LEAD
+BODY
+
+=transit mars septile mercury
+LEAD
+BODY
+
+=transit mars novile mercury
+LEAD
+BODY
+
+=transit mars decile mercury
+LEAD
+BODY
+
+# mars with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction venus
+LEAD
+BODY
+
+=transit mars sextile venus
+LEAD
+BODY
+
+=transit mars square venus
+LEAD
+BODY
+
+=transit mars trine venus
+LEAD
+BODY
+
+=transit mars opposition venus
+LEAD
+BODY
+
+=transit mars biquintile venus
+LEAD
+BODY
+
+=transit mars septile venus
+LEAD
+BODY
+
+=transit mars novile venus
+LEAD
+BODY
+
+=transit mars decile venus
+LEAD
+BODY
+
+# mars with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction mars
+LEAD
+BODY
+
+=transit mars sextile mars
+LEAD
+BODY
+
+=transit mars square mars
+LEAD
+BODY
+
+=transit mars trine mars
+LEAD
+BODY
+
+=transit mars opposition mars
+LEAD
+BODY
+
+=transit mars biquintile mars
+LEAD
+BODY
+
+=transit mars septile mars
+LEAD
+BODY
+
+=transit mars novile mars
+LEAD
+BODY
+
+=transit mars decile mars
+LEAD
+BODY
+
+# mars with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction jupiter
+LEAD
+BODY
+
+=transit mars sextile jupiter
+LEAD
+BODY
+
+=transit mars square jupiter
+LEAD
+BODY
+
+=transit mars trine jupiter
+LEAD
+BODY
+
+=transit mars opposition jupiter
+LEAD
+BODY
+
+=transit mars biquintile jupiter
+LEAD
+BODY
+
+=transit mars septile jupiter
+LEAD
+BODY
+
+=transit mars novile jupiter
+LEAD
+BODY
+
+=transit mars decile jupiter
+LEAD
+BODY
+
+# mars with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction saturn
+LEAD
+BODY
+
+=transit mars sextile saturn
+LEAD
+BODY
+
+=transit mars square saturn
+LEAD
+BODY
+
+=transit mars trine saturn
+LEAD
+BODY
+
+=transit mars opposition saturn
+LEAD
+BODY
+
+=transit mars biquintile saturn
+LEAD
+BODY
+
+=transit mars septile saturn
+LEAD
+BODY
+
+=transit mars novile saturn
+LEAD
+BODY
+
+=transit mars decile saturn
+LEAD
+BODY
+
+# mars with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction uranus
+LEAD
+BODY
+
+=transit mars sextile uranus
+LEAD
+BODY
+
+=transit mars square uranus
+LEAD
+BODY
+
+=transit mars trine uranus
+LEAD
+BODY
+
+=transit mars opposition uranus
+LEAD
+BODY
+
+=transit mars biquintile uranus
+LEAD
+BODY
+
+=transit mars septile uranus
+LEAD
+BODY
+
+=transit mars novile uranus
+LEAD
+BODY
+
+=transit mars decile uranus
+LEAD
+BODY
+
+# mars with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction neptune
+LEAD
+BODY
+
+=transit mars sextile neptune
+LEAD
+BODY
+
+=transit mars square neptune
+LEAD
+BODY
+
+=transit mars trine neptune
+LEAD
+BODY
+
+=transit mars opposition neptune
+LEAD
+BODY
+
+=transit mars biquintile neptune
+LEAD
+BODY
+
+=transit mars septile neptune
+LEAD
+BODY
+
+=transit mars novile neptune
+LEAD
+BODY
+
+=transit mars decile neptune
+LEAD
+BODY
+
+# mars with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction pluto
+LEAD
+BODY
+
+=transit mars sextile pluto
+LEAD
+BODY
+
+=transit mars square pluto
+LEAD
+BODY
+
+=transit mars trine pluto
+LEAD
+BODY
+
+=transit mars opposition pluto
+LEAD
+BODY
+
+=transit mars biquintile pluto
+LEAD
+BODY
+
+=transit mars septile pluto
+LEAD
+BODY
+
+=transit mars novile pluto
+LEAD
+BODY
+
+=transit mars decile pluto
+LEAD
+BODY
+
+# mars with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction chiron
+LEAD
+BODY
+
+=transit mars sextile chiron
+LEAD
+BODY
+
+=transit mars square chiron
+LEAD
+BODY
+
+=transit mars trine chiron
+LEAD
+BODY
+
+=transit mars opposition chiron
+LEAD
+BODY
+
+=transit mars biquintile chiron
+LEAD
+BODY
+
+=transit mars septile chiron
+LEAD
+BODY
+
+=transit mars novile chiron
+LEAD
+BODY
+
+=transit mars decile chiron
+LEAD
+BODY
+
+# mars with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mars conjunction north_node
+LEAD
+BODY
+
+=transit mars sextile north_node
+LEAD
+BODY
+
+=transit mars square north_node
+LEAD
+BODY
+
+=transit mars trine north_node
+LEAD
+BODY
+
+=transit mars opposition north_node
+LEAD
+BODY
+
+=transit mars biquintile north_node
+LEAD
+BODY
+
+=transit mars septile north_node
+LEAD
+BODY
+
+=transit mars novile north_node
+LEAD
+BODY
+
+=transit mars decile north_node
+LEAD
+BODY

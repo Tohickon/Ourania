@@ -1,0 +1,1261 @@
+# transit: ic - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# ic with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction ascendant
+LEAD
+BODY
+
+=transit ic sextile ascendant
+LEAD
+BODY
+
+=transit ic square ascendant
+LEAD
+BODY
+
+=transit ic trine ascendant
+LEAD
+BODY
+
+=transit ic opposition ascendant
+LEAD
+BODY
+
+=transit ic quincunx ascendant
+LEAD
+BODY
+
+=transit ic semisextile ascendant
+LEAD
+BODY
+
+=transit ic semisquare ascendant
+LEAD
+BODY
+
+=transit ic sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit ic quintile ascendant
+LEAD
+BODY
+
+=transit ic sesquiquintile ascendant
+LEAD
+BODY
+
+# ic with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction descendant
+LEAD
+BODY
+
+=transit ic sextile descendant
+LEAD
+BODY
+
+=transit ic square descendant
+LEAD
+BODY
+
+=transit ic trine descendant
+LEAD
+BODY
+
+=transit ic opposition descendant
+LEAD
+BODY
+
+=transit ic quincunx descendant
+LEAD
+BODY
+
+=transit ic semisextile descendant
+LEAD
+BODY
+
+=transit ic semisquare descendant
+LEAD
+BODY
+
+=transit ic sesquiquadrate descendant
+LEAD
+BODY
+
+=transit ic quintile descendant
+LEAD
+BODY
+
+=transit ic sesquiquintile descendant
+LEAD
+BODY
+
+# ic with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction mc
+LEAD
+BODY
+
+=transit ic sextile mc
+LEAD
+BODY
+
+=transit ic square mc
+LEAD
+BODY
+
+=transit ic trine mc
+LEAD
+BODY
+
+=transit ic opposition mc
+LEAD
+BODY
+
+=transit ic quincunx mc
+LEAD
+BODY
+
+=transit ic semisextile mc
+LEAD
+BODY
+
+=transit ic semisquare mc
+LEAD
+BODY
+
+=transit ic sesquiquadrate mc
+LEAD
+BODY
+
+=transit ic quintile mc
+LEAD
+BODY
+
+=transit ic sesquiquintile mc
+LEAD
+BODY
+
+# ic with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction south_node
+LEAD
+BODY
+
+=transit ic sextile south_node
+LEAD
+BODY
+
+=transit ic square south_node
+LEAD
+BODY
+
+=transit ic trine south_node
+LEAD
+BODY
+
+=transit ic opposition south_node
+LEAD
+BODY
+
+=transit ic quincunx south_node
+LEAD
+BODY
+
+=transit ic semisextile south_node
+LEAD
+BODY
+
+=transit ic semisquare south_node
+LEAD
+BODY
+
+=transit ic sesquiquadrate south_node
+LEAD
+BODY
+
+=transit ic quintile south_node
+LEAD
+BODY
+
+=transit ic sesquiquintile south_node
+LEAD
+BODY
+
+# ic with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction ceres
+LEAD
+BODY
+
+=transit ic sextile ceres
+LEAD
+BODY
+
+=transit ic square ceres
+LEAD
+BODY
+
+=transit ic trine ceres
+LEAD
+BODY
+
+=transit ic opposition ceres
+LEAD
+BODY
+
+=transit ic quincunx ceres
+LEAD
+BODY
+
+=transit ic semisextile ceres
+LEAD
+BODY
+
+=transit ic semisquare ceres
+LEAD
+BODY
+
+=transit ic sesquiquadrate ceres
+LEAD
+BODY
+
+=transit ic quintile ceres
+LEAD
+BODY
+
+=transit ic sesquiquintile ceres
+LEAD
+BODY
+
+# ic with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction pallas
+LEAD
+BODY
+
+=transit ic sextile pallas
+LEAD
+BODY
+
+=transit ic square pallas
+LEAD
+BODY
+
+=transit ic trine pallas
+LEAD
+BODY
+
+=transit ic opposition pallas
+LEAD
+BODY
+
+=transit ic quincunx pallas
+LEAD
+BODY
+
+=transit ic semisextile pallas
+LEAD
+BODY
+
+=transit ic semisquare pallas
+LEAD
+BODY
+
+=transit ic sesquiquadrate pallas
+LEAD
+BODY
+
+=transit ic quintile pallas
+LEAD
+BODY
+
+=transit ic sesquiquintile pallas
+LEAD
+BODY
+
+# ic with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction juno
+LEAD
+BODY
+
+=transit ic sextile juno
+LEAD
+BODY
+
+=transit ic square juno
+LEAD
+BODY
+
+=transit ic trine juno
+LEAD
+BODY
+
+=transit ic opposition juno
+LEAD
+BODY
+
+=transit ic quincunx juno
+LEAD
+BODY
+
+=transit ic semisextile juno
+LEAD
+BODY
+
+=transit ic semisquare juno
+LEAD
+BODY
+
+=transit ic sesquiquadrate juno
+LEAD
+BODY
+
+=transit ic quintile juno
+LEAD
+BODY
+
+=transit ic sesquiquintile juno
+LEAD
+BODY
+
+# ic with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction vesta
+LEAD
+BODY
+
+=transit ic sextile vesta
+LEAD
+BODY
+
+=transit ic square vesta
+LEAD
+BODY
+
+=transit ic trine vesta
+LEAD
+BODY
+
+=transit ic opposition vesta
+LEAD
+BODY
+
+=transit ic quincunx vesta
+LEAD
+BODY
+
+=transit ic semisextile vesta
+LEAD
+BODY
+
+=transit ic semisquare vesta
+LEAD
+BODY
+
+=transit ic sesquiquadrate vesta
+LEAD
+BODY
+
+=transit ic quintile vesta
+LEAD
+BODY
+
+=transit ic sesquiquintile vesta
+LEAD
+BODY
+
+# ic with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction eris
+LEAD
+BODY
+
+=transit ic sextile eris
+LEAD
+BODY
+
+=transit ic square eris
+LEAD
+BODY
+
+=transit ic trine eris
+LEAD
+BODY
+
+=transit ic opposition eris
+LEAD
+BODY
+
+=transit ic quincunx eris
+LEAD
+BODY
+
+=transit ic semisextile eris
+LEAD
+BODY
+
+=transit ic semisquare eris
+LEAD
+BODY
+
+=transit ic sesquiquadrate eris
+LEAD
+BODY
+
+=transit ic quintile eris
+LEAD
+BODY
+
+=transit ic sesquiquintile eris
+LEAD
+BODY
+
+# ic with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction eros
+LEAD
+BODY
+
+=transit ic sextile eros
+LEAD
+BODY
+
+=transit ic square eros
+LEAD
+BODY
+
+=transit ic trine eros
+LEAD
+BODY
+
+=transit ic opposition eros
+LEAD
+BODY
+
+=transit ic quincunx eros
+LEAD
+BODY
+
+=transit ic semisextile eros
+LEAD
+BODY
+
+=transit ic semisquare eros
+LEAD
+BODY
+
+=transit ic sesquiquadrate eros
+LEAD
+BODY
+
+=transit ic quintile eros
+LEAD
+BODY
+
+=transit ic sesquiquintile eros
+LEAD
+BODY
+
+# ic with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction hygiea
+LEAD
+BODY
+
+=transit ic sextile hygiea
+LEAD
+BODY
+
+=transit ic square hygiea
+LEAD
+BODY
+
+=transit ic trine hygiea
+LEAD
+BODY
+
+=transit ic opposition hygiea
+LEAD
+BODY
+
+=transit ic quincunx hygiea
+LEAD
+BODY
+
+=transit ic semisextile hygiea
+LEAD
+BODY
+
+=transit ic semisquare hygiea
+LEAD
+BODY
+
+=transit ic sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit ic quintile hygiea
+LEAD
+BODY
+
+=transit ic sesquiquintile hygiea
+LEAD
+BODY
+
+# ic with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction nessus
+LEAD
+BODY
+
+=transit ic sextile nessus
+LEAD
+BODY
+
+=transit ic square nessus
+LEAD
+BODY
+
+=transit ic trine nessus
+LEAD
+BODY
+
+=transit ic opposition nessus
+LEAD
+BODY
+
+=transit ic quincunx nessus
+LEAD
+BODY
+
+=transit ic semisextile nessus
+LEAD
+BODY
+
+=transit ic semisquare nessus
+LEAD
+BODY
+
+=transit ic sesquiquadrate nessus
+LEAD
+BODY
+
+=transit ic quintile nessus
+LEAD
+BODY
+
+=transit ic sesquiquintile nessus
+LEAD
+BODY
+
+# ic with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction pholus
+LEAD
+BODY
+
+=transit ic sextile pholus
+LEAD
+BODY
+
+=transit ic square pholus
+LEAD
+BODY
+
+=transit ic trine pholus
+LEAD
+BODY
+
+=transit ic opposition pholus
+LEAD
+BODY
+
+=transit ic quincunx pholus
+LEAD
+BODY
+
+=transit ic semisextile pholus
+LEAD
+BODY
+
+=transit ic semisquare pholus
+LEAD
+BODY
+
+=transit ic sesquiquadrate pholus
+LEAD
+BODY
+
+=transit ic quintile pholus
+LEAD
+BODY
+
+=transit ic sesquiquintile pholus
+LEAD
+BODY
+
+# ic with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction fortune
+LEAD
+BODY
+
+=transit ic sextile fortune
+LEAD
+BODY
+
+=transit ic square fortune
+LEAD
+BODY
+
+=transit ic trine fortune
+LEAD
+BODY
+
+=transit ic opposition fortune
+LEAD
+BODY
+
+=transit ic quincunx fortune
+LEAD
+BODY
+
+=transit ic semisextile fortune
+LEAD
+BODY
+
+=transit ic semisquare fortune
+LEAD
+BODY
+
+=transit ic sesquiquadrate fortune
+LEAD
+BODY
+
+=transit ic quintile fortune
+LEAD
+BODY
+
+=transit ic sesquiquintile fortune
+LEAD
+BODY
+
+# ic with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction spirit
+LEAD
+BODY
+
+=transit ic sextile spirit
+LEAD
+BODY
+
+=transit ic square spirit
+LEAD
+BODY
+
+=transit ic trine spirit
+LEAD
+BODY
+
+=transit ic opposition spirit
+LEAD
+BODY
+
+=transit ic quincunx spirit
+LEAD
+BODY
+
+=transit ic semisextile spirit
+LEAD
+BODY
+
+=transit ic semisquare spirit
+LEAD
+BODY
+
+=transit ic sesquiquadrate spirit
+LEAD
+BODY
+
+=transit ic quintile spirit
+LEAD
+BODY
+
+=transit ic sesquiquintile spirit
+LEAD
+BODY
+
+# ic with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction lilith
+LEAD
+BODY
+
+=transit ic sextile lilith
+LEAD
+BODY
+
+=transit ic square lilith
+LEAD
+BODY
+
+=transit ic trine lilith
+LEAD
+BODY
+
+=transit ic opposition lilith
+LEAD
+BODY
+
+=transit ic quincunx lilith
+LEAD
+BODY
+
+=transit ic semisextile lilith
+LEAD
+BODY
+
+=transit ic semisquare lilith
+LEAD
+BODY
+
+=transit ic sesquiquadrate lilith
+LEAD
+BODY
+
+=transit ic quintile lilith
+LEAD
+BODY
+
+=transit ic sesquiquintile lilith
+LEAD
+BODY
+
+# ic with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction moon
+LEAD
+BODY
+
+=transit ic sextile moon
+LEAD
+BODY
+
+=transit ic square moon
+LEAD
+BODY
+
+=transit ic trine moon
+LEAD
+BODY
+
+=transit ic opposition moon
+LEAD
+BODY
+
+=transit ic quincunx moon
+LEAD
+BODY
+
+=transit ic semisextile moon
+LEAD
+BODY
+
+=transit ic semisquare moon
+LEAD
+BODY
+
+=transit ic sesquiquadrate moon
+LEAD
+BODY
+
+=transit ic quintile moon
+LEAD
+BODY
+
+=transit ic sesquiquintile moon
+LEAD
+BODY
+
+# ic with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction sun
+LEAD
+BODY
+
+=transit ic sextile sun
+LEAD
+BODY
+
+=transit ic square sun
+LEAD
+BODY
+
+=transit ic trine sun
+LEAD
+BODY
+
+=transit ic opposition sun
+LEAD
+BODY
+
+=transit ic quincunx sun
+LEAD
+BODY
+
+=transit ic semisextile sun
+LEAD
+BODY
+
+=transit ic semisquare sun
+LEAD
+BODY
+
+=transit ic sesquiquadrate sun
+LEAD
+BODY
+
+=transit ic quintile sun
+LEAD
+BODY
+
+=transit ic sesquiquintile sun
+LEAD
+BODY
+
+# ic with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction mercury
+LEAD
+BODY
+
+=transit ic sextile mercury
+LEAD
+BODY
+
+=transit ic square mercury
+LEAD
+BODY
+
+=transit ic trine mercury
+LEAD
+BODY
+
+=transit ic opposition mercury
+LEAD
+BODY
+
+=transit ic quincunx mercury
+LEAD
+BODY
+
+=transit ic semisextile mercury
+LEAD
+BODY
+
+=transit ic semisquare mercury
+LEAD
+BODY
+
+=transit ic sesquiquadrate mercury
+LEAD
+BODY
+
+=transit ic quintile mercury
+LEAD
+BODY
+
+=transit ic sesquiquintile mercury
+LEAD
+BODY
+
+# ic with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction venus
+LEAD
+BODY
+
+=transit ic sextile venus
+LEAD
+BODY
+
+=transit ic square venus
+LEAD
+BODY
+
+=transit ic trine venus
+LEAD
+BODY
+
+=transit ic opposition venus
+LEAD
+BODY
+
+=transit ic quincunx venus
+LEAD
+BODY
+
+=transit ic semisextile venus
+LEAD
+BODY
+
+=transit ic semisquare venus
+LEAD
+BODY
+
+=transit ic sesquiquadrate venus
+LEAD
+BODY
+
+=transit ic quintile venus
+LEAD
+BODY
+
+=transit ic sesquiquintile venus
+LEAD
+BODY
+
+# ic with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction mars
+LEAD
+BODY
+
+=transit ic sextile mars
+LEAD
+BODY
+
+=transit ic square mars
+LEAD
+BODY
+
+=transit ic trine mars
+LEAD
+BODY
+
+=transit ic opposition mars
+LEAD
+BODY
+
+=transit ic quincunx mars
+LEAD
+BODY
+
+=transit ic semisextile mars
+LEAD
+BODY
+
+=transit ic semisquare mars
+LEAD
+BODY
+
+=transit ic sesquiquadrate mars
+LEAD
+BODY
+
+=transit ic quintile mars
+LEAD
+BODY
+
+=transit ic sesquiquintile mars
+LEAD
+BODY
+
+# ic with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction jupiter
+LEAD
+BODY
+
+=transit ic sextile jupiter
+LEAD
+BODY
+
+=transit ic square jupiter
+LEAD
+BODY
+
+=transit ic trine jupiter
+LEAD
+BODY
+
+=transit ic opposition jupiter
+LEAD
+BODY
+
+=transit ic quincunx jupiter
+LEAD
+BODY
+
+=transit ic semisextile jupiter
+LEAD
+BODY
+
+=transit ic semisquare jupiter
+LEAD
+BODY
+
+=transit ic sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit ic quintile jupiter
+LEAD
+BODY
+
+=transit ic sesquiquintile jupiter
+LEAD
+BODY
+
+# ic with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction saturn
+LEAD
+BODY
+
+=transit ic sextile saturn
+LEAD
+BODY
+
+=transit ic square saturn
+LEAD
+BODY
+
+=transit ic trine saturn
+LEAD
+BODY
+
+=transit ic opposition saturn
+LEAD
+BODY
+
+=transit ic quincunx saturn
+LEAD
+BODY
+
+=transit ic semisextile saturn
+LEAD
+BODY
+
+=transit ic semisquare saturn
+LEAD
+BODY
+
+=transit ic sesquiquadrate saturn
+LEAD
+BODY
+
+=transit ic quintile saturn
+LEAD
+BODY
+
+=transit ic sesquiquintile saturn
+LEAD
+BODY
+
+# ic with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction uranus
+LEAD
+BODY
+
+=transit ic sextile uranus
+LEAD
+BODY
+
+=transit ic square uranus
+LEAD
+BODY
+
+=transit ic trine uranus
+LEAD
+BODY
+
+=transit ic opposition uranus
+LEAD
+BODY
+
+=transit ic quincunx uranus
+LEAD
+BODY
+
+=transit ic semisextile uranus
+LEAD
+BODY
+
+=transit ic semisquare uranus
+LEAD
+BODY
+
+=transit ic sesquiquadrate uranus
+LEAD
+BODY
+
+=transit ic quintile uranus
+LEAD
+BODY
+
+=transit ic sesquiquintile uranus
+LEAD
+BODY
+
+# ic with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction neptune
+LEAD
+BODY
+
+=transit ic sextile neptune
+LEAD
+BODY
+
+=transit ic square neptune
+LEAD
+BODY
+
+=transit ic trine neptune
+LEAD
+BODY
+
+=transit ic opposition neptune
+LEAD
+BODY
+
+=transit ic quincunx neptune
+LEAD
+BODY
+
+=transit ic semisextile neptune
+LEAD
+BODY
+
+=transit ic semisquare neptune
+LEAD
+BODY
+
+=transit ic sesquiquadrate neptune
+LEAD
+BODY
+
+=transit ic quintile neptune
+LEAD
+BODY
+
+=transit ic sesquiquintile neptune
+LEAD
+BODY
+
+# ic with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction pluto
+LEAD
+BODY
+
+=transit ic sextile pluto
+LEAD
+BODY
+
+=transit ic square pluto
+LEAD
+BODY
+
+=transit ic trine pluto
+LEAD
+BODY
+
+=transit ic opposition pluto
+LEAD
+BODY
+
+=transit ic quincunx pluto
+LEAD
+BODY
+
+=transit ic semisextile pluto
+LEAD
+BODY
+
+=transit ic semisquare pluto
+LEAD
+BODY
+
+=transit ic sesquiquadrate pluto
+LEAD
+BODY
+
+=transit ic quintile pluto
+LEAD
+BODY
+
+=transit ic sesquiquintile pluto
+LEAD
+BODY
+
+# ic with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction north_node
+LEAD
+BODY
+
+=transit ic sextile north_node
+LEAD
+BODY
+
+=transit ic square north_node
+LEAD
+BODY
+
+=transit ic trine north_node
+LEAD
+BODY
+
+=transit ic opposition north_node
+LEAD
+BODY
+
+=transit ic quincunx north_node
+LEAD
+BODY
+
+=transit ic semisextile north_node
+LEAD
+BODY
+
+=transit ic semisquare north_node
+LEAD
+BODY
+
+=transit ic sesquiquadrate north_node
+LEAD
+BODY
+
+=transit ic quintile north_node
+LEAD
+BODY
+
+=transit ic sesquiquintile north_node
+LEAD
+BODY
+
+# ic with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit ic conjunction chiron
+LEAD
+BODY
+
+=transit ic sextile chiron
+LEAD
+BODY
+
+=transit ic square chiron
+LEAD
+BODY
+
+=transit ic trine chiron
+LEAD
+BODY
+
+=transit ic opposition chiron
+LEAD
+BODY
+
+=transit ic quincunx chiron
+LEAD
+BODY
+
+=transit ic semisextile chiron
+LEAD
+BODY
+
+=transit ic semisquare chiron
+LEAD
+BODY
+
+=transit ic sesquiquadrate chiron
+LEAD
+BODY
+
+=transit ic quintile chiron
+LEAD
+BODY
+
+=transit ic sesquiquintile chiron
+LEAD
+BODY

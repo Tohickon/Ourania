@@ -1,0 +1,1261 @@
+# transit: spirit - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# spirit with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction ascendant
+LEAD
+BODY
+
+=transit spirit sextile ascendant
+LEAD
+BODY
+
+=transit spirit square ascendant
+LEAD
+BODY
+
+=transit spirit trine ascendant
+LEAD
+BODY
+
+=transit spirit opposition ascendant
+LEAD
+BODY
+
+=transit spirit quincunx ascendant
+LEAD
+BODY
+
+=transit spirit semisextile ascendant
+LEAD
+BODY
+
+=transit spirit semisquare ascendant
+LEAD
+BODY
+
+=transit spirit sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit spirit quintile ascendant
+LEAD
+BODY
+
+=transit spirit sesquiquintile ascendant
+LEAD
+BODY
+
+# spirit with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction descendant
+LEAD
+BODY
+
+=transit spirit sextile descendant
+LEAD
+BODY
+
+=transit spirit square descendant
+LEAD
+BODY
+
+=transit spirit trine descendant
+LEAD
+BODY
+
+=transit spirit opposition descendant
+LEAD
+BODY
+
+=transit spirit quincunx descendant
+LEAD
+BODY
+
+=transit spirit semisextile descendant
+LEAD
+BODY
+
+=transit spirit semisquare descendant
+LEAD
+BODY
+
+=transit spirit sesquiquadrate descendant
+LEAD
+BODY
+
+=transit spirit quintile descendant
+LEAD
+BODY
+
+=transit spirit sesquiquintile descendant
+LEAD
+BODY
+
+# spirit with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction mc
+LEAD
+BODY
+
+=transit spirit sextile mc
+LEAD
+BODY
+
+=transit spirit square mc
+LEAD
+BODY
+
+=transit spirit trine mc
+LEAD
+BODY
+
+=transit spirit opposition mc
+LEAD
+BODY
+
+=transit spirit quincunx mc
+LEAD
+BODY
+
+=transit spirit semisextile mc
+LEAD
+BODY
+
+=transit spirit semisquare mc
+LEAD
+BODY
+
+=transit spirit sesquiquadrate mc
+LEAD
+BODY
+
+=transit spirit quintile mc
+LEAD
+BODY
+
+=transit spirit sesquiquintile mc
+LEAD
+BODY
+
+# spirit with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction ic
+LEAD
+BODY
+
+=transit spirit sextile ic
+LEAD
+BODY
+
+=transit spirit square ic
+LEAD
+BODY
+
+=transit spirit trine ic
+LEAD
+BODY
+
+=transit spirit opposition ic
+LEAD
+BODY
+
+=transit spirit quincunx ic
+LEAD
+BODY
+
+=transit spirit semisextile ic
+LEAD
+BODY
+
+=transit spirit semisquare ic
+LEAD
+BODY
+
+=transit spirit sesquiquadrate ic
+LEAD
+BODY
+
+=transit spirit quintile ic
+LEAD
+BODY
+
+=transit spirit sesquiquintile ic
+LEAD
+BODY
+
+# spirit with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction south_node
+LEAD
+BODY
+
+=transit spirit sextile south_node
+LEAD
+BODY
+
+=transit spirit square south_node
+LEAD
+BODY
+
+=transit spirit trine south_node
+LEAD
+BODY
+
+=transit spirit opposition south_node
+LEAD
+BODY
+
+=transit spirit quincunx south_node
+LEAD
+BODY
+
+=transit spirit semisextile south_node
+LEAD
+BODY
+
+=transit spirit semisquare south_node
+LEAD
+BODY
+
+=transit spirit sesquiquadrate south_node
+LEAD
+BODY
+
+=transit spirit quintile south_node
+LEAD
+BODY
+
+=transit spirit sesquiquintile south_node
+LEAD
+BODY
+
+# spirit with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction ceres
+LEAD
+BODY
+
+=transit spirit sextile ceres
+LEAD
+BODY
+
+=transit spirit square ceres
+LEAD
+BODY
+
+=transit spirit trine ceres
+LEAD
+BODY
+
+=transit spirit opposition ceres
+LEAD
+BODY
+
+=transit spirit quincunx ceres
+LEAD
+BODY
+
+=transit spirit semisextile ceres
+LEAD
+BODY
+
+=transit spirit semisquare ceres
+LEAD
+BODY
+
+=transit spirit sesquiquadrate ceres
+LEAD
+BODY
+
+=transit spirit quintile ceres
+LEAD
+BODY
+
+=transit spirit sesquiquintile ceres
+LEAD
+BODY
+
+# spirit with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction pallas
+LEAD
+BODY
+
+=transit spirit sextile pallas
+LEAD
+BODY
+
+=transit spirit square pallas
+LEAD
+BODY
+
+=transit spirit trine pallas
+LEAD
+BODY
+
+=transit spirit opposition pallas
+LEAD
+BODY
+
+=transit spirit quincunx pallas
+LEAD
+BODY
+
+=transit spirit semisextile pallas
+LEAD
+BODY
+
+=transit spirit semisquare pallas
+LEAD
+BODY
+
+=transit spirit sesquiquadrate pallas
+LEAD
+BODY
+
+=transit spirit quintile pallas
+LEAD
+BODY
+
+=transit spirit sesquiquintile pallas
+LEAD
+BODY
+
+# spirit with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction juno
+LEAD
+BODY
+
+=transit spirit sextile juno
+LEAD
+BODY
+
+=transit spirit square juno
+LEAD
+BODY
+
+=transit spirit trine juno
+LEAD
+BODY
+
+=transit spirit opposition juno
+LEAD
+BODY
+
+=transit spirit quincunx juno
+LEAD
+BODY
+
+=transit spirit semisextile juno
+LEAD
+BODY
+
+=transit spirit semisquare juno
+LEAD
+BODY
+
+=transit spirit sesquiquadrate juno
+LEAD
+BODY
+
+=transit spirit quintile juno
+LEAD
+BODY
+
+=transit spirit sesquiquintile juno
+LEAD
+BODY
+
+# spirit with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction vesta
+LEAD
+BODY
+
+=transit spirit sextile vesta
+LEAD
+BODY
+
+=transit spirit square vesta
+LEAD
+BODY
+
+=transit spirit trine vesta
+LEAD
+BODY
+
+=transit spirit opposition vesta
+LEAD
+BODY
+
+=transit spirit quincunx vesta
+LEAD
+BODY
+
+=transit spirit semisextile vesta
+LEAD
+BODY
+
+=transit spirit semisquare vesta
+LEAD
+BODY
+
+=transit spirit sesquiquadrate vesta
+LEAD
+BODY
+
+=transit spirit quintile vesta
+LEAD
+BODY
+
+=transit spirit sesquiquintile vesta
+LEAD
+BODY
+
+# spirit with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction eris
+LEAD
+BODY
+
+=transit spirit sextile eris
+LEAD
+BODY
+
+=transit spirit square eris
+LEAD
+BODY
+
+=transit spirit trine eris
+LEAD
+BODY
+
+=transit spirit opposition eris
+LEAD
+BODY
+
+=transit spirit quincunx eris
+LEAD
+BODY
+
+=transit spirit semisextile eris
+LEAD
+BODY
+
+=transit spirit semisquare eris
+LEAD
+BODY
+
+=transit spirit sesquiquadrate eris
+LEAD
+BODY
+
+=transit spirit quintile eris
+LEAD
+BODY
+
+=transit spirit sesquiquintile eris
+LEAD
+BODY
+
+# spirit with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction eros
+LEAD
+BODY
+
+=transit spirit sextile eros
+LEAD
+BODY
+
+=transit spirit square eros
+LEAD
+BODY
+
+=transit spirit trine eros
+LEAD
+BODY
+
+=transit spirit opposition eros
+LEAD
+BODY
+
+=transit spirit quincunx eros
+LEAD
+BODY
+
+=transit spirit semisextile eros
+LEAD
+BODY
+
+=transit spirit semisquare eros
+LEAD
+BODY
+
+=transit spirit sesquiquadrate eros
+LEAD
+BODY
+
+=transit spirit quintile eros
+LEAD
+BODY
+
+=transit spirit sesquiquintile eros
+LEAD
+BODY
+
+# spirit with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction hygiea
+LEAD
+BODY
+
+=transit spirit sextile hygiea
+LEAD
+BODY
+
+=transit spirit square hygiea
+LEAD
+BODY
+
+=transit spirit trine hygiea
+LEAD
+BODY
+
+=transit spirit opposition hygiea
+LEAD
+BODY
+
+=transit spirit quincunx hygiea
+LEAD
+BODY
+
+=transit spirit semisextile hygiea
+LEAD
+BODY
+
+=transit spirit semisquare hygiea
+LEAD
+BODY
+
+=transit spirit sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit spirit quintile hygiea
+LEAD
+BODY
+
+=transit spirit sesquiquintile hygiea
+LEAD
+BODY
+
+# spirit with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction nessus
+LEAD
+BODY
+
+=transit spirit sextile nessus
+LEAD
+BODY
+
+=transit spirit square nessus
+LEAD
+BODY
+
+=transit spirit trine nessus
+LEAD
+BODY
+
+=transit spirit opposition nessus
+LEAD
+BODY
+
+=transit spirit quincunx nessus
+LEAD
+BODY
+
+=transit spirit semisextile nessus
+LEAD
+BODY
+
+=transit spirit semisquare nessus
+LEAD
+BODY
+
+=transit spirit sesquiquadrate nessus
+LEAD
+BODY
+
+=transit spirit quintile nessus
+LEAD
+BODY
+
+=transit spirit sesquiquintile nessus
+LEAD
+BODY
+
+# spirit with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction pholus
+LEAD
+BODY
+
+=transit spirit sextile pholus
+LEAD
+BODY
+
+=transit spirit square pholus
+LEAD
+BODY
+
+=transit spirit trine pholus
+LEAD
+BODY
+
+=transit spirit opposition pholus
+LEAD
+BODY
+
+=transit spirit quincunx pholus
+LEAD
+BODY
+
+=transit spirit semisextile pholus
+LEAD
+BODY
+
+=transit spirit semisquare pholus
+LEAD
+BODY
+
+=transit spirit sesquiquadrate pholus
+LEAD
+BODY
+
+=transit spirit quintile pholus
+LEAD
+BODY
+
+=transit spirit sesquiquintile pholus
+LEAD
+BODY
+
+# spirit with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction fortune
+LEAD
+BODY
+
+=transit spirit sextile fortune
+LEAD
+BODY
+
+=transit spirit square fortune
+LEAD
+BODY
+
+=transit spirit trine fortune
+LEAD
+BODY
+
+=transit spirit opposition fortune
+LEAD
+BODY
+
+=transit spirit quincunx fortune
+LEAD
+BODY
+
+=transit spirit semisextile fortune
+LEAD
+BODY
+
+=transit spirit semisquare fortune
+LEAD
+BODY
+
+=transit spirit sesquiquadrate fortune
+LEAD
+BODY
+
+=transit spirit quintile fortune
+LEAD
+BODY
+
+=transit spirit sesquiquintile fortune
+LEAD
+BODY
+
+# spirit with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction lilith
+LEAD
+BODY
+
+=transit spirit sextile lilith
+LEAD
+BODY
+
+=transit spirit square lilith
+LEAD
+BODY
+
+=transit spirit trine lilith
+LEAD
+BODY
+
+=transit spirit opposition lilith
+LEAD
+BODY
+
+=transit spirit quincunx lilith
+LEAD
+BODY
+
+=transit spirit semisextile lilith
+LEAD
+BODY
+
+=transit spirit semisquare lilith
+LEAD
+BODY
+
+=transit spirit sesquiquadrate lilith
+LEAD
+BODY
+
+=transit spirit quintile lilith
+LEAD
+BODY
+
+=transit spirit sesquiquintile lilith
+LEAD
+BODY
+
+# spirit with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction moon
+LEAD
+BODY
+
+=transit spirit sextile moon
+LEAD
+BODY
+
+=transit spirit square moon
+LEAD
+BODY
+
+=transit spirit trine moon
+LEAD
+BODY
+
+=transit spirit opposition moon
+LEAD
+BODY
+
+=transit spirit quincunx moon
+LEAD
+BODY
+
+=transit spirit semisextile moon
+LEAD
+BODY
+
+=transit spirit semisquare moon
+LEAD
+BODY
+
+=transit spirit sesquiquadrate moon
+LEAD
+BODY
+
+=transit spirit quintile moon
+LEAD
+BODY
+
+=transit spirit sesquiquintile moon
+LEAD
+BODY
+
+# spirit with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction sun
+LEAD
+BODY
+
+=transit spirit sextile sun
+LEAD
+BODY
+
+=transit spirit square sun
+LEAD
+BODY
+
+=transit spirit trine sun
+LEAD
+BODY
+
+=transit spirit opposition sun
+LEAD
+BODY
+
+=transit spirit quincunx sun
+LEAD
+BODY
+
+=transit spirit semisextile sun
+LEAD
+BODY
+
+=transit spirit semisquare sun
+LEAD
+BODY
+
+=transit spirit sesquiquadrate sun
+LEAD
+BODY
+
+=transit spirit quintile sun
+LEAD
+BODY
+
+=transit spirit sesquiquintile sun
+LEAD
+BODY
+
+# spirit with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction mercury
+LEAD
+BODY
+
+=transit spirit sextile mercury
+LEAD
+BODY
+
+=transit spirit square mercury
+LEAD
+BODY
+
+=transit spirit trine mercury
+LEAD
+BODY
+
+=transit spirit opposition mercury
+LEAD
+BODY
+
+=transit spirit quincunx mercury
+LEAD
+BODY
+
+=transit spirit semisextile mercury
+LEAD
+BODY
+
+=transit spirit semisquare mercury
+LEAD
+BODY
+
+=transit spirit sesquiquadrate mercury
+LEAD
+BODY
+
+=transit spirit quintile mercury
+LEAD
+BODY
+
+=transit spirit sesquiquintile mercury
+LEAD
+BODY
+
+# spirit with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction venus
+LEAD
+BODY
+
+=transit spirit sextile venus
+LEAD
+BODY
+
+=transit spirit square venus
+LEAD
+BODY
+
+=transit spirit trine venus
+LEAD
+BODY
+
+=transit spirit opposition venus
+LEAD
+BODY
+
+=transit spirit quincunx venus
+LEAD
+BODY
+
+=transit spirit semisextile venus
+LEAD
+BODY
+
+=transit spirit semisquare venus
+LEAD
+BODY
+
+=transit spirit sesquiquadrate venus
+LEAD
+BODY
+
+=transit spirit quintile venus
+LEAD
+BODY
+
+=transit spirit sesquiquintile venus
+LEAD
+BODY
+
+# spirit with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction mars
+LEAD
+BODY
+
+=transit spirit sextile mars
+LEAD
+BODY
+
+=transit spirit square mars
+LEAD
+BODY
+
+=transit spirit trine mars
+LEAD
+BODY
+
+=transit spirit opposition mars
+LEAD
+BODY
+
+=transit spirit quincunx mars
+LEAD
+BODY
+
+=transit spirit semisextile mars
+LEAD
+BODY
+
+=transit spirit semisquare mars
+LEAD
+BODY
+
+=transit spirit sesquiquadrate mars
+LEAD
+BODY
+
+=transit spirit quintile mars
+LEAD
+BODY
+
+=transit spirit sesquiquintile mars
+LEAD
+BODY
+
+# spirit with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction jupiter
+LEAD
+BODY
+
+=transit spirit sextile jupiter
+LEAD
+BODY
+
+=transit spirit square jupiter
+LEAD
+BODY
+
+=transit spirit trine jupiter
+LEAD
+BODY
+
+=transit spirit opposition jupiter
+LEAD
+BODY
+
+=transit spirit quincunx jupiter
+LEAD
+BODY
+
+=transit spirit semisextile jupiter
+LEAD
+BODY
+
+=transit spirit semisquare jupiter
+LEAD
+BODY
+
+=transit spirit sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit spirit quintile jupiter
+LEAD
+BODY
+
+=transit spirit sesquiquintile jupiter
+LEAD
+BODY
+
+# spirit with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction saturn
+LEAD
+BODY
+
+=transit spirit sextile saturn
+LEAD
+BODY
+
+=transit spirit square saturn
+LEAD
+BODY
+
+=transit spirit trine saturn
+LEAD
+BODY
+
+=transit spirit opposition saturn
+LEAD
+BODY
+
+=transit spirit quincunx saturn
+LEAD
+BODY
+
+=transit spirit semisextile saturn
+LEAD
+BODY
+
+=transit spirit semisquare saturn
+LEAD
+BODY
+
+=transit spirit sesquiquadrate saturn
+LEAD
+BODY
+
+=transit spirit quintile saturn
+LEAD
+BODY
+
+=transit spirit sesquiquintile saturn
+LEAD
+BODY
+
+# spirit with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction uranus
+LEAD
+BODY
+
+=transit spirit sextile uranus
+LEAD
+BODY
+
+=transit spirit square uranus
+LEAD
+BODY
+
+=transit spirit trine uranus
+LEAD
+BODY
+
+=transit spirit opposition uranus
+LEAD
+BODY
+
+=transit spirit quincunx uranus
+LEAD
+BODY
+
+=transit spirit semisextile uranus
+LEAD
+BODY
+
+=transit spirit semisquare uranus
+LEAD
+BODY
+
+=transit spirit sesquiquadrate uranus
+LEAD
+BODY
+
+=transit spirit quintile uranus
+LEAD
+BODY
+
+=transit spirit sesquiquintile uranus
+LEAD
+BODY
+
+# spirit with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction neptune
+LEAD
+BODY
+
+=transit spirit sextile neptune
+LEAD
+BODY
+
+=transit spirit square neptune
+LEAD
+BODY
+
+=transit spirit trine neptune
+LEAD
+BODY
+
+=transit spirit opposition neptune
+LEAD
+BODY
+
+=transit spirit quincunx neptune
+LEAD
+BODY
+
+=transit spirit semisextile neptune
+LEAD
+BODY
+
+=transit spirit semisquare neptune
+LEAD
+BODY
+
+=transit spirit sesquiquadrate neptune
+LEAD
+BODY
+
+=transit spirit quintile neptune
+LEAD
+BODY
+
+=transit spirit sesquiquintile neptune
+LEAD
+BODY
+
+# spirit with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction pluto
+LEAD
+BODY
+
+=transit spirit sextile pluto
+LEAD
+BODY
+
+=transit spirit square pluto
+LEAD
+BODY
+
+=transit spirit trine pluto
+LEAD
+BODY
+
+=transit spirit opposition pluto
+LEAD
+BODY
+
+=transit spirit quincunx pluto
+LEAD
+BODY
+
+=transit spirit semisextile pluto
+LEAD
+BODY
+
+=transit spirit semisquare pluto
+LEAD
+BODY
+
+=transit spirit sesquiquadrate pluto
+LEAD
+BODY
+
+=transit spirit quintile pluto
+LEAD
+BODY
+
+=transit spirit sesquiquintile pluto
+LEAD
+BODY
+
+# spirit with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction north_node
+LEAD
+BODY
+
+=transit spirit sextile north_node
+LEAD
+BODY
+
+=transit spirit square north_node
+LEAD
+BODY
+
+=transit spirit trine north_node
+LEAD
+BODY
+
+=transit spirit opposition north_node
+LEAD
+BODY
+
+=transit spirit quincunx north_node
+LEAD
+BODY
+
+=transit spirit semisextile north_node
+LEAD
+BODY
+
+=transit spirit semisquare north_node
+LEAD
+BODY
+
+=transit spirit sesquiquadrate north_node
+LEAD
+BODY
+
+=transit spirit quintile north_node
+LEAD
+BODY
+
+=transit spirit sesquiquintile north_node
+LEAD
+BODY
+
+# spirit with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit spirit conjunction chiron
+LEAD
+BODY
+
+=transit spirit sextile chiron
+LEAD
+BODY
+
+=transit spirit square chiron
+LEAD
+BODY
+
+=transit spirit trine chiron
+LEAD
+BODY
+
+=transit spirit opposition chiron
+LEAD
+BODY
+
+=transit spirit quincunx chiron
+LEAD
+BODY
+
+=transit spirit semisextile chiron
+LEAD
+BODY
+
+=transit spirit semisquare chiron
+LEAD
+BODY
+
+=transit spirit sesquiquadrate chiron
+LEAD
+BODY
+
+=transit spirit quintile chiron
+LEAD
+BODY
+
+=transit spirit sesquiquintile chiron
+LEAD
+BODY

@@ -1,0 +1,1274 @@
+# transit: pluto - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# pluto with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction descendant
+LEAD
+BODY
+
+=transit pluto sextile descendant
+LEAD
+BODY
+
+=transit pluto square descendant
+LEAD
+BODY
+
+=transit pluto trine descendant
+LEAD
+BODY
+
+=transit pluto opposition descendant
+LEAD
+BODY
+
+=transit pluto quincunx descendant
+LEAD
+BODY
+
+=transit pluto semisextile descendant
+LEAD
+BODY
+
+=transit pluto semisquare descendant
+LEAD
+BODY
+
+=transit pluto sesquiquadrate descendant
+LEAD
+BODY
+
+=transit pluto quintile descendant
+LEAD
+BODY
+
+=transit pluto biquintile descendant
+LEAD
+BODY
+
+=transit pluto sesquiquintile descendant
+LEAD
+BODY
+
+=transit pluto septile descendant
+LEAD
+BODY
+
+=transit pluto novile descendant
+LEAD
+BODY
+
+=transit pluto decile descendant
+LEAD
+BODY
+
+# pluto with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction ic
+LEAD
+BODY
+
+=transit pluto sextile ic
+LEAD
+BODY
+
+=transit pluto square ic
+LEAD
+BODY
+
+=transit pluto trine ic
+LEAD
+BODY
+
+=transit pluto opposition ic
+LEAD
+BODY
+
+=transit pluto quincunx ic
+LEAD
+BODY
+
+=transit pluto semisextile ic
+LEAD
+BODY
+
+=transit pluto semisquare ic
+LEAD
+BODY
+
+=transit pluto sesquiquadrate ic
+LEAD
+BODY
+
+=transit pluto quintile ic
+LEAD
+BODY
+
+=transit pluto biquintile ic
+LEAD
+BODY
+
+=transit pluto sesquiquintile ic
+LEAD
+BODY
+
+=transit pluto septile ic
+LEAD
+BODY
+
+=transit pluto novile ic
+LEAD
+BODY
+
+=transit pluto decile ic
+LEAD
+BODY
+
+# pluto with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction ascendant
+LEAD
+BODY
+
+=transit pluto sextile ascendant
+LEAD
+BODY
+
+=transit pluto square ascendant
+LEAD
+BODY
+
+=transit pluto trine ascendant
+LEAD
+BODY
+
+=transit pluto opposition ascendant
+LEAD
+BODY
+
+=transit pluto quincunx ascendant
+LEAD
+BODY
+
+=transit pluto semisextile ascendant
+LEAD
+BODY
+
+=transit pluto semisquare ascendant
+LEAD
+BODY
+
+=transit pluto sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit pluto quintile ascendant
+LEAD
+BODY
+
+=transit pluto biquintile ascendant
+LEAD
+BODY
+
+=transit pluto sesquiquintile ascendant
+LEAD
+BODY
+
+=transit pluto septile ascendant
+LEAD
+BODY
+
+=transit pluto novile ascendant
+LEAD
+BODY
+
+=transit pluto decile ascendant
+LEAD
+BODY
+
+# pluto with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction mc
+LEAD
+BODY
+
+=transit pluto sextile mc
+LEAD
+BODY
+
+=transit pluto square mc
+LEAD
+BODY
+
+=transit pluto trine mc
+LEAD
+BODY
+
+=transit pluto opposition mc
+LEAD
+BODY
+
+=transit pluto quincunx mc
+LEAD
+BODY
+
+=transit pluto semisextile mc
+LEAD
+BODY
+
+=transit pluto semisquare mc
+LEAD
+BODY
+
+=transit pluto sesquiquadrate mc
+LEAD
+BODY
+
+=transit pluto quintile mc
+LEAD
+BODY
+
+=transit pluto biquintile mc
+LEAD
+BODY
+
+=transit pluto sesquiquintile mc
+LEAD
+BODY
+
+=transit pluto septile mc
+LEAD
+BODY
+
+=transit pluto novile mc
+LEAD
+BODY
+
+=transit pluto decile mc
+LEAD
+BODY
+
+# pluto with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction south_node
+LEAD
+BODY
+
+=transit pluto sextile south_node
+LEAD
+BODY
+
+=transit pluto square south_node
+LEAD
+BODY
+
+=transit pluto trine south_node
+LEAD
+BODY
+
+=transit pluto opposition south_node
+LEAD
+BODY
+
+=transit pluto quincunx south_node
+LEAD
+BODY
+
+=transit pluto semisextile south_node
+LEAD
+BODY
+
+=transit pluto semisquare south_node
+LEAD
+BODY
+
+=transit pluto sesquiquadrate south_node
+LEAD
+BODY
+
+=transit pluto quintile south_node
+LEAD
+BODY
+
+=transit pluto sesquiquintile south_node
+LEAD
+BODY
+
+# pluto with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction ceres
+LEAD
+BODY
+
+=transit pluto sextile ceres
+LEAD
+BODY
+
+=transit pluto square ceres
+LEAD
+BODY
+
+=transit pluto trine ceres
+LEAD
+BODY
+
+=transit pluto opposition ceres
+LEAD
+BODY
+
+=transit pluto quincunx ceres
+LEAD
+BODY
+
+=transit pluto semisextile ceres
+LEAD
+BODY
+
+=transit pluto semisquare ceres
+LEAD
+BODY
+
+=transit pluto sesquiquadrate ceres
+LEAD
+BODY
+
+=transit pluto quintile ceres
+LEAD
+BODY
+
+=transit pluto sesquiquintile ceres
+LEAD
+BODY
+
+# pluto with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction pallas
+LEAD
+BODY
+
+=transit pluto sextile pallas
+LEAD
+BODY
+
+=transit pluto square pallas
+LEAD
+BODY
+
+=transit pluto trine pallas
+LEAD
+BODY
+
+=transit pluto opposition pallas
+LEAD
+BODY
+
+=transit pluto quincunx pallas
+LEAD
+BODY
+
+=transit pluto semisextile pallas
+LEAD
+BODY
+
+=transit pluto semisquare pallas
+LEAD
+BODY
+
+=transit pluto sesquiquadrate pallas
+LEAD
+BODY
+
+=transit pluto quintile pallas
+LEAD
+BODY
+
+=transit pluto sesquiquintile pallas
+LEAD
+BODY
+
+# pluto with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction juno
+LEAD
+BODY
+
+=transit pluto sextile juno
+LEAD
+BODY
+
+=transit pluto square juno
+LEAD
+BODY
+
+=transit pluto trine juno
+LEAD
+BODY
+
+=transit pluto opposition juno
+LEAD
+BODY
+
+=transit pluto quincunx juno
+LEAD
+BODY
+
+=transit pluto semisextile juno
+LEAD
+BODY
+
+=transit pluto semisquare juno
+LEAD
+BODY
+
+=transit pluto sesquiquadrate juno
+LEAD
+BODY
+
+=transit pluto quintile juno
+LEAD
+BODY
+
+=transit pluto sesquiquintile juno
+LEAD
+BODY
+
+# pluto with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction vesta
+LEAD
+BODY
+
+=transit pluto sextile vesta
+LEAD
+BODY
+
+=transit pluto square vesta
+LEAD
+BODY
+
+=transit pluto trine vesta
+LEAD
+BODY
+
+=transit pluto opposition vesta
+LEAD
+BODY
+
+=transit pluto quincunx vesta
+LEAD
+BODY
+
+=transit pluto semisextile vesta
+LEAD
+BODY
+
+=transit pluto semisquare vesta
+LEAD
+BODY
+
+=transit pluto sesquiquadrate vesta
+LEAD
+BODY
+
+=transit pluto quintile vesta
+LEAD
+BODY
+
+=transit pluto sesquiquintile vesta
+LEAD
+BODY
+
+# pluto with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction eris
+LEAD
+BODY
+
+=transit pluto sextile eris
+LEAD
+BODY
+
+=transit pluto square eris
+LEAD
+BODY
+
+=transit pluto trine eris
+LEAD
+BODY
+
+=transit pluto opposition eris
+LEAD
+BODY
+
+=transit pluto quincunx eris
+LEAD
+BODY
+
+=transit pluto semisextile eris
+LEAD
+BODY
+
+=transit pluto semisquare eris
+LEAD
+BODY
+
+=transit pluto sesquiquadrate eris
+LEAD
+BODY
+
+=transit pluto quintile eris
+LEAD
+BODY
+
+=transit pluto sesquiquintile eris
+LEAD
+BODY
+
+# pluto with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction eros
+LEAD
+BODY
+
+=transit pluto sextile eros
+LEAD
+BODY
+
+=transit pluto square eros
+LEAD
+BODY
+
+=transit pluto trine eros
+LEAD
+BODY
+
+=transit pluto opposition eros
+LEAD
+BODY
+
+=transit pluto quincunx eros
+LEAD
+BODY
+
+=transit pluto semisextile eros
+LEAD
+BODY
+
+=transit pluto semisquare eros
+LEAD
+BODY
+
+=transit pluto sesquiquadrate eros
+LEAD
+BODY
+
+=transit pluto quintile eros
+LEAD
+BODY
+
+=transit pluto sesquiquintile eros
+LEAD
+BODY
+
+# pluto with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction hygiea
+LEAD
+BODY
+
+=transit pluto sextile hygiea
+LEAD
+BODY
+
+=transit pluto square hygiea
+LEAD
+BODY
+
+=transit pluto trine hygiea
+LEAD
+BODY
+
+=transit pluto opposition hygiea
+LEAD
+BODY
+
+=transit pluto quincunx hygiea
+LEAD
+BODY
+
+=transit pluto semisextile hygiea
+LEAD
+BODY
+
+=transit pluto semisquare hygiea
+LEAD
+BODY
+
+=transit pluto sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit pluto quintile hygiea
+LEAD
+BODY
+
+=transit pluto sesquiquintile hygiea
+LEAD
+BODY
+
+# pluto with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction nessus
+LEAD
+BODY
+
+=transit pluto sextile nessus
+LEAD
+BODY
+
+=transit pluto square nessus
+LEAD
+BODY
+
+=transit pluto trine nessus
+LEAD
+BODY
+
+=transit pluto opposition nessus
+LEAD
+BODY
+
+=transit pluto quincunx nessus
+LEAD
+BODY
+
+=transit pluto semisextile nessus
+LEAD
+BODY
+
+=transit pluto semisquare nessus
+LEAD
+BODY
+
+=transit pluto sesquiquadrate nessus
+LEAD
+BODY
+
+=transit pluto quintile nessus
+LEAD
+BODY
+
+=transit pluto sesquiquintile nessus
+LEAD
+BODY
+
+# pluto with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction pholus
+LEAD
+BODY
+
+=transit pluto sextile pholus
+LEAD
+BODY
+
+=transit pluto square pholus
+LEAD
+BODY
+
+=transit pluto trine pholus
+LEAD
+BODY
+
+=transit pluto opposition pholus
+LEAD
+BODY
+
+=transit pluto quincunx pholus
+LEAD
+BODY
+
+=transit pluto semisextile pholus
+LEAD
+BODY
+
+=transit pluto semisquare pholus
+LEAD
+BODY
+
+=transit pluto sesquiquadrate pholus
+LEAD
+BODY
+
+=transit pluto quintile pholus
+LEAD
+BODY
+
+=transit pluto sesquiquintile pholus
+LEAD
+BODY
+
+# pluto with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction fortune
+LEAD
+BODY
+
+=transit pluto sextile fortune
+LEAD
+BODY
+
+=transit pluto square fortune
+LEAD
+BODY
+
+=transit pluto trine fortune
+LEAD
+BODY
+
+=transit pluto opposition fortune
+LEAD
+BODY
+
+=transit pluto quincunx fortune
+LEAD
+BODY
+
+=transit pluto semisextile fortune
+LEAD
+BODY
+
+=transit pluto semisquare fortune
+LEAD
+BODY
+
+=transit pluto sesquiquadrate fortune
+LEAD
+BODY
+
+=transit pluto quintile fortune
+LEAD
+BODY
+
+=transit pluto sesquiquintile fortune
+LEAD
+BODY
+
+# pluto with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction spirit
+LEAD
+BODY
+
+=transit pluto sextile spirit
+LEAD
+BODY
+
+=transit pluto square spirit
+LEAD
+BODY
+
+=transit pluto trine spirit
+LEAD
+BODY
+
+=transit pluto opposition spirit
+LEAD
+BODY
+
+=transit pluto quincunx spirit
+LEAD
+BODY
+
+=transit pluto semisextile spirit
+LEAD
+BODY
+
+=transit pluto semisquare spirit
+LEAD
+BODY
+
+=transit pluto sesquiquadrate spirit
+LEAD
+BODY
+
+=transit pluto quintile spirit
+LEAD
+BODY
+
+=transit pluto sesquiquintile spirit
+LEAD
+BODY
+
+# pluto with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction lilith
+LEAD
+BODY
+
+=transit pluto sextile lilith
+LEAD
+BODY
+
+=transit pluto square lilith
+LEAD
+BODY
+
+=transit pluto trine lilith
+LEAD
+BODY
+
+=transit pluto opposition lilith
+LEAD
+BODY
+
+=transit pluto quincunx lilith
+LEAD
+BODY
+
+=transit pluto semisextile lilith
+LEAD
+BODY
+
+=transit pluto semisquare lilith
+LEAD
+BODY
+
+=transit pluto sesquiquadrate lilith
+LEAD
+BODY
+
+=transit pluto quintile lilith
+LEAD
+BODY
+
+=transit pluto sesquiquintile lilith
+LEAD
+BODY
+
+# pluto with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction sun
+LEAD
+BODY
+
+=transit pluto sextile sun
+LEAD
+BODY
+
+=transit pluto square sun
+LEAD
+BODY
+
+=transit pluto trine sun
+LEAD
+BODY
+
+=transit pluto opposition sun
+LEAD
+BODY
+
+=transit pluto biquintile sun
+LEAD
+BODY
+
+=transit pluto septile sun
+LEAD
+BODY
+
+=transit pluto novile sun
+LEAD
+BODY
+
+=transit pluto decile sun
+LEAD
+BODY
+
+# pluto with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction moon
+LEAD
+BODY
+
+=transit pluto sextile moon
+LEAD
+BODY
+
+=transit pluto square moon
+LEAD
+BODY
+
+=transit pluto trine moon
+LEAD
+BODY
+
+=transit pluto opposition moon
+LEAD
+BODY
+
+=transit pluto biquintile moon
+LEAD
+BODY
+
+=transit pluto septile moon
+LEAD
+BODY
+
+=transit pluto novile moon
+LEAD
+BODY
+
+=transit pluto decile moon
+LEAD
+BODY
+
+# pluto with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction mercury
+LEAD
+BODY
+
+=transit pluto sextile mercury
+LEAD
+BODY
+
+=transit pluto square mercury
+LEAD
+BODY
+
+=transit pluto trine mercury
+LEAD
+BODY
+
+=transit pluto opposition mercury
+LEAD
+BODY
+
+=transit pluto biquintile mercury
+LEAD
+BODY
+
+=transit pluto septile mercury
+LEAD
+BODY
+
+=transit pluto novile mercury
+LEAD
+BODY
+
+=transit pluto decile mercury
+LEAD
+BODY
+
+# pluto with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction venus
+LEAD
+BODY
+
+=transit pluto sextile venus
+LEAD
+BODY
+
+=transit pluto square venus
+LEAD
+BODY
+
+=transit pluto trine venus
+LEAD
+BODY
+
+=transit pluto opposition venus
+LEAD
+BODY
+
+=transit pluto biquintile venus
+LEAD
+BODY
+
+=transit pluto septile venus
+LEAD
+BODY
+
+=transit pluto novile venus
+LEAD
+BODY
+
+=transit pluto decile venus
+LEAD
+BODY
+
+# pluto with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction mars
+LEAD
+BODY
+
+=transit pluto sextile mars
+LEAD
+BODY
+
+=transit pluto square mars
+LEAD
+BODY
+
+=transit pluto trine mars
+LEAD
+BODY
+
+=transit pluto opposition mars
+LEAD
+BODY
+
+=transit pluto biquintile mars
+LEAD
+BODY
+
+=transit pluto septile mars
+LEAD
+BODY
+
+=transit pluto novile mars
+LEAD
+BODY
+
+=transit pluto decile mars
+LEAD
+BODY
+
+# pluto with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction jupiter
+LEAD
+BODY
+
+=transit pluto sextile jupiter
+LEAD
+BODY
+
+=transit pluto square jupiter
+LEAD
+BODY
+
+=transit pluto trine jupiter
+LEAD
+BODY
+
+=transit pluto opposition jupiter
+LEAD
+BODY
+
+=transit pluto biquintile jupiter
+LEAD
+BODY
+
+=transit pluto septile jupiter
+LEAD
+BODY
+
+=transit pluto novile jupiter
+LEAD
+BODY
+
+=transit pluto decile jupiter
+LEAD
+BODY
+
+# pluto with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction saturn
+LEAD
+BODY
+
+=transit pluto sextile saturn
+LEAD
+BODY
+
+=transit pluto square saturn
+LEAD
+BODY
+
+=transit pluto trine saturn
+LEAD
+BODY
+
+=transit pluto opposition saturn
+LEAD
+BODY
+
+=transit pluto biquintile saturn
+LEAD
+BODY
+
+=transit pluto septile saturn
+LEAD
+BODY
+
+=transit pluto novile saturn
+LEAD
+BODY
+
+=transit pluto decile saturn
+LEAD
+BODY
+
+# pluto with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction uranus
+LEAD
+BODY
+
+=transit pluto sextile uranus
+LEAD
+BODY
+
+=transit pluto square uranus
+LEAD
+BODY
+
+=transit pluto trine uranus
+LEAD
+BODY
+
+=transit pluto opposition uranus
+LEAD
+BODY
+
+=transit pluto biquintile uranus
+LEAD
+BODY
+
+=transit pluto septile uranus
+LEAD
+BODY
+
+=transit pluto novile uranus
+LEAD
+BODY
+
+=transit pluto decile uranus
+LEAD
+BODY
+
+# pluto with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction neptune
+LEAD
+BODY
+
+=transit pluto sextile neptune
+LEAD
+BODY
+
+=transit pluto square neptune
+LEAD
+BODY
+
+=transit pluto trine neptune
+LEAD
+BODY
+
+=transit pluto opposition neptune
+LEAD
+BODY
+
+=transit pluto biquintile neptune
+LEAD
+BODY
+
+=transit pluto septile neptune
+LEAD
+BODY
+
+=transit pluto novile neptune
+LEAD
+BODY
+
+=transit pluto decile neptune
+LEAD
+BODY
+
+# pluto with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction pluto
+LEAD
+BODY
+
+=transit pluto sextile pluto
+LEAD
+BODY
+
+=transit pluto square pluto
+LEAD
+BODY
+
+=transit pluto trine pluto
+LEAD
+BODY
+
+=transit pluto opposition pluto
+LEAD
+BODY
+
+=transit pluto biquintile pluto
+LEAD
+BODY
+
+=transit pluto septile pluto
+LEAD
+BODY
+
+=transit pluto novile pluto
+LEAD
+BODY
+
+=transit pluto decile pluto
+LEAD
+BODY
+
+# pluto with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction chiron
+LEAD
+BODY
+
+=transit pluto sextile chiron
+LEAD
+BODY
+
+=transit pluto square chiron
+LEAD
+BODY
+
+=transit pluto trine chiron
+LEAD
+BODY
+
+=transit pluto opposition chiron
+LEAD
+BODY
+
+=transit pluto biquintile chiron
+LEAD
+BODY
+
+=transit pluto septile chiron
+LEAD
+BODY
+
+=transit pluto novile chiron
+LEAD
+BODY
+
+=transit pluto decile chiron
+LEAD
+BODY
+
+# pluto with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit pluto conjunction north_node
+LEAD
+BODY
+
+=transit pluto sextile north_node
+LEAD
+BODY
+
+=transit pluto square north_node
+LEAD
+BODY
+
+=transit pluto trine north_node
+LEAD
+BODY
+
+=transit pluto opposition north_node
+LEAD
+BODY
+
+=transit pluto biquintile north_node
+LEAD
+BODY
+
+=transit pluto septile north_node
+LEAD
+BODY
+
+=transit pluto novile north_node
+LEAD
+BODY
+
+=transit pluto decile north_node
+LEAD
+BODY

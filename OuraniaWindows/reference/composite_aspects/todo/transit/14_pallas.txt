@@ -1,0 +1,1261 @@
+# transit: pallas - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# pallas with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction ascendant
+LEAD
+BODY
+
+=transit pallas sextile ascendant
+LEAD
+BODY
+
+=transit pallas square ascendant
+LEAD
+BODY
+
+=transit pallas trine ascendant
+LEAD
+BODY
+
+=transit pallas opposition ascendant
+LEAD
+BODY
+
+=transit pallas quincunx ascendant
+LEAD
+BODY
+
+=transit pallas semisextile ascendant
+LEAD
+BODY
+
+=transit pallas semisquare ascendant
+LEAD
+BODY
+
+=transit pallas sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit pallas quintile ascendant
+LEAD
+BODY
+
+=transit pallas sesquiquintile ascendant
+LEAD
+BODY
+
+# pallas with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction descendant
+LEAD
+BODY
+
+=transit pallas sextile descendant
+LEAD
+BODY
+
+=transit pallas square descendant
+LEAD
+BODY
+
+=transit pallas trine descendant
+LEAD
+BODY
+
+=transit pallas opposition descendant
+LEAD
+BODY
+
+=transit pallas quincunx descendant
+LEAD
+BODY
+
+=transit pallas semisextile descendant
+LEAD
+BODY
+
+=transit pallas semisquare descendant
+LEAD
+BODY
+
+=transit pallas sesquiquadrate descendant
+LEAD
+BODY
+
+=transit pallas quintile descendant
+LEAD
+BODY
+
+=transit pallas sesquiquintile descendant
+LEAD
+BODY
+
+# pallas with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction mc
+LEAD
+BODY
+
+=transit pallas sextile mc
+LEAD
+BODY
+
+=transit pallas square mc
+LEAD
+BODY
+
+=transit pallas trine mc
+LEAD
+BODY
+
+=transit pallas opposition mc
+LEAD
+BODY
+
+=transit pallas quincunx mc
+LEAD
+BODY
+
+=transit pallas semisextile mc
+LEAD
+BODY
+
+=transit pallas semisquare mc
+LEAD
+BODY
+
+=transit pallas sesquiquadrate mc
+LEAD
+BODY
+
+=transit pallas quintile mc
+LEAD
+BODY
+
+=transit pallas sesquiquintile mc
+LEAD
+BODY
+
+# pallas with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction ic
+LEAD
+BODY
+
+=transit pallas sextile ic
+LEAD
+BODY
+
+=transit pallas square ic
+LEAD
+BODY
+
+=transit pallas trine ic
+LEAD
+BODY
+
+=transit pallas opposition ic
+LEAD
+BODY
+
+=transit pallas quincunx ic
+LEAD
+BODY
+
+=transit pallas semisextile ic
+LEAD
+BODY
+
+=transit pallas semisquare ic
+LEAD
+BODY
+
+=transit pallas sesquiquadrate ic
+LEAD
+BODY
+
+=transit pallas quintile ic
+LEAD
+BODY
+
+=transit pallas sesquiquintile ic
+LEAD
+BODY
+
+# pallas with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction south_node
+LEAD
+BODY
+
+=transit pallas sextile south_node
+LEAD
+BODY
+
+=transit pallas square south_node
+LEAD
+BODY
+
+=transit pallas trine south_node
+LEAD
+BODY
+
+=transit pallas opposition south_node
+LEAD
+BODY
+
+=transit pallas quincunx south_node
+LEAD
+BODY
+
+=transit pallas semisextile south_node
+LEAD
+BODY
+
+=transit pallas semisquare south_node
+LEAD
+BODY
+
+=transit pallas sesquiquadrate south_node
+LEAD
+BODY
+
+=transit pallas quintile south_node
+LEAD
+BODY
+
+=transit pallas sesquiquintile south_node
+LEAD
+BODY
+
+# pallas with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction ceres
+LEAD
+BODY
+
+=transit pallas sextile ceres
+LEAD
+BODY
+
+=transit pallas square ceres
+LEAD
+BODY
+
+=transit pallas trine ceres
+LEAD
+BODY
+
+=transit pallas opposition ceres
+LEAD
+BODY
+
+=transit pallas quincunx ceres
+LEAD
+BODY
+
+=transit pallas semisextile ceres
+LEAD
+BODY
+
+=transit pallas semisquare ceres
+LEAD
+BODY
+
+=transit pallas sesquiquadrate ceres
+LEAD
+BODY
+
+=transit pallas quintile ceres
+LEAD
+BODY
+
+=transit pallas sesquiquintile ceres
+LEAD
+BODY
+
+# pallas with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction juno
+LEAD
+BODY
+
+=transit pallas sextile juno
+LEAD
+BODY
+
+=transit pallas square juno
+LEAD
+BODY
+
+=transit pallas trine juno
+LEAD
+BODY
+
+=transit pallas opposition juno
+LEAD
+BODY
+
+=transit pallas quincunx juno
+LEAD
+BODY
+
+=transit pallas semisextile juno
+LEAD
+BODY
+
+=transit pallas semisquare juno
+LEAD
+BODY
+
+=transit pallas sesquiquadrate juno
+LEAD
+BODY
+
+=transit pallas quintile juno
+LEAD
+BODY
+
+=transit pallas sesquiquintile juno
+LEAD
+BODY
+
+# pallas with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction vesta
+LEAD
+BODY
+
+=transit pallas sextile vesta
+LEAD
+BODY
+
+=transit pallas square vesta
+LEAD
+BODY
+
+=transit pallas trine vesta
+LEAD
+BODY
+
+=transit pallas opposition vesta
+LEAD
+BODY
+
+=transit pallas quincunx vesta
+LEAD
+BODY
+
+=transit pallas semisextile vesta
+LEAD
+BODY
+
+=transit pallas semisquare vesta
+LEAD
+BODY
+
+=transit pallas sesquiquadrate vesta
+LEAD
+BODY
+
+=transit pallas quintile vesta
+LEAD
+BODY
+
+=transit pallas sesquiquintile vesta
+LEAD
+BODY
+
+# pallas with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction eris
+LEAD
+BODY
+
+=transit pallas sextile eris
+LEAD
+BODY
+
+=transit pallas square eris
+LEAD
+BODY
+
+=transit pallas trine eris
+LEAD
+BODY
+
+=transit pallas opposition eris
+LEAD
+BODY
+
+=transit pallas quincunx eris
+LEAD
+BODY
+
+=transit pallas semisextile eris
+LEAD
+BODY
+
+=transit pallas semisquare eris
+LEAD
+BODY
+
+=transit pallas sesquiquadrate eris
+LEAD
+BODY
+
+=transit pallas quintile eris
+LEAD
+BODY
+
+=transit pallas sesquiquintile eris
+LEAD
+BODY
+
+# pallas with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction eros
+LEAD
+BODY
+
+=transit pallas sextile eros
+LEAD
+BODY
+
+=transit pallas square eros
+LEAD
+BODY
+
+=transit pallas trine eros
+LEAD
+BODY
+
+=transit pallas opposition eros
+LEAD
+BODY
+
+=transit pallas quincunx eros
+LEAD
+BODY
+
+=transit pallas semisextile eros
+LEAD
+BODY
+
+=transit pallas semisquare eros
+LEAD
+BODY
+
+=transit pallas sesquiquadrate eros
+LEAD
+BODY
+
+=transit pallas quintile eros
+LEAD
+BODY
+
+=transit pallas sesquiquintile eros
+LEAD
+BODY
+
+# pallas with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction hygiea
+LEAD
+BODY
+
+=transit pallas sextile hygiea
+LEAD
+BODY
+
+=transit pallas square hygiea
+LEAD
+BODY
+
+=transit pallas trine hygiea
+LEAD
+BODY
+
+=transit pallas opposition hygiea
+LEAD
+BODY
+
+=transit pallas quincunx hygiea
+LEAD
+BODY
+
+=transit pallas semisextile hygiea
+LEAD
+BODY
+
+=transit pallas semisquare hygiea
+LEAD
+BODY
+
+=transit pallas sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit pallas quintile hygiea
+LEAD
+BODY
+
+=transit pallas sesquiquintile hygiea
+LEAD
+BODY
+
+# pallas with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction nessus
+LEAD
+BODY
+
+=transit pallas sextile nessus
+LEAD
+BODY
+
+=transit pallas square nessus
+LEAD
+BODY
+
+=transit pallas trine nessus
+LEAD
+BODY
+
+=transit pallas opposition nessus
+LEAD
+BODY
+
+=transit pallas quincunx nessus
+LEAD
+BODY
+
+=transit pallas semisextile nessus
+LEAD
+BODY
+
+=transit pallas semisquare nessus
+LEAD
+BODY
+
+=transit pallas sesquiquadrate nessus
+LEAD
+BODY
+
+=transit pallas quintile nessus
+LEAD
+BODY
+
+=transit pallas sesquiquintile nessus
+LEAD
+BODY
+
+# pallas with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction pholus
+LEAD
+BODY
+
+=transit pallas sextile pholus
+LEAD
+BODY
+
+=transit pallas square pholus
+LEAD
+BODY
+
+=transit pallas trine pholus
+LEAD
+BODY
+
+=transit pallas opposition pholus
+LEAD
+BODY
+
+=transit pallas quincunx pholus
+LEAD
+BODY
+
+=transit pallas semisextile pholus
+LEAD
+BODY
+
+=transit pallas semisquare pholus
+LEAD
+BODY
+
+=transit pallas sesquiquadrate pholus
+LEAD
+BODY
+
+=transit pallas quintile pholus
+LEAD
+BODY
+
+=transit pallas sesquiquintile pholus
+LEAD
+BODY
+
+# pallas with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction fortune
+LEAD
+BODY
+
+=transit pallas sextile fortune
+LEAD
+BODY
+
+=transit pallas square fortune
+LEAD
+BODY
+
+=transit pallas trine fortune
+LEAD
+BODY
+
+=transit pallas opposition fortune
+LEAD
+BODY
+
+=transit pallas quincunx fortune
+LEAD
+BODY
+
+=transit pallas semisextile fortune
+LEAD
+BODY
+
+=transit pallas semisquare fortune
+LEAD
+BODY
+
+=transit pallas sesquiquadrate fortune
+LEAD
+BODY
+
+=transit pallas quintile fortune
+LEAD
+BODY
+
+=transit pallas sesquiquintile fortune
+LEAD
+BODY
+
+# pallas with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction spirit
+LEAD
+BODY
+
+=transit pallas sextile spirit
+LEAD
+BODY
+
+=transit pallas square spirit
+LEAD
+BODY
+
+=transit pallas trine spirit
+LEAD
+BODY
+
+=transit pallas opposition spirit
+LEAD
+BODY
+
+=transit pallas quincunx spirit
+LEAD
+BODY
+
+=transit pallas semisextile spirit
+LEAD
+BODY
+
+=transit pallas semisquare spirit
+LEAD
+BODY
+
+=transit pallas sesquiquadrate spirit
+LEAD
+BODY
+
+=transit pallas quintile spirit
+LEAD
+BODY
+
+=transit pallas sesquiquintile spirit
+LEAD
+BODY
+
+# pallas with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction lilith
+LEAD
+BODY
+
+=transit pallas sextile lilith
+LEAD
+BODY
+
+=transit pallas square lilith
+LEAD
+BODY
+
+=transit pallas trine lilith
+LEAD
+BODY
+
+=transit pallas opposition lilith
+LEAD
+BODY
+
+=transit pallas quincunx lilith
+LEAD
+BODY
+
+=transit pallas semisextile lilith
+LEAD
+BODY
+
+=transit pallas semisquare lilith
+LEAD
+BODY
+
+=transit pallas sesquiquadrate lilith
+LEAD
+BODY
+
+=transit pallas quintile lilith
+LEAD
+BODY
+
+=transit pallas sesquiquintile lilith
+LEAD
+BODY
+
+# pallas with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction moon
+LEAD
+BODY
+
+=transit pallas sextile moon
+LEAD
+BODY
+
+=transit pallas square moon
+LEAD
+BODY
+
+=transit pallas trine moon
+LEAD
+BODY
+
+=transit pallas opposition moon
+LEAD
+BODY
+
+=transit pallas quincunx moon
+LEAD
+BODY
+
+=transit pallas semisextile moon
+LEAD
+BODY
+
+=transit pallas semisquare moon
+LEAD
+BODY
+
+=transit pallas sesquiquadrate moon
+LEAD
+BODY
+
+=transit pallas quintile moon
+LEAD
+BODY
+
+=transit pallas sesquiquintile moon
+LEAD
+BODY
+
+# pallas with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction sun
+LEAD
+BODY
+
+=transit pallas sextile sun
+LEAD
+BODY
+
+=transit pallas square sun
+LEAD
+BODY
+
+=transit pallas trine sun
+LEAD
+BODY
+
+=transit pallas opposition sun
+LEAD
+BODY
+
+=transit pallas quincunx sun
+LEAD
+BODY
+
+=transit pallas semisextile sun
+LEAD
+BODY
+
+=transit pallas semisquare sun
+LEAD
+BODY
+
+=transit pallas sesquiquadrate sun
+LEAD
+BODY
+
+=transit pallas quintile sun
+LEAD
+BODY
+
+=transit pallas sesquiquintile sun
+LEAD
+BODY
+
+# pallas with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction mercury
+LEAD
+BODY
+
+=transit pallas sextile mercury
+LEAD
+BODY
+
+=transit pallas square mercury
+LEAD
+BODY
+
+=transit pallas trine mercury
+LEAD
+BODY
+
+=transit pallas opposition mercury
+LEAD
+BODY
+
+=transit pallas quincunx mercury
+LEAD
+BODY
+
+=transit pallas semisextile mercury
+LEAD
+BODY
+
+=transit pallas semisquare mercury
+LEAD
+BODY
+
+=transit pallas sesquiquadrate mercury
+LEAD
+BODY
+
+=transit pallas quintile mercury
+LEAD
+BODY
+
+=transit pallas sesquiquintile mercury
+LEAD
+BODY
+
+# pallas with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction venus
+LEAD
+BODY
+
+=transit pallas sextile venus
+LEAD
+BODY
+
+=transit pallas square venus
+LEAD
+BODY
+
+=transit pallas trine venus
+LEAD
+BODY
+
+=transit pallas opposition venus
+LEAD
+BODY
+
+=transit pallas quincunx venus
+LEAD
+BODY
+
+=transit pallas semisextile venus
+LEAD
+BODY
+
+=transit pallas semisquare venus
+LEAD
+BODY
+
+=transit pallas sesquiquadrate venus
+LEAD
+BODY
+
+=transit pallas quintile venus
+LEAD
+BODY
+
+=transit pallas sesquiquintile venus
+LEAD
+BODY
+
+# pallas with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction mars
+LEAD
+BODY
+
+=transit pallas sextile mars
+LEAD
+BODY
+
+=transit pallas square mars
+LEAD
+BODY
+
+=transit pallas trine mars
+LEAD
+BODY
+
+=transit pallas opposition mars
+LEAD
+BODY
+
+=transit pallas quincunx mars
+LEAD
+BODY
+
+=transit pallas semisextile mars
+LEAD
+BODY
+
+=transit pallas semisquare mars
+LEAD
+BODY
+
+=transit pallas sesquiquadrate mars
+LEAD
+BODY
+
+=transit pallas quintile mars
+LEAD
+BODY
+
+=transit pallas sesquiquintile mars
+LEAD
+BODY
+
+# pallas with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction jupiter
+LEAD
+BODY
+
+=transit pallas sextile jupiter
+LEAD
+BODY
+
+=transit pallas square jupiter
+LEAD
+BODY
+
+=transit pallas trine jupiter
+LEAD
+BODY
+
+=transit pallas opposition jupiter
+LEAD
+BODY
+
+=transit pallas quincunx jupiter
+LEAD
+BODY
+
+=transit pallas semisextile jupiter
+LEAD
+BODY
+
+=transit pallas semisquare jupiter
+LEAD
+BODY
+
+=transit pallas sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit pallas quintile jupiter
+LEAD
+BODY
+
+=transit pallas sesquiquintile jupiter
+LEAD
+BODY
+
+# pallas with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction saturn
+LEAD
+BODY
+
+=transit pallas sextile saturn
+LEAD
+BODY
+
+=transit pallas square saturn
+LEAD
+BODY
+
+=transit pallas trine saturn
+LEAD
+BODY
+
+=transit pallas opposition saturn
+LEAD
+BODY
+
+=transit pallas quincunx saturn
+LEAD
+BODY
+
+=transit pallas semisextile saturn
+LEAD
+BODY
+
+=transit pallas semisquare saturn
+LEAD
+BODY
+
+=transit pallas sesquiquadrate saturn
+LEAD
+BODY
+
+=transit pallas quintile saturn
+LEAD
+BODY
+
+=transit pallas sesquiquintile saturn
+LEAD
+BODY
+
+# pallas with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction uranus
+LEAD
+BODY
+
+=transit pallas sextile uranus
+LEAD
+BODY
+
+=transit pallas square uranus
+LEAD
+BODY
+
+=transit pallas trine uranus
+LEAD
+BODY
+
+=transit pallas opposition uranus
+LEAD
+BODY
+
+=transit pallas quincunx uranus
+LEAD
+BODY
+
+=transit pallas semisextile uranus
+LEAD
+BODY
+
+=transit pallas semisquare uranus
+LEAD
+BODY
+
+=transit pallas sesquiquadrate uranus
+LEAD
+BODY
+
+=transit pallas quintile uranus
+LEAD
+BODY
+
+=transit pallas sesquiquintile uranus
+LEAD
+BODY
+
+# pallas with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction neptune
+LEAD
+BODY
+
+=transit pallas sextile neptune
+LEAD
+BODY
+
+=transit pallas square neptune
+LEAD
+BODY
+
+=transit pallas trine neptune
+LEAD
+BODY
+
+=transit pallas opposition neptune
+LEAD
+BODY
+
+=transit pallas quincunx neptune
+LEAD
+BODY
+
+=transit pallas semisextile neptune
+LEAD
+BODY
+
+=transit pallas semisquare neptune
+LEAD
+BODY
+
+=transit pallas sesquiquadrate neptune
+LEAD
+BODY
+
+=transit pallas quintile neptune
+LEAD
+BODY
+
+=transit pallas sesquiquintile neptune
+LEAD
+BODY
+
+# pallas with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction pluto
+LEAD
+BODY
+
+=transit pallas sextile pluto
+LEAD
+BODY
+
+=transit pallas square pluto
+LEAD
+BODY
+
+=transit pallas trine pluto
+LEAD
+BODY
+
+=transit pallas opposition pluto
+LEAD
+BODY
+
+=transit pallas quincunx pluto
+LEAD
+BODY
+
+=transit pallas semisextile pluto
+LEAD
+BODY
+
+=transit pallas semisquare pluto
+LEAD
+BODY
+
+=transit pallas sesquiquadrate pluto
+LEAD
+BODY
+
+=transit pallas quintile pluto
+LEAD
+BODY
+
+=transit pallas sesquiquintile pluto
+LEAD
+BODY
+
+# pallas with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction north_node
+LEAD
+BODY
+
+=transit pallas sextile north_node
+LEAD
+BODY
+
+=transit pallas square north_node
+LEAD
+BODY
+
+=transit pallas trine north_node
+LEAD
+BODY
+
+=transit pallas opposition north_node
+LEAD
+BODY
+
+=transit pallas quincunx north_node
+LEAD
+BODY
+
+=transit pallas semisextile north_node
+LEAD
+BODY
+
+=transit pallas semisquare north_node
+LEAD
+BODY
+
+=transit pallas sesquiquadrate north_node
+LEAD
+BODY
+
+=transit pallas quintile north_node
+LEAD
+BODY
+
+=transit pallas sesquiquintile north_node
+LEAD
+BODY
+
+# pallas with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pallas conjunction chiron
+LEAD
+BODY
+
+=transit pallas sextile chiron
+LEAD
+BODY
+
+=transit pallas square chiron
+LEAD
+BODY
+
+=transit pallas trine chiron
+LEAD
+BODY
+
+=transit pallas opposition chiron
+LEAD
+BODY
+
+=transit pallas quincunx chiron
+LEAD
+BODY
+
+=transit pallas semisextile chiron
+LEAD
+BODY
+
+=transit pallas semisquare chiron
+LEAD
+BODY
+
+=transit pallas sesquiquadrate chiron
+LEAD
+BODY
+
+=transit pallas quintile chiron
+LEAD
+BODY
+
+=transit pallas sesquiquintile chiron
+LEAD
+BODY

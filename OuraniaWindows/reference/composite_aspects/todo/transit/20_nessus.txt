@@ -1,0 +1,1261 @@
+# transit: nessus - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# nessus with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction ascendant
+LEAD
+BODY
+
+=transit nessus sextile ascendant
+LEAD
+BODY
+
+=transit nessus square ascendant
+LEAD
+BODY
+
+=transit nessus trine ascendant
+LEAD
+BODY
+
+=transit nessus opposition ascendant
+LEAD
+BODY
+
+=transit nessus quincunx ascendant
+LEAD
+BODY
+
+=transit nessus semisextile ascendant
+LEAD
+BODY
+
+=transit nessus semisquare ascendant
+LEAD
+BODY
+
+=transit nessus sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit nessus quintile ascendant
+LEAD
+BODY
+
+=transit nessus sesquiquintile ascendant
+LEAD
+BODY
+
+# nessus with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction descendant
+LEAD
+BODY
+
+=transit nessus sextile descendant
+LEAD
+BODY
+
+=transit nessus square descendant
+LEAD
+BODY
+
+=transit nessus trine descendant
+LEAD
+BODY
+
+=transit nessus opposition descendant
+LEAD
+BODY
+
+=transit nessus quincunx descendant
+LEAD
+BODY
+
+=transit nessus semisextile descendant
+LEAD
+BODY
+
+=transit nessus semisquare descendant
+LEAD
+BODY
+
+=transit nessus sesquiquadrate descendant
+LEAD
+BODY
+
+=transit nessus quintile descendant
+LEAD
+BODY
+
+=transit nessus sesquiquintile descendant
+LEAD
+BODY
+
+# nessus with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction mc
+LEAD
+BODY
+
+=transit nessus sextile mc
+LEAD
+BODY
+
+=transit nessus square mc
+LEAD
+BODY
+
+=transit nessus trine mc
+LEAD
+BODY
+
+=transit nessus opposition mc
+LEAD
+BODY
+
+=transit nessus quincunx mc
+LEAD
+BODY
+
+=transit nessus semisextile mc
+LEAD
+BODY
+
+=transit nessus semisquare mc
+LEAD
+BODY
+
+=transit nessus sesquiquadrate mc
+LEAD
+BODY
+
+=transit nessus quintile mc
+LEAD
+BODY
+
+=transit nessus sesquiquintile mc
+LEAD
+BODY
+
+# nessus with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction ic
+LEAD
+BODY
+
+=transit nessus sextile ic
+LEAD
+BODY
+
+=transit nessus square ic
+LEAD
+BODY
+
+=transit nessus trine ic
+LEAD
+BODY
+
+=transit nessus opposition ic
+LEAD
+BODY
+
+=transit nessus quincunx ic
+LEAD
+BODY
+
+=transit nessus semisextile ic
+LEAD
+BODY
+
+=transit nessus semisquare ic
+LEAD
+BODY
+
+=transit nessus sesquiquadrate ic
+LEAD
+BODY
+
+=transit nessus quintile ic
+LEAD
+BODY
+
+=transit nessus sesquiquintile ic
+LEAD
+BODY
+
+# nessus with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction south_node
+LEAD
+BODY
+
+=transit nessus sextile south_node
+LEAD
+BODY
+
+=transit nessus square south_node
+LEAD
+BODY
+
+=transit nessus trine south_node
+LEAD
+BODY
+
+=transit nessus opposition south_node
+LEAD
+BODY
+
+=transit nessus quincunx south_node
+LEAD
+BODY
+
+=transit nessus semisextile south_node
+LEAD
+BODY
+
+=transit nessus semisquare south_node
+LEAD
+BODY
+
+=transit nessus sesquiquadrate south_node
+LEAD
+BODY
+
+=transit nessus quintile south_node
+LEAD
+BODY
+
+=transit nessus sesquiquintile south_node
+LEAD
+BODY
+
+# nessus with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction ceres
+LEAD
+BODY
+
+=transit nessus sextile ceres
+LEAD
+BODY
+
+=transit nessus square ceres
+LEAD
+BODY
+
+=transit nessus trine ceres
+LEAD
+BODY
+
+=transit nessus opposition ceres
+LEAD
+BODY
+
+=transit nessus quincunx ceres
+LEAD
+BODY
+
+=transit nessus semisextile ceres
+LEAD
+BODY
+
+=transit nessus semisquare ceres
+LEAD
+BODY
+
+=transit nessus sesquiquadrate ceres
+LEAD
+BODY
+
+=transit nessus quintile ceres
+LEAD
+BODY
+
+=transit nessus sesquiquintile ceres
+LEAD
+BODY
+
+# nessus with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction pallas
+LEAD
+BODY
+
+=transit nessus sextile pallas
+LEAD
+BODY
+
+=transit nessus square pallas
+LEAD
+BODY
+
+=transit nessus trine pallas
+LEAD
+BODY
+
+=transit nessus opposition pallas
+LEAD
+BODY
+
+=transit nessus quincunx pallas
+LEAD
+BODY
+
+=transit nessus semisextile pallas
+LEAD
+BODY
+
+=transit nessus semisquare pallas
+LEAD
+BODY
+
+=transit nessus sesquiquadrate pallas
+LEAD
+BODY
+
+=transit nessus quintile pallas
+LEAD
+BODY
+
+=transit nessus sesquiquintile pallas
+LEAD
+BODY
+
+# nessus with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction juno
+LEAD
+BODY
+
+=transit nessus sextile juno
+LEAD
+BODY
+
+=transit nessus square juno
+LEAD
+BODY
+
+=transit nessus trine juno
+LEAD
+BODY
+
+=transit nessus opposition juno
+LEAD
+BODY
+
+=transit nessus quincunx juno
+LEAD
+BODY
+
+=transit nessus semisextile juno
+LEAD
+BODY
+
+=transit nessus semisquare juno
+LEAD
+BODY
+
+=transit nessus sesquiquadrate juno
+LEAD
+BODY
+
+=transit nessus quintile juno
+LEAD
+BODY
+
+=transit nessus sesquiquintile juno
+LEAD
+BODY
+
+# nessus with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction vesta
+LEAD
+BODY
+
+=transit nessus sextile vesta
+LEAD
+BODY
+
+=transit nessus square vesta
+LEAD
+BODY
+
+=transit nessus trine vesta
+LEAD
+BODY
+
+=transit nessus opposition vesta
+LEAD
+BODY
+
+=transit nessus quincunx vesta
+LEAD
+BODY
+
+=transit nessus semisextile vesta
+LEAD
+BODY
+
+=transit nessus semisquare vesta
+LEAD
+BODY
+
+=transit nessus sesquiquadrate vesta
+LEAD
+BODY
+
+=transit nessus quintile vesta
+LEAD
+BODY
+
+=transit nessus sesquiquintile vesta
+LEAD
+BODY
+
+# nessus with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction eris
+LEAD
+BODY
+
+=transit nessus sextile eris
+LEAD
+BODY
+
+=transit nessus square eris
+LEAD
+BODY
+
+=transit nessus trine eris
+LEAD
+BODY
+
+=transit nessus opposition eris
+LEAD
+BODY
+
+=transit nessus quincunx eris
+LEAD
+BODY
+
+=transit nessus semisextile eris
+LEAD
+BODY
+
+=transit nessus semisquare eris
+LEAD
+BODY
+
+=transit nessus sesquiquadrate eris
+LEAD
+BODY
+
+=transit nessus quintile eris
+LEAD
+BODY
+
+=transit nessus sesquiquintile eris
+LEAD
+BODY
+
+# nessus with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction eros
+LEAD
+BODY
+
+=transit nessus sextile eros
+LEAD
+BODY
+
+=transit nessus square eros
+LEAD
+BODY
+
+=transit nessus trine eros
+LEAD
+BODY
+
+=transit nessus opposition eros
+LEAD
+BODY
+
+=transit nessus quincunx eros
+LEAD
+BODY
+
+=transit nessus semisextile eros
+LEAD
+BODY
+
+=transit nessus semisquare eros
+LEAD
+BODY
+
+=transit nessus sesquiquadrate eros
+LEAD
+BODY
+
+=transit nessus quintile eros
+LEAD
+BODY
+
+=transit nessus sesquiquintile eros
+LEAD
+BODY
+
+# nessus with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction hygiea
+LEAD
+BODY
+
+=transit nessus sextile hygiea
+LEAD
+BODY
+
+=transit nessus square hygiea
+LEAD
+BODY
+
+=transit nessus trine hygiea
+LEAD
+BODY
+
+=transit nessus opposition hygiea
+LEAD
+BODY
+
+=transit nessus quincunx hygiea
+LEAD
+BODY
+
+=transit nessus semisextile hygiea
+LEAD
+BODY
+
+=transit nessus semisquare hygiea
+LEAD
+BODY
+
+=transit nessus sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit nessus quintile hygiea
+LEAD
+BODY
+
+=transit nessus sesquiquintile hygiea
+LEAD
+BODY
+
+# nessus with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction pholus
+LEAD
+BODY
+
+=transit nessus sextile pholus
+LEAD
+BODY
+
+=transit nessus square pholus
+LEAD
+BODY
+
+=transit nessus trine pholus
+LEAD
+BODY
+
+=transit nessus opposition pholus
+LEAD
+BODY
+
+=transit nessus quincunx pholus
+LEAD
+BODY
+
+=transit nessus semisextile pholus
+LEAD
+BODY
+
+=transit nessus semisquare pholus
+LEAD
+BODY
+
+=transit nessus sesquiquadrate pholus
+LEAD
+BODY
+
+=transit nessus quintile pholus
+LEAD
+BODY
+
+=transit nessus sesquiquintile pholus
+LEAD
+BODY
+
+# nessus with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction fortune
+LEAD
+BODY
+
+=transit nessus sextile fortune
+LEAD
+BODY
+
+=transit nessus square fortune
+LEAD
+BODY
+
+=transit nessus trine fortune
+LEAD
+BODY
+
+=transit nessus opposition fortune
+LEAD
+BODY
+
+=transit nessus quincunx fortune
+LEAD
+BODY
+
+=transit nessus semisextile fortune
+LEAD
+BODY
+
+=transit nessus semisquare fortune
+LEAD
+BODY
+
+=transit nessus sesquiquadrate fortune
+LEAD
+BODY
+
+=transit nessus quintile fortune
+LEAD
+BODY
+
+=transit nessus sesquiquintile fortune
+LEAD
+BODY
+
+# nessus with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction spirit
+LEAD
+BODY
+
+=transit nessus sextile spirit
+LEAD
+BODY
+
+=transit nessus square spirit
+LEAD
+BODY
+
+=transit nessus trine spirit
+LEAD
+BODY
+
+=transit nessus opposition spirit
+LEAD
+BODY
+
+=transit nessus quincunx spirit
+LEAD
+BODY
+
+=transit nessus semisextile spirit
+LEAD
+BODY
+
+=transit nessus semisquare spirit
+LEAD
+BODY
+
+=transit nessus sesquiquadrate spirit
+LEAD
+BODY
+
+=transit nessus quintile spirit
+LEAD
+BODY
+
+=transit nessus sesquiquintile spirit
+LEAD
+BODY
+
+# nessus with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction lilith
+LEAD
+BODY
+
+=transit nessus sextile lilith
+LEAD
+BODY
+
+=transit nessus square lilith
+LEAD
+BODY
+
+=transit nessus trine lilith
+LEAD
+BODY
+
+=transit nessus opposition lilith
+LEAD
+BODY
+
+=transit nessus quincunx lilith
+LEAD
+BODY
+
+=transit nessus semisextile lilith
+LEAD
+BODY
+
+=transit nessus semisquare lilith
+LEAD
+BODY
+
+=transit nessus sesquiquadrate lilith
+LEAD
+BODY
+
+=transit nessus quintile lilith
+LEAD
+BODY
+
+=transit nessus sesquiquintile lilith
+LEAD
+BODY
+
+# nessus with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction moon
+LEAD
+BODY
+
+=transit nessus sextile moon
+LEAD
+BODY
+
+=transit nessus square moon
+LEAD
+BODY
+
+=transit nessus trine moon
+LEAD
+BODY
+
+=transit nessus opposition moon
+LEAD
+BODY
+
+=transit nessus quincunx moon
+LEAD
+BODY
+
+=transit nessus semisextile moon
+LEAD
+BODY
+
+=transit nessus semisquare moon
+LEAD
+BODY
+
+=transit nessus sesquiquadrate moon
+LEAD
+BODY
+
+=transit nessus quintile moon
+LEAD
+BODY
+
+=transit nessus sesquiquintile moon
+LEAD
+BODY
+
+# nessus with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction sun
+LEAD
+BODY
+
+=transit nessus sextile sun
+LEAD
+BODY
+
+=transit nessus square sun
+LEAD
+BODY
+
+=transit nessus trine sun
+LEAD
+BODY
+
+=transit nessus opposition sun
+LEAD
+BODY
+
+=transit nessus quincunx sun
+LEAD
+BODY
+
+=transit nessus semisextile sun
+LEAD
+BODY
+
+=transit nessus semisquare sun
+LEAD
+BODY
+
+=transit nessus sesquiquadrate sun
+LEAD
+BODY
+
+=transit nessus quintile sun
+LEAD
+BODY
+
+=transit nessus sesquiquintile sun
+LEAD
+BODY
+
+# nessus with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction mercury
+LEAD
+BODY
+
+=transit nessus sextile mercury
+LEAD
+BODY
+
+=transit nessus square mercury
+LEAD
+BODY
+
+=transit nessus trine mercury
+LEAD
+BODY
+
+=transit nessus opposition mercury
+LEAD
+BODY
+
+=transit nessus quincunx mercury
+LEAD
+BODY
+
+=transit nessus semisextile mercury
+LEAD
+BODY
+
+=transit nessus semisquare mercury
+LEAD
+BODY
+
+=transit nessus sesquiquadrate mercury
+LEAD
+BODY
+
+=transit nessus quintile mercury
+LEAD
+BODY
+
+=transit nessus sesquiquintile mercury
+LEAD
+BODY
+
+# nessus with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction venus
+LEAD
+BODY
+
+=transit nessus sextile venus
+LEAD
+BODY
+
+=transit nessus square venus
+LEAD
+BODY
+
+=transit nessus trine venus
+LEAD
+BODY
+
+=transit nessus opposition venus
+LEAD
+BODY
+
+=transit nessus quincunx venus
+LEAD
+BODY
+
+=transit nessus semisextile venus
+LEAD
+BODY
+
+=transit nessus semisquare venus
+LEAD
+BODY
+
+=transit nessus sesquiquadrate venus
+LEAD
+BODY
+
+=transit nessus quintile venus
+LEAD
+BODY
+
+=transit nessus sesquiquintile venus
+LEAD
+BODY
+
+# nessus with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction mars
+LEAD
+BODY
+
+=transit nessus sextile mars
+LEAD
+BODY
+
+=transit nessus square mars
+LEAD
+BODY
+
+=transit nessus trine mars
+LEAD
+BODY
+
+=transit nessus opposition mars
+LEAD
+BODY
+
+=transit nessus quincunx mars
+LEAD
+BODY
+
+=transit nessus semisextile mars
+LEAD
+BODY
+
+=transit nessus semisquare mars
+LEAD
+BODY
+
+=transit nessus sesquiquadrate mars
+LEAD
+BODY
+
+=transit nessus quintile mars
+LEAD
+BODY
+
+=transit nessus sesquiquintile mars
+LEAD
+BODY
+
+# nessus with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction jupiter
+LEAD
+BODY
+
+=transit nessus sextile jupiter
+LEAD
+BODY
+
+=transit nessus square jupiter
+LEAD
+BODY
+
+=transit nessus trine jupiter
+LEAD
+BODY
+
+=transit nessus opposition jupiter
+LEAD
+BODY
+
+=transit nessus quincunx jupiter
+LEAD
+BODY
+
+=transit nessus semisextile jupiter
+LEAD
+BODY
+
+=transit nessus semisquare jupiter
+LEAD
+BODY
+
+=transit nessus sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit nessus quintile jupiter
+LEAD
+BODY
+
+=transit nessus sesquiquintile jupiter
+LEAD
+BODY
+
+# nessus with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction saturn
+LEAD
+BODY
+
+=transit nessus sextile saturn
+LEAD
+BODY
+
+=transit nessus square saturn
+LEAD
+BODY
+
+=transit nessus trine saturn
+LEAD
+BODY
+
+=transit nessus opposition saturn
+LEAD
+BODY
+
+=transit nessus quincunx saturn
+LEAD
+BODY
+
+=transit nessus semisextile saturn
+LEAD
+BODY
+
+=transit nessus semisquare saturn
+LEAD
+BODY
+
+=transit nessus sesquiquadrate saturn
+LEAD
+BODY
+
+=transit nessus quintile saturn
+LEAD
+BODY
+
+=transit nessus sesquiquintile saturn
+LEAD
+BODY
+
+# nessus with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction uranus
+LEAD
+BODY
+
+=transit nessus sextile uranus
+LEAD
+BODY
+
+=transit nessus square uranus
+LEAD
+BODY
+
+=transit nessus trine uranus
+LEAD
+BODY
+
+=transit nessus opposition uranus
+LEAD
+BODY
+
+=transit nessus quincunx uranus
+LEAD
+BODY
+
+=transit nessus semisextile uranus
+LEAD
+BODY
+
+=transit nessus semisquare uranus
+LEAD
+BODY
+
+=transit nessus sesquiquadrate uranus
+LEAD
+BODY
+
+=transit nessus quintile uranus
+LEAD
+BODY
+
+=transit nessus sesquiquintile uranus
+LEAD
+BODY
+
+# nessus with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction neptune
+LEAD
+BODY
+
+=transit nessus sextile neptune
+LEAD
+BODY
+
+=transit nessus square neptune
+LEAD
+BODY
+
+=transit nessus trine neptune
+LEAD
+BODY
+
+=transit nessus opposition neptune
+LEAD
+BODY
+
+=transit nessus quincunx neptune
+LEAD
+BODY
+
+=transit nessus semisextile neptune
+LEAD
+BODY
+
+=transit nessus semisquare neptune
+LEAD
+BODY
+
+=transit nessus sesquiquadrate neptune
+LEAD
+BODY
+
+=transit nessus quintile neptune
+LEAD
+BODY
+
+=transit nessus sesquiquintile neptune
+LEAD
+BODY
+
+# nessus with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction pluto
+LEAD
+BODY
+
+=transit nessus sextile pluto
+LEAD
+BODY
+
+=transit nessus square pluto
+LEAD
+BODY
+
+=transit nessus trine pluto
+LEAD
+BODY
+
+=transit nessus opposition pluto
+LEAD
+BODY
+
+=transit nessus quincunx pluto
+LEAD
+BODY
+
+=transit nessus semisextile pluto
+LEAD
+BODY
+
+=transit nessus semisquare pluto
+LEAD
+BODY
+
+=transit nessus sesquiquadrate pluto
+LEAD
+BODY
+
+=transit nessus quintile pluto
+LEAD
+BODY
+
+=transit nessus sesquiquintile pluto
+LEAD
+BODY
+
+# nessus with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction north_node
+LEAD
+BODY
+
+=transit nessus sextile north_node
+LEAD
+BODY
+
+=transit nessus square north_node
+LEAD
+BODY
+
+=transit nessus trine north_node
+LEAD
+BODY
+
+=transit nessus opposition north_node
+LEAD
+BODY
+
+=transit nessus quincunx north_node
+LEAD
+BODY
+
+=transit nessus semisextile north_node
+LEAD
+BODY
+
+=transit nessus semisquare north_node
+LEAD
+BODY
+
+=transit nessus sesquiquadrate north_node
+LEAD
+BODY
+
+=transit nessus quintile north_node
+LEAD
+BODY
+
+=transit nessus sesquiquintile north_node
+LEAD
+BODY
+
+# nessus with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit nessus conjunction chiron
+LEAD
+BODY
+
+=transit nessus sextile chiron
+LEAD
+BODY
+
+=transit nessus square chiron
+LEAD
+BODY
+
+=transit nessus trine chiron
+LEAD
+BODY
+
+=transit nessus opposition chiron
+LEAD
+BODY
+
+=transit nessus quincunx chiron
+LEAD
+BODY
+
+=transit nessus semisextile chiron
+LEAD
+BODY
+
+=transit nessus semisquare chiron
+LEAD
+BODY
+
+=transit nessus sesquiquadrate chiron
+LEAD
+BODY
+
+=transit nessus quintile chiron
+LEAD
+BODY
+
+=transit nessus sesquiquintile chiron
+LEAD
+BODY

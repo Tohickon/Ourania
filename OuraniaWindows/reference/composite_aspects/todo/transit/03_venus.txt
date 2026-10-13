@@ -1,0 +1,1274 @@
+# transit: venus - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# venus with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction descendant
+LEAD
+BODY
+
+=transit venus sextile descendant
+LEAD
+BODY
+
+=transit venus square descendant
+LEAD
+BODY
+
+=transit venus trine descendant
+LEAD
+BODY
+
+=transit venus opposition descendant
+LEAD
+BODY
+
+=transit venus quincunx descendant
+LEAD
+BODY
+
+=transit venus semisextile descendant
+LEAD
+BODY
+
+=transit venus semisquare descendant
+LEAD
+BODY
+
+=transit venus sesquiquadrate descendant
+LEAD
+BODY
+
+=transit venus quintile descendant
+LEAD
+BODY
+
+=transit venus biquintile descendant
+LEAD
+BODY
+
+=transit venus sesquiquintile descendant
+LEAD
+BODY
+
+=transit venus septile descendant
+LEAD
+BODY
+
+=transit venus novile descendant
+LEAD
+BODY
+
+=transit venus decile descendant
+LEAD
+BODY
+
+# venus with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction ic
+LEAD
+BODY
+
+=transit venus sextile ic
+LEAD
+BODY
+
+=transit venus square ic
+LEAD
+BODY
+
+=transit venus trine ic
+LEAD
+BODY
+
+=transit venus opposition ic
+LEAD
+BODY
+
+=transit venus quincunx ic
+LEAD
+BODY
+
+=transit venus semisextile ic
+LEAD
+BODY
+
+=transit venus semisquare ic
+LEAD
+BODY
+
+=transit venus sesquiquadrate ic
+LEAD
+BODY
+
+=transit venus quintile ic
+LEAD
+BODY
+
+=transit venus biquintile ic
+LEAD
+BODY
+
+=transit venus sesquiquintile ic
+LEAD
+BODY
+
+=transit venus septile ic
+LEAD
+BODY
+
+=transit venus novile ic
+LEAD
+BODY
+
+=transit venus decile ic
+LEAD
+BODY
+
+# venus with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction ascendant
+LEAD
+BODY
+
+=transit venus sextile ascendant
+LEAD
+BODY
+
+=transit venus square ascendant
+LEAD
+BODY
+
+=transit venus trine ascendant
+LEAD
+BODY
+
+=transit venus opposition ascendant
+LEAD
+BODY
+
+=transit venus quincunx ascendant
+LEAD
+BODY
+
+=transit venus semisextile ascendant
+LEAD
+BODY
+
+=transit venus semisquare ascendant
+LEAD
+BODY
+
+=transit venus sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit venus quintile ascendant
+LEAD
+BODY
+
+=transit venus biquintile ascendant
+LEAD
+BODY
+
+=transit venus sesquiquintile ascendant
+LEAD
+BODY
+
+=transit venus septile ascendant
+LEAD
+BODY
+
+=transit venus novile ascendant
+LEAD
+BODY
+
+=transit venus decile ascendant
+LEAD
+BODY
+
+# venus with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction mc
+LEAD
+BODY
+
+=transit venus sextile mc
+LEAD
+BODY
+
+=transit venus square mc
+LEAD
+BODY
+
+=transit venus trine mc
+LEAD
+BODY
+
+=transit venus opposition mc
+LEAD
+BODY
+
+=transit venus quincunx mc
+LEAD
+BODY
+
+=transit venus semisextile mc
+LEAD
+BODY
+
+=transit venus semisquare mc
+LEAD
+BODY
+
+=transit venus sesquiquadrate mc
+LEAD
+BODY
+
+=transit venus quintile mc
+LEAD
+BODY
+
+=transit venus biquintile mc
+LEAD
+BODY
+
+=transit venus sesquiquintile mc
+LEAD
+BODY
+
+=transit venus septile mc
+LEAD
+BODY
+
+=transit venus novile mc
+LEAD
+BODY
+
+=transit venus decile mc
+LEAD
+BODY
+
+# venus with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction south_node
+LEAD
+BODY
+
+=transit venus sextile south_node
+LEAD
+BODY
+
+=transit venus square south_node
+LEAD
+BODY
+
+=transit venus trine south_node
+LEAD
+BODY
+
+=transit venus opposition south_node
+LEAD
+BODY
+
+=transit venus quincunx south_node
+LEAD
+BODY
+
+=transit venus semisextile south_node
+LEAD
+BODY
+
+=transit venus semisquare south_node
+LEAD
+BODY
+
+=transit venus sesquiquadrate south_node
+LEAD
+BODY
+
+=transit venus quintile south_node
+LEAD
+BODY
+
+=transit venus sesquiquintile south_node
+LEAD
+BODY
+
+# venus with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction ceres
+LEAD
+BODY
+
+=transit venus sextile ceres
+LEAD
+BODY
+
+=transit venus square ceres
+LEAD
+BODY
+
+=transit venus trine ceres
+LEAD
+BODY
+
+=transit venus opposition ceres
+LEAD
+BODY
+
+=transit venus quincunx ceres
+LEAD
+BODY
+
+=transit venus semisextile ceres
+LEAD
+BODY
+
+=transit venus semisquare ceres
+LEAD
+BODY
+
+=transit venus sesquiquadrate ceres
+LEAD
+BODY
+
+=transit venus quintile ceres
+LEAD
+BODY
+
+=transit venus sesquiquintile ceres
+LEAD
+BODY
+
+# venus with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction pallas
+LEAD
+BODY
+
+=transit venus sextile pallas
+LEAD
+BODY
+
+=transit venus square pallas
+LEAD
+BODY
+
+=transit venus trine pallas
+LEAD
+BODY
+
+=transit venus opposition pallas
+LEAD
+BODY
+
+=transit venus quincunx pallas
+LEAD
+BODY
+
+=transit venus semisextile pallas
+LEAD
+BODY
+
+=transit venus semisquare pallas
+LEAD
+BODY
+
+=transit venus sesquiquadrate pallas
+LEAD
+BODY
+
+=transit venus quintile pallas
+LEAD
+BODY
+
+=transit venus sesquiquintile pallas
+LEAD
+BODY
+
+# venus with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction juno
+LEAD
+BODY
+
+=transit venus sextile juno
+LEAD
+BODY
+
+=transit venus square juno
+LEAD
+BODY
+
+=transit venus trine juno
+LEAD
+BODY
+
+=transit venus opposition juno
+LEAD
+BODY
+
+=transit venus quincunx juno
+LEAD
+BODY
+
+=transit venus semisextile juno
+LEAD
+BODY
+
+=transit venus semisquare juno
+LEAD
+BODY
+
+=transit venus sesquiquadrate juno
+LEAD
+BODY
+
+=transit venus quintile juno
+LEAD
+BODY
+
+=transit venus sesquiquintile juno
+LEAD
+BODY
+
+# venus with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction vesta
+LEAD
+BODY
+
+=transit venus sextile vesta
+LEAD
+BODY
+
+=transit venus square vesta
+LEAD
+BODY
+
+=transit venus trine vesta
+LEAD
+BODY
+
+=transit venus opposition vesta
+LEAD
+BODY
+
+=transit venus quincunx vesta
+LEAD
+BODY
+
+=transit venus semisextile vesta
+LEAD
+BODY
+
+=transit venus semisquare vesta
+LEAD
+BODY
+
+=transit venus sesquiquadrate vesta
+LEAD
+BODY
+
+=transit venus quintile vesta
+LEAD
+BODY
+
+=transit venus sesquiquintile vesta
+LEAD
+BODY
+
+# venus with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction eris
+LEAD
+BODY
+
+=transit venus sextile eris
+LEAD
+BODY
+
+=transit venus square eris
+LEAD
+BODY
+
+=transit venus trine eris
+LEAD
+BODY
+
+=transit venus opposition eris
+LEAD
+BODY
+
+=transit venus quincunx eris
+LEAD
+BODY
+
+=transit venus semisextile eris
+LEAD
+BODY
+
+=transit venus semisquare eris
+LEAD
+BODY
+
+=transit venus sesquiquadrate eris
+LEAD
+BODY
+
+=transit venus quintile eris
+LEAD
+BODY
+
+=transit venus sesquiquintile eris
+LEAD
+BODY
+
+# venus with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction eros
+LEAD
+BODY
+
+=transit venus sextile eros
+LEAD
+BODY
+
+=transit venus square eros
+LEAD
+BODY
+
+=transit venus trine eros
+LEAD
+BODY
+
+=transit venus opposition eros
+LEAD
+BODY
+
+=transit venus quincunx eros
+LEAD
+BODY
+
+=transit venus semisextile eros
+LEAD
+BODY
+
+=transit venus semisquare eros
+LEAD
+BODY
+
+=transit venus sesquiquadrate eros
+LEAD
+BODY
+
+=transit venus quintile eros
+LEAD
+BODY
+
+=transit venus sesquiquintile eros
+LEAD
+BODY
+
+# venus with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction hygiea
+LEAD
+BODY
+
+=transit venus sextile hygiea
+LEAD
+BODY
+
+=transit venus square hygiea
+LEAD
+BODY
+
+=transit venus trine hygiea
+LEAD
+BODY
+
+=transit venus opposition hygiea
+LEAD
+BODY
+
+=transit venus quincunx hygiea
+LEAD
+BODY
+
+=transit venus semisextile hygiea
+LEAD
+BODY
+
+=transit venus semisquare hygiea
+LEAD
+BODY
+
+=transit venus sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit venus quintile hygiea
+LEAD
+BODY
+
+=transit venus sesquiquintile hygiea
+LEAD
+BODY
+
+# venus with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction nessus
+LEAD
+BODY
+
+=transit venus sextile nessus
+LEAD
+BODY
+
+=transit venus square nessus
+LEAD
+BODY
+
+=transit venus trine nessus
+LEAD
+BODY
+
+=transit venus opposition nessus
+LEAD
+BODY
+
+=transit venus quincunx nessus
+LEAD
+BODY
+
+=transit venus semisextile nessus
+LEAD
+BODY
+
+=transit venus semisquare nessus
+LEAD
+BODY
+
+=transit venus sesquiquadrate nessus
+LEAD
+BODY
+
+=transit venus quintile nessus
+LEAD
+BODY
+
+=transit venus sesquiquintile nessus
+LEAD
+BODY
+
+# venus with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction pholus
+LEAD
+BODY
+
+=transit venus sextile pholus
+LEAD
+BODY
+
+=transit venus square pholus
+LEAD
+BODY
+
+=transit venus trine pholus
+LEAD
+BODY
+
+=transit venus opposition pholus
+LEAD
+BODY
+
+=transit venus quincunx pholus
+LEAD
+BODY
+
+=transit venus semisextile pholus
+LEAD
+BODY
+
+=transit venus semisquare pholus
+LEAD
+BODY
+
+=transit venus sesquiquadrate pholus
+LEAD
+BODY
+
+=transit venus quintile pholus
+LEAD
+BODY
+
+=transit venus sesquiquintile pholus
+LEAD
+BODY
+
+# venus with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction fortune
+LEAD
+BODY
+
+=transit venus sextile fortune
+LEAD
+BODY
+
+=transit venus square fortune
+LEAD
+BODY
+
+=transit venus trine fortune
+LEAD
+BODY
+
+=transit venus opposition fortune
+LEAD
+BODY
+
+=transit venus quincunx fortune
+LEAD
+BODY
+
+=transit venus semisextile fortune
+LEAD
+BODY
+
+=transit venus semisquare fortune
+LEAD
+BODY
+
+=transit venus sesquiquadrate fortune
+LEAD
+BODY
+
+=transit venus quintile fortune
+LEAD
+BODY
+
+=transit venus sesquiquintile fortune
+LEAD
+BODY
+
+# venus with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction spirit
+LEAD
+BODY
+
+=transit venus sextile spirit
+LEAD
+BODY
+
+=transit venus square spirit
+LEAD
+BODY
+
+=transit venus trine spirit
+LEAD
+BODY
+
+=transit venus opposition spirit
+LEAD
+BODY
+
+=transit venus quincunx spirit
+LEAD
+BODY
+
+=transit venus semisextile spirit
+LEAD
+BODY
+
+=transit venus semisquare spirit
+LEAD
+BODY
+
+=transit venus sesquiquadrate spirit
+LEAD
+BODY
+
+=transit venus quintile spirit
+LEAD
+BODY
+
+=transit venus sesquiquintile spirit
+LEAD
+BODY
+
+# venus with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction lilith
+LEAD
+BODY
+
+=transit venus sextile lilith
+LEAD
+BODY
+
+=transit venus square lilith
+LEAD
+BODY
+
+=transit venus trine lilith
+LEAD
+BODY
+
+=transit venus opposition lilith
+LEAD
+BODY
+
+=transit venus quincunx lilith
+LEAD
+BODY
+
+=transit venus semisextile lilith
+LEAD
+BODY
+
+=transit venus semisquare lilith
+LEAD
+BODY
+
+=transit venus sesquiquadrate lilith
+LEAD
+BODY
+
+=transit venus quintile lilith
+LEAD
+BODY
+
+=transit venus sesquiquintile lilith
+LEAD
+BODY
+
+# venus with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction sun
+LEAD
+BODY
+
+=transit venus sextile sun
+LEAD
+BODY
+
+=transit venus square sun
+LEAD
+BODY
+
+=transit venus trine sun
+LEAD
+BODY
+
+=transit venus opposition sun
+LEAD
+BODY
+
+=transit venus biquintile sun
+LEAD
+BODY
+
+=transit venus septile sun
+LEAD
+BODY
+
+=transit venus novile sun
+LEAD
+BODY
+
+=transit venus decile sun
+LEAD
+BODY
+
+# venus with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction moon
+LEAD
+BODY
+
+=transit venus sextile moon
+LEAD
+BODY
+
+=transit venus square moon
+LEAD
+BODY
+
+=transit venus trine moon
+LEAD
+BODY
+
+=transit venus opposition moon
+LEAD
+BODY
+
+=transit venus biquintile moon
+LEAD
+BODY
+
+=transit venus septile moon
+LEAD
+BODY
+
+=transit venus novile moon
+LEAD
+BODY
+
+=transit venus decile moon
+LEAD
+BODY
+
+# venus with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction mercury
+LEAD
+BODY
+
+=transit venus sextile mercury
+LEAD
+BODY
+
+=transit venus square mercury
+LEAD
+BODY
+
+=transit venus trine mercury
+LEAD
+BODY
+
+=transit venus opposition mercury
+LEAD
+BODY
+
+=transit venus biquintile mercury
+LEAD
+BODY
+
+=transit venus septile mercury
+LEAD
+BODY
+
+=transit venus novile mercury
+LEAD
+BODY
+
+=transit venus decile mercury
+LEAD
+BODY
+
+# venus with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction venus
+LEAD
+BODY
+
+=transit venus sextile venus
+LEAD
+BODY
+
+=transit venus square venus
+LEAD
+BODY
+
+=transit venus trine venus
+LEAD
+BODY
+
+=transit venus opposition venus
+LEAD
+BODY
+
+=transit venus biquintile venus
+LEAD
+BODY
+
+=transit venus septile venus
+LEAD
+BODY
+
+=transit venus novile venus
+LEAD
+BODY
+
+=transit venus decile venus
+LEAD
+BODY
+
+# venus with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction mars
+LEAD
+BODY
+
+=transit venus sextile mars
+LEAD
+BODY
+
+=transit venus square mars
+LEAD
+BODY
+
+=transit venus trine mars
+LEAD
+BODY
+
+=transit venus opposition mars
+LEAD
+BODY
+
+=transit venus biquintile mars
+LEAD
+BODY
+
+=transit venus septile mars
+LEAD
+BODY
+
+=transit venus novile mars
+LEAD
+BODY
+
+=transit venus decile mars
+LEAD
+BODY
+
+# venus with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction jupiter
+LEAD
+BODY
+
+=transit venus sextile jupiter
+LEAD
+BODY
+
+=transit venus square jupiter
+LEAD
+BODY
+
+=transit venus trine jupiter
+LEAD
+BODY
+
+=transit venus opposition jupiter
+LEAD
+BODY
+
+=transit venus biquintile jupiter
+LEAD
+BODY
+
+=transit venus septile jupiter
+LEAD
+BODY
+
+=transit venus novile jupiter
+LEAD
+BODY
+
+=transit venus decile jupiter
+LEAD
+BODY
+
+# venus with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction saturn
+LEAD
+BODY
+
+=transit venus sextile saturn
+LEAD
+BODY
+
+=transit venus square saturn
+LEAD
+BODY
+
+=transit venus trine saturn
+LEAD
+BODY
+
+=transit venus opposition saturn
+LEAD
+BODY
+
+=transit venus biquintile saturn
+LEAD
+BODY
+
+=transit venus septile saturn
+LEAD
+BODY
+
+=transit venus novile saturn
+LEAD
+BODY
+
+=transit venus decile saturn
+LEAD
+BODY
+
+# venus with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction uranus
+LEAD
+BODY
+
+=transit venus sextile uranus
+LEAD
+BODY
+
+=transit venus square uranus
+LEAD
+BODY
+
+=transit venus trine uranus
+LEAD
+BODY
+
+=transit venus opposition uranus
+LEAD
+BODY
+
+=transit venus biquintile uranus
+LEAD
+BODY
+
+=transit venus septile uranus
+LEAD
+BODY
+
+=transit venus novile uranus
+LEAD
+BODY
+
+=transit venus decile uranus
+LEAD
+BODY
+
+# venus with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction neptune
+LEAD
+BODY
+
+=transit venus sextile neptune
+LEAD
+BODY
+
+=transit venus square neptune
+LEAD
+BODY
+
+=transit venus trine neptune
+LEAD
+BODY
+
+=transit venus opposition neptune
+LEAD
+BODY
+
+=transit venus biquintile neptune
+LEAD
+BODY
+
+=transit venus septile neptune
+LEAD
+BODY
+
+=transit venus novile neptune
+LEAD
+BODY
+
+=transit venus decile neptune
+LEAD
+BODY
+
+# venus with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction pluto
+LEAD
+BODY
+
+=transit venus sextile pluto
+LEAD
+BODY
+
+=transit venus square pluto
+LEAD
+BODY
+
+=transit venus trine pluto
+LEAD
+BODY
+
+=transit venus opposition pluto
+LEAD
+BODY
+
+=transit venus biquintile pluto
+LEAD
+BODY
+
+=transit venus septile pluto
+LEAD
+BODY
+
+=transit venus novile pluto
+LEAD
+BODY
+
+=transit venus decile pluto
+LEAD
+BODY
+
+# venus with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction chiron
+LEAD
+BODY
+
+=transit venus sextile chiron
+LEAD
+BODY
+
+=transit venus square chiron
+LEAD
+BODY
+
+=transit venus trine chiron
+LEAD
+BODY
+
+=transit venus opposition chiron
+LEAD
+BODY
+
+=transit venus biquintile chiron
+LEAD
+BODY
+
+=transit venus septile chiron
+LEAD
+BODY
+
+=transit venus novile chiron
+LEAD
+BODY
+
+=transit venus decile chiron
+LEAD
+BODY
+
+# venus with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit venus conjunction north_node
+LEAD
+BODY
+
+=transit venus sextile north_node
+LEAD
+BODY
+
+=transit venus square north_node
+LEAD
+BODY
+
+=transit venus trine north_node
+LEAD
+BODY
+
+=transit venus opposition north_node
+LEAD
+BODY
+
+=transit venus biquintile north_node
+LEAD
+BODY
+
+=transit venus septile north_node
+LEAD
+BODY
+
+=transit venus novile north_node
+LEAD
+BODY
+
+=transit venus decile north_node
+LEAD
+BODY
