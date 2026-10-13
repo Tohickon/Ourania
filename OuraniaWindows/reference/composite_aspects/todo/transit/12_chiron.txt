@@ -1,0 +1,1274 @@
+# transit: chiron - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# chiron with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction descendant
+LEAD
+BODY
+
+=transit chiron sextile descendant
+LEAD
+BODY
+
+=transit chiron square descendant
+LEAD
+BODY
+
+=transit chiron trine descendant
+LEAD
+BODY
+
+=transit chiron opposition descendant
+LEAD
+BODY
+
+=transit chiron quincunx descendant
+LEAD
+BODY
+
+=transit chiron semisextile descendant
+LEAD
+BODY
+
+=transit chiron semisquare descendant
+LEAD
+BODY
+
+=transit chiron sesquiquadrate descendant
+LEAD
+BODY
+
+=transit chiron quintile descendant
+LEAD
+BODY
+
+=transit chiron biquintile descendant
+LEAD
+BODY
+
+=transit chiron sesquiquintile descendant
+LEAD
+BODY
+
+=transit chiron septile descendant
+LEAD
+BODY
+
+=transit chiron novile descendant
+LEAD
+BODY
+
+=transit chiron decile descendant
+LEAD
+BODY
+
+# chiron with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction ic
+LEAD
+BODY
+
+=transit chiron sextile ic
+LEAD
+BODY
+
+=transit chiron square ic
+LEAD
+BODY
+
+=transit chiron trine ic
+LEAD
+BODY
+
+=transit chiron opposition ic
+LEAD
+BODY
+
+=transit chiron quincunx ic
+LEAD
+BODY
+
+=transit chiron semisextile ic
+LEAD
+BODY
+
+=transit chiron semisquare ic
+LEAD
+BODY
+
+=transit chiron sesquiquadrate ic
+LEAD
+BODY
+
+=transit chiron quintile ic
+LEAD
+BODY
+
+=transit chiron biquintile ic
+LEAD
+BODY
+
+=transit chiron sesquiquintile ic
+LEAD
+BODY
+
+=transit chiron septile ic
+LEAD
+BODY
+
+=transit chiron novile ic
+LEAD
+BODY
+
+=transit chiron decile ic
+LEAD
+BODY
+
+# chiron with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction ascendant
+LEAD
+BODY
+
+=transit chiron sextile ascendant
+LEAD
+BODY
+
+=transit chiron square ascendant
+LEAD
+BODY
+
+=transit chiron trine ascendant
+LEAD
+BODY
+
+=transit chiron opposition ascendant
+LEAD
+BODY
+
+=transit chiron quincunx ascendant
+LEAD
+BODY
+
+=transit chiron semisextile ascendant
+LEAD
+BODY
+
+=transit chiron semisquare ascendant
+LEAD
+BODY
+
+=transit chiron sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit chiron quintile ascendant
+LEAD
+BODY
+
+=transit chiron biquintile ascendant
+LEAD
+BODY
+
+=transit chiron sesquiquintile ascendant
+LEAD
+BODY
+
+=transit chiron septile ascendant
+LEAD
+BODY
+
+=transit chiron novile ascendant
+LEAD
+BODY
+
+=transit chiron decile ascendant
+LEAD
+BODY
+
+# chiron with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction mc
+LEAD
+BODY
+
+=transit chiron sextile mc
+LEAD
+BODY
+
+=transit chiron square mc
+LEAD
+BODY
+
+=transit chiron trine mc
+LEAD
+BODY
+
+=transit chiron opposition mc
+LEAD
+BODY
+
+=transit chiron quincunx mc
+LEAD
+BODY
+
+=transit chiron semisextile mc
+LEAD
+BODY
+
+=transit chiron semisquare mc
+LEAD
+BODY
+
+=transit chiron sesquiquadrate mc
+LEAD
+BODY
+
+=transit chiron quintile mc
+LEAD
+BODY
+
+=transit chiron biquintile mc
+LEAD
+BODY
+
+=transit chiron sesquiquintile mc
+LEAD
+BODY
+
+=transit chiron septile mc
+LEAD
+BODY
+
+=transit chiron novile mc
+LEAD
+BODY
+
+=transit chiron decile mc
+LEAD
+BODY
+
+# chiron with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction south_node
+LEAD
+BODY
+
+=transit chiron sextile south_node
+LEAD
+BODY
+
+=transit chiron square south_node
+LEAD
+BODY
+
+=transit chiron trine south_node
+LEAD
+BODY
+
+=transit chiron opposition south_node
+LEAD
+BODY
+
+=transit chiron quincunx south_node
+LEAD
+BODY
+
+=transit chiron semisextile south_node
+LEAD
+BODY
+
+=transit chiron semisquare south_node
+LEAD
+BODY
+
+=transit chiron sesquiquadrate south_node
+LEAD
+BODY
+
+=transit chiron quintile south_node
+LEAD
+BODY
+
+=transit chiron sesquiquintile south_node
+LEAD
+BODY
+
+# chiron with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction ceres
+LEAD
+BODY
+
+=transit chiron sextile ceres
+LEAD
+BODY
+
+=transit chiron square ceres
+LEAD
+BODY
+
+=transit chiron trine ceres
+LEAD
+BODY
+
+=transit chiron opposition ceres
+LEAD
+BODY
+
+=transit chiron quincunx ceres
+LEAD
+BODY
+
+=transit chiron semisextile ceres
+LEAD
+BODY
+
+=transit chiron semisquare ceres
+LEAD
+BODY
+
+=transit chiron sesquiquadrate ceres
+LEAD
+BODY
+
+=transit chiron quintile ceres
+LEAD
+BODY
+
+=transit chiron sesquiquintile ceres
+LEAD
+BODY
+
+# chiron with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction pallas
+LEAD
+BODY
+
+=transit chiron sextile pallas
+LEAD
+BODY
+
+=transit chiron square pallas
+LEAD
+BODY
+
+=transit chiron trine pallas
+LEAD
+BODY
+
+=transit chiron opposition pallas
+LEAD
+BODY
+
+=transit chiron quincunx pallas
+LEAD
+BODY
+
+=transit chiron semisextile pallas
+LEAD
+BODY
+
+=transit chiron semisquare pallas
+LEAD
+BODY
+
+=transit chiron sesquiquadrate pallas
+LEAD
+BODY
+
+=transit chiron quintile pallas
+LEAD
+BODY
+
+=transit chiron sesquiquintile pallas
+LEAD
+BODY
+
+# chiron with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction juno
+LEAD
+BODY
+
+=transit chiron sextile juno
+LEAD
+BODY
+
+=transit chiron square juno
+LEAD
+BODY
+
+=transit chiron trine juno
+LEAD
+BODY
+
+=transit chiron opposition juno
+LEAD
+BODY
+
+=transit chiron quincunx juno
+LEAD
+BODY
+
+=transit chiron semisextile juno
+LEAD
+BODY
+
+=transit chiron semisquare juno
+LEAD
+BODY
+
+=transit chiron sesquiquadrate juno
+LEAD
+BODY
+
+=transit chiron quintile juno
+LEAD
+BODY
+
+=transit chiron sesquiquintile juno
+LEAD
+BODY
+
+# chiron with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction vesta
+LEAD
+BODY
+
+=transit chiron sextile vesta
+LEAD
+BODY
+
+=transit chiron square vesta
+LEAD
+BODY
+
+=transit chiron trine vesta
+LEAD
+BODY
+
+=transit chiron opposition vesta
+LEAD
+BODY
+
+=transit chiron quincunx vesta
+LEAD
+BODY
+
+=transit chiron semisextile vesta
+LEAD
+BODY
+
+=transit chiron semisquare vesta
+LEAD
+BODY
+
+=transit chiron sesquiquadrate vesta
+LEAD
+BODY
+
+=transit chiron quintile vesta
+LEAD
+BODY
+
+=transit chiron sesquiquintile vesta
+LEAD
+BODY
+
+# chiron with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction eris
+LEAD
+BODY
+
+=transit chiron sextile eris
+LEAD
+BODY
+
+=transit chiron square eris
+LEAD
+BODY
+
+=transit chiron trine eris
+LEAD
+BODY
+
+=transit chiron opposition eris
+LEAD
+BODY
+
+=transit chiron quincunx eris
+LEAD
+BODY
+
+=transit chiron semisextile eris
+LEAD
+BODY
+
+=transit chiron semisquare eris
+LEAD
+BODY
+
+=transit chiron sesquiquadrate eris
+LEAD
+BODY
+
+=transit chiron quintile eris
+LEAD
+BODY
+
+=transit chiron sesquiquintile eris
+LEAD
+BODY
+
+# chiron with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction eros
+LEAD
+BODY
+
+=transit chiron sextile eros
+LEAD
+BODY
+
+=transit chiron square eros
+LEAD
+BODY
+
+=transit chiron trine eros
+LEAD
+BODY
+
+=transit chiron opposition eros
+LEAD
+BODY
+
+=transit chiron quincunx eros
+LEAD
+BODY
+
+=transit chiron semisextile eros
+LEAD
+BODY
+
+=transit chiron semisquare eros
+LEAD
+BODY
+
+=transit chiron sesquiquadrate eros
+LEAD
+BODY
+
+=transit chiron quintile eros
+LEAD
+BODY
+
+=transit chiron sesquiquintile eros
+LEAD
+BODY
+
+# chiron with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction hygiea
+LEAD
+BODY
+
+=transit chiron sextile hygiea
+LEAD
+BODY
+
+=transit chiron square hygiea
+LEAD
+BODY
+
+=transit chiron trine hygiea
+LEAD
+BODY
+
+=transit chiron opposition hygiea
+LEAD
+BODY
+
+=transit chiron quincunx hygiea
+LEAD
+BODY
+
+=transit chiron semisextile hygiea
+LEAD
+BODY
+
+=transit chiron semisquare hygiea
+LEAD
+BODY
+
+=transit chiron sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit chiron quintile hygiea
+LEAD
+BODY
+
+=transit chiron sesquiquintile hygiea
+LEAD
+BODY
+
+# chiron with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction nessus
+LEAD
+BODY
+
+=transit chiron sextile nessus
+LEAD
+BODY
+
+=transit chiron square nessus
+LEAD
+BODY
+
+=transit chiron trine nessus
+LEAD
+BODY
+
+=transit chiron opposition nessus
+LEAD
+BODY
+
+=transit chiron quincunx nessus
+LEAD
+BODY
+
+=transit chiron semisextile nessus
+LEAD
+BODY
+
+=transit chiron semisquare nessus
+LEAD
+BODY
+
+=transit chiron sesquiquadrate nessus
+LEAD
+BODY
+
+=transit chiron quintile nessus
+LEAD
+BODY
+
+=transit chiron sesquiquintile nessus
+LEAD
+BODY
+
+# chiron with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction pholus
+LEAD
+BODY
+
+=transit chiron sextile pholus
+LEAD
+BODY
+
+=transit chiron square pholus
+LEAD
+BODY
+
+=transit chiron trine pholus
+LEAD
+BODY
+
+=transit chiron opposition pholus
+LEAD
+BODY
+
+=transit chiron quincunx pholus
+LEAD
+BODY
+
+=transit chiron semisextile pholus
+LEAD
+BODY
+
+=transit chiron semisquare pholus
+LEAD
+BODY
+
+=transit chiron sesquiquadrate pholus
+LEAD
+BODY
+
+=transit chiron quintile pholus
+LEAD
+BODY
+
+=transit chiron sesquiquintile pholus
+LEAD
+BODY
+
+# chiron with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction fortune
+LEAD
+BODY
+
+=transit chiron sextile fortune
+LEAD
+BODY
+
+=transit chiron square fortune
+LEAD
+BODY
+
+=transit chiron trine fortune
+LEAD
+BODY
+
+=transit chiron opposition fortune
+LEAD
+BODY
+
+=transit chiron quincunx fortune
+LEAD
+BODY
+
+=transit chiron semisextile fortune
+LEAD
+BODY
+
+=transit chiron semisquare fortune
+LEAD
+BODY
+
+=transit chiron sesquiquadrate fortune
+LEAD
+BODY
+
+=transit chiron quintile fortune
+LEAD
+BODY
+
+=transit chiron sesquiquintile fortune
+LEAD
+BODY
+
+# chiron with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction spirit
+LEAD
+BODY
+
+=transit chiron sextile spirit
+LEAD
+BODY
+
+=transit chiron square spirit
+LEAD
+BODY
+
+=transit chiron trine spirit
+LEAD
+BODY
+
+=transit chiron opposition spirit
+LEAD
+BODY
+
+=transit chiron quincunx spirit
+LEAD
+BODY
+
+=transit chiron semisextile spirit
+LEAD
+BODY
+
+=transit chiron semisquare spirit
+LEAD
+BODY
+
+=transit chiron sesquiquadrate spirit
+LEAD
+BODY
+
+=transit chiron quintile spirit
+LEAD
+BODY
+
+=transit chiron sesquiquintile spirit
+LEAD
+BODY
+
+# chiron with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction lilith
+LEAD
+BODY
+
+=transit chiron sextile lilith
+LEAD
+BODY
+
+=transit chiron square lilith
+LEAD
+BODY
+
+=transit chiron trine lilith
+LEAD
+BODY
+
+=transit chiron opposition lilith
+LEAD
+BODY
+
+=transit chiron quincunx lilith
+LEAD
+BODY
+
+=transit chiron semisextile lilith
+LEAD
+BODY
+
+=transit chiron semisquare lilith
+LEAD
+BODY
+
+=transit chiron sesquiquadrate lilith
+LEAD
+BODY
+
+=transit chiron quintile lilith
+LEAD
+BODY
+
+=transit chiron sesquiquintile lilith
+LEAD
+BODY
+
+# chiron with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction sun
+LEAD
+BODY
+
+=transit chiron sextile sun
+LEAD
+BODY
+
+=transit chiron square sun
+LEAD
+BODY
+
+=transit chiron trine sun
+LEAD
+BODY
+
+=transit chiron opposition sun
+LEAD
+BODY
+
+=transit chiron biquintile sun
+LEAD
+BODY
+
+=transit chiron septile sun
+LEAD
+BODY
+
+=transit chiron novile sun
+LEAD
+BODY
+
+=transit chiron decile sun
+LEAD
+BODY
+
+# chiron with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction moon
+LEAD
+BODY
+
+=transit chiron sextile moon
+LEAD
+BODY
+
+=transit chiron square moon
+LEAD
+BODY
+
+=transit chiron trine moon
+LEAD
+BODY
+
+=transit chiron opposition moon
+LEAD
+BODY
+
+=transit chiron biquintile moon
+LEAD
+BODY
+
+=transit chiron septile moon
+LEAD
+BODY
+
+=transit chiron novile moon
+LEAD
+BODY
+
+=transit chiron decile moon
+LEAD
+BODY
+
+# chiron with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction mercury
+LEAD
+BODY
+
+=transit chiron sextile mercury
+LEAD
+BODY
+
+=transit chiron square mercury
+LEAD
+BODY
+
+=transit chiron trine mercury
+LEAD
+BODY
+
+=transit chiron opposition mercury
+LEAD
+BODY
+
+=transit chiron biquintile mercury
+LEAD
+BODY
+
+=transit chiron septile mercury
+LEAD
+BODY
+
+=transit chiron novile mercury
+LEAD
+BODY
+
+=transit chiron decile mercury
+LEAD
+BODY
+
+# chiron with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction venus
+LEAD
+BODY
+
+=transit chiron sextile venus
+LEAD
+BODY
+
+=transit chiron square venus
+LEAD
+BODY
+
+=transit chiron trine venus
+LEAD
+BODY
+
+=transit chiron opposition venus
+LEAD
+BODY
+
+=transit chiron biquintile venus
+LEAD
+BODY
+
+=transit chiron septile venus
+LEAD
+BODY
+
+=transit chiron novile venus
+LEAD
+BODY
+
+=transit chiron decile venus
+LEAD
+BODY
+
+# chiron with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction mars
+LEAD
+BODY
+
+=transit chiron sextile mars
+LEAD
+BODY
+
+=transit chiron square mars
+LEAD
+BODY
+
+=transit chiron trine mars
+LEAD
+BODY
+
+=transit chiron opposition mars
+LEAD
+BODY
+
+=transit chiron biquintile mars
+LEAD
+BODY
+
+=transit chiron septile mars
+LEAD
+BODY
+
+=transit chiron novile mars
+LEAD
+BODY
+
+=transit chiron decile mars
+LEAD
+BODY
+
+# chiron with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction jupiter
+LEAD
+BODY
+
+=transit chiron sextile jupiter
+LEAD
+BODY
+
+=transit chiron square jupiter
+LEAD
+BODY
+
+=transit chiron trine jupiter
+LEAD
+BODY
+
+=transit chiron opposition jupiter
+LEAD
+BODY
+
+=transit chiron biquintile jupiter
+LEAD
+BODY
+
+=transit chiron septile jupiter
+LEAD
+BODY
+
+=transit chiron novile jupiter
+LEAD
+BODY
+
+=transit chiron decile jupiter
+LEAD
+BODY
+
+# chiron with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction saturn
+LEAD
+BODY
+
+=transit chiron sextile saturn
+LEAD
+BODY
+
+=transit chiron square saturn
+LEAD
+BODY
+
+=transit chiron trine saturn
+LEAD
+BODY
+
+=transit chiron opposition saturn
+LEAD
+BODY
+
+=transit chiron biquintile saturn
+LEAD
+BODY
+
+=transit chiron septile saturn
+LEAD
+BODY
+
+=transit chiron novile saturn
+LEAD
+BODY
+
+=transit chiron decile saturn
+LEAD
+BODY
+
+# chiron with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction uranus
+LEAD
+BODY
+
+=transit chiron sextile uranus
+LEAD
+BODY
+
+=transit chiron square uranus
+LEAD
+BODY
+
+=transit chiron trine uranus
+LEAD
+BODY
+
+=transit chiron opposition uranus
+LEAD
+BODY
+
+=transit chiron biquintile uranus
+LEAD
+BODY
+
+=transit chiron septile uranus
+LEAD
+BODY
+
+=transit chiron novile uranus
+LEAD
+BODY
+
+=transit chiron decile uranus
+LEAD
+BODY
+
+# chiron with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction neptune
+LEAD
+BODY
+
+=transit chiron sextile neptune
+LEAD
+BODY
+
+=transit chiron square neptune
+LEAD
+BODY
+
+=transit chiron trine neptune
+LEAD
+BODY
+
+=transit chiron opposition neptune
+LEAD
+BODY
+
+=transit chiron biquintile neptune
+LEAD
+BODY
+
+=transit chiron septile neptune
+LEAD
+BODY
+
+=transit chiron novile neptune
+LEAD
+BODY
+
+=transit chiron decile neptune
+LEAD
+BODY
+
+# chiron with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction pluto
+LEAD
+BODY
+
+=transit chiron sextile pluto
+LEAD
+BODY
+
+=transit chiron square pluto
+LEAD
+BODY
+
+=transit chiron trine pluto
+LEAD
+BODY
+
+=transit chiron opposition pluto
+LEAD
+BODY
+
+=transit chiron biquintile pluto
+LEAD
+BODY
+
+=transit chiron septile pluto
+LEAD
+BODY
+
+=transit chiron novile pluto
+LEAD
+BODY
+
+=transit chiron decile pluto
+LEAD
+BODY
+
+# chiron with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction chiron
+LEAD
+BODY
+
+=transit chiron sextile chiron
+LEAD
+BODY
+
+=transit chiron square chiron
+LEAD
+BODY
+
+=transit chiron trine chiron
+LEAD
+BODY
+
+=transit chiron opposition chiron
+LEAD
+BODY
+
+=transit chiron biquintile chiron
+LEAD
+BODY
+
+=transit chiron septile chiron
+LEAD
+BODY
+
+=transit chiron novile chiron
+LEAD
+BODY
+
+=transit chiron decile chiron
+LEAD
+BODY
+
+# chiron with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit chiron conjunction north_node
+LEAD
+BODY
+
+=transit chiron sextile north_node
+LEAD
+BODY
+
+=transit chiron square north_node
+LEAD
+BODY
+
+=transit chiron trine north_node
+LEAD
+BODY
+
+=transit chiron opposition north_node
+LEAD
+BODY
+
+=transit chiron biquintile north_node
+LEAD
+BODY
+
+=transit chiron septile north_node
+LEAD
+BODY
+
+=transit chiron novile north_node
+LEAD
+BODY
+
+=transit chiron decile north_node
+LEAD
+BODY

@@ -1,0 +1,1274 @@
+# transit: sun - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# sun with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction descendant
+LEAD
+BODY
+
+=transit sun sextile descendant
+LEAD
+BODY
+
+=transit sun square descendant
+LEAD
+BODY
+
+=transit sun trine descendant
+LEAD
+BODY
+
+=transit sun opposition descendant
+LEAD
+BODY
+
+=transit sun quincunx descendant
+LEAD
+BODY
+
+=transit sun semisextile descendant
+LEAD
+BODY
+
+=transit sun semisquare descendant
+LEAD
+BODY
+
+=transit sun sesquiquadrate descendant
+LEAD
+BODY
+
+=transit sun quintile descendant
+LEAD
+BODY
+
+=transit sun biquintile descendant
+LEAD
+BODY
+
+=transit sun sesquiquintile descendant
+LEAD
+BODY
+
+=transit sun septile descendant
+LEAD
+BODY
+
+=transit sun novile descendant
+LEAD
+BODY
+
+=transit sun decile descendant
+LEAD
+BODY
+
+# sun with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction ic
+LEAD
+BODY
+
+=transit sun sextile ic
+LEAD
+BODY
+
+=transit sun square ic
+LEAD
+BODY
+
+=transit sun trine ic
+LEAD
+BODY
+
+=transit sun opposition ic
+LEAD
+BODY
+
+=transit sun quincunx ic
+LEAD
+BODY
+
+=transit sun semisextile ic
+LEAD
+BODY
+
+=transit sun semisquare ic
+LEAD
+BODY
+
+=transit sun sesquiquadrate ic
+LEAD
+BODY
+
+=transit sun quintile ic
+LEAD
+BODY
+
+=transit sun biquintile ic
+LEAD
+BODY
+
+=transit sun sesquiquintile ic
+LEAD
+BODY
+
+=transit sun septile ic
+LEAD
+BODY
+
+=transit sun novile ic
+LEAD
+BODY
+
+=transit sun decile ic
+LEAD
+BODY
+
+# sun with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction ascendant
+LEAD
+BODY
+
+=transit sun sextile ascendant
+LEAD
+BODY
+
+=transit sun square ascendant
+LEAD
+BODY
+
+=transit sun trine ascendant
+LEAD
+BODY
+
+=transit sun opposition ascendant
+LEAD
+BODY
+
+=transit sun quincunx ascendant
+LEAD
+BODY
+
+=transit sun semisextile ascendant
+LEAD
+BODY
+
+=transit sun semisquare ascendant
+LEAD
+BODY
+
+=transit sun sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit sun quintile ascendant
+LEAD
+BODY
+
+=transit sun biquintile ascendant
+LEAD
+BODY
+
+=transit sun sesquiquintile ascendant
+LEAD
+BODY
+
+=transit sun septile ascendant
+LEAD
+BODY
+
+=transit sun novile ascendant
+LEAD
+BODY
+
+=transit sun decile ascendant
+LEAD
+BODY
+
+# sun with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction mc
+LEAD
+BODY
+
+=transit sun sextile mc
+LEAD
+BODY
+
+=transit sun square mc
+LEAD
+BODY
+
+=transit sun trine mc
+LEAD
+BODY
+
+=transit sun opposition mc
+LEAD
+BODY
+
+=transit sun quincunx mc
+LEAD
+BODY
+
+=transit sun semisextile mc
+LEAD
+BODY
+
+=transit sun semisquare mc
+LEAD
+BODY
+
+=transit sun sesquiquadrate mc
+LEAD
+BODY
+
+=transit sun quintile mc
+LEAD
+BODY
+
+=transit sun biquintile mc
+LEAD
+BODY
+
+=transit sun sesquiquintile mc
+LEAD
+BODY
+
+=transit sun septile mc
+LEAD
+BODY
+
+=transit sun novile mc
+LEAD
+BODY
+
+=transit sun decile mc
+LEAD
+BODY
+
+# sun with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction south_node
+LEAD
+BODY
+
+=transit sun sextile south_node
+LEAD
+BODY
+
+=transit sun square south_node
+LEAD
+BODY
+
+=transit sun trine south_node
+LEAD
+BODY
+
+=transit sun opposition south_node
+LEAD
+BODY
+
+=transit sun quincunx south_node
+LEAD
+BODY
+
+=transit sun semisextile south_node
+LEAD
+BODY
+
+=transit sun semisquare south_node
+LEAD
+BODY
+
+=transit sun sesquiquadrate south_node
+LEAD
+BODY
+
+=transit sun quintile south_node
+LEAD
+BODY
+
+=transit sun sesquiquintile south_node
+LEAD
+BODY
+
+# sun with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction ceres
+LEAD
+BODY
+
+=transit sun sextile ceres
+LEAD
+BODY
+
+=transit sun square ceres
+LEAD
+BODY
+
+=transit sun trine ceres
+LEAD
+BODY
+
+=transit sun opposition ceres
+LEAD
+BODY
+
+=transit sun quincunx ceres
+LEAD
+BODY
+
+=transit sun semisextile ceres
+LEAD
+BODY
+
+=transit sun semisquare ceres
+LEAD
+BODY
+
+=transit sun sesquiquadrate ceres
+LEAD
+BODY
+
+=transit sun quintile ceres
+LEAD
+BODY
+
+=transit sun sesquiquintile ceres
+LEAD
+BODY
+
+# sun with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction pallas
+LEAD
+BODY
+
+=transit sun sextile pallas
+LEAD
+BODY
+
+=transit sun square pallas
+LEAD
+BODY
+
+=transit sun trine pallas
+LEAD
+BODY
+
+=transit sun opposition pallas
+LEAD
+BODY
+
+=transit sun quincunx pallas
+LEAD
+BODY
+
+=transit sun semisextile pallas
+LEAD
+BODY
+
+=transit sun semisquare pallas
+LEAD
+BODY
+
+=transit sun sesquiquadrate pallas
+LEAD
+BODY
+
+=transit sun quintile pallas
+LEAD
+BODY
+
+=transit sun sesquiquintile pallas
+LEAD
+BODY
+
+# sun with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction juno
+LEAD
+BODY
+
+=transit sun sextile juno
+LEAD
+BODY
+
+=transit sun square juno
+LEAD
+BODY
+
+=transit sun trine juno
+LEAD
+BODY
+
+=transit sun opposition juno
+LEAD
+BODY
+
+=transit sun quincunx juno
+LEAD
+BODY
+
+=transit sun semisextile juno
+LEAD
+BODY
+
+=transit sun semisquare juno
+LEAD
+BODY
+
+=transit sun sesquiquadrate juno
+LEAD
+BODY
+
+=transit sun quintile juno
+LEAD
+BODY
+
+=transit sun sesquiquintile juno
+LEAD
+BODY
+
+# sun with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction vesta
+LEAD
+BODY
+
+=transit sun sextile vesta
+LEAD
+BODY
+
+=transit sun square vesta
+LEAD
+BODY
+
+=transit sun trine vesta
+LEAD
+BODY
+
+=transit sun opposition vesta
+LEAD
+BODY
+
+=transit sun quincunx vesta
+LEAD
+BODY
+
+=transit sun semisextile vesta
+LEAD
+BODY
+
+=transit sun semisquare vesta
+LEAD
+BODY
+
+=transit sun sesquiquadrate vesta
+LEAD
+BODY
+
+=transit sun quintile vesta
+LEAD
+BODY
+
+=transit sun sesquiquintile vesta
+LEAD
+BODY
+
+# sun with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction eris
+LEAD
+BODY
+
+=transit sun sextile eris
+LEAD
+BODY
+
+=transit sun square eris
+LEAD
+BODY
+
+=transit sun trine eris
+LEAD
+BODY
+
+=transit sun opposition eris
+LEAD
+BODY
+
+=transit sun quincunx eris
+LEAD
+BODY
+
+=transit sun semisextile eris
+LEAD
+BODY
+
+=transit sun semisquare eris
+LEAD
+BODY
+
+=transit sun sesquiquadrate eris
+LEAD
+BODY
+
+=transit sun quintile eris
+LEAD
+BODY
+
+=transit sun sesquiquintile eris
+LEAD
+BODY
+
+# sun with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction eros
+LEAD
+BODY
+
+=transit sun sextile eros
+LEAD
+BODY
+
+=transit sun square eros
+LEAD
+BODY
+
+=transit sun trine eros
+LEAD
+BODY
+
+=transit sun opposition eros
+LEAD
+BODY
+
+=transit sun quincunx eros
+LEAD
+BODY
+
+=transit sun semisextile eros
+LEAD
+BODY
+
+=transit sun semisquare eros
+LEAD
+BODY
+
+=transit sun sesquiquadrate eros
+LEAD
+BODY
+
+=transit sun quintile eros
+LEAD
+BODY
+
+=transit sun sesquiquintile eros
+LEAD
+BODY
+
+# sun with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction hygiea
+LEAD
+BODY
+
+=transit sun sextile hygiea
+LEAD
+BODY
+
+=transit sun square hygiea
+LEAD
+BODY
+
+=transit sun trine hygiea
+LEAD
+BODY
+
+=transit sun opposition hygiea
+LEAD
+BODY
+
+=transit sun quincunx hygiea
+LEAD
+BODY
+
+=transit sun semisextile hygiea
+LEAD
+BODY
+
+=transit sun semisquare hygiea
+LEAD
+BODY
+
+=transit sun sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit sun quintile hygiea
+LEAD
+BODY
+
+=transit sun sesquiquintile hygiea
+LEAD
+BODY
+
+# sun with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction nessus
+LEAD
+BODY
+
+=transit sun sextile nessus
+LEAD
+BODY
+
+=transit sun square nessus
+LEAD
+BODY
+
+=transit sun trine nessus
+LEAD
+BODY
+
+=transit sun opposition nessus
+LEAD
+BODY
+
+=transit sun quincunx nessus
+LEAD
+BODY
+
+=transit sun semisextile nessus
+LEAD
+BODY
+
+=transit sun semisquare nessus
+LEAD
+BODY
+
+=transit sun sesquiquadrate nessus
+LEAD
+BODY
+
+=transit sun quintile nessus
+LEAD
+BODY
+
+=transit sun sesquiquintile nessus
+LEAD
+BODY
+
+# sun with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction pholus
+LEAD
+BODY
+
+=transit sun sextile pholus
+LEAD
+BODY
+
+=transit sun square pholus
+LEAD
+BODY
+
+=transit sun trine pholus
+LEAD
+BODY
+
+=transit sun opposition pholus
+LEAD
+BODY
+
+=transit sun quincunx pholus
+LEAD
+BODY
+
+=transit sun semisextile pholus
+LEAD
+BODY
+
+=transit sun semisquare pholus
+LEAD
+BODY
+
+=transit sun sesquiquadrate pholus
+LEAD
+BODY
+
+=transit sun quintile pholus
+LEAD
+BODY
+
+=transit sun sesquiquintile pholus
+LEAD
+BODY
+
+# sun with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction fortune
+LEAD
+BODY
+
+=transit sun sextile fortune
+LEAD
+BODY
+
+=transit sun square fortune
+LEAD
+BODY
+
+=transit sun trine fortune
+LEAD
+BODY
+
+=transit sun opposition fortune
+LEAD
+BODY
+
+=transit sun quincunx fortune
+LEAD
+BODY
+
+=transit sun semisextile fortune
+LEAD
+BODY
+
+=transit sun semisquare fortune
+LEAD
+BODY
+
+=transit sun sesquiquadrate fortune
+LEAD
+BODY
+
+=transit sun quintile fortune
+LEAD
+BODY
+
+=transit sun sesquiquintile fortune
+LEAD
+BODY
+
+# sun with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction spirit
+LEAD
+BODY
+
+=transit sun sextile spirit
+LEAD
+BODY
+
+=transit sun square spirit
+LEAD
+BODY
+
+=transit sun trine spirit
+LEAD
+BODY
+
+=transit sun opposition spirit
+LEAD
+BODY
+
+=transit sun quincunx spirit
+LEAD
+BODY
+
+=transit sun semisextile spirit
+LEAD
+BODY
+
+=transit sun semisquare spirit
+LEAD
+BODY
+
+=transit sun sesquiquadrate spirit
+LEAD
+BODY
+
+=transit sun quintile spirit
+LEAD
+BODY
+
+=transit sun sesquiquintile spirit
+LEAD
+BODY
+
+# sun with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction lilith
+LEAD
+BODY
+
+=transit sun sextile lilith
+LEAD
+BODY
+
+=transit sun square lilith
+LEAD
+BODY
+
+=transit sun trine lilith
+LEAD
+BODY
+
+=transit sun opposition lilith
+LEAD
+BODY
+
+=transit sun quincunx lilith
+LEAD
+BODY
+
+=transit sun semisextile lilith
+LEAD
+BODY
+
+=transit sun semisquare lilith
+LEAD
+BODY
+
+=transit sun sesquiquadrate lilith
+LEAD
+BODY
+
+=transit sun quintile lilith
+LEAD
+BODY
+
+=transit sun sesquiquintile lilith
+LEAD
+BODY
+
+# sun with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction sun
+LEAD
+BODY
+
+=transit sun sextile sun
+LEAD
+BODY
+
+=transit sun square sun
+LEAD
+BODY
+
+=transit sun trine sun
+LEAD
+BODY
+
+=transit sun opposition sun
+LEAD
+BODY
+
+=transit sun biquintile sun
+LEAD
+BODY
+
+=transit sun septile sun
+LEAD
+BODY
+
+=transit sun novile sun
+LEAD
+BODY
+
+=transit sun decile sun
+LEAD
+BODY
+
+# sun with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction moon
+LEAD
+BODY
+
+=transit sun sextile moon
+LEAD
+BODY
+
+=transit sun square moon
+LEAD
+BODY
+
+=transit sun trine moon
+LEAD
+BODY
+
+=transit sun opposition moon
+LEAD
+BODY
+
+=transit sun biquintile moon
+LEAD
+BODY
+
+=transit sun septile moon
+LEAD
+BODY
+
+=transit sun novile moon
+LEAD
+BODY
+
+=transit sun decile moon
+LEAD
+BODY
+
+# sun with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction mercury
+LEAD
+BODY
+
+=transit sun sextile mercury
+LEAD
+BODY
+
+=transit sun square mercury
+LEAD
+BODY
+
+=transit sun trine mercury
+LEAD
+BODY
+
+=transit sun opposition mercury
+LEAD
+BODY
+
+=transit sun biquintile mercury
+LEAD
+BODY
+
+=transit sun septile mercury
+LEAD
+BODY
+
+=transit sun novile mercury
+LEAD
+BODY
+
+=transit sun decile mercury
+LEAD
+BODY
+
+# sun with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction venus
+LEAD
+BODY
+
+=transit sun sextile venus
+LEAD
+BODY
+
+=transit sun square venus
+LEAD
+BODY
+
+=transit sun trine venus
+LEAD
+BODY
+
+=transit sun opposition venus
+LEAD
+BODY
+
+=transit sun biquintile venus
+LEAD
+BODY
+
+=transit sun septile venus
+LEAD
+BODY
+
+=transit sun novile venus
+LEAD
+BODY
+
+=transit sun decile venus
+LEAD
+BODY
+
+# sun with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction mars
+LEAD
+BODY
+
+=transit sun sextile mars
+LEAD
+BODY
+
+=transit sun square mars
+LEAD
+BODY
+
+=transit sun trine mars
+LEAD
+BODY
+
+=transit sun opposition mars
+LEAD
+BODY
+
+=transit sun biquintile mars
+LEAD
+BODY
+
+=transit sun septile mars
+LEAD
+BODY
+
+=transit sun novile mars
+LEAD
+BODY
+
+=transit sun decile mars
+LEAD
+BODY
+
+# sun with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction jupiter
+LEAD
+BODY
+
+=transit sun sextile jupiter
+LEAD
+BODY
+
+=transit sun square jupiter
+LEAD
+BODY
+
+=transit sun trine jupiter
+LEAD
+BODY
+
+=transit sun opposition jupiter
+LEAD
+BODY
+
+=transit sun biquintile jupiter
+LEAD
+BODY
+
+=transit sun septile jupiter
+LEAD
+BODY
+
+=transit sun novile jupiter
+LEAD
+BODY
+
+=transit sun decile jupiter
+LEAD
+BODY
+
+# sun with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction saturn
+LEAD
+BODY
+
+=transit sun sextile saturn
+LEAD
+BODY
+
+=transit sun square saturn
+LEAD
+BODY
+
+=transit sun trine saturn
+LEAD
+BODY
+
+=transit sun opposition saturn
+LEAD
+BODY
+
+=transit sun biquintile saturn
+LEAD
+BODY
+
+=transit sun septile saturn
+LEAD
+BODY
+
+=transit sun novile saturn
+LEAD
+BODY
+
+=transit sun decile saturn
+LEAD
+BODY
+
+# sun with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction uranus
+LEAD
+BODY
+
+=transit sun sextile uranus
+LEAD
+BODY
+
+=transit sun square uranus
+LEAD
+BODY
+
+=transit sun trine uranus
+LEAD
+BODY
+
+=transit sun opposition uranus
+LEAD
+BODY
+
+=transit sun biquintile uranus
+LEAD
+BODY
+
+=transit sun septile uranus
+LEAD
+BODY
+
+=transit sun novile uranus
+LEAD
+BODY
+
+=transit sun decile uranus
+LEAD
+BODY
+
+# sun with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction neptune
+LEAD
+BODY
+
+=transit sun sextile neptune
+LEAD
+BODY
+
+=transit sun square neptune
+LEAD
+BODY
+
+=transit sun trine neptune
+LEAD
+BODY
+
+=transit sun opposition neptune
+LEAD
+BODY
+
+=transit sun biquintile neptune
+LEAD
+BODY
+
+=transit sun septile neptune
+LEAD
+BODY
+
+=transit sun novile neptune
+LEAD
+BODY
+
+=transit sun decile neptune
+LEAD
+BODY
+
+# sun with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction pluto
+LEAD
+BODY
+
+=transit sun sextile pluto
+LEAD
+BODY
+
+=transit sun square pluto
+LEAD
+BODY
+
+=transit sun trine pluto
+LEAD
+BODY
+
+=transit sun opposition pluto
+LEAD
+BODY
+
+=transit sun biquintile pluto
+LEAD
+BODY
+
+=transit sun septile pluto
+LEAD
+BODY
+
+=transit sun novile pluto
+LEAD
+BODY
+
+=transit sun decile pluto
+LEAD
+BODY
+
+# sun with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction chiron
+LEAD
+BODY
+
+=transit sun sextile chiron
+LEAD
+BODY
+
+=transit sun square chiron
+LEAD
+BODY
+
+=transit sun trine chiron
+LEAD
+BODY
+
+=transit sun opposition chiron
+LEAD
+BODY
+
+=transit sun biquintile chiron
+LEAD
+BODY
+
+=transit sun septile chiron
+LEAD
+BODY
+
+=transit sun novile chiron
+LEAD
+BODY
+
+=transit sun decile chiron
+LEAD
+BODY
+
+# sun with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit sun conjunction north_node
+LEAD
+BODY
+
+=transit sun sextile north_node
+LEAD
+BODY
+
+=transit sun square north_node
+LEAD
+BODY
+
+=transit sun trine north_node
+LEAD
+BODY
+
+=transit sun opposition north_node
+LEAD
+BODY
+
+=transit sun biquintile north_node
+LEAD
+BODY
+
+=transit sun septile north_node
+LEAD
+BODY
+
+=transit sun novile north_node
+LEAD
+BODY
+
+=transit sun decile north_node
+LEAD
+BODY

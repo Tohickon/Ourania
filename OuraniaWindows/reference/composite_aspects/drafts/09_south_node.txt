@@ -1,0 +1,304 @@
+# South Node as first body: 75 readings, written by hand.
+# The two Nodes are always opposite each other, so of the five South Node / North Node
+# readings only the opposition describes a real chart. The other four are written so that
+# they make sense if the app ever shows them.
+
+=south_node conjunction ascendant
+You come across as a couple who have known each other for ever.
+There is an old ease in how you stand together, and strangers assume a long history even in the first year. With the South Node on the Ascendant the pair leads with habit: familiar roles, practiced jokes, a way of entering a room that never varies. It is comforting to be around. It can also fix you both in an early version of yourselves.
+
+=south_node sextile ascendant
+Your long practice at being a couple is an asset you could use more.
+People find the pair of you easy because nothing about you is improvised. The South Node in sextile to the Ascendant turns that into an advantage whenever you choose to offer it: host the awkward gathering, take the newcomers under your wing. Familiarity is a skill. Kept at home, it is merely a routine.
+
+=south_node square ascendant
+Old habits keep spoiling the impression you mean to give.
+You intend to arrive calm and you arrive bickering about the route, as usual. The South Node squaring the Ascendant drags the pair's oldest patterns into public view at exactly the wrong moments. Friends could recite the exchange. One of you is mortified and the other thinks it is nobody's business. It will happen again at the next wedding.
+
+=south_node trine ascendant
+What you have always been like together still serves you well.
+Nothing about your manner needs fixing. With the South Node trine the Ascendant, the couple's settled ways, how you greet people, who drives, who tells the story, work smoothly and put others at ease. You could go on like this indefinitely. That is the only caution: indefinitely is a long time to make no new first impression.
+
+=south_node opposition ascendant
+You keep meeting the past in the people you get close to.
+The South Node opposite the Ascendant sits on the Descendant, so partners, clients and close friends tend to be familiar types: the same kind of boss again, another friend who needs rescuing. The pair is drawn to what it already knows how to handle. One of you notices the pattern first. Pointing it out during the rescue is not appreciated.
+
+=south_node conjunction chiron
+An old wound is also an old habit in this relationship.
+Hurt and routine have grown together. With Chiron on the South Node the couple returns to the same sore subject the way a tongue finds a broken tooth: the failed business, the estranged child, the thing that was said in 2009. You know every turn of the conversation. Having it again changes nothing. Declining to have it, once, might.
+
+=south_node sextile chiron
+What you learned from past pain is ready to be useful.
+Chiron in sextile to the South Node means the hard years left the pair with real knowledge, and somebody could benefit from it. Sit with the friend going through the same thing. Write it down. It takes a decision to revisit old ground on purpose instead of by accident. Done deliberately, the visit is short and leaves you lighter.
+
+=south_node square chiron
+Falling back on what is familiar keeps reopening an old injury.
+Under strain one of you goes quiet, exactly as in the bad years, and the other feels the old abandonment arrive on schedule. The South Node square Chiron ties a default reaction to a lasting hurt. Neither means harm. The habit does it for you. This returns at every crisis until someone does the unfamiliar thing and stays in the room.
+
+=south_node trine chiron
+You handle each other's old hurts with long practiced tact.
+No one has to explain. With Chiron trine the South Node the pair knows from experience what not to say on which anniversary, and the knowledge sits lightly. Comfort is given almost without noticing. It is a real kindness between you. See that tact does not become a way of never mentioning the thing at all.
+
+=south_node opposition chiron
+The comfortable past pulls one way and the unhealed place pulls the other.
+One of you wants to keep things as they have always been. Across the chart Chiron is hurting in a new direction, near the North Node, where growth is. So staying put looks safe and feels wrong, and moving looks right and stings. You take turns holding each end. The ache is at least pointing somewhere useful.
+
+=south_node conjunction jupiter
+You have always been lucky in the same way, and you count on it.
+Generosity is an old habit here. With Jupiter on the South Node the pair has a long record of things working out, large hospitality, and a faith inherited from somebody's cheerful family. It is a pleasure to visit. The weakness is assuming the old luck covers new situations, and promising on the strength of a past that does not owe you anything.
+
+=south_node sextile jupiter
+Old good fortune could be put to fresh use.
+Jupiter in sextile to the South Node points to goodwill the pair has already banked: former colleagues, a reputation in the old neighborhood, a degree gathering dust. Draw on it deliberately for something current. People are glad to be asked. Couples who never ask treat their past as a photograph album when it is closer to a savings account.
+
+=south_node square jupiter
+The old habit of overdoing it keeps catching you out.
+Too many guests, too large a round, another yes when the diary is full. The South Node square Jupiter makes excess the pair's reflex, learned long ago and never unlearned. It feels like warmth. It lands as debt and exhaustion. Each of you can see the other doing it. Stopping yourselves is a different skill and comes later.
+
+=south_node trine jupiter
+Things have generally gone well for you, and the habit of expecting that helps.
+Optimism is well founded in this house. With Jupiter trine the South Node the couple carries an easy confidence from past good years, and it steadies you in dull ones. Old friends turn up with opportunities. Enjoy it. Just stretch occasionally toward something your history gives you no reason to think you can do.
+
+=south_node opposition jupiter
+Familiar ground on one side, wide horizons on the other.
+The South Node holds what the pair knows. Jupiter opposite stands by the North Node, waving a map. So growth and good fortune lie together in the direction you have not been, and habit sits alone on the near bank. One of you needs little persuading. The other packs slowly and is glad afterwards, most times.
+
+=south_node conjunction mars
+You fight the way you have always fought.
+The moves are known in advance. With Mars on the South Node the pair has an old, efficient way of being angry, the same opening, the same retreat to the same rooms, and of working hard, too, in a pattern set years ago. There is competence in it. There is no surprise, and a quarrel that changes nothing is mostly exercise.
+
+=south_node sextile mars
+Old strengths are there to be called on.
+Mars in sextile to the South Node says one of you used to be good at something physical or bold, a sport, a trade, standing up to people, and has let it lapse. Take it up again on purpose. The body remembers faster than you expect, and the confidence spreads into the rest of life. It will not come back uninvited.
+
+=south_node square mars
+The same old argument keeps breaking out.
+Different subject, identical fight. The South Node square Mars has the pair reacting from reflex: one advances, one stonewalls, as you each did in earlier lives with earlier people. It is quick and nobody chooses it. You can both feel it starting. The trick, which takes years, is for either one to do something unscripted in the first ten seconds.
+
+=south_node trine mars
+You work together with the ease of long practice.
+Nobody discusses who lifts which end. With Mars trine the South Node the couple has a well worn physical partnership: moving furniture, cooking for twenty, getting four people to an airport. Energy is not wasted on negotiation. New kinds of effort are another matter, and you both grumble when a task does not fit the old drill.
+
+=south_node opposition mars
+Habit says stay and drive says go.
+Mars opposite the South Node stands at the North Node, pushing forward. So the pair's energy is on the side of change, and its comfort is on the side of the past. One of you is impatient to get on with the new thing. The other is still saying goodbye to the old. The impatient one is usually right and often tactless.
+
+=south_node conjunction mercury
+You have the same conversations you have always had.
+Catchphrases, pet names, a private shorthand. With Mercury on the South Node the pair's talk is old and comfortable, and half of it needs no finishing. It is one of the pleasures of a long partnership. It is also why new information has trouble getting in: each of you answers what the other usually says instead of what was said.
+
+=south_node sextile mercury
+Something you already know would solve a present problem.
+Mercury in sextile to the South Node suggests looking in the old notebooks. A contact from years ago, a method from a former job, a language half remembered. Go and find it deliberately. The pair that searches its own past for answers saves a great deal of fresh effort. It only works if someone thinks to look.
+
+=south_node square mercury
+Stale ways of talking keep blocking what needs to be said.
+One of you starts a sentence and the other finishes it wrongly. The South Node square Mercury fills the pair's speech with reflexes: the automatic contradiction, the joke that deflects, the subject always changed at the same point. So real news goes unheard. You bicker about tone. It is the script that is at fault, and scripts can be rewritten.
+
+=south_node trine mercury
+You understand each other with very few words.
+A look across a room is a paragraph. With Mercury trine the South Node the couple's long acquaintance makes communication quick, accurate and often silent. Errands are divided without discussion. Others find it slightly uncanny. Remember to spell things out for the rest of the world, which was not there for the first twenty years.
+
+=south_node opposition mercury
+What you have always thought meets a new idea.
+Mercury opposite the South Node sits with the North Node, so fresh thinking lies ahead and old opinions behind. One partner comes home with a different way of seeing things. The other defends what you have always believed. Reading the same book and arguing about it is better than one of you changing in private.
+
+=south_node conjunction mc
+You are known for something you have always done.
+The family trade, the long held post, the shop with your name over it. With the South Node on the Midheaven the couple's public standing rests on the past, and it is secure. People know what to expect of you. They also stop offering anything else, and a change of direction means disappointing a town that had you neatly filed.
+
+=south_node sextile mc
+Your track record is worth more than you are asking for it.
+The South Node in sextile to the Midheaven says experience is your capital. Mention the years. Ask for the reference. Offer to train the newcomers. The pair tends to assume everyone knows what it has done, and almost nobody does until told. A modest, deliberate reminder to the right person changes your standing.
+
+=south_node square mc
+The past keeps holding back your public progress.
+An old reputation, an outdated qualification, the way things were done at the last place. The South Node square the Midheaven has the pair reaching for a familiar answer just when the job needs a new one. Promotions stall. One of you says they do not appreciate experience. The other wonders, quietly, whether experience is the whole story.
+
+=south_node trine mc
+Long experience makes your working life run smoothly.
+You have seen most problems before. With the South Node trine the Midheaven the couple's history supports its standing without anyone having to mention it, and you are trusted with things younger pairs are not. Work is seldom a crisis. A mild effort to learn the new system, whatever it is this year, would keep it that way.
+
+=south_node opposition mc
+Home and old habit sit together, and the world calls from the far side.
+Opposite the Midheaven, the South Node rests at the root of the chart, in family and private life. That is the pair's default: staying in, doing things as your parents did. Growth, with the North Node, is up in public. One of you would happily never leave the kitchen. The other wants to be seen doing something.
+
+=south_node conjunction moon
+Your comforts are very old ones.
+The same breakfast for twenty years. With the Moon on the South Node the pair's emotional life runs on habit and memory: family recipes, a mother's sayings, a way of being ill that was learned in childhood. It is deeply soothing. It also means that under stress you each turn back into a much younger person, and those two do not always get on.
+
+=south_node sextile moon
+An old comfort, deliberately revived, would steady you both.
+The Moon in sextile to the South Node points to something that used to settle the household and fell out of use: Sunday lunch, a walk after supper, ringing home on a set evening. Bring it back on purpose. It takes one of you to suggest it. The effect on mood is quick and feels oddly like relief.
+
+=south_node square moon
+Old emotional reflexes keep upsetting the present.
+One of you is slighted and reacts as a child would have. The South Node square the Moon wires the pair's feelings to the past, so a small present matter gets a large, antique response. You are each fluent in the other's family history by now. That knowledge can soothe. In a row it is more often used as ammunition.
+
+=south_node trine moon
+You are at home with each other in a way that needs no effort.
+Moods are read correctly without comment. With the Moon trine the South Node the pair shares a settled domestic rhythm, built over years or simply brought ready made from similar backgrounds. Illness and bad news are handled gently. It is restful. An occasional new dish on the table would not go amiss.
+
+=south_node opposition moon
+What you are used to and what you now need are on opposite sides.
+The Moon opposite the South Node stands with the North Node. So the pair's real emotional needs lie in unfamiliar territory, and the old comforts no longer quite comfort. One of you keeps offering the usual remedy. The other keeps saying, a little guiltily, that it does not help. Ask what would, and expect a surprising answer.
+
+=south_node conjunction neptune
+You have shared the same dream for a very long time.
+A cottage, a boat, a way of life in another country. With Neptune on the South Node the pair has an old vision it returns to like a favorite film, and a habit of drifting when things get difficult. The dream is a comfort. It is also a place to hide, and some of it was out of date before either of you noticed.
+
+=south_node sextile neptune
+An old source of inspiration is still there if you go back to it.
+Neptune in sextile to the South Node remembers what used to move the two of you: a kind of music, a church, a coastline, a book read aloud. You have to return on purpose. It is not nostalgia if you bring something back for present use. Left unvisited, it becomes one more thing you used to do.
+
+=south_node square neptune
+An old habit of not looking keeps costing you.
+Things were always left vague in your families, or one of you learned early that it was safer not to ask. The South Node square Neptune repeats that in the pair: accounts unopened, a drink problem unnamed, a hope never checked against the facts. Confusion feels normal. It surfaces as a crisis about every third year.
+
+=south_node trine neptune
+A gentle, long standing sympathy runs between you.
+Nothing needs proving. With Neptune trine the South Node the pair has an old, wordless understanding and a shared taste for quiet things: water, dusk, familiar music. It gets you through hard seasons without much talk. You are not the couple to ask about pensions, and you know it, and you ask someone else.
+
+=south_node opposition neptune
+The known sits on one side and the longed for on the other.
+Neptune opposite the South Node joins the North Node, so what the pair dreams of also lies in the direction of growth. Behind you is habit. Ahead is something only half visible. One of you wants proof before leaving solid ground. There will not be any. Small trial steps are the way: a visit before a move.
+
+=south_node conjunction north_node
+The whole story of this couple runs along one line, from what is known to what is not.
+The South Node and the North Node always face each other, so they never truly join. Read this as the axis itself. At one end are your habits, your families and the things you can do half asleep. At the other is what you are for. A good life together spends time at both ends and does not mistake the first for the second.
+
+=south_node sextile north_node
+The past can be made to serve the future, with a little thought.
+The Nodes stand opposite one another in every chart, so this is a way of looking at the axis more than an aspect. Take one old skill and point it somewhere new. A trade learned young can pay for the thing you have not tried. The pair has to plan that. Otherwise the old ability just keeps doing the old job.
+
+=south_node square north_node
+Habit and growth pull against each other here, and you feel the strain.
+Because the Nodes are always opposed, treat this as the tension of the axis. What you have always done is comfortable and close. What would stretch you is across the chart and inconvenient. The pair quarrels about it without naming it: one says why change, the other says is this all. It is the right quarrel to be having.
+
+=south_node trine north_node
+You carry your past forward without being held by it.
+The two Nodes face one another in any chart, so read this as the axis at its best. Old skills are used for new ends. Families are honored and not obeyed. The pair moves on without burning anything down, and friends who left home with more drama rather envy you. Keep moving, all the same.
+
+=south_node opposition north_node
+Everything familiar lies behind you and everything worth reaching lies ahead.
+This is how the Nodes always stand: the South Node opposite the North. For the couple it sets comfort against growth as plainly as it can be set. One of you speaks for the old ways and the other for the next step, and you may trade those parts over the years. Neither end is wrong. You are simply meant to travel from one toward the other.
+
+=south_node conjunction pluto
+There is an old, deep pattern here that neither of you chose.
+Something intense was inherited: a family secret, a history of loss, a habit of control passed down like furniture. With Pluto on the South Node the pair acts it out without meaning to, and recognizes it only afterwards. You are strong together. You are strongest when you can say, this is my grandmother's fear and not ours, and put it down.
+
+=south_node sextile pluto
+Digging into the past on purpose would free a good deal of energy.
+Pluto in sextile to the South Node rewards the pair that goes looking. Trace the family money. Ask the aunt what really happened. Clear the attic properly. It is deliberate work and not always pleasant. What comes back is power that was tied up in not knowing, and you will both feel the difference.
+
+=south_node square pluto
+Old struggles for control keep being replayed.
+The details change and the shape does not. The South Node square Pluto has the pair repeating an inherited fight: who holds the money, who is allowed to leave, who knows the secret. You recognize it from your parents' kitchens. Seeing that is half of it. The other half is refusing the role when it is handed to you.
+
+=south_node trine pluto
+You draw strength from having come through hard things before.
+Not much frightens this household. With Pluto trine the South Node the pair's history includes real difficulty, survived, and the knowledge sits in you both as calm. In a crisis you already know what matters. Others lean on that. Do let them see, sometimes, that it cost you something.
+
+=south_node opposition pluto
+The pull of the familiar meets a force that insists on change.
+Pluto opposite the South Node stands with the North Node, so transformation is on the growing side and it is not optional. The pair can go willingly or be taken. One of you grips the old arrangements harder as they loosen. The other has accepted it and waits. What comes after is usually better, and never the same.
+
+=south_node conjunction saturn
+Duty is an old habit in this relationship.
+You do what is expected because you always have. With Saturn on the South Node the pair carries responsibility like a family trait: the eldest child's seriousness, the long hours, the rule that pleasure comes after. It makes you dependable. It can also keep you serving obligations that expired years ago and that nobody is checking.
+
+=south_node sextile saturn
+Hard won experience could be turned into something solid.
+Saturn in sextile to the South Node says the pair has already served its apprenticeship somewhere. Use it. Write the manual, take the senior role, charge properly for what you know. This needs deciding, since modest people undervalue old knowledge. Left unclaimed, the years of effort are just years.
+
+=south_node square saturn
+Old rules keep tripping you up.
+Never borrow. Never complain. Never leave before the washing up. The South Node square Saturn has the pair obeying laws laid down in other houses long ago, and they chafe. One of you still believes in them. The other rebels and then feels guilty. Go through them one by one and vote, as adults, on which to keep.
+
+=south_node trine saturn
+You have a settled, grown up way of running your life.
+Bills, repairs, elderly relatives: all handled without drama. With Saturn trine the South Node the pair inherited good habits or built them long ago, and they hold. Others think you dull and ask your advice. The structure is sound enough to bear a little risk, should you ever feel like taking one.
+
+=south_node opposition saturn
+The easy old way faces a demanding new responsibility.
+Saturn opposite the South Node sits by the North Node, so growth here means work: a duty the pair has not carried before. Habit offers a comfortable way out. One of you takes up the weight and the other hangs back in what is known. It is lonely for the first. Share the load early and it turns out to be bearable.
+
+=south_node conjunction sun
+You are very much the couple you have always been.
+Identity is settled. With the Sun on the South Node the pair knows who it is, shines in familiar company and is at its best doing what it has done before. That is solid ground. The risk is becoming a tribute act to your own earlier years, performing the famous numbers for friends who would secretly like a new one.
+
+=south_node sextile sun
+Past achievements can still light the way.
+The Sun in sextile to the South Node says something you were once proud of deserves another outing. Show the old work. Tell the story to someone who has not heard it. Do it on purpose and to a purpose, and confidence returns that you can spend on something current. Hidden in a drawer, it only makes you wistful.
+
+=south_node square sun
+Old pride keeps getting in the way.
+We have always done it like this. The South Node square the Sun fastens the pair's self respect to former glories, so any new approach feels like an insult. One of you bristles at advice. The other bristles on the first one's behalf. You could learn a great deal from younger people if it did not hurt quite so much.
+
+=south_node trine sun
+What you have long been gives you an easy confidence.
+You do not need to prove anything. With the Sun trine the South Node the pair is comfortable in its own history, and that security makes you generous hosts and patient teachers. Nobody feels judged in your house. Keep a little curiosity alive, since comfort of this kind can quietly close the windows.
+
+=south_node opposition sun
+Who you were and who you are becoming face each other.
+The Sun opposite the South Node stands with the North Node, so the pair's vitality is on the growing side. You feel most alive when doing something unpracticed. The old self tugs: easier, safer, already paid for. One of you lights up at the new and the other mourns a little. Both responses are honest.
+
+=south_node conjunction uranus
+Restlessness is a long standing habit with you.
+You have always been the unconventional ones. With Uranus on the South Node the pair's reflex is to break away: move again, quit again, refuse the ordinary arrangement. It felt like freedom once. Now it is a routine like any other, and the truly new thing for you might be staying put and finishing something.
+
+=south_node sextile uranus
+An old flash of originality could be picked up again.
+Uranus in sextile to the South Node remembers an idea the pair had years ago and dropped as impractical. Circumstances have changed. Look at it again on purpose. What was eccentric then may be merely sensible now. Nobody will remind you of it, so one of you has to go and find the folder.
+
+=south_node square uranus
+The old urge to bolt keeps upsetting what you build.
+Things are going well, and one of you starts looking at the door. The South Node square Uranus makes sudden exit the pair's inherited answer to pressure, learned in families where someone always left. It comes on fast. The other partner has seen it before and braces. Name it early: this is the old itch, not a real reason.
+
+=south_node trine uranus
+You have always been comfortably different, and it still works.
+Nobody expects you to do things the usual way. With Uranus trine the South Node the pair's oddities are long established and well tolerated, and you move through change without fuss because you have had practice. It is a pleasant freedom. Convention has its uses too, and you might borrow one occasionally.
+
+=south_node opposition uranus
+The settled past is confronted by something entirely new.
+Uranus opposite the South Node joins the North Node, so growth arrives as a jolt. A sudden opening, in the direction you have never gone. Habit says no thank you. One of you is thrilled. The other wants the old week back. You will go, in the end. How graciously is the only part still in your hands.
+
+=south_node conjunction venus
+You love each other in a well worn, familiar way.
+Same side of the bed, same restaurant on the anniversary. With Venus on the South Node the pair's affection is an old habit and a real comfort, sometimes with a sense of having known each other before. Nothing needs explaining. Courtship, though, has rather lapsed, and each of you misses being surprised more than you say.
+
+=south_node sextile venus
+An old pleasure, taken up again, would warm things between you.
+Venus in sextile to the South Node recalls what you used to do when you were first together: dancing, long drives, cooking something elaborate. Arrange it deliberately. It will feel faintly foolish for ten minutes. After that the pair remembers a good deal more than the activity, and the week is different.
+
+=south_node square venus
+Old ways of loving keep falling short of what is needed now.
+One of you still shows affection as you did at twenty five. The South Node square Venus leaves the pair giving each other what used to work: the same gift, the same gesture, the same silence taken for peace. It is meant kindly and it misses. Ask what would please the person who exists this year.
+
+=south_node trine venus
+There is a long, easy fondness here.
+You like each other. With Venus trine the South Node the pair has years of small kindnesses behind it, shared tastes and a comfortable way of spending an evening. Friends find it restful to watch. Keep a few compliments in circulation, since it is easy to assume they are understood and stop saying them.
+
+=south_node opposition venus
+The comfortable old bond meets a love that asks more of you.
+Venus opposite the South Node stands at the North Node, so affection itself lies on the growing side. The pair is asked to love in a way it has not practiced: more openly, more generously, less by rote. Habit offers the old distant comfort. One of you reaches and the other hesitates. Reaching is the direction.
+
+=south_node conjunction vesta
+Your devotions are old ones, kept without question.
+A practice, a faith, a daily task handed down. With Vesta on the South Node the pair tends a flame it inherited, and tends it well. There is dignity in that. It is worth asking, once in a while, whether you still believe in what the ritual is for, or whether you are simply very good at keeping it going.
+
+=south_node sextile vesta
+A former discipline could be taken up again to good effect.
+Vesta in sextile to the South Node says one of you once had a practice: an instrument, a prayer, an hour of study. The habit is still in the body. Resume it on purpose. It will come back more quickly than a new one could be learned, and the steadiness it brings spreads to the other partner.
+
+=south_node square vesta
+Old duties keep crowding out what you want to give yourselves to now.
+The routine demands its hours. The South Node square Vesta has the pair faithful to commitments from an earlier life, a committee, a caretaking role, a standard of housekeeping, while the present calling waits. One of you cannot let go. The other resents the altar. Retiring a duty properly is harder than dropping it, and better.
+
+=south_node trine vesta
+Long kept habits of care give your home its calm.
+Things are done properly because they always have been. With Vesta trine the South Node the pair's routines, the locked door at ten, the table laid, the work begun at the same hour, are old and unforced. Order comes naturally. Visitors feel it and lower their voices. A little mess would not be a moral failure.
+
+=south_node opposition vesta
+What you used to be devoted to faces what now asks for your devotion.
+Vesta opposite the South Node sits beside the North Node, so the flame worth tending is ahead of you. Behind is a comfortable round of the usual. The pair has to choose what to serve. One of you has already turned toward the new work. The other is still tidying the old house. Come along when you are ready, but come.

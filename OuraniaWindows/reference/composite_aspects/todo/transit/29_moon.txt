@@ -1,0 +1,553 @@
+# transit: moon - 134 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# moon with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction sun
+LEAD
+BODY
+
+=transit moon sextile sun
+LEAD
+BODY
+
+=transit moon square sun
+LEAD
+BODY
+
+=transit moon trine sun
+LEAD
+BODY
+
+=transit moon opposition sun
+LEAD
+BODY
+
+=transit moon biquintile sun
+LEAD
+BODY
+
+=transit moon septile sun
+LEAD
+BODY
+
+=transit moon novile sun
+LEAD
+BODY
+
+=transit moon decile sun
+LEAD
+BODY
+
+# moon with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction moon
+LEAD
+BODY
+
+=transit moon sextile moon
+LEAD
+BODY
+
+=transit moon square moon
+LEAD
+BODY
+
+=transit moon trine moon
+LEAD
+BODY
+
+=transit moon opposition moon
+LEAD
+BODY
+
+=transit moon biquintile moon
+LEAD
+BODY
+
+=transit moon septile moon
+LEAD
+BODY
+
+=transit moon novile moon
+LEAD
+BODY
+
+=transit moon decile moon
+LEAD
+BODY
+
+# moon with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction mercury
+LEAD
+BODY
+
+=transit moon sextile mercury
+LEAD
+BODY
+
+=transit moon square mercury
+LEAD
+BODY
+
+=transit moon trine mercury
+LEAD
+BODY
+
+=transit moon opposition mercury
+LEAD
+BODY
+
+=transit moon biquintile mercury
+LEAD
+BODY
+
+=transit moon septile mercury
+LEAD
+BODY
+
+=transit moon novile mercury
+LEAD
+BODY
+
+=transit moon decile mercury
+LEAD
+BODY
+
+# moon with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction venus
+LEAD
+BODY
+
+=transit moon sextile venus
+LEAD
+BODY
+
+=transit moon square venus
+LEAD
+BODY
+
+=transit moon trine venus
+LEAD
+BODY
+
+=transit moon opposition venus
+LEAD
+BODY
+
+=transit moon biquintile venus
+LEAD
+BODY
+
+=transit moon septile venus
+LEAD
+BODY
+
+=transit moon novile venus
+LEAD
+BODY
+
+=transit moon decile venus
+LEAD
+BODY
+
+# moon with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction mars
+LEAD
+BODY
+
+=transit moon sextile mars
+LEAD
+BODY
+
+=transit moon square mars
+LEAD
+BODY
+
+=transit moon trine mars
+LEAD
+BODY
+
+=transit moon opposition mars
+LEAD
+BODY
+
+=transit moon biquintile mars
+LEAD
+BODY
+
+=transit moon septile mars
+LEAD
+BODY
+
+=transit moon novile mars
+LEAD
+BODY
+
+=transit moon decile mars
+LEAD
+BODY
+
+# moon with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction jupiter
+LEAD
+BODY
+
+=transit moon sextile jupiter
+LEAD
+BODY
+
+=transit moon square jupiter
+LEAD
+BODY
+
+=transit moon trine jupiter
+LEAD
+BODY
+
+=transit moon opposition jupiter
+LEAD
+BODY
+
+=transit moon biquintile jupiter
+LEAD
+BODY
+
+=transit moon septile jupiter
+LEAD
+BODY
+
+=transit moon novile jupiter
+LEAD
+BODY
+
+=transit moon decile jupiter
+LEAD
+BODY
+
+# moon with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction saturn
+LEAD
+BODY
+
+=transit moon sextile saturn
+LEAD
+BODY
+
+=transit moon square saturn
+LEAD
+BODY
+
+=transit moon trine saturn
+LEAD
+BODY
+
+=transit moon opposition saturn
+LEAD
+BODY
+
+=transit moon biquintile saturn
+LEAD
+BODY
+
+=transit moon septile saturn
+LEAD
+BODY
+
+=transit moon novile saturn
+LEAD
+BODY
+
+=transit moon decile saturn
+LEAD
+BODY
+
+# moon with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction uranus
+LEAD
+BODY
+
+=transit moon sextile uranus
+LEAD
+BODY
+
+=transit moon square uranus
+LEAD
+BODY
+
+=transit moon trine uranus
+LEAD
+BODY
+
+=transit moon opposition uranus
+LEAD
+BODY
+
+=transit moon biquintile uranus
+LEAD
+BODY
+
+=transit moon septile uranus
+LEAD
+BODY
+
+=transit moon novile uranus
+LEAD
+BODY
+
+=transit moon decile uranus
+LEAD
+BODY
+
+# moon with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction neptune
+LEAD
+BODY
+
+=transit moon sextile neptune
+LEAD
+BODY
+
+=transit moon square neptune
+LEAD
+BODY
+
+=transit moon trine neptune
+LEAD
+BODY
+
+=transit moon opposition neptune
+LEAD
+BODY
+
+=transit moon biquintile neptune
+LEAD
+BODY
+
+=transit moon septile neptune
+LEAD
+BODY
+
+=transit moon novile neptune
+LEAD
+BODY
+
+=transit moon decile neptune
+LEAD
+BODY
+
+# moon with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction pluto
+LEAD
+BODY
+
+=transit moon sextile pluto
+LEAD
+BODY
+
+=transit moon square pluto
+LEAD
+BODY
+
+=transit moon trine pluto
+LEAD
+BODY
+
+=transit moon opposition pluto
+LEAD
+BODY
+
+=transit moon biquintile pluto
+LEAD
+BODY
+
+=transit moon septile pluto
+LEAD
+BODY
+
+=transit moon novile pluto
+LEAD
+BODY
+
+=transit moon decile pluto
+LEAD
+BODY
+
+# moon with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction chiron
+LEAD
+BODY
+
+=transit moon sextile chiron
+LEAD
+BODY
+
+=transit moon square chiron
+LEAD
+BODY
+
+=transit moon trine chiron
+LEAD
+BODY
+
+=transit moon opposition chiron
+LEAD
+BODY
+
+=transit moon biquintile chiron
+LEAD
+BODY
+
+=transit moon septile chiron
+LEAD
+BODY
+
+=transit moon novile chiron
+LEAD
+BODY
+
+=transit moon decile chiron
+LEAD
+BODY
+
+# moon with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction north_node
+LEAD
+BODY
+
+=transit moon sextile north_node
+LEAD
+BODY
+
+=transit moon square north_node
+LEAD
+BODY
+
+=transit moon trine north_node
+LEAD
+BODY
+
+=transit moon opposition north_node
+LEAD
+BODY
+
+=transit moon biquintile north_node
+LEAD
+BODY
+
+=transit moon septile north_node
+LEAD
+BODY
+
+=transit moon novile north_node
+LEAD
+BODY
+
+=transit moon decile north_node
+LEAD
+BODY
+
+# moon with ascendant: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction ascendant
+LEAD
+BODY
+
+=transit moon sextile ascendant
+LEAD
+BODY
+
+=transit moon square ascendant
+LEAD
+BODY
+
+=transit moon trine ascendant
+LEAD
+BODY
+
+=transit moon opposition ascendant
+LEAD
+BODY
+
+=transit moon biquintile ascendant
+LEAD
+BODY
+
+=transit moon septile ascendant
+LEAD
+BODY
+
+=transit moon novile ascendant
+LEAD
+BODY
+
+=transit moon decile ascendant
+LEAD
+BODY
+
+# moon with descendant: 4 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon biquintile descendant
+LEAD
+BODY
+
+=transit moon septile descendant
+LEAD
+BODY
+
+=transit moon novile descendant
+LEAD
+BODY
+
+=transit moon decile descendant
+LEAD
+BODY
+
+# moon with mc: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon conjunction mc
+LEAD
+BODY
+
+=transit moon sextile mc
+LEAD
+BODY
+
+=transit moon square mc
+LEAD
+BODY
+
+=transit moon trine mc
+LEAD
+BODY
+
+=transit moon opposition mc
+LEAD
+BODY
+
+=transit moon biquintile mc
+LEAD
+BODY
+
+=transit moon septile mc
+LEAD
+BODY
+
+=transit moon novile mc
+LEAD
+BODY
+
+=transit moon decile mc
+LEAD
+BODY
+
+# moon with ic: 4 readings, one per aspect. Each must read differently from the others in this group.
+=transit moon biquintile ic
+LEAD
+BODY
+
+=transit moon septile ic
+LEAD
+BODY
+
+=transit moon novile ic
+LEAD
+BODY
+
+=transit moon decile ic
+LEAD
+BODY

@@ -8,3 +8,40 @@
 
 SkyViewCheck     5      # 5: Eros and Eris cannot be placed, so the sky holds 17 of 19 chosen points
 ChartSetupCheck  1      # 1: "with the real directory every selectable body can be placed" (same four files)
+
+# Added 2026-10-10. CI had been red on every push since 2026-09-28 and these two are why. Both
+# were written on David's machine and hold the runner to that machine's ephemeris folder, which
+# is short of semo_18.se1 - the Moon's own file for 1800 to 2399 - so there the lunar nodes come
+# from the built-in approximation. The runner downloads that file, so here they come from it.
+# Measured with the five files CI fetches: the node differs by 0.0067 degrees at most (24
+# seconds of arc).
+#
+# THE MACHINE-SIDE FIX IS DONE, 2026-10-11, commit e6378e1e. semo_18.se1 is in that folder,
+# ephemeris-corpus.tsv is regenerated (538 rows moved, one source transition - North Node
+# approximation -> files on 50 rows - and nothing the other way), and StartupCheck's Part G is
+# turned round: it asserts the directory is whole instead of asserting the Moon's file is
+# absent. The same 24 arcseconds were measured independently there. So do NOT do that work
+# again - it is the commit above.
+#
+# WHAT IS LEFT HERE IS NOT THE MOON, AND BOTH LINES STAY. The two folders still differ, by the
+# four numbered-asteroid files (Hygiea, Eros, Nessus, Eris): David's machine HAS them - ast0,
+# ast7 and ast136 are all present - and the runner cannot download them, which is the same
+# cause as the two SkyViewCheck and ChartSetupCheck lines at the top of this file. So the
+# corpus now holds asteroid longitudes the runner cannot reproduce, and StartupCheck still
+# finds bodies it cannot compute inside the files' era.
+#
+# THE COUNTS BELOW ARE MEASURED ON THE RUNNER, not guessed from a laptop. CI run 38200921189,
+# 2026-10-12, is where they come from - the first run after e6378e1e merged. Both fell to 1, and
+# both remaining failures have the same cause as the two lines at the top of this file: the four
+# numbered-asteroid files the runner cannot download. Nothing here is about the Moon any more.
+#
+# That run also caught a defect in e6378e1e itself. Its rewritten StartupCheck assertions said
+# "no file is missing from this machine's ephemeris directory" and "start-up says the directory
+# is whole" - true where they were written, false here, so StartupCheck went from one CI failure
+# to THREE and named the four asteroid files in the message. That is the complaint this file was
+# created over, reintroduced by the commit meant to end it. Fixed: the assertions now name the
+# two facts the Moon's file changes - it is not among the missing, and the North Node no longer
+# approximates - which hold on any folder that has it.
+
+EphemerisCorpusCheck 1   # 1 in Part A: rows carrying the four numbered-asteroid files, which this machine has and the runner cannot download. The Moon's half of this is gone - the corpus was regenerated with semo_18.se1 on 2026-10-11 (e6378e1e), and CI measured this at 1 of 51 the first time it ran against it
+StartupCheck     1      # 1: "inside the files' era nothing is beyond computing", on the same four asteroid files (Eris, Eros, Hygiea, Nessus). The other two failures this line used to cover are gone: the Moon's file is in place, and the assertions that read as "this whole directory is complete" were replaced with ones about the Moon's file alone

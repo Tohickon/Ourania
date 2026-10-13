@@ -1,0 +1,1261 @@
+# transit: eros - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# eros with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction ascendant
+LEAD
+BODY
+
+=transit eros sextile ascendant
+LEAD
+BODY
+
+=transit eros square ascendant
+LEAD
+BODY
+
+=transit eros trine ascendant
+LEAD
+BODY
+
+=transit eros opposition ascendant
+LEAD
+BODY
+
+=transit eros quincunx ascendant
+LEAD
+BODY
+
+=transit eros semisextile ascendant
+LEAD
+BODY
+
+=transit eros semisquare ascendant
+LEAD
+BODY
+
+=transit eros sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit eros quintile ascendant
+LEAD
+BODY
+
+=transit eros sesquiquintile ascendant
+LEAD
+BODY
+
+# eros with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction descendant
+LEAD
+BODY
+
+=transit eros sextile descendant
+LEAD
+BODY
+
+=transit eros square descendant
+LEAD
+BODY
+
+=transit eros trine descendant
+LEAD
+BODY
+
+=transit eros opposition descendant
+LEAD
+BODY
+
+=transit eros quincunx descendant
+LEAD
+BODY
+
+=transit eros semisextile descendant
+LEAD
+BODY
+
+=transit eros semisquare descendant
+LEAD
+BODY
+
+=transit eros sesquiquadrate descendant
+LEAD
+BODY
+
+=transit eros quintile descendant
+LEAD
+BODY
+
+=transit eros sesquiquintile descendant
+LEAD
+BODY
+
+# eros with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction mc
+LEAD
+BODY
+
+=transit eros sextile mc
+LEAD
+BODY
+
+=transit eros square mc
+LEAD
+BODY
+
+=transit eros trine mc
+LEAD
+BODY
+
+=transit eros opposition mc
+LEAD
+BODY
+
+=transit eros quincunx mc
+LEAD
+BODY
+
+=transit eros semisextile mc
+LEAD
+BODY
+
+=transit eros semisquare mc
+LEAD
+BODY
+
+=transit eros sesquiquadrate mc
+LEAD
+BODY
+
+=transit eros quintile mc
+LEAD
+BODY
+
+=transit eros sesquiquintile mc
+LEAD
+BODY
+
+# eros with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction ic
+LEAD
+BODY
+
+=transit eros sextile ic
+LEAD
+BODY
+
+=transit eros square ic
+LEAD
+BODY
+
+=transit eros trine ic
+LEAD
+BODY
+
+=transit eros opposition ic
+LEAD
+BODY
+
+=transit eros quincunx ic
+LEAD
+BODY
+
+=transit eros semisextile ic
+LEAD
+BODY
+
+=transit eros semisquare ic
+LEAD
+BODY
+
+=transit eros sesquiquadrate ic
+LEAD
+BODY
+
+=transit eros quintile ic
+LEAD
+BODY
+
+=transit eros sesquiquintile ic
+LEAD
+BODY
+
+# eros with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction south_node
+LEAD
+BODY
+
+=transit eros sextile south_node
+LEAD
+BODY
+
+=transit eros square south_node
+LEAD
+BODY
+
+=transit eros trine south_node
+LEAD
+BODY
+
+=transit eros opposition south_node
+LEAD
+BODY
+
+=transit eros quincunx south_node
+LEAD
+BODY
+
+=transit eros semisextile south_node
+LEAD
+BODY
+
+=transit eros semisquare south_node
+LEAD
+BODY
+
+=transit eros sesquiquadrate south_node
+LEAD
+BODY
+
+=transit eros quintile south_node
+LEAD
+BODY
+
+=transit eros sesquiquintile south_node
+LEAD
+BODY
+
+# eros with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction ceres
+LEAD
+BODY
+
+=transit eros sextile ceres
+LEAD
+BODY
+
+=transit eros square ceres
+LEAD
+BODY
+
+=transit eros trine ceres
+LEAD
+BODY
+
+=transit eros opposition ceres
+LEAD
+BODY
+
+=transit eros quincunx ceres
+LEAD
+BODY
+
+=transit eros semisextile ceres
+LEAD
+BODY
+
+=transit eros semisquare ceres
+LEAD
+BODY
+
+=transit eros sesquiquadrate ceres
+LEAD
+BODY
+
+=transit eros quintile ceres
+LEAD
+BODY
+
+=transit eros sesquiquintile ceres
+LEAD
+BODY
+
+# eros with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction pallas
+LEAD
+BODY
+
+=transit eros sextile pallas
+LEAD
+BODY
+
+=transit eros square pallas
+LEAD
+BODY
+
+=transit eros trine pallas
+LEAD
+BODY
+
+=transit eros opposition pallas
+LEAD
+BODY
+
+=transit eros quincunx pallas
+LEAD
+BODY
+
+=transit eros semisextile pallas
+LEAD
+BODY
+
+=transit eros semisquare pallas
+LEAD
+BODY
+
+=transit eros sesquiquadrate pallas
+LEAD
+BODY
+
+=transit eros quintile pallas
+LEAD
+BODY
+
+=transit eros sesquiquintile pallas
+LEAD
+BODY
+
+# eros with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction juno
+LEAD
+BODY
+
+=transit eros sextile juno
+LEAD
+BODY
+
+=transit eros square juno
+LEAD
+BODY
+
+=transit eros trine juno
+LEAD
+BODY
+
+=transit eros opposition juno
+LEAD
+BODY
+
+=transit eros quincunx juno
+LEAD
+BODY
+
+=transit eros semisextile juno
+LEAD
+BODY
+
+=transit eros semisquare juno
+LEAD
+BODY
+
+=transit eros sesquiquadrate juno
+LEAD
+BODY
+
+=transit eros quintile juno
+LEAD
+BODY
+
+=transit eros sesquiquintile juno
+LEAD
+BODY
+
+# eros with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction vesta
+LEAD
+BODY
+
+=transit eros sextile vesta
+LEAD
+BODY
+
+=transit eros square vesta
+LEAD
+BODY
+
+=transit eros trine vesta
+LEAD
+BODY
+
+=transit eros opposition vesta
+LEAD
+BODY
+
+=transit eros quincunx vesta
+LEAD
+BODY
+
+=transit eros semisextile vesta
+LEAD
+BODY
+
+=transit eros semisquare vesta
+LEAD
+BODY
+
+=transit eros sesquiquadrate vesta
+LEAD
+BODY
+
+=transit eros quintile vesta
+LEAD
+BODY
+
+=transit eros sesquiquintile vesta
+LEAD
+BODY
+
+# eros with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction eris
+LEAD
+BODY
+
+=transit eros sextile eris
+LEAD
+BODY
+
+=transit eros square eris
+LEAD
+BODY
+
+=transit eros trine eris
+LEAD
+BODY
+
+=transit eros opposition eris
+LEAD
+BODY
+
+=transit eros quincunx eris
+LEAD
+BODY
+
+=transit eros semisextile eris
+LEAD
+BODY
+
+=transit eros semisquare eris
+LEAD
+BODY
+
+=transit eros sesquiquadrate eris
+LEAD
+BODY
+
+=transit eros quintile eris
+LEAD
+BODY
+
+=transit eros sesquiquintile eris
+LEAD
+BODY
+
+# eros with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction hygiea
+LEAD
+BODY
+
+=transit eros sextile hygiea
+LEAD
+BODY
+
+=transit eros square hygiea
+LEAD
+BODY
+
+=transit eros trine hygiea
+LEAD
+BODY
+
+=transit eros opposition hygiea
+LEAD
+BODY
+
+=transit eros quincunx hygiea
+LEAD
+BODY
+
+=transit eros semisextile hygiea
+LEAD
+BODY
+
+=transit eros semisquare hygiea
+LEAD
+BODY
+
+=transit eros sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit eros quintile hygiea
+LEAD
+BODY
+
+=transit eros sesquiquintile hygiea
+LEAD
+BODY
+
+# eros with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction nessus
+LEAD
+BODY
+
+=transit eros sextile nessus
+LEAD
+BODY
+
+=transit eros square nessus
+LEAD
+BODY
+
+=transit eros trine nessus
+LEAD
+BODY
+
+=transit eros opposition nessus
+LEAD
+BODY
+
+=transit eros quincunx nessus
+LEAD
+BODY
+
+=transit eros semisextile nessus
+LEAD
+BODY
+
+=transit eros semisquare nessus
+LEAD
+BODY
+
+=transit eros sesquiquadrate nessus
+LEAD
+BODY
+
+=transit eros quintile nessus
+LEAD
+BODY
+
+=transit eros sesquiquintile nessus
+LEAD
+BODY
+
+# eros with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction pholus
+LEAD
+BODY
+
+=transit eros sextile pholus
+LEAD
+BODY
+
+=transit eros square pholus
+LEAD
+BODY
+
+=transit eros trine pholus
+LEAD
+BODY
+
+=transit eros opposition pholus
+LEAD
+BODY
+
+=transit eros quincunx pholus
+LEAD
+BODY
+
+=transit eros semisextile pholus
+LEAD
+BODY
+
+=transit eros semisquare pholus
+LEAD
+BODY
+
+=transit eros sesquiquadrate pholus
+LEAD
+BODY
+
+=transit eros quintile pholus
+LEAD
+BODY
+
+=transit eros sesquiquintile pholus
+LEAD
+BODY
+
+# eros with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction fortune
+LEAD
+BODY
+
+=transit eros sextile fortune
+LEAD
+BODY
+
+=transit eros square fortune
+LEAD
+BODY
+
+=transit eros trine fortune
+LEAD
+BODY
+
+=transit eros opposition fortune
+LEAD
+BODY
+
+=transit eros quincunx fortune
+LEAD
+BODY
+
+=transit eros semisextile fortune
+LEAD
+BODY
+
+=transit eros semisquare fortune
+LEAD
+BODY
+
+=transit eros sesquiquadrate fortune
+LEAD
+BODY
+
+=transit eros quintile fortune
+LEAD
+BODY
+
+=transit eros sesquiquintile fortune
+LEAD
+BODY
+
+# eros with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction spirit
+LEAD
+BODY
+
+=transit eros sextile spirit
+LEAD
+BODY
+
+=transit eros square spirit
+LEAD
+BODY
+
+=transit eros trine spirit
+LEAD
+BODY
+
+=transit eros opposition spirit
+LEAD
+BODY
+
+=transit eros quincunx spirit
+LEAD
+BODY
+
+=transit eros semisextile spirit
+LEAD
+BODY
+
+=transit eros semisquare spirit
+LEAD
+BODY
+
+=transit eros sesquiquadrate spirit
+LEAD
+BODY
+
+=transit eros quintile spirit
+LEAD
+BODY
+
+=transit eros sesquiquintile spirit
+LEAD
+BODY
+
+# eros with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction lilith
+LEAD
+BODY
+
+=transit eros sextile lilith
+LEAD
+BODY
+
+=transit eros square lilith
+LEAD
+BODY
+
+=transit eros trine lilith
+LEAD
+BODY
+
+=transit eros opposition lilith
+LEAD
+BODY
+
+=transit eros quincunx lilith
+LEAD
+BODY
+
+=transit eros semisextile lilith
+LEAD
+BODY
+
+=transit eros semisquare lilith
+LEAD
+BODY
+
+=transit eros sesquiquadrate lilith
+LEAD
+BODY
+
+=transit eros quintile lilith
+LEAD
+BODY
+
+=transit eros sesquiquintile lilith
+LEAD
+BODY
+
+# eros with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction moon
+LEAD
+BODY
+
+=transit eros sextile moon
+LEAD
+BODY
+
+=transit eros square moon
+LEAD
+BODY
+
+=transit eros trine moon
+LEAD
+BODY
+
+=transit eros opposition moon
+LEAD
+BODY
+
+=transit eros quincunx moon
+LEAD
+BODY
+
+=transit eros semisextile moon
+LEAD
+BODY
+
+=transit eros semisquare moon
+LEAD
+BODY
+
+=transit eros sesquiquadrate moon
+LEAD
+BODY
+
+=transit eros quintile moon
+LEAD
+BODY
+
+=transit eros sesquiquintile moon
+LEAD
+BODY
+
+# eros with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction sun
+LEAD
+BODY
+
+=transit eros sextile sun
+LEAD
+BODY
+
+=transit eros square sun
+LEAD
+BODY
+
+=transit eros trine sun
+LEAD
+BODY
+
+=transit eros opposition sun
+LEAD
+BODY
+
+=transit eros quincunx sun
+LEAD
+BODY
+
+=transit eros semisextile sun
+LEAD
+BODY
+
+=transit eros semisquare sun
+LEAD
+BODY
+
+=transit eros sesquiquadrate sun
+LEAD
+BODY
+
+=transit eros quintile sun
+LEAD
+BODY
+
+=transit eros sesquiquintile sun
+LEAD
+BODY
+
+# eros with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction mercury
+LEAD
+BODY
+
+=transit eros sextile mercury
+LEAD
+BODY
+
+=transit eros square mercury
+LEAD
+BODY
+
+=transit eros trine mercury
+LEAD
+BODY
+
+=transit eros opposition mercury
+LEAD
+BODY
+
+=transit eros quincunx mercury
+LEAD
+BODY
+
+=transit eros semisextile mercury
+LEAD
+BODY
+
+=transit eros semisquare mercury
+LEAD
+BODY
+
+=transit eros sesquiquadrate mercury
+LEAD
+BODY
+
+=transit eros quintile mercury
+LEAD
+BODY
+
+=transit eros sesquiquintile mercury
+LEAD
+BODY
+
+# eros with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction venus
+LEAD
+BODY
+
+=transit eros sextile venus
+LEAD
+BODY
+
+=transit eros square venus
+LEAD
+BODY
+
+=transit eros trine venus
+LEAD
+BODY
+
+=transit eros opposition venus
+LEAD
+BODY
+
+=transit eros quincunx venus
+LEAD
+BODY
+
+=transit eros semisextile venus
+LEAD
+BODY
+
+=transit eros semisquare venus
+LEAD
+BODY
+
+=transit eros sesquiquadrate venus
+LEAD
+BODY
+
+=transit eros quintile venus
+LEAD
+BODY
+
+=transit eros sesquiquintile venus
+LEAD
+BODY
+
+# eros with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction mars
+LEAD
+BODY
+
+=transit eros sextile mars
+LEAD
+BODY
+
+=transit eros square mars
+LEAD
+BODY
+
+=transit eros trine mars
+LEAD
+BODY
+
+=transit eros opposition mars
+LEAD
+BODY
+
+=transit eros quincunx mars
+LEAD
+BODY
+
+=transit eros semisextile mars
+LEAD
+BODY
+
+=transit eros semisquare mars
+LEAD
+BODY
+
+=transit eros sesquiquadrate mars
+LEAD
+BODY
+
+=transit eros quintile mars
+LEAD
+BODY
+
+=transit eros sesquiquintile mars
+LEAD
+BODY
+
+# eros with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction jupiter
+LEAD
+BODY
+
+=transit eros sextile jupiter
+LEAD
+BODY
+
+=transit eros square jupiter
+LEAD
+BODY
+
+=transit eros trine jupiter
+LEAD
+BODY
+
+=transit eros opposition jupiter
+LEAD
+BODY
+
+=transit eros quincunx jupiter
+LEAD
+BODY
+
+=transit eros semisextile jupiter
+LEAD
+BODY
+
+=transit eros semisquare jupiter
+LEAD
+BODY
+
+=transit eros sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit eros quintile jupiter
+LEAD
+BODY
+
+=transit eros sesquiquintile jupiter
+LEAD
+BODY
+
+# eros with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction saturn
+LEAD
+BODY
+
+=transit eros sextile saturn
+LEAD
+BODY
+
+=transit eros square saturn
+LEAD
+BODY
+
+=transit eros trine saturn
+LEAD
+BODY
+
+=transit eros opposition saturn
+LEAD
+BODY
+
+=transit eros quincunx saturn
+LEAD
+BODY
+
+=transit eros semisextile saturn
+LEAD
+BODY
+
+=transit eros semisquare saturn
+LEAD
+BODY
+
+=transit eros sesquiquadrate saturn
+LEAD
+BODY
+
+=transit eros quintile saturn
+LEAD
+BODY
+
+=transit eros sesquiquintile saturn
+LEAD
+BODY
+
+# eros with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction uranus
+LEAD
+BODY
+
+=transit eros sextile uranus
+LEAD
+BODY
+
+=transit eros square uranus
+LEAD
+BODY
+
+=transit eros trine uranus
+LEAD
+BODY
+
+=transit eros opposition uranus
+LEAD
+BODY
+
+=transit eros quincunx uranus
+LEAD
+BODY
+
+=transit eros semisextile uranus
+LEAD
+BODY
+
+=transit eros semisquare uranus
+LEAD
+BODY
+
+=transit eros sesquiquadrate uranus
+LEAD
+BODY
+
+=transit eros quintile uranus
+LEAD
+BODY
+
+=transit eros sesquiquintile uranus
+LEAD
+BODY
+
+# eros with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction neptune
+LEAD
+BODY
+
+=transit eros sextile neptune
+LEAD
+BODY
+
+=transit eros square neptune
+LEAD
+BODY
+
+=transit eros trine neptune
+LEAD
+BODY
+
+=transit eros opposition neptune
+LEAD
+BODY
+
+=transit eros quincunx neptune
+LEAD
+BODY
+
+=transit eros semisextile neptune
+LEAD
+BODY
+
+=transit eros semisquare neptune
+LEAD
+BODY
+
+=transit eros sesquiquadrate neptune
+LEAD
+BODY
+
+=transit eros quintile neptune
+LEAD
+BODY
+
+=transit eros sesquiquintile neptune
+LEAD
+BODY
+
+# eros with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction pluto
+LEAD
+BODY
+
+=transit eros sextile pluto
+LEAD
+BODY
+
+=transit eros square pluto
+LEAD
+BODY
+
+=transit eros trine pluto
+LEAD
+BODY
+
+=transit eros opposition pluto
+LEAD
+BODY
+
+=transit eros quincunx pluto
+LEAD
+BODY
+
+=transit eros semisextile pluto
+LEAD
+BODY
+
+=transit eros semisquare pluto
+LEAD
+BODY
+
+=transit eros sesquiquadrate pluto
+LEAD
+BODY
+
+=transit eros quintile pluto
+LEAD
+BODY
+
+=transit eros sesquiquintile pluto
+LEAD
+BODY
+
+# eros with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction north_node
+LEAD
+BODY
+
+=transit eros sextile north_node
+LEAD
+BODY
+
+=transit eros square north_node
+LEAD
+BODY
+
+=transit eros trine north_node
+LEAD
+BODY
+
+=transit eros opposition north_node
+LEAD
+BODY
+
+=transit eros quincunx north_node
+LEAD
+BODY
+
+=transit eros semisextile north_node
+LEAD
+BODY
+
+=transit eros semisquare north_node
+LEAD
+BODY
+
+=transit eros sesquiquadrate north_node
+LEAD
+BODY
+
+=transit eros quintile north_node
+LEAD
+BODY
+
+=transit eros sesquiquintile north_node
+LEAD
+BODY
+
+# eros with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit eros conjunction chiron
+LEAD
+BODY
+
+=transit eros sextile chiron
+LEAD
+BODY
+
+=transit eros square chiron
+LEAD
+BODY
+
+=transit eros trine chiron
+LEAD
+BODY
+
+=transit eros opposition chiron
+LEAD
+BODY
+
+=transit eros quincunx chiron
+LEAD
+BODY
+
+=transit eros semisextile chiron
+LEAD
+BODY
+
+=transit eros semisquare chiron
+LEAD
+BODY
+
+=transit eros sesquiquadrate chiron
+LEAD
+BODY
+
+=transit eros quintile chiron
+LEAD
+BODY
+
+=transit eros sesquiquintile chiron
+LEAD
+BODY

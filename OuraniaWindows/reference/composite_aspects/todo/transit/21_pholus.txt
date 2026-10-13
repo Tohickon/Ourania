@@ -1,0 +1,1261 @@
+# transit: pholus - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# pholus with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction ascendant
+LEAD
+BODY
+
+=transit pholus sextile ascendant
+LEAD
+BODY
+
+=transit pholus square ascendant
+LEAD
+BODY
+
+=transit pholus trine ascendant
+LEAD
+BODY
+
+=transit pholus opposition ascendant
+LEAD
+BODY
+
+=transit pholus quincunx ascendant
+LEAD
+BODY
+
+=transit pholus semisextile ascendant
+LEAD
+BODY
+
+=transit pholus semisquare ascendant
+LEAD
+BODY
+
+=transit pholus sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit pholus quintile ascendant
+LEAD
+BODY
+
+=transit pholus sesquiquintile ascendant
+LEAD
+BODY
+
+# pholus with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction descendant
+LEAD
+BODY
+
+=transit pholus sextile descendant
+LEAD
+BODY
+
+=transit pholus square descendant
+LEAD
+BODY
+
+=transit pholus trine descendant
+LEAD
+BODY
+
+=transit pholus opposition descendant
+LEAD
+BODY
+
+=transit pholus quincunx descendant
+LEAD
+BODY
+
+=transit pholus semisextile descendant
+LEAD
+BODY
+
+=transit pholus semisquare descendant
+LEAD
+BODY
+
+=transit pholus sesquiquadrate descendant
+LEAD
+BODY
+
+=transit pholus quintile descendant
+LEAD
+BODY
+
+=transit pholus sesquiquintile descendant
+LEAD
+BODY
+
+# pholus with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction mc
+LEAD
+BODY
+
+=transit pholus sextile mc
+LEAD
+BODY
+
+=transit pholus square mc
+LEAD
+BODY
+
+=transit pholus trine mc
+LEAD
+BODY
+
+=transit pholus opposition mc
+LEAD
+BODY
+
+=transit pholus quincunx mc
+LEAD
+BODY
+
+=transit pholus semisextile mc
+LEAD
+BODY
+
+=transit pholus semisquare mc
+LEAD
+BODY
+
+=transit pholus sesquiquadrate mc
+LEAD
+BODY
+
+=transit pholus quintile mc
+LEAD
+BODY
+
+=transit pholus sesquiquintile mc
+LEAD
+BODY
+
+# pholus with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction ic
+LEAD
+BODY
+
+=transit pholus sextile ic
+LEAD
+BODY
+
+=transit pholus square ic
+LEAD
+BODY
+
+=transit pholus trine ic
+LEAD
+BODY
+
+=transit pholus opposition ic
+LEAD
+BODY
+
+=transit pholus quincunx ic
+LEAD
+BODY
+
+=transit pholus semisextile ic
+LEAD
+BODY
+
+=transit pholus semisquare ic
+LEAD
+BODY
+
+=transit pholus sesquiquadrate ic
+LEAD
+BODY
+
+=transit pholus quintile ic
+LEAD
+BODY
+
+=transit pholus sesquiquintile ic
+LEAD
+BODY
+
+# pholus with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction south_node
+LEAD
+BODY
+
+=transit pholus sextile south_node
+LEAD
+BODY
+
+=transit pholus square south_node
+LEAD
+BODY
+
+=transit pholus trine south_node
+LEAD
+BODY
+
+=transit pholus opposition south_node
+LEAD
+BODY
+
+=transit pholus quincunx south_node
+LEAD
+BODY
+
+=transit pholus semisextile south_node
+LEAD
+BODY
+
+=transit pholus semisquare south_node
+LEAD
+BODY
+
+=transit pholus sesquiquadrate south_node
+LEAD
+BODY
+
+=transit pholus quintile south_node
+LEAD
+BODY
+
+=transit pholus sesquiquintile south_node
+LEAD
+BODY
+
+# pholus with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction ceres
+LEAD
+BODY
+
+=transit pholus sextile ceres
+LEAD
+BODY
+
+=transit pholus square ceres
+LEAD
+BODY
+
+=transit pholus trine ceres
+LEAD
+BODY
+
+=transit pholus opposition ceres
+LEAD
+BODY
+
+=transit pholus quincunx ceres
+LEAD
+BODY
+
+=transit pholus semisextile ceres
+LEAD
+BODY
+
+=transit pholus semisquare ceres
+LEAD
+BODY
+
+=transit pholus sesquiquadrate ceres
+LEAD
+BODY
+
+=transit pholus quintile ceres
+LEAD
+BODY
+
+=transit pholus sesquiquintile ceres
+LEAD
+BODY
+
+# pholus with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction pallas
+LEAD
+BODY
+
+=transit pholus sextile pallas
+LEAD
+BODY
+
+=transit pholus square pallas
+LEAD
+BODY
+
+=transit pholus trine pallas
+LEAD
+BODY
+
+=transit pholus opposition pallas
+LEAD
+BODY
+
+=transit pholus quincunx pallas
+LEAD
+BODY
+
+=transit pholus semisextile pallas
+LEAD
+BODY
+
+=transit pholus semisquare pallas
+LEAD
+BODY
+
+=transit pholus sesquiquadrate pallas
+LEAD
+BODY
+
+=transit pholus quintile pallas
+LEAD
+BODY
+
+=transit pholus sesquiquintile pallas
+LEAD
+BODY
+
+# pholus with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction juno
+LEAD
+BODY
+
+=transit pholus sextile juno
+LEAD
+BODY
+
+=transit pholus square juno
+LEAD
+BODY
+
+=transit pholus trine juno
+LEAD
+BODY
+
+=transit pholus opposition juno
+LEAD
+BODY
+
+=transit pholus quincunx juno
+LEAD
+BODY
+
+=transit pholus semisextile juno
+LEAD
+BODY
+
+=transit pholus semisquare juno
+LEAD
+BODY
+
+=transit pholus sesquiquadrate juno
+LEAD
+BODY
+
+=transit pholus quintile juno
+LEAD
+BODY
+
+=transit pholus sesquiquintile juno
+LEAD
+BODY
+
+# pholus with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction vesta
+LEAD
+BODY
+
+=transit pholus sextile vesta
+LEAD
+BODY
+
+=transit pholus square vesta
+LEAD
+BODY
+
+=transit pholus trine vesta
+LEAD
+BODY
+
+=transit pholus opposition vesta
+LEAD
+BODY
+
+=transit pholus quincunx vesta
+LEAD
+BODY
+
+=transit pholus semisextile vesta
+LEAD
+BODY
+
+=transit pholus semisquare vesta
+LEAD
+BODY
+
+=transit pholus sesquiquadrate vesta
+LEAD
+BODY
+
+=transit pholus quintile vesta
+LEAD
+BODY
+
+=transit pholus sesquiquintile vesta
+LEAD
+BODY
+
+# pholus with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction eris
+LEAD
+BODY
+
+=transit pholus sextile eris
+LEAD
+BODY
+
+=transit pholus square eris
+LEAD
+BODY
+
+=transit pholus trine eris
+LEAD
+BODY
+
+=transit pholus opposition eris
+LEAD
+BODY
+
+=transit pholus quincunx eris
+LEAD
+BODY
+
+=transit pholus semisextile eris
+LEAD
+BODY
+
+=transit pholus semisquare eris
+LEAD
+BODY
+
+=transit pholus sesquiquadrate eris
+LEAD
+BODY
+
+=transit pholus quintile eris
+LEAD
+BODY
+
+=transit pholus sesquiquintile eris
+LEAD
+BODY
+
+# pholus with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction eros
+LEAD
+BODY
+
+=transit pholus sextile eros
+LEAD
+BODY
+
+=transit pholus square eros
+LEAD
+BODY
+
+=transit pholus trine eros
+LEAD
+BODY
+
+=transit pholus opposition eros
+LEAD
+BODY
+
+=transit pholus quincunx eros
+LEAD
+BODY
+
+=transit pholus semisextile eros
+LEAD
+BODY
+
+=transit pholus semisquare eros
+LEAD
+BODY
+
+=transit pholus sesquiquadrate eros
+LEAD
+BODY
+
+=transit pholus quintile eros
+LEAD
+BODY
+
+=transit pholus sesquiquintile eros
+LEAD
+BODY
+
+# pholus with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction hygiea
+LEAD
+BODY
+
+=transit pholus sextile hygiea
+LEAD
+BODY
+
+=transit pholus square hygiea
+LEAD
+BODY
+
+=transit pholus trine hygiea
+LEAD
+BODY
+
+=transit pholus opposition hygiea
+LEAD
+BODY
+
+=transit pholus quincunx hygiea
+LEAD
+BODY
+
+=transit pholus semisextile hygiea
+LEAD
+BODY
+
+=transit pholus semisquare hygiea
+LEAD
+BODY
+
+=transit pholus sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit pholus quintile hygiea
+LEAD
+BODY
+
+=transit pholus sesquiquintile hygiea
+LEAD
+BODY
+
+# pholus with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction nessus
+LEAD
+BODY
+
+=transit pholus sextile nessus
+LEAD
+BODY
+
+=transit pholus square nessus
+LEAD
+BODY
+
+=transit pholus trine nessus
+LEAD
+BODY
+
+=transit pholus opposition nessus
+LEAD
+BODY
+
+=transit pholus quincunx nessus
+LEAD
+BODY
+
+=transit pholus semisextile nessus
+LEAD
+BODY
+
+=transit pholus semisquare nessus
+LEAD
+BODY
+
+=transit pholus sesquiquadrate nessus
+LEAD
+BODY
+
+=transit pholus quintile nessus
+LEAD
+BODY
+
+=transit pholus sesquiquintile nessus
+LEAD
+BODY
+
+# pholus with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction fortune
+LEAD
+BODY
+
+=transit pholus sextile fortune
+LEAD
+BODY
+
+=transit pholus square fortune
+LEAD
+BODY
+
+=transit pholus trine fortune
+LEAD
+BODY
+
+=transit pholus opposition fortune
+LEAD
+BODY
+
+=transit pholus quincunx fortune
+LEAD
+BODY
+
+=transit pholus semisextile fortune
+LEAD
+BODY
+
+=transit pholus semisquare fortune
+LEAD
+BODY
+
+=transit pholus sesquiquadrate fortune
+LEAD
+BODY
+
+=transit pholus quintile fortune
+LEAD
+BODY
+
+=transit pholus sesquiquintile fortune
+LEAD
+BODY
+
+# pholus with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction spirit
+LEAD
+BODY
+
+=transit pholus sextile spirit
+LEAD
+BODY
+
+=transit pholus square spirit
+LEAD
+BODY
+
+=transit pholus trine spirit
+LEAD
+BODY
+
+=transit pholus opposition spirit
+LEAD
+BODY
+
+=transit pholus quincunx spirit
+LEAD
+BODY
+
+=transit pholus semisextile spirit
+LEAD
+BODY
+
+=transit pholus semisquare spirit
+LEAD
+BODY
+
+=transit pholus sesquiquadrate spirit
+LEAD
+BODY
+
+=transit pholus quintile spirit
+LEAD
+BODY
+
+=transit pholus sesquiquintile spirit
+LEAD
+BODY
+
+# pholus with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction lilith
+LEAD
+BODY
+
+=transit pholus sextile lilith
+LEAD
+BODY
+
+=transit pholus square lilith
+LEAD
+BODY
+
+=transit pholus trine lilith
+LEAD
+BODY
+
+=transit pholus opposition lilith
+LEAD
+BODY
+
+=transit pholus quincunx lilith
+LEAD
+BODY
+
+=transit pholus semisextile lilith
+LEAD
+BODY
+
+=transit pholus semisquare lilith
+LEAD
+BODY
+
+=transit pholus sesquiquadrate lilith
+LEAD
+BODY
+
+=transit pholus quintile lilith
+LEAD
+BODY
+
+=transit pholus sesquiquintile lilith
+LEAD
+BODY
+
+# pholus with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction moon
+LEAD
+BODY
+
+=transit pholus sextile moon
+LEAD
+BODY
+
+=transit pholus square moon
+LEAD
+BODY
+
+=transit pholus trine moon
+LEAD
+BODY
+
+=transit pholus opposition moon
+LEAD
+BODY
+
+=transit pholus quincunx moon
+LEAD
+BODY
+
+=transit pholus semisextile moon
+LEAD
+BODY
+
+=transit pholus semisquare moon
+LEAD
+BODY
+
+=transit pholus sesquiquadrate moon
+LEAD
+BODY
+
+=transit pholus quintile moon
+LEAD
+BODY
+
+=transit pholus sesquiquintile moon
+LEAD
+BODY
+
+# pholus with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction sun
+LEAD
+BODY
+
+=transit pholus sextile sun
+LEAD
+BODY
+
+=transit pholus square sun
+LEAD
+BODY
+
+=transit pholus trine sun
+LEAD
+BODY
+
+=transit pholus opposition sun
+LEAD
+BODY
+
+=transit pholus quincunx sun
+LEAD
+BODY
+
+=transit pholus semisextile sun
+LEAD
+BODY
+
+=transit pholus semisquare sun
+LEAD
+BODY
+
+=transit pholus sesquiquadrate sun
+LEAD
+BODY
+
+=transit pholus quintile sun
+LEAD
+BODY
+
+=transit pholus sesquiquintile sun
+LEAD
+BODY
+
+# pholus with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction mercury
+LEAD
+BODY
+
+=transit pholus sextile mercury
+LEAD
+BODY
+
+=transit pholus square mercury
+LEAD
+BODY
+
+=transit pholus trine mercury
+LEAD
+BODY
+
+=transit pholus opposition mercury
+LEAD
+BODY
+
+=transit pholus quincunx mercury
+LEAD
+BODY
+
+=transit pholus semisextile mercury
+LEAD
+BODY
+
+=transit pholus semisquare mercury
+LEAD
+BODY
+
+=transit pholus sesquiquadrate mercury
+LEAD
+BODY
+
+=transit pholus quintile mercury
+LEAD
+BODY
+
+=transit pholus sesquiquintile mercury
+LEAD
+BODY
+
+# pholus with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction venus
+LEAD
+BODY
+
+=transit pholus sextile venus
+LEAD
+BODY
+
+=transit pholus square venus
+LEAD
+BODY
+
+=transit pholus trine venus
+LEAD
+BODY
+
+=transit pholus opposition venus
+LEAD
+BODY
+
+=transit pholus quincunx venus
+LEAD
+BODY
+
+=transit pholus semisextile venus
+LEAD
+BODY
+
+=transit pholus semisquare venus
+LEAD
+BODY
+
+=transit pholus sesquiquadrate venus
+LEAD
+BODY
+
+=transit pholus quintile venus
+LEAD
+BODY
+
+=transit pholus sesquiquintile venus
+LEAD
+BODY
+
+# pholus with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction mars
+LEAD
+BODY
+
+=transit pholus sextile mars
+LEAD
+BODY
+
+=transit pholus square mars
+LEAD
+BODY
+
+=transit pholus trine mars
+LEAD
+BODY
+
+=transit pholus opposition mars
+LEAD
+BODY
+
+=transit pholus quincunx mars
+LEAD
+BODY
+
+=transit pholus semisextile mars
+LEAD
+BODY
+
+=transit pholus semisquare mars
+LEAD
+BODY
+
+=transit pholus sesquiquadrate mars
+LEAD
+BODY
+
+=transit pholus quintile mars
+LEAD
+BODY
+
+=transit pholus sesquiquintile mars
+LEAD
+BODY
+
+# pholus with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction jupiter
+LEAD
+BODY
+
+=transit pholus sextile jupiter
+LEAD
+BODY
+
+=transit pholus square jupiter
+LEAD
+BODY
+
+=transit pholus trine jupiter
+LEAD
+BODY
+
+=transit pholus opposition jupiter
+LEAD
+BODY
+
+=transit pholus quincunx jupiter
+LEAD
+BODY
+
+=transit pholus semisextile jupiter
+LEAD
+BODY
+
+=transit pholus semisquare jupiter
+LEAD
+BODY
+
+=transit pholus sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit pholus quintile jupiter
+LEAD
+BODY
+
+=transit pholus sesquiquintile jupiter
+LEAD
+BODY
+
+# pholus with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction saturn
+LEAD
+BODY
+
+=transit pholus sextile saturn
+LEAD
+BODY
+
+=transit pholus square saturn
+LEAD
+BODY
+
+=transit pholus trine saturn
+LEAD
+BODY
+
+=transit pholus opposition saturn
+LEAD
+BODY
+
+=transit pholus quincunx saturn
+LEAD
+BODY
+
+=transit pholus semisextile saturn
+LEAD
+BODY
+
+=transit pholus semisquare saturn
+LEAD
+BODY
+
+=transit pholus sesquiquadrate saturn
+LEAD
+BODY
+
+=transit pholus quintile saturn
+LEAD
+BODY
+
+=transit pholus sesquiquintile saturn
+LEAD
+BODY
+
+# pholus with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction uranus
+LEAD
+BODY
+
+=transit pholus sextile uranus
+LEAD
+BODY
+
+=transit pholus square uranus
+LEAD
+BODY
+
+=transit pholus trine uranus
+LEAD
+BODY
+
+=transit pholus opposition uranus
+LEAD
+BODY
+
+=transit pholus quincunx uranus
+LEAD
+BODY
+
+=transit pholus semisextile uranus
+LEAD
+BODY
+
+=transit pholus semisquare uranus
+LEAD
+BODY
+
+=transit pholus sesquiquadrate uranus
+LEAD
+BODY
+
+=transit pholus quintile uranus
+LEAD
+BODY
+
+=transit pholus sesquiquintile uranus
+LEAD
+BODY
+
+# pholus with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction neptune
+LEAD
+BODY
+
+=transit pholus sextile neptune
+LEAD
+BODY
+
+=transit pholus square neptune
+LEAD
+BODY
+
+=transit pholus trine neptune
+LEAD
+BODY
+
+=transit pholus opposition neptune
+LEAD
+BODY
+
+=transit pholus quincunx neptune
+LEAD
+BODY
+
+=transit pholus semisextile neptune
+LEAD
+BODY
+
+=transit pholus semisquare neptune
+LEAD
+BODY
+
+=transit pholus sesquiquadrate neptune
+LEAD
+BODY
+
+=transit pholus quintile neptune
+LEAD
+BODY
+
+=transit pholus sesquiquintile neptune
+LEAD
+BODY
+
+# pholus with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction pluto
+LEAD
+BODY
+
+=transit pholus sextile pluto
+LEAD
+BODY
+
+=transit pholus square pluto
+LEAD
+BODY
+
+=transit pholus trine pluto
+LEAD
+BODY
+
+=transit pholus opposition pluto
+LEAD
+BODY
+
+=transit pholus quincunx pluto
+LEAD
+BODY
+
+=transit pholus semisextile pluto
+LEAD
+BODY
+
+=transit pholus semisquare pluto
+LEAD
+BODY
+
+=transit pholus sesquiquadrate pluto
+LEAD
+BODY
+
+=transit pholus quintile pluto
+LEAD
+BODY
+
+=transit pholus sesquiquintile pluto
+LEAD
+BODY
+
+# pholus with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction north_node
+LEAD
+BODY
+
+=transit pholus sextile north_node
+LEAD
+BODY
+
+=transit pholus square north_node
+LEAD
+BODY
+
+=transit pholus trine north_node
+LEAD
+BODY
+
+=transit pholus opposition north_node
+LEAD
+BODY
+
+=transit pholus quincunx north_node
+LEAD
+BODY
+
+=transit pholus semisextile north_node
+LEAD
+BODY
+
+=transit pholus semisquare north_node
+LEAD
+BODY
+
+=transit pholus sesquiquadrate north_node
+LEAD
+BODY
+
+=transit pholus quintile north_node
+LEAD
+BODY
+
+=transit pholus sesquiquintile north_node
+LEAD
+BODY
+
+# pholus with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit pholus conjunction chiron
+LEAD
+BODY
+
+=transit pholus sextile chiron
+LEAD
+BODY
+
+=transit pholus square chiron
+LEAD
+BODY
+
+=transit pholus trine chiron
+LEAD
+BODY
+
+=transit pholus opposition chiron
+LEAD
+BODY
+
+=transit pholus quincunx chiron
+LEAD
+BODY
+
+=transit pholus semisextile chiron
+LEAD
+BODY
+
+=transit pholus semisquare chiron
+LEAD
+BODY
+
+=transit pholus sesquiquadrate chiron
+LEAD
+BODY
+
+=transit pholus quintile chiron
+LEAD
+BODY
+
+=transit pholus sesquiquintile chiron
+LEAD
+BODY

@@ -1,0 +1,1274 @@
+# transit: mercury - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# mercury with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction descendant
+LEAD
+BODY
+
+=transit mercury sextile descendant
+LEAD
+BODY
+
+=transit mercury square descendant
+LEAD
+BODY
+
+=transit mercury trine descendant
+LEAD
+BODY
+
+=transit mercury opposition descendant
+LEAD
+BODY
+
+=transit mercury quincunx descendant
+LEAD
+BODY
+
+=transit mercury semisextile descendant
+LEAD
+BODY
+
+=transit mercury semisquare descendant
+LEAD
+BODY
+
+=transit mercury sesquiquadrate descendant
+LEAD
+BODY
+
+=transit mercury quintile descendant
+LEAD
+BODY
+
+=transit mercury biquintile descendant
+LEAD
+BODY
+
+=transit mercury sesquiquintile descendant
+LEAD
+BODY
+
+=transit mercury septile descendant
+LEAD
+BODY
+
+=transit mercury novile descendant
+LEAD
+BODY
+
+=transit mercury decile descendant
+LEAD
+BODY
+
+# mercury with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction ic
+LEAD
+BODY
+
+=transit mercury sextile ic
+LEAD
+BODY
+
+=transit mercury square ic
+LEAD
+BODY
+
+=transit mercury trine ic
+LEAD
+BODY
+
+=transit mercury opposition ic
+LEAD
+BODY
+
+=transit mercury quincunx ic
+LEAD
+BODY
+
+=transit mercury semisextile ic
+LEAD
+BODY
+
+=transit mercury semisquare ic
+LEAD
+BODY
+
+=transit mercury sesquiquadrate ic
+LEAD
+BODY
+
+=transit mercury quintile ic
+LEAD
+BODY
+
+=transit mercury biquintile ic
+LEAD
+BODY
+
+=transit mercury sesquiquintile ic
+LEAD
+BODY
+
+=transit mercury septile ic
+LEAD
+BODY
+
+=transit mercury novile ic
+LEAD
+BODY
+
+=transit mercury decile ic
+LEAD
+BODY
+
+# mercury with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction ascendant
+LEAD
+BODY
+
+=transit mercury sextile ascendant
+LEAD
+BODY
+
+=transit mercury square ascendant
+LEAD
+BODY
+
+=transit mercury trine ascendant
+LEAD
+BODY
+
+=transit mercury opposition ascendant
+LEAD
+BODY
+
+=transit mercury quincunx ascendant
+LEAD
+BODY
+
+=transit mercury semisextile ascendant
+LEAD
+BODY
+
+=transit mercury semisquare ascendant
+LEAD
+BODY
+
+=transit mercury sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit mercury quintile ascendant
+LEAD
+BODY
+
+=transit mercury biquintile ascendant
+LEAD
+BODY
+
+=transit mercury sesquiquintile ascendant
+LEAD
+BODY
+
+=transit mercury septile ascendant
+LEAD
+BODY
+
+=transit mercury novile ascendant
+LEAD
+BODY
+
+=transit mercury decile ascendant
+LEAD
+BODY
+
+# mercury with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction mc
+LEAD
+BODY
+
+=transit mercury sextile mc
+LEAD
+BODY
+
+=transit mercury square mc
+LEAD
+BODY
+
+=transit mercury trine mc
+LEAD
+BODY
+
+=transit mercury opposition mc
+LEAD
+BODY
+
+=transit mercury quincunx mc
+LEAD
+BODY
+
+=transit mercury semisextile mc
+LEAD
+BODY
+
+=transit mercury semisquare mc
+LEAD
+BODY
+
+=transit mercury sesquiquadrate mc
+LEAD
+BODY
+
+=transit mercury quintile mc
+LEAD
+BODY
+
+=transit mercury biquintile mc
+LEAD
+BODY
+
+=transit mercury sesquiquintile mc
+LEAD
+BODY
+
+=transit mercury septile mc
+LEAD
+BODY
+
+=transit mercury novile mc
+LEAD
+BODY
+
+=transit mercury decile mc
+LEAD
+BODY
+
+# mercury with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction south_node
+LEAD
+BODY
+
+=transit mercury sextile south_node
+LEAD
+BODY
+
+=transit mercury square south_node
+LEAD
+BODY
+
+=transit mercury trine south_node
+LEAD
+BODY
+
+=transit mercury opposition south_node
+LEAD
+BODY
+
+=transit mercury quincunx south_node
+LEAD
+BODY
+
+=transit mercury semisextile south_node
+LEAD
+BODY
+
+=transit mercury semisquare south_node
+LEAD
+BODY
+
+=transit mercury sesquiquadrate south_node
+LEAD
+BODY
+
+=transit mercury quintile south_node
+LEAD
+BODY
+
+=transit mercury sesquiquintile south_node
+LEAD
+BODY
+
+# mercury with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction ceres
+LEAD
+BODY
+
+=transit mercury sextile ceres
+LEAD
+BODY
+
+=transit mercury square ceres
+LEAD
+BODY
+
+=transit mercury trine ceres
+LEAD
+BODY
+
+=transit mercury opposition ceres
+LEAD
+BODY
+
+=transit mercury quincunx ceres
+LEAD
+BODY
+
+=transit mercury semisextile ceres
+LEAD
+BODY
+
+=transit mercury semisquare ceres
+LEAD
+BODY
+
+=transit mercury sesquiquadrate ceres
+LEAD
+BODY
+
+=transit mercury quintile ceres
+LEAD
+BODY
+
+=transit mercury sesquiquintile ceres
+LEAD
+BODY
+
+# mercury with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction pallas
+LEAD
+BODY
+
+=transit mercury sextile pallas
+LEAD
+BODY
+
+=transit mercury square pallas
+LEAD
+BODY
+
+=transit mercury trine pallas
+LEAD
+BODY
+
+=transit mercury opposition pallas
+LEAD
+BODY
+
+=transit mercury quincunx pallas
+LEAD
+BODY
+
+=transit mercury semisextile pallas
+LEAD
+BODY
+
+=transit mercury semisquare pallas
+LEAD
+BODY
+
+=transit mercury sesquiquadrate pallas
+LEAD
+BODY
+
+=transit mercury quintile pallas
+LEAD
+BODY
+
+=transit mercury sesquiquintile pallas
+LEAD
+BODY
+
+# mercury with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction juno
+LEAD
+BODY
+
+=transit mercury sextile juno
+LEAD
+BODY
+
+=transit mercury square juno
+LEAD
+BODY
+
+=transit mercury trine juno
+LEAD
+BODY
+
+=transit mercury opposition juno
+LEAD
+BODY
+
+=transit mercury quincunx juno
+LEAD
+BODY
+
+=transit mercury semisextile juno
+LEAD
+BODY
+
+=transit mercury semisquare juno
+LEAD
+BODY
+
+=transit mercury sesquiquadrate juno
+LEAD
+BODY
+
+=transit mercury quintile juno
+LEAD
+BODY
+
+=transit mercury sesquiquintile juno
+LEAD
+BODY
+
+# mercury with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction vesta
+LEAD
+BODY
+
+=transit mercury sextile vesta
+LEAD
+BODY
+
+=transit mercury square vesta
+LEAD
+BODY
+
+=transit mercury trine vesta
+LEAD
+BODY
+
+=transit mercury opposition vesta
+LEAD
+BODY
+
+=transit mercury quincunx vesta
+LEAD
+BODY
+
+=transit mercury semisextile vesta
+LEAD
+BODY
+
+=transit mercury semisquare vesta
+LEAD
+BODY
+
+=transit mercury sesquiquadrate vesta
+LEAD
+BODY
+
+=transit mercury quintile vesta
+LEAD
+BODY
+
+=transit mercury sesquiquintile vesta
+LEAD
+BODY
+
+# mercury with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction eris
+LEAD
+BODY
+
+=transit mercury sextile eris
+LEAD
+BODY
+
+=transit mercury square eris
+LEAD
+BODY
+
+=transit mercury trine eris
+LEAD
+BODY
+
+=transit mercury opposition eris
+LEAD
+BODY
+
+=transit mercury quincunx eris
+LEAD
+BODY
+
+=transit mercury semisextile eris
+LEAD
+BODY
+
+=transit mercury semisquare eris
+LEAD
+BODY
+
+=transit mercury sesquiquadrate eris
+LEAD
+BODY
+
+=transit mercury quintile eris
+LEAD
+BODY
+
+=transit mercury sesquiquintile eris
+LEAD
+BODY
+
+# mercury with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction eros
+LEAD
+BODY
+
+=transit mercury sextile eros
+LEAD
+BODY
+
+=transit mercury square eros
+LEAD
+BODY
+
+=transit mercury trine eros
+LEAD
+BODY
+
+=transit mercury opposition eros
+LEAD
+BODY
+
+=transit mercury quincunx eros
+LEAD
+BODY
+
+=transit mercury semisextile eros
+LEAD
+BODY
+
+=transit mercury semisquare eros
+LEAD
+BODY
+
+=transit mercury sesquiquadrate eros
+LEAD
+BODY
+
+=transit mercury quintile eros
+LEAD
+BODY
+
+=transit mercury sesquiquintile eros
+LEAD
+BODY
+
+# mercury with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction hygiea
+LEAD
+BODY
+
+=transit mercury sextile hygiea
+LEAD
+BODY
+
+=transit mercury square hygiea
+LEAD
+BODY
+
+=transit mercury trine hygiea
+LEAD
+BODY
+
+=transit mercury opposition hygiea
+LEAD
+BODY
+
+=transit mercury quincunx hygiea
+LEAD
+BODY
+
+=transit mercury semisextile hygiea
+LEAD
+BODY
+
+=transit mercury semisquare hygiea
+LEAD
+BODY
+
+=transit mercury sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit mercury quintile hygiea
+LEAD
+BODY
+
+=transit mercury sesquiquintile hygiea
+LEAD
+BODY
+
+# mercury with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction nessus
+LEAD
+BODY
+
+=transit mercury sextile nessus
+LEAD
+BODY
+
+=transit mercury square nessus
+LEAD
+BODY
+
+=transit mercury trine nessus
+LEAD
+BODY
+
+=transit mercury opposition nessus
+LEAD
+BODY
+
+=transit mercury quincunx nessus
+LEAD
+BODY
+
+=transit mercury semisextile nessus
+LEAD
+BODY
+
+=transit mercury semisquare nessus
+LEAD
+BODY
+
+=transit mercury sesquiquadrate nessus
+LEAD
+BODY
+
+=transit mercury quintile nessus
+LEAD
+BODY
+
+=transit mercury sesquiquintile nessus
+LEAD
+BODY
+
+# mercury with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction pholus
+LEAD
+BODY
+
+=transit mercury sextile pholus
+LEAD
+BODY
+
+=transit mercury square pholus
+LEAD
+BODY
+
+=transit mercury trine pholus
+LEAD
+BODY
+
+=transit mercury opposition pholus
+LEAD
+BODY
+
+=transit mercury quincunx pholus
+LEAD
+BODY
+
+=transit mercury semisextile pholus
+LEAD
+BODY
+
+=transit mercury semisquare pholus
+LEAD
+BODY
+
+=transit mercury sesquiquadrate pholus
+LEAD
+BODY
+
+=transit mercury quintile pholus
+LEAD
+BODY
+
+=transit mercury sesquiquintile pholus
+LEAD
+BODY
+
+# mercury with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction fortune
+LEAD
+BODY
+
+=transit mercury sextile fortune
+LEAD
+BODY
+
+=transit mercury square fortune
+LEAD
+BODY
+
+=transit mercury trine fortune
+LEAD
+BODY
+
+=transit mercury opposition fortune
+LEAD
+BODY
+
+=transit mercury quincunx fortune
+LEAD
+BODY
+
+=transit mercury semisextile fortune
+LEAD
+BODY
+
+=transit mercury semisquare fortune
+LEAD
+BODY
+
+=transit mercury sesquiquadrate fortune
+LEAD
+BODY
+
+=transit mercury quintile fortune
+LEAD
+BODY
+
+=transit mercury sesquiquintile fortune
+LEAD
+BODY
+
+# mercury with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction spirit
+LEAD
+BODY
+
+=transit mercury sextile spirit
+LEAD
+BODY
+
+=transit mercury square spirit
+LEAD
+BODY
+
+=transit mercury trine spirit
+LEAD
+BODY
+
+=transit mercury opposition spirit
+LEAD
+BODY
+
+=transit mercury quincunx spirit
+LEAD
+BODY
+
+=transit mercury semisextile spirit
+LEAD
+BODY
+
+=transit mercury semisquare spirit
+LEAD
+BODY
+
+=transit mercury sesquiquadrate spirit
+LEAD
+BODY
+
+=transit mercury quintile spirit
+LEAD
+BODY
+
+=transit mercury sesquiquintile spirit
+LEAD
+BODY
+
+# mercury with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction lilith
+LEAD
+BODY
+
+=transit mercury sextile lilith
+LEAD
+BODY
+
+=transit mercury square lilith
+LEAD
+BODY
+
+=transit mercury trine lilith
+LEAD
+BODY
+
+=transit mercury opposition lilith
+LEAD
+BODY
+
+=transit mercury quincunx lilith
+LEAD
+BODY
+
+=transit mercury semisextile lilith
+LEAD
+BODY
+
+=transit mercury semisquare lilith
+LEAD
+BODY
+
+=transit mercury sesquiquadrate lilith
+LEAD
+BODY
+
+=transit mercury quintile lilith
+LEAD
+BODY
+
+=transit mercury sesquiquintile lilith
+LEAD
+BODY
+
+# mercury with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction sun
+LEAD
+BODY
+
+=transit mercury sextile sun
+LEAD
+BODY
+
+=transit mercury square sun
+LEAD
+BODY
+
+=transit mercury trine sun
+LEAD
+BODY
+
+=transit mercury opposition sun
+LEAD
+BODY
+
+=transit mercury biquintile sun
+LEAD
+BODY
+
+=transit mercury septile sun
+LEAD
+BODY
+
+=transit mercury novile sun
+LEAD
+BODY
+
+=transit mercury decile sun
+LEAD
+BODY
+
+# mercury with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction moon
+LEAD
+BODY
+
+=transit mercury sextile moon
+LEAD
+BODY
+
+=transit mercury square moon
+LEAD
+BODY
+
+=transit mercury trine moon
+LEAD
+BODY
+
+=transit mercury opposition moon
+LEAD
+BODY
+
+=transit mercury biquintile moon
+LEAD
+BODY
+
+=transit mercury septile moon
+LEAD
+BODY
+
+=transit mercury novile moon
+LEAD
+BODY
+
+=transit mercury decile moon
+LEAD
+BODY
+
+# mercury with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction mercury
+LEAD
+BODY
+
+=transit mercury sextile mercury
+LEAD
+BODY
+
+=transit mercury square mercury
+LEAD
+BODY
+
+=transit mercury trine mercury
+LEAD
+BODY
+
+=transit mercury opposition mercury
+LEAD
+BODY
+
+=transit mercury biquintile mercury
+LEAD
+BODY
+
+=transit mercury septile mercury
+LEAD
+BODY
+
+=transit mercury novile mercury
+LEAD
+BODY
+
+=transit mercury decile mercury
+LEAD
+BODY
+
+# mercury with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction venus
+LEAD
+BODY
+
+=transit mercury sextile venus
+LEAD
+BODY
+
+=transit mercury square venus
+LEAD
+BODY
+
+=transit mercury trine venus
+LEAD
+BODY
+
+=transit mercury opposition venus
+LEAD
+BODY
+
+=transit mercury biquintile venus
+LEAD
+BODY
+
+=transit mercury septile venus
+LEAD
+BODY
+
+=transit mercury novile venus
+LEAD
+BODY
+
+=transit mercury decile venus
+LEAD
+BODY
+
+# mercury with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction mars
+LEAD
+BODY
+
+=transit mercury sextile mars
+LEAD
+BODY
+
+=transit mercury square mars
+LEAD
+BODY
+
+=transit mercury trine mars
+LEAD
+BODY
+
+=transit mercury opposition mars
+LEAD
+BODY
+
+=transit mercury biquintile mars
+LEAD
+BODY
+
+=transit mercury septile mars
+LEAD
+BODY
+
+=transit mercury novile mars
+LEAD
+BODY
+
+=transit mercury decile mars
+LEAD
+BODY
+
+# mercury with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction jupiter
+LEAD
+BODY
+
+=transit mercury sextile jupiter
+LEAD
+BODY
+
+=transit mercury square jupiter
+LEAD
+BODY
+
+=transit mercury trine jupiter
+LEAD
+BODY
+
+=transit mercury opposition jupiter
+LEAD
+BODY
+
+=transit mercury biquintile jupiter
+LEAD
+BODY
+
+=transit mercury septile jupiter
+LEAD
+BODY
+
+=transit mercury novile jupiter
+LEAD
+BODY
+
+=transit mercury decile jupiter
+LEAD
+BODY
+
+# mercury with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction saturn
+LEAD
+BODY
+
+=transit mercury sextile saturn
+LEAD
+BODY
+
+=transit mercury square saturn
+LEAD
+BODY
+
+=transit mercury trine saturn
+LEAD
+BODY
+
+=transit mercury opposition saturn
+LEAD
+BODY
+
+=transit mercury biquintile saturn
+LEAD
+BODY
+
+=transit mercury septile saturn
+LEAD
+BODY
+
+=transit mercury novile saturn
+LEAD
+BODY
+
+=transit mercury decile saturn
+LEAD
+BODY
+
+# mercury with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction uranus
+LEAD
+BODY
+
+=transit mercury sextile uranus
+LEAD
+BODY
+
+=transit mercury square uranus
+LEAD
+BODY
+
+=transit mercury trine uranus
+LEAD
+BODY
+
+=transit mercury opposition uranus
+LEAD
+BODY
+
+=transit mercury biquintile uranus
+LEAD
+BODY
+
+=transit mercury septile uranus
+LEAD
+BODY
+
+=transit mercury novile uranus
+LEAD
+BODY
+
+=transit mercury decile uranus
+LEAD
+BODY
+
+# mercury with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction neptune
+LEAD
+BODY
+
+=transit mercury sextile neptune
+LEAD
+BODY
+
+=transit mercury square neptune
+LEAD
+BODY
+
+=transit mercury trine neptune
+LEAD
+BODY
+
+=transit mercury opposition neptune
+LEAD
+BODY
+
+=transit mercury biquintile neptune
+LEAD
+BODY
+
+=transit mercury septile neptune
+LEAD
+BODY
+
+=transit mercury novile neptune
+LEAD
+BODY
+
+=transit mercury decile neptune
+LEAD
+BODY
+
+# mercury with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction pluto
+LEAD
+BODY
+
+=transit mercury sextile pluto
+LEAD
+BODY
+
+=transit mercury square pluto
+LEAD
+BODY
+
+=transit mercury trine pluto
+LEAD
+BODY
+
+=transit mercury opposition pluto
+LEAD
+BODY
+
+=transit mercury biquintile pluto
+LEAD
+BODY
+
+=transit mercury septile pluto
+LEAD
+BODY
+
+=transit mercury novile pluto
+LEAD
+BODY
+
+=transit mercury decile pluto
+LEAD
+BODY
+
+# mercury with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction chiron
+LEAD
+BODY
+
+=transit mercury sextile chiron
+LEAD
+BODY
+
+=transit mercury square chiron
+LEAD
+BODY
+
+=transit mercury trine chiron
+LEAD
+BODY
+
+=transit mercury opposition chiron
+LEAD
+BODY
+
+=transit mercury biquintile chiron
+LEAD
+BODY
+
+=transit mercury septile chiron
+LEAD
+BODY
+
+=transit mercury novile chiron
+LEAD
+BODY
+
+=transit mercury decile chiron
+LEAD
+BODY
+
+# mercury with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit mercury conjunction north_node
+LEAD
+BODY
+
+=transit mercury sextile north_node
+LEAD
+BODY
+
+=transit mercury square north_node
+LEAD
+BODY
+
+=transit mercury trine north_node
+LEAD
+BODY
+
+=transit mercury opposition north_node
+LEAD
+BODY
+
+=transit mercury biquintile north_node
+LEAD
+BODY
+
+=transit mercury septile north_node
+LEAD
+BODY
+
+=transit mercury novile north_node
+LEAD
+BODY
+
+=transit mercury decile north_node
+LEAD
+BODY

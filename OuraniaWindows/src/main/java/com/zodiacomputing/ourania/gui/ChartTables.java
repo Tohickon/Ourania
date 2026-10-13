@@ -13,6 +13,7 @@ import com.zodiacomputing.ourania.astro.Zodiac;
 import com.zodiacomputing.ourania.astro.Transits;
 import com.zodiacomputing.ourania.astro.Draconic;
 import com.zodiacomputing.ourania.astro.Rulership;
+import com.zodiacomputing.ourania.astro.ArcMidpoints;
 import com.zodiacomputing.ourania.astro.SolarArc;
 
 import de.thmac.swisseph.SweDate;
@@ -749,6 +750,7 @@ public final class ChartTables {
          .append("The arc is the same for every point, so what varies is what each one ")
          .append("arrives at.</i></p>");
         h.append(contactSection(natal, sw, natalJd, nowJd, true));
+        h.append(midpointSection(natal, sw, natalJd, nowJd));
         return h.toString();
     }
 
@@ -828,6 +830,109 @@ public final class ChartTables {
                  + "significant natal point inside this window. For solar arc that is common - "
                  + "the arc moves about a degree a year, so a point either arrives or it does "
                  + "not.</i></p>";
+        }
+        return h.toString();
+    }
+
+    /**
+     * The midpoint pictures: {@code SA Uranus = Sun/Moon}, and when each is live.
+     *
+     * <p><b>A different instrument from the table above, not more rows for it.</b> A directed
+     * planet reaching a natal planet is a chapter about a degree wide, which at a degree a year
+     * is a couple of years. A directed planet reaching a natal <i>midpoint</i> is read on a
+     * quarter-degree orb, so it dates a season rather than a chapter - and the midpoint is not a
+     * body but the fused matrix of two, which is why it gets its own notation and its own table
+     * instead of a fourth column here.
+     *
+     * <p><b>Why this exists at all is NavigationCheck.</b> {@link ArcMidpoints} was written,
+     * tested at 65 checks and nine mutations, and reachable from nothing - and this project has
+     * a guard that asserts every engine in the astro package is named somewhere in the
+     * interface, because "an engine with no way in is invisible in exactly the way a missing one
+     * is not: the suites stay green, so nothing reports it". It failed on ArcMidpoints by name,
+     * which is how this table came to be written.
+     *
+     * <p>The orb is stated on the screen rather than assumed, because it is ten times tighter
+     * than any other orb in the app and a reader who did not know that would read these rows as
+     * the same kind of claim as the rows above them.
+     */
+    private static String midpointSection(ChartFrame natal, SwissEph sw, double natalJd,
+                                          double nowJd) {
+        double from = nowJd - CONTACT_HALF_WINDOW;
+        double to = nowJd + CONTACT_HALF_WINDOW;
+        java.util.List<ArcMidpoints.Contact> hits;
+        try {
+            hits = ArcMidpoints.contacts(sw, natal, natalJd, from, to);
+        } catch (RuntimeException e) {
+            return "";
+        }
+        StringBuilder h = new StringBuilder();
+        h.append("<h2>Midpoint pictures</h2>");
+        h.append("<p>A directed point reaching the midpoint of two natal points, written the ")
+         .append("way a midpoint tree writes it. Read on the eighth harmonic, so a ")
+         .append("conjunction, semisquare, square, sesquiquadrate and opposition are one ")
+         .append("contact. The orb is ")
+         .append(String.format("%.2f", ArcMidpoints.ORB))
+         .append("&deg; of arc - about ten times tighter than the table above, and about six ")
+         .append("months wide at the arc's rate of a degree a year, with the strongest ")
+         .append(String.format("%.2f", ArcMidpoints.PEAK))
+         .append("&deg; of it near six weeks around the exact date.</p>");
+        if (hits.isEmpty()) {
+            return h.append("<p><i>No directed point reaches a natal midpoint inside this ")
+                    .append("window.</i></p>").toString();
+        }
+        h.append("<table cellpadding=\"4\">");
+        h.append(row4("th", "Exact", "Picture", "Active from", "until"));
+        for (ArcMidpoints.Contact c : hits) {
+            h.append(row4("td", dateOf(c.jd), c.picture(),
+                Double.isNaN(c.jdFrom) ? "&mdash;" : dateOf(c.jdFrom),
+                Double.isNaN(c.jdTo) ? "&mdash;" : dateOf(c.jdTo)));
+        }
+        h.append("</table>");
+        h.append(activePictures(natal, sw, natalJd, nowJd, hits));
+        return h.toString();
+    }
+
+    /**
+     * Readings for the pictures live right now, rather than for every one in the window.
+     *
+     * <b>Live, and not all of them.</b> The window is six months either side and the orb is a
+     * quarter of a degree, so a typical chart has thirty-eight pictures perfecting in it and
+     * two or three in force. A paragraph for each would bury the ones that are happening under
+     * thirty-five that are not, which is the cookbook dump this app's whole reading layer
+     * exists to avoid. The table above is the index; this is what is going on.
+     *
+     * <b>"Live" is asked of the same function that weighs it.</b> A picture counts when
+     * {@link ArcMidpoints#weight} of its offset is above zero, which is true exactly inside the
+     * orb - so this cannot drift from the strength line each reading prints, and moving the orb
+     * moves both.
+     */
+    private static String activePictures(ChartFrame natal, SwissEph sw, double natalJd,
+                                         double nowJd,
+                                         java.util.List<ArcMidpoints.Contact> hits) {
+        ChartFrame.Body sun = natal == null ? null : natal.body("Sun");
+        if (sun == null || !sun.ok || hits.isEmpty()) {
+            return "";
+        }
+        double arcNow = com.zodiacomputing.ourania.astro.SolarArc.arcAt(
+            sw, natalJd, sun.lon, nowJd);
+        if (Double.isNaN(arcNow)) {
+            return "";
+        }
+        StringBuilder h = new StringBuilder();
+        int live = 0;
+        for (ArcMidpoints.Contact c : hits) {
+            if (ArcMidpoints.weight(arcNow - c.arc) > 0.0) {
+                if (live == 0) {
+                    h.append("<h2>In force now</h2>");
+                }
+                h.append(ArcMidpointReading.of(c, nowJd, arcNow));
+                live++;
+            }
+        }
+        if (live == 0) {
+            return "<h2>In force now</h2><p><i>None of the pictures above is inside its orb "
+                 + "today. At a quarter of a degree that is the ordinary state - these are "
+                 + "dated events rather than a standing condition.</i></p>";
         }
         return h.toString();
     }

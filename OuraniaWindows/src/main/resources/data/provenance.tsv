@@ -1,0 +1,63 @@
+# Where each reading file came from (C7). CorpusCheck fails on a .json in this directory with no row here,
+# whichever class opens it - or none (since 10 Oct; before that only InterpretationService's own list was asked).
+# file<TAB>writer<TAB>shape<TAB>how this is known
+# writer: david | agent | external | unknown     shape: written (each entry its own text) | composed (built from shared sentences)
+# The shape is MEASURED by CorpusCheck Part B and must match; the writer is declared, so say how it is known.
+# Add the row when you add the file - it is the only moment the answer is cheap.
+
+interpretations.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+degree_interpretations.json	external	written	The WORDING is in-project since 10 Oct; the CONTENT is not. 334 readings derive from a pasted chat/notebook-tool answer summarising the degree-symbol authors Charubel, Sepharial, Kozminsky, Janduz, Muir, Henson, Weber and Matthews (165 rewritten earlier, 169 redrafted and spliced in on 10 Oct with David's approval; they had been that answer word for word). 26 - Sagittarius 11-20, Pisces 21-30, Aries 3, 4, 6, 15, 24, 25 - were written the same day from a second pasted answer David supplied; he names its source as Esther V. Leinbach, Degrees of the Zodiac (stated for Aries 3, assumed for the rest - David to confirm). Both pasted texts, the drafts and the measurements are in reference/degrees; how close either answer is to any book is NOT known
+Sabian_interpretations.json	unknown	written	the symbol lines are the Jones/Wheeler symbols of 1925 (public domain); who wrote the summary keynotes is NOT known, and they read like Rudhyar 1973 - PROVENANCE.md item 2, the highest-risk question in the corpus
+modern_sabians.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+Ascendent.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+Descendant.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+ic.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+mc.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+aspect_prose_v2.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+spirit_prose.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspect_prose.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspect_prose_b.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+semisquare_prose.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+pattern_detail.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+aspect_general.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+quincunx_gap.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+extra_bodies.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_placements.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+macro_dynamics.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+relationship_prose.json	unknown	written	project notes call it 'sourced', which implies an outside origin nobody named - PROVENANCE.md item 4
+synastry_interaspects.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_placements.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_aspect_frames_v3.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_aspects.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_aspect_pairs.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_signs.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_placements_b.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_minor_aspects.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+synastry_overlays.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+synastry_angle_contacts.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_angles.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_sabian.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transits_ptolemaic_t.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transit_angles.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_minor_aspects_classical.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transit_everything_else.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transit_minor_aspects_asteroids_angles.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transit_ptolemaic_asteroids_angles_classical.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_aspects_expanded.json	agent	written	composite_aspect rewritten 11 Oct 2026 in reference/composite_aspects: 590 of the 1,300 drafted in a notebook from the project's own brief and 710 written by an AI agent in session, all checked by build.py there (which body came from where is in that folder's drafts/ and the commit messages).
+composite_asteroid_pairs.json	agent	written	composite_aspect rewritten 11 Oct 2026 in reference/composite_aspects: 590 of the 1,300 drafted in a notebook from the project's own brief and 710 written by an AI agent in session, all checked by build.py there (which body came from where is in that folder's drafts/ and the commit messages).
+minor_aspects_natal.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspects_composite.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspects_synastry.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+minor_aspects_transit.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+aspect_frames_v2.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transits_new_aspects.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+composite_transits_new_aspects_b.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+tarot_bodies.json	agent	written	written by an agent; each entry marks itself attested in a deck, attested by myth, or inferred (InterpretationService.tarotBodies)
+d10_point_prose.json	david	composed	David's 336 paragraphs for the Vertex, East Point and five lots, 16 Sep (C9); composed because each point's paragraphs share their framing sentences
+d10_point_transits.json	agent	written	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_decans.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_mansions.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_technical_degrees.json	agent	composed	written in-project by an AI agent - inferred from the house voice and session records, not recorded (PROVENANCE.md); David to confirm
+body_degree_factors.json	agent	written	written by an agent from David's two transposition documents of 2026-08-31; the fourteen bodies those did not cover are standard meanings (InterpretationService.LAZY_FILES)
+glossary.json	david	written	built by generate_glossary.py from reference/glossary/Master_Glossary.txt, David's glossary, on 2 Oct (commit 9fceec5) - the definitions are his text, the script only reshapes them; David to confirm the source text is his own writing
+solar_arc_midpoints.json	agent	written	written in-project by an AI agent on 2026-10-11, recorded: the 13 arc_catalyst sentences are the agent's own words for what each directed body does on arrival; the 4 arc_picture readings are the agent's wording of doctrine David supplied the same day, which he credited to Ebertin's Combination of Stellar Influences, Tyl and Brady - the substance is theirs, the sentences are not quoted from them. NOTE the file is small because most of a reading is NOT here: ArcMidpointReading composes each picture from the pair's own conjunction prose in interpretations.json and extra_bodies.json, whose provenance is their own rows above. 1,014 pictures are reachable and only 4 are written, deliberately - see that class for why a catalogue of the rest would be invention. David to confirm the four against his sources.

@@ -1,0 +1,1274 @@
+# transit: saturn - 311 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# saturn with descendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction descendant
+LEAD
+BODY
+
+=transit saturn sextile descendant
+LEAD
+BODY
+
+=transit saturn square descendant
+LEAD
+BODY
+
+=transit saturn trine descendant
+LEAD
+BODY
+
+=transit saturn opposition descendant
+LEAD
+BODY
+
+=transit saturn quincunx descendant
+LEAD
+BODY
+
+=transit saturn semisextile descendant
+LEAD
+BODY
+
+=transit saturn semisquare descendant
+LEAD
+BODY
+
+=transit saturn sesquiquadrate descendant
+LEAD
+BODY
+
+=transit saturn quintile descendant
+LEAD
+BODY
+
+=transit saturn biquintile descendant
+LEAD
+BODY
+
+=transit saturn sesquiquintile descendant
+LEAD
+BODY
+
+=transit saturn septile descendant
+LEAD
+BODY
+
+=transit saturn novile descendant
+LEAD
+BODY
+
+=transit saturn decile descendant
+LEAD
+BODY
+
+# saturn with ic: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction ic
+LEAD
+BODY
+
+=transit saturn sextile ic
+LEAD
+BODY
+
+=transit saturn square ic
+LEAD
+BODY
+
+=transit saturn trine ic
+LEAD
+BODY
+
+=transit saturn opposition ic
+LEAD
+BODY
+
+=transit saturn quincunx ic
+LEAD
+BODY
+
+=transit saturn semisextile ic
+LEAD
+BODY
+
+=transit saturn semisquare ic
+LEAD
+BODY
+
+=transit saturn sesquiquadrate ic
+LEAD
+BODY
+
+=transit saturn quintile ic
+LEAD
+BODY
+
+=transit saturn biquintile ic
+LEAD
+BODY
+
+=transit saturn sesquiquintile ic
+LEAD
+BODY
+
+=transit saturn septile ic
+LEAD
+BODY
+
+=transit saturn novile ic
+LEAD
+BODY
+
+=transit saturn decile ic
+LEAD
+BODY
+
+# saturn with ascendant: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction ascendant
+LEAD
+BODY
+
+=transit saturn sextile ascendant
+LEAD
+BODY
+
+=transit saturn square ascendant
+LEAD
+BODY
+
+=transit saturn trine ascendant
+LEAD
+BODY
+
+=transit saturn opposition ascendant
+LEAD
+BODY
+
+=transit saturn quincunx ascendant
+LEAD
+BODY
+
+=transit saturn semisextile ascendant
+LEAD
+BODY
+
+=transit saturn semisquare ascendant
+LEAD
+BODY
+
+=transit saturn sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit saturn quintile ascendant
+LEAD
+BODY
+
+=transit saturn biquintile ascendant
+LEAD
+BODY
+
+=transit saturn sesquiquintile ascendant
+LEAD
+BODY
+
+=transit saturn septile ascendant
+LEAD
+BODY
+
+=transit saturn novile ascendant
+LEAD
+BODY
+
+=transit saturn decile ascendant
+LEAD
+BODY
+
+# saturn with mc: 15 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction mc
+LEAD
+BODY
+
+=transit saturn sextile mc
+LEAD
+BODY
+
+=transit saturn square mc
+LEAD
+BODY
+
+=transit saturn trine mc
+LEAD
+BODY
+
+=transit saturn opposition mc
+LEAD
+BODY
+
+=transit saturn quincunx mc
+LEAD
+BODY
+
+=transit saturn semisextile mc
+LEAD
+BODY
+
+=transit saturn semisquare mc
+LEAD
+BODY
+
+=transit saturn sesquiquadrate mc
+LEAD
+BODY
+
+=transit saturn quintile mc
+LEAD
+BODY
+
+=transit saturn biquintile mc
+LEAD
+BODY
+
+=transit saturn sesquiquintile mc
+LEAD
+BODY
+
+=transit saturn septile mc
+LEAD
+BODY
+
+=transit saturn novile mc
+LEAD
+BODY
+
+=transit saturn decile mc
+LEAD
+BODY
+
+# saturn with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction south_node
+LEAD
+BODY
+
+=transit saturn sextile south_node
+LEAD
+BODY
+
+=transit saturn square south_node
+LEAD
+BODY
+
+=transit saturn trine south_node
+LEAD
+BODY
+
+=transit saturn opposition south_node
+LEAD
+BODY
+
+=transit saturn quincunx south_node
+LEAD
+BODY
+
+=transit saturn semisextile south_node
+LEAD
+BODY
+
+=transit saturn semisquare south_node
+LEAD
+BODY
+
+=transit saturn sesquiquadrate south_node
+LEAD
+BODY
+
+=transit saturn quintile south_node
+LEAD
+BODY
+
+=transit saturn sesquiquintile south_node
+LEAD
+BODY
+
+# saturn with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction ceres
+LEAD
+BODY
+
+=transit saturn sextile ceres
+LEAD
+BODY
+
+=transit saturn square ceres
+LEAD
+BODY
+
+=transit saturn trine ceres
+LEAD
+BODY
+
+=transit saturn opposition ceres
+LEAD
+BODY
+
+=transit saturn quincunx ceres
+LEAD
+BODY
+
+=transit saturn semisextile ceres
+LEAD
+BODY
+
+=transit saturn semisquare ceres
+LEAD
+BODY
+
+=transit saturn sesquiquadrate ceres
+LEAD
+BODY
+
+=transit saturn quintile ceres
+LEAD
+BODY
+
+=transit saturn sesquiquintile ceres
+LEAD
+BODY
+
+# saturn with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction pallas
+LEAD
+BODY
+
+=transit saturn sextile pallas
+LEAD
+BODY
+
+=transit saturn square pallas
+LEAD
+BODY
+
+=transit saturn trine pallas
+LEAD
+BODY
+
+=transit saturn opposition pallas
+LEAD
+BODY
+
+=transit saturn quincunx pallas
+LEAD
+BODY
+
+=transit saturn semisextile pallas
+LEAD
+BODY
+
+=transit saturn semisquare pallas
+LEAD
+BODY
+
+=transit saturn sesquiquadrate pallas
+LEAD
+BODY
+
+=transit saturn quintile pallas
+LEAD
+BODY
+
+=transit saturn sesquiquintile pallas
+LEAD
+BODY
+
+# saturn with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction juno
+LEAD
+BODY
+
+=transit saturn sextile juno
+LEAD
+BODY
+
+=transit saturn square juno
+LEAD
+BODY
+
+=transit saturn trine juno
+LEAD
+BODY
+
+=transit saturn opposition juno
+LEAD
+BODY
+
+=transit saturn quincunx juno
+LEAD
+BODY
+
+=transit saturn semisextile juno
+LEAD
+BODY
+
+=transit saturn semisquare juno
+LEAD
+BODY
+
+=transit saturn sesquiquadrate juno
+LEAD
+BODY
+
+=transit saturn quintile juno
+LEAD
+BODY
+
+=transit saturn sesquiquintile juno
+LEAD
+BODY
+
+# saturn with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction vesta
+LEAD
+BODY
+
+=transit saturn sextile vesta
+LEAD
+BODY
+
+=transit saturn square vesta
+LEAD
+BODY
+
+=transit saturn trine vesta
+LEAD
+BODY
+
+=transit saturn opposition vesta
+LEAD
+BODY
+
+=transit saturn quincunx vesta
+LEAD
+BODY
+
+=transit saturn semisextile vesta
+LEAD
+BODY
+
+=transit saturn semisquare vesta
+LEAD
+BODY
+
+=transit saturn sesquiquadrate vesta
+LEAD
+BODY
+
+=transit saturn quintile vesta
+LEAD
+BODY
+
+=transit saturn sesquiquintile vesta
+LEAD
+BODY
+
+# saturn with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction eris
+LEAD
+BODY
+
+=transit saturn sextile eris
+LEAD
+BODY
+
+=transit saturn square eris
+LEAD
+BODY
+
+=transit saturn trine eris
+LEAD
+BODY
+
+=transit saturn opposition eris
+LEAD
+BODY
+
+=transit saturn quincunx eris
+LEAD
+BODY
+
+=transit saturn semisextile eris
+LEAD
+BODY
+
+=transit saturn semisquare eris
+LEAD
+BODY
+
+=transit saturn sesquiquadrate eris
+LEAD
+BODY
+
+=transit saturn quintile eris
+LEAD
+BODY
+
+=transit saturn sesquiquintile eris
+LEAD
+BODY
+
+# saturn with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction eros
+LEAD
+BODY
+
+=transit saturn sextile eros
+LEAD
+BODY
+
+=transit saturn square eros
+LEAD
+BODY
+
+=transit saturn trine eros
+LEAD
+BODY
+
+=transit saturn opposition eros
+LEAD
+BODY
+
+=transit saturn quincunx eros
+LEAD
+BODY
+
+=transit saturn semisextile eros
+LEAD
+BODY
+
+=transit saturn semisquare eros
+LEAD
+BODY
+
+=transit saturn sesquiquadrate eros
+LEAD
+BODY
+
+=transit saturn quintile eros
+LEAD
+BODY
+
+=transit saturn sesquiquintile eros
+LEAD
+BODY
+
+# saturn with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction hygiea
+LEAD
+BODY
+
+=transit saturn sextile hygiea
+LEAD
+BODY
+
+=transit saturn square hygiea
+LEAD
+BODY
+
+=transit saturn trine hygiea
+LEAD
+BODY
+
+=transit saturn opposition hygiea
+LEAD
+BODY
+
+=transit saturn quincunx hygiea
+LEAD
+BODY
+
+=transit saturn semisextile hygiea
+LEAD
+BODY
+
+=transit saturn semisquare hygiea
+LEAD
+BODY
+
+=transit saturn sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit saturn quintile hygiea
+LEAD
+BODY
+
+=transit saturn sesquiquintile hygiea
+LEAD
+BODY
+
+# saturn with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction nessus
+LEAD
+BODY
+
+=transit saturn sextile nessus
+LEAD
+BODY
+
+=transit saturn square nessus
+LEAD
+BODY
+
+=transit saturn trine nessus
+LEAD
+BODY
+
+=transit saturn opposition nessus
+LEAD
+BODY
+
+=transit saturn quincunx nessus
+LEAD
+BODY
+
+=transit saturn semisextile nessus
+LEAD
+BODY
+
+=transit saturn semisquare nessus
+LEAD
+BODY
+
+=transit saturn sesquiquadrate nessus
+LEAD
+BODY
+
+=transit saturn quintile nessus
+LEAD
+BODY
+
+=transit saturn sesquiquintile nessus
+LEAD
+BODY
+
+# saturn with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction pholus
+LEAD
+BODY
+
+=transit saturn sextile pholus
+LEAD
+BODY
+
+=transit saturn square pholus
+LEAD
+BODY
+
+=transit saturn trine pholus
+LEAD
+BODY
+
+=transit saturn opposition pholus
+LEAD
+BODY
+
+=transit saturn quincunx pholus
+LEAD
+BODY
+
+=transit saturn semisextile pholus
+LEAD
+BODY
+
+=transit saturn semisquare pholus
+LEAD
+BODY
+
+=transit saturn sesquiquadrate pholus
+LEAD
+BODY
+
+=transit saturn quintile pholus
+LEAD
+BODY
+
+=transit saturn sesquiquintile pholus
+LEAD
+BODY
+
+# saturn with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction fortune
+LEAD
+BODY
+
+=transit saturn sextile fortune
+LEAD
+BODY
+
+=transit saturn square fortune
+LEAD
+BODY
+
+=transit saturn trine fortune
+LEAD
+BODY
+
+=transit saturn opposition fortune
+LEAD
+BODY
+
+=transit saturn quincunx fortune
+LEAD
+BODY
+
+=transit saturn semisextile fortune
+LEAD
+BODY
+
+=transit saturn semisquare fortune
+LEAD
+BODY
+
+=transit saturn sesquiquadrate fortune
+LEAD
+BODY
+
+=transit saturn quintile fortune
+LEAD
+BODY
+
+=transit saturn sesquiquintile fortune
+LEAD
+BODY
+
+# saturn with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction spirit
+LEAD
+BODY
+
+=transit saturn sextile spirit
+LEAD
+BODY
+
+=transit saturn square spirit
+LEAD
+BODY
+
+=transit saturn trine spirit
+LEAD
+BODY
+
+=transit saturn opposition spirit
+LEAD
+BODY
+
+=transit saturn quincunx spirit
+LEAD
+BODY
+
+=transit saturn semisextile spirit
+LEAD
+BODY
+
+=transit saturn semisquare spirit
+LEAD
+BODY
+
+=transit saturn sesquiquadrate spirit
+LEAD
+BODY
+
+=transit saturn quintile spirit
+LEAD
+BODY
+
+=transit saturn sesquiquintile spirit
+LEAD
+BODY
+
+# saturn with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction lilith
+LEAD
+BODY
+
+=transit saturn sextile lilith
+LEAD
+BODY
+
+=transit saturn square lilith
+LEAD
+BODY
+
+=transit saturn trine lilith
+LEAD
+BODY
+
+=transit saturn opposition lilith
+LEAD
+BODY
+
+=transit saturn quincunx lilith
+LEAD
+BODY
+
+=transit saturn semisextile lilith
+LEAD
+BODY
+
+=transit saturn semisquare lilith
+LEAD
+BODY
+
+=transit saturn sesquiquadrate lilith
+LEAD
+BODY
+
+=transit saturn quintile lilith
+LEAD
+BODY
+
+=transit saturn sesquiquintile lilith
+LEAD
+BODY
+
+# saturn with sun: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction sun
+LEAD
+BODY
+
+=transit saturn sextile sun
+LEAD
+BODY
+
+=transit saturn square sun
+LEAD
+BODY
+
+=transit saturn trine sun
+LEAD
+BODY
+
+=transit saturn opposition sun
+LEAD
+BODY
+
+=transit saturn biquintile sun
+LEAD
+BODY
+
+=transit saturn septile sun
+LEAD
+BODY
+
+=transit saturn novile sun
+LEAD
+BODY
+
+=transit saturn decile sun
+LEAD
+BODY
+
+# saturn with moon: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction moon
+LEAD
+BODY
+
+=transit saturn sextile moon
+LEAD
+BODY
+
+=transit saturn square moon
+LEAD
+BODY
+
+=transit saturn trine moon
+LEAD
+BODY
+
+=transit saturn opposition moon
+LEAD
+BODY
+
+=transit saturn biquintile moon
+LEAD
+BODY
+
+=transit saturn septile moon
+LEAD
+BODY
+
+=transit saturn novile moon
+LEAD
+BODY
+
+=transit saturn decile moon
+LEAD
+BODY
+
+# saturn with mercury: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction mercury
+LEAD
+BODY
+
+=transit saturn sextile mercury
+LEAD
+BODY
+
+=transit saturn square mercury
+LEAD
+BODY
+
+=transit saturn trine mercury
+LEAD
+BODY
+
+=transit saturn opposition mercury
+LEAD
+BODY
+
+=transit saturn biquintile mercury
+LEAD
+BODY
+
+=transit saturn septile mercury
+LEAD
+BODY
+
+=transit saturn novile mercury
+LEAD
+BODY
+
+=transit saturn decile mercury
+LEAD
+BODY
+
+# saturn with venus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction venus
+LEAD
+BODY
+
+=transit saturn sextile venus
+LEAD
+BODY
+
+=transit saturn square venus
+LEAD
+BODY
+
+=transit saturn trine venus
+LEAD
+BODY
+
+=transit saturn opposition venus
+LEAD
+BODY
+
+=transit saturn biquintile venus
+LEAD
+BODY
+
+=transit saturn septile venus
+LEAD
+BODY
+
+=transit saturn novile venus
+LEAD
+BODY
+
+=transit saturn decile venus
+LEAD
+BODY
+
+# saturn with mars: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction mars
+LEAD
+BODY
+
+=transit saturn sextile mars
+LEAD
+BODY
+
+=transit saturn square mars
+LEAD
+BODY
+
+=transit saturn trine mars
+LEAD
+BODY
+
+=transit saturn opposition mars
+LEAD
+BODY
+
+=transit saturn biquintile mars
+LEAD
+BODY
+
+=transit saturn septile mars
+LEAD
+BODY
+
+=transit saturn novile mars
+LEAD
+BODY
+
+=transit saturn decile mars
+LEAD
+BODY
+
+# saturn with jupiter: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction jupiter
+LEAD
+BODY
+
+=transit saturn sextile jupiter
+LEAD
+BODY
+
+=transit saturn square jupiter
+LEAD
+BODY
+
+=transit saturn trine jupiter
+LEAD
+BODY
+
+=transit saturn opposition jupiter
+LEAD
+BODY
+
+=transit saturn biquintile jupiter
+LEAD
+BODY
+
+=transit saturn septile jupiter
+LEAD
+BODY
+
+=transit saturn novile jupiter
+LEAD
+BODY
+
+=transit saturn decile jupiter
+LEAD
+BODY
+
+# saturn with saturn: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction saturn
+LEAD
+BODY
+
+=transit saturn sextile saturn
+LEAD
+BODY
+
+=transit saturn square saturn
+LEAD
+BODY
+
+=transit saturn trine saturn
+LEAD
+BODY
+
+=transit saturn opposition saturn
+LEAD
+BODY
+
+=transit saturn biquintile saturn
+LEAD
+BODY
+
+=transit saturn septile saturn
+LEAD
+BODY
+
+=transit saturn novile saturn
+LEAD
+BODY
+
+=transit saturn decile saturn
+LEAD
+BODY
+
+# saturn with uranus: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction uranus
+LEAD
+BODY
+
+=transit saturn sextile uranus
+LEAD
+BODY
+
+=transit saturn square uranus
+LEAD
+BODY
+
+=transit saturn trine uranus
+LEAD
+BODY
+
+=transit saturn opposition uranus
+LEAD
+BODY
+
+=transit saturn biquintile uranus
+LEAD
+BODY
+
+=transit saturn septile uranus
+LEAD
+BODY
+
+=transit saturn novile uranus
+LEAD
+BODY
+
+=transit saturn decile uranus
+LEAD
+BODY
+
+# saturn with neptune: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction neptune
+LEAD
+BODY
+
+=transit saturn sextile neptune
+LEAD
+BODY
+
+=transit saturn square neptune
+LEAD
+BODY
+
+=transit saturn trine neptune
+LEAD
+BODY
+
+=transit saturn opposition neptune
+LEAD
+BODY
+
+=transit saturn biquintile neptune
+LEAD
+BODY
+
+=transit saturn septile neptune
+LEAD
+BODY
+
+=transit saturn novile neptune
+LEAD
+BODY
+
+=transit saturn decile neptune
+LEAD
+BODY
+
+# saturn with pluto: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction pluto
+LEAD
+BODY
+
+=transit saturn sextile pluto
+LEAD
+BODY
+
+=transit saturn square pluto
+LEAD
+BODY
+
+=transit saturn trine pluto
+LEAD
+BODY
+
+=transit saturn opposition pluto
+LEAD
+BODY
+
+=transit saturn biquintile pluto
+LEAD
+BODY
+
+=transit saturn septile pluto
+LEAD
+BODY
+
+=transit saturn novile pluto
+LEAD
+BODY
+
+=transit saturn decile pluto
+LEAD
+BODY
+
+# saturn with chiron: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction chiron
+LEAD
+BODY
+
+=transit saturn sextile chiron
+LEAD
+BODY
+
+=transit saturn square chiron
+LEAD
+BODY
+
+=transit saturn trine chiron
+LEAD
+BODY
+
+=transit saturn opposition chiron
+LEAD
+BODY
+
+=transit saturn biquintile chiron
+LEAD
+BODY
+
+=transit saturn septile chiron
+LEAD
+BODY
+
+=transit saturn novile chiron
+LEAD
+BODY
+
+=transit saturn decile chiron
+LEAD
+BODY
+
+# saturn with north_node: 9 readings, one per aspect. Each must read differently from the others in this group.
+=transit saturn conjunction north_node
+LEAD
+BODY
+
+=transit saturn sextile north_node
+LEAD
+BODY
+
+=transit saturn square north_node
+LEAD
+BODY
+
+=transit saturn trine north_node
+LEAD
+BODY
+
+=transit saturn opposition north_node
+LEAD
+BODY
+
+=transit saturn biquintile north_node
+LEAD
+BODY
+
+=transit saturn septile north_node
+LEAD
+BODY
+
+=transit saturn novile north_node
+LEAD
+BODY
+
+=transit saturn decile north_node
+LEAD
+BODY

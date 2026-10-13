@@ -936,10 +936,11 @@ implements WheelSource, GlobeSource {
         this.relationshipFrame = null;
         this.relationshipCacheKey = null;
         if (this.showTransitChart) {
-            this.animateTarget = "Both";
-            if (this.animateCombo != null) {
-                this.animateCombo.setSelectedItem("Both");
-            }
+            // <b>"Both" meant two things here and only one of them was wanted.</b> Setting the
+            // aspect filter to show natal-natal and transit-natal together is right. Setting
+            // the animate target to "Both" in the same breath made the transport walk Chart A's
+            // birth moment - one word, two settings, one condition. The transport is aimed from
+            // its own box beside it now, which nothing but the reader touches.
             this.aspectFilter = "Both";
             if (this.filterCombo != null) {
                 this.filterCombo.setSelectedItem("Both");
@@ -948,10 +949,6 @@ implements WheelSource, GlobeSource {
                 this.alignCombo.setEnabled(true);
             }
         } else {
-            this.animateTarget = "Natal";
-            if (this.animateCombo != null) {
-                this.animateCombo.setSelectedItem("Natal");
-            }
             this.aspectFilter = "Natal-Natal";
             if (this.filterCombo != null) {
                 this.filterCombo.setSelectedItem("Natal-Natal");
@@ -1308,12 +1305,20 @@ implements WheelSource, GlobeSource {
     }
 
     private String skyTimeZoneId = ZoneId.systemDefault().getId();
-    private String animateTarget = "Transit";
     private String aspectFilter = "Natal-Natal";
     /** The chart's own settings, shown on the Settings screen rather than under the wheel. */
     private JPanel chartControls;
 
-    private JComboBox<String> animateCombo;
+    /**
+     * Whether the transport steps the birth chart instead of the sky - David's own selector.
+     *
+     * <b>"CANT I JUST HAVE A SELECTOR FOR THE TIME STEPPER? OR LIKE A CHECK BOX".</b> It
+     * replaces an "Anim: Natal / Transit / Both" dropdown that sat on the Settings screen,
+     * three screens away from the buttons it governed, and which installMode overwrote on
+     * every chart. A box beside the stepper says what the next press will move, and is the
+     * only thing that decides it.
+     */
+    private javax.swing.JCheckBox stepNatalBox;
     private JComboBox<String> filterCombo;
     private JComboBox<String> alignCombo;
     /** The "Houses:" caption beside {@link #alignCombo}, hidden with it when there is one chart. */
@@ -1341,6 +1346,30 @@ implements WheelSource, GlobeSource {
      * third ring off until something else happened to change the mode. One statement, two
      * callers, and neither can drift from the other.
      */
+    /** Whether the reader has aimed the transport at the birth chart. */
+    private boolean stepsNatal() {
+        return this.stepNatalBox != null && this.stepNatalBox.isSelected();
+    }
+
+    /**
+     * Greys the box where a birth moment is not a thing the transport could move.
+     *
+     * <b>Disabled rather than hidden</b>, unlike the house-frame selector beside the scrub bar:
+     * that one shares a row whose width would reflow, and this one sits in a wrapping strip of
+     * buttons where a gap appearing and closing as the mode changes is worse than a grey label.
+     * Unticked on the way out, so a box that comes back enabled is not silently still armed.
+     */
+    private void syncStepNatalBox() {
+        if (this.stepNatalBox == null) {
+            return;
+        }
+        boolean can = this.natalIsAimable();
+        this.stepNatalBox.setEnabled(can);
+        if (!can && this.stepNatalBox.isSelected()) {
+            this.stepNatalBox.setSelected(false);
+        }
+    }
+
     private void applyRingFlags() {
         this.showTransitChart = SkymapPanel.outerWheelShown(this.chartMode, this.transitsEnabled);
         this.showTriWheel = SkymapPanel.triWheelShown(this.chartMode, this.transitsEnabled,
@@ -1351,6 +1380,10 @@ implements WheelSource, GlobeSource {
         this.outerBloom.set(this.showTransitChart);
         this.triBloom.set(this.showTriWheel);
         this.arcBloom.set(this.showArcRing);
+        // Here rather than in installMode, because the chips change which wheels are drawn
+        // without going through a mode - and whether a birth moment is aimable follows the
+        // wheels, not the mode.
+        this.syncStepNatalBox();
     }
 
     /**
@@ -4404,6 +4437,20 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             Widgets.styleButton(jButtonArray[bi], buttonRoles[bi]);
             jPanel2.add(jButtonArray[bi]);
         }
+        // <b>What the transport is aimed at, beside the transport.</b> David, 2026-10-10:
+        // "CANT I JUST HAVE A SELECTOR FOR THE TIME STEPPER? OR LIKE A CHECK BOX". The thing
+        // it replaces was a dropdown on the Settings screen, which is where nobody looks
+        // before pressing a button under the wheel - and it was assigned by installMode rather
+        // than chosen, which is how the birth chart came to move unasked.
+        this.stepNatalBox = new javax.swing.JCheckBox("Step birth chart");
+        this.stepNatalBox.setToolTipText("Off: the buttons move the sky. On: they move the "
+            + "birth moment itself, for working out a time by hand. The scrub bar always "
+            + "moves the sky.");
+        this.stepNatalBox.setBackground(Color.BLACK);
+        this.stepNatalBox.setForeground(Color.WHITE);
+        this.stepNatalBox.setFont(Theme.SMALL);
+        this.stepNatalBox.setFocusPainted(false);
+        jPanel2.add(this.stepNatalBox);
         // <b>One bar, the sky's, on a row of its own.</b> There were three from 20 Sep - Chart A,
         // Chart B and the sky - and David, 30 Sep: "time scrubbing is really only needed for the
         // transit chart not a b or another charts". A birth time is changed from Chart Setup, and
@@ -4477,18 +4524,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         harmonicLabel.setForeground(Color.WHITE);
         this.chartControls.add(harmonicLabel);
         this.chartControls.add(harmonicCombo);
-        String[] stringArray = new String[]{"Natal", "Transit", "Both"};
-        this.animateCombo = new JComboBox<String>(stringArray);
-        this.animateCombo.setSelectedItem(this.animateTarget);
-        this.animateCombo.addActionListener(actionEvent -> {
-            this.animateTarget = (String)this.animateCombo.getSelectedItem();
-        });
-        this.animateCombo.setToolTipText("Which chart advances when the animation runs");
-        SkymapPanel.styleCompactCombo(this.animateCombo);
-        JLabel jLabel2 = compactLabel("Anim:", "Animate");
-        jLabel2.setForeground(Color.WHITE);
-        this.chartControls.add(jLabel2);
-        this.chartControls.add(this.animateCombo);
         String[] stringArray2 = new String[]{"Natal-Natal", "Transit-Natal", "Both"};
         this.filterCombo = new JComboBox<String>(stringArray2);
         this.filterCombo.setSelectedItem(this.aspectFilter);
@@ -6478,95 +6513,83 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         return false;
     }
 
+    /**
+     * Whether a birth moment is a thing the transport could aim at on this chart.
+     *
+     * <b>Two charts where it never is, whatever the box says.</b> In a synastry or a composite
+     * both wheels are people, and walking one of their birth moments forward rebuilds a
+     * stranger's chart under the reader - a live defect once, found when Play on a synastry
+     * stepped person B a day at a time. And where the inner wheel is the sky there is no birth
+     * moment on it at all; aiming at it used to write {@code natalRing.time}, which
+     * updateChartData overwrote from the sky on the very next recompute, so Play did nothing
+     * whatever on the chart the app opens onto. ScrubCheck found that on 2026-09-15.
+     *
+     * <p>The box is disabled where this is false - see {@link #syncStepNatalBox}. A control that
+     * cannot change the outcome is a control that lies about what the button will do.
+     */
+    private boolean natalIsAimable() {
+        return this.innerIsBirthChart && !this.isRelationshipChart() && !this.isSynastryChart();
+    }
+
+    /**
+     * Whether a tick of the transport moves the inner wheel's own moment.
+     *
+     * <b>David, 2026-10-10: "mAYBE I STLL WANT TO MOVE A PERSONS BIRTH CHART FORWARD OR
+     * BACKWARD IN TIME I SHOULD SSTILL HAVE THE OPOTION".</b> Stepping a birth time to watch
+     * the angles swing is how a chart is rectified by hand, and the G8 screen does not do it -
+     * that one scores candidate times against dated events and reports a ranking. So the
+     * capability stays, and it is now asked for rather than assumed.
+     */
+    private boolean transportMovesNatal() {
+        if (!this.natalIsAimable()) {
+            return false;
+        }
+        // <b>With no transit ring the birth chart is the only thing on the wheel.</b> A
+        // transport that moved nothing else there would be a button that does nothing.
+        return this.stepsNatal() || !this.showTransitChart;
+    }
+
+    /**
+     * One tick of the transport.
+     *
+     * <b>David, 2026-10-10: "when i progress the transit chart chart a also moves".</b> It did.
+     * Measured on a birth chart with transits on, two ticks forward at a day a step moved
+     * {@code natalRing.time} from 31 Jan to 2 Feb and left {@code skyRing.time} where it was -
+     * the reader's birth moment walking forward while the sky stood still, with Chart A's Moon
+     * 28 degrees from where it belonged. Both halves of what he saw: the glyphs move because
+     * the chart is recast, and the date readout moves because it prints this field.
+     *
+     * <b>The cause was a default, not the feature.</b> installMode could only ever set the old
+     * animate target to "Both" or "Natal" - exactly the two values that move a birth time -
+     * and never to "Transit", which was the field's initialiser and which no code path put
+     * back. So the rectification option was switched on permanently, silently, for every chart.
+     *
+     * <b>The switch this replaces was a second copy of {@link #stepBy}.</b> Six cases naming
+     * the same six units in the same order, while {@code stepped} was already in this file,
+     * already used by the two branches above the switch, and already what the scrub calls.
+     * Most of the ninety-five lines were a method written twice, once well.
+     *
+     * <b>Exactly one wheel moves, which is why this is an if/else and not two ifs.</b> The old
+     * pair of conditions could both be true at once - that was the "Both" setting, and the
+     * reader's birth chart moving was half of it - and could both be false at once, which is
+     * how the transport came to do nothing whatever on the cold-open chart. Two booleans over
+     * four states, for a question with two answers. A {@code transportMovesSky()} written as
+     * the complement of the line above was drafted here and deleted: nothing called it,
+     * because the {@code else} is the complement. It survived its own mutation, which is how
+     * it was caught - the same defect as {@code moveSky}, a method named and documented for a
+     * job no caller gives it, two hundred lines up this file.
+     */
     private void stepTime() {
-        boolean bl;
         int n = this.animationDirection;
-        boolean bl2 = this.animateTarget.equals("Natal") || this.animateTarget.equals("Both") || !this.showTransitChart;
-        boolean bl3 = bl = (this.animateTarget.equals("Transit") || this.animateTarget.equals("Both")) && this.showTransitChart;
-        // <b>The transport moves the sky, and never a birth time.</b> This guarded the
-        // composite modes only - "animating Transit there must move the sky, not one of the
-        // two birth charts" - and the same sentence is true of a synastry, where the outer
-        // wheel is the second person. It was not guarded, so pressing Play on a synastry
-        // walked person B's birth moment forward a day at a time and rebuilt their chart
-        // under the reader. Every mode but the synastry's own Chart B now steps the sky.
-        if (this.isRelationshipChart() || this.isSynastryChart()) {
-            if (bl) {
-                this.skyRing.time = "Real Time".equals(this.stepAmount)
-                    ? ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId))
-                    : this.stepped(this.skyRing.time, n);
-            }
-            return;
-        }
-        // <b>With no Chart A the inner wheel is the sky, so the sky is what moves.</b>
-        // updateChartData copies skyRing.time over natalRing.time whenever the inner wheel is the
-        // sky, so the branch below - which moved natalRing.time - was undone by the very next
-        // recompute, and Play, Fast and Slow did nothing at all on the chart the app opens
-        // onto. Found by ScrubCheck on 2026-09-15, since a scrub steps through here too.
-        if (!this.innerIsBirthChart) {
-            if (bl2 || bl) {
-                this.skyRing.time = "Real Time".equals(this.stepAmount)
-                    ? ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId))
-                    : this.stepped(this.skyRing.time, n);
-            }
-            return;
-        }
-        if ("Real Time".equals(this.stepAmount)) {
-            if (bl2) {
-                this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
-            }
-            if (bl) {
-                this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
-            }
-            return;
-        }
-        switch (this.stepAmount) {
-            case "1 Minute": {
-                if (bl2) {
-                    this.natalRing.time = this.natalRing.time.plusMinutes(n);
-                }
-                if (!bl) break;
-                this.skyRing.time = this.skyRing.time.plusMinutes(n);
-                break;
-            }
-            case "1 Hour": {
-                if (bl2) {
-                    this.natalRing.time = this.natalRing.time.plusHours(n);
-                }
-                if (!bl) break;
-                this.skyRing.time = this.skyRing.time.plusHours(n);
-                break;
-            }
-            case "1 Day": {
-                if (bl2) {
-                    this.natalRing.time = this.natalRing.time.plusDays(n);
-                }
-                if (!bl) break;
-                this.skyRing.time = this.skyRing.time.plusDays(n);
-                break;
-            }
-            case "1 Week": {
-                if (bl2) {
-                    this.natalRing.time = this.natalRing.time.plusWeeks(n);
-                }
-                if (!bl) break;
-                this.skyRing.time = this.skyRing.time.plusWeeks(n);
-                break;
-            }
-            case "1 Month": {
-                if (bl2) {
-                    this.natalRing.time = this.natalRing.time.plusMonths(n);
-                }
-                if (!bl) break;
-                this.skyRing.time = this.skyRing.time.plusMonths(n);
-                break;
-            }
-            case "1 Year": {
-                if (bl2) {
-                    this.natalRing.time = this.natalRing.time.plusYears(n);
-                }
-                if (!bl) break;
-                this.skyRing.time = this.skyRing.time.plusYears(n);
-            }
+        boolean real = "Real Time".equals(this.stepAmount);
+        if (this.transportMovesNatal()) {
+            this.natalRing.time = real
+                ? ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId))
+                : this.stepped(this.natalRing.time, n);
+        } else {
+            this.skyRing.time = real
+                ? ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId))
+                : this.stepped(this.skyRing.time, n);
         }
     }
 
@@ -6806,27 +6829,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      */
     void jumpToNow() {
         this.isPlaying = false;
-        // <b>With no Chart A the inner wheel is the sky, so the sky is what moves.</b>
-        // updateChartData copies skyRing.time over natalRing.time whenever the inner wheel is
-        // the sky, so a write to natalRing.time here is undone by the recompute four lines
-        // down, and the button does nothing on the chart the app opens onto. That is exactly
-        // the defect ScrubCheck found in stepTime on 2026-09-15 - see the same branch there -
-        // and it came back when this was lifted out of the Now button's listener in 442ee856,
-        // because the listener was the half of the rule that got copied. reg32 caught it.
-        // A third place needing this sentence is the point at which it should become one call.
-        if (!this.innerIsBirthChart) {
-            this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
+        // <b>It became one call, which this comment asked for twice.</b> It carried its own
+        // copy of the transport's rule and said "A third place needing this sentence is the
+        // point at which it should become one call". There were four copies by then and they
+        // had drifted: this one moved a birth moment to today, and stepTime's walked one
+        // forward a day at a time on any natal chart with transits on. transportMovesNatal is
+        // the one place now, so Now and a tick of Play cannot disagree about which wheel they
+        // are for.
+        if (this.transportMovesNatal()) {
+            this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
         } else {
-            boolean movesNatal = this.animateTarget.equals("Natal")
-                || this.animateTarget.equals("Both") || !this.showTransitChart;
-            boolean movesSky = (this.animateTarget.equals("Transit")
-                || this.animateTarget.equals("Both")) && this.showTransitChart;
-            if (movesNatal) {
-                this.natalRing.time = ZonedDateTime.now(ZoneId.of(this.baseTimeZoneId));
-            }
-            if (movesSky) {
-                this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
-            }
+            this.skyRing.time = ZonedDateTime.now(ZoneId.of(this.skyTimeZoneId));
         }
         this.updateChartData();
         if (this.chartPanel != null) {

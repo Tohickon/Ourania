@@ -42,6 +42,8 @@ public final class ScrubCheck {
             part("G: Play moves the chart the app opens onto", () -> play(sky));
             part("H: one bar, and a scrub never moves a birth time", () -> bars(sky));
             part("I: a bar held pulled keeps time going until it is let go", () -> shuttle(sky));
+            part("J: the transport moves what the box says, and only the reader sets it",
+                () -> transport(sky));
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }
@@ -281,7 +283,9 @@ public final class ScrubCheck {
                 set(sky, "innerIsBirthChart", true);
                 set(sky, "showTransitChart", true);
                 set(sky, "outerRing.time", personB);
-                set(sky, "animateTarget", "Both");
+                // Ticked on purpose: a synastry must ignore it, because both wheels are
+                // people there and there is no birth moment the transport may touch.
+                box(sky).setSelected(true);
                 sky.beginScrub();
                 sky.scrubTo(2);
                 sky.endScrub();
@@ -295,7 +299,7 @@ public final class ScrubCheck {
         eq("person B's birth did not move", personB, time(sky, "outerRing.time"));
         SwingUtilities.invokeAndWait(() -> {
             try {
-                set(sky, "animateTarget", "Transit");
+                box(sky).setSelected(false);
                 set(sky, "chartMode", ChartMode.SINGLE);
                 set(sky, "innerIsBirthChart", false);
             } catch (Exception e) {
@@ -373,9 +377,9 @@ public final class ScrubCheck {
      */
     private static void play(SkymapPanel sky) throws Exception {
         reset(sky, "1 Day");
-        // The cold open exactly: no Chart A, no transits, Play aimed at "Transit" as it starts.
+        // The cold open exactly: no Chart A, no transits, the box unticked as it starts.
         set(sky, "showTransitChart", false);
-        set(sky, "animateTarget", "Transit");
+        aim(sky, false);
         ok("this is the cold-open chart: no Chart A, the sky on the inner wheel, no transits",
             !(Boolean) field(sky, "innerIsBirthChart") && !(Boolean) field(sky, "showTransitChart"));
         final java.lang.reflect.Method step = SkymapPanel.class.getDeclaredMethod("stepTime");
@@ -411,9 +415,10 @@ public final class ScrubCheck {
         javax.swing.JPanel row = (javax.swing.JPanel) field(sky, "scrubRow");
         eq("the scrub row carries one bar", 1, sliders(row));
 
-        // The case the old rule got wrong: a birth chart, transits on, Play aimed at both.
+        // The case the old rule got wrong: a birth chart, transits on, and the transport
+        // aimed at the birth chart. The scrub ignores that aim; Part J is where it is obeyed.
         mode(sky, ChartMode.SINGLE, true, true, personB, "1 Hour");
-        set(sky, "animateTarget", "Both");
+        aim(sky, true);
         SwingUtilities.invokeAndWait(() -> {
             sky.beginScrub();
             sky.scrubTo(3);
@@ -425,7 +430,7 @@ public final class ScrubCheck {
         slide(sky.scrubSlider, 2);
         eq("the bar goes on from there", ANCHOR.plusHours(5), time(sky, "skyRing.time"));
         eq("and leaves the birth where it was", ANCHOR, time(sky, "natalRing.time"));
-        set(sky, "animateTarget", "Transit");
+        aim(sky, false);
 
         mode(sky, ChartMode.SYNASTRY, true, true, personB, "1 Day");
         slide(sky.scrubSlider, 4);
@@ -439,6 +444,158 @@ public final class ScrubCheck {
         eq("and neither person", ANCHOR, time(sky, "natalRing.time"));
         eq("of the two", personB, time(sky, "outerRing.time"));
         mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
+    }
+
+    /** The box beside the transport, which says what its buttons move. */
+    private static javax.swing.JCheckBox box(SkymapPanel sky) throws Exception {
+        return (javax.swing.JCheckBox) field(sky, "stepNatalBox");
+    }
+
+    /** Ticks or unticks that box, on the event thread, as a reader does. */
+    private static void aim(SkymapPanel sky, boolean atNatal) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                box(sky).setSelected(atNatal);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /** One tick of the transport, exactly as the animation timer delivers it. */
+    private static void tick(SkymapPanel sky, int direction) throws Exception {
+        final java.lang.reflect.Method step = SkymapPanel.class.getDeclaredMethod("stepTime");
+        step.setAccessible(true);
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                set(sky, "animationDirection", direction);
+                step.invoke(sky);
+                sky.updateChartData();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * The transport moves what the box says, and nothing else decides it.
+     *
+     * <p><b>David, 2026-10-10: "when i progress the transit chart chart a also moves".</b> It
+     * did. On a birth chart with transits on, two ticks forward at a day a step moved
+     * {@code natalRing.time} two days and left the sky where it was - the reader's birth
+     * moment walking forward while the sky stood still.
+     *
+     * <p><b>The cause was a default, which is why the first assertion here is about one.</b>
+     * {@code installMode} could only ever set the old animate target to "Both" or "Natal",
+     * exactly the two values that move a birth time, and never to "Transit", which was the
+     * field's initialiser and which no code path put back. So nobody chose it and it was
+     * always on. Generating a chart must leave the transport aimed at the sky.
+     *
+     * <p><b>And the capability is asserted, not just the fix.</b> David: "mAYBE I STLL WANT TO
+     * MOVE A PERSONS BIRTH CHART FORWARD OR BACKWARD IN TIME I SHOULD SSTILL HAVE THE OPOTION".
+     * Stepping a birth time by hand is how a chart is rectified by eye, and the G8 screen does
+     * not do it - it scores candidate times against dated events. A test that only pinned "the
+     * birth never moves" would pass on a build that had taken the option away, which is the
+     * failure mode this whole part exists to avoid.
+     *
+     * <p>Part H is the scrub, which ignores the box entirely - one bar, the sky's, by David's
+     * decision of 30 Sep. These are deliberately different controls and the difference is
+     * asserted in both places.
+     */
+    private static void transport(SkymapPanel sky) throws Exception {
+        final ZonedDateTime personB = ZonedDateTime.of(1985, 3, 2, 14, 30, 0, 0, ZoneId.of("UTC"));
+
+        // <b>The default, through the real door.</b> applyChartMode runs installMode, which
+        // is where the old target was assigned.
+        //
+        // <b>TRANSIT and not SINGLE, and the precondition is asserted.</b> The first cut of
+        // this used SINGLE, for which outerWheelShown is false - so installMode took its other
+        // branch and the assertion never reached the code it was about. It passed, and the
+        // mutation that puts the defect back passed with it. An assertion that cannot say
+        // whether it exercised its subject is not a guard, so the subject is pinned first.
+        aim(sky, true);
+        SwingUtilities.invokeAndWait(() -> sky.applyChartMode(ChartMode.TRANSIT, true));
+        ok("this chart really does show the transit ring, so installMode took that branch",
+            (Boolean) field(sky, "showTransitChart"));
+        ok("and generating it does not aim the transport at a birth moment",
+            !box(sky).isSelected());
+
+        // ---- a birth chart with transits on, the box unticked: David's chart, fixed.
+        mode(sky, ChartMode.SINGLE, true, true, personB, "1 Day");
+        aim(sky, false);
+        int moon = com.zodiacomputing.ourania.astro.Bodies.indexOf("moon");
+        double[] before = ((double[]) field(sky, "natalRing.lon")).clone();
+        tick(sky, 1);
+        tick(sky, 1);
+        eq("unticked, two ticks move the sky two days", ANCHOR.plusDays(2), time(sky, "skyRing.time"));
+        eq("and the birth moment does not move at all", ANCHOR, time(sky, "natalRing.time"));
+        double still = com.zodiacomputing.ourania.astro.Aspects.separation(before[moon],
+            ((double[]) field(sky, "natalRing.lon"))[moon]);
+        ok("so Chart A's Moon is where it was, " + String.format("%.4f", still) + " degrees off",
+            still < 0.0001);
+
+        // ---- ticked: the option David asked to keep.
+        mode(sky, ChartMode.SINGLE, true, true, personB, "1 Day");
+        aim(sky, true);
+        before = ((double[]) field(sky, "natalRing.lon")).clone();
+        tick(sky, 1);
+        tick(sky, 1);
+        eq("ticked, two ticks move the birth moment two days", ANCHOR.plusDays(2),
+            time(sky, "natalRing.time"));
+        eq("and the sky stays put, so the transits it is read against hold still",
+            ANCHOR, time(sky, "skyRing.time"));
+        double moved = com.zodiacomputing.ourania.astro.Aspects.separation(before[moon],
+            ((double[]) field(sky, "natalRing.lon"))[moon]);
+        ok("and the chart is recast, the Moon " + Math.round(moved) + " degrees on",
+            moved > 20 && moved < 32);
+
+        // ---- and back again, because rectification goes both ways.
+        tick(sky, -1);
+        tick(sky, -1);
+        eq("two ticks back return the birth moment", ANCHOR, time(sky, "natalRing.time"));
+
+        // ---- the Now button follows the same box, which is why it is one call.
+        mode(sky, ChartMode.SINGLE, true, true, personB, "1 Day");
+        aim(sky, false);
+        SwingUtilities.invokeAndWait(sky::jumpToNow);
+        eq("Now with the box unticked leaves the birth moment alone", ANCHOR,
+            time(sky, "natalRing.time"));
+        ok("and moves the sky to this moment",
+            !ANCHOR.equals(time(sky, "skyRing.time")));
+
+        // ---- no Chart A: the inner wheel IS the sky, so the box cannot mean anything.
+        mode(sky, ChartMode.SINGLE, false, false, personB, "1 Day");
+        aim(sky, true);
+        tick(sky, 1);
+        eq("with no Chart A the sky moves however the box is set", ANCHOR.plusDays(1),
+            time(sky, "skyRing.time"));
+
+        // ---- a synastry: both wheels are people, so neither birth may be touched.
+        mode(sky, ChartMode.SYNASTRY, true, true, personB, "1 Day");
+        aim(sky, true);
+        tick(sky, 1);
+        eq("on a synastry the sky moves", ANCHOR.plusDays(1), time(sky, "skyRing.time"));
+        eq("and not Chart A's birth, whatever the box says", ANCHOR, time(sky, "natalRing.time"));
+        eq("nor Chart B's", personB, time(sky, "outerRing.time"));
+
+        // <b>And the box says so rather than pretending.</b> applyRingFlags greys it where a
+        // birth moment is not aimable, and unticks it so it cannot come back armed.
+        final java.lang.reflect.Method flags =
+            SkymapPanel.class.getDeclaredMethod("applyRingFlags");
+        flags.setAccessible(true);
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                flags.invoke(sky);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        ok("the box is greyed on a chart where no birth moment can move",
+            !box(sky).isEnabled());
+        ok("and unticked, so it does not come back armed", !box(sky).isSelected());
+
+        mode(sky, ChartMode.SINGLE, false, false, personB, "1 Hour");
+        aim(sky, false);
     }
 
     /** How many sliders a container holds, however deep. */

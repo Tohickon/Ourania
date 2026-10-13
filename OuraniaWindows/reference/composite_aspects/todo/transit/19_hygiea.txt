@@ -1,0 +1,1261 @@
+# transit: hygiea - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# hygiea with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction ascendant
+LEAD
+BODY
+
+=transit hygiea sextile ascendant
+LEAD
+BODY
+
+=transit hygiea square ascendant
+LEAD
+BODY
+
+=transit hygiea trine ascendant
+LEAD
+BODY
+
+=transit hygiea opposition ascendant
+LEAD
+BODY
+
+=transit hygiea quincunx ascendant
+LEAD
+BODY
+
+=transit hygiea semisextile ascendant
+LEAD
+BODY
+
+=transit hygiea semisquare ascendant
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit hygiea quintile ascendant
+LEAD
+BODY
+
+=transit hygiea sesquiquintile ascendant
+LEAD
+BODY
+
+# hygiea with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction descendant
+LEAD
+BODY
+
+=transit hygiea sextile descendant
+LEAD
+BODY
+
+=transit hygiea square descendant
+LEAD
+BODY
+
+=transit hygiea trine descendant
+LEAD
+BODY
+
+=transit hygiea opposition descendant
+LEAD
+BODY
+
+=transit hygiea quincunx descendant
+LEAD
+BODY
+
+=transit hygiea semisextile descendant
+LEAD
+BODY
+
+=transit hygiea semisquare descendant
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate descendant
+LEAD
+BODY
+
+=transit hygiea quintile descendant
+LEAD
+BODY
+
+=transit hygiea sesquiquintile descendant
+LEAD
+BODY
+
+# hygiea with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction mc
+LEAD
+BODY
+
+=transit hygiea sextile mc
+LEAD
+BODY
+
+=transit hygiea square mc
+LEAD
+BODY
+
+=transit hygiea trine mc
+LEAD
+BODY
+
+=transit hygiea opposition mc
+LEAD
+BODY
+
+=transit hygiea quincunx mc
+LEAD
+BODY
+
+=transit hygiea semisextile mc
+LEAD
+BODY
+
+=transit hygiea semisquare mc
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate mc
+LEAD
+BODY
+
+=transit hygiea quintile mc
+LEAD
+BODY
+
+=transit hygiea sesquiquintile mc
+LEAD
+BODY
+
+# hygiea with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction ic
+LEAD
+BODY
+
+=transit hygiea sextile ic
+LEAD
+BODY
+
+=transit hygiea square ic
+LEAD
+BODY
+
+=transit hygiea trine ic
+LEAD
+BODY
+
+=transit hygiea opposition ic
+LEAD
+BODY
+
+=transit hygiea quincunx ic
+LEAD
+BODY
+
+=transit hygiea semisextile ic
+LEAD
+BODY
+
+=transit hygiea semisquare ic
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate ic
+LEAD
+BODY
+
+=transit hygiea quintile ic
+LEAD
+BODY
+
+=transit hygiea sesquiquintile ic
+LEAD
+BODY
+
+# hygiea with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction south_node
+LEAD
+BODY
+
+=transit hygiea sextile south_node
+LEAD
+BODY
+
+=transit hygiea square south_node
+LEAD
+BODY
+
+=transit hygiea trine south_node
+LEAD
+BODY
+
+=transit hygiea opposition south_node
+LEAD
+BODY
+
+=transit hygiea quincunx south_node
+LEAD
+BODY
+
+=transit hygiea semisextile south_node
+LEAD
+BODY
+
+=transit hygiea semisquare south_node
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate south_node
+LEAD
+BODY
+
+=transit hygiea quintile south_node
+LEAD
+BODY
+
+=transit hygiea sesquiquintile south_node
+LEAD
+BODY
+
+# hygiea with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction ceres
+LEAD
+BODY
+
+=transit hygiea sextile ceres
+LEAD
+BODY
+
+=transit hygiea square ceres
+LEAD
+BODY
+
+=transit hygiea trine ceres
+LEAD
+BODY
+
+=transit hygiea opposition ceres
+LEAD
+BODY
+
+=transit hygiea quincunx ceres
+LEAD
+BODY
+
+=transit hygiea semisextile ceres
+LEAD
+BODY
+
+=transit hygiea semisquare ceres
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate ceres
+LEAD
+BODY
+
+=transit hygiea quintile ceres
+LEAD
+BODY
+
+=transit hygiea sesquiquintile ceres
+LEAD
+BODY
+
+# hygiea with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction pallas
+LEAD
+BODY
+
+=transit hygiea sextile pallas
+LEAD
+BODY
+
+=transit hygiea square pallas
+LEAD
+BODY
+
+=transit hygiea trine pallas
+LEAD
+BODY
+
+=transit hygiea opposition pallas
+LEAD
+BODY
+
+=transit hygiea quincunx pallas
+LEAD
+BODY
+
+=transit hygiea semisextile pallas
+LEAD
+BODY
+
+=transit hygiea semisquare pallas
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate pallas
+LEAD
+BODY
+
+=transit hygiea quintile pallas
+LEAD
+BODY
+
+=transit hygiea sesquiquintile pallas
+LEAD
+BODY
+
+# hygiea with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction juno
+LEAD
+BODY
+
+=transit hygiea sextile juno
+LEAD
+BODY
+
+=transit hygiea square juno
+LEAD
+BODY
+
+=transit hygiea trine juno
+LEAD
+BODY
+
+=transit hygiea opposition juno
+LEAD
+BODY
+
+=transit hygiea quincunx juno
+LEAD
+BODY
+
+=transit hygiea semisextile juno
+LEAD
+BODY
+
+=transit hygiea semisquare juno
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate juno
+LEAD
+BODY
+
+=transit hygiea quintile juno
+LEAD
+BODY
+
+=transit hygiea sesquiquintile juno
+LEAD
+BODY
+
+# hygiea with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction vesta
+LEAD
+BODY
+
+=transit hygiea sextile vesta
+LEAD
+BODY
+
+=transit hygiea square vesta
+LEAD
+BODY
+
+=transit hygiea trine vesta
+LEAD
+BODY
+
+=transit hygiea opposition vesta
+LEAD
+BODY
+
+=transit hygiea quincunx vesta
+LEAD
+BODY
+
+=transit hygiea semisextile vesta
+LEAD
+BODY
+
+=transit hygiea semisquare vesta
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate vesta
+LEAD
+BODY
+
+=transit hygiea quintile vesta
+LEAD
+BODY
+
+=transit hygiea sesquiquintile vesta
+LEAD
+BODY
+
+# hygiea with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction eris
+LEAD
+BODY
+
+=transit hygiea sextile eris
+LEAD
+BODY
+
+=transit hygiea square eris
+LEAD
+BODY
+
+=transit hygiea trine eris
+LEAD
+BODY
+
+=transit hygiea opposition eris
+LEAD
+BODY
+
+=transit hygiea quincunx eris
+LEAD
+BODY
+
+=transit hygiea semisextile eris
+LEAD
+BODY
+
+=transit hygiea semisquare eris
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate eris
+LEAD
+BODY
+
+=transit hygiea quintile eris
+LEAD
+BODY
+
+=transit hygiea sesquiquintile eris
+LEAD
+BODY
+
+# hygiea with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction eros
+LEAD
+BODY
+
+=transit hygiea sextile eros
+LEAD
+BODY
+
+=transit hygiea square eros
+LEAD
+BODY
+
+=transit hygiea trine eros
+LEAD
+BODY
+
+=transit hygiea opposition eros
+LEAD
+BODY
+
+=transit hygiea quincunx eros
+LEAD
+BODY
+
+=transit hygiea semisextile eros
+LEAD
+BODY
+
+=transit hygiea semisquare eros
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate eros
+LEAD
+BODY
+
+=transit hygiea quintile eros
+LEAD
+BODY
+
+=transit hygiea sesquiquintile eros
+LEAD
+BODY
+
+# hygiea with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction nessus
+LEAD
+BODY
+
+=transit hygiea sextile nessus
+LEAD
+BODY
+
+=transit hygiea square nessus
+LEAD
+BODY
+
+=transit hygiea trine nessus
+LEAD
+BODY
+
+=transit hygiea opposition nessus
+LEAD
+BODY
+
+=transit hygiea quincunx nessus
+LEAD
+BODY
+
+=transit hygiea semisextile nessus
+LEAD
+BODY
+
+=transit hygiea semisquare nessus
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate nessus
+LEAD
+BODY
+
+=transit hygiea quintile nessus
+LEAD
+BODY
+
+=transit hygiea sesquiquintile nessus
+LEAD
+BODY
+
+# hygiea with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction pholus
+LEAD
+BODY
+
+=transit hygiea sextile pholus
+LEAD
+BODY
+
+=transit hygiea square pholus
+LEAD
+BODY
+
+=transit hygiea trine pholus
+LEAD
+BODY
+
+=transit hygiea opposition pholus
+LEAD
+BODY
+
+=transit hygiea quincunx pholus
+LEAD
+BODY
+
+=transit hygiea semisextile pholus
+LEAD
+BODY
+
+=transit hygiea semisquare pholus
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate pholus
+LEAD
+BODY
+
+=transit hygiea quintile pholus
+LEAD
+BODY
+
+=transit hygiea sesquiquintile pholus
+LEAD
+BODY
+
+# hygiea with fortune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction fortune
+LEAD
+BODY
+
+=transit hygiea sextile fortune
+LEAD
+BODY
+
+=transit hygiea square fortune
+LEAD
+BODY
+
+=transit hygiea trine fortune
+LEAD
+BODY
+
+=transit hygiea opposition fortune
+LEAD
+BODY
+
+=transit hygiea quincunx fortune
+LEAD
+BODY
+
+=transit hygiea semisextile fortune
+LEAD
+BODY
+
+=transit hygiea semisquare fortune
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate fortune
+LEAD
+BODY
+
+=transit hygiea quintile fortune
+LEAD
+BODY
+
+=transit hygiea sesquiquintile fortune
+LEAD
+BODY
+
+# hygiea with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction spirit
+LEAD
+BODY
+
+=transit hygiea sextile spirit
+LEAD
+BODY
+
+=transit hygiea square spirit
+LEAD
+BODY
+
+=transit hygiea trine spirit
+LEAD
+BODY
+
+=transit hygiea opposition spirit
+LEAD
+BODY
+
+=transit hygiea quincunx spirit
+LEAD
+BODY
+
+=transit hygiea semisextile spirit
+LEAD
+BODY
+
+=transit hygiea semisquare spirit
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate spirit
+LEAD
+BODY
+
+=transit hygiea quintile spirit
+LEAD
+BODY
+
+=transit hygiea sesquiquintile spirit
+LEAD
+BODY
+
+# hygiea with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction lilith
+LEAD
+BODY
+
+=transit hygiea sextile lilith
+LEAD
+BODY
+
+=transit hygiea square lilith
+LEAD
+BODY
+
+=transit hygiea trine lilith
+LEAD
+BODY
+
+=transit hygiea opposition lilith
+LEAD
+BODY
+
+=transit hygiea quincunx lilith
+LEAD
+BODY
+
+=transit hygiea semisextile lilith
+LEAD
+BODY
+
+=transit hygiea semisquare lilith
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate lilith
+LEAD
+BODY
+
+=transit hygiea quintile lilith
+LEAD
+BODY
+
+=transit hygiea sesquiquintile lilith
+LEAD
+BODY
+
+# hygiea with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction moon
+LEAD
+BODY
+
+=transit hygiea sextile moon
+LEAD
+BODY
+
+=transit hygiea square moon
+LEAD
+BODY
+
+=transit hygiea trine moon
+LEAD
+BODY
+
+=transit hygiea opposition moon
+LEAD
+BODY
+
+=transit hygiea quincunx moon
+LEAD
+BODY
+
+=transit hygiea semisextile moon
+LEAD
+BODY
+
+=transit hygiea semisquare moon
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate moon
+LEAD
+BODY
+
+=transit hygiea quintile moon
+LEAD
+BODY
+
+=transit hygiea sesquiquintile moon
+LEAD
+BODY
+
+# hygiea with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction sun
+LEAD
+BODY
+
+=transit hygiea sextile sun
+LEAD
+BODY
+
+=transit hygiea square sun
+LEAD
+BODY
+
+=transit hygiea trine sun
+LEAD
+BODY
+
+=transit hygiea opposition sun
+LEAD
+BODY
+
+=transit hygiea quincunx sun
+LEAD
+BODY
+
+=transit hygiea semisextile sun
+LEAD
+BODY
+
+=transit hygiea semisquare sun
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate sun
+LEAD
+BODY
+
+=transit hygiea quintile sun
+LEAD
+BODY
+
+=transit hygiea sesquiquintile sun
+LEAD
+BODY
+
+# hygiea with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction mercury
+LEAD
+BODY
+
+=transit hygiea sextile mercury
+LEAD
+BODY
+
+=transit hygiea square mercury
+LEAD
+BODY
+
+=transit hygiea trine mercury
+LEAD
+BODY
+
+=transit hygiea opposition mercury
+LEAD
+BODY
+
+=transit hygiea quincunx mercury
+LEAD
+BODY
+
+=transit hygiea semisextile mercury
+LEAD
+BODY
+
+=transit hygiea semisquare mercury
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate mercury
+LEAD
+BODY
+
+=transit hygiea quintile mercury
+LEAD
+BODY
+
+=transit hygiea sesquiquintile mercury
+LEAD
+BODY
+
+# hygiea with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction venus
+LEAD
+BODY
+
+=transit hygiea sextile venus
+LEAD
+BODY
+
+=transit hygiea square venus
+LEAD
+BODY
+
+=transit hygiea trine venus
+LEAD
+BODY
+
+=transit hygiea opposition venus
+LEAD
+BODY
+
+=transit hygiea quincunx venus
+LEAD
+BODY
+
+=transit hygiea semisextile venus
+LEAD
+BODY
+
+=transit hygiea semisquare venus
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate venus
+LEAD
+BODY
+
+=transit hygiea quintile venus
+LEAD
+BODY
+
+=transit hygiea sesquiquintile venus
+LEAD
+BODY
+
+# hygiea with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction mars
+LEAD
+BODY
+
+=transit hygiea sextile mars
+LEAD
+BODY
+
+=transit hygiea square mars
+LEAD
+BODY
+
+=transit hygiea trine mars
+LEAD
+BODY
+
+=transit hygiea opposition mars
+LEAD
+BODY
+
+=transit hygiea quincunx mars
+LEAD
+BODY
+
+=transit hygiea semisextile mars
+LEAD
+BODY
+
+=transit hygiea semisquare mars
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate mars
+LEAD
+BODY
+
+=transit hygiea quintile mars
+LEAD
+BODY
+
+=transit hygiea sesquiquintile mars
+LEAD
+BODY
+
+# hygiea with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction jupiter
+LEAD
+BODY
+
+=transit hygiea sextile jupiter
+LEAD
+BODY
+
+=transit hygiea square jupiter
+LEAD
+BODY
+
+=transit hygiea trine jupiter
+LEAD
+BODY
+
+=transit hygiea opposition jupiter
+LEAD
+BODY
+
+=transit hygiea quincunx jupiter
+LEAD
+BODY
+
+=transit hygiea semisextile jupiter
+LEAD
+BODY
+
+=transit hygiea semisquare jupiter
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit hygiea quintile jupiter
+LEAD
+BODY
+
+=transit hygiea sesquiquintile jupiter
+LEAD
+BODY
+
+# hygiea with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction saturn
+LEAD
+BODY
+
+=transit hygiea sextile saturn
+LEAD
+BODY
+
+=transit hygiea square saturn
+LEAD
+BODY
+
+=transit hygiea trine saturn
+LEAD
+BODY
+
+=transit hygiea opposition saturn
+LEAD
+BODY
+
+=transit hygiea quincunx saturn
+LEAD
+BODY
+
+=transit hygiea semisextile saturn
+LEAD
+BODY
+
+=transit hygiea semisquare saturn
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate saturn
+LEAD
+BODY
+
+=transit hygiea quintile saturn
+LEAD
+BODY
+
+=transit hygiea sesquiquintile saturn
+LEAD
+BODY
+
+# hygiea with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction uranus
+LEAD
+BODY
+
+=transit hygiea sextile uranus
+LEAD
+BODY
+
+=transit hygiea square uranus
+LEAD
+BODY
+
+=transit hygiea trine uranus
+LEAD
+BODY
+
+=transit hygiea opposition uranus
+LEAD
+BODY
+
+=transit hygiea quincunx uranus
+LEAD
+BODY
+
+=transit hygiea semisextile uranus
+LEAD
+BODY
+
+=transit hygiea semisquare uranus
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate uranus
+LEAD
+BODY
+
+=transit hygiea quintile uranus
+LEAD
+BODY
+
+=transit hygiea sesquiquintile uranus
+LEAD
+BODY
+
+# hygiea with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction neptune
+LEAD
+BODY
+
+=transit hygiea sextile neptune
+LEAD
+BODY
+
+=transit hygiea square neptune
+LEAD
+BODY
+
+=transit hygiea trine neptune
+LEAD
+BODY
+
+=transit hygiea opposition neptune
+LEAD
+BODY
+
+=transit hygiea quincunx neptune
+LEAD
+BODY
+
+=transit hygiea semisextile neptune
+LEAD
+BODY
+
+=transit hygiea semisquare neptune
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate neptune
+LEAD
+BODY
+
+=transit hygiea quintile neptune
+LEAD
+BODY
+
+=transit hygiea sesquiquintile neptune
+LEAD
+BODY
+
+# hygiea with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction pluto
+LEAD
+BODY
+
+=transit hygiea sextile pluto
+LEAD
+BODY
+
+=transit hygiea square pluto
+LEAD
+BODY
+
+=transit hygiea trine pluto
+LEAD
+BODY
+
+=transit hygiea opposition pluto
+LEAD
+BODY
+
+=transit hygiea quincunx pluto
+LEAD
+BODY
+
+=transit hygiea semisextile pluto
+LEAD
+BODY
+
+=transit hygiea semisquare pluto
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate pluto
+LEAD
+BODY
+
+=transit hygiea quintile pluto
+LEAD
+BODY
+
+=transit hygiea sesquiquintile pluto
+LEAD
+BODY
+
+# hygiea with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction north_node
+LEAD
+BODY
+
+=transit hygiea sextile north_node
+LEAD
+BODY
+
+=transit hygiea square north_node
+LEAD
+BODY
+
+=transit hygiea trine north_node
+LEAD
+BODY
+
+=transit hygiea opposition north_node
+LEAD
+BODY
+
+=transit hygiea quincunx north_node
+LEAD
+BODY
+
+=transit hygiea semisextile north_node
+LEAD
+BODY
+
+=transit hygiea semisquare north_node
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate north_node
+LEAD
+BODY
+
+=transit hygiea quintile north_node
+LEAD
+BODY
+
+=transit hygiea sesquiquintile north_node
+LEAD
+BODY
+
+# hygiea with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit hygiea conjunction chiron
+LEAD
+BODY
+
+=transit hygiea sextile chiron
+LEAD
+BODY
+
+=transit hygiea square chiron
+LEAD
+BODY
+
+=transit hygiea trine chiron
+LEAD
+BODY
+
+=transit hygiea opposition chiron
+LEAD
+BODY
+
+=transit hygiea quincunx chiron
+LEAD
+BODY
+
+=transit hygiea semisextile chiron
+LEAD
+BODY
+
+=transit hygiea semisquare chiron
+LEAD
+BODY
+
+=transit hygiea sesquiquadrate chiron
+LEAD
+BODY
+
+=transit hygiea quintile chiron
+LEAD
+BODY
+
+=transit hygiea sesquiquintile chiron
+LEAD
+BODY

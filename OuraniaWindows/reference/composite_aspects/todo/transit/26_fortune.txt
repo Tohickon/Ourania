@@ -1,0 +1,1261 @@
+# transit: fortune - 308 readings to write. Replace LEAD and BODY; keep the = lines exactly. Lines starting # are notes and are ignored.
+
+# fortune with descendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction descendant
+LEAD
+BODY
+
+=transit fortune sextile descendant
+LEAD
+BODY
+
+=transit fortune square descendant
+LEAD
+BODY
+
+=transit fortune trine descendant
+LEAD
+BODY
+
+=transit fortune opposition descendant
+LEAD
+BODY
+
+=transit fortune quincunx descendant
+LEAD
+BODY
+
+=transit fortune semisextile descendant
+LEAD
+BODY
+
+=transit fortune semisquare descendant
+LEAD
+BODY
+
+=transit fortune sesquiquadrate descendant
+LEAD
+BODY
+
+=transit fortune quintile descendant
+LEAD
+BODY
+
+=transit fortune sesquiquintile descendant
+LEAD
+BODY
+
+# fortune with ic: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction ic
+LEAD
+BODY
+
+=transit fortune sextile ic
+LEAD
+BODY
+
+=transit fortune square ic
+LEAD
+BODY
+
+=transit fortune trine ic
+LEAD
+BODY
+
+=transit fortune opposition ic
+LEAD
+BODY
+
+=transit fortune quincunx ic
+LEAD
+BODY
+
+=transit fortune semisextile ic
+LEAD
+BODY
+
+=transit fortune semisquare ic
+LEAD
+BODY
+
+=transit fortune sesquiquadrate ic
+LEAD
+BODY
+
+=transit fortune quintile ic
+LEAD
+BODY
+
+=transit fortune sesquiquintile ic
+LEAD
+BODY
+
+# fortune with ascendant: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction ascendant
+LEAD
+BODY
+
+=transit fortune sextile ascendant
+LEAD
+BODY
+
+=transit fortune square ascendant
+LEAD
+BODY
+
+=transit fortune trine ascendant
+LEAD
+BODY
+
+=transit fortune opposition ascendant
+LEAD
+BODY
+
+=transit fortune quincunx ascendant
+LEAD
+BODY
+
+=transit fortune semisextile ascendant
+LEAD
+BODY
+
+=transit fortune semisquare ascendant
+LEAD
+BODY
+
+=transit fortune sesquiquadrate ascendant
+LEAD
+BODY
+
+=transit fortune quintile ascendant
+LEAD
+BODY
+
+=transit fortune sesquiquintile ascendant
+LEAD
+BODY
+
+# fortune with mc: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction mc
+LEAD
+BODY
+
+=transit fortune sextile mc
+LEAD
+BODY
+
+=transit fortune square mc
+LEAD
+BODY
+
+=transit fortune trine mc
+LEAD
+BODY
+
+=transit fortune opposition mc
+LEAD
+BODY
+
+=transit fortune quincunx mc
+LEAD
+BODY
+
+=transit fortune semisextile mc
+LEAD
+BODY
+
+=transit fortune semisquare mc
+LEAD
+BODY
+
+=transit fortune sesquiquadrate mc
+LEAD
+BODY
+
+=transit fortune quintile mc
+LEAD
+BODY
+
+=transit fortune sesquiquintile mc
+LEAD
+BODY
+
+# fortune with south_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction south_node
+LEAD
+BODY
+
+=transit fortune sextile south_node
+LEAD
+BODY
+
+=transit fortune square south_node
+LEAD
+BODY
+
+=transit fortune trine south_node
+LEAD
+BODY
+
+=transit fortune opposition south_node
+LEAD
+BODY
+
+=transit fortune quincunx south_node
+LEAD
+BODY
+
+=transit fortune semisextile south_node
+LEAD
+BODY
+
+=transit fortune semisquare south_node
+LEAD
+BODY
+
+=transit fortune sesquiquadrate south_node
+LEAD
+BODY
+
+=transit fortune quintile south_node
+LEAD
+BODY
+
+=transit fortune sesquiquintile south_node
+LEAD
+BODY
+
+# fortune with ceres: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction ceres
+LEAD
+BODY
+
+=transit fortune sextile ceres
+LEAD
+BODY
+
+=transit fortune square ceres
+LEAD
+BODY
+
+=transit fortune trine ceres
+LEAD
+BODY
+
+=transit fortune opposition ceres
+LEAD
+BODY
+
+=transit fortune quincunx ceres
+LEAD
+BODY
+
+=transit fortune semisextile ceres
+LEAD
+BODY
+
+=transit fortune semisquare ceres
+LEAD
+BODY
+
+=transit fortune sesquiquadrate ceres
+LEAD
+BODY
+
+=transit fortune quintile ceres
+LEAD
+BODY
+
+=transit fortune sesquiquintile ceres
+LEAD
+BODY
+
+# fortune with pallas: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction pallas
+LEAD
+BODY
+
+=transit fortune sextile pallas
+LEAD
+BODY
+
+=transit fortune square pallas
+LEAD
+BODY
+
+=transit fortune trine pallas
+LEAD
+BODY
+
+=transit fortune opposition pallas
+LEAD
+BODY
+
+=transit fortune quincunx pallas
+LEAD
+BODY
+
+=transit fortune semisextile pallas
+LEAD
+BODY
+
+=transit fortune semisquare pallas
+LEAD
+BODY
+
+=transit fortune sesquiquadrate pallas
+LEAD
+BODY
+
+=transit fortune quintile pallas
+LEAD
+BODY
+
+=transit fortune sesquiquintile pallas
+LEAD
+BODY
+
+# fortune with juno: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction juno
+LEAD
+BODY
+
+=transit fortune sextile juno
+LEAD
+BODY
+
+=transit fortune square juno
+LEAD
+BODY
+
+=transit fortune trine juno
+LEAD
+BODY
+
+=transit fortune opposition juno
+LEAD
+BODY
+
+=transit fortune quincunx juno
+LEAD
+BODY
+
+=transit fortune semisextile juno
+LEAD
+BODY
+
+=transit fortune semisquare juno
+LEAD
+BODY
+
+=transit fortune sesquiquadrate juno
+LEAD
+BODY
+
+=transit fortune quintile juno
+LEAD
+BODY
+
+=transit fortune sesquiquintile juno
+LEAD
+BODY
+
+# fortune with vesta: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction vesta
+LEAD
+BODY
+
+=transit fortune sextile vesta
+LEAD
+BODY
+
+=transit fortune square vesta
+LEAD
+BODY
+
+=transit fortune trine vesta
+LEAD
+BODY
+
+=transit fortune opposition vesta
+LEAD
+BODY
+
+=transit fortune quincunx vesta
+LEAD
+BODY
+
+=transit fortune semisextile vesta
+LEAD
+BODY
+
+=transit fortune semisquare vesta
+LEAD
+BODY
+
+=transit fortune sesquiquadrate vesta
+LEAD
+BODY
+
+=transit fortune quintile vesta
+LEAD
+BODY
+
+=transit fortune sesquiquintile vesta
+LEAD
+BODY
+
+# fortune with eris: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction eris
+LEAD
+BODY
+
+=transit fortune sextile eris
+LEAD
+BODY
+
+=transit fortune square eris
+LEAD
+BODY
+
+=transit fortune trine eris
+LEAD
+BODY
+
+=transit fortune opposition eris
+LEAD
+BODY
+
+=transit fortune quincunx eris
+LEAD
+BODY
+
+=transit fortune semisextile eris
+LEAD
+BODY
+
+=transit fortune semisquare eris
+LEAD
+BODY
+
+=transit fortune sesquiquadrate eris
+LEAD
+BODY
+
+=transit fortune quintile eris
+LEAD
+BODY
+
+=transit fortune sesquiquintile eris
+LEAD
+BODY
+
+# fortune with eros: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction eros
+LEAD
+BODY
+
+=transit fortune sextile eros
+LEAD
+BODY
+
+=transit fortune square eros
+LEAD
+BODY
+
+=transit fortune trine eros
+LEAD
+BODY
+
+=transit fortune opposition eros
+LEAD
+BODY
+
+=transit fortune quincunx eros
+LEAD
+BODY
+
+=transit fortune semisextile eros
+LEAD
+BODY
+
+=transit fortune semisquare eros
+LEAD
+BODY
+
+=transit fortune sesquiquadrate eros
+LEAD
+BODY
+
+=transit fortune quintile eros
+LEAD
+BODY
+
+=transit fortune sesquiquintile eros
+LEAD
+BODY
+
+# fortune with hygiea: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction hygiea
+LEAD
+BODY
+
+=transit fortune sextile hygiea
+LEAD
+BODY
+
+=transit fortune square hygiea
+LEAD
+BODY
+
+=transit fortune trine hygiea
+LEAD
+BODY
+
+=transit fortune opposition hygiea
+LEAD
+BODY
+
+=transit fortune quincunx hygiea
+LEAD
+BODY
+
+=transit fortune semisextile hygiea
+LEAD
+BODY
+
+=transit fortune semisquare hygiea
+LEAD
+BODY
+
+=transit fortune sesquiquadrate hygiea
+LEAD
+BODY
+
+=transit fortune quintile hygiea
+LEAD
+BODY
+
+=transit fortune sesquiquintile hygiea
+LEAD
+BODY
+
+# fortune with nessus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction nessus
+LEAD
+BODY
+
+=transit fortune sextile nessus
+LEAD
+BODY
+
+=transit fortune square nessus
+LEAD
+BODY
+
+=transit fortune trine nessus
+LEAD
+BODY
+
+=transit fortune opposition nessus
+LEAD
+BODY
+
+=transit fortune quincunx nessus
+LEAD
+BODY
+
+=transit fortune semisextile nessus
+LEAD
+BODY
+
+=transit fortune semisquare nessus
+LEAD
+BODY
+
+=transit fortune sesquiquadrate nessus
+LEAD
+BODY
+
+=transit fortune quintile nessus
+LEAD
+BODY
+
+=transit fortune sesquiquintile nessus
+LEAD
+BODY
+
+# fortune with pholus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction pholus
+LEAD
+BODY
+
+=transit fortune sextile pholus
+LEAD
+BODY
+
+=transit fortune square pholus
+LEAD
+BODY
+
+=transit fortune trine pholus
+LEAD
+BODY
+
+=transit fortune opposition pholus
+LEAD
+BODY
+
+=transit fortune quincunx pholus
+LEAD
+BODY
+
+=transit fortune semisextile pholus
+LEAD
+BODY
+
+=transit fortune semisquare pholus
+LEAD
+BODY
+
+=transit fortune sesquiquadrate pholus
+LEAD
+BODY
+
+=transit fortune quintile pholus
+LEAD
+BODY
+
+=transit fortune sesquiquintile pholus
+LEAD
+BODY
+
+# fortune with spirit: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction spirit
+LEAD
+BODY
+
+=transit fortune sextile spirit
+LEAD
+BODY
+
+=transit fortune square spirit
+LEAD
+BODY
+
+=transit fortune trine spirit
+LEAD
+BODY
+
+=transit fortune opposition spirit
+LEAD
+BODY
+
+=transit fortune quincunx spirit
+LEAD
+BODY
+
+=transit fortune semisextile spirit
+LEAD
+BODY
+
+=transit fortune semisquare spirit
+LEAD
+BODY
+
+=transit fortune sesquiquadrate spirit
+LEAD
+BODY
+
+=transit fortune quintile spirit
+LEAD
+BODY
+
+=transit fortune sesquiquintile spirit
+LEAD
+BODY
+
+# fortune with lilith: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction lilith
+LEAD
+BODY
+
+=transit fortune sextile lilith
+LEAD
+BODY
+
+=transit fortune square lilith
+LEAD
+BODY
+
+=transit fortune trine lilith
+LEAD
+BODY
+
+=transit fortune opposition lilith
+LEAD
+BODY
+
+=transit fortune quincunx lilith
+LEAD
+BODY
+
+=transit fortune semisextile lilith
+LEAD
+BODY
+
+=transit fortune semisquare lilith
+LEAD
+BODY
+
+=transit fortune sesquiquadrate lilith
+LEAD
+BODY
+
+=transit fortune quintile lilith
+LEAD
+BODY
+
+=transit fortune sesquiquintile lilith
+LEAD
+BODY
+
+# fortune with moon: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction moon
+LEAD
+BODY
+
+=transit fortune sextile moon
+LEAD
+BODY
+
+=transit fortune square moon
+LEAD
+BODY
+
+=transit fortune trine moon
+LEAD
+BODY
+
+=transit fortune opposition moon
+LEAD
+BODY
+
+=transit fortune quincunx moon
+LEAD
+BODY
+
+=transit fortune semisextile moon
+LEAD
+BODY
+
+=transit fortune semisquare moon
+LEAD
+BODY
+
+=transit fortune sesquiquadrate moon
+LEAD
+BODY
+
+=transit fortune quintile moon
+LEAD
+BODY
+
+=transit fortune sesquiquintile moon
+LEAD
+BODY
+
+# fortune with sun: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction sun
+LEAD
+BODY
+
+=transit fortune sextile sun
+LEAD
+BODY
+
+=transit fortune square sun
+LEAD
+BODY
+
+=transit fortune trine sun
+LEAD
+BODY
+
+=transit fortune opposition sun
+LEAD
+BODY
+
+=transit fortune quincunx sun
+LEAD
+BODY
+
+=transit fortune semisextile sun
+LEAD
+BODY
+
+=transit fortune semisquare sun
+LEAD
+BODY
+
+=transit fortune sesquiquadrate sun
+LEAD
+BODY
+
+=transit fortune quintile sun
+LEAD
+BODY
+
+=transit fortune sesquiquintile sun
+LEAD
+BODY
+
+# fortune with mercury: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction mercury
+LEAD
+BODY
+
+=transit fortune sextile mercury
+LEAD
+BODY
+
+=transit fortune square mercury
+LEAD
+BODY
+
+=transit fortune trine mercury
+LEAD
+BODY
+
+=transit fortune opposition mercury
+LEAD
+BODY
+
+=transit fortune quincunx mercury
+LEAD
+BODY
+
+=transit fortune semisextile mercury
+LEAD
+BODY
+
+=transit fortune semisquare mercury
+LEAD
+BODY
+
+=transit fortune sesquiquadrate mercury
+LEAD
+BODY
+
+=transit fortune quintile mercury
+LEAD
+BODY
+
+=transit fortune sesquiquintile mercury
+LEAD
+BODY
+
+# fortune with venus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction venus
+LEAD
+BODY
+
+=transit fortune sextile venus
+LEAD
+BODY
+
+=transit fortune square venus
+LEAD
+BODY
+
+=transit fortune trine venus
+LEAD
+BODY
+
+=transit fortune opposition venus
+LEAD
+BODY
+
+=transit fortune quincunx venus
+LEAD
+BODY
+
+=transit fortune semisextile venus
+LEAD
+BODY
+
+=transit fortune semisquare venus
+LEAD
+BODY
+
+=transit fortune sesquiquadrate venus
+LEAD
+BODY
+
+=transit fortune quintile venus
+LEAD
+BODY
+
+=transit fortune sesquiquintile venus
+LEAD
+BODY
+
+# fortune with mars: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction mars
+LEAD
+BODY
+
+=transit fortune sextile mars
+LEAD
+BODY
+
+=transit fortune square mars
+LEAD
+BODY
+
+=transit fortune trine mars
+LEAD
+BODY
+
+=transit fortune opposition mars
+LEAD
+BODY
+
+=transit fortune quincunx mars
+LEAD
+BODY
+
+=transit fortune semisextile mars
+LEAD
+BODY
+
+=transit fortune semisquare mars
+LEAD
+BODY
+
+=transit fortune sesquiquadrate mars
+LEAD
+BODY
+
+=transit fortune quintile mars
+LEAD
+BODY
+
+=transit fortune sesquiquintile mars
+LEAD
+BODY
+
+# fortune with jupiter: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction jupiter
+LEAD
+BODY
+
+=transit fortune sextile jupiter
+LEAD
+BODY
+
+=transit fortune square jupiter
+LEAD
+BODY
+
+=transit fortune trine jupiter
+LEAD
+BODY
+
+=transit fortune opposition jupiter
+LEAD
+BODY
+
+=transit fortune quincunx jupiter
+LEAD
+BODY
+
+=transit fortune semisextile jupiter
+LEAD
+BODY
+
+=transit fortune semisquare jupiter
+LEAD
+BODY
+
+=transit fortune sesquiquadrate jupiter
+LEAD
+BODY
+
+=transit fortune quintile jupiter
+LEAD
+BODY
+
+=transit fortune sesquiquintile jupiter
+LEAD
+BODY
+
+# fortune with saturn: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction saturn
+LEAD
+BODY
+
+=transit fortune sextile saturn
+LEAD
+BODY
+
+=transit fortune square saturn
+LEAD
+BODY
+
+=transit fortune trine saturn
+LEAD
+BODY
+
+=transit fortune opposition saturn
+LEAD
+BODY
+
+=transit fortune quincunx saturn
+LEAD
+BODY
+
+=transit fortune semisextile saturn
+LEAD
+BODY
+
+=transit fortune semisquare saturn
+LEAD
+BODY
+
+=transit fortune sesquiquadrate saturn
+LEAD
+BODY
+
+=transit fortune quintile saturn
+LEAD
+BODY
+
+=transit fortune sesquiquintile saturn
+LEAD
+BODY
+
+# fortune with uranus: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction uranus
+LEAD
+BODY
+
+=transit fortune sextile uranus
+LEAD
+BODY
+
+=transit fortune square uranus
+LEAD
+BODY
+
+=transit fortune trine uranus
+LEAD
+BODY
+
+=transit fortune opposition uranus
+LEAD
+BODY
+
+=transit fortune quincunx uranus
+LEAD
+BODY
+
+=transit fortune semisextile uranus
+LEAD
+BODY
+
+=transit fortune semisquare uranus
+LEAD
+BODY
+
+=transit fortune sesquiquadrate uranus
+LEAD
+BODY
+
+=transit fortune quintile uranus
+LEAD
+BODY
+
+=transit fortune sesquiquintile uranus
+LEAD
+BODY
+
+# fortune with neptune: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction neptune
+LEAD
+BODY
+
+=transit fortune sextile neptune
+LEAD
+BODY
+
+=transit fortune square neptune
+LEAD
+BODY
+
+=transit fortune trine neptune
+LEAD
+BODY
+
+=transit fortune opposition neptune
+LEAD
+BODY
+
+=transit fortune quincunx neptune
+LEAD
+BODY
+
+=transit fortune semisextile neptune
+LEAD
+BODY
+
+=transit fortune semisquare neptune
+LEAD
+BODY
+
+=transit fortune sesquiquadrate neptune
+LEAD
+BODY
+
+=transit fortune quintile neptune
+LEAD
+BODY
+
+=transit fortune sesquiquintile neptune
+LEAD
+BODY
+
+# fortune with pluto: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction pluto
+LEAD
+BODY
+
+=transit fortune sextile pluto
+LEAD
+BODY
+
+=transit fortune square pluto
+LEAD
+BODY
+
+=transit fortune trine pluto
+LEAD
+BODY
+
+=transit fortune opposition pluto
+LEAD
+BODY
+
+=transit fortune quincunx pluto
+LEAD
+BODY
+
+=transit fortune semisextile pluto
+LEAD
+BODY
+
+=transit fortune semisquare pluto
+LEAD
+BODY
+
+=transit fortune sesquiquadrate pluto
+LEAD
+BODY
+
+=transit fortune quintile pluto
+LEAD
+BODY
+
+=transit fortune sesquiquintile pluto
+LEAD
+BODY
+
+# fortune with north_node: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction north_node
+LEAD
+BODY
+
+=transit fortune sextile north_node
+LEAD
+BODY
+
+=transit fortune square north_node
+LEAD
+BODY
+
+=transit fortune trine north_node
+LEAD
+BODY
+
+=transit fortune opposition north_node
+LEAD
+BODY
+
+=transit fortune quincunx north_node
+LEAD
+BODY
+
+=transit fortune semisextile north_node
+LEAD
+BODY
+
+=transit fortune semisquare north_node
+LEAD
+BODY
+
+=transit fortune sesquiquadrate north_node
+LEAD
+BODY
+
+=transit fortune quintile north_node
+LEAD
+BODY
+
+=transit fortune sesquiquintile north_node
+LEAD
+BODY
+
+# fortune with chiron: 11 readings, one per aspect. Each must read differently from the others in this group.
+=transit fortune conjunction chiron
+LEAD
+BODY
+
+=transit fortune sextile chiron
+LEAD
+BODY
+
+=transit fortune square chiron
+LEAD
+BODY
+
+=transit fortune trine chiron
+LEAD
+BODY
+
+=transit fortune opposition chiron
+LEAD
+BODY
+
+=transit fortune quincunx chiron
+LEAD
+BODY
+
+=transit fortune semisextile chiron
+LEAD
+BODY
+
+=transit fortune semisquare chiron
+LEAD
+BODY
+
+=transit fortune sesquiquadrate chiron
+LEAD
+BODY
+
+=transit fortune quintile chiron
+LEAD
+BODY
+
+=transit fortune sesquiquintile chiron
+LEAD
+BODY

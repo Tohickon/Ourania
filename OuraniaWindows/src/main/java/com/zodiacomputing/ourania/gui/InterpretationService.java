@@ -191,6 +191,12 @@ public class InterpretationService {
      * planet pairs in that file are hand-written and better than anything replacing them.
      */
     private static final String[] EXTRA_FILES = {
+        // Solar arc onto natal midpoints. Two small sections rather than a bulk corpus: a
+        // catalyst sentence per directed body, and the handful of pictures that carry a
+        // specific traditional reading. The 1,014 pictures a thirteen-point dial can make are
+        // NOT stored - ArcMidpointReading composes the rest from the pair's own conjunction
+        // prose, which already exists for all 78 pairs. See that class for why.
+        "solar_arc_midpoints.json",
         "aspect_prose_v2.json",
         "spirit_prose.json",
         "minor_aspect_prose.json",
@@ -771,6 +777,12 @@ public class InterpretationService {
      */
     private final Map<String, String> tarotBodies = new HashMap<>();
 
+    /** What each directed body does when it arrives on a midpoint; thirteen entries. */
+    private final Map<String, String> arcCatalysts = new HashMap<>();
+
+    /** The pictures with a specific reading of their own, keyed directed_a_b. */
+    private final Map<String, String> arcPictures = new HashMap<>();
+
     /** The map a section header names, or null when the line is not a known section. */
     private Map<String, String> sectionFor(String line) {
         if (line.startsWith("\"body_core\""))    return bodyCores;
@@ -800,6 +812,8 @@ public class InterpretationService {
         if (line.startsWith("\"composite_aspect_frame\"")) return compositeAspectFrames;
         if (line.startsWith("\"composite_aspect\"")) return compositeAspects;
         if (line.startsWith("\"synastry_aspect\"")) return synastryAspects;
+        if (line.startsWith("\"arc_catalyst\"")) return arcCatalysts;
+        if (line.startsWith("\"arc_picture\"")) return arcPictures;
         return null;
     }
 
@@ -822,6 +836,19 @@ public class InterpretationService {
     public boolean hasEntry(String section, String key) {
         Map<String, String> m = sectionFor("\"" + section + "\"");
         return m != null && m.containsKey(key);
+    }
+
+    /**
+     * What a section actually serves - every key and the text a reader is shown for it - or
+     * null when this build knows no such section.
+     *
+     * Exists for CorpusCheck. A file on disk is not what a reader sees: under putIfAbsent an
+     * earlier file can shadow a later one's text for the same key, so a measurement of reading
+     * quality has to be taken here, after the merge, and not from the files. Returns a copy.
+     */
+    public Map<String, String> servedSection(String section) {
+        Map<String, String> m = sectionFor("\"" + section + "\"");
+        return m == null ? null : new java.util.TreeMap<>(m);
     }
 
     public String getMacroDynamic(String key) {
@@ -1256,6 +1283,46 @@ public class InterpretationService {
      */
     public String getAspectGeneral(String aspectLabel) {
         return aspectLabel == null ? null : aspects.get(aspectLabel.toLowerCase());
+    }
+
+    /**
+     * What a directed body does when it arrives on a midpoint, or "" when none is written.
+     *
+     * One sentence per body, which is the whole of what this layer needs from the catalyst
+     * half of a picture - the other half is the pair's own fusion, and that already exists.
+     */
+    public String getArcCatalyst(String bodyName) {
+        return arcCatalysts.getOrDefault(bodyKey(bodyName), "");
+    }
+
+    /**
+     * A specific reading for one midpoint picture, or null when the catalogue has none.
+     *
+     * <b>Both orders of the pair are tried, as {@link #getAspect} does, and for a stronger
+     * reason here.</b> A/B and B/A are not two readings of one thing the way a conjunction's
+     * two orders are - they are the <i>same point</i>: {@code Dial.midpoint} takes the nearer
+     * midpoint, which is symmetric, so Sun/Moon and Moon/Sun name one degree. A catalogue that
+     * matched one order only would answer for half the charts that reach it, depending on which
+     * way round {@code Dial.midpoints} happened to pair them.
+     *
+     * <p>Most pictures have none and that is the normal case, not a gap: thirteen points make
+     * 1,014 pictures and a catalogue of them written out would be mostly invention. Null here
+     * means "compose it", which is what {@code ArcMidpointReading} does.
+     */
+    public String getArcPicture(String directed, String a, String b) {
+        if (directed == null || a == null || b == null) {
+            return null;
+        }
+        String d = bodyKey(directed);
+        String ka = bodyKey(a);
+        String kb = bodyKey(b);
+        String hit = arcPictures.get(d + "_" + ka + "_" + kb);
+        return hit != null ? hit : arcPictures.get(d + "_" + kb + "_" + ka);
+    }
+
+    /** How many pictures carry a specific reading, for a check that counts them. */
+    public int arcPictureCount() {
+        return arcPictures.size();
     }
 
     public String getAspect(String planet1, String planet2, String aspect) {

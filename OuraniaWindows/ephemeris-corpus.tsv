@@ -23,18 +23,18 @@
 #   java -cp "src\main\java;lib\*" com.zodiacomputing.ourania.astro.EphemerisCorpus --overwrite-the-expectations
 # Houses: P.  Zodiac: tropical.  Settings: a fresh install's defaults.
 era	place	point	longitude	source
-1500	greenwich	Sun	79.747999161	approximation
-1500	greenwich	Moon	128.763839139	files
-1500	greenwich	Mercury	104.139295397	approximation
-1500	greenwich	Venus	115.377578060	approximation
-1500	greenwich	Mars	114.969406814	approximation
-1500	greenwich	Jupiter	356.236455729	approximation
-1500	greenwich	Saturn	57.778524209	approximation
-1500	greenwich	Uranus	330.058496043	approximation
-1500	greenwich	Neptune	286.496576990	approximation
-1500	greenwich	Pluto	233.196218182	approximation
-1500	greenwich	North Node	67.677001306	approximation
-1500	greenwich	South Node	247.677001306	derived
+1500	greenwich	Sun	79.748044851	approximation
+1500	greenwich	Moon	128.764411022	files
+1500	greenwich	Mercury	104.139334331	approximation
+1500	greenwich	Venus	115.377634403	approximation
+1500	greenwich	Mars	114.969436472	approximation
+1500	greenwich	Jupiter	356.236461090	approximation
+1500	greenwich	Saturn	57.778530156	approximation
+1500	greenwich	Uranus	330.058495788	approximation
+1500	greenwich	Neptune	286.496575874	approximation
+1500	greenwich	Pluto	233.196217041	approximation
+1500	greenwich	North Node	67.677003553	approximation
+1500	greenwich	South Node	247.677003553	derived
 1500	greenwich	Chiron	nan	none
 1500	greenwich	Ceres	nan	none
 1500	greenwich	Pallas	nan	none
@@ -223,18 +223,18 @@ era	place	point	longitude	source
 1500	ushuaia	houses:Midheaven	11.894266046	houses
 1500	ushuaia	houses:ARMC	10.932147985	houses
 1500	ushuaia	houses:Vertex	294.874718768	houses
-1800	greenwich	Sun	280.429292509	approximation
-1800	greenwich	Moon	348.466606109	files
-1800	greenwich	Mercury	268.343608194	approximation
-1800	greenwich	Venus	233.627206934	approximation
-1800	greenwich	Mars	244.335788939	approximation
-1800	greenwich	Jupiter	84.527007522	approximation
-1800	greenwich	Saturn	128.799193590	approximation
-1800	greenwich	Uranus	177.126573904	approximation
-1800	greenwich	Neptune	226.621781567	approximation
-1800	greenwich	Pluto	331.410402568	approximation
-1800	greenwich	North Node	34.181523326	approximation
-1800	greenwich	South Node	214.181523326	derived
+1800	greenwich	Sun	280.429298185	approximation
+1800	greenwich	Moon	348.466743502	files
+1800	greenwich	Mercury	268.343603488	approximation
+1800	greenwich	Venus	233.627212751	approximation
+1800	greenwich	Mars	244.335792803	approximation
+1800	greenwich	Jupiter	84.527006823	approximation
+1800	greenwich	Saturn	128.799193219	approximation
+1800	greenwich	Uranus	177.126573905	approximation
+1800	greenwich	Neptune	226.621781705	approximation
+1800	greenwich	Pluto	331.410402673	approximation
+1800	greenwich	North Node	34.187393767	files
+1800	greenwich	South Node	214.187393767	derived
 1800	greenwich	Chiron	nan	none
 1800	greenwich	Ceres	nan	none
 1800	greenwich	Pallas	nan	none
@@ -245,10 +245,10 @@ era	place	point	longitude	source
 1800	greenwich	Hygiea	nan	none
 1800	greenwich	Nessus	nan	none
 1800	greenwich	Pholus	nan	none
-1800	greenwich	Ascendant	187.320178937	derived
-1800	greenwich	Descendant	7.320178937	derived
-1800	greenwich	MC	99.537534432	derived
-1800	greenwich	IC	279.537534432	derived
+1800	greenwich	Ascendant	187.320182805	derived
+1800	greenwich	Descendant	7.320182805	derived
+1800	greenwich	MC	99.537539492	derived
+1800	greenwich	IC	279.537539492	derived
 1800	greenwich	Part of Fortune	nan	none
 1800	greenwich	Part of Spirit	nan	none
 1800	greenwich	Black Moon Lilith	nan	none
@@ -259,22 +259,22 @@ era	place	point	longitude	source
 1800	greenwich	Lot of Courage	nan	none
 1800	greenwich	Lot of Victory	nan	none
 1800	greenwich	Lot of Nemesis	nan	none
-1800	greenwich	houses:Ascendant	187.320178937	houses
-1800	greenwich	houses:Midheaven	99.537534432	houses
-1800	greenwich	houses:ARMC	100.379596842	houses
-1800	greenwich	houses:Vertex	17.110599045	houses
-1800	sydney	Sun	280.429292509	approximation
-1800	sydney	Moon	348.466606109	files
-1800	sydney	Mercury	268.343608194	approximation
-1800	sydney	Venus	233.627206934	approximation
-1800	sydney	Mars	244.335788939	approximation
-1800	sydney	Jupiter	84.527007522	approximation
-1800	sydney	Saturn	128.799193590	approximation
-1800	sydney	Uranus	177.126573904	approximation
-1800	sydney	Neptune	226.621781567	approximation
-1800	sydney	Pluto	331.410402568	approximation
-1800	sydney	North Node	34.181523326	approximation
-1800	sydney	South Node	214.181523326	derived
+1800	greenwich	houses:Ascendant	187.320182805	houses
+1800	greenwich	houses:Midheaven	99.537539492	houses
+1800	greenwich	houses:ARMC	100.379602329	houses
+1800	greenwich	houses:Vertex	17.110607905	houses
+1800	sydney	Sun	280.429298185	approximation
+1800	sydney	Moon	348.466743502	files
+1800	sydney	Mercury	268.343603488	approximation
+1800	sydney	Venus	233.627212751	approximation
+1800	sydney	Mars	244.335792803	approximation
+1800	sydney	Jupiter	84.527006823	approximation
+1800	sydney	Saturn	128.799193219	approximation
+1800	sydney	Uranus	177.126573905	approximation
+1800	sydney	Neptune	226.621781705	approximation
+1800	sydney	Pluto	331.410402673	approximation
+1800	sydney	North Node	34.187393767	files
+1800	sydney	South Node	214.187393767	derived
 1800	sydney	Chiron	nan	none
 1800	sydney	Ceres	nan	none
 1800	sydney	Pallas	nan	none
@@ -285,10 +285,10 @@ era	place	point	longitude	source
 1800	sydney	Hygiea	nan	none
 1800	sydney	Nessus	nan	none
 1800	sydney	Pholus	nan	none
-1800	sydney	Ascendant	344.485193673	derived
-1800	sydney	Descendant	164.485193673	derived
-1800	sydney	MC	253.021956495	derived
-1800	sydney	IC	73.021956495	derived
+1800	sydney	Ascendant	344.485198282	derived
+1800	sydney	Descendant	164.485198282	derived
+1800	sydney	MC	253.021961610	derived
+1800	sydney	IC	73.021961610	derived
 1800	sydney	Part of Fortune	nan	none
 1800	sydney	Part of Spirit	nan	none
 1800	sydney	Black Moon Lilith	nan	none
@@ -299,22 +299,22 @@ era	place	point	longitude	source
 1800	sydney	Lot of Courage	nan	none
 1800	sydney	Lot of Victory	nan	none
 1800	sydney	Lot of Nemesis	nan	none
-1800	sydney	houses:Ascendant	344.485193673	houses
-1800	sydney	houses:Midheaven	253.021956495	houses
-1800	sydney	houses:ARMC	251.590396842	houses
-1800	sydney	houses:Vertex	131.256905651	houses
-1800	equator	Sun	280.429292509	approximation
-1800	equator	Moon	348.466606109	files
-1800	equator	Mercury	268.343608194	approximation
-1800	equator	Venus	233.627206934	approximation
-1800	equator	Mars	244.335788939	approximation
-1800	equator	Jupiter	84.527007522	approximation
-1800	equator	Saturn	128.799193590	approximation
-1800	equator	Uranus	177.126573904	approximation
-1800	equator	Neptune	226.621781567	approximation
-1800	equator	Pluto	331.410402568	approximation
-1800	equator	North Node	34.181523326	approximation
-1800	equator	South Node	214.181523326	derived
+1800	sydney	houses:Ascendant	344.485198282	houses
+1800	sydney	houses:Midheaven	253.021961610	houses
+1800	sydney	houses:ARMC	251.590402329	houses
+1800	sydney	houses:Vertex	131.256916669	houses
+1800	equator	Sun	280.429298185	approximation
+1800	equator	Moon	348.466743502	files
+1800	equator	Mercury	268.343603488	approximation
+1800	equator	Venus	233.627212751	approximation
+1800	equator	Mars	244.335792803	approximation
+1800	equator	Jupiter	84.527006823	approximation
+1800	equator	Saturn	128.799193219	approximation
+1800	equator	Uranus	177.126573905	approximation
+1800	equator	Neptune	226.621781705	approximation
+1800	equator	Pluto	331.410402673	approximation
+1800	equator	North Node	34.187393767	files
+1800	equator	South Node	214.187393767	derived
 1800	equator	Chiron	nan	none
 1800	equator	Ceres	nan	none
 1800	equator	Pallas	nan	none
@@ -325,10 +325,10 @@ era	place	point	longitude	source
 1800	equator	Hygiea	nan	none
 1800	equator	Nessus	nan	none
 1800	equator	Pholus	nan	none
-1800	equator	Ascendant	110.223580938	derived
-1800	equator	Descendant	290.223580938	derived
-1800	equator	MC	23.645154426	derived
-1800	equator	IC	203.645154426	derived
+1800	equator	Ascendant	110.223586084	derived
+1800	equator	Descendant	290.223586084	derived
+1800	equator	MC	23.645160256	derived
+1800	equator	IC	203.645160256	derived
 1800	equator	Part of Fortune	nan	none
 1800	equator	Part of Spirit	nan	none
 1800	equator	Black Moon Lilith	nan	none
@@ -339,22 +339,22 @@ era	place	point	longitude	source
 1800	equator	Lot of Courage	nan	none
 1800	equator	Lot of Victory	nan	none
 1800	equator	Lot of Nemesis	nan	none
-1800	equator	houses:Ascendant	110.223580938	houses
-1800	equator	houses:Midheaven	23.645154426	houses
-1800	equator	houses:ARMC	21.881096842	houses
+1800	equator	houses:Ascendant	110.223586084	houses
+1800	equator	houses:Midheaven	23.645160256	houses
+1800	equator	houses:ARMC	21.881102329	houses
 1800	equator	houses:Vertex	0.000000000	houses
-1800	longyearbyen	Sun	280.429292509	approximation
-1800	longyearbyen	Moon	348.466606109	files
-1800	longyearbyen	Mercury	268.343608194	approximation
-1800	longyearbyen	Venus	233.627206934	approximation
-1800	longyearbyen	Mars	244.335788939	approximation
-1800	longyearbyen	Jupiter	84.527007522	approximation
-1800	longyearbyen	Saturn	128.799193590	approximation
-1800	longyearbyen	Uranus	177.126573904	approximation
-1800	longyearbyen	Neptune	226.621781567	approximation
-1800	longyearbyen	Pluto	331.410402568	approximation
-1800	longyearbyen	North Node	34.181523326	approximation
-1800	longyearbyen	South Node	214.181523326	derived
+1800	longyearbyen	Sun	280.429298185	approximation
+1800	longyearbyen	Moon	348.466743502	files
+1800	longyearbyen	Mercury	268.343603488	approximation
+1800	longyearbyen	Venus	233.627212751	approximation
+1800	longyearbyen	Mars	244.335792803	approximation
+1800	longyearbyen	Jupiter	84.527006823	approximation
+1800	longyearbyen	Saturn	128.799193219	approximation
+1800	longyearbyen	Uranus	177.126573905	approximation
+1800	longyearbyen	Neptune	226.621781705	approximation
+1800	longyearbyen	Pluto	331.410402673	approximation
+1800	longyearbyen	North Node	34.187393767	files
+1800	longyearbyen	South Node	214.187393767	derived
 1800	longyearbyen	Chiron	nan	none
 1800	longyearbyen	Ceres	nan	none
 1800	longyearbyen	Pallas	nan	none
@@ -365,10 +365,10 @@ era	place	point	longitude	source
 1800	longyearbyen	Hygiea	nan	none
 1800	longyearbyen	Nessus	nan	none
 1800	longyearbyen	Pholus	nan	none
-1800	longyearbyen	Ascendant	189.110294720	derived
-1800	longyearbyen	Descendant	9.110294720	derived
-1800	longyearbyen	MC	114.110689151	derived
-1800	longyearbyen	IC	294.110689151	derived
+1800	longyearbyen	Ascendant	189.110296605	derived
+1800	longyearbyen	Descendant	9.110296605	derived
+1800	longyearbyen	MC	114.110694343	derived
+1800	longyearbyen	IC	294.110694343	derived
 1800	longyearbyen	Part of Fortune	nan	none
 1800	longyearbyen	Part of Spirit	nan	none
 1800	longyearbyen	Black Moon Lilith	nan	none
@@ -379,22 +379,22 @@ era	place	point	longitude	source
 1800	longyearbyen	Lot of Courage	nan	none
 1800	longyearbyen	Lot of Victory	nan	none
 1800	longyearbyen	Lot of Nemesis	nan	none
-1800	longyearbyen	houses:Ascendant	189.110294720	houses
-1800	longyearbyen	houses:Midheaven	114.110689151	houses
-1800	longyearbyen	houses:ARMC	116.007796842	houses
-1800	longyearbyen	houses:Vertex	30.602693198	houses
-1800	ushuaia	Sun	280.429292509	approximation
-1800	ushuaia	Moon	348.466606109	files
-1800	ushuaia	Mercury	268.343608194	approximation
-1800	ushuaia	Venus	233.627206934	approximation
-1800	ushuaia	Mars	244.335788939	approximation
-1800	ushuaia	Jupiter	84.527007522	approximation
-1800	ushuaia	Saturn	128.799193590	approximation
-1800	ushuaia	Uranus	177.126573904	approximation
-1800	ushuaia	Neptune	226.621781567	approximation
-1800	ushuaia	Pluto	331.410402568	approximation
-1800	ushuaia	North Node	34.181523326	approximation
-1800	ushuaia	South Node	214.181523326	derived
+1800	longyearbyen	houses:Ascendant	189.110296605	houses
+1800	longyearbyen	houses:Midheaven	114.110694343	houses
+1800	longyearbyen	houses:ARMC	116.007802329	houses
+1800	longyearbyen	houses:Vertex	30.602699431	houses
+1800	ushuaia	Sun	280.429298185	approximation
+1800	ushuaia	Moon	348.466743502	files
+1800	ushuaia	Mercury	268.343603488	approximation
+1800	ushuaia	Venus	233.627212751	approximation
+1800	ushuaia	Mars	244.335792803	approximation
+1800	ushuaia	Jupiter	84.527006823	approximation
+1800	ushuaia	Saturn	128.799193219	approximation
+1800	ushuaia	Uranus	177.126573905	approximation
+1800	ushuaia	Neptune	226.621781705	approximation
+1800	ushuaia	Pluto	331.410402673	approximation
+1800	ushuaia	North Node	34.187393767	files
+1800	ushuaia	South Node	214.187393767	derived
 1800	ushuaia	Chiron	nan	none
 1800	ushuaia	Ceres	nan	none
 1800	ushuaia	Pallas	nan	none
@@ -405,10 +405,10 @@ era	place	point	longitude	source
 1800	ushuaia	Hygiea	nan	none
 1800	ushuaia	Nessus	nan	none
 1800	ushuaia	Pholus	nan	none
-1800	ushuaia	Ascendant	84.779979279	derived
-1800	ushuaia	Descendant	264.779979279	derived
-1800	ushuaia	MC	34.344204763	derived
-1800	ushuaia	IC	214.344204763	derived
+1800	ushuaia	Ascendant	84.779983960	derived
+1800	ushuaia	Descendant	264.779983960	derived
+1800	ushuaia	MC	34.344210443	derived
+1800	ushuaia	IC	214.344210443	derived
 1800	ushuaia	Part of Fortune	nan	none
 1800	ushuaia	Part of Spirit	nan	none
 1800	ushuaia	Black Moon Lilith	nan	none
@@ -419,23 +419,23 @@ era	place	point	longitude	source
 1800	ushuaia	Lot of Courage	nan	none
 1800	ushuaia	Lot of Victory	nan	none
 1800	ushuaia	Lot of Nemesis	nan	none
-1800	ushuaia	houses:Ascendant	84.779979279	houses
-1800	ushuaia	houses:Midheaven	34.344204763	houses
-1800	ushuaia	houses:ARMC	32.078196842	houses
-1800	ushuaia	houses:Vertex	312.190368706	houses
-1850	greenwich	Sun	0.288097838	files
-1850	greenwich	Moon	91.397431224	files
-1850	greenwich	Mercury	337.296386690	files
-1850	greenwich	Venus	4.819327096	files
-1850	greenwich	Mars	92.421044340	files
-1850	greenwich	Jupiter	166.590374280	files
-1850	greenwich	Saturn	9.514655308	files
-1850	greenwich	Uranus	24.765441462	files
-1850	greenwich	Neptune	335.452335872	files
-1850	greenwich	Pluto	27.710909258	files
-1850	greenwich	North Node	143.133339255	approximation
-1850	greenwich	South Node	323.133339255	derived
-1850	greenwich	Chiron	250.849840874	files
+1800	ushuaia	houses:Ascendant	84.779983960	houses
+1800	ushuaia	houses:Midheaven	34.344210443	houses
+1800	ushuaia	houses:ARMC	32.078202329	houses
+1800	ushuaia	houses:Vertex	312.190373181	houses
+1850	greenwich	Sun	0.288100362	files
+1850	greenwich	Moon	91.397164008	files
+1850	greenwich	Mercury	337.296390478	files
+1850	greenwich	Venus	4.819330260	files
+1850	greenwich	Mars	92.421045428	files
+1850	greenwich	Jupiter	166.590373965	files
+1850	greenwich	Saturn	9.514655625	files
+1850	greenwich	Uranus	24.765441598	files
+1850	greenwich	Neptune	335.452335962	files
+1850	greenwich	Pluto	27.710909311	files
+1850	greenwich	North Node	143.140034906	files
+1850	greenwich	South Node	323.140034906	derived
+1850	greenwich	Chiron	250.849840880	files
 1850	greenwich	Ceres	nan	none
 1850	greenwich	Pallas	nan	none
 1850	greenwich	Juno	nan	none
@@ -445,8 +445,8 @@ era	place	point	longitude	source
 1850	greenwich	Hygiea	nan	none
 1850	greenwich	Nessus	nan	none
 1850	greenwich	Pholus	nan	none
-1850	greenwich	Ascendant	356.170214596	derived
-1850	greenwich	Descendant	176.170214596	derived
+1850	greenwich	Ascendant	356.170214597	derived
+1850	greenwich	Descendant	176.170214597	derived
 1850	greenwich	MC	268.532626318	derived
 1850	greenwich	IC	88.532626318	derived
 1850	greenwich	Part of Fortune	nan	none
@@ -459,23 +459,23 @@ era	place	point	longitude	source
 1850	greenwich	Lot of Courage	nan	none
 1850	greenwich	Lot of Victory	nan	none
 1850	greenwich	Lot of Nemesis	nan	none
-1850	greenwich	houses:Ascendant	356.170214596	houses
+1850	greenwich	houses:Ascendant	356.170214597	houses
 1850	greenwich	houses:Midheaven	268.532626318	houses
 1850	greenwich	houses:ARMC	268.400504220	houses
 1850	greenwich	houses:Vertex	178.704079185	houses
-1850	sydney	Sun	0.288097838	files
-1850	sydney	Moon	91.397431224	files
-1850	sydney	Mercury	337.296386690	files
-1850	sydney	Venus	4.819327096	files
-1850	sydney	Mars	92.421044340	files
-1850	sydney	Jupiter	166.590374280	files
-1850	sydney	Saturn	9.514655308	files
-1850	sydney	Uranus	24.765441462	files
-1850	sydney	Neptune	335.452335872	files
-1850	sydney	Pluto	27.710909258	files
-1850	sydney	North Node	143.133339255	approximation
-1850	sydney	South Node	323.133339255	derived
-1850	sydney	Chiron	250.849840874	files
+1850	sydney	Sun	0.288100362	files
+1850	sydney	Moon	91.397164008	files
+1850	sydney	Mercury	337.296390478	files
+1850	sydney	Venus	4.819330260	files
+1850	sydney	Mars	92.421045428	files
+1850	sydney	Jupiter	166.590373965	files
+1850	sydney	Saturn	9.514655625	files
+1850	sydney	Uranus	24.765441598	files
+1850	sydney	Neptune	335.452335962	files
+1850	sydney	Pluto	27.710909311	files
+1850	sydney	North Node	143.140034906	files
+1850	sydney	South Node	323.140034906	derived
+1850	sydney	Chiron	250.849840880	files
 1850	sydney	Ceres	nan	none
 1850	sydney	Pallas	nan	none
 1850	sydney	Juno	nan	none
@@ -503,19 +503,19 @@ era	place	point	longitude	source
 1850	sydney	houses:Midheaven	61.721144018	houses
 1850	sydney	houses:ARMC	59.611304220	houses
 1850	sydney	houses:Vertex	339.927535335	houses
-1850	equator	Sun	0.288097838	files
-1850	equator	Moon	91.397431224	files
-1850	equator	Mercury	337.296386690	files
-1850	equator	Venus	4.819327096	files
-1850	equator	Mars	92.421044340	files
-1850	equator	Jupiter	166.590374280	files
-1850	equator	Saturn	9.514655308	files
-1850	equator	Uranus	24.765441462	files
-1850	equator	Neptune	335.452335872	files
-1850	equator	Pluto	27.710909258	files
-1850	equator	North Node	143.133339255	approximation
-1850	equator	South Node	323.133339255	derived
-1850	equator	Chiron	250.849840874	files
+1850	equator	Sun	0.288100362	files
+1850	equator	Moon	91.397164008	files
+1850	equator	Mercury	337.296390478	files
+1850	equator	Venus	4.819330260	files
+1850	equator	Mars	92.421045428	files
+1850	equator	Jupiter	166.590373965	files
+1850	equator	Saturn	9.514655625	files
+1850	equator	Uranus	24.765441598	files
+1850	equator	Neptune	335.452335962	files
+1850	equator	Pluto	27.710909311	files
+1850	equator	North Node	143.140034906	files
+1850	equator	South Node	323.140034906	derived
+1850	equator	Chiron	250.849840880	files
 1850	equator	Ceres	nan	none
 1850	equator	Pallas	nan	none
 1850	equator	Juno	nan	none
@@ -543,19 +543,19 @@ era	place	point	longitude	source
 1850	equator	houses:Midheaven	190.773977122	houses
 1850	equator	houses:ARMC	189.902004220	houses
 1850	equator	houses:Vertex	180.000000000	houses
-1850	longyearbyen	Sun	0.288097838	files
-1850	longyearbyen	Moon	91.397431224	files
-1850	longyearbyen	Mercury	337.296386690	files
-1850	longyearbyen	Venus	4.819327096	files
-1850	longyearbyen	Mars	92.421044340	files
-1850	longyearbyen	Jupiter	166.590374280	files
-1850	longyearbyen	Saturn	9.514655308	files
-1850	longyearbyen	Uranus	24.765441462	files
-1850	longyearbyen	Neptune	335.452335872	files
-1850	longyearbyen	Pluto	27.710909258	files
-1850	longyearbyen	North Node	143.133339255	approximation
-1850	longyearbyen	South Node	323.133339255	derived
-1850	longyearbyen	Chiron	250.849840874	files
+1850	longyearbyen	Sun	0.288100362	files
+1850	longyearbyen	Moon	91.397164008	files
+1850	longyearbyen	Mercury	337.296390478	files
+1850	longyearbyen	Venus	4.819330260	files
+1850	longyearbyen	Mars	92.421045428	files
+1850	longyearbyen	Jupiter	166.590373965	files
+1850	longyearbyen	Saturn	9.514655625	files
+1850	longyearbyen	Uranus	24.765441598	files
+1850	longyearbyen	Neptune	335.452335962	files
+1850	longyearbyen	Pluto	27.710909311	files
+1850	longyearbyen	North Node	143.140034906	files
+1850	longyearbyen	South Node	323.140034906	derived
+1850	longyearbyen	Chiron	250.849840880	files
 1850	longyearbyen	Ceres	nan	none
 1850	longyearbyen	Pallas	nan	none
 1850	longyearbyen	Juno	nan	none
@@ -582,20 +582,20 @@ era	place	point	longitude	source
 1850	longyearbyen	houses:Ascendant	346.622059305	houses
 1850	longyearbyen	houses:Midheaven	282.909861456	houses
 1850	longyearbyen	houses:ARMC	284.028704220	houses
-1850	longyearbyen	houses:Vertex	193.989709066	houses
-1850	ushuaia	Sun	0.288097838	files
-1850	ushuaia	Moon	91.397431224	files
-1850	ushuaia	Mercury	337.296386690	files
-1850	ushuaia	Venus	4.819327096	files
-1850	ushuaia	Mars	92.421044340	files
-1850	ushuaia	Jupiter	166.590374280	files
-1850	ushuaia	Saturn	9.514655308	files
-1850	ushuaia	Uranus	24.765441462	files
-1850	ushuaia	Neptune	335.452335872	files
-1850	ushuaia	Pluto	27.710909258	files
-1850	ushuaia	North Node	143.133339255	approximation
-1850	ushuaia	South Node	323.133339255	derived
-1850	ushuaia	Chiron	250.849840874	files
+1850	longyearbyen	houses:Vertex	193.989709067	houses
+1850	ushuaia	Sun	0.288100362	files
+1850	ushuaia	Moon	91.397164008	files
+1850	ushuaia	Mercury	337.296390478	files
+1850	ushuaia	Venus	4.819330260	files
+1850	ushuaia	Mars	92.421045428	files
+1850	ushuaia	Jupiter	166.590373965	files
+1850	ushuaia	Saturn	9.514655625	files
+1850	ushuaia	Uranus	24.765441598	files
+1850	ushuaia	Neptune	335.452335962	files
+1850	ushuaia	Pluto	27.710909311	files
+1850	ushuaia	North Node	143.140034906	files
+1850	ushuaia	South Node	323.140034906	derived
+1850	ushuaia	Chiron	250.849840880	files
 1850	ushuaia	Ceres	nan	none
 1850	ushuaia	Pallas	nan	none
 1850	ushuaia	Juno	nan	none
@@ -623,19 +623,19 @@ era	place	point	longitude	source
 1850	ushuaia	houses:Midheaven	201.746811021	houses
 1850	ushuaia	houses:ARMC	200.099104220	houses
 1850	ushuaia	houses:Vertex	92.101895198	houses
-1900	greenwich	Sun	273.538314042	files
-1900	greenwich	Moon	320.278062702	files
-1900	greenwich	Mercury	258.286409190	files
-1900	greenwich	Venus	243.002486434	files
-1900	greenwich	Mars	160.559680927	files
-1900	greenwich	Jupiter	264.546726674	files
-1900	greenwich	Saturn	276.964626267	files
-1900	greenwich	Uranus	253.947116640	files
-1900	greenwich	Neptune	87.693780460	files
-1900	greenwich	Pluto	76.375161804	files
-1900	greenwich	North Node	241.389869635	approximation
-1900	greenwich	South Node	61.389869635	derived
-1900	greenwich	Chiron	268.046327283	files
+1900	greenwich	Sun	273.538314729	files
+1900	greenwich	Moon	320.277986238	files
+1900	greenwich	Mercury	258.286410190	files
+1900	greenwich	Venus	243.002487271	files
+1900	greenwich	Mars	160.559681067	files
+1900	greenwich	Jupiter	264.546726827	files
+1900	greenwich	Saturn	276.964626347	files
+1900	greenwich	Uranus	253.947116680	files
+1900	greenwich	Neptune	87.693780441	files
+1900	greenwich	Pluto	76.375161791	files
+1900	greenwich	North Node	241.393090730	files
+1900	greenwich	South Node	61.393090730	derived
+1900	greenwich	Chiron	268.046327357	files
 1900	greenwich	Ceres	nan	none
 1900	greenwich	Pallas	nan	none
 1900	greenwich	Juno	nan	none
@@ -663,19 +663,19 @@ era	place	point	longitude	source
 1900	greenwich	houses:Midheaven	4.127117746	houses
 1900	greenwich	houses:ARMC	3.787264557	houses
 1900	greenwich	houses:Vertex	255.599413207	houses
-1900	sydney	Sun	273.538314042	files
-1900	sydney	Moon	320.278062702	files
-1900	sydney	Mercury	258.286409190	files
-1900	sydney	Venus	243.002486434	files
-1900	sydney	Mars	160.559680927	files
-1900	sydney	Jupiter	264.546726674	files
-1900	sydney	Saturn	276.964626267	files
-1900	sydney	Uranus	253.947116640	files
-1900	sydney	Neptune	87.693780460	files
-1900	sydney	Pluto	76.375161804	files
-1900	sydney	North Node	241.389869635	approximation
-1900	sydney	South Node	61.389869635	derived
-1900	sydney	Chiron	268.046327283	files
+1900	sydney	Sun	273.538314729	files
+1900	sydney	Moon	320.277986238	files
+1900	sydney	Mercury	258.286410190	files
+1900	sydney	Venus	243.002487271	files
+1900	sydney	Mars	160.559681067	files
+1900	sydney	Jupiter	264.546726827	files
+1900	sydney	Saturn	276.964626347	files
+1900	sydney	Uranus	253.947116680	files
+1900	sydney	Neptune	87.693780441	files
+1900	sydney	Pluto	76.375161791	files
+1900	sydney	North Node	241.393090730	files
+1900	sydney	South Node	61.393090730	derived
+1900	sydney	Chiron	268.046327357	files
 1900	sydney	Ceres	nan	none
 1900	sydney	Pallas	nan	none
 1900	sydney	Juno	nan	none
@@ -703,19 +703,19 @@ era	place	point	longitude	source
 1900	sydney	houses:Midheaven	153.054126236	houses
 1900	sydney	houses:ARMC	154.998064557	houses
 1900	sydney	houses:Vertex	42.742966598	houses
-1900	equator	Sun	273.538314042	files
-1900	equator	Moon	320.278062702	files
-1900	equator	Mercury	258.286409190	files
-1900	equator	Venus	243.002486434	files
-1900	equator	Mars	160.559680927	files
-1900	equator	Jupiter	264.546726674	files
-1900	equator	Saturn	276.964626267	files
-1900	equator	Uranus	253.947116640	files
-1900	equator	Neptune	87.693780460	files
-1900	equator	Pluto	76.375161804	files
-1900	equator	North Node	241.389869635	approximation
-1900	equator	South Node	61.389869635	derived
-1900	equator	Chiron	268.046327283	files
+1900	equator	Sun	273.538314729	files
+1900	equator	Moon	320.277986238	files
+1900	equator	Mercury	258.286410190	files
+1900	equator	Venus	243.002487271	files
+1900	equator	Mars	160.559681067	files
+1900	equator	Jupiter	264.546726827	files
+1900	equator	Saturn	276.964626347	files
+1900	equator	Uranus	253.947116680	files
+1900	equator	Neptune	87.693780441	files
+1900	equator	Pluto	76.375161791	files
+1900	equator	North Node	241.393090730	files
+1900	equator	South Node	61.393090730	derived
+1900	equator	Chiron	268.046327357	files
 1900	equator	Ceres	nan	none
 1900	equator	Pallas	nan	none
 1900	equator	Juno	nan	none
@@ -743,19 +743,19 @@ era	place	point	longitude	source
 1900	equator	houses:Midheaven	284.078274172	houses
 1900	equator	houses:ARMC	285.288764557	houses
 1900	equator	houses:Vertex	180.000000000	houses
-1900	longyearbyen	Sun	273.538314042	files
-1900	longyearbyen	Moon	320.278062702	files
-1900	longyearbyen	Mercury	258.286409190	files
-1900	longyearbyen	Venus	243.002486434	files
-1900	longyearbyen	Mars	160.559680927	files
-1900	longyearbyen	Jupiter	264.546726674	files
-1900	longyearbyen	Saturn	276.964626267	files
-1900	longyearbyen	Uranus	253.947116640	files
-1900	longyearbyen	Neptune	87.693780460	files
-1900	longyearbyen	Pluto	76.375161804	files
-1900	longyearbyen	North Node	241.389869635	approximation
-1900	longyearbyen	South Node	61.389869635	derived
-1900	longyearbyen	Chiron	268.046327283	files
+1900	longyearbyen	Sun	273.538314729	files
+1900	longyearbyen	Moon	320.277986238	files
+1900	longyearbyen	Mercury	258.286410190	files
+1900	longyearbyen	Venus	243.002487271	files
+1900	longyearbyen	Mars	160.559681067	files
+1900	longyearbyen	Jupiter	264.546726827	files
+1900	longyearbyen	Saturn	276.964626347	files
+1900	longyearbyen	Uranus	253.947116680	files
+1900	longyearbyen	Neptune	87.693780441	files
+1900	longyearbyen	Pluto	76.375161791	files
+1900	longyearbyen	North Node	241.393090730	files
+1900	longyearbyen	South Node	61.393090730	derived
+1900	longyearbyen	Chiron	268.046327357	files
 1900	longyearbyen	Ceres	nan	none
 1900	longyearbyen	Pallas	nan	none
 1900	longyearbyen	Juno	nan	none
@@ -767,8 +767,8 @@ era	place	point	longitude	source
 1900	longyearbyen	Pholus	nan	none
 1900	longyearbyen	Ascendant	156.924343067	derived
 1900	longyearbyen	Descendant	336.924343067	derived
-1900	longyearbyen	MC	21.016392626	derived
-1900	longyearbyen	IC	201.016392626	derived
+1900	longyearbyen	MC	21.016392627	derived
+1900	longyearbyen	IC	201.016392627	derived
 1900	longyearbyen	Part of Fortune	nan	none
 1900	longyearbyen	Part of Spirit	nan	none
 1900	longyearbyen	Black Moon Lilith	nan	none
@@ -780,22 +780,22 @@ era	place	point	longitude	source
 1900	longyearbyen	Lot of Victory	nan	none
 1900	longyearbyen	Lot of Nemesis	nan	none
 1900	longyearbyen	houses:Ascendant	156.924343067	houses
-1900	longyearbyen	houses:Midheaven	21.016392626	houses
+1900	longyearbyen	houses:Midheaven	21.016392627	houses
 1900	longyearbyen	houses:ARMC	19.415464557	houses
 1900	longyearbyen	houses:Vertex	283.244848123	houses
-1900	ushuaia	Sun	273.538314042	files
-1900	ushuaia	Moon	320.278062702	files
-1900	ushuaia	Mercury	258.286409190	files
-1900	ushuaia	Venus	243.002486434	files
-1900	ushuaia	Mars	160.559680927	files
-1900	ushuaia	Jupiter	264.546726674	files
-1900	ushuaia	Saturn	276.964626267	files
-1900	ushuaia	Uranus	253.947116640	files
-1900	ushuaia	Neptune	87.693780460	files
-1900	ushuaia	Pluto	76.375161804	files
-1900	ushuaia	North Node	241.389869635	approximation
-1900	ushuaia	South Node	61.389869635	derived
-1900	ushuaia	Chiron	268.046327283	files
+1900	ushuaia	Sun	273.538314729	files
+1900	ushuaia	Moon	320.277986238	files
+1900	ushuaia	Mercury	258.286410190	files
+1900	ushuaia	Venus	243.002487271	files
+1900	ushuaia	Mars	160.559681067	files
+1900	ushuaia	Jupiter	264.546726827	files
+1900	ushuaia	Saturn	276.964626347	files
+1900	ushuaia	Uranus	253.947116680	files
+1900	ushuaia	Neptune	87.693780441	files
+1900	ushuaia	Pluto	76.375161791	files
+1900	ushuaia	North Node	241.393090730	files
+1900	ushuaia	South Node	61.393090730	derived
+1900	ushuaia	Chiron	268.046327357	files
 1900	ushuaia	Ceres	nan	none
 1900	ushuaia	Pallas	nan	none
 1900	ushuaia	Juno	nan	none
@@ -823,18 +823,18 @@ era	place	point	longitude	source
 1900	ushuaia	houses:Midheaven	293.619794579	houses
 1900	ushuaia	houses:ARMC	295.485864557	houses
 1900	ushuaia	houses:Vertex	218.168360993	houses
-1950	greenwich	Sun	101.833560281	files
-1950	greenwich	Moon	340.668329908	files
-1950	greenwich	Mercury	93.704324785	files
-1950	greenwich	Venus	68.181907305	files
-1950	greenwich	Mars	189.635133013	files
-1950	greenwich	Jupiter	337.364400580	files
-1950	greenwich	Saturn	164.636870237	files
+1950	greenwich	Sun	101.833560277	files
+1950	greenwich	Moon	340.668539478	files
+1950	greenwich	Mercury	93.704324789	files
+1950	greenwich	Venus	68.181907307	files
+1950	greenwich	Mars	189.635133012	files
+1950	greenwich	Jupiter	337.364400581	files
+1950	greenwich	Saturn	164.636870236	files
 1950	greenwich	Uranus	95.610995279	files
 1950	greenwich	Neptune	194.593567493	files
-1950	greenwich	Pluto	136.726349285	files
-1950	greenwich	North Node	1.788830453	approximation
-1950	greenwich	South Node	181.788830453	derived
+1950	greenwich	Pluto	136.726349284	files
+1950	greenwich	North Node	1.788345124	files
+1950	greenwich	South Node	181.788345124	derived
 1950	greenwich	Chiron	257.063576263	files
 1950	greenwich	Ceres	nan	none
 1950	greenwich	Pallas	nan	none
@@ -863,18 +863,18 @@ era	place	point	longitude	source
 1950	greenwich	houses:Midheaven	66.199593655	houses
 1950	greenwich	houses:ARMC	64.323519831	houses
 1950	greenwich	houses:Vertex	319.652568711	houses
-1950	sydney	Sun	101.833560281	files
-1950	sydney	Moon	340.668329908	files
-1950	sydney	Mercury	93.704324785	files
-1950	sydney	Venus	68.181907305	files
-1950	sydney	Mars	189.635133013	files
-1950	sydney	Jupiter	337.364400580	files
-1950	sydney	Saturn	164.636870237	files
+1950	sydney	Sun	101.833560277	files
+1950	sydney	Moon	340.668539478	files
+1950	sydney	Mercury	93.704324789	files
+1950	sydney	Venus	68.181907307	files
+1950	sydney	Mars	189.635133012	files
+1950	sydney	Jupiter	337.364400581	files
+1950	sydney	Saturn	164.636870236	files
 1950	sydney	Uranus	95.610995279	files
 1950	sydney	Neptune	194.593567493	files
-1950	sydney	Pluto	136.726349285	files
-1950	sydney	North Node	1.788830453	approximation
-1950	sydney	South Node	181.788830453	derived
+1950	sydney	Pluto	136.726349284	files
+1950	sydney	North Node	1.788345124	files
+1950	sydney	South Node	181.788345124	derived
 1950	sydney	Chiron	257.063576263	files
 1950	sydney	Ceres	nan	none
 1950	sydney	Pallas	nan	none
@@ -903,18 +903,18 @@ era	place	point	longitude	source
 1950	sydney	houses:Midheaven	217.900182396	houses
 1950	sydney	houses:ARMC	215.534319831	houses
 1950	sydney	houses:Vertex	85.806508573	houses
-1950	equator	Sun	101.833560281	files
-1950	equator	Moon	340.668329908	files
-1950	equator	Mercury	93.704324785	files
-1950	equator	Venus	68.181907305	files
-1950	equator	Mars	189.635133013	files
-1950	equator	Jupiter	337.364400580	files
-1950	equator	Saturn	164.636870237	files
+1950	equator	Sun	101.833560277	files
+1950	equator	Moon	340.668539478	files
+1950	equator	Mercury	93.704324789	files
+1950	equator	Venus	68.181907307	files
+1950	equator	Mars	189.635133012	files
+1950	equator	Jupiter	337.364400581	files
+1950	equator	Saturn	164.636870236	files
 1950	equator	Uranus	95.610995279	files
 1950	equator	Neptune	194.593567493	files
-1950	equator	Pluto	136.726349285	files
-1950	equator	North Node	1.788830453	approximation
-1950	equator	South Node	181.788830453	derived
+1950	equator	Pluto	136.726349284	files
+1950	equator	North Node	1.788345124	files
+1950	equator	South Node	181.788345124	derived
 1950	equator	Chiron	257.063576263	files
 1950	equator	Ceres	nan	none
 1950	equator	Pallas	nan	none
@@ -943,18 +943,18 @@ era	place	point	longitude	source
 1950	equator	houses:Midheaven	344.607282158	houses
 1950	equator	houses:ARMC	345.825019831	houses
 1950	equator	houses:Vertex	180.000000000	houses
-1950	longyearbyen	Sun	101.833560281	files
-1950	longyearbyen	Moon	340.668329908	files
-1950	longyearbyen	Mercury	93.704324785	files
-1950	longyearbyen	Venus	68.181907305	files
-1950	longyearbyen	Mars	189.635133013	files
-1950	longyearbyen	Jupiter	337.364400580	files
-1950	longyearbyen	Saturn	164.636870237	files
+1950	longyearbyen	Sun	101.833560277	files
+1950	longyearbyen	Moon	340.668539478	files
+1950	longyearbyen	Mercury	93.704324789	files
+1950	longyearbyen	Venus	68.181907307	files
+1950	longyearbyen	Mars	189.635133012	files
+1950	longyearbyen	Jupiter	337.364400581	files
+1950	longyearbyen	Saturn	164.636870236	files
 1950	longyearbyen	Uranus	95.610995279	files
 1950	longyearbyen	Neptune	194.593567493	files
-1950	longyearbyen	Pluto	136.726349285	files
-1950	longyearbyen	North Node	1.788830453	approximation
-1950	longyearbyen	South Node	181.788830453	derived
+1950	longyearbyen	Pluto	136.726349284	files
+1950	longyearbyen	North Node	1.788345124	files
+1950	longyearbyen	South Node	181.788345124	derived
 1950	longyearbyen	Chiron	257.063576263	files
 1950	longyearbyen	Ceres	nan	none
 1950	longyearbyen	Pallas	nan	none
@@ -983,18 +983,18 @@ era	place	point	longitude	source
 1950	longyearbyen	houses:Midheaven	80.766583831	houses
 1950	longyearbyen	houses:ARMC	79.951719831	houses
 1950	longyearbyen	houses:Vertex	347.993363912	houses
-1950	ushuaia	Sun	101.833560281	files
-1950	ushuaia	Moon	340.668329908	files
-1950	ushuaia	Mercury	93.704324785	files
-1950	ushuaia	Venus	68.181907305	files
-1950	ushuaia	Mars	189.635133013	files
-1950	ushuaia	Jupiter	337.364400580	files
-1950	ushuaia	Saturn	164.636870237	files
+1950	ushuaia	Sun	101.833560277	files
+1950	ushuaia	Moon	340.668539478	files
+1950	ushuaia	Mercury	93.704324789	files
+1950	ushuaia	Venus	68.181907307	files
+1950	ushuaia	Mars	189.635133012	files
+1950	ushuaia	Jupiter	337.364400581	files
+1950	ushuaia	Saturn	164.636870236	files
 1950	ushuaia	Uranus	95.610995279	files
 1950	ushuaia	Neptune	194.593567493	files
-1950	ushuaia	Pluto	136.726349285	files
-1950	ushuaia	North Node	1.788830453	approximation
-1950	ushuaia	South Node	181.788830453	derived
+1950	ushuaia	Pluto	136.726349284	files
+1950	ushuaia	North Node	1.788345124	files
+1950	ushuaia	South Node	181.788345124	derived
 1950	ushuaia	Chiron	257.063576263	files
 1950	ushuaia	Ceres	nan	none
 1950	ushuaia	Pallas	nan	none
@@ -1023,18 +1023,18 @@ era	place	point	longitude	source
 1950	ushuaia	houses:Midheaven	355.665369591	houses
 1950	ushuaia	houses:ARMC	356.022119831	houses
 1950	ushuaia	houses:Vertex	282.274135089	houses
-1975	greenwich	Sun	101.592980907	files
-1975	greenwich	Moon	39.447238375	files
-1975	greenwich	Mercury	80.239557062	files
-1975	greenwich	Venus	145.929504437	files
-1975	greenwich	Mars	32.142143170	files
+1975	greenwich	Sun	101.592980911	files
+1975	greenwich	Moon	39.447216696	files
+1975	greenwich	Mercury	80.239557065	files
+1975	greenwich	Venus	145.929504446	files
+1975	greenwich	Mars	32.142143169	files
 1975	greenwich	Jupiter	22.003540508	files
 1975	greenwich	Saturn	111.022325141	files
 1975	greenwich	Uranus	208.361852380	files
 1975	greenwich	Neptune	249.598141774	files
 1975	greenwich	Pluto	186.560999161	files
-1975	greenwich	North Node	240.235019225	approximation
-1975	greenwich	South Node	60.235019225	derived
+1975	greenwich	North Node	240.238895594	files
+1975	greenwich	South Node	60.238895594	derived
 1975	greenwich	Chiron	27.809562066	files
 1975	greenwich	Ceres	nan	none
 1975	greenwich	Pallas	nan	none
@@ -1063,18 +1063,18 @@ era	place	point	longitude	source
 1975	greenwich	houses:Midheaven	344.050786863	houses
 1975	greenwich	houses:ARMC	345.307754370	houses
 1975	greenwich	houses:Vertex	240.405827070	houses
-1975	sydney	Sun	101.592980907	files
-1975	sydney	Moon	39.447238375	files
-1975	sydney	Mercury	80.239557062	files
-1975	sydney	Venus	145.929504437	files
-1975	sydney	Mars	32.142143170	files
+1975	sydney	Sun	101.592980911	files
+1975	sydney	Moon	39.447216696	files
+1975	sydney	Mercury	80.239557065	files
+1975	sydney	Venus	145.929504446	files
+1975	sydney	Mars	32.142143169	files
 1975	sydney	Jupiter	22.003540508	files
 1975	sydney	Saturn	111.022325141	files
 1975	sydney	Uranus	208.361852380	files
 1975	sydney	Neptune	249.598141774	files
 1975	sydney	Pluto	186.560999161	files
-1975	sydney	North Node	240.235019225	approximation
-1975	sydney	South Node	60.235019225	derived
+1975	sydney	North Node	240.238895594	files
+1975	sydney	South Node	60.238895594	derived
 1975	sydney	Chiron	27.809562066	files
 1975	sydney	Ceres	nan	none
 1975	sydney	Pallas	nan	none
@@ -1103,18 +1103,18 @@ era	place	point	longitude	source
 1975	sydney	houses:Midheaven	134.051845986	houses
 1975	sydney	houses:ARMC	136.518554370	houses
 1975	sydney	houses:Vertex	30.659359823	houses
-1975	equator	Sun	101.592980907	files
-1975	equator	Moon	39.447238375	files
-1975	equator	Mercury	80.239557062	files
-1975	equator	Venus	145.929504437	files
-1975	equator	Mars	32.142143170	files
+1975	equator	Sun	101.592980911	files
+1975	equator	Moon	39.447216696	files
+1975	equator	Mercury	80.239557065	files
+1975	equator	Venus	145.929504446	files
+1975	equator	Mars	32.142143169	files
 1975	equator	Jupiter	22.003540508	files
 1975	equator	Saturn	111.022325141	files
 1975	equator	Uranus	208.361852380	files
 1975	equator	Neptune	249.598141774	files
 1975	equator	Pluto	186.560999161	files
-1975	equator	North Node	240.235019225	approximation
-1975	equator	South Node	60.235019225	derived
+1975	equator	North Node	240.238895594	files
+1975	equator	South Node	60.238895594	derived
 1975	equator	Chiron	27.809562066	files
 1975	equator	Ceres	nan	none
 1975	equator	Pallas	nan	none
@@ -1143,18 +1143,18 @@ era	place	point	longitude	source
 1975	equator	houses:Midheaven	267.072107438	houses
 1975	equator	houses:ARMC	266.809254370	houses
 1975	equator	houses:Vertex	180.000000000	houses
-1975	longyearbyen	Sun	101.592980907	files
-1975	longyearbyen	Moon	39.447238375	files
-1975	longyearbyen	Mercury	80.239557062	files
-1975	longyearbyen	Venus	145.929504437	files
-1975	longyearbyen	Mars	32.142143170	files
+1975	longyearbyen	Sun	101.592980911	files
+1975	longyearbyen	Moon	39.447216696	files
+1975	longyearbyen	Mercury	80.239557065	files
+1975	longyearbyen	Venus	145.929504446	files
+1975	longyearbyen	Mars	32.142143169	files
 1975	longyearbyen	Jupiter	22.003540508	files
 1975	longyearbyen	Saturn	111.022325141	files
 1975	longyearbyen	Uranus	208.361852380	files
 1975	longyearbyen	Neptune	249.598141774	files
 1975	longyearbyen	Pluto	186.560999161	files
-1975	longyearbyen	North Node	240.235019225	approximation
-1975	longyearbyen	South Node	60.235019225	derived
+1975	longyearbyen	North Node	240.238895594	files
+1975	longyearbyen	South Node	60.238895594	derived
 1975	longyearbyen	Chiron	27.809562066	files
 1975	longyearbyen	Ceres	nan	none
 1975	longyearbyen	Pallas	nan	none
@@ -1183,18 +1183,18 @@ era	place	point	longitude	source
 1975	longyearbyen	houses:Midheaven	1.020129904	houses
 1975	longyearbyen	houses:ARMC	0.935954370	houses
 1975	longyearbyen	houses:Vertex	266.112154310	houses
-1975	ushuaia	Sun	101.592980907	files
-1975	ushuaia	Moon	39.447238375	files
-1975	ushuaia	Mercury	80.239557062	files
-1975	ushuaia	Venus	145.929504437	files
-1975	ushuaia	Mars	32.142143170	files
+1975	ushuaia	Sun	101.592980911	files
+1975	ushuaia	Moon	39.447216696	files
+1975	ushuaia	Mercury	80.239557065	files
+1975	ushuaia	Venus	145.929504446	files
+1975	ushuaia	Mars	32.142143169	files
 1975	ushuaia	Jupiter	22.003540508	files
 1975	ushuaia	Saturn	111.022325141	files
 1975	ushuaia	Uranus	208.361852380	files
 1975	ushuaia	Neptune	249.598141774	files
 1975	ushuaia	Pluto	186.560999161	files
-1975	ushuaia	North Node	240.235019225	approximation
-1975	ushuaia	South Node	60.235019225	derived
+1975	ushuaia	North Node	240.238895594	files
+1975	ushuaia	South Node	60.238895594	derived
 1975	ushuaia	Chiron	27.809562066	files
 1975	ushuaia	Ceres	nan	none
 1975	ushuaia	Pallas	nan	none
@@ -1223,18 +1223,18 @@ era	place	point	longitude	source
 1975	ushuaia	houses:Midheaven	276.433183293	houses
 1975	ushuaia	houses:ARMC	277.006354370	houses
 1975	ushuaia	houses:Vertex	190.957600572	houses
-2000	greenwich	Sun	280.368918815	files
-2000	greenwich	Moon	223.323775589	files
-2000	greenwich	Mercury	271.889277159	files
-2000	greenwich	Venus	241.565788486	files
-2000	greenwich	Mars	327.963302584	files
+2000	greenwich	Sun	280.368918807	files
+2000	greenwich	Moon	223.323750830	files
+2000	greenwich	Mercury	271.889277154	files
+2000	greenwich	Venus	241.565788483	files
+2000	greenwich	Mars	327.963302580	files
 2000	greenwich	Jupiter	25.253087173	files
 2000	greenwich	Saturn	40.395663488	files
 2000	greenwich	Uranus	314.809187728	files
-2000	greenwich	Neptune	303.193013230	files
+2000	greenwich	Neptune	303.193013229	files
 2000	greenwich	Pluto	251.454779299	files
-2000	greenwich	North Node	123.952895437	approximation
-2000	greenwich	South Node	303.952895437	derived
+2000	greenwich	North Node	123.954128235	files
+2000	greenwich	South Node	303.954128235	derived
 2000	greenwich	Chiron	251.617654456	files
 2000	greenwich	Ceres	nan	none
 2000	greenwich	Pallas	nan	none
@@ -1263,18 +1263,18 @@ era	place	point	longitude	source
 2000	greenwich	houses:Midheaven	279.609703812	houses
 2000	greenwich	houses:ARMC	280.455571853	houses
 2000	greenwich	houses:Vertex	188.468175185	houses
-2000	sydney	Sun	280.368918815	files
-2000	sydney	Moon	223.323775589	files
-2000	sydney	Mercury	271.889277159	files
-2000	sydney	Venus	241.565788486	files
-2000	sydney	Mars	327.963302584	files
+2000	sydney	Sun	280.368918807	files
+2000	sydney	Moon	223.323750830	files
+2000	sydney	Mercury	271.889277154	files
+2000	sydney	Venus	241.565788483	files
+2000	sydney	Mars	327.963302580	files
 2000	sydney	Jupiter	25.253087173	files
 2000	sydney	Saturn	40.395663488	files
 2000	sydney	Uranus	314.809187728	files
-2000	sydney	Neptune	303.193013230	files
+2000	sydney	Neptune	303.193013229	files
 2000	sydney	Pluto	251.454779299	files
-2000	sydney	North Node	123.952895437	approximation
-2000	sydney	South Node	303.952895437	derived
+2000	sydney	North Node	123.954128235	files
+2000	sydney	South Node	303.954128235	derived
 2000	sydney	Chiron	251.617654456	files
 2000	sydney	Ceres	nan	none
 2000	sydney	Pallas	nan	none
@@ -1303,18 +1303,18 @@ era	place	point	longitude	source
 2000	sydney	houses:Midheaven	73.089186278	houses
 2000	sydney	houses:ARMC	71.666371853	houses
 2000	sydney	houses:Vertex	347.870254119	houses
-2000	equator	Sun	280.368918815	files
-2000	equator	Moon	223.323775589	files
-2000	equator	Mercury	271.889277159	files
-2000	equator	Venus	241.565788486	files
-2000	equator	Mars	327.963302584	files
+2000	equator	Sun	280.368918807	files
+2000	equator	Moon	223.323750830	files
+2000	equator	Mercury	271.889277154	files
+2000	equator	Venus	241.565788483	files
+2000	equator	Mars	327.963302580	files
 2000	equator	Jupiter	25.253087173	files
 2000	equator	Saturn	40.395663488	files
 2000	equator	Uranus	314.809187728	files
-2000	equator	Neptune	303.193013230	files
+2000	equator	Neptune	303.193013229	files
 2000	equator	Pluto	251.454779299	files
-2000	equator	North Node	123.952895437	approximation
-2000	equator	South Node	303.952895437	derived
+2000	equator	North Node	123.954128235	files
+2000	equator	South Node	303.954128235	derived
 2000	equator	Chiron	251.617654456	files
 2000	equator	Ceres	nan	none
 2000	equator	Pallas	nan	none
@@ -1343,18 +1343,18 @@ era	place	point	longitude	source
 2000	equator	houses:Midheaven	203.721126603	houses
 2000	equator	houses:ARMC	201.957071853	houses
 2000	equator	houses:Vertex	180.000000000	houses
-2000	longyearbyen	Sun	280.368918815	files
-2000	longyearbyen	Moon	223.323775589	files
-2000	longyearbyen	Mercury	271.889277159	files
-2000	longyearbyen	Venus	241.565788486	files
-2000	longyearbyen	Mars	327.963302584	files
+2000	longyearbyen	Sun	280.368918807	files
+2000	longyearbyen	Moon	223.323750830	files
+2000	longyearbyen	Mercury	271.889277154	files
+2000	longyearbyen	Venus	241.565788483	files
+2000	longyearbyen	Mars	327.963302580	files
 2000	longyearbyen	Jupiter	25.253087173	files
 2000	longyearbyen	Saturn	40.395663488	files
 2000	longyearbyen	Uranus	314.809187728	files
-2000	longyearbyen	Neptune	303.193013230	files
+2000	longyearbyen	Neptune	303.193013229	files
 2000	longyearbyen	Pluto	251.454779299	files
-2000	longyearbyen	North Node	123.952895437	approximation
-2000	longyearbyen	South Node	303.952895437	derived
+2000	longyearbyen	North Node	123.954128235	files
+2000	longyearbyen	South Node	303.954128235	derived
 2000	longyearbyen	Chiron	251.617654456	files
 2000	longyearbyen	Ceres	nan	none
 2000	longyearbyen	Pallas	nan	none
@@ -1383,18 +1383,18 @@ era	place	point	longitude	source
 2000	longyearbyen	houses:Midheaven	294.187381377	houses
 2000	longyearbyen	houses:ARMC	296.083771853	houses
 2000	longyearbyen	houses:Vertex	205.863252954	houses
-2000	ushuaia	Sun	280.368918815	files
-2000	ushuaia	Moon	223.323775589	files
-2000	ushuaia	Mercury	271.889277159	files
-2000	ushuaia	Venus	241.565788486	files
-2000	ushuaia	Mars	327.963302584	files
+2000	ushuaia	Sun	280.368918807	files
+2000	ushuaia	Moon	223.323750830	files
+2000	ushuaia	Mercury	271.889277154	files
+2000	ushuaia	Venus	241.565788483	files
+2000	ushuaia	Mars	327.963302580	files
 2000	ushuaia	Jupiter	25.253087173	files
 2000	ushuaia	Saturn	40.395663488	files
 2000	ushuaia	Uranus	314.809187728	files
-2000	ushuaia	Neptune	303.193013230	files
+2000	ushuaia	Neptune	303.193013229	files
 2000	ushuaia	Pluto	251.454779299	files
-2000	ushuaia	North Node	123.952895437	approximation
-2000	ushuaia	South Node	303.952895437	derived
+2000	ushuaia	North Node	123.954128235	files
+2000	ushuaia	South Node	303.954128235	derived
 2000	ushuaia	Chiron	251.617654456	files
 2000	ushuaia	Ceres	nan	none
 2000	ushuaia	Pallas	nan	none
@@ -1423,18 +1423,18 @@ era	place	point	longitude	source
 2000	ushuaia	houses:Midheaven	214.416848586	houses
 2000	ushuaia	houses:ARMC	212.154171853	houses
 2000	ushuaia	houses:Vertex	103.785748641	houses
-2026	greenwich	Sun	184.893748533	files
-2026	greenwich	Moon	21.464285216	files
-2026	greenwich	Mercury	206.615528658	files
-2026	greenwich	Venus	217.963167844	files
-2026	greenwich	Mars	119.931071045	files
-2026	greenwich	Jupiter	139.047957642	files
-2026	greenwich	Saturn	11.812579498	files
+2026	greenwich	Sun	184.893748537	files
+2026	greenwich	Moon	21.464159094	files
+2026	greenwich	Mercury	206.615528661	files
+2026	greenwich	Venus	217.963167851	files
+2026	greenwich	Mars	119.931071047	files
+2026	greenwich	Jupiter	139.047957643	files
+2026	greenwich	Saturn	11.812579497	files
 2026	greenwich	Uranus	65.572323712	files
 2026	greenwich	Neptune	2.945052944	files
 2026	greenwich	Pluto	303.145367671	files
-2026	greenwich	North Node	329.420960695	approximation
-2026	greenwich	South Node	149.420960695	derived
+2026	greenwich	North Node	329.421096612	files
+2026	greenwich	South Node	149.421096612	derived
 2026	greenwich	Chiron	29.615444989	files
 2026	greenwich	Ceres	nan	none
 2026	greenwich	Pallas	nan	none
@@ -1463,18 +1463,18 @@ era	place	point	longitude	source
 2026	greenwich	houses:Midheaven	7.390070568	houses
 2026	greenwich	houses:ARMC	6.786254855	houses
 2026	greenwich	houses:Vertex	258.156942844	houses
-2026	sydney	Sun	184.893748533	files
-2026	sydney	Moon	21.464285216	files
-2026	sydney	Mercury	206.615528658	files
-2026	sydney	Venus	217.963167844	files
-2026	sydney	Mars	119.931071045	files
-2026	sydney	Jupiter	139.047957642	files
-2026	sydney	Saturn	11.812579498	files
+2026	sydney	Sun	184.893748537	files
+2026	sydney	Moon	21.464159094	files
+2026	sydney	Mercury	206.615528661	files
+2026	sydney	Venus	217.963167851	files
+2026	sydney	Mars	119.931071047	files
+2026	sydney	Jupiter	139.047957643	files
+2026	sydney	Saturn	11.812579497	files
 2026	sydney	Uranus	65.572323712	files
 2026	sydney	Neptune	2.945052944	files
 2026	sydney	Pluto	303.145367671	files
-2026	sydney	North Node	329.420960695	approximation
-2026	sydney	South Node	149.420960695	derived
+2026	sydney	North Node	329.421096612	files
+2026	sydney	South Node	149.421096612	derived
 2026	sydney	Chiron	29.615444989	files
 2026	sydney	Ceres	nan	none
 2026	sydney	Pallas	nan	none
@@ -1503,18 +1503,18 @@ era	place	point	longitude	source
 2026	sydney	houses:Midheaven	156.230084551	houses
 2026	sydney	houses:ARMC	157.997054855	houses
 2026	sydney	houses:Vertex	44.717107980	houses
-2026	equator	Sun	184.893748533	files
-2026	equator	Moon	21.464285216	files
-2026	equator	Mercury	206.615528658	files
-2026	equator	Venus	217.963167844	files
-2026	equator	Mars	119.931071045	files
-2026	equator	Jupiter	139.047957642	files
-2026	equator	Saturn	11.812579498	files
+2026	equator	Sun	184.893748537	files
+2026	equator	Moon	21.464159094	files
+2026	equator	Mercury	206.615528661	files
+2026	equator	Venus	217.963167851	files
+2026	equator	Mars	119.931071047	files
+2026	equator	Jupiter	139.047957643	files
+2026	equator	Saturn	11.812579497	files
 2026	equator	Uranus	65.572323712	files
 2026	equator	Neptune	2.945052944	files
 2026	equator	Pluto	303.145367671	files
-2026	equator	North Node	329.420960695	approximation
-2026	equator	South Node	149.420960695	derived
+2026	equator	North Node	329.421096612	files
+2026	equator	South Node	149.421096612	derived
 2026	equator	Chiron	29.615444989	files
 2026	equator	Ceres	nan	none
 2026	equator	Pallas	nan	none
@@ -1543,18 +1543,18 @@ era	place	point	longitude	source
 2026	equator	houses:Midheaven	286.868002730	houses
 2026	equator	houses:ARMC	288.287754855	houses
 2026	equator	houses:Vertex	180.000000000	houses
-2026	longyearbyen	Sun	184.893748533	files
-2026	longyearbyen	Moon	21.464285216	files
-2026	longyearbyen	Mercury	206.615528658	files
-2026	longyearbyen	Venus	217.963167844	files
-2026	longyearbyen	Mars	119.931071045	files
-2026	longyearbyen	Jupiter	139.047957642	files
-2026	longyearbyen	Saturn	11.812579498	files
+2026	longyearbyen	Sun	184.893748537	files
+2026	longyearbyen	Moon	21.464159094	files
+2026	longyearbyen	Mercury	206.615528661	files
+2026	longyearbyen	Venus	217.963167851	files
+2026	longyearbyen	Mars	119.931071047	files
+2026	longyearbyen	Jupiter	139.047957643	files
+2026	longyearbyen	Saturn	11.812579497	files
 2026	longyearbyen	Uranus	65.572323712	files
 2026	longyearbyen	Neptune	2.945052944	files
 2026	longyearbyen	Pluto	303.145367671	files
-2026	longyearbyen	North Node	329.420960695	approximation
-2026	longyearbyen	South Node	149.420960695	derived
+2026	longyearbyen	North Node	329.421096612	files
+2026	longyearbyen	South Node	149.421096612	derived
 2026	longyearbyen	Chiron	29.615444989	files
 2026	longyearbyen	Ceres	nan	none
 2026	longyearbyen	Pallas	nan	none
@@ -1583,18 +1583,18 @@ era	place	point	longitude	source
 2026	longyearbyen	houses:Midheaven	24.206703369	houses
 2026	longyearbyen	houses:ARMC	22.414454855	houses
 2026	longyearbyen	houses:Vertex	286.104892639	houses
-2026	ushuaia	Sun	184.893748533	files
-2026	ushuaia	Moon	21.464285216	files
-2026	ushuaia	Mercury	206.615528658	files
-2026	ushuaia	Venus	217.963167844	files
-2026	ushuaia	Mars	119.931071045	files
-2026	ushuaia	Jupiter	139.047957642	files
-2026	ushuaia	Saturn	11.812579498	files
+2026	ushuaia	Sun	184.893748537	files
+2026	ushuaia	Moon	21.464159094	files
+2026	ushuaia	Mercury	206.615528661	files
+2026	ushuaia	Venus	217.963167851	files
+2026	ushuaia	Mars	119.931071047	files
+2026	ushuaia	Jupiter	139.047957643	files
+2026	ushuaia	Saturn	11.812579497	files
 2026	ushuaia	Uranus	65.572323712	files
 2026	ushuaia	Neptune	2.945052944	files
 2026	ushuaia	Pluto	303.145367671	files
-2026	ushuaia	North Node	329.420960695	approximation
-2026	ushuaia	South Node	149.420960695	derived
+2026	ushuaia	North Node	329.421096612	files
+2026	ushuaia	South Node	149.421096612	derived
 2026	ushuaia	Chiron	29.615444989	files
 2026	ushuaia	Ceres	nan	none
 2026	ushuaia	Pallas	nan	none
@@ -1623,18 +1623,18 @@ era	place	point	longitude	source
 2026	ushuaia	houses:Midheaven	296.466073694	houses
 2026	ushuaia	houses:ARMC	298.484854855	houses
 2026	ushuaia	houses:Vertex	222.206666372	houses
-2100	greenwich	Sun	340.459852971	files
-2100	greenwich	Moon	220.845854656	files
-2100	greenwich	Mercury	313.884676705	files
+2100	greenwich	Sun	340.459852969	files
+2100	greenwich	Moon	220.845822622	files
+2100	greenwich	Mercury	313.884676702	files
 2100	greenwich	Venus	26.899683039	files
-2100	greenwich	Mars	59.530835471	files
+2100	greenwich	Mars	59.530835473	files
 2100	greenwich	Jupiter	202.438854955	files
 2100	greenwich	Saturn	206.115705350	files
 2100	greenwich	Uranus	19.389806961	files
 2100	greenwich	Neptune	166.118608922	files
 2100	greenwich	Pluto	32.712437920	files
-2100	greenwich	North Node	347.394627238	approximation
-2100	greenwich	South Node	167.394627238	derived
+2100	greenwich	North Node	347.396345895	files
+2100	greenwich	South Node	167.396345895	derived
 2100	greenwich	Chiron	246.402218257	files
 2100	greenwich	Ceres	nan	none
 2100	greenwich	Pallas	nan	none
@@ -1663,18 +1663,18 @@ era	place	point	longitude	source
 2100	greenwich	houses:Midheaven	156.975722304	houses
 2100	greenwich	houses:ARMC	158.697314390	houses
 2100	greenwich	houses:Vertex	88.965776791	houses
-2100	sydney	Sun	340.459852971	files
-2100	sydney	Moon	220.845854656	files
-2100	sydney	Mercury	313.884676705	files
+2100	sydney	Sun	340.459852969	files
+2100	sydney	Moon	220.845822622	files
+2100	sydney	Mercury	313.884676702	files
 2100	sydney	Venus	26.899683039	files
-2100	sydney	Mars	59.530835471	files
+2100	sydney	Mars	59.530835473	files
 2100	sydney	Jupiter	202.438854955	files
 2100	sydney	Saturn	206.115705350	files
 2100	sydney	Uranus	19.389806961	files
 2100	sydney	Neptune	166.118608922	files
 2100	sydney	Pluto	32.712437920	files
-2100	sydney	North Node	347.394627238	approximation
-2100	sydney	South Node	167.394627238	derived
+2100	sydney	North Node	347.396345895	files
+2100	sydney	South Node	167.396345895	derived
 2100	sydney	Chiron	246.402218257	files
 2100	sydney	Ceres	nan	none
 2100	sydney	Pallas	nan	none
@@ -1703,18 +1703,18 @@ era	place	point	longitude	source
 2100	sydney	houses:Midheaven	307.503190770	houses
 2100	sydney	houses:ARMC	309.908114390	houses
 2100	sydney	houses:Vertex	260.146813073	houses
-2100	equator	Sun	340.459852971	files
-2100	equator	Moon	220.845854656	files
-2100	equator	Mercury	313.884676705	files
+2100	equator	Sun	340.459852969	files
+2100	equator	Moon	220.845822622	files
+2100	equator	Mercury	313.884676702	files
 2100	equator	Venus	26.899683039	files
-2100	equator	Mars	59.530835471	files
+2100	equator	Mars	59.530835473	files
 2100	equator	Jupiter	202.438854955	files
 2100	equator	Saturn	206.115705350	files
 2100	equator	Uranus	19.389806961	files
 2100	equator	Neptune	166.118608922	files
 2100	equator	Pluto	32.712437920	files
-2100	equator	North Node	347.394627238	approximation
-2100	equator	South Node	167.394627238	derived
+2100	equator	North Node	347.396345895	files
+2100	equator	South Node	167.396345895	derived
 2100	equator	Chiron	246.402218257	files
 2100	equator	Ceres	nan	none
 2100	equator	Pallas	nan	none
@@ -1743,18 +1743,18 @@ era	place	point	longitude	source
 2100	equator	houses:Midheaven	80.993052757	houses
 2100	equator	houses:ARMC	80.198814390	houses
 2100	equator	houses:Vertex	0.000000000	houses
-2100	longyearbyen	Sun	340.459852971	files
-2100	longyearbyen	Moon	220.845854656	files
-2100	longyearbyen	Mercury	313.884676705	files
+2100	longyearbyen	Sun	340.459852969	files
+2100	longyearbyen	Moon	220.845822622	files
+2100	longyearbyen	Mercury	313.884676702	files
 2100	longyearbyen	Venus	26.899683039	files
-2100	longyearbyen	Mars	59.530835471	files
+2100	longyearbyen	Mars	59.530835473	files
 2100	longyearbyen	Jupiter	202.438854955	files
 2100	longyearbyen	Saturn	206.115705350	files
 2100	longyearbyen	Uranus	19.389806961	files
 2100	longyearbyen	Neptune	166.118608922	files
 2100	longyearbyen	Pluto	32.712437920	files
-2100	longyearbyen	North Node	347.394627238	approximation
-2100	longyearbyen	South Node	167.394627238	derived
+2100	longyearbyen	North Node	347.396345895	files
+2100	longyearbyen	South Node	167.396345895	derived
 2100	longyearbyen	Chiron	246.402218257	files
 2100	longyearbyen	Ceres	nan	none
 2100	longyearbyen	Pallas	nan	none
@@ -1783,18 +1783,18 @@ era	place	point	longitude	source
 2100	longyearbyen	houses:Midheaven	173.819427254	houses
 2100	longyearbyen	houses:ARMC	174.325514390	houses
 2100	longyearbyen	houses:Vertex	89.549309445	houses
-2100	ushuaia	Sun	340.459852971	files
-2100	ushuaia	Moon	220.845854656	files
-2100	ushuaia	Mercury	313.884676705	files
+2100	ushuaia	Sun	340.459852969	files
+2100	ushuaia	Moon	220.845822622	files
+2100	ushuaia	Mercury	313.884676702	files
 2100	ushuaia	Venus	26.899683039	files
-2100	ushuaia	Mars	59.530835471	files
+2100	ushuaia	Mars	59.530835473	files
 2100	ushuaia	Jupiter	202.438854955	files
 2100	ushuaia	Saturn	206.115705350	files
 2100	ushuaia	Uranus	19.389806961	files
 2100	ushuaia	Neptune	166.118608922	files
 2100	ushuaia	Pluto	32.712437920	files
-2100	ushuaia	North Node	347.394627238	approximation
-2100	ushuaia	South Node	167.394627238	derived
+2100	ushuaia	North Node	347.396345895	files
+2100	ushuaia	South Node	167.396345895	derived
 2100	ushuaia	Chiron	246.402218257	files
 2100	ushuaia	Ceres	nan	none
 2100	ushuaia	Pallas	nan	none
@@ -1823,19 +1823,19 @@ era	place	point	longitude	source
 2100	ushuaia	houses:Midheaven	90.363273947	houses
 2100	ushuaia	houses:ARMC	90.395914390	houses
 2100	ushuaia	houses:Vertex	0.330474303	houses
-2200	greenwich	Sun	228.884941226	files
-2200	greenwich	Moon	273.638464713	files
-2200	greenwich	Mercury	234.733777319	files
-2200	greenwich	Venus	275.761060780	files
-2200	greenwich	Mars	255.519271822	files
+2200	greenwich	Sun	228.884941222	files
+2200	greenwich	Moon	273.638323452	files
+2200	greenwich	Mercury	234.733777316	files
+2200	greenwich	Venus	275.761060774	files
+2200	greenwich	Mars	255.519271819	files
 2200	greenwich	Jupiter	4.126916518	files
 2200	greenwich	Saturn	336.778059604	files
 2200	greenwich	Uranus	93.516916890	files
 2200	greenwich	Neptune	25.316606338	files
 2200	greenwich	Pluto	146.691901732	files
-2200	greenwich	North Node	201.448802210	approximation
-2200	greenwich	South Node	21.448802210	derived
-2200	greenwich	Chiron	262.958761510	files
+2200	greenwich	North Node	201.450342349	files
+2200	greenwich	South Node	21.450342349	derived
+2200	greenwich	Chiron	262.958761509	files
 2200	greenwich	Ceres	nan	none
 2200	greenwich	Pallas	nan	none
 2200	greenwich	Juno	nan	none
@@ -1863,19 +1863,19 @@ era	place	point	longitude	source
 2200	greenwich	houses:Midheaven	220.697593335	houses
 2200	greenwich	houses:ARMC	218.282715578	houses
 2200	greenwich	houses:Vertex	138.422788614	houses
-2200	sydney	Sun	228.884941226	files
-2200	sydney	Moon	273.638464713	files
-2200	sydney	Mercury	234.733777319	files
-2200	sydney	Venus	275.761060780	files
-2200	sydney	Mars	255.519271822	files
+2200	sydney	Sun	228.884941222	files
+2200	sydney	Moon	273.638323452	files
+2200	sydney	Mercury	234.733777316	files
+2200	sydney	Venus	275.761060774	files
+2200	sydney	Mars	255.519271819	files
 2200	sydney	Jupiter	4.126916518	files
 2200	sydney	Saturn	336.778059604	files
 2200	sydney	Uranus	93.516916890	files
 2200	sydney	Neptune	25.316606338	files
 2200	sydney	Pluto	146.691901732	files
-2200	sydney	North Node	201.448802210	approximation
-2200	sydney	South Node	21.448802210	derived
-2200	sydney	Chiron	262.958761510	files
+2200	sydney	North Node	201.450342349	files
+2200	sydney	South Node	21.450342349	derived
+2200	sydney	Chiron	262.958761509	files
 2200	sydney	Ceres	nan	none
 2200	sydney	Pallas	nan	none
 2200	sydney	Juno	nan	none
@@ -1903,19 +1903,19 @@ era	place	point	longitude	source
 2200	sydney	houses:Midheaven	10.327524905	houses
 2200	sydney	houses:ARMC	9.493515578	houses
 2200	sydney	houses:Vertex	307.003491397	houses
-2200	equator	Sun	228.884941226	files
-2200	equator	Moon	273.638464713	files
-2200	equator	Mercury	234.733777319	files
-2200	equator	Venus	275.761060780	files
-2200	equator	Mars	255.519271822	files
+2200	equator	Sun	228.884941222	files
+2200	equator	Moon	273.638323452	files
+2200	equator	Mercury	234.733777316	files
+2200	equator	Venus	275.761060774	files
+2200	equator	Mars	255.519271819	files
 2200	equator	Jupiter	4.126916518	files
 2200	equator	Saturn	336.778059604	files
 2200	equator	Uranus	93.516916890	files
 2200	equator	Neptune	25.316606338	files
 2200	equator	Pluto	146.691901732	files
-2200	equator	North Node	201.448802210	approximation
-2200	equator	South Node	21.448802210	derived
-2200	equator	Chiron	262.958761510	files
+2200	equator	North Node	201.450342349	files
+2200	equator	South Node	21.450342349	derived
+2200	equator	Chiron	262.958761509	files
 2200	equator	Ceres	nan	none
 2200	equator	Pallas	nan	none
 2200	equator	Juno	nan	none
@@ -1943,19 +1943,19 @@ era	place	point	longitude	source
 2200	equator	houses:Midheaven	137.342968750	houses
 2200	equator	houses:ARMC	139.784215578	houses
 2200	equator	houses:Vertex	0.000000000	houses
-2200	longyearbyen	Sun	228.884941226	files
-2200	longyearbyen	Moon	273.638464713	files
-2200	longyearbyen	Mercury	234.733777319	files
-2200	longyearbyen	Venus	275.761060780	files
-2200	longyearbyen	Mars	255.519271822	files
+2200	longyearbyen	Sun	228.884941222	files
+2200	longyearbyen	Moon	273.638323452	files
+2200	longyearbyen	Mercury	234.733777316	files
+2200	longyearbyen	Venus	275.761060774	files
+2200	longyearbyen	Mars	255.519271819	files
 2200	longyearbyen	Jupiter	4.126916518	files
 2200	longyearbyen	Saturn	336.778059604	files
 2200	longyearbyen	Uranus	93.516916890	files
 2200	longyearbyen	Neptune	25.316606338	files
 2200	longyearbyen	Pluto	146.691901732	files
-2200	longyearbyen	North Node	201.448802210	approximation
-2200	longyearbyen	South Node	21.448802210	derived
-2200	longyearbyen	Chiron	262.958761510	files
+2200	longyearbyen	North Node	201.450342349	files
+2200	longyearbyen	South Node	21.450342349	derived
+2200	longyearbyen	Chiron	262.958761509	files
 2200	longyearbyen	Ceres	nan	none
 2200	longyearbyen	Pallas	nan	none
 2200	longyearbyen	Juno	nan	none
@@ -1983,19 +1983,19 @@ era	place	point	longitude	source
 2200	longyearbyen	houses:Midheaven	236.220787194	houses
 2200	longyearbyen	houses:ARMC	233.910915578	houses
 2200	longyearbyen	houses:Vertex	144.454321747	houses
-2200	ushuaia	Sun	228.884941226	files
-2200	ushuaia	Moon	273.638464713	files
-2200	ushuaia	Mercury	234.733777319	files
-2200	ushuaia	Venus	275.761060780	files
-2200	ushuaia	Mars	255.519271822	files
+2200	ushuaia	Sun	228.884941222	files
+2200	ushuaia	Moon	273.638323452	files
+2200	ushuaia	Mercury	234.733777316	files
+2200	ushuaia	Venus	275.761060774	files
+2200	ushuaia	Mars	255.519271819	files
 2200	ushuaia	Jupiter	4.126916518	files
 2200	ushuaia	Saturn	336.778059604	files
 2200	ushuaia	Uranus	93.516916890	files
 2200	ushuaia	Neptune	25.316606338	files
 2200	ushuaia	Pluto	146.691901732	files
-2200	ushuaia	North Node	201.448802210	approximation
-2200	ushuaia	South Node	21.448802210	derived
-2200	ushuaia	Chiron	262.958761510	files
+2200	ushuaia	North Node	201.450342349	files
+2200	ushuaia	South Node	21.450342349	derived
+2200	ushuaia	Chiron	262.958761509	files
 2200	ushuaia	Ceres	nan	none
 2200	ushuaia	Pallas	nan	none
 2200	ushuaia	Juno	nan	none
@@ -2023,18 +2023,18 @@ era	place	point	longitude	source
 2200	ushuaia	houses:Midheaven	147.804877937	houses
 2200	ushuaia	houses:ARMC	149.981315578	houses
 2200	ushuaia	houses:Vertex	49.506076683	houses
-2399	greenwich	Sun	279.276864705	files
-2399	greenwich	Moon	318.807520207	files
-2399	greenwich	Mercury	258.113481455	files
-2399	greenwich	Venus	268.212382555	files
-2399	greenwich	Mars	248.638309162	files
-2399	greenwich	Jupiter	291.276797791	files
-2399	greenwich	Saturn	267.208395836	files
+2399	greenwich	Sun	279.276864698	files
+2399	greenwich	Moon	318.807385438	files
+2399	greenwich	Mercury	258.113481449	files
+2399	greenwich	Venus	268.212382550	files
+2399	greenwich	Mars	248.638309159	files
+2399	greenwich	Jupiter	291.276797790	files
+2399	greenwich	Saturn	267.208395835	files
 2399	greenwich	Uranus	239.716715621	files
-2399	greenwich	Neptune	105.239147919	files
+2399	greenwich	Neptune	105.239147920	files
 2399	greenwich	Pluto	86.335786183	files
-2399	greenwich	North Node	307.443317950	approximation
-2399	greenwich	South Node	127.443317950	derived
+2399	greenwich	North Node	307.441735904	files
+2399	greenwich	South Node	127.441735904	derived
 2399	greenwich	Chiron	317.594653788	files
 2399	greenwich	Ceres	nan	none
 2399	greenwich	Pallas	nan	none
@@ -2063,18 +2063,18 @@ era	place	point	longitude	source
 2399	greenwich	houses:Midheaven	278.860444489	houses
 2399	greenwich	houses:ARMC	279.639371382	houses
 2399	greenwich	houses:Vertex	187.809472262	houses
-2399	sydney	Sun	279.276864705	files
-2399	sydney	Moon	318.807520207	files
-2399	sydney	Mercury	258.113481455	files
-2399	sydney	Venus	268.212382555	files
-2399	sydney	Mars	248.638309162	files
-2399	sydney	Jupiter	291.276797791	files
-2399	sydney	Saturn	267.208395836	files
+2399	sydney	Sun	279.276864698	files
+2399	sydney	Moon	318.807385438	files
+2399	sydney	Mercury	258.113481449	files
+2399	sydney	Venus	268.212382550	files
+2399	sydney	Mars	248.638309159	files
+2399	sydney	Jupiter	291.276797790	files
+2399	sydney	Saturn	267.208395835	files
 2399	sydney	Uranus	239.716715621	files
-2399	sydney	Neptune	105.239147919	files
+2399	sydney	Neptune	105.239147920	files
 2399	sydney	Pluto	86.335786183	files
-2399	sydney	North Node	307.443317950	approximation
-2399	sydney	South Node	127.443317950	derived
+2399	sydney	North Node	307.441735904	files
+2399	sydney	South Node	127.441735904	derived
 2399	sydney	Chiron	317.594653788	files
 2399	sydney	Ceres	nan	none
 2399	sydney	Pallas	nan	none
@@ -2103,18 +2103,18 @@ era	place	point	longitude	source
 2399	sydney	houses:Midheaven	72.321761836	houses
 2399	sydney	houses:ARMC	70.850171382	houses
 2399	sydney	houses:Vertex	347.324119194	houses
-2399	equator	Sun	279.276864705	files
-2399	equator	Moon	318.807520207	files
-2399	equator	Mercury	258.113481455	files
-2399	equator	Venus	268.212382555	files
-2399	equator	Mars	248.638309162	files
-2399	equator	Jupiter	291.276797791	files
-2399	equator	Saturn	267.208395836	files
+2399	equator	Sun	279.276864698	files
+2399	equator	Moon	318.807385438	files
+2399	equator	Mercury	258.113481449	files
+2399	equator	Venus	268.212382550	files
+2399	equator	Mars	248.638309159	files
+2399	equator	Jupiter	291.276797790	files
+2399	equator	Saturn	267.208395835	files
 2399	equator	Uranus	239.716715621	files
-2399	equator	Neptune	105.239147919	files
+2399	equator	Neptune	105.239147920	files
 2399	equator	Pluto	86.335786183	files
-2399	equator	North Node	307.443317950	approximation
-2399	equator	South Node	127.443317950	derived
+2399	equator	North Node	307.441735904	files
+2399	equator	South Node	127.441735904	derived
 2399	equator	Chiron	317.594653788	files
 2399	equator	Ceres	nan	none
 2399	equator	Pallas	nan	none
@@ -2143,18 +2143,18 @@ era	place	point	longitude	source
 2399	equator	houses:Midheaven	202.845944129	houses
 2399	equator	houses:ARMC	201.140871382	houses
 2399	equator	houses:Vertex	180.000000000	houses
-2399	longyearbyen	Sun	279.276864705	files
-2399	longyearbyen	Moon	318.807520207	files
-2399	longyearbyen	Mercury	258.113481455	files
-2399	longyearbyen	Venus	268.212382555	files
-2399	longyearbyen	Mars	248.638309162	files
-2399	longyearbyen	Jupiter	291.276797791	files
-2399	longyearbyen	Saturn	267.208395836	files
+2399	longyearbyen	Sun	279.276864698	files
+2399	longyearbyen	Moon	318.807385438	files
+2399	longyearbyen	Mercury	258.113481449	files
+2399	longyearbyen	Venus	268.212382550	files
+2399	longyearbyen	Mars	248.638309159	files
+2399	longyearbyen	Jupiter	291.276797790	files
+2399	longyearbyen	Saturn	267.208395835	files
 2399	longyearbyen	Uranus	239.716715621	files
-2399	longyearbyen	Neptune	105.239147919	files
+2399	longyearbyen	Neptune	105.239147920	files
 2399	longyearbyen	Pluto	86.335786183	files
-2399	longyearbyen	North Node	307.443317950	approximation
-2399	longyearbyen	South Node	127.443317950	derived
+2399	longyearbyen	North Node	307.441735904	files
+2399	longyearbyen	South Node	127.441735904	derived
 2399	longyearbyen	Chiron	317.594653788	files
 2399	longyearbyen	Ceres	nan	none
 2399	longyearbyen	Pallas	nan	none
@@ -2183,18 +2183,18 @@ era	place	point	longitude	source
 2399	longyearbyen	houses:Midheaven	293.423328606	houses
 2399	longyearbyen	houses:ARMC	295.267571382	houses
 2399	longyearbyen	houses:Vertex	205.062309218	houses
-2399	ushuaia	Sun	279.276864705	files
-2399	ushuaia	Moon	318.807520207	files
-2399	ushuaia	Mercury	258.113481455	files
-2399	ushuaia	Venus	268.212382555	files
-2399	ushuaia	Mars	248.638309162	files
-2399	ushuaia	Jupiter	291.276797791	files
-2399	ushuaia	Saturn	267.208395836	files
+2399	ushuaia	Sun	279.276864698	files
+2399	ushuaia	Moon	318.807385438	files
+2399	ushuaia	Mercury	258.113481449	files
+2399	ushuaia	Venus	268.212382550	files
+2399	ushuaia	Mars	248.638309159	files
+2399	ushuaia	Jupiter	291.276797790	files
+2399	ushuaia	Saturn	267.208395835	files
 2399	ushuaia	Uranus	239.716715621	files
-2399	ushuaia	Neptune	105.239147919	files
+2399	ushuaia	Neptune	105.239147920	files
 2399	ushuaia	Pluto	86.335786183	files
-2399	ushuaia	North Node	307.443317950	approximation
-2399	ushuaia	South Node	127.443317950	derived
+2399	ushuaia	North Node	307.441735904	files
+2399	ushuaia	South Node	127.441735904	derived
 2399	ushuaia	Chiron	317.594653788	files
 2399	ushuaia	Ceres	nan	none
 2399	ushuaia	Pallas	nan	none
