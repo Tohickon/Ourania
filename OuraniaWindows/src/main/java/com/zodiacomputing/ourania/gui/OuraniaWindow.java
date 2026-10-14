@@ -1403,6 +1403,29 @@ public class OuraniaWindow extends JFrame {
      * control quietly appears on five pages.
      */
     private JComponent readingPage(String kind, JComponent body) {
+        if ("SNAPSHOT".equals(kind)) {
+            // The same strip as Synthesize's mechanics box, for the same HTML 3.2 reason:
+            // the choice is made before the page is built, so it is a setting.
+            JCheckBox why = new JCheckBox("Show the astrology", Settings.astrologerView());
+            why.setForeground(Theme.TEXT);
+            why.setBackground(Color.BLACK);
+            why.setFont(Theme.BODY);
+            why.setFocusPainted(false);
+            why.setToolTipText("<html>Under each card, the placements it was read from: "
+                + "which body, in which sign and house.<br>Off: the plain reading only.</html>");
+            why.addItemListener(e -> {
+                Settings.setAstrologerView(why.isSelected());
+                runReading("SNAPSHOT");
+            });
+            JPanel strip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
+            strip.setBackground(Color.BLACK);
+            strip.add(why);
+            JPanel page = new JPanel(new BorderLayout());
+            page.setBackground(Color.BLACK);
+            page.add(strip, BorderLayout.NORTH);
+            page.add(body, BorderLayout.CENTER);
+            return page;
+        }
         if (!"SYNTHESIZE".equals(kind)) {
             return body;
         }
@@ -1712,6 +1735,33 @@ public class OuraniaWindow extends JFrame {
             revalidate();
             repaint();
         }
+    }
+
+    /**
+     * The snapshot as plain cards, onto the At a glance tab.
+     *
+     * <b>The tab never showed its own reading.</b> Opening it ran the snapshot, and
+     * {@link #showSnapshot} wrote the result onto the Reading page and moved the rail there -
+     * the behaviour from before the readings had tabs, which NavigationCheck still pins for
+     * that door and which is left alone. When the tab asked, the answer goes to the tab.
+     */
+    public void showSnapshotCards(String when, String where, String cardsHtml) {
+        if (interpretationPanel == null) {
+            return;
+        }
+        if (pendingReadingPage != null) {
+            String html = interpretationPanel.capture(
+                () -> interpretationPanel.showSnapshotCards(when, where, cardsHtml));
+            if (html != null && routeToReadingPage(html)) {
+                return;
+            }
+        }
+        interpretationPanel.showSnapshotCards(when, where, cardsHtml);
+        if (chartRail != null) {
+            revealPage(READING_PAGE);
+        }
+        revalidate();
+        repaint();
     }
 
     /** The full L9 report tier, from SkymapPanel's Report button. */

@@ -1156,6 +1156,25 @@ public class InterpretationPanel extends JPanel {
         setHtml(html.toString(), false);
     }
 
+    /** The snapshot as plain cards, already rendered by {@link ReadingCard#html}. */
+    public void showSnapshotCards(String when, String where, String cardsHtml) {
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 16px;'>");
+        html.append("<h2 style='color:#00BFFF;'>At a glance</h2>");
+        if ((when != null && !when.isEmpty()) || (where != null && !where.isEmpty())) {
+            html.append("<p style='color:#9AA5B1; font-size:11px;'>");
+            if (when != null && !when.isEmpty()) {
+                html.append(escape(when));
+            }
+            if (where != null && !where.isEmpty()) {
+                html.append("<br>").append(escape(where));
+            }
+            html.append("</p>");
+        }
+        html.append(cardsHtml).append("</body></html>");
+        setHtml(html.toString(), false);
+    }
+
     /**
      * The full report tier.
      *

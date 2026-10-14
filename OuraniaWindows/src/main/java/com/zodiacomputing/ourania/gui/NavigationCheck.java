@@ -301,6 +301,10 @@ public final class NavigationCheck {
             if ("SYNTHESIZE".equals(r[1])) {
                 ok("the Synthesize page carries the mechanics checkbox",
                     boxes.contains("Show the mechanics"));
+            } else if ("SNAPSHOT".equals(r[1])) {
+                // The plain cards' "why" boxes (2026-10-13), behind Astrologer view.
+                ok("the Snapshot page carries the astrology checkbox",
+                    boxes.equals(java.util.List.of("Show the astrology")));
             } else {
                 ok("the reading " + r[0] + " carries no checkbox of its own", boxes.isEmpty());
             }

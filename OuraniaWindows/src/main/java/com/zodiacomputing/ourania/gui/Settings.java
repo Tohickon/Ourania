@@ -1618,6 +1618,24 @@ public final class Settings {
         set(READING_MECHANICS_KEY, on ? "true" : "false");
     }
 
+    /** Settings key for whether plain cards also show the astrology behind them. */
+    public static final String ASTROLOGER_VIEW_KEY = "view.astrologer";
+
+    /**
+     * Whether each {@link ReadingCard} shows its "why" box - the placements that produced it.
+     *
+     * <b>Off by default, the reverse of the mechanics tier,</b> and David's call on 2026-10-13
+     * ("plain by default"). The card's meaning is the whole of what it says; the why box is
+     * evidence for it, which a new reader does not need to see before they can read the card.
+     */
+    public static boolean astrologerView() {
+        return "true".equals(get(ASTROLOGER_VIEW_KEY, "false"));
+    }
+
+    public static void setAstrologerView(boolean on) {
+        set(ASTROLOGER_VIEW_KEY, on ? "true" : "false");
+    }
+
     public static void setTrueNode(boolean useTrue) {
         set(NODE_VARIANT_KEY, useTrue ? "true" : "mean");
     }

@@ -4244,11 +4244,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     return NarrativeSynthesizer.generateReport(chartFrame, result, list, result2, chartFrame2, profection, list2, yearScan, list3, bl,
                         SkymapPanel.this.isRelationshipChart(), Settings.readingMechanics());
                 }
-                object = PlainSnapshot.generate(chartFrame, result, list);
+                // <b>Cards, not a paragraph (2026-10-13).</b> The same three blocks, each led by
+                // its headline, with the placements behind it shown only in Astrologer view.
+                // The year's sentence was glued onto the last block; it is its own card now,
+                // because it answers a different question from the paragraph it was stuck to.
+                List<ReadingCard> cards = new ArrayList<>(
+                    PlainSnapshot.cards(chartFrame, result, list));
                 if (bl) {
-                    return (String)object + " " + Snapshot.timeSentence(profection, list2);
+                    cards.add(new ReadingCard("THIS YEAR", null,
+                        Snapshot.timeSentence(profection, list2), null));
                 }
-                return (String)object;
+                return ReadingCard.html(cards, Settings.astrologerView());
             }
 
             @Override
@@ -4259,7 +4265,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
                         SkymapPanel.this.window.showSynthesis((String)this.get());
                     } else {
-                        SkymapPanel.this.window.showSnapshot(string2, string, (String)this.get());
+                        SkymapPanel.this.window.showSnapshotCards(string2, string, (String)this.get());
                     }
                 }
                 catch (Exception exception) {
