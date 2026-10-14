@@ -42,6 +42,7 @@ public class OuraniaWindow extends JFrame {
     private DrawerRail chartRail;
     /** Blueprint's own pages: the two charts, the views of them, and the natal documents. */
     private SubRail blueprint;
+    private LifeAreasPanel lifeAreasPanel;
     /** Chronometry's: the sky over the chart, and the documents about time. */
     private SubRail chronometry;
     private OverviewPanel overviewPanel;
@@ -93,6 +94,8 @@ public class OuraniaWindow extends JFrame {
     /** What kind of chart this is, before any of the detail. */
     public static final String OVERVIEW_PAGE = "Overview";
     public static final String READING_PAGE = "Interpretation";
+    /** The chart grouped by the parts of a life (2026-10-13). See {@link LifeAreasPanel}. */
+    public static final String LIFE_AREAS_PAGE = "Life areas";
 
     /**
      * The three rail tabs, each holding a handful of pages.
@@ -383,6 +386,8 @@ public class OuraniaWindow extends JFrame {
         // because it reads the wheel, and the wheel is built two lines up.
         overviewPanel = new OverviewPanel(skymapPanel, this);
         blueprint.addPage(OVERVIEW_PAGE, overviewPanel);
+        lifeAreasPanel = new LifeAreasPanel(skymapPanel, this);
+        blueprint.addPage(LIFE_AREAS_PAGE, lifeAreasPanel);
 
         interpretationPanel = new InterpretationPanel(skymapPanel, this);
         // <b>The rail owns this panel's visibility, and nothing else may touch it.</b> The rail
@@ -443,6 +448,12 @@ public class OuraniaWindow extends JFrame {
             if (READING_PAGE.equals(page)) {
                 if (interpretationPanel != null) {
                     interpretationPanel.updateInterpretations();
+                }
+                return;
+            }
+            if (LIFE_AREAS_PAGE.equals(page)) {
+                if (lifeAreasPanel != null) {
+                    lifeAreasPanel.refresh();
                 }
                 return;
             }

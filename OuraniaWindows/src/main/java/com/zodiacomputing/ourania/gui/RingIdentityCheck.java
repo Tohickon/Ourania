@@ -553,7 +553,8 @@ public final class RingIdentityCheck {
             // The pages, one level down, in the order they are read.
             eq("Blueprint holds the two charts, the views of them, then the documents",
                 Arrays.asList(OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
-                    OuraniaWindow.OVERVIEW_PAGE, OuraniaWindow.READING_PAGE,
+                    OuraniaWindow.OVERVIEW_PAGE, OuraniaWindow.LIFE_AREAS_PAGE,
+                    OuraniaWindow.READING_PAGE,
                     OuraniaWindow.SELECTION_PAGE, "Snapshot", "Report", "Synthesize"),
                 w[0].blueprintRail().pages());
             eq("Chronometry holds the sky, then the documents about time",
@@ -565,7 +566,9 @@ public final class RingIdentityCheck {
             List<String> every = new ArrayList<>(w[0].blueprintRail().pages());
             every.addAll(w[0].chronometryRail().pages());
             every.add(OuraniaWindow.SYNASTRY_PAGE);
-            eq("twelve pages went in and twelve came out", 12, every.size());
+            // Thirteen since Life areas joined Blueprint (2026-10-13): twelve kept, one added.
+            eq("twelve pages went in, twelve came out, and Life areas joined them", 13,
+                every.size());
 
             // And each is still addressable by the name its callers hold. revealPage has to
             // land on the page itself, not merely on the tab above it - opening the right
