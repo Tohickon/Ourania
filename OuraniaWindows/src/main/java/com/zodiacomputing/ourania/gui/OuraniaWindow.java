@@ -345,6 +345,13 @@ public class OuraniaWindow extends JFrame {
         // through as a label, in the one state a new reader sees first.
         blueprint.setPageLabel(CHART_PAGE, PLACEMENTS_LABEL);
         chronometry.setPageLabel(TRANSITS_PAGE, PLACEMENTS_LABEL);
+        // <b>The doors say what they answer, in a reader's words.</b> David, 2026-10-13: the
+        // tabs "only show the user the back end math side". Set on chartRail directly, because
+        // BLUEPRINT_PAGE and CHART_PAGE are the same string and setPageLabel(page) would find
+        // the page inside the strip first and rename that instead.
+        chartRail.setPageLabel(BLUEPRINT_PAGE, YOU_LABEL);
+        chartRail.setPageLabel(SYNASTRY_PAGE, TOGETHER_LABEL);
+        chartRail.setPageLabel(CHRONOMETRY_PAGE, NOW_LABEL);
         chartRail.prepare(BLUEPRINT_PAGE);
         blueprint.prepare(CHART_PAGE);
         chronometry.prepare(TRANSITS_PAGE);
@@ -406,6 +413,7 @@ public class OuraniaWindow extends JFrame {
             JComponent page = readingPage(r[1], HtmlPanes.scroller(pane));
             (TIMED_READINGS.contains(r[0]) ? chronometry : blueprint).addPage(r[0], page);
         }
+        PLAIN_LABELS.forEach(this::setPageLabel);
 
         // <b>Opening a tab has to produce the page, not just reveal it.</b> The readings were
         // buttons that ran something; turned into tabs they revealed panes nothing had ever
@@ -980,6 +988,23 @@ public class OuraniaWindow extends JFrame {
      * are different things.
      */
     static final String PLACEMENTS_LABEL = "Placements";
+
+    /**
+     * The three doors and the documents behind them, as a reader who is not an astrologer would
+     * name them (2026-10-13, plan: 2026-10-13-ourania-plain-english-tabs-plan). Labels only: the
+     * keys are how callers and suites address the pages, and they do not change.
+     */
+    static final String YOU_LABEL = "You";
+    static final String TOGETHER_LABEL = "Together";
+    static final String NOW_LABEL = "Now";
+    static final java.util.Map<String, String> PLAIN_LABELS = java.util.Map.of(
+        "Snapshot", "At a glance",
+        "Report", "Full report",
+        "Synthesize", "Your year",
+        "Predict", "Coming up",
+        OVERVIEW_PAGE, "Chart shape",
+        READING_PAGE, "Reading",
+        SELECTION_PAGE, "Selected");
 
     /**
      * A chart page is named for whose chart it is.
