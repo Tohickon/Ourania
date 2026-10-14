@@ -3722,6 +3722,14 @@ public class InterpretationPanel extends JPanel {
         cardTitle(html, symbolGlyph(index), title.toString(),
             isTransit ? "transiting" : null);
 
+        // <b>Plain view says where in a life, not where on the wheel (2026-10-13).</b> The
+        // degree, decan, its rulers and the house number are the astrologer's line; a reader
+        // gets the part of life the house stands for. Astrologer view prints the line as before.
+        boolean plain = !Settings.astrologerView();
+        String area = def.isAngle() ? null : LifeAreas.of(houseNum);
+        if (plain && area != null) {
+            cardMeta(html, "Shows up in: " + escape(area));
+        }
         StringBuilder meta = new StringBuilder();
         meta.append(com.zodiacomputing.ourania.astro.Zodiac.format(lon)).append(" ");
         glyph(meta, SkymapPanel.ZODIAC_SYMBOLS[signIdx], 12, null);
@@ -3742,7 +3750,9 @@ public class InterpretationPanel extends JPanel {
         if (!def.isAngle()) {
             meta.append(" &nbsp;|&nbsp; house ").append(houseNum);
         }
-        cardMeta(html, meta.toString());
+        if (!plain) {
+            cardMeta(html, meta.toString());
+        }
 
         // A composite point whose two sources are near opposition is a coin flip, and the
         // card says so rather than presenting it as settled. Silent for every other chart.
@@ -3775,7 +3785,8 @@ public class InterpretationPanel extends JPanel {
 
         String sabian = leadOrNull(svc.getSabianSymbol(signName, degree));
         if (sabian != null) {
-            cardBlock(html, "#FFD166", "SABIAN " + signName.toUpperCase() + " " + degree,
+            cardBlock(html, "#FFD166", plain ? "AN IMAGE FOR THIS DEGREE"
+                    : "SABIAN " + signName.toUpperCase() + " " + degree,
                 "<i>\"" + sabian + "\"</i>");
         }
 
@@ -3784,19 +3795,23 @@ public class InterpretationPanel extends JPanel {
             java.util.List<String[]> active = skymapPanel.getActiveAspectsFor(index, isTransit);
             aspectCount = active == null ? 0 : active.size();
         }
-        if (aspectCount > 0) {
+        if (aspectCount > 0 && !plain) {
             cardMeta(html, aspectCount + (aspectCount == 1 ? " active aspect" : " active aspects"));
         }
 
         // <b>The ring goes in the link.</b> This card knows which wheel it is describing and
         // used to drop that on the way out, so Read in full always opened Chart A - with Chart A
         // and Sky up, a card reading "Sun in Libra" opened the natal Sun in Leo. David, 25 Sep.
-        cardLinks(html, new String[][] {
-            {"body|" + index + "|" + (isTransit ? "1" : "0"), "Read in full"},
-            {"sign|" + signName, signName},
-            {"decan|" + signName + "|" + decanNum, "Decan " + decanNum},
-            {"sabian|" + signName + "|" + degree, "Sabian"}
-        });
+        cardLinks(html, plain
+            ? new String[][] {
+                {"body|" + index + "|" + (isTransit ? "1" : "0"), "Read in full"},
+                {"sign|" + signName, signName}}
+            : new String[][] {
+                {"body|" + index + "|" + (isTransit ? "1" : "0"), "Read in full"},
+                {"sign|" + signName, signName},
+                {"decan|" + signName + "|" + decanNum, "Decan " + decanNum},
+                {"sabian|" + signName + "|" + degree, "Sabian"}
+            });
         cardClose(html);
         return html.toString();
     }
@@ -3811,7 +3826,7 @@ public class InterpretationPanel extends JPanel {
         // The masthead. A ZonedDateTime.toString() - "2026-08-25T13:42:07.481-07:00[America/
         // Los_Angeles]" - is a machine's idea of a moment and was the first thing a reader
         // met on this screen. The same instant, formatted for a person, costs one formatter.
-        html.append("<div style='color:#FFFFFF; font-size:17px;'><b>Full Interpretation</b></div>");
+        html.append("<div style='color:#FFFFFF; font-size:17px;'><b>Your Reading</b></div>");
         html.append("<div style='color:").append(CARD_KICKER)
             .append("; font-size:11px;'>")
             .append(escape(time.format(java.time.format.DateTimeFormatter
@@ -3848,7 +3863,8 @@ public class InterpretationPanel extends JPanel {
             // member fires all of them. Nothing here when the chart has none - which is now
             // most charts, since patterns were restricted to physical bodies at a tight orb.
             if (!g.aspectPatterns.isEmpty()) {
-                sectionHeading(html, ACCENT_PATTERN, "ASPECT PATTERNS",
+                sectionHeading(html, ACCENT_PATTERN, Settings.astrologerView()
+                        ? "ASPECT PATTERNS" : "PATTERNS THAT TIE YOUR CHART TOGETHER",
                     g.aspectPatterns.size() + (g.aspectPatterns.size() == 1
                         ? " closed circuit" : " closed circuits"));
                 String mechanics = macroLead("pattern_mechanics");
@@ -3922,7 +3938,8 @@ public class InterpretationPanel extends JPanel {
             // do not.
             com.zodiacomputing.ourania.astro.LunarMansions.Mansion mansion =
                 com.zodiacomputing.ourania.astro.LunarMansions.ofMoon(frame);
-            if (mansion != null) {
+            // Astrologer view only: an electional technique, and the card says so itself.
+            if (mansion != null && Settings.astrologerView()) {
                 sectionHeading(html, ACCENT_MANSION, "THE MOON'S MANSION", null);
                 cardOpen(html, ACCENT_MANSION, null);
                 // indexOf returns -1 for an id the registry does not carry, and symbolGlyph

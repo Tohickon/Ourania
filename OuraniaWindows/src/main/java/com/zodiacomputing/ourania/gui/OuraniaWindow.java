@@ -1411,8 +1411,10 @@ public class OuraniaWindow extends JFrame {
             why.setBackground(Color.BLACK);
             why.setFont(Theme.BODY);
             why.setFocusPainted(false);
-            why.setToolTipText("<html>Under each card, the placements it was read from: "
-                + "which body, in which sign and house.<br>Off: the plain reading only.</html>");
+            why.setToolTipText("<html>Astrologer view, for every page: under each card here, the placements it "
+                + "was read from; on Chart shape, every card's detail open; on Reading, the "
+                + "degrees, decans, houses and Sabian symbols.<br>Off: the plain reading "
+                + "only.</html>");
             why.addItemListener(e -> {
                 Settings.setAstrologerView(why.isSelected());
                 runReading("SNAPSHOT");
