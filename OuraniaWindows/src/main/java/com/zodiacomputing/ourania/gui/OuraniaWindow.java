@@ -42,6 +42,7 @@ public class OuraniaWindow extends JFrame {
     private DrawerRail chartRail;
     /** Blueprint's own pages: the two charts, the views of them, and the natal documents. */
     private SubRail blueprint;
+    private LifeAreasPanel lifeAreasPanel;
     /** Chronometry's: the sky over the chart, and the documents about time. */
     private SubRail chronometry;
     private OverviewPanel overviewPanel;
@@ -93,6 +94,8 @@ public class OuraniaWindow extends JFrame {
     /** What kind of chart this is, before any of the detail. */
     public static final String OVERVIEW_PAGE = "Overview";
     public static final String READING_PAGE = "Interpretation";
+    /** The chart grouped by the parts of a life (2026-10-13). See {@link LifeAreasPanel}. */
+    public static final String LIFE_AREAS_PAGE = "Life areas";
 
     /**
      * The three rail tabs, each holding a handful of pages.
@@ -345,6 +348,13 @@ public class OuraniaWindow extends JFrame {
         // through as a label, in the one state a new reader sees first.
         blueprint.setPageLabel(CHART_PAGE, PLACEMENTS_LABEL);
         chronometry.setPageLabel(TRANSITS_PAGE, PLACEMENTS_LABEL);
+        // <b>The doors say what they answer, in a reader's words.</b> David, 2026-10-13: the
+        // tabs "only show the user the back end math side". Set on chartRail directly, because
+        // BLUEPRINT_PAGE and CHART_PAGE are the same string and setPageLabel(page) would find
+        // the page inside the strip first and rename that instead.
+        chartRail.setPageLabel(BLUEPRINT_PAGE, YOU_LABEL);
+        chartRail.setPageLabel(SYNASTRY_PAGE, TOGETHER_LABEL);
+        chartRail.setPageLabel(CHRONOMETRY_PAGE, NOW_LABEL);
         chartRail.prepare(BLUEPRINT_PAGE);
         blueprint.prepare(CHART_PAGE);
         chronometry.prepare(TRANSITS_PAGE);
@@ -376,6 +386,8 @@ public class OuraniaWindow extends JFrame {
         // because it reads the wheel, and the wheel is built two lines up.
         overviewPanel = new OverviewPanel(skymapPanel, this);
         blueprint.addPage(OVERVIEW_PAGE, overviewPanel);
+        lifeAreasPanel = new LifeAreasPanel(skymapPanel, this);
+        blueprint.addPage(LIFE_AREAS_PAGE, lifeAreasPanel);
 
         interpretationPanel = new InterpretationPanel(skymapPanel, this);
         // <b>The rail owns this panel's visibility, and nothing else may touch it.</b> The rail
@@ -406,6 +418,7 @@ public class OuraniaWindow extends JFrame {
             JComponent page = readingPage(r[1], HtmlPanes.scroller(pane));
             (TIMED_READINGS.contains(r[0]) ? chronometry : blueprint).addPage(r[0], page);
         }
+        PLAIN_LABELS.forEach(this::setPageLabel);
 
         // <b>Opening a tab has to produce the page, not just reveal it.</b> The readings were
         // buttons that ran something; turned into tabs they revealed panes nothing had ever
@@ -435,6 +448,12 @@ public class OuraniaWindow extends JFrame {
             if (READING_PAGE.equals(page)) {
                 if (interpretationPanel != null) {
                     interpretationPanel.updateInterpretations();
+                }
+                return;
+            }
+            if (LIFE_AREAS_PAGE.equals(page)) {
+                if (lifeAreasPanel != null) {
+                    lifeAreasPanel.refresh();
                 }
                 return;
             }
@@ -982,6 +1001,23 @@ public class OuraniaWindow extends JFrame {
     static final String PLACEMENTS_LABEL = "Placements";
 
     /**
+     * The three doors and the documents behind them, as a reader who is not an astrologer would
+     * name them (2026-10-13, plan: 2026-10-13-ourania-plain-english-tabs-plan). Labels only: the
+     * keys are how callers and suites address the pages, and they do not change.
+     */
+    static final String YOU_LABEL = "You";
+    static final String TOGETHER_LABEL = "Together";
+    static final String NOW_LABEL = "Now";
+    static final java.util.Map<String, String> PLAIN_LABELS = java.util.Map.of(
+        "Snapshot", "At a glance",
+        "Report", "Full report",
+        "Synthesize", "Your year",
+        "Predict", "Coming up",
+        OVERVIEW_PAGE, "Chart shape",
+        READING_PAGE, "Reading",
+        SELECTION_PAGE, "Selected");
+
+    /**
      * A chart page is named for whose chart it is.
      *
      * <b>David, 2026-10-10: "under Chart have it named the name of the person whose chart it
@@ -1378,6 +1414,31 @@ public class OuraniaWindow extends JFrame {
      * control quietly appears on five pages.
      */
     private JComponent readingPage(String kind, JComponent body) {
+        if ("SNAPSHOT".equals(kind)) {
+            // The same strip as Synthesize's mechanics box, for the same HTML 3.2 reason:
+            // the choice is made before the page is built, so it is a setting.
+            JCheckBox why = new JCheckBox("Show the astrology", Settings.astrologerView());
+            why.setForeground(Theme.TEXT);
+            why.setBackground(Color.BLACK);
+            why.setFont(Theme.BODY);
+            why.setFocusPainted(false);
+            why.setToolTipText("<html>Astrologer view, for every page: under each card here, the placements it "
+                + "was read from; on Chart shape, every card's detail open; on Reading, the "
+                + "degrees, decans, houses and Sabian symbols.<br>Off: the plain reading "
+                + "only.</html>");
+            why.addItemListener(e -> {
+                Settings.setAstrologerView(why.isSelected());
+                runReading("SNAPSHOT");
+            });
+            JPanel strip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
+            strip.setBackground(Color.BLACK);
+            strip.add(why);
+            JPanel page = new JPanel(new BorderLayout());
+            page.setBackground(Color.BLACK);
+            page.add(strip, BorderLayout.NORTH);
+            page.add(body, BorderLayout.CENTER);
+            return page;
+        }
         if (!"SYNTHESIZE".equals(kind)) {
             return body;
         }
@@ -1687,6 +1748,33 @@ public class OuraniaWindow extends JFrame {
             revalidate();
             repaint();
         }
+    }
+
+    /**
+     * The snapshot as plain cards, onto the At a glance tab.
+     *
+     * <b>The tab never showed its own reading.</b> Opening it ran the snapshot, and
+     * {@link #showSnapshot} wrote the result onto the Reading page and moved the rail there -
+     * the behaviour from before the readings had tabs, which NavigationCheck still pins for
+     * that door and which is left alone. When the tab asked, the answer goes to the tab.
+     */
+    public void showSnapshotCards(String when, String where, String cardsHtml) {
+        if (interpretationPanel == null) {
+            return;
+        }
+        if (pendingReadingPage != null) {
+            String html = interpretationPanel.capture(
+                () -> interpretationPanel.showSnapshotCards(when, where, cardsHtml));
+            if (html != null && routeToReadingPage(html)) {
+                return;
+            }
+        }
+        interpretationPanel.showSnapshotCards(when, where, cardsHtml);
+        if (chartRail != null) {
+            revealPage(READING_PAGE);
+        }
+        revalidate();
+        repaint();
     }
 
     /** The full L9 report tier, from SkymapPanel's Report button. */

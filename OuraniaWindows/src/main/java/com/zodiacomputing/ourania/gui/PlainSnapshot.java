@@ -56,21 +56,12 @@ public final class PlainSnapshot {
     public static int bodiesPerParagraph = 3;
 
     public static String generate(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked) {
-        InterpretationService svc = InterpretationService.getInstance();
-        StringBuilder out = new StringBuilder();
-        Set<String> used = new LinkedHashSet<>();
-
-        List<String> past = pickNamed(f, PAST, used);
-        List<String> now = pickRanked(f, ranked, used);
-        List<String> ahead = pickNamed(f, FUTURE, used);
-
-        out.append(block(svc, f, "WHAT YOU ARE WORKING FROM", past, openerPast(g), null));
-        out.append("\n\n");
-        out.append(block(svc, f, "WHERE THE WEIGHT SITS NOW", now, "", tail(g)));
-        out.append("\n\n");
-        out.append(block(svc, f, "WHERE IT IS HEADING", ahead, "", null));
-
-        return out.toString();
+        List<String> blocks = new ArrayList<>();
+        for (ReadingCard c : cards(f, g, ranked)) {
+            blocks.add(c.label() + (c.headline() != null ? ": " + c.headline() : "")
+                + "\n\n" + c.body());
+        }
+        return String.join("\n\n", blocks);
     }
 
     // ------------------------------------------------------------------ selection
@@ -137,17 +128,51 @@ public final class PlainSnapshot {
      *               the title can be built from the placements the opener knows nothing of
      * @param tail   a closing observation about the chart as a whole, or null
      */
-    private static String block(InterpretationService svc, ChartFrame f, String heading,
-                                List<String> names, String opener, String tail) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(heading);
+    /**
+     * The same three paragraphs as {@link #generate}, as cards (2026-10-13).
+     *
+     * The headline is the paragraph's theme, and the why box lists the placements that made
+     * it. {@code generate} is built from these, so the text and the cards cannot say different
+     * things.
+     */
+    public static List<ReadingCard> cards(ChartFrame f, Gestalt.Result g,
+                                          List<BodyScore.Vector> ranked) {
+        InterpretationService svc = InterpretationService.getInstance();
+        Set<String> used = new LinkedHashSet<>();
+        List<String> past = pickNamed(f, PAST, used);
+        List<String> now = pickRanked(f, ranked, used);
+        List<String> ahead = pickNamed(f, FUTURE, used);
+        return List.of(
+            card(svc, f, "WHAT YOU ARE WORKING FROM", past, openerPast(g), null),
+            card(svc, f, "WHERE THE WEIGHT SITS NOW", now, "", tail(g)),
+            card(svc, f, "WHERE IT IS HEADING", ahead, "", null));
+    }
 
+    private static ReadingCard card(InterpretationService svc, ChartFrame f, String heading,
+                                    List<String> names, String opener, String tail) {
         String theme = themeOf(f, names);
-        if (theme != null) {
-            sb.append(": ").append(theme);
-        }
-        sb.append("\n\n");
+        return new ReadingCard(heading, theme, prose(svc, f, names, opener, tail),
+            whyOf(f, names));
+    }
 
+    /** "Sun in Libra, 11th house" for each placement, in the order the prose takes them. */
+    private static List<String> whyOf(ChartFrame f, List<String> names) {
+        List<String> out = new ArrayList<>();
+        for (String name : names) {
+            ChartFrame.Body b = bodyOf(f, name);
+            if (b == null || !b.ok) {
+                continue;
+            }
+            int house = Zodiac.houseOf(b.lon, f.cusps);
+            out.add(name + " in " + capitalise(Zodiac.signName(b.lon))
+                + (house > 0 ? ", " + ordinal(house) + " house" : ""));
+        }
+        return out;
+    }
+
+    private static String prose(InterpretationService svc, ChartFrame f, List<String> names,
+                                String opener, String tail) {
+        StringBuilder sb = new StringBuilder();
         if (names.isEmpty()) {
             sb.append(opener.isEmpty() ? "" : opener)
               .append("the chart says nothing specific enough to be worth reporting.");

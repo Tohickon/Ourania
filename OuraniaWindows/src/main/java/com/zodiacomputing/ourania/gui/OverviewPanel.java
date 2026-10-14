@@ -169,11 +169,11 @@ final class OverviewPanel extends JPanel {
     private Card sectCard(Gestalt.Result g) {
         String benefic = Sect.beneficOfSect(g.diurnal);
         Card c = new Card("sect", g.diurnal ? "☀" : "☽",
-            "Home-Court Advantage",
-            g.diurnal ? "Day chart" : "Night chart",
-            "Born " + (g.diurnal ? "in daylight" : "at night") + ", so " + g.sectLight + " and "
-                + benefic + " play at home - they work with the fewest obstacles in this chart, "
-                + "while " + g.outOfSectMalefic + " is the one that has to be handled.");
+            "Who Has the Easy Run",
+            subtitleOfSect(g.diurnal),
+            "Because you were born " + (g.diurnal ? "in daylight" : "at night") + ", "
+                + g.sectLight + " and " + benefic + " work with the fewest obstacles in your "
+                + "chart, while " + g.outOfSectMalefic + " is the one that needs handling.");
         c.detail.add("Classical figure: " + (g.diurnal ? "diurnal" : "nocturnal") + " sect");
         c.detail.add("Light of the sect: " + g.sectLight);
         c.detail.add("Benefic of sect: " + benefic);
@@ -194,9 +194,9 @@ final class OverviewPanel extends JPanel {
             }
         }
         String name = g.shape.name().charAt(0) + g.shape.name().substring(1).toLowerCase();
-        Card c = new Card("shape", "◔", "Chart Shape",
-            name + (handle.isEmpty() ? "" : ", led by " + handle + where),
-            "The bodies sit in a " + name.toLowerCase() + " across the wheel"
+        Card c = new Card("shape", "◔", "How Your Chart Is Laid Out",
+            plainShape(g.shape) + (handle.isEmpty() ? "" : ", led by " + handle + where),
+            "Your planets are " + plainShape(g.shape).toLowerCase()
                 + (handle.isEmpty() ? "." : ", with " + handle + " out in front - the placement "
                     + "that pulls the rest along and the one to read first."));
         c.detail.add("Classical figure: " + name + " pattern");
@@ -217,8 +217,8 @@ final class OverviewPanel extends JPanel {
             return null;
         }
         BodyScore.Vector top = ranked.get(0);
-        Card c = new Card("prominence", "📢", "Loudest in the Chart",
-            top.body + " at " + String.format("%.0f%%", top.prominence * 100),
+        Card c = new Card("prominence", "📢", "The Loudest Voice",
+            top.body,
             top.body + " holds the microphone here. It is the placement that speaks over the "
                 + "others, and the one whose themes keep turning up whatever the chart is "
                 + "asked about.");
@@ -254,15 +254,15 @@ final class OverviewPanel extends JPanel {
         TransferOfLight.Transfer first = mine.get(0);
         Card c = new Card(translation ? "translation" : "collection",
             translation ? "🏃" : "🧲",
-            translation ? "Messenger Bridge" : "Mediator Connection",
-            mine.size() + (translation ? " translations of light" : " collections of light"),
+            translation ? "Go-Betweens" : "Shared Meeting Points",
+            countOf(mine.size(), kind),
             translation
-                ? "A fast body is carrying light from one placement to another, like a relay "
-                    + "runner taking a baton across: " + first.mediator + " has just left "
+                ? "One planet links two others that would not otherwise meet, like a relay "
+                    + "runner passing a baton: " + first.mediator + " has just left "
                     + first.from + " and is on its way to " + first.to + "."
-                : "Two placements that do not meet are both reaching the same third one, the "
-                    + "way two people who do not know each other share a friend: "
-                    + first.from + " and " + first.to + " both apply to " + first.mediator
+                : "Two parts of your chart that never meet directly both reach the same third "
+                    + "planet, the way two strangers share a friend: "
+                    + first.from + " and " + first.to + " both reach " + first.mediator
                     + ".");
         c.detail.add("Classical figure: " + (translation ? "translation of light"
             : "collection of light"));
@@ -286,6 +286,35 @@ final class OverviewPanel extends JPanel {
             c.detail.add("and " + (mine.size() - SHOWN) + " more, written out in Synthesize.");
         }
         return c;
+    }
+
+    /**
+     * The card subtitles in a reader's words (2026-10-13). The classical names - sect, the
+     * Jones pattern, translation and collection of light - stay in each card's detail, which
+     * is where an astrologer looks for them. Package-visible so OverviewPageCheck asks the
+     * same rule rather than a copy of its wording.
+     */
+    static String subtitleOfSect(boolean diurnal) {
+        return diurnal ? "Born in daylight" : "Born at night";
+    }
+
+    static String countOf(int n, TransferOfLight.Kind kind) {
+        boolean one = n == 1;
+        return n + (kind == TransferOfLight.Kind.TRANSLATION
+            ? (one ? " link made through a go-between" : " links made through a go-between")
+            : (one ? " meeting point" : " meeting points"));
+    }
+
+    static String plainShape(Gestalt.Shape shape) {
+        switch (shape) {
+            case BUNDLE: return "Packed into one part of life";
+            case BOWL: return "Gathered on one half, with the other half open";
+            case BUCKET: return "Gathered on one side, poured through one point";
+            case LOCOMOTIVE: return "Driven by an engine at the front";
+            case SEESAW: return "Pulled between two sides";
+            case SPLASH: return "Spread across every part of life";
+            default: return "Spread out in a few strong clusters";
+        }
     }
 
     /** One aspect of a transfer, with how far from exact it is and which way it is going. */
@@ -323,9 +352,10 @@ final class OverviewPanel extends JPanel {
                 + "what kind of chart it is.</p></body></html>");
             return sb.toString();
         }
-        sb.append("<h2>Overview</h2>");
+        sb.append("<h2>Chart shape</h2>");
         for (Card c : cards) {
-            boolean open = expanded.contains(c.id);
+            // In Astrologer view every card starts open, and a click closes it instead.
+            boolean open = expanded.contains(c.id) != Settings.astrologerView();
             sb.append("<p><b>").append(c.icon).append(' ').append(esc(c.title))
               .append("</b><br>").append(esc(c.subtitle)).append("<br>")
               .append(esc(c.plain)).append("<br>")
