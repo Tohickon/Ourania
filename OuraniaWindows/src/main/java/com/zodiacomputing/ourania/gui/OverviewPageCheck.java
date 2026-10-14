@@ -117,7 +117,7 @@ public final class OverviewPageCheck {
         SwingUtilities.invokeAndWait(() -> { });
         String html = panel.html();
         yes("opening it produces a page", html != null && html.length() > 200);
-        yes("and the page is the overview", html.contains("Overview"));
+        yes("and the page is the overview", html.contains("Chart shape"));
         yes("it is not the empty-chart message",
             !html.contains("No chart is cast yet"));
     }
@@ -199,7 +199,7 @@ public final class OverviewPageCheck {
         OverviewPanel.Card sect = card(cards, "sect");
         yes("there is a sect card", sect != null);
         if (sect != null) {
-            eq("the sect card says what Gestalt says", g.diurnal ? "Day chart" : "Night chart",
+            eq("the sect card says what Gestalt says", OverviewPanel.subtitleOfSect(g.diurnal),
                 sect.subtitle);
             yes("and names the light of the sect: " + g.sectLight,
                 String.join(" ", sect.detail).contains(g.sectLight));
@@ -216,12 +216,12 @@ public final class OverviewPageCheck {
                 collections++;
             }
         }
-        countAgrees(cards, "translation", translations, "translations of light");
-        countAgrees(cards, "collection", collections, "collections of light");
+        countAgrees(cards, "translation", translations, TransferOfLight.Kind.TRANSLATION);
+        countAgrees(cards, "collection", collections, TransferOfLight.Kind.COLLECTION);
     }
 
     private static void countAgrees(List<OverviewPanel.Card> cards, String id, int engine,
-                                    String words) {
+                                    TransferOfLight.Kind kind) {
         OverviewPanel.Card c = card(cards, id);
         if (engine == 0) {
             yes("no " + id + " card when the engine found none", c == null);
@@ -229,7 +229,7 @@ public final class OverviewPageCheck {
         }
         yes("there is a " + id + " card, because the engine found " + engine, c != null);
         if (c != null) {
-            eq("the " + id + " card counts what the engine found", engine + " " + words,
+            eq("the " + id + " card counts what the engine found", OverviewPanel.countOf(engine, kind),
                 c.subtitle);
         }
     }
