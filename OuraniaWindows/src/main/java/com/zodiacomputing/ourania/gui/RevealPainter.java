@@ -178,12 +178,12 @@ final class RevealPainter {
         }
         List<String> ticks = s.plan.ticks();
         boolean labelled = s.plan.labelled();
-        // Dialog, not Arial: Arial has no check mark and drew a box for each tick. The logical
-        // font falls back through the system's symbol fonts.
-        Font f = new Font(Font.DIALOG, Font.BOLD, 12);
+        // Through Theme.font, like every font in the app: a physical face made directly has no
+        // fallback, and the first version drew each check mark as an empty box.
+        Font f = Theme.font("Arial", Font.BOLD, 12);
         g.setFont(f);
         FontMetrics fm = g.getFontMetrics();
-        String mark = f.canDisplay('✔') ? "✔" : "√";
+        String mark = "✔";
         List<String> parts = new ArrayList<>();
         for (String tick : ticks) {
             parts.add(labelled && tick != null ? tick + " " + mark : mark);
@@ -259,17 +259,17 @@ final class RevealPainter {
         int x = (int) card.getX() + 10;
         int y = (int) card.getY() + 10;
         if (title > 0.0) {
-            g.setFont(new Font("Arial", Font.BOLD, 10));
+            g.setFont(Theme.font("Arial", Font.BOLD, 10));
             g.setColor(alpha(LABEL, title * fade));
             y += g.getFontMetrics().getAscent();
             g.drawString(s.plan.title().toUpperCase(java.util.Locale.ROOT), x, y);
-            g.setFont(new Font("Arial", Font.BOLD, 15));
+            g.setFont(Theme.font("Arial", Font.BOLD, 15));
             g.setColor(alpha(Color.WHITE, title * fade));
             y += g.getFontMetrics().getHeight();
             g.drawString(s.plan.title(), x, y);
         }
         if (body > 0.0 && !s.plan.body().isEmpty()) {
-            g.setFont(new Font("Arial", Font.PLAIN, 13));
+            g.setFont(Theme.font("Arial", Font.PLAIN, 13));
             g.setColor(alpha(Color.WHITE, body * fade));
             FontMetrics fm = g.getFontMetrics();
             for (String line : wrap(s.plan.body(), fm, (int) w - 20)) {
