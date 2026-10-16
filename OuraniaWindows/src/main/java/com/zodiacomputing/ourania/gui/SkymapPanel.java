@@ -3647,7 +3647,7 @@ implements WheelSource, GlobeSource {
      * same place, same house system, same ephemeris - so this is a second view of chart B,
      * not a second opinion about it.
      */
-    private ChartFrame synastryChartB() {
+    ChartFrame synastryChartB() {
         if (this.sw == null || this.outerRing.sd == null) {
             return null;
         }
@@ -3709,8 +3709,7 @@ implements WheelSource, GlobeSource {
                 || this.sw == null || this.natalRing.sd == null || this.outerRing.sd == null) {
             return null;
         }
-        ChartFrame host = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
-            this.innerLat(), this.innerLon(), this.houseSystem);
+        ChartFrame host = this.synastryChartA();
         ChartFrame visitor = this.synastryChartB();
         if (host == null || visitor == null) {
             return null;
@@ -3724,12 +3723,30 @@ implements WheelSource, GlobeSource {
         return null;
     }
 
-    private String generateSynastryCrossHtml() {
+    /**
+     * Chart A's frame as a synastry reads it, or null when there is no pair to read.
+     *
+     * <b>The one construction of chart A for every cross-chart question</b> - the hover's
+     * angle contact, the cross-contact section and the Together page. Until 2026-10-16 the
+     * hover cast it from {@link #innerLat} and the section from the natal ring's own place,
+     * which agree only while the inner wheel is a birth chart. The inner wheel's place is the
+     * right one: it is the chart being drawn.
+     */
+    ChartFrame synastryChartA() {
         if (this.sw == null || this.natalRing.sd == null || this.outerRing.sd == null) {
-            return "";
+            return null;
         }
-        ChartFrame chartFrame = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
-            this.natalRing.latitude, this.natalRing.longitude, this.houseSystem);
+        return this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
+            this.innerLat(), this.innerLon(), this.houseSystem);
+    }
+
+    /** The reader's aspect switches, by {@link Aspects.Type} ordinal; a copy, for the Together page. */
+    boolean[] aspectSelection() {
+        return this.aspectShown == null ? null : this.aspectShown.clone();
+    }
+
+    private String generateSynastryCrossHtml() {
+        ChartFrame chartFrame = this.synastryChartA();
         ChartFrame chartFrame2 = this.synastryChartB();
         if (chartFrame == null || chartFrame2 == null) {
             return "";
@@ -5882,12 +5899,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * the fourth caller rather than copied into it.
      */
     static String boldLead(String prose) {
-        if (prose == null) {
-            return null;
-        }
-        int open = prose.indexOf("<b>");
-        int close = prose.indexOf("</b>", open + 3);
-        return open >= 0 && close > open ? prose.substring(open + 3, close) : null;
+        // Lives on ReadingCard since 2026-10-16, beside the code that splits a reading into a
+        // card; kept here as one line so the panel's own callers did not all have to move.
+        return ReadingCard.boldLead(prose);
     }
 
     /** The bold lead of the interpretation - the one-sentence finding - or null. */

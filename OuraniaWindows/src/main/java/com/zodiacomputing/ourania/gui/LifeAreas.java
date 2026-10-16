@@ -32,4 +32,18 @@ final class LifeAreas {
     static String of(int house) {
         return house >= 1 && house <= 12 ? AREAS[house - 1] : null;
     }
+
+    /**
+     * The same part of life in another person's chart: "how they come across", not "how you".
+     *
+     * <b>Derived from {@link #of}, not a second table,</b> so the two can never name a house
+     * differently. The Together page needs both voices - their planets in your life, and yours
+     * in theirs - and only the pronouns change between them.
+     */
+    static String ofTheirs(int house) {
+        String s = of(house);
+        // Whole words only: "young" or "yourself" in a later phrase must not become "theyng".
+        return s == null ? null
+            : s.replaceAll("\\byour\\b", "their").replaceAll("\\byou\\b", "they");
+    }
 }

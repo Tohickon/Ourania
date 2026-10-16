@@ -85,3 +85,6 @@ java -cp "src\main\java;lib\*" com.zodiacomputing.ourania.gui.OuraniaWindow
   but the PDF export can only say the library is missing.
 - Writing source files with PowerShell's `Set-Content -Encoding utf8` emits a BOM and
   `javac` rejects it. Use `[System.IO.File]::WriteAllText` with `UTF8Encoding $false`.
+- **javac argfiles (`@file`) treat `\` as an escape character.** A Windows path written into one
+  collapses (`C:\Users\daver\Projects` becomes `C:UsersdaverProjects`) and the error names a file
+  that was never asked for. Use forward slashes inside argfiles.

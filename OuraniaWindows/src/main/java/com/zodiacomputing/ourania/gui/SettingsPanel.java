@@ -283,6 +283,32 @@ public class SettingsPanel extends JPanel {
         body.add(textScaleRow());
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
+        body.add(heading("Readings & Plain Views"));
+        body.add(note("How reading cards present the chart. Plain view leads with ordinary-week "
+            + "meaning and keeps technical terms out of headlines. Astrologer view opens the 'Why' "
+            + "drawer under every card by default."));
+        JCheckBox astrologerView = new JCheckBox("Astrologer view (show the astrology drawer by default)",
+            Settings.astrologerView());
+        astrologerView.setForeground(TEXT);
+        astrologerView.setBackground(Color.BLACK);
+        astrologerView.setFont(Theme.BODY);
+        astrologerView.setFocusPainted(false);
+        astrologerView.setAlignmentX(Component.LEFT_ALIGNMENT);
+        astrologerView.setToolTipText("<html><b>On:</b> every reading card shows its 'Why &mdash; the astrology' "
+            + "drawer with degrees, signs, houses, essential dignities and aspects open by default.<br>"
+            + "<b>Off:</b> plain reading only; technical details stay collapsed.</html>");
+        astrologerView.addItemListener(e -> {
+            if (!constructing && !seeding) {
+                Settings.setAstrologerView(astrologerView.isSelected());
+                status.setText("Saved");
+                if (window != null) {
+                    window.refreshPlainPages();
+                }
+            }
+        });
+        body.add(astrologerView);
+        body.add(Box.createRigidArea(new Dimension(0, 18)));
+
         body.add(heading("Colour Template"));
         body.add(note("A template sets the whole chart at once - every aspect, the four "
             + "elements, the mansion ring and the wheel's own background. Choosing one clears "
