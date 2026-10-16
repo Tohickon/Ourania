@@ -302,7 +302,7 @@ public class SettingsPanel extends JPanel {
                 Settings.setAstrologerView(astrologerView.isSelected());
                 status.setText("Saved");
                 if (window != null) {
-                    window.refreshTransitsPane();
+                    window.refreshPlainPages();
                 }
             }
         });

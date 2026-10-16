@@ -123,44 +123,40 @@ public final class NowCards {
     public static ReadingCard toCard(TransitHit hit) {
         InterpretationService svc = InterpretationService.getInstance();
         String prose = svc.getTransitAspect(hit.transiting, hit.natal, hit.aspect.label);
-        String lead = SkymapPanel.boldLead(prose);
+
+        String category = hit.isFast ? "THIS WEEK · CATALYST" : "THIS SEASON · THE LONG ARC";
+        String label = "[ " + hit.timingBadge() + " ] · " + category;
+
+        List<String> why = new ArrayList<>();
+        why.add("Transiting " + hit.transiting + " in " + PlacementText.capitalise(Zodiac.signName(hit.transitLon))
+            + (hit.transitHouse > 0 ? ", " + Zodiac.ordinal(hit.transitHouse) + " house" : ""));
+        why.add(hit.aspect.label + " Natal " + hit.natal + " in " + PlacementText.capitalise(Zodiac.signName(hit.natalLon))
+            + (hit.natalHouse > 0 ? ", " + Zodiac.ordinal(hit.natalHouse) + " house" : ""));
+        why.add(String.format("Orb: %.2f° (%s)", hit.orb, hit.timingBadge().toLowerCase()));
+
+        ReadingCard card = ReadingCard.fromLead(label, prose, why);
+        if (card != null) {
+            return card;
+        }
 
         String headline;
         String bodyText;
 
-        if (lead != null && !lead.isEmpty()) {
-            headline = lead;
-            String rest = prose.replace("<b>" + lead + "</b>", "")
-                               .replaceAll("(?i)<br\\s*/?>", " ")
-                               .replaceAll("(?i)<[^>]+>", "")
-                               .replaceAll("\\s+", " ")
-                               .trim();
-            bodyText = rest.isEmpty() ? lead : rest;
-        } else if (prose != null && !prose.trim().isEmpty() && !prose.startsWith("<i>(No transit reading")) {
+        if (prose != null && !prose.trim().isEmpty() && !prose.startsWith("<i>(No transit reading")) {
             headline = hit.transiting + " " + hit.aspect.label.toLowerCase() + " natal " + hit.natal;
             bodyText = prose.replaceAll("(?i)<[^>]+>", " ").replaceAll("\\s+", " ").trim();
         } else {
             headline = hit.transiting + " " + hit.aspect.label.toLowerCase() + " natal " + hit.natal;
             if (hit.isFast) {
                 bodyText = "A fast-moving daily catalyst activating your natal " + hit.natal
-                    + (hit.natalHouse > 0 ? " in the " + ordinal(hit.natalHouse) + " house" : "")
+                    + (hit.natalHouse > 0 ? " in the " + Zodiac.ordinal(hit.natalHouse) + " house" : "")
                     + ". Events, interactions, and immediate choices around this theme move quickly.";
             } else {
                 bodyText = "An enduring developmental arc steadily reshaping, testing, and deepening your natal "
-                    + hit.natal + (hit.natalHouse > 0 ? " in the " + ordinal(hit.natalHouse) + " house" : "")
+                    + hit.natal + (hit.natalHouse > 0 ? " in the " + Zodiac.ordinal(hit.natalHouse) + " house" : "")
                     + ". This theme is doing foundational work throughout this season.";
             }
         }
-
-        String category = hit.isFast ? "THIS WEEK \u00b7 CATALYST" : "THIS SEASON \u00b7 THE LONG ARC";
-        String label = "[ " + hit.timingBadge() + " ] \u00b7 " + category;
-
-        List<String> why = new ArrayList<>();
-        why.add("Transiting " + hit.transiting + " in " + capitalise(Zodiac.signName(hit.transitLon))
-            + (hit.transitHouse > 0 ? ", " + ordinal(hit.transitHouse) + " house" : ""));
-        why.add(hit.aspect.label + " Natal " + hit.natal + " in " + capitalise(Zodiac.signName(hit.natalLon))
-            + (hit.natalHouse > 0 ? ", " + ordinal(hit.natalHouse) + " house" : ""));
-        why.add(String.format("Orb: %.2f\u00b0 (%s)", hit.orb, hit.timingBadge().toLowerCase()));
 
         return new ReadingCard(label, headline, bodyText, why);
     }
@@ -172,11 +168,8 @@ public final class NowCards {
                               boolean showWhy, String rawPlacementsHtml) {
         List<TransitHit> hits = findHits(transitRing, natalRing, cusps);
 
-        StringBuilder sb = new StringBuilder("<html><body style='font-family:Arial; font-size:12px; color:white;'>");
-        sb.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>Now \u00b7 Active Cycles</h2>");
-        sb.append("<div style='color:#9AA5B1; font-size:11px; margin-bottom: 14px;'>")
-          .append("The sky passing over your chart &mdash; immediate catalysts this week and major cycles this season.")
-          .append("</div>");
+        StringBuilder sb = ReadingCard.page("Now \u00b7 Active Cycles",
+            "The sky passing over your chart &mdash; immediate catalysts this week and major cycles this season.");
 
         List<ReadingCard> thisWeekCards = new ArrayList<>();
         List<ReadingCard> thisSeasonCards = new ArrayList<>();
@@ -233,16 +226,5 @@ public final class NowCards {
                    .replaceFirst("(?i)<body[^>]*>", "")
                    .replaceFirst("(?i)</body>\\s*</html>\\s*$", "")
                    .trim();
-    }
-
-    private static String capitalise(String s) {
-        return s == null || s.isEmpty() ? "" : Character.toUpperCase(s.charAt(0)) + s.substring(1);
-    }
-
-    private static String ordinal(int n) {
-        int t = n % 100;
-        String suffix = t >= 11 && t <= 13 ? "th"
-            : n % 10 == 1 ? "st" : n % 10 == 2 ? "nd" : n % 10 == 3 ? "rd" : "th";
-        return n + suffix;
     }
 }

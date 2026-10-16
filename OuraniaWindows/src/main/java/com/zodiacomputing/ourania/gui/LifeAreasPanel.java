@@ -85,14 +85,14 @@ final class LifeAreasPanel extends JPanel {
                 }
                 PlainSnapshot.Line line = PlainSnapshot.plain(svc.getPlanetInHouse(def.name, house));
                 lines.add(line == null ? def.name + " is here."
-                    : line.whole ? capitalise(line.text) + "."
+                    : line.whole ? PlacementText.capitalise(line.text) + "."
                     : def.name + ": " + line.text + ".");
-                why.add(def.name + " in " + capitalise(Zodiac.signName(b.lon)) + ", "
-                    + ordinal(house) + " house");
+                why.add(def.name + " in " + PlacementText.capitalise(Zodiac.signName(b.lon)) + ", "
+                    + Zodiac.ordinal(house) + " house");
             }
             if (!lines.isEmpty()) {
                 out.add(new ReadingCard(lines.size() > 2 ? "A BUSY PART OF YOUR LIFE" : null,
-                    capitalise(LifeAreas.of(house)), String.join(" ", lines), why));
+                    PlacementText.capitalise(LifeAreas.of(house)), String.join(" ", lines), why));
             }
         }
         return out;
@@ -120,20 +120,10 @@ final class LifeAreasPanel extends JPanel {
 
     /** Whether the wheel has this body switched on. */
     private boolean shown(int index) {
-        boolean[] valid = skymap == null || skymap.natalRing == null ? null : skymap.natalRing.valid;
-        return valid == null || index >= valid.length || valid[index];
+        return skymap == null || skymap.natalRing == null || skymap.natalRing.shows(index);
     }
 
-    private static String capitalise(String s) {
-        return s == null || s.isEmpty() ? "" : Character.toUpperCase(s.charAt(0)) + s.substring(1);
-    }
 
-    private static String ordinal(int n) {
-        int t = n % 100;
-        String suffix = t >= 11 && t <= 13 ? "th"
-            : n % 10 == 1 ? "st" : n % 10 == 2 ? "nd" : n % 10 == 3 ? "rd" : "th";
-        return n + suffix;
-    }
 
     private static String esc(String s) {
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
