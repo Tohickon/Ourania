@@ -1,5 +1,7 @@
 package com.zodiacomputing.ourania.gui;
 
+import com.zodiacomputing.ourania.astro.PlacementVectorCalculator;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +27,35 @@ public record ReadingCard(String label, String headline, String body, List<Strin
 
     public ReadingCard {
         why = why == null ? List.of() : List.copyOf(why);
+    }
+
+    /**
+     * A card for one theme of the year, from {@link PlacementVectorCalculator#readings}.
+     *
+     * <b>The label is the theme's plain name and nothing else.</b> The first draft put the
+     * band there ("[MAJOR] Career"), which is the number in plain view by another name. The
+     * band, the chart weight and the testimonies go in the why lines, which only Astrologer
+     * view shows; whether this is a headline at all is the Rule of Three's, not the weight's.
+     *
+     * @param headline the sentence the caller chose; null falls back to the theme's name
+     * @param takeaway appended as "How to handle it: ..."; null for none
+     */
+    public static ReadingCard fromTheme(PlacementVectorCalculator.ThemeReading r,
+            String headline, String body, String takeaway) {
+        StringBuilder b = new StringBuilder(body == null ? "" : body.trim());
+        if (takeaway != null && !takeaway.isBlank()) {
+            if (b.length() > 0) b.append("\n\n");
+            b.append("How to handle it: ").append(takeaway.trim());
+        }
+        List<String> why = new ArrayList<>();
+        why.add(r.convergence().families.size() + " independent techniques agree"
+            + (r.headline() ? " (Rule of Three met)" : " (background, below the Rule of Three)"));
+        why.add(String.format(java.util.Locale.ROOT, "Chart weight: %s, %.2f of the strongest theme",
+            r.band().label, r.share()));
+        why.addAll(r.convergence().testimonies);
+        return new ReadingCard(r.theme().label,
+            headline == null || headline.isBlank() ? r.theme().label : headline,
+            b.toString(), why);
     }
 
     /** The cards as page body HTML; the caller supplies the document around it. */
