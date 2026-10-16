@@ -51,6 +51,8 @@ public class OuraniaWindow extends JFrame {
     private javax.swing.JEditorPane chartBPane;
     private javax.swing.JEditorPane synastryPane;
     private javax.swing.JEditorPane selectionPane;
+    private javax.swing.JCheckBox transitAstrologerCheck;
+    private String lastTransitHtml = "";
     /** The right rail: what the app can do, and the grid that is read against the wheel. */
     private DrawerRail menuRail;
     /** The Index tab's content (G11). Package-private so the check can ask what it is showing. */
@@ -320,7 +322,24 @@ public class OuraniaWindow extends JFrame {
         chronometry = new SubRail();
         blueprint.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
         blueprint.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
-        chronometry.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
+        JPanel transitPage = new JPanel(new BorderLayout());
+        transitPage.setBackground(Color.BLACK);
+        transitAstrologerCheck = new javax.swing.JCheckBox("Show the astrology", Settings.astrologerView());
+        transitAstrologerCheck.setForeground(Theme.TEXT);
+        transitAstrologerCheck.setBackground(Color.BLACK);
+        transitAstrologerCheck.setFont(Theme.BODY);
+        transitAstrologerCheck.setFocusPainted(false);
+        transitAstrologerCheck.setToolTipText("<html>Astrologer view: on, show the exact aspects, orbs, and planetary coordinates.<br>Off: plain weekly and seasonal takeaways only.</html>");
+        transitAstrologerCheck.addItemListener(e -> {
+            Settings.setAstrologerView(transitAstrologerCheck.isSelected());
+            refreshTransitsPane();
+        });
+        JPanel transitStrip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
+        transitStrip.setBackground(Color.BLACK);
+        transitStrip.add(transitAstrologerCheck);
+        transitPage.add(transitStrip, BorderLayout.NORTH);
+        transitPage.add(HtmlPanes.scroller(transitPane), BorderLayout.CENTER);
+        chronometry.addPage(TRANSITS_PAGE, transitPage);
         // <b>Synastry is a rail tab with one page, and that is not an oversight.</b> It is a
         // question about a pair, which is neither of the two people and not a moment either -
         // so it is its own door. A SubRail holding one tab would draw a strip with a single
@@ -457,6 +476,10 @@ public class OuraniaWindow extends JFrame {
                 }
                 return;
             }
+            if (TRANSITS_PAGE.equals(page)) {
+                refreshTransitsPane();
+                return;
+            }
             for (String[] r : READINGS) {
                 if (r[0].equals(page)) {
                     // Regenerated on each open. A reading is a snapshot of a moment, and the
@@ -540,6 +563,11 @@ public class OuraniaWindow extends JFrame {
 
         // After skymapPanel, because applying a selection calls straight into it.
         contentPanel.add(new SettingsPanel(this), "SETTINGS");
+
+        // Sync the wheel's ring bar so chips reflect whether charts exist on cold open
+        if (skymapPanel != null) {
+            syncRingBar(skymapPanel.ringBarComponent());
+        }
     }
 
     /**
@@ -1076,6 +1104,7 @@ public class OuraniaWindow extends JFrame {
 
     public void updateChartSections(String natalHtml, String transitHtml, String gridHtml,
             String synastryHtml, String chartBHtml) {
+        this.lastTransitHtml = transitHtml;
         if (chartBPane != null) {
             HtmlPanes.setHtml(chartBPane, chartBHtml);
         }
@@ -1095,9 +1124,7 @@ public class OuraniaWindow extends JFrame {
         if (natalPane != null) {
             HtmlPanes.setHtml(natalPane, natalHtml);
         }
-        if (transitPane != null) {
-            HtmlPanes.setHtml(transitPane, transitHtml);
-        }
+        refreshTransitsPane();
         // <b>Greyed out on a chart drawn without transits.</b> The wheel still emits a transit
         // section for a single chart - the document wrapper with nothing in it - so the tab
         // opened onto a blank panel, which reads as broken rather than as empty. Measured on
@@ -1117,6 +1144,30 @@ public class OuraniaWindow extends JFrame {
         if (chartSetupPanel != null) {
             chartSetupPanel.refreshProfiles();
         }
+    }
+
+    /**
+     * Redraws the Now page as plain cards from the last transit section the wheel sent, in the
+     * current Astrologer view. <b>The one place that decides which ring is "now":</b> an event
+     * chart in the outer ring is the moment being read; otherwise the live sky, if it has one.
+     * An empty section is written as it came, so the greyed-tab state is unchanged.
+     */
+    public void refreshTransitsPane() {
+        if (transitAstrologerCheck != null && transitAstrologerCheck.isSelected() != Settings.astrologerView()) {
+            transitAstrologerCheck.setSelected(Settings.astrologerView());
+        }
+        if (transitPane == null) {
+            return;
+        }
+        if (skymapPanel == null || !hasContent(lastTransitHtml)) {
+            HtmlPanes.setHtml(transitPane, lastTransitHtml);
+            return;
+        }
+        WheelRing now = skymapPanel.outerRing.kind.readsAsEvent()
+            ? skymapPanel.outerRing
+            : (skymapPanel.skyRing.time != null ? skymapPanel.skyRing : skymapPanel.outerRing);
+        HtmlPanes.setHtml(transitPane, NowCards.html(now, skymapPanel.natalRing,
+            skymapPanel.activeCusps, Settings.astrologerView(), lastTransitHtml));
     }
 
     /**
@@ -1428,6 +1479,7 @@ public class OuraniaWindow extends JFrame {
                 + "only.</html>");
             why.addItemListener(e -> {
                 Settings.setAstrologerView(why.isSelected());
+                refreshTransitsPane();
                 runReading("SNAPSHOT");
             });
             JPanel strip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
@@ -2044,6 +2096,9 @@ public class OuraniaWindow extends JFrame {
     public void drawSavedChart() {
         if (chartSetupPanel != null) {
             chartSetupPanel.drawSavedChartA();
+        }
+        if (skymapPanel != null) {
+            syncRingBar(skymapPanel.ringBarComponent());
         }
     }
 

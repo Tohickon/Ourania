@@ -6,5 +6,5 @@ rem classes in it and the app would not start. %~dp0 is the folder this .bat sit
 cd /d "%~dp0OuraniaWindows"
 rem lib\* carries OpenPDF, which the PDF report needs. Without it on the classpath the app still
 rem starts and every other export works, but Save Reading as PDF can only explain why it cannot.
-"C:\Program Files\Android\Android Studio\jbr\bin\java.exe" -cp "src\main\java;lib\*" com.zodiacomputing.ourania.gui.OuraniaWindow
+"C:\Program Files\Android\Android Studio\jbr\bin\java.exe" -cp "out;src\main\java;lib\*" com.zodiacomputing.ourania.gui.OuraniaWindow
 cmd /k
