@@ -150,11 +150,8 @@ public class NarrativeSynthesizer {
         // three testimonies. Conditions are the ones section 4.9 used to carry: convergence is
         // assembled from the profection year scan and the solar return, so a relationship
         // chart - which has no birthday - gets none of it.
-        List<ThemeConvergence.Result> yearThemes = null;
-        if (!relationship && withTime && scan != null && convergence != null) {
-            yearThemes = ThemeConvergence.themes(f, prof, convergence, scan.moonClock,
-                scan.catalysts);
-        }
+        List<ThemeConvergence.Result> yearThemes =
+            yearThemes(f, prof, scan, convergence, withTime, relationship);
         // K12 stage 2. The mid-term clock reads the same whether or not any theme reaches
         // three, so it is stated whatever the themes do - and stated once, in the summary,
         // because it is a headline-level fact and not a piece of machinery.
@@ -859,8 +856,22 @@ public class NarrativeSynthesizer {
                 + " point, so it does not count as a testimony)</span>");
     }
 
+    /**
+     * The year's themes as the synthesis reads them, or null when there are none to read.
+     *
+     * <b>One method for the page and for the reveal that introduces it,</b> so the card that
+     * forms on the wheel and the tier 2 it lands on can never be about different themes.
+     */
+    static List<ThemeConvergence.Result> yearThemes(ChartFrame f, Profection prof, YearScan scan,
+            List<Convergence.Target> convergence, boolean withTime, boolean relationship) {
+        if (relationship || !withTime || scan == null || convergence == null) {
+            return null;
+        }
+        return ThemeConvergence.themes(f, prof, convergence, scan.moonClock, scan.catalysts);
+    }
+
     /** A technique family as a reader's name for it rather than as its enum constant. */
-    private static String familyLabel(String family) {
+    static String familyLabel(String family) {
         switch (family) {
             case "PROFECTION": return "Profection";
             case "TRANSIT": return "Transit";

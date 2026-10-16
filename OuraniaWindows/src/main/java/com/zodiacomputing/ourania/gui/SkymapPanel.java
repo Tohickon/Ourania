@@ -4051,13 +4051,13 @@ implements WheelSource, GlobeSource {
             return;
         }
         if ("SNAPSHOT".equals(name)) {
-            this.showReading(ReadingTier.PARAGRAPH);
+            this.askForReading(ReadingTier.PARAGRAPH);
         } else if ("REPORT".equals(name)) {
-            this.showReading(ReadingTier.REPORT);
+            this.askForReading(ReadingTier.REPORT);
         } else if ("SYNTHESIZE".equals(name)) {
-            this.showReading(ReadingTier.SYNTHESIZE);
+            this.askForReading(ReadingTier.SYNTHESIZE);
         } else if ("TIMELINE".equals(name)) {
-            this.showReading(ReadingTier.TIMELINE);
+            this.askForReading(ReadingTier.TIMELINE);
         }
     }
 
@@ -4148,8 +4148,33 @@ implements WheelSource, GlobeSource {
         }.execute();
     }
 
+    /**
+     * True for the one showReading that the reader asked for; read and cleared at its start.
+     *
+     * <b>The reveal plays only for a request, never for a rebuild.</b> refreshReadingIfShown
+     * calls showReading on every chart change, which the transport makes several times a
+     * second; a reading forming on the wheel each time would turn a demonstration into noise.
+     * So the buttons and the sidebar come through {@link #askForReading}, and nothing else does.
+     */
+    private boolean readingAsked;
+
+    /** The reveal that shows a reading forming from its chart factors; made on first use. */
+    private ReadingReveal reveal;
+
+    /** A reading the reader asked for, which may be revealed rather than simply shown. */
+    void askForReading(ReadingTier tier) {
+        this.readingAsked = true;
+        this.showReading(tier);
+    }
+
     /** Package-private since B8, so a batch can ask for the same reading a reader would. */
     void showReading(final ReadingTier readingTier) {
+        final boolean asked = this.readingAsked;
+        this.readingAsked = false;
+        // Whatever is still forming lands now, so it cannot land later over this reading.
+        if (this.reveal != null) {
+            this.reveal.interrupt();
+        }
         if (this.sw == null || this.natalRing.sd == null || this.window == null || readingTier == ReadingTier.NONE) {
             return;
         }
@@ -4183,6 +4208,9 @@ implements WheelSource, GlobeSource {
         final double dNow = this.skyRing.sd != null
             ? this.skyRing.sd.getJulDay() : Double.NaN;
         new SwingWorker<String, Void>(){
+
+            /** The headline theme to reveal, when the reader asked and the year has one. */
+            private RevealPlan revealPlan;
 
             @Override
             protected String doInBackground() {
@@ -4258,6 +4286,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // remembered by the checkbox that sets it: this tab regenerates on every
                     // open, so a state held in the widget would be lost the first time the
                     // reader looked at another page.
+                    if (asked) {
+                        this.revealPlan = RevealPlan.firstHeadline(
+                            NarrativeSynthesizer.yearThemes(chartFrame, profection, yearScan, list3,
+                                bl, SkymapPanel.this.isRelationshipChart()),
+                            Settings.astrologerView());
+                    }
                     return NarrativeSynthesizer.generateReport(chartFrame, result, list, result2, chartFrame2, profection, list2, yearScan, list3, bl,
                         SkymapPanel.this.isRelationshipChart(), Settings.readingMechanics());
                 }
@@ -4280,7 +4314,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (readingTier == ReadingTier.REPORT) {
                         SkymapPanel.this.window.showReport(string2, string, (String)this.get());
                     } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
-                        SkymapPanel.this.window.showSynthesis((String)this.get());
+                        String html = (String)this.get();
+                        RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, this.revealPlan)
+                            ? SkymapPanel.this.revealScene(this.revealPlan) : null;
+                        if (scene != null) {
+                            SkymapPanel.this.reveal().play(scene,
+                                () -> SkymapPanel.this.window.showSynthesis(html));
+                        } else {
+                            SkymapPanel.this.window.showSynthesis(html);
+                        }
                     } else {
                         SkymapPanel.this.window.showSnapshotCards(string2, string, (String)this.get());
                     }
@@ -4292,7 +4334,65 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }.execute();
     }
 
+    /**
+     * Where a reveal is drawn: the wheel's centre and radius, the chart factors' glyphs, and the
+     * reading pane, all in the window's layered pane. Null when the wheel cannot show it - the
+     * globe is up, the wheel is not on screen, or none of the factors is drawn - in which case
+     * the reading is simply shown.
+     *
+     * <b>Positions are the painter's own</b>: {@link Geometry#natalRadii} and the canonical
+     * screenX/screenY, the same chain the hit test uses, so a thread ends on the glyph it names.
+     */
+    RevealPainter.Scene revealScene(RevealPlan plan) {
+        if (plan == null || this.chartPanel == null || !this.chartPanel.isShowing()
+                || this.isGlobeMode() || this.window == null) {
+            return null;
+        }
+        javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(this.chartPanel);
+        Geometry g = this.geometry();
+        if (root == null || g == null) {
+            return null;
+        }
+        javax.swing.JLayeredPane lp = root.getLayeredPane();
+        int[] radii = g.natalRadii();
+        List<java.awt.Point> points = new ArrayList<>();
+        for (String name : plan.points()) {
+            int i = Bodies.indexOfName(name);
+            if (i < 0) {
+                i = Bodies.indexOf(name.toLowerCase(java.util.Locale.ROOT));
+            }
+            if (i < 0 || i >= this.natalRing.lon.length || !this.natalRing.valid[i]) {
+                continue;
+            }
+            java.awt.Point p = new java.awt.Point(
+                SkymapPanel.screenX(g.cx, g.pin, this.natalRing.lon[i], radii[i]),
+                SkymapPanel.screenY(g.cy, g.pin, this.natalRing.lon[i], radii[i]));
+            points.add(javax.swing.SwingUtilities.convertPoint(this.chartPanel, p, lp));
+        }
+        if (points.isEmpty()) {
+            return null;
+        }
+        java.awt.Point centre = javax.swing.SwingUtilities.convertPoint(this.chartPanel,
+            new java.awt.Point(g.cx, g.cy), lp);
+        int radius = Math.min(this.chartPanel.getWidth(), this.chartPanel.getHeight()) / 2;
+        // A headline theme forms at the chart's centre; a placement will form at its planet.
+        return new RevealPainter.Scene(centre, radius, points, centre,
+            this.window.readingLanding(lp), plan, Color.BLACK);
+    }
+
+    private ReadingReveal reveal() {
+        if (this.reveal == null) {
+            this.reveal = new ReadingReveal(
+                javax.swing.SwingUtilities.getRootPane(this.chartPanel).getLayeredPane());
+        }
+        return this.reveal;
+    }
+
     private void refreshReadingIfShown() {
+        // The chart moved, so a reveal's threads would point at where the glyphs were.
+        if (this.reveal != null) {
+            this.reveal.interrupt();
+        }
         if (this.readingTier == ReadingTier.NONE || this.isPlaying) {
             return;
         }
@@ -4425,16 +4525,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         jButton6.addActionListener(actionEvent -> jumpToNow());
         JButton jButton7 = new JButton("Snapshot");
         jButton7.setToolTipText("Read the natal chart as it currently stands");
-        jButton7.addActionListener(actionEvent -> this.showReading(ReadingTier.PARAGRAPH));
+        jButton7.addActionListener(actionEvent -> this.askForReading(ReadingTier.PARAGRAPH));
         JButton jButton8 = new JButton("Report");
         jButton8.setToolTipText("The full reading: shape, weights, repeated themes, tensions");
-        jButton8.addActionListener(actionEvent -> this.showReading(ReadingTier.REPORT));
+        jButton8.addActionListener(actionEvent -> this.askForReading(ReadingTier.REPORT));
         JButton jButton9 = new JButton("Synthesize");
         jButton9.setToolTipText("Generate a narrative reading based on the chart");
-        jButton9.addActionListener(actionEvent -> this.showReading(ReadingTier.SYNTHESIZE));
+        jButton9.addActionListener(actionEvent -> this.askForReading(ReadingTier.SYNTHESIZE));
         JButton jButton9_2 = new JButton("Predict");
         jButton9_2.setToolTipText("Generate a timeline prediction based on the chart");
-        jButton9_2.addActionListener(actionEvent -> this.showReading(ReadingTier.TIMELINE));
+        jButton9_2.addActionListener(actionEvent -> this.askForReading(ReadingTier.TIMELINE));
         JButton jButton10 = new JButton("Calendar");
         jButton10.setToolTipText("Ingresses, stations, lunations and mundane aspects for the year");
         jButton10.addActionListener(actionEvent -> this.showAnnualCalendar());
