@@ -467,8 +467,10 @@ public final class RevealCheck {
         BufferedImage landed = placedAt(RevealPainter.AT_TEXT, p);
         eq("and lands on the reading", RevealPainter.CARD_FILL.getRGB(),
             landed.getRGB(TARGET.x + TARGET.width - 20, TARGET.y + TARGET.height - 12));
-        int words = lit(placedAt(RevealPainter.TOTAL_MS, p), TARGET);
+        int words = lit(placedAt(RevealPainter.FORM_MS, p), TARGET);
         yes("with the reading's words on it, saw " + words, words > 60);
+        int held = lit(placedAt(RevealPainter.AT_OUT - 1, p), TARGET);
+        yes("and it holds like a theme's card, saw " + held, held > 60);
 
         // No counter: the band Part C reads the ticks in stays empty for a whole placement.
         Rectangle band = new Rectangle(0, CENTRE.y - 90,
