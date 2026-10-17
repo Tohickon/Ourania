@@ -22,7 +22,8 @@ import javax.swing.SwingUtilities;
 
 /**
  * The chart reveals the reading, stage 1 (2026-10-16): a headline theme's card forms on the
- * wheel from the chart factors that produced it.
+ * wheel from the chart factors that produced it. Stage 2 (Parts F and G): a placement's card
+ * forms at its own planet, from that placement's own reading, with nothing counted.
  *
  * <p><b>Part A is the one that matters most.</b> A reveal meant to earn a reader's trust in the
  * Rule of Three must show what the engine counted and nothing else. So the plan is checked
@@ -52,6 +53,9 @@ public final class RevealCheck {
         part("Part C: plain view names no technique", RevealCheck::theLabels);
         part("Part D: interrupted, unasked, and with motion off", RevealCheck::thePlayback);
         part("Part E: only a request plays it", RevealCheck::theTrigger);
+        part("Part F: a placement forms at its planet, from its own reading", RevealCheck::thePlacement);
+        part("Part G: the real wheel's placement factors and focal point", RevealCheck::theRealWheel);
+        part("Part H: the card lands on a real card that stays", RevealCheck::theRealCard);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -222,8 +226,8 @@ public final class RevealCheck {
             at(RevealPainter.AT_OUT - 1, p).getRGB(inTarget.x, inTarget.y));
         BufferedImage gone = at(RevealPainter.TOTAL_MS, p);
         eq("then fades away entirely", GREY.getRGB(), gone.getRGB(inTarget.x, inTarget.y));
-        yes("and the reading lands when the card has formed, not after the hold",
-            Math.abs(RevealPainter.LANDS_AT * RevealPainter.TOTAL_MS - RevealPainter.FORM_MS) < 1e-6);
+        yes("and the reading lands as the card starts to fly, so it has a real card to land on",
+            Math.abs(RevealPainter.LANDS_AT * RevealPainter.TOTAL_MS - RevealPainter.AT_TRAVEL) < 1e-6);
     }
 
     // ------------------------------------------------------------------ C
@@ -363,9 +367,430 @@ public final class RevealCheck {
             .contains("this.askForReading(ReadingTier.SYNTHESIZE)"));
         String show = body(s, "void showReading(final ReadingTier readingTier)");
         yes("a request is read once and cleared", show.contains("this.readingAsked = false;"));
-        yes("the reveal is gated by shouldPlay", s.contains("ReadingReveal.shouldPlay(asked, this.revealPlan)"));
+        yes("the reveal is gated by shouldPlay", s.contains("ReadingReveal.shouldPlay(asked, plan)"));
         yes("and the batch reports do not ask",
             !Files.readString(src.resolveSibling("BatchReports.java")).contains("askForReading"));
+
+        // Stage 2: a single click on the wheel asks; nothing else does.
+        String clicked = body(s, "public void mouseClicked(MouseEvent mouseEvent)");
+        yes("a single click on the wheel asks for its placement",
+            clicked.contains("SkymapPanel.this.askForPlacement(at.x, at.y)"));
+        yes("the hover never asks", !body(s, "public void mouseMoved(MouseEvent").contains("askFor"));
+        yes("nor does the rebuild", !refresh.contains("askForPlacement"));
+        String ask = body(s, "void askForPlacement(int x, int y)");
+        yes("the click's request is cleared on every exit",
+            ask.contains("finally") && ask.contains("this.readingAsked = false;"));
+        String place = body(s, "private boolean revealPlacement(int body, String card)");
+        yes("a placement is gated by shouldPlay",
+            place.contains("ReadingReveal.shouldPlay(asked, plan)"));
+        yes("and forms at its planet, not at the centre",
+            place.contains("this.revealScene(plan, body)"));
+        yes("and lands the very card the click built",
+            place.contains("this.window.showSelection(card, true)"));
+        yes("only the placement exit reads the request",
+            !body(s, "private void handleChartClick(int n, int n2)").contains("readingAsked"));
+    }
+
+    // ------------------------------------------------------------------ F
+
+    /** A placement on the Part B wheel: it forms at P, away from the centre, from P and C1. */
+    private static final Point P = new Point(240, 260);
+
+    private static final String READING = "<html><body>"
+        + "<p style='font-size:14px;'>Venus is what you value. It draws people near.</p>"
+        + "<h2 style='color:#E0E0E0;'><b>Venus in Libra</b></h2>"
+        + "<p>Venus in Libra seeks balance. It weighs.</p>"
+        + "<h2><b>Active Aspects</b></h2><h3><i>Square</i> to Natal Mars</h3><p>Friction.</p>"
+        + "</body></html>";
+
+    private static RevealPlan placement() {
+        return RevealPlan.forPlacement("Venus", List.of(
+            new String[] {"Mars", "Square", "Applying"},
+            new String[] {"Moon", "Trine", ""},
+            new String[] {"Mars", "Square", "Applying"}), READING);
+    }
+
+    private static RevealPainter.Scene placed(RevealPlan p) {
+        return new RevealPainter.Scene(CENTRE, 150, List.of(P, C1), P, TARGET, p, Color.BLACK);
+    }
+
+    private static BufferedImage placedAt(double ms, RevealPlan p) {
+        BufferedImage img = new BufferedImage(W, H, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        g.setColor(GREY);
+        g.fillRect(0, 0, W, H);
+        RevealPainter.paint(g, placed(p), ms / RevealPainter.TOTAL_MS, 1.0);
+        g.dispose();
+        return img;
+    }
+
+    private static void thePlacement() throws Exception {
+        RevealPlan p = placement();
+        eq("the title is the reading's own heading", "Venus in Libra", p.title());
+        eq("the body is the first sentence under that heading", "Venus in Libra seeks balance.",
+            p.body());
+        eq("the factors are the planet and the reading's aspects, each once",
+            "[Venus, Mars, Moon]", p.points().toString());
+        yes("nothing is counted", p.ticks().isEmpty());
+        yes("and nothing is confirmed", !p.confirmed());
+        yes("no reading, no plan", RevealPlan.forPlacement("Venus", List.of(), "") == null);
+        yes("a reading with no heading has no plan",
+            RevealPlan.forPlacement("Venus", List.of(), "<p>Only words.</p>") == null);
+        eq("a placement with no aspects is the planet alone", "[Venus]",
+            RevealPlan.forPlacement("Venus", null, READING).points().toString());
+
+        Settings.setAnimateRings(true);
+        Settings.setAnimateReadings(true);
+        yes("a clicked placement plays", ReadingReveal.shouldPlay(true, p));
+        yes("a placement never plays unasked", !ReadingReveal.shouldPlay(false, p));
+        Settings.setAnimateReadings(false);
+        yes("nor with the reveal turned off", !ReadingReveal.shouldPlay(true, p));
+        Settings.setAnimateReadings(true);
+        Settings.setAnimateRings(false);
+        yes("nor with reduced motion", !ReadingReveal.shouldPlay(true, p));
+        Settings.setAnimateRings(true);
+
+        // Pixels at fixed moments.
+        BufferedImage lit = placedAt(RevealPainter.AT_THREADS, p);
+        near("the planet itself stays bright", 128, red(lit, P), 2);
+        near("the wheel dims round it", 77, red(lit, ELSEWHERE), 3);
+        BufferedImage threads = placedAt(RevealPainter.AT_ORB - 1, p);
+        Point onThread = new Point((C1.x + P.x) / 2, (C1.y + P.y) / 2);
+        yes("a thread runs from the aspecting body to the planet, saw " + hex(threads, onThread),
+            red(threads, onThread) > 200 && blue(threads, onThread) < 160);
+        BufferedImage orb = placedAt(RevealPainter.AT_CRYSTAL, p);
+        yes("the orb forms at the planet, saw " + hex(orb, P),
+            red(orb, P) > 200 && green(orb, P) > 160);
+        near("and not at the chart's centre", 77, red(orb, CENTRE), 3);
+        BufferedImage card = placedAt(RevealPainter.AT_TRAVEL, p);
+        eq("the card emerges round the planet", RevealPainter.CARD_FILL.getRGB(),
+            card.getRGB(P.x + RevealPainter.CARD_W / 2 - 12, P.y));
+        BufferedImage landed = placedAt(RevealPainter.AT_TEXT, p);
+        eq("and lands on the reading", RevealPainter.CARD_FILL.getRGB(),
+            landed.getRGB(TARGET.x + TARGET.width - 20, TARGET.y + TARGET.height - 12));
+        int words = lit(placedAt(RevealPainter.FORM_MS, p), TARGET);
+        yes("with the reading's words on it, saw " + words, words > 60);
+        int held = lit(placedAt(RevealPainter.AT_OUT - 1, p), TARGET);
+        yes("and it holds like a theme's card, saw " + held, held > 60);
+
+        // No counter: the band Part C reads the ticks in stays empty for a whole placement.
+        Rectangle band = new Rectangle(0, CENTRE.y - 90,
+            2 * CENTRE.x, 90 - RevealPainter.CARD_H / 2 - 2);
+        int themeTicks = lit(at(RevealPainter.AT_CRYSTAL - 1, plan(false)), band);
+        yes("a theme draws its counter there, saw " + themeTicks, themeTicks > 30);
+        int most = 0;
+        for (int ms = RevealPainter.AT_THREADS; ms < RevealPainter.AT_EMERGE; ms += 50) {
+            most = Math.max(most, lit(placedAt(ms, p), band));
+        }
+        eq("a placement draws no counter at any moment", 0, most);
+
+        // The click that asks must not land its own reveal; the next press must.
+        JLayeredPane layer = new JLayeredPane();
+        layer.setSize(W, H);
+        javax.swing.JComponent wheel = new javax.swing.JPanel();
+        wheel.setBounds(0, 0, W, H);
+        layer.add(wheel, JLayeredPane.DEFAULT_LAYER);
+        ReadingReveal reveal = new ReadingReveal(layer);
+        AtomicInteger landedCount = new AtomicInteger();
+        wheel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                reveal.play(placed(p), landedCount::incrementAndGet);
+            }
+        });
+        SwingUtilities.invokeAndWait(() -> {
+            press(wheel, java.awt.event.MouseEvent.MOUSE_PRESSED);
+            press(wheel, java.awt.event.MouseEvent.MOUSE_RELEASED);
+            press(wheel, java.awt.event.MouseEvent.MOUSE_CLICKED);
+        });
+        SwingUtilities.invokeAndWait(() -> { });
+        yes("the click that asked starts the reveal", reveal.playing());
+        eq("and does not land it", 0, landedCount.get());
+        SwingUtilities.invokeAndWait(() -> press(wheel, java.awt.event.MouseEvent.MOUSE_PRESSED));
+        eq("the next press lands it", 1, landedCount.get());
+        SwingUtilities.invokeAndWait(() -> reveal.interrupt());
+        eq("once", 1, landedCount.get());
+    }
+
+    private static void press(java.awt.Component c, int id) {
+        c.dispatchEvent(new java.awt.event.MouseEvent(c, id, System.currentTimeMillis(), 0, P.x,
+            P.y, 1, false, java.awt.event.MouseEvent.BUTTON1));
+    }
+
+    // ------------------------------------------------------------------ G
+
+    /**
+     * The real wheel, not shown: for each classical planet, the plan its click makes and the
+     * scene it is drawn in. The window is never put on the screen, so the click path itself
+     * shows the card at once here, which is checked too.
+     */
+    private static void theRealWheel() throws Exception {
+        OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            SkymapPanel sky = (SkymapPanel) CheckReflect.get(w[0], "skymapPanel");
+            java.awt.Component chart = (java.awt.Component) CheckReflect.get(sky, "chartPanel");
+            SwingUtilities.invokeAndWait(() -> chart.setSize(900, 820));
+            JLayeredPane lp = w[0].getLayeredPane();
+            java.lang.reflect.Method bodyAt = SkymapPanel.class.getDeclaredMethod("bodyAt",
+                int.class, int.class);
+            bodyAt.setAccessible(true);
+            String[] names = {"Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"};
+            int planets = 0;
+            int factors = 0;
+            for (String name : names) {
+                int i = com.zodiacomputing.ourania.astro.Bodies.indexOfName(name);
+                if (i < 0 || !sky.natalRing.valid[i]) {
+                    continue;
+                }
+                planets++;
+                String[] reading = new String[1];
+                SwingUtilities.invokeAndWait(() -> {
+                    sky.selectionHtml(i, sky.natalRing.lon[i], sky.natalRing.speed[i], false);
+                    try {
+                        reading[0] = (String) CheckReflect.get(sky, "selectionReading");
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                List<String[]> aspects = sky.getActiveAspectsFor(i, false);
+                RevealPlan plan = RevealPlan.forPlacement(SkymapPanel.BODY_NAMES[i], aspects,
+                    reading[0]);
+                if (plan == null) {
+                    yes(name + " has a plan", false);
+                    continue;
+                }
+                String text = squash(reading[0].replaceAll("<[^>]+>", " "));
+                eq(name + ": the first factor is the planet", SkymapPanel.BODY_NAMES[i],
+                    plan.points().get(0));
+                yes(name + ": the title is in its reading, " + plan.title(),
+                    text.contains(squash(plan.title())));
+                yes(name + ": so is the body, " + plan.body(), plan.body().isEmpty()
+                    || squash(reading[0].replaceAll("<[^>]+>", "")).contains(squash(plan.body())));
+                yes(name + ": nothing is counted", plan.ticks().isEmpty() && !plan.confirmed());
+
+                // Each factor is a body the wheel lights for this focus, by the same gate.
+                sky.focusBody = i;
+                sky.focusTransit = false;
+                List<String> unlit = new ArrayList<>();
+                List<String> unnamed = new ArrayList<>();
+                for (String f : plan.points().subList(1, plan.points().size())) {
+                    factors++;
+                    int j = com.zodiacomputing.ourania.astro.Bodies.indexOfName(f);
+                    if (j < 0) {
+                        unlit.add(f);
+                        continue;
+                    }
+                    double sep = com.zodiacomputing.ourania.astro.Aspects.separation(
+                        sky.natalRing.lon[i], sky.natalRing.lon[j]);
+                    if (sky.glyphWeight(j, false) != 1.0
+                            || sky.visibleAspect(sep, i, j, sky.profileForPair(false)) == null) {
+                        unlit.add(f);
+                    }
+                    if (!text.contains(squash(f))) {
+                        unnamed.add(f);
+                    }
+                }
+                eq(name + ": every factor is lit by glyphWeight's gate", "[]", unlit.toString());
+                eq(name + ": and named in the reading", "[]", unnamed.toString());
+                eq(name + ": and they are the reading's aspects, each once", aspects.stream()
+                    .map(a -> a[0]).distinct().count(), (long) plan.points().size() - 1);
+                sky.focusBody = -1;
+
+                // The scene: its focal point is the planet's glyph, which the hit test finds.
+                RevealPainter.Scene[] scene = new RevealPainter.Scene[1];
+                SwingUtilities.invokeAndWait(() -> scene[0] = sky.sceneOn(plan, i, lp));
+                if (scene[0] == null) {
+                    yes(name + " has a scene", false);
+                    continue;
+                }
+                Point focal = SwingUtilities.convertPoint(lp, scene[0].focal(), chart);
+                Point wheelAt = sky.toWheel(focal.x, focal.y);
+                int hit = (Integer) bodyAt.invoke(sky, wheelAt.x, wheelAt.y);
+                eq(name + ": the card forms on its own glyph", i, hit);
+                yes(name + ": not at the centre", !scene[0].focal().equals(scene[0].centre()));
+                eq(name + ": and the planet is the first contributor", scene[0].focal(),
+                    scene[0].contributors().get(0));
+                eq(name + ": every factor has a place on the wheel", plan.points().size(),
+                    scene[0].contributors().size());
+            }
+            yes("the planets were read, " + planets, planets >= 5);
+            yes("and between them had aspects to light, " + factors, factors > 0);
+
+            // Zoomed in and off centre, the card still forms on the glyph the reader sees.
+            int sun = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Sun");
+            SwingUtilities.invokeAndWait(() -> {
+                Point s = SwingUtilities.convertPoint(lp, sky.sceneOn(placement(), sun, lp).focal(),
+                    chart);
+                // A little off the glyph, so the zoom also pans the wheel.
+                sky.zoomAt(s.x + 40, s.y + 30, -5);
+            });
+            yes("the wheel is zoomed for this, " + sky.view.zoom(), sky.view.zoom() > 2.0
+                && !sky.viewIsFit());
+            int seen = 0;
+            List<String> missed = new ArrayList<>();
+            for (String name : names) {
+                int i = com.zodiacomputing.ourania.astro.Bodies.indexOfName(name);
+                if (i < 0 || !sky.natalRing.valid[i]) {
+                    continue;
+                }
+                RevealPainter.Scene[] scene = new RevealPainter.Scene[1];
+                SwingUtilities.invokeAndWait(() -> scene[0] = sky.sceneOn(placement(), i, lp));
+                Point focal = SwingUtilities.convertPoint(lp, scene[0].focal(), chart);
+                if (!new Rectangle(0, 0, chart.getWidth(), chart.getHeight()).contains(focal)) {
+                    continue;
+                }
+                seen++;
+                Point wheelAt = sky.toWheel(focal.x, focal.y);
+                if ((Integer) bodyAt.invoke(sky, wheelAt.x, wheelAt.y) != i) {
+                    missed.add(name);
+                }
+            }
+            yes("some planets are still on screen, " + seen, seen > 0);
+            eq("each forms on its zoomed glyph", "[]", missed.toString());
+            SwingUtilities.invokeAndWait(() -> sky.fitView());
+
+            // A synthesis still forms at the centre: the focal point is a parameter, not a change.
+            RevealPainter.Scene[] centred = new RevealPainter.Scene[1];
+            SwingUtilities.invokeAndWait(() -> centred[0] = sky.sceneOn(plan(false),
+                SkymapPanel.REVEAL_AT_CENTRE, lp));
+            yes("a headline theme still forms at the centre", centred[0] != null
+                && centred[0].focal().equals(centred[0].centre()));
+
+            // Off screen there is nothing to watch, so the click shows its card at once.
+            Settings.setAnimateRings(true);
+            Settings.setAnimateReadings(true);
+            int venus = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Venus");
+            javax.swing.JEditorPane selection = (javax.swing.JEditorPane)
+                CheckReflect.get(w[0], "selectionPane");
+            String[] shown = new String[1];
+            SwingUtilities.invokeAndWait(() -> {
+                selection.setText("<html><body>rc-nothing-opened</body></html>");
+                RevealPainter.Scene none = sky.revealScene(placement(), venus);
+                Point v = SwingUtilities.convertPoint(lp,
+                    sky.sceneOn(placement(), venus, lp).focal(), chart);
+                Point at = sky.toWheel(v.x, v.y);
+                sky.askForPlacement(at.x, at.y);
+                shown[0] = none == null ? selection.getText() : "a scene off screen";
+            });
+            yes("a wheel that is not on screen has no scene, and the card opens at once",
+                !shown[0].contains("rc-nothing-opened") && !shown[0].contains("off screen"));
+            yes("and the click left no request behind",
+                !(Boolean) CheckReflect.get(sky, "readingAsked"));
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    // ------------------------------------------------------------------ H
+
+    /**
+     * David, 2026-10-17: the card "disappears too soon and makes no sense". It landed on a
+     * page that said something else. Now the page opens on the same card, as real HTML, and
+     * the flying card lands on that card's own box.
+     */
+    private static void theRealCard() throws Exception {
+        RevealPlan p = placement();
+        ReadingCard c = p.card();
+        eq("the card's label is the title, as the painter draws it", "VENUS IN LIBRA", c.label());
+        eq("its headline is the title", p.title(), c.headline());
+        eq("its body is the plan's", p.body(), c.body());
+        String page = p.onTop("<html><body style='color:white;'><p>The rest.</p></body></html>");
+        int card = page.indexOf("id='" + RevealPlan.CARD_ID + "'");
+        yes("the page opens on the card", card > 0 && card < page.indexOf("The rest."));
+        yes("straight after its body tag", page.indexOf("<body style='color:white;'><div id=") > 0);
+        yes("rendered by the cards' own renderer",
+            page.contains(ReadingCard.html(List.of(c), false)));
+        yes("a page with no body tag still gets it first", p.onTop("<p>x</p>").startsWith("<div id="));
+
+        // The painter: the wheel is clear before the flight, and the slot is held from landing.
+        BufferedImage flying = placedAt(RevealPainter.AT_TRAVEL + 60, p);
+        near("the wheel is itself again when the card flies", 128, red(flying, ELSEWHERE), 1);
+        Point corner = new Point(TARGET.x + 3, TARGET.y + 3);
+        eq("before landing the page is untouched", GREY.getRGB(),
+            placedAt(RevealPainter.AT_TRAVEL - 20, p).getRGB(corner.x, corner.y));
+        eq("from landing, the real card's slot is held empty", RevealPainter.CARD_FILL.getRGB(),
+            flying.getRGB(corner.x, corner.y));
+        eq("no words in the slot until the card arrives", 0,
+            lit(flying, new Rectangle(TARGET.x, TARGET.y, 120, TARGET.height)));
+
+        // The real card, found on a real page, and its box is the card's own.
+        javax.swing.JFrame[] frame = new javax.swing.JFrame[1];
+        javax.swing.JEditorPane[] pane = new javax.swing.JEditorPane[1];
+        Rectangle[] found = new Rectangle[3];
+        BufferedImage[] shot = new BufferedImage[1];
+        SwingUtilities.invokeAndWait(() -> {
+            frame[0] = new javax.swing.JFrame();
+            frame[0].setUndecorated(true);
+            pane[0] = new javax.swing.JEditorPane("text/html", "");
+            pane[0].setEditable(false);
+            pane[0].setBackground(Color.BLACK);
+            pane[0].setText(p.onTop("<html><body style='color:white; font-family:Arial;'>"
+                + "<p>Below the card.</p></body></html>"));
+            frame[0].getContentPane().add(pane[0]);
+            frame[0].setSize(320, 420);
+            frame[0].setLocation(-3000, -3000);
+            frame[0].setVisible(true);
+        });
+        try {
+            SwingUtilities.invokeAndWait(() -> { });
+            SwingUtilities.invokeAndWait(() -> {
+                JLayeredPane lp = frame[0].getLayeredPane();
+                found[0] = ReadingReveal.cardOnPage(lp, p.title());
+                found[1] = ReadingReveal.cardOnPage(lp, "Mars in Aries");
+                shot[0] = new BufferedImage(pane[0].getWidth(), pane[0].getHeight(),
+                    BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = shot[0].createGraphics();
+                pane[0].paint(g);
+                g.dispose();
+            });
+            Rectangle r = found[0];
+            yes("the real card is found on the page, " + r, r != null);
+            if (r != null) {
+                Rectangle inPane = SwingUtilities.convertRectangle(frame[0].getLayeredPane(), r,
+                    pane[0]);
+                yes("at the top of the page, " + inPane, inPane.y < 30);
+                yes("as wide as the page, " + inPane, inPane.width > pane[0].getWidth() - 40);
+                yes("and as tall as a card, " + inPane, inPane.height > 40 && inPane.height < 200);
+                eq("its box is the card on screen, by its colour", RevealPainter.CARD_FILL.getRGB(),
+                    shot[0].getRGB(inPane.x + 4, inPane.y + inPane.height - 4));
+                yes("and the page below it is not", shot[0].getRGB(inPane.x + 4,
+                    inPane.y + inPane.height + 30) != RevealPainter.CARD_FILL.getRGB());
+            }
+            yes("a card with another heading is not taken for it", found[1] == null);
+            SwingUtilities.invokeAndWait(() -> frame[0].setVisible(false));
+            SwingUtilities.invokeAndWait(() -> found[2] =
+                ReadingReveal.cardOnPage(frame[0].getLayeredPane(), p.title()));
+            yes("a page that is not on screen is not landed on", found[2] == null);
+
+            // The reveal takes the measured box as its landing once the page is there.
+            SwingUtilities.invokeAndWait(() -> frame[0].setVisible(true));
+            Settings.setAnimateRings(true);
+            Settings.setAnimateReadings(true);
+            JLayeredPane lp = frame[0].getLayeredPane();
+            ReadingReveal reveal = new ReadingReveal(lp);
+            Rectangle real = new Rectangle(20, 30, 200, 90);
+            AtomicInteger landed = new AtomicInteger();
+            SwingUtilities.invokeAndWait(() -> reveal.play(placed(p), landed::incrementAndGet,
+                () -> landed.get() > 0 ? real : null));
+            eq("before landing it aims at the scene's own target", TARGET,
+                reveal.scene().target());
+            long deadline = System.currentTimeMillis() + 4000;
+            while (reveal.progress() < RevealPainter.LANDS_AT + 0.05
+                    && System.currentTimeMillis() < deadline) {
+                Thread.sleep(10);
+            }
+            SwingUtilities.invokeAndWait(() -> { });
+            eq("the reading has landed", 1, landed.get());
+            eq("and the card now flies to the real card", real, reveal.scene().target());
+            SwingUtilities.invokeAndWait(() -> reveal.interrupt());
+        } finally {
+            SwingUtilities.invokeAndWait(() -> frame[0].dispose());
+        }
+    }
+
+    private static String squash(String s) {
+        return s.replace("&nbsp;", " ").replaceAll("\\s+", " ").trim();
     }
 
     /** The text of a method from its signature to the next blank-line-separated declaration. */

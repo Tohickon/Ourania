@@ -67,8 +67,15 @@ final class RevealPainter {
     static final int AT_HOLD = AT_TEXT + TEXT_MS;
     static final int AT_OUT = AT_HOLD + HOLD_MS;
 
-    /** Where the reading lands, as a fraction of the whole timeline: when the card has formed. */
-    static final double LANDS_AT = FORM_MS / (double) TOTAL_MS;
+    /**
+     * Where the reading lands, as a fraction of the whole timeline: as the card starts to fly.
+     *
+     * <b>Before the flight, not after it,</b> because the card flies to the real card on the
+     * page, and that card has a place only once the page is there. {@link ReadingReveal}
+     * measures it each frame and the painter covers it until the flying card arrives, so the
+     * reader sees one card travel into its slot, never two.
+     */
+    static final double LANDS_AT = AT_TRAVEL / (double) TOTAL_MS;
 
     /** How far the wheel recedes: a non-contributor draws at 60% of its brightness. */
     static final float DIM = 0.40f;
@@ -91,7 +98,8 @@ final class RevealPainter {
      * @param centre       the wheel's centre
      * @param radius       the wheel's radius: the veil covers this circle
      * @param contributors the screen positions of the chart factors, in the plan's order
-     * @param focal        where the orb forms - the centre for a headline theme
+     * @param focal        where the orb forms - the centre for a headline theme, the planet's
+     *                     own glyph for a placement
      * @param target       where the card lands: the top of the reading pane
      * @param background   the colour the veil darkens towards
      */
@@ -99,6 +107,12 @@ final class RevealPainter {
             Rectangle target, RevealPlan plan, Color background) {
         Scene {
             contributors = List.copyOf(contributors);
+        }
+
+        /** The same scene, landing on {@code r}: where the real card turned out to be. */
+        Scene landingOn(Rectangle r) {
+            return new Scene(centre, radius, contributors, focal, new Rectangle(r), plan,
+                background);
         }
     }
 
@@ -128,7 +142,10 @@ final class RevealPainter {
             double travel = stage(t, AT_TRAVEL, TRAVEL_MS);
             double crystal = stage(t, AT_CRYSTAL, CRYSTAL_MS);
 
-            veil(g, s, in * (1.0 - Bloom.smoothstep(0, 1, travel)) * fade);
+            // Gone before the flight: the page lands then, and opening the rail can move the
+            // wheel out from under a veil drawn where it was.
+            double emerged = Bloom.smoothstep(0, 1, stage(t, AT_EMERGE, EMERGE_MS));
+            veil(g, s, in * (1.0 - emerged) * fade);
             glows(g, s, in * (1.0 - crystal) * fade);
             threads(g, s, t, (1.0 - crystal) * fade);
             counter(g, s, t, fade);
@@ -186,7 +203,8 @@ final class RevealPainter {
 
     /**
      * The Rule of Three, counted where the reader can see it: one tick per technique that
-     * counted, then the verdict. Technique names only when the plan carries them.
+     * counted, then the verdict. Technique names only when the plan carries them. A placement
+     * has no ticks and is never confirmed, so it draws nothing here.
      */
     private static void counter(Graphics2D g, Scene s, double t, double fade) {
         double p = stage(t, AT_THREADS, THREADS_MS + ORB_MS);
@@ -261,6 +279,12 @@ final class RevealPainter {
             ? lerp(0.7, 1.05, Bloom.smoothstep(0, 1, emerge / 0.6))
             : lerp(1.05, 1.0, Bloom.smoothstep(0, 1, (emerge - 0.6) / 0.4));
         Rectangle land = s.target;
+        if (stage(t, AT_TRAVEL, TRAVEL_MS) > 0.0) {
+            // The real card is on the page from here on. Its slot stays empty until this one
+            // arrives in it, and fades with it, so what is left is the real card.
+            g.setColor(alpha(CARD_FILL, fade));
+            g.fill(land);
+        }
         Point2D at = arc(new Point2D.Double(fx, fy),
             new Point2D.Double(land.getCenterX(), land.getCenterY()), travel);
         double w = lerp(CARD_W * scale, land.width, travel);
@@ -270,7 +294,7 @@ final class RevealPainter {
         g.setColor(alpha(CARD_FILL, fade));
         g.fill(card);
         g.setStroke(new BasicStroke(1.5f));
-        g.setColor(alpha(GOLD, fade * (1.0 - 0.6 * travel)));
+        g.setColor(alpha(GOLD, fade * (1.0 - travel)));
         g.draw(card);
 
         double title = stage(t, AT_TEXT, TEXT_MS / 2);
@@ -281,17 +305,17 @@ final class RevealPainter {
             g.setFont(Theme.font("Arial", Font.BOLD, 10));
             g.setColor(alpha(LABEL, title * fade));
             y += g.getFontMetrics().getAscent();
-            g.drawString(s.plan.title().toUpperCase(java.util.Locale.ROOT), x, y);
+            g.drawString(s.plan.card().label(), x, y);
             g.setFont(Theme.font("Arial", Font.BOLD, 15));
             g.setColor(alpha(Color.WHITE, title * fade));
             y += g.getFontMetrics().getHeight();
-            g.drawString(s.plan.title(), x, y);
+            g.drawString(s.plan.card().headline(), x, y);
         }
-        if (body > 0.0 && !s.plan.body().isEmpty()) {
+        if (body > 0.0 && !s.plan.card().body().isEmpty()) {
             g.setFont(Theme.font("Arial", Font.PLAIN, 13));
             g.setColor(alpha(Color.WHITE, body * fade));
             FontMetrics fm = g.getFontMetrics();
-            for (String line : wrap(s.plan.body(), fm, (int) w - 20)) {
+            for (String line : wrap(s.plan.card().body(), fm, (int) w - 20)) {
                 y += fm.getHeight();
                 if (y > card.getMaxY() - 4) {
                     break;
