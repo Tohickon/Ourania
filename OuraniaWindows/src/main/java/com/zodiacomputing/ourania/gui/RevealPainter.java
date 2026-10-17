@@ -91,7 +91,8 @@ final class RevealPainter {
      * @param centre       the wheel's centre
      * @param radius       the wheel's radius: the veil covers this circle
      * @param contributors the screen positions of the chart factors, in the plan's order
-     * @param focal        where the orb forms - the centre for a headline theme
+     * @param focal        where the orb forms - the centre for a headline theme, the planet's
+     *                     own glyph for a placement
      * @param target       where the card lands: the top of the reading pane
      * @param background   the colour the veil darkens towards
      */
@@ -186,7 +187,8 @@ final class RevealPainter {
 
     /**
      * The Rule of Three, counted where the reader can see it: one tick per technique that
-     * counted, then the verdict. Technique names only when the plan carries them.
+     * counted, then the verdict. Technique names only when the plan carries them. A placement
+     * has no ticks and is never confirmed, so it draws nothing here.
      */
     private static void counter(Graphics2D g, Scene s, double t, double fade) {
         double p = stage(t, AT_THREADS, THREADS_MS + ORB_MS);

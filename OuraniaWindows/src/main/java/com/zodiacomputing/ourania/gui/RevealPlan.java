@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * What a reading's reveal shows, read off the engine's own verdict (storyboard "The chart
- * reveals the reading", stage 1, 2026-10-16).
+ * reveals the reading", stage 1, 2026-10-16), or off a placement's own reading (stage 2).
  *
  * <b>Nothing here decides anything.</b> The chart factors are the points the theme's counted
  * votes landed on; the ticks are the votes that added a family; "confirmed" is
@@ -70,6 +70,47 @@ record RevealPlan(String title, String body, List<String> ticks, boolean confirm
             }
         }
         return null;
+    }
+
+    /**
+     * The plan for one natal placement the reader clicked (stage 2), or null when its reading
+     * has no heading to show.
+     *
+     * <b>Every part is lifted from the reading the click opens.</b> The title is that reading's
+     * first heading ("Venus in Libra"); the body is the first sentence under that heading, by
+     * {@link InterpretationPanel#pieceLead}, the rule the main account already uses. Under the
+     * heading, not at the top: the top is the planet's core text, which for some planets opens
+     * with a myth rather than with what this placement means. The factors
+     * are the planet and each body in {@code aspects}, the list the reading was written from.
+     * Nothing is counted: there are no ticks, and a placement is never "confirmed".
+     *
+     * @param body    the clicked body's name, which is also the focal point
+     * @param aspects the reading's own aspect rows, the other body's name first in each
+     * @param reading the reading's HTML
+     */
+    static RevealPlan forPlacement(String body, List<String[]> aspects, String reading) {
+        if (body == null || reading == null || reading.isEmpty()) {
+            return null;
+        }
+        List<String[]> sections = SkymapPanel.readingSections(reading);
+        if (sections.isEmpty()) {
+            return null;
+        }
+        String lead = InterpretationPanel.pieceLead(sections.get(0)[1]);
+        if (lead.toLowerCase(java.util.Locale.ROOT).contains("not found")) {
+            lead = "";
+        }
+        Set<String> points = new LinkedHashSet<>();
+        points.add(body);
+        if (aspects != null) {
+            for (String[] a : aspects) {
+                if (a != null && a.length > 0 && a[0] != null) {
+                    points.add(a[0]);
+                }
+            }
+        }
+        return new RevealPlan(sections.get(0)[0], lead, List.of(), false,
+            new ArrayList<>(points));
     }
 
     /** Whether the ticks carry technique names, which only Astrologer view gives them. */
