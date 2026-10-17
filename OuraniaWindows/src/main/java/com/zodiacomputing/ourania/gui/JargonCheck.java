@@ -171,6 +171,17 @@ public final class JargonCheck {
         String full = NowCards.html(sky, natal, cusps, false, "<p>raw orb table</p>");
         yes("the filled page has cards", full.contains(TransitCard.WHAT_TO_DO));
         clean("the filled Now page", text(full));
+        // The whole timeline, with its own words: the window titles, "strongest on ...",
+        // "And N more", and the line a running clock shows.
+        de.thmac.swisseph.SwissEph sw = new de.thmac.swisseph.SwissEph(
+            com.zodiacomputing.ourania.astro.Ephemeris.PATH);
+        sky.sd = new de.thmac.swisseph.SweDate(2026, 10, 17, 16.0);
+        sky.time = java.time.ZonedDateTime.of(2026, 10, 17, 12, 0, 0, 0,
+            java.time.ZoneId.of("America/New_York"));
+        String timeline = NowCards.html(sky, natal, cusps, false, "<p>raw orb table</p>", sw);
+        yes("the timeline reaches ahead", timeline.contains(">Later this year</h3>")
+            || timeline.contains(">Next month</h3>"));
+        clean("the Now timeline", text(timeline));
         String astro = NowCards.html(sky, natal, cusps, true, "<p>raw orb table</p>");
         yes("the drawer in Astrologer view still names the astrology",
             !banned(text(astro)).isEmpty());

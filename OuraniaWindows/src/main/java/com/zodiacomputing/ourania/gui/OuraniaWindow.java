@@ -1184,8 +1184,13 @@ public class OuraniaWindow extends JFrame {
         }
         // The wheel's rule, so the page and the pop-ups that land on it read the same ring.
         WheelRing now = skymapPanel.nowRing();
+        // The timeline's dates cost a walk of the ephemeris, which the page does not take
+        // while time is running; it shows what is happening right now, and the rest when
+        // time stops (SkymapPanel.timeSettled).
+        boolean moving = skymapPanel.isPlaying() || skymapPanel.isScrubbing();
         HtmlPanes.setHtml(transitPane, NowCards.html(now, skymapPanel.natalRing,
-            skymapPanel.activeCusps, Settings.astrologerView(), lastTransitHtml));
+            skymapPanel.activeCusps, Settings.astrologerView(), lastTransitHtml,
+            moving ? null : skymapPanel.sw));
     }
 
     /**
