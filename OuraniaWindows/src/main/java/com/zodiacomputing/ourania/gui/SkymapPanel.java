@@ -2640,6 +2640,8 @@ implements WheelSource, GlobeSource {
     private double selectionLon;
     private double selectionSpeed;
     private boolean selectionTransit;
+    /** The reading the card on screen was cut from, which a placement's reveal takes its words from. */
+    private String selectionReading = "";
 
     /** Which sections of the selection card the reader has opened. Survives re-selection. */
     private final java.util.Set<String> selectionOpen = new java.util.LinkedHashSet<>();
@@ -2680,6 +2682,7 @@ implements WheelSource, GlobeSource {
         String reading = this.window == null ? "" : this.window.planetReadingHtml(
             BODY_NAMES[n], SIGN_NAMES[signIdx], degree, decan, house,
             this.getActiveAspectsFor(n, transit), lon);
+        this.selectionReading = reading;
 
         StringBuilder extra = new StringBuilder();
         String lead = leadParagraph(reading);
@@ -2799,7 +2802,7 @@ implements WheelSource, GlobeSource {
      * appears here, and neither can quietly fall behind the other. Index-keyed, so the open
      * set survives moving between bodies with the same shape of reading.
      */
-    private static java.util.List<String[]> readingSections(String html) {
+    static java.util.List<String[]> readingSections(String html) {
         java.util.List<String[]> out = new java.util.ArrayList<String[]>();
         if (html == null || html.isEmpty()) {
             return out;
@@ -3124,7 +3127,13 @@ implements WheelSource, GlobeSource {
                     return;
                 }
                 java.awt.Point at = SkymapPanel.this.toWheel(mouseEvent.getX(), mouseEvent.getY());
-                SkymapPanel.this.handleChartClick(at.x, at.y);
+                // A single click asks for what it opens, so a placement may form at its planet.
+                // The second click of a double has already been answered by the first.
+                if (mouseEvent.getClickCount() == 1) {
+                    SkymapPanel.this.askForPlacement(at.x, at.y);
+                } else {
+                    SkymapPanel.this.handleChartClick(at.x, at.y);
+                }
             }
 
             @Override
@@ -4316,7 +4325,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
                         String html = (String)this.get();
                         RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, this.revealPlan)
-                            ? SkymapPanel.this.revealScene(this.revealPlan) : null;
+                            ? SkymapPanel.this.revealScene(this.revealPlan, REVEAL_AT_CENTRE) : null;
                         if (scene != null) {
                             SkymapPanel.this.reveal().play(scene,
                                 () -> SkymapPanel.this.window.showSynthesis(html));
@@ -4334,26 +4343,39 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }.execute();
     }
 
+    /** The focal point a headline theme forms at: the chart's centre, not any one body. */
+    static final int REVEAL_AT_CENTRE = -1;
+
     /**
      * Where a reveal is drawn: the wheel's centre and radius, the chart factors' glyphs, and the
      * reading pane, all in the window's layered pane. Null when the wheel cannot show it - the
      * globe is up, the wheel is not on screen, or none of the factors is drawn - in which case
      * the reading is simply shown.
      *
-     * <b>Positions are the painter's own</b>: {@link Geometry#natalRadii} and the canonical
-     * screenX/screenY, the same chain the hit test uses, so a thread ends on the glyph it names.
+     * @param focalBody the natal body the card forms at, or {@link #REVEAL_AT_CENTRE}
      */
-    RevealPainter.Scene revealScene(RevealPlan plan) {
+    RevealPainter.Scene revealScene(RevealPlan plan, int focalBody) {
         if (plan == null || this.chartPanel == null || !this.chartPanel.isShowing()
                 || this.isGlobeMode() || this.window == null) {
             return null;
         }
         javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(this.chartPanel);
+        return root == null ? null : this.sceneOn(plan, focalBody, root.getLayeredPane());
+    }
+
+    /**
+     * The scene itself, on a given layered pane. Split from {@link #revealScene} so a check can
+     * ask where a reveal would be drawn without putting a window on the screen.
+     *
+     * <b>Positions are the painter's own</b>: {@link Geometry#natalRadii} and the canonical
+     * screenX/screenY, the same chain the hit test uses, so a thread ends on the glyph it names
+     * and a placement's card forms on the glyph that was clicked.
+     */
+    RevealPainter.Scene sceneOn(RevealPlan plan, int focalBody, javax.swing.JLayeredPane lp) {
         Geometry g = this.geometry();
-        if (root == null || g == null) {
+        if (plan == null || g == null || this.window == null) {
             return null;
         }
-        javax.swing.JLayeredPane lp = root.getLayeredPane();
         int[] radii = g.natalRadii();
         List<java.awt.Point> points = new ArrayList<>();
         for (String name : plan.points()) {
@@ -4361,23 +4383,88 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             if (i < 0) {
                 i = Bodies.indexOf(name.toLowerCase(java.util.Locale.ROOT));
             }
-            if (i < 0 || i >= this.natalRing.lon.length || !this.natalRing.valid[i]) {
-                continue;
+            java.awt.Point p = this.glyphOn(g, radii, i, lp);
+            if (p != null) {
+                points.add(p);
             }
-            java.awt.Point p = new java.awt.Point(
-                SkymapPanel.screenX(g.cx, g.pin, this.natalRing.lon[i], radii[i]),
-                SkymapPanel.screenY(g.cy, g.pin, this.natalRing.lon[i], radii[i]));
-            points.add(javax.swing.SwingUtilities.convertPoint(this.chartPanel, p, lp));
         }
         if (points.isEmpty()) {
             return null;
         }
-        java.awt.Point centre = javax.swing.SwingUtilities.convertPoint(this.chartPanel,
-            new java.awt.Point(g.cx, g.cy), lp);
-        int radius = Math.min(this.chartPanel.getWidth(), this.chartPanel.getHeight()) / 2;
-        // A headline theme forms at the chart's centre; a placement will form at its planet.
-        return new RevealPainter.Scene(centre, radius, points, centre,
+        java.awt.Point centre = this.onScreen(g.cx, g.cy, lp);
+        java.awt.Point focal = focalBody == REVEAL_AT_CENTRE ? centre
+            : this.glyphOn(g, radii, focalBody, lp);
+        if (focal == null) {
+            return null;
+        }
+        int radius = (int) Math.round(this.view.zoom()
+            * Math.min(this.chartPanel.getWidth(), this.chartPanel.getHeight()) / 2.0);
+        return new RevealPainter.Scene(centre, radius, points, focal,
             this.window.readingLanding(lp), plan, Color.BLACK);
+    }
+
+    /** A natal body's glyph in the layered pane, or null when it is not drawn. */
+    private java.awt.Point glyphOn(Geometry g, int[] radii, int i, javax.swing.JLayeredPane lp) {
+        if (i < 0 || i >= this.natalRing.lon.length || !this.natalRing.valid[i]) {
+            return null;
+        }
+        return this.onScreen(SkymapPanel.screenX(g.cx, g.pin, this.natalRing.lon[i], radii[i]),
+            SkymapPanel.screenY(g.cy, g.pin, this.natalRing.lon[i], radii[i]), lp);
+    }
+
+    /**
+     * A wheel point where the reader sees it, in the layered pane. Through the view's own
+     * transform, the one the painter draws with, so a zoomed or panned wheel's card still forms
+     * on the glyph that was clicked.
+     */
+    private java.awt.Point onScreen(int x, int y, javax.swing.JLayeredPane lp) {
+        java.awt.geom.Point2D p = this.viewTransform(this.viewW(), this.viewH())
+            .transform(new java.awt.geom.Point2D.Double(x, y), null);
+        return javax.swing.SwingUtilities.convertPoint(this.chartPanel,
+            (int) Math.round(p.getX()), (int) Math.round(p.getY()), lp);
+    }
+
+    /**
+     * A click on the wheel, as the reader's request for what it opens.
+     *
+     * <b>The same one-shot flag {@link #askForReading} sets</b>, and cleared on every exit:
+     * handleChartClick has many, and only the natal-placement one reads it. A flag left set by
+     * a click on empty space would make the next transport rebuild play a reveal.
+     */
+    void askForPlacement(int x, int y) {
+        this.readingAsked = true;
+        try {
+            this.handleChartClick(x, y);
+        } finally {
+            this.readingAsked = false;
+        }
+    }
+
+    /**
+     * Plays a placement's reveal, forming at its planet, and lands {@code card} at the end.
+     *
+     * <b>The factors are the reading's own.</b> The planet, and each body in the aspect list
+     * the reading was written from - {@link #getActiveAspectsFor}, which asks visibleAspect,
+     * the gate glyphWeight lights the wheel by. The words are the reading's heading and its
+     * first sentence under it. No ticks: a placement is not a vote, so nothing is counted.
+     *
+     * <b>The click that asked does not interrupt it.</b> The reveal starts on MOUSE_CLICKED,
+     * after this click's press; only a later press or key lands it.
+     *
+     * @return whether a reveal is playing; false means the caller shows the card at once
+     */
+    private boolean revealPlacement(int body, String card) {
+        boolean asked = this.readingAsked;
+        this.readingAsked = false;
+        RevealPlan plan = asked ? RevealPlan.forPlacement(BODY_NAMES[body],
+            this.getActiveAspectsFor(body, false), this.selectionReading) : null;
+        RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, plan)
+            ? this.revealScene(plan, body) : null;
+        if (scene == null) {
+            return false;
+        }
+        this.reveal().play(scene, () -> this.window.showSelection(card));
+        return true;
     }
 
     private ReadingReveal reveal() {
@@ -4837,10 +4924,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             double[] spd = this.focusTransit ? this.outerRing.speed : this.natalRing.speed;
             if (this.focusBody < lon.length) {
                 // The same card the tooltip builds - one description of a body, shown in two
-                // places rather than written twice.
-                this.window.showSelection(
-                    this.selectionHtml(this.focusBody, lon[this.focusBody], spd[this.focusBody],
-                        this.focusTransit));
+                // places rather than written twice. A natal placement the reader asked for
+                // forms at its planet first, and this same card lands at the end.
+                String card = this.selectionHtml(this.focusBody, lon[this.focusBody],
+                    spd[this.focusBody], this.focusTransit);
+                boolean placement = !this.focusTransit && !Bodies.at(this.focusBody).isAngle();
+                if (!placement || !this.revealPlacement(this.focusBody, card)) {
+                    this.window.showSelection(card);
+                }
                 // <b>The natal-body exit, which this method's own list of exits promised and
                 // did not have.</b> Everything below resolves by radius, and the last two
                 // branches are "inside the body ring is a house, outside it is a sign" - so a
@@ -4855,7 +4946,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // angles, which showAngleAt reads in full, and anything on the transit or sky
                 // ring, whose branches list its contacts back to Chart A and Chart B. Guarding
                 // only on isAngle cost exactly those two sky assertions in AspectGridCheck.
-                if (!this.focusTransit && !Bodies.at(this.focusBody).isAngle()) {
+                if (placement) {
                     // <b>And the full reading, not just the card.</b> The card is a summary -
                     // degree, house, decan, one line of Sabian - and reaching the placement's
                     // actual meaning took four more steps: Interpretations, then the index,
