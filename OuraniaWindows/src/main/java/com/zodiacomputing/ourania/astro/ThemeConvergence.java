@@ -57,6 +57,11 @@ public final class ThemeConvergence {
             this.points = points;
         }
 
+        /** The theme's own house - the first it lists - for a reader who wants one part of life. */
+        public int house() {
+            return houses[0];
+        }
+
         boolean hasHouse(int h) {
             for (int x : houses) {
                 if (x == h) {
@@ -75,6 +80,17 @@ public final class ThemeConvergence {
         public final Set<Convergence.Family> families = EnumSet.noneOf(Convergence.Family.class);
         /** One line per independent witness: the family, the point, and the witness's own detail. */
         public final List<String> testimonies = new ArrayList<>();
+        /**
+         * Every testimony that counted, as data rather than as a line: which family, on which
+         * chart factor, from which moving body.
+         *
+         * <p><b>Written in the same statement that adds the family</b>, so the list can only
+         * say what {@link #families} says. The reading's reveal draws the chart factors that
+         * produced a theme from this, and ticks one technique per vote whose {@code first} is
+         * true. An echo never reaches this list - it is skipped before the family is added -
+         * and neither does a background catalyst, so the guard's work cannot show as a tick.
+         */
+        public final List<Vote> votes = new ArrayList<>();
         /** The members' convergence scores summed, for ordering within a band. */
         public double score;
 
@@ -140,6 +156,19 @@ public final class ThemeConvergence {
     }
 
     /** How close two catalyst touches must fall to count as one date. */
+    /**
+     * One counted testimony.
+     *
+     * @param family     the technique that spoke
+     * @param point      the natal chart factor it spoke through: the witnessed point, the lord
+     *                   of the year for a profection, or null for the progressed Moon's house,
+     *                   which names an area of life and no single point
+     * @param movingBody the body doing the touching, or null where there is none
+     * @param first      true for the vote that added its family; false for the same technique
+     *                   again, which is shown and counted once
+     */
+    public record Vote(Convergence.Family family, String point, String movingBody, boolean first) { }
+
     public static final double PEAK_SPAN_DAYS = 3.0;
 
     /** Two or more catalyst touches on a theme's points, close enough to be one occasion. */
@@ -221,7 +250,8 @@ public final class ThemeConvergence {
             r.theme = theme;
             r.members.addAll(membersOf(theme, f));
             if (prof != null && theme.hasHouse(prof.house)) {
-                r.families.add(Convergence.Family.PROFECTION);
+                r.votes.add(new Vote(Convergence.Family.PROFECTION, prof.lord, null,
+                    r.families.add(Convergence.Family.PROFECTION)));
                 r.testimonies.add("PROFECTION: the year falls on the " + ordinal(prof.house)
                     + " house (lord " + prof.lord + ")");
             }
@@ -236,6 +266,7 @@ public final class ThemeConvergence {
                         continue;
                     }
                     boolean fresh = r.families.add(Convergence.Family.PROGRESSED_MOON);
+                    r.votes.add(new Vote(Convergence.Family.PROGRESSED_MOON, null, null, fresh));
                     r.testimonies.add("PROGRESSED_MOON: " + t
                         + (t.phase == null || t.phase.isEmpty() ? "" : ", lunation " + t.phase)
                         + (fresh ? "" : " (same technique, counted once)"));
@@ -259,6 +290,7 @@ public final class ThemeConvergence {
                         continue;
                     }
                     boolean fresh = r.families.add(w.family);
+                    r.votes.add(new Vote(w.family, t.natal, w.movingBody, fresh));
                     // Every independent witness is listed; a family repeated on another point
                     // is still shown, so the reader sees what agreed, but it counts once.
                     r.testimonies.add(w.family.name() + ": " + t.natal + " - " + w.detail

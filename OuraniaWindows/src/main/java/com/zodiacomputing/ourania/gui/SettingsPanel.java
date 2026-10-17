@@ -307,6 +307,23 @@ public class SettingsPanel extends JPanel {
             }
         });
         body.add(astrologerView);
+        JCheckBox revealReadings = new JCheckBox("Show where a reading comes from (animated)",
+            Settings.animateReadings());
+        revealReadings.setForeground(TEXT);
+        revealReadings.setBackground(Color.BLACK);
+        revealReadings.setFont(Theme.BODY);
+        revealReadings.setFocusPainted(false);
+        revealReadings.setAlignmentX(Component.LEFT_ALIGNMENT);
+        revealReadings.setToolTipText("<html><b>On:</b> when you ask for a reading, the parts of "
+            + "the chart that produced it light up and the card forms from them.<br>"
+            + "<b>Off:</b> the reading appears at once, with no motion.</html>");
+        revealReadings.addItemListener(e -> {
+            if (!constructing && !seeding) {
+                Settings.setAnimateReadings(revealReadings.isSelected());
+                status.setText("Saved");
+            }
+        });
+        body.add(revealReadings);
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
         body.add(heading("Colour Template"));

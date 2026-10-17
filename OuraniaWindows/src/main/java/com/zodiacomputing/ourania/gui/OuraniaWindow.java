@@ -1980,6 +1980,21 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
+    /**
+     * Where a revealed reading's card lands, in the layered pane's coordinates: the top of the
+     * left rail, where {@link #showSynthesis} puts the reading. A rail that is shut has no
+     * bounds yet, so the card lands where the rail opens - showSynthesis opens it on landing.
+     */
+    java.awt.Rectangle readingLanding(javax.swing.JLayeredPane lp) {
+        int h = RevealPainter.CARD_H;
+        if (chartRail != null && chartRail.isShowing() && chartRail.getWidth() > 60) {
+            java.awt.Rectangle r = javax.swing.SwingUtilities.convertRectangle(
+                chartRail.getParent(), chartRail.getBounds(), lp);
+            return new java.awt.Rectangle(r.x + 8, r.y + 48, Math.max(200, r.width - 16), h);
+        }
+        return new java.awt.Rectangle(8, 96, 324, h);
+    }
+
     public void showSynthesis(String html) {
         // A reading asked for by tab goes back to that tab. Anything else - a body clicked on
         // the wheel, a chart table - goes to the general Interpretation page.

@@ -1636,6 +1636,25 @@ public final class Settings {
         set(ASTROLOGER_VIEW_KEY, on ? "true" : "false");
     }
 
+    /** Settings key for the reveal that shows a reading forming from its chart factors. */
+    public static final String ANIMATE_READINGS_KEY = "view.animateReadings";
+
+    /**
+     * Whether a reading the reader asked for forms on the wheel first, or simply appears.
+     *
+     * <b>On by default, and its own setting,</b> because it is a little over two seconds of
+     * motion where the ring bloom is under one, and a reader may want one and not the other.
+     * {@link ReadingReveal} also stays still when {@link #animateRings} is off: that setting
+     * is the app's reduced-motion answer, and a reader who chose it chose it for everything.
+     */
+    public static boolean animateReadings() {
+        return !"false".equals(get(ANIMATE_READINGS_KEY, "true"));
+    }
+
+    public static void setAnimateReadings(boolean on) {
+        set(ANIMATE_READINGS_KEY, on ? "true" : "false");
+    }
+
     public static void setTrueNode(boolean useTrue) {
         set(NODE_VARIANT_KEY, useTrue ? "true" : "mean");
     }
