@@ -93,6 +93,13 @@ final class ReadingReveal {
             return;
         }
         land();
+        // Past the landing, the card is only holding over a reading that is already there.
+        // Folding would fly it back to the wheel, so it simply goes.
+        if (bloom.opening() && bloom.value() >= RevealPainter.LANDS_AT) {
+            bloom.setImmediately(false);
+            remove();
+            return;
+        }
         if (bloom.opening()) {
             foldFrom = Math.max(1e-6, bloom.value());
             bloom.set(false);
@@ -103,8 +110,11 @@ final class ReadingReveal {
         if (bloom == null) {
             return;
         }
-        if (bloom.opening() && bloom.value() >= 1.0) {
+        // The reading lands as soon as the card has formed, and the card then holds over it.
+        if (bloom.opening() && bloom.value() >= RevealPainter.LANDS_AT) {
             land();
+        }
+        if (bloom.opening() && bloom.value() >= 1.0) {
             remove();
             return;
         }

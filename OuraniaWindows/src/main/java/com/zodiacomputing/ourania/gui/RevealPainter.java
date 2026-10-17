@@ -41,8 +41,21 @@ final class RevealPainter {
     static final int EMERGE_MS = 350;
     static final int TRAVEL_MS = 400;
     static final int TEXT_MS = 250;
-    static final int TOTAL_MS = HIGHLIGHT_MS + THREADS_MS + ORB_MS + CRYSTAL_MS + EMERGE_MS
+    /** The storyboard's sequence: from the first dim to the card's text in place. */
+    static final int FORM_MS = HIGHLIGHT_MS + THREADS_MS + ORB_MS + CRYSTAL_MS + EMERGE_MS
         + TRAVEL_MS + TEXT_MS;
+    /**
+     * How long the landed card stays readable before it fades.
+     *
+     * <b>Not in the storyboard, and the first build showed why it is needed.</b> The text
+     * finished fading in at the very end and the overlay went in the same frame, so David saw
+     * the card "for half a second" and could not read it. The real reading lands under the
+     * card when it forms; the card then stays on top for this long, as the summary of what
+     * just formed, and a click or a key still takes it away at once.
+     */
+    static final int HOLD_MS = 2500;
+    static final int OUT_MS = 300;
+    static final int TOTAL_MS = FORM_MS + HOLD_MS + OUT_MS;
 
     /** Where each stage starts, in ms. */
     static final int AT_THREADS = HIGHLIGHT_MS;
@@ -51,6 +64,11 @@ final class RevealPainter {
     static final int AT_EMERGE = AT_CRYSTAL + CRYSTAL_MS;
     static final int AT_TRAVEL = AT_EMERGE + EMERGE_MS;
     static final int AT_TEXT = AT_TRAVEL + TRAVEL_MS;
+    static final int AT_HOLD = AT_TEXT + TEXT_MS;
+    static final int AT_OUT = AT_HOLD + HOLD_MS;
+
+    /** Where the reading lands, as a fraction of the whole timeline: when the card has formed. */
+    static final double LANDS_AT = FORM_MS / (double) TOTAL_MS;
 
     /** How far the wheel recedes: a non-contributor draws at 60% of its brightness. */
     static final float DIM = 0.40f;
@@ -97,6 +115,7 @@ final class RevealPainter {
      *             recedes rather than playing backwards at full strength over the real card
      */
     static void paint(Graphics2D g0, Scene s, double t, double fade) {
+        fade *= 1.0 - Bloom.smoothstep(0, 1, stage(t, AT_OUT, OUT_MS));
         if (t <= 0.0 || fade <= 0.0) {
             return;
         }

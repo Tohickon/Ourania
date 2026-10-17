@@ -164,7 +164,7 @@ public final class RevealCheck {
     }
 
     private static void theStages() {
-        eq("the budget is the storyboard's 2.2 s", 2200, RevealPainter.TOTAL_MS);
+        eq("the forming is the storyboard's 2.2 s", 2200, RevealPainter.FORM_MS);
         RevealPlan p = plan(true);
 
         BufferedImage start = at(0, p);
@@ -210,9 +210,20 @@ public final class RevealCheck {
         near("with the focal point clear", 128, red(landed, CENTRE), 1);
         eq("no text before the text stage", 0, lit(landed, TARGET));
         int titleOnly = lit(at(RevealPainter.AT_TEXT + RevealPainter.TEXT_MS / 2, p), TARGET);
-        int all = lit(at(RevealPainter.TOTAL_MS, p), TARGET);
+        int all = lit(at(RevealPainter.AT_HOLD, p), TARGET);
         yes("the title fades in first, saw " + titleOnly, titleOnly > 30);
         yes("then the body, saw " + all, all > titleOnly + 30);
+
+        // The landed card holds, readable, and only then fades.
+        int held = lit(at(RevealPainter.AT_OUT - 1, p), TARGET);
+        eq("the card holds, all its text still there", all, held);
+        yes("it holds for at least two seconds", RevealPainter.HOLD_MS >= 2000);
+        eq("the hold card still fills the landing", RevealPainter.CARD_FILL.getRGB(),
+            at(RevealPainter.AT_OUT - 1, p).getRGB(inTarget.x, inTarget.y));
+        BufferedImage gone = at(RevealPainter.TOTAL_MS, p);
+        eq("then fades away entirely", GREY.getRGB(), gone.getRGB(inTarget.x, inTarget.y));
+        yes("and the reading lands when the card has formed, not after the hold",
+            Math.abs(RevealPainter.LANDS_AT * RevealPainter.TOTAL_MS - RevealPainter.FORM_MS) < 1e-6);
     }
 
     // ------------------------------------------------------------------ C
@@ -264,7 +275,7 @@ public final class RevealCheck {
         long deadline = System.currentTimeMillis() + 3000;
         while (System.currentTimeMillis() < deadline) {
             double v = reveal[0].progress();
-            if (v > 0.15 && v < 0.7) {
+            if (v > 0.05 && v < 0.6 * RevealPainter.LANDS_AT) {
                 partway = v;
                 break;
             }
@@ -293,14 +304,32 @@ public final class RevealCheck {
         // A whole reveal, uninterrupted, lands once at its end.
         AtomicInteger second = new AtomicInteger();
         long began = System.currentTimeMillis();
+        boolean[] landedWhilePlaying = new boolean[1];
         SwingUtilities.invokeAndWait(() -> reveal[0].play(scene(p), second::incrementAndGet));
-        while (reveal[0].playing() && System.currentTimeMillis() < began + 8000) {
+        while (reveal[0].playing() && System.currentTimeMillis() < began + 12000) {
+            if (second.get() == 1) {
+                landedWhilePlaying[0] = true;
+            }
             Thread.sleep(10);
         }
         long whole = System.currentTimeMillis() - began;
+        yes("the reading landed while the card was still on screen", landedWhilePlaying[0]);
         eq("an uninterrupted reveal lands once", 1, second.get());
         yes("after its whole sequence, " + whole + " ms", whole >= RevealPainter.TOTAL_MS - 100);
         yes("and leaves nothing on the window", layer.getComponentCount() == 0);
+
+        // A click during the hold takes the card away at once, with no flight back.
+        AtomicInteger h = new AtomicInteger();
+        SwingUtilities.invokeAndWait(() -> reveal[0].play(scene(p), h::incrementAndGet));
+        long holdBy = System.currentTimeMillis() + 8000;
+        while (h.get() == 0 && System.currentTimeMillis() < holdBy) {
+            Thread.sleep(10);
+        }
+        yes("the reading lands, and the card holds", h.get() == 1 && reveal[0].playing());
+        SwingUtilities.invokeAndWait(() -> reveal[0].interrupt());
+        yes("a click during the hold removes the card at once",
+            !reveal[0].playing() && layer.getComponentCount() == 0);
+        eq("without landing the reading again", 1, h.get());
 
         // A second request while the first plays: the first lands, then the second plays.
         AtomicInteger a = new AtomicInteger();
