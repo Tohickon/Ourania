@@ -197,6 +197,11 @@ public class InterpretationService {
         // NOT stored - ArcMidpointReading composes the rest from the pair's own conjunction
         // prose, which already exists for all 78 pairs. See that class for why.
         "solar_arc_midpoints.json",
+        // The plain transit cards on the Now page (2026-10-17): short parts that a card is
+        // built from - what the sky planet does, how the contact feels, which need it
+        // touches - and one "what to do now" line for each sky planet and major aspect.
+        // See TransitCard. Its own file and section, so nothing else can overwrite it.
+        "transit_cards.json",
         "aspect_prose_v2.json",
         "spirit_prose.json",
         "minor_aspect_prose.json",
@@ -780,6 +785,9 @@ public class InterpretationService {
     /** What each directed body does when it arrives on a midpoint; thirteen entries. */
     private final Map<String, String> arcCatalysts = new HashMap<>();
 
+    /** The parts the plain transit cards are built from, keyed kind.body[.aspect]. */
+    private final Map<String, String> transitCardParts = new HashMap<>();
+
     /** The pictures with a specific reading of their own, keyed directed_a_b. */
     private final Map<String, String> arcPictures = new HashMap<>();
 
@@ -814,6 +822,7 @@ public class InterpretationService {
         if (line.startsWith("\"synastry_aspect\"")) return synastryAspects;
         if (line.startsWith("\"arc_catalyst\"")) return arcCatalysts;
         if (line.startsWith("\"arc_picture\"")) return arcPictures;
+        if (line.startsWith("\"transit_card\"")) return transitCardParts;
         return null;
     }
 
@@ -1291,6 +1300,14 @@ public class InterpretationService {
      * One sentence per body, which is the whole of what this layer needs from the catalyst
      * half of a picture - the other half is the pair's own fusion, and that already exists.
      */
+    /**
+     * One part of a plain transit card, or null when none is written. The key is the part's
+     * kind and the body's id, and the aspect for a "todo": {@code "todo.saturn.square"}.
+     */
+    public String getTransitCardPart(String key) {
+        return key == null ? null : transitCardParts.get(key);
+    }
+
     public String getArcCatalyst(String bodyName) {
         return arcCatalysts.getOrDefault(bodyKey(bodyName), "");
     }

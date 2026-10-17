@@ -26,14 +26,38 @@ import java.util.Set;
  * @param ticks     one entry per technique that counted, in the order the engine counted them;
  *                  the technique's name in Astrologer view, null in plain view
  * @param confirmed whether the Rule of Three is met
- * @param points    the natal chart factors the counted votes landed on, each once
+ * @param points    the natal chart factors the counted votes landed on, each once; a point
+ *                  on the sky ring is written {@link #SKY} + its name
+ * @param label     the card's small heading, or null for the title in capitals
  */
 record RevealPlan(String title, String body, List<String> ticks, boolean confirmed,
-        List<String> points) {
+        List<String> points, String label) {
+
+    /** The prefix of a point that stands on the sky ring, not the natal one. */
+    static final String SKY = "sky:";
 
     RevealPlan {
         ticks = java.util.Collections.unmodifiableList(new ArrayList<>(ticks));
         points = List.copyOf(points);
+    }
+
+    /** A plan whose card is headed by its title in capitals, as stage 1 and 2 draw it. */
+    RevealPlan(String title, String body, List<String> ticks, boolean confirmed,
+            List<String> points) {
+        this(title, body, ticks, confirmed, points, null);
+    }
+
+    /**
+     * The plan for one transit's plain card (2026-10-17): the card itself, word for word, and
+     * its two factors - the planet in the sky, where the card forms, and the natal point it
+     * touches. Nothing is counted.
+     */
+    static RevealPlan forTransit(NowCards.TransitHit hit, ReadingCard card) {
+        if (hit == null || card == null) {
+            return null;
+        }
+        return new RevealPlan(card.headline(), card.body(), List.of(), false,
+            List.of(SKY + hit.transiting(), hit.natal()), card.label());
     }
 
     /** The plan for one theme, or null when the theme is not a headline - stage 1 shows only those. */
@@ -121,7 +145,8 @@ record RevealPlan(String title, String body, List<String> ticks, boolean confirm
      * shows it through {@link ReadingCard#html}, so the two cannot say different things.
      */
     ReadingCard card() {
-        return new ReadingCard(title.toUpperCase(java.util.Locale.ROOT), title, body, List.of());
+        return new ReadingCard(label != null ? label : title.toUpperCase(java.util.Locale.ROOT),
+            title, body, List.of());
     }
 
     /**

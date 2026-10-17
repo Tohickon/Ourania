@@ -152,8 +152,12 @@ public record ReadingCard(String label, String headline, String body, List<Strin
                     + " margin-top:4px;'>").append(escape(c.headline)).append("</div>");
             }
             if (c.body != null && !c.body.isEmpty()) {
-                sb.append("<p style='font-size:13px; margin-top:6px;'>")
-                  .append(escape(c.body)).append("</p>");
+                // A blank line in the body is a new paragraph: fromTheme's "How to handle it"
+                // and a transit card's "What to do now" stand on their own line.
+                for (String para : c.body.split("\n\\s*\n")) {
+                    sb.append("<p style='font-size:13px; margin-top:6px;'>")
+                      .append(escape(para.trim())).append("</p>");
+                }
             }
             if (showWhy && !c.why.isEmpty()) {
                 sb.append("<div style='color:#9AA5B1; font-size:11px; margin-top:6px;'>"

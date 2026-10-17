@@ -127,12 +127,7 @@ public final class NowCards {
         String category = hit.isFast ? "THIS WEEK · CATALYST" : "THIS SEASON · THE LONG ARC";
         String label = "[ " + hit.timingBadge() + " ] · " + category;
 
-        List<String> why = new ArrayList<>();
-        why.add("Transiting " + hit.transiting + " in " + PlacementText.capitalise(Zodiac.signName(hit.transitLon))
-            + (hit.transitHouse > 0 ? ", " + Zodiac.ordinal(hit.transitHouse) + " house" : ""));
-        why.add(hit.aspect.label + " Natal " + hit.natal + " in " + PlacementText.capitalise(Zodiac.signName(hit.natalLon))
-            + (hit.natalHouse > 0 ? ", " + Zodiac.ordinal(hit.natalHouse) + " house" : ""));
-        why.add(String.format("Orb: %.2f° (%s)", hit.orb, hit.timingBadge().toLowerCase()));
+        List<String> why = whyLines(hit);
 
         ReadingCard card = ReadingCard.fromLead(label, prose, why);
         if (card != null) {
@@ -162,6 +157,21 @@ public final class NowCards {
     }
 
     /**
+     * The astrology behind a transit card, one line each: shared by this page's card and the
+     * plain {@link TransitCard}, so the two cannot name the contact differently.
+     */
+    static List<String> whyLines(TransitHit hit) {
+        List<String> why = new ArrayList<>();
+        why.add("Transiting " + hit.transiting + " in " + PlacementText.capitalise(Zodiac.signName(hit.transitLon))
+            + (hit.transitHouse > 0 ? ", " + Zodiac.ordinal(hit.transitHouse) + " house" : ""));
+        why.add(hit.aspect.label + " Natal " + hit.natal + " in " + PlacementText.capitalise(Zodiac.signName(hit.natalLon))
+            + (hit.natalHouse > 0 ? ", " + Zodiac.ordinal(hit.natalHouse) + " house" : ""));
+        why.add(String.format("Orb: %.2f° (%s)", hit.orb, hit.timingBadge().toLowerCase()));
+
+        return why;
+    }
+
+    /**
      * Builds the complete page HTML for the Now / Transits pane.
      */
     public static String html(WheelRing transitRing, WheelRing natalRing, double[] cusps,
@@ -173,17 +183,19 @@ public final class NowCards {
 
         List<ReadingCard> thisWeekCards = new ArrayList<>();
         List<ReadingCard> thisSeasonCards = new ArrayList<>();
+        List<String> thisWeekIds = new ArrayList<>();
+        List<String> thisSeasonIds = new ArrayList<>();
 
-        for (TransitHit hit : hits) {
-            ReadingCard card = toCard(hit);
+        for (TransitHit hit : shown(hits, showWhy)) {
+            // Plain view: the transit as a part of life and a direction (TransitCard), majors
+            // only. Astrologer view keeps the corpus card for every contact.
+            ReadingCard card = showWhy ? toCard(hit) : TransitCard.of(hit);
             if (hit.isFast) {
-                if (thisWeekCards.size() < 6) {
-                    thisWeekCards.add(card);
-                }
+                thisWeekCards.add(card);
+                thisWeekIds.add(TransitCard.id(hit));
             } else {
-                if (thisSeasonCards.size() < 6) {
-                    thisSeasonCards.add(card);
-                }
+                thisSeasonCards.add(card);
+                thisSeasonIds.add(TransitCard.id(hit));
             }
         }
 
@@ -191,18 +203,18 @@ public final class NowCards {
             sb.append("<table width='100%' cellpadding='10' cellspacing='0' bgcolor='#1B2230' style='margin-bottom:12px;'><tr><td>")
               .append("<div style='color:#7FA7C9; font-size:10px; font-weight:bold;'>QUIET SKY</div>")
               .append("<div style='color:#FFFFFF; font-size:15px; font-weight:bold; margin-top:4px;'>A Quiet Stretch in the Sky</div>")
-              .append("<p style='font-size:13px; margin-top:6px; color:#E0E0E0;'>No major transit aspects are in tight peak orb right now. Your chart is running on steady habit rather than external pressure.</p>")
+              .append("<p style='font-size:13px; margin-top:6px; color:#E0E0E0;'>Nothing in the sky is pressing on your chart right now. Life runs on steady habit for the moment, not on outside pressure.</p>")
               .append("</td></tr></table>");
         }
 
         if (!thisWeekCards.isEmpty()) {
             sb.append("<h3 style='color:#7FB3FF; margin-top:14px; margin-bottom:6px;'>This Week \u00b7 Catalysts</h3>");
-            sb.append(ReadingCard.html(thisWeekCards, showWhy));
+            sb.append(cardsHtml(thisWeekCards, thisWeekIds, showWhy));
         }
 
         if (!thisSeasonCards.isEmpty()) {
             sb.append("<h3 style='color:#FFD166; margin-top:18px; margin-bottom:6px;'>This Season \u00b7 The Long Arc</h3>");
-            sb.append(ReadingCard.html(thisSeasonCards, showWhy));
+            sb.append(cardsHtml(thisSeasonCards, thisSeasonIds, showWhy));
         }
 
         // Astrologer view drawer: append raw placement tables when enabled
@@ -214,6 +226,44 @@ public final class NowCards {
         }
 
         sb.append("</body></html>");
+        return sb.toString();
+    }
+
+    /** How many cards each section of the page holds. */
+    static final int PER_SECTION = 6;
+
+    /**
+     * The contacts the page makes a card for, in its order: up to {@link #PER_SECTION} this
+     * week and as many this season, and in plain view only those with a plain card.
+     *
+     * <b>The page and its pop-ups ask this one rule.</b> The pop-ups first chose from every
+     * contact, so a card could form, fly, and find no card of its own on the page to land on.
+     */
+    static List<TransitHit> shown(List<TransitHit> hits, boolean showWhy) {
+        List<TransitHit> out = new ArrayList<>();
+        int fast = 0;
+        int slow = 0;
+        for (TransitHit hit : hits) {
+            if (!showWhy && TransitCard.of(hit) == null) {
+                continue;
+            }
+            if (hit.isFast ? fast++ < PER_SECTION : slow++ < PER_SECTION) {
+                out.add(hit);
+            }
+        }
+        return out;
+    }
+
+    /**
+     * The cards, each in a div named for its contact ({@link TransitCard#id}), so a card that
+     * pops up when time stops can find its own card on this page and land on it.
+     */
+    private static String cardsHtml(List<ReadingCard> cards, List<String> ids, boolean showWhy) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < cards.size(); i++) {
+            sb.append("<div id='").append(ids.get(i)).append("'>")
+              .append(ReadingCard.html(List.of(cards.get(i)), showWhy)).append("</div>");
+        }
         return sb.toString();
     }
 

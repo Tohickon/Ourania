@@ -4391,14 +4391,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (plan == null || g == null || this.window == null) {
             return null;
         }
-        int[] radii = g.natalRadii();
         List<java.awt.Point> points = new ArrayList<>();
         for (String name : plan.points()) {
-            int i = Bodies.indexOfName(name);
-            if (i < 0) {
-                i = Bodies.indexOf(name.toLowerCase(java.util.Locale.ROOT));
-            }
-            java.awt.Point p = this.glyphOn(g, radii, i, lp);
+            java.awt.Point p = this.pointOn(g, name, lp);
             if (p != null) {
                 points.add(p);
             }
@@ -4408,7 +4403,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         java.awt.Point centre = this.onScreen(g.cx, g.cy, lp);
         java.awt.Point focal = focalBody == REVEAL_AT_CENTRE ? centre
-            : this.glyphOn(g, radii, focalBody, lp);
+            : focalBody == REVEAL_AT_FIRST ? this.pointOn(g, plan.points().get(0), lp)
+            : this.glyphOn(g, this.natalRing, g.natalRadii(), focalBody, lp);
         if (focal == null) {
             return null;
         }
@@ -4418,13 +4414,124 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             this.window.readingLanding(lp), plan, Color.BLACK);
     }
 
-    /** A natal body's glyph in the layered pane, or null when it is not drawn. */
-    private java.awt.Point glyphOn(Geometry g, int[] radii, int i, javax.swing.JLayeredPane lp) {
-        if (i < 0 || i >= this.natalRing.lon.length || !this.natalRing.valid[i]) {
+    /** The focal point of a transit's card: its first factor, the planet in the sky. */
+    static final int REVEAL_AT_FIRST = -2;
+
+    /**
+     * A plan's point on screen: a natal body by name, or {@link RevealPlan#SKY} + a name for
+     * a body on the ring the Now page reads ({@link #nowRing}), when that ring is drawn.
+     */
+    private java.awt.Point pointOn(Geometry g, String name, javax.swing.JLayeredPane lp) {
+        boolean sky = name.startsWith(RevealPlan.SKY);
+        String bare = sky ? name.substring(RevealPlan.SKY.length()) : name;
+        int i = Bodies.indexOfName(bare);
+        if (i < 0) {
+            i = Bodies.indexOf(bare.toLowerCase(java.util.Locale.ROOT));
+        }
+        if (!sky) {
+            return this.glyphOn(g, this.natalRing, g.natalRadii(), i, lp);
+        }
+        WheelRing now = this.nowRing();
+        if (now == this.outerRing && this.outerRingDrawn()) {
+            return this.glyphOn(g, now, g.transitRadii(), i, lp);
+        }
+        if (now == this.skyRing && this.triRingDrawn()) {
+            return this.glyphOn(g, now, g.triRadii(), i, lp);
+        }
+        return null;
+    }
+
+    /** A body's glyph on one ring, in the layered pane, or null when it is not drawn. */
+    private java.awt.Point glyphOn(Geometry g, WheelRing ring, int[] radii, int i,
+            javax.swing.JLayeredPane lp) {
+        if (i < 0 || i >= ring.lon.length || !ring.valid[i]) {
             return null;
         }
-        return this.onScreen(SkymapPanel.screenX(g.cx, g.pin, this.natalRing.lon[i], radii[i]),
-            SkymapPanel.screenY(g.cy, g.pin, this.natalRing.lon[i], radii[i]), lp);
+        return this.onScreen(SkymapPanel.screenX(g.cx, g.pin, ring.lon[i], radii[i]),
+            SkymapPanel.screenY(g.cy, g.pin, ring.lon[i], radii[i]), lp);
+    }
+
+    /**
+     * The ring the Now page reads its transits from: the outer ring when it holds a moment,
+     * else the sky ring when it has one. One rule, asked by the page and by its pop-ups, so a
+     * card cannot form at a planet on a different ring from the one its card describes.
+     */
+    WheelRing nowRing() {
+        return this.outerRing.kind.readsAsEvent() ? this.outerRing
+            : (this.skyRing.time != null ? this.skyRing : this.outerRing);
+    }
+
+    /**
+     * Time has stopped on a moment the reader chose: Pause, the end of a scrub, or Now.
+     *
+     * <b>Never a tick of Play</b>, which moves time several times a second; pop-ups on every
+     * tick would be noise, the reason the reading's rebuild never reveals either. Queued, so
+     * the chart and the Now page are rebuilt for this moment before anything is read.
+     */
+    private void timeSettled() {
+        if (this.window != null && ReadingReveal.allowed()) {
+            javax.swing.SwingUtilities.invokeLater(this::popTransits);
+        }
+    }
+
+    /**
+     * The transits of this moment as pop-ups: the three nearest their exact moment, in that
+     * order, each forming at its planet in the sky with a thread to the natal point it touches,
+     * and landing on its own card on the Now page. A click or a key ends the chain.
+     */
+    void popTransits() {
+        if (this.isPlaying || this.isScrubbing() || this.sw == null || this.natalRing.sd == null
+                || this.window == null) {
+            return;
+        }
+        // <b>The page first, then the wheel is measured.</b> Opening the rail moves the wheel and
+        // the pages lay out as it opens, so a chain that opened the page at its first landing
+        // measured a card 150 px wide, and its threads pointed at where the glyphs had been.
+        this.window.revealPage(OuraniaWindow.TRANSITS_PAGE);
+        javax.swing.Timer settle = new javax.swing.Timer(RAIL_SETTLE_MS, e -> this.playTransits());
+        settle.setRepeats(false);
+        settle.start();
+    }
+
+    /** How long the rail takes to open, so the wheel is measured where it comes to rest. */
+    static final int RAIL_SETTLE_MS = 450;
+
+    private void playTransits() {
+        if (this.isPlaying || this.isScrubbing()) {
+            return;
+        }
+        WheelRing now = this.nowRing();
+        if (now == null || now.sd == null) {
+            return;
+        }
+        double jd = now.sd.getJulDay();
+        // Only contacts the Now page shows a card for, so each pop-up has a card to land on.
+        List<NowCards.TransitHit> pop = TransitCard.firstToPop(
+            NowCards.shown(NowCards.findHits(now, this.natalRing, this.activeCusps),
+                Settings.astrologerView()),
+            h -> TransitCard.daysFromExact(this.sw, h, jd), TransitCard.POP_COUNT);
+        List<Object[]> chain = new ArrayList<>();
+        for (NowCards.TransitHit h : pop) {
+            RevealPlan plan = RevealPlan.forTransit(h, TransitCard.of(h));
+            RevealPainter.Scene scene = this.revealScene(plan, REVEAL_AT_FIRST);
+            if (scene != null) {
+                chain.add(new Object[] {scene, TransitCard.id(h), plan});
+            }
+        }
+        this.popNext(chain, 0);
+    }
+
+    private void popNext(List<Object[]> chain, int k) {
+        if (k >= chain.size() || this.window == null) {
+            return;
+        }
+        Object[] item = chain.get(k);
+        RevealPlan plan = (RevealPlan) item[2];
+        // The page is already open. Astrologer view shows the corpus card for the contact, so
+        // there the card is found by its id alone.
+        this.reveal().play((RevealPainter.Scene) item[0], null,
+            this.landingFor((String) item[1], Settings.astrologerView() ? null : plan.title()),
+            TransitCard.POP_MS, () -> this.popNext(chain, k + 1));
     }
 
     /**
@@ -4485,9 +4592,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
 
     /** Where a plan's real card is on the page, asked of the window's layered pane. */
     private java.util.function.Supplier<java.awt.Rectangle> landingFor(RevealPlan plan) {
+        return this.landingFor(RevealPlan.CARD_ID, plan.title());
+    }
+
+    /** Where the card with this id, and this heading if one is given, is on the page. */
+    private java.util.function.Supplier<java.awt.Rectangle> landingFor(String id, String headline) {
         javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(this.chartPanel);
         return root == null ? null
-            : () -> ReadingReveal.cardOnPage(root.getLayeredPane(), plan.title());
+            : () -> ReadingReveal.cardOnPage(root.getLayeredPane(), id, headline, true);
     }
 
     private ReadingReveal reveal() {
@@ -6963,7 +7075,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     void endScrub() {
+        boolean was = this.scrub.isScrubbing();
         this.scrub.end();
+        if (was) {
+            this.timeSettled();
+        }
     }
 
     /**
@@ -7047,6 +7163,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     /** Starts or stops time, leaving the direction and rate alone. */
     void playPause() {
         this.isPlaying = !this.isPlaying;
+        if (!this.isPlaying) {
+            this.timeSettled();
+        }
     }
 
     /** True while time is running, so a check can see what the control did. */
@@ -7084,6 +7203,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.chartPanel != null) {
             this.chartPanel.repaint();
         }
+        this.timeSettled();
     }
 
     /**

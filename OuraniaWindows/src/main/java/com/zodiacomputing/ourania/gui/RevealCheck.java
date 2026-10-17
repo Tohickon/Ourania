@@ -56,6 +56,7 @@ public final class RevealCheck {
         part("Part F: a placement forms at its planet, from its own reading", RevealCheck::thePlacement);
         part("Part G: the real wheel's placement factors and focal point", RevealCheck::theRealWheel);
         part("Part H: the card lands on a real card that stays", RevealCheck::theRealCard);
+        part("Part I: transit cards pop up when time stops", () -> theTransitPopups(sw));
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -787,6 +788,207 @@ public final class RevealCheck {
         } finally {
             SwingUtilities.invokeAndWait(() -> frame[0].dispose());
         }
+    }
+
+    // ------------------------------------------------------------------ I
+
+    /**
+     * David, 2026-10-17: the transit cards should pop up "when a wheel or chart is progressed
+     * and stops on a time", highlighted on the chart, "in order of occurrance". He chose the
+     * exact time for the order and three cards for each stop.
+     */
+    private static void theTransitPopups(SwissEph sw) throws Exception {
+        // The order: nearest exact first, before or after; only contacts with a plain card.
+        NowCards.TransitHit far = hit("Saturn", "Moon", com.zodiacomputing.ourania.astro.Aspects.Type.SQUARE, 0.2);
+        NowCards.TransitHit near = hit("Mars", "Sun", com.zodiacomputing.ourania.astro.Aspects.Type.TRINE, 1.9);
+        NowCards.TransitHit mid = hit("Venus", "Mars", com.zodiacomputing.ourania.astro.Aspects.Type.SEXTILE, 0.9);
+        NowCards.TransitHit tie = hit("Sun", "Venus", com.zodiacomputing.ourania.astro.Aspects.Type.SQUARE, 0.4);
+        NowCards.TransitHit minor = hit("Sun", "Uranus", com.zodiacomputing.ourania.astro.Aspects.Type.DECILE, 0.01);
+        java.util.Map<NowCards.TransitHit, Double> days = new java.util.HashMap<>();
+        days.put(far, 40.0);
+        days.put(near, 0.5);
+        days.put(mid, 3.0);
+        days.put(tie, 3.0);
+        days.put(minor, 0.0);
+        List<NowCards.TransitHit> pop = TransitCard.firstToPop(List.of(far, near, mid, tie, minor),
+            days::get, 3);
+        eq("three cards, nearest their exact moment first, a tie by orb",
+            List.of(near, tie, mid), pop);
+        yes("a contact with no plain card never pops up", !pop.contains(minor));
+        eq("David chose three", 3, TransitCard.POP_COUNT);
+
+        // The exact moment, from the ephemeris: a natal point where Mars will be in seven hours
+        // is that far from exact, and one where Mars was five days ago, five days. (Not "now"
+        // exactly: the search finds a change of sign, and a zero on its own sample is no change.)
+        double jd = new SweDate(2026, 10, 17, 12.0).getJulDay();
+        double marsNow = com.zodiacomputing.ourania.astro.Almanac.bodyLongitude(sw, jd + 0.3, "Mars");
+        double marsBefore = com.zodiacomputing.ourania.astro.Almanac.bodyLongitude(sw, jd - 5, "Mars");
+        NowCards.TransitHit exactNow = new NowCards.TransitHit("Mars", marsNow, 0.7, 1, "Sun",
+            marsNow, 1, com.zodiacomputing.ourania.astro.Aspects.Type.CONJUNCTION, 0.0, false, true);
+        NowCards.TransitHit fiveAgo = new NowCards.TransitHit("Mars", marsNow, 0.7, 1, "Sun",
+            marsBefore, 1, com.zodiacomputing.ourania.astro.Aspects.Type.CONJUNCTION, 3.5, false, true);
+        near("a contact exact in seven hours is 0.3 days away", 0.3, TransitCard.daysFromExact(sw, exactNow, jd), 0.02);
+        near("one exact five days ago is five days away", 5.0, TransitCard.daysFromExact(sw, fiveAgo, jd), 0.1);
+
+        // The page makes a card for every contact that can pop up, each with its own id.
+        WheelRing sky = WheelRing.of(WheelRing.Kind.SKY);
+        WheelRing natal = WheelRing.of(WheelRing.Kind.CHART_A);
+        int mars = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Mars");
+        int saturn = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Saturn");
+        int sun = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Sun");
+        int moon = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Moon");
+        natal.valid[sun] = true;
+        natal.lon[sun] = 120.0;
+        natal.valid[moon] = true;
+        natal.lon[moon] = 210.0;
+        sky.valid[mars] = true;
+        sky.lon[mars] = 120.3;
+        sky.speed[mars] = 0.6;
+        sky.valid[saturn] = true;
+        sky.lon[saturn] = 300.5;
+        sky.speed[saturn] = 0.05;
+        double[] cusps = new double[13];
+        for (int i = 1; i <= 12; i++) {
+            cusps[i] = (i - 1) * 30.0;
+        }
+        List<NowCards.TransitHit> found = NowCards.findHits(sky, natal, cusps);
+        List<NowCards.TransitHit> shown = NowCards.shown(found, false);
+        String page = NowCards.html(sky, natal, cusps, false, "");
+        List<String> missing = new ArrayList<>();
+        for (NowCards.TransitHit h : TransitCard.firstToPop(shown, h -> h.orb(), 3)) {
+            if (!page.contains("<div id='" + TransitCard.id(h) + "'>")) {
+                missing.add(TransitCard.id(h));
+            }
+        }
+        yes("the fixture has contacts that pop up, " + shown.size(), !shown.isEmpty());
+        eq("every card that can pop up has its own card on the page", "[]", missing.toString());
+        yes("the astrologer page names its cards the same way", NowCards.html(sky, natal, cusps,
+            true, "").contains("<div id='" + TransitCard.id(shown.get(0)) + "'>"));
+
+        // The plan is the card on the page, word for word, forming at the planet in the sky.
+        NowCards.TransitHit pluto = new NowCards.TransitHit("Pluto", 304.0, 0.01, 2, "Mars",
+            214.8, 11, com.zodiacomputing.ourania.astro.Aspects.Type.SQUARE, 1.2, true, false);
+        ReadingCard card = TransitCard.of(pluto);
+        RevealPlan plan = RevealPlan.forTransit(pluto, card);
+        eq("the painted card is the page's card, word for word",
+            List.of(card.label(), card.headline(), card.body()),
+            List.of(plan.card().label(), plan.card().headline(), plan.card().body()));
+        eq("its factors are the planet in the sky, then the natal point",
+            List.of(RevealPlan.SKY + "Pluto", "Mars"), plan.points());
+        yes("and nothing is counted", plan.ticks().isEmpty() && !plan.confirmed());
+
+        // A transit's headline is a sentence: wrapped, it stays inside its card.
+        Rectangle real = new Rectangle(440, 30, 240, 300);
+        BufferedImage img = new BufferedImage(W, H, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        g.setColor(GREY);
+        g.fillRect(0, 0, W, H);
+        RevealPainter.paint(g, new RevealPainter.Scene(CENTRE, 150, List.of(P, C1), P, real, plan,
+            Color.BLACK), (RevealPainter.AT_HOLD + 100.0) / RevealPainter.TOTAL_MS, 1.0);
+        g.dispose();
+        int inside = lit(img, real);
+        int outside = lit(img, new Rectangle(real.x + real.width + 2, real.y, W - real.x - real.width - 2, real.height));
+        yes("the card's words are drawn, " + inside, inside > 200);
+        eq("and none of them runs past its right edge", 0, outside);
+
+        // A chain: the next card plays when one ends by itself; a click ends the chain.
+        JLayeredPane layer = new JLayeredPane();
+        layer.setSize(W, H);
+        ReadingReveal reveal = new ReadingReveal(layer);
+        AtomicInteger played = new AtomicInteger();
+        Runnable[] second = new Runnable[1];
+        second[0] = () -> reveal.play(placed(placement()), played::incrementAndGet, null, 300, null);
+        SwingUtilities.invokeAndWait(() -> reveal.play(placed(placement()), played::incrementAndGet,
+            null, 300, second[0]));
+        long until = System.currentTimeMillis() + 4000;
+        while (played.get() < 2 && System.currentTimeMillis() < until) {
+            Thread.sleep(10);
+        }
+        eq("a card that ends by itself plays the next", 2, played.get());
+        while (reveal.playing() && System.currentTimeMillis() < until) {
+            Thread.sleep(10);
+        }
+        AtomicInteger chained = new AtomicInteger();
+        SwingUtilities.invokeAndWait(() -> reveal.play(placed(placement()), null, null, 2000,
+            chained::incrementAndGet));
+        SwingUtilities.invokeAndWait(() -> reveal.interrupt());
+        Thread.sleep(500);
+        eq("an interrupted card ends the chain", 0, chained.get());
+
+        // On the real wheel in Transit mode, a card forms on its planet's glyph in the sky.
+        OuraniaWindow[] w = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> w[0] = new OuraniaWindow());
+        try {
+            SkymapPanel wheel = (SkymapPanel) CheckReflect.get(w[0], "skymapPanel");
+            java.awt.Component chart = (java.awt.Component) CheckReflect.get(wheel, "chartPanel");
+            SwingUtilities.invokeAndWait(() -> {
+                chart.setSize(900, 820);
+                wheel.applyChartMode(ChartMode.TRANSIT, true);
+            });
+            long open = System.currentTimeMillis() + 4000;
+            while (!wheel.outerRingDrawn() && System.currentTimeMillis() < open) {
+                Thread.sleep(20);
+            }
+            yes("the transit ring is drawn", wheel.outerRingDrawn());
+            yes("and it is the ring the Now page reads", wheel.nowRing() == wheel.outerRing);
+            java.lang.reflect.Method bodyAt = SkymapPanel.class.getDeclaredMethod("bodyAt",
+                int.class, int.class);
+            bodyAt.setAccessible(true);
+            JLayeredPane lp = w[0].getLayeredPane();
+            int tried = 0;
+            List<String> wrong = new ArrayList<>();
+            double[] cuspsNow = (double[]) CheckReflect.get(wheel, "activeCusps");
+            for (NowCards.TransitHit h : NowCards.shown(NowCards.findHits(wheel.nowRing(),
+                    wheel.natalRing, cuspsNow), false)) {
+                RevealPlan tp = RevealPlan.forTransit(h, TransitCard.of(h));
+                RevealPainter.Scene[] sc = new RevealPainter.Scene[1];
+                SwingUtilities.invokeAndWait(() -> sc[0] = wheel.sceneOn(tp,
+                    SkymapPanel.REVEAL_AT_FIRST, lp));
+                if (sc[0] == null) {
+                    wrong.add(h.transiting() + " has no scene");
+                    continue;
+                }
+                tried++;
+                Point f = SwingUtilities.convertPoint(lp, sc[0].focal(), chart);
+                Point at = wheel.toWheel(f.x, f.y);
+                int got = (Integer) bodyAt.invoke(wheel, at.x, at.y);
+                int want = com.zodiacomputing.ourania.astro.Bodies.indexOfName(h.transiting())
+                    | WheelLayout.TRANSIT_BIT;
+                if (got != want) {
+                    wrong.add(h.transiting() + " formed at " + got);
+                }
+                if (sc[0].contributors().size() != 2) {
+                    wrong.add(h.transiting() + " has " + sc[0].contributors().size() + " factors");
+                }
+            }
+            yes("the default sky has cards to form, " + tried, tried > 0);
+            eq("each forms on its planet in the sky, with the natal point as its other factor",
+                "[]", wrong.toString());
+        } finally {
+            SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+
+        // Only a stop of time plays them, never a tick of Play.
+        Path src = Path.of("src/main/java/com/zodiacomputing/ourania/gui/SkymapPanel.java");
+        if (Files.exists(src)) {
+            String s = Files.readString(src);
+            yes("Pause pops them up", body(s, "void playPause()").contains("this.timeSettled()"));
+            yes("so does the end of a scrub", body(s, "void endScrub()").contains("this.timeSettled()"));
+            yes("and the Now button", body(s, "void jumpToNow()").contains("this.timeSettled()"));
+            yes("a tick of Play never does", !body(s, "private void stepTime()").contains("timeSettled")
+                && !body(s, "private void stepTime()").contains("popTransits"));
+            yes("they respect reduced motion",
+                body(s, "private void timeSettled()").contains("ReadingReveal.allowed()"));
+            yes("they choose from the cards the page shows",
+                body(s, "private void playTransits()").contains("NowCards.shown("));
+            yes("the page reads the wheel's own ring rule", Files.readString(
+                src.resolveSibling("OuraniaWindow.java")).contains("skymapPanel.nowRing()"));
+        }
+    }
+
+    private static NowCards.TransitHit hit(String sky, String natal,
+            com.zodiacomputing.ourania.astro.Aspects.Type type, double orb) {
+        return new NowCards.TransitHit(sky, 10, 1, 1, natal, 10, 1, type, orb, true, false);
     }
 
     private static String squash(String s) {
