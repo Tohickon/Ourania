@@ -299,28 +299,50 @@ final class RevealPainter {
 
         double title = stage(t, AT_TEXT, TEXT_MS / 2);
         double body = stage(t, AT_TEXT + TEXT_MS / 2, TEXT_MS - TEXT_MS / 2);
+        // Laid out as ReadingCard.html lays out the real card it lands on: the same three
+        // sizes at the page's scale, the label and the headline wrapped, and a blank line in
+        // the body a new paragraph. A transit's headline is a sentence; drawn on one line it ran
+        // off the card and across the wheel.
         int x = (int) card.getX() + 10;
-        int y = (int) card.getY() + 10;
-        if (title > 0.0) {
-            g.setFont(Theme.font("Arial", Font.BOLD, 10));
-            g.setColor(alpha(LABEL, title * fade));
-            y += g.getFontMetrics().getAscent();
-            g.drawString(s.plan.card().label(), x, y);
-            g.setFont(Theme.font("Arial", Font.BOLD, 15));
-            g.setColor(alpha(Color.WHITE, title * fade));
-            y += g.getFontMetrics().getHeight();
-            g.drawString(s.plan.card().headline(), x, y);
+        int width = (int) w - 20;
+        int[] y = {(int) card.getY() + 10};
+        double bottom = card.getMaxY() - 4;
+        ReadingCard c = s.plan.card();
+        text(g, c.label(), Font.BOLD, 10, LABEL, title * fade, x, y, width, bottom);
+        y[0] += 4;
+        text(g, c.headline(), Font.BOLD, 15, Color.WHITE, title * fade, x, y, width, bottom);
+        for (String para : c.body().split("\n\\s*\n")) {
+            y[0] += 6;
+            text(g, para.trim(), Font.PLAIN, 13, Color.WHITE, body * fade, x, y, width, bottom);
         }
-        if (body > 0.0 && !s.plan.card().body().isEmpty()) {
-            g.setFont(Theme.font("Arial", Font.PLAIN, 13));
-            g.setColor(alpha(Color.WHITE, body * fade));
-            FontMetrics fm = g.getFontMetrics();
-            for (String line : wrap(s.plan.card().body(), fm, (int) w - 20)) {
-                y += fm.getHeight();
-                if (y > card.getMaxY() - 4) {
-                    break;
-                }
-                g.drawString(line, x, y);
+    }
+
+    /**
+     * How much larger the reading pane draws a CSS size than a font of the same number: it
+     * takes a size in pixels as points at the screen's 96 dpi. Without it the painted card's
+     * words were a quarter smaller than the real card's, and jumped when it took over.
+     */
+    static final float HTML_SCALE = 96f / 72f;
+
+    /**
+     * One wrapped block of a card's text at {@code y}, which it moves down. Laid out even
+     * while it is invisible, so the body sits where it will be when the title fades in first.
+     */
+    private static void text(Graphics2D g, String s, int style, int cssSize, Color color,
+            double k, int x, int[] y, int width, double bottom) {
+        if (s == null || s.isEmpty()) {
+            return;
+        }
+        g.setFont(Theme.font("Arial", style, Math.round(cssSize * HTML_SCALE)));
+        FontMetrics fm = g.getFontMetrics();
+        g.setColor(alpha(color, k));
+        for (String line : wrap(s, fm, width)) {
+            y[0] += fm.getHeight();
+            if (y[0] > bottom) {
+                return;
+            }
+            if (k > 0.0) {
+                g.drawString(line, x, y[0] - fm.getDescent());
             }
         }
     }

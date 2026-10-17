@@ -38,6 +38,8 @@ final class ReadingReveal {
     private Runnable onLand;
     /** Where the real card is once the page has landed, or null while it cannot be seen. */
     private java.util.function.Supplier<java.awt.Rectangle> landing;
+    /** What follows a reveal that ran to its end; dropped when anything interrupts it. */
+    private Runnable then;
     /** The value at which the reveal was interrupted, which the fold fades against. */
     private double foldFrom = 1.0;
     private AWTEventListener interruptor;
@@ -93,15 +95,28 @@ final class ReadingReveal {
      */
     void play(RevealPainter.Scene s, Runnable onLand,
             java.util.function.Supplier<java.awt.Rectangle> landing) {
+        this.play(s, onLand, landing, RevealPainter.TOTAL_MS, null);
+    }
+
+    /**
+     * As above, over {@code totalMs} rather than the storyboard's whole timeline, and with
+     * {@code then} run once the reveal has ended by itself - the next card of a chain.
+     *
+     * <b>A click or a key ends the chain, not just the card.</b> {@code then} is dropped on an
+     * interrupt, because the reader who clicks has had enough; every card is on its page.
+     */
+    void play(RevealPainter.Scene s, Runnable onLand,
+            java.util.function.Supplier<java.awt.Rectangle> landing, int totalMs, Runnable then) {
         interrupt();
         remove();
         this.scene = s;
         this.onLand = onLand;
         this.landing = landing;
+        this.then = then;
         this.foldFrom = 1.0;
         overlay.setBounds(0, 0, layer.getWidth(), layer.getHeight());
         layer.add(overlay, JLayeredPane.DRAG_LAYER);
-        bloom = Bloom.timeline(RevealPainter.TOTAL_MS, FOLD_MS, this::frame);
+        bloom = Bloom.timeline(totalMs, FOLD_MS, this::frame);
         listen();
         bloom.set(true);
     }
@@ -111,6 +126,7 @@ final class ReadingReveal {
         if (!playing() || bloom == null) {
             return;
         }
+        then = null;
         land();
         // Past the landing, the card is only holding over a reading that is already there.
         // Folding would fly it back to the wheel, so it simply goes.
@@ -141,6 +157,12 @@ final class ReadingReveal {
         }
         if (bloom.opening() && bloom.value() >= 1.0) {
             remove();
+            Runnable next = then;
+            then = null;
+            if (next != null) {
+                // Later, not now: the next card's play() must not run inside this frame.
+                javax.swing.SwingUtilities.invokeLater(next);
+            }
             return;
         }
         if (!bloom.opening() && bloom.value() <= 0.0) {
@@ -194,12 +216,27 @@ final class ReadingReveal {
      * card's own table, from the pane's view tree, so the flying card lands on its edges.
      */
     static java.awt.Rectangle cardOnPage(JLayeredPane lp, String headline) {
+        return cardOnPage(lp, RevealPlan.CARD_ID, headline);
+    }
+
+    /** As above, for the card with this id: each transit's card has its own. */
+    static java.awt.Rectangle cardOnPage(JLayeredPane lp, String id, String headline) {
+        return cardOnPage(lp, id, headline, false);
+    }
+
+    /**
+     * As above; with {@code bringIntoView}, a card that is on the page but scrolled out of
+     * sight is scrolled to, and found on the next frame. A transit's card can be the fifth on
+     * its page, and a card that lands on a box the reader cannot see lands on nothing.
+     */
+    static java.awt.Rectangle cardOnPage(JLayeredPane lp, String id, String headline,
+            boolean bringIntoView) {
         for (javax.swing.JEditorPane pane : panes(lp, new java.util.ArrayList<>())) {
             if (!pane.isShowing()
                     || !(pane.getDocument() instanceof javax.swing.text.html.HTMLDocument doc)) {
                 continue;
             }
-            javax.swing.text.Element div = doc.getElement(RevealPlan.CARD_ID);
+            javax.swing.text.Element div = doc.getElement(id);
             if (div == null) {
                 continue;
             }
@@ -219,6 +256,10 @@ final class ReadingReveal {
                 box = div;
             }
             java.awt.Rectangle r = boxOf(pane, box);
+            if (r != null && bringIntoView && !pane.getVisibleRect().contains(r)) {
+                // Whole, not just a corner of it: the card lands on all of its box.
+                pane.scrollRectToVisible(r);
+            }
             if (r != null && r.width > 0 && r.height > 0 && pane.getVisibleRect().intersects(r)) {
                 return javax.swing.SwingUtilities.convertRectangle(pane, r, lp);
             }

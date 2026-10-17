@@ -1,7 +1,15 @@
 package com.zodiacomputing.ourania.gui;
 
 import com.zodiacomputing.ourania.astro.Bodies;
+import com.zodiacomputing.ourania.astro.Transits;
+import de.thmac.swisseph.SwissEph;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.ToDoubleFunction;
 
 /**
  * A transit as a plain card: which part of your life it touches, what the sky does to which
@@ -26,6 +34,12 @@ import java.util.Locale;
  * the list, and NowCardsCheck asserts it holds exactly the five.
  */
 final class TransitCard {
+
+    /** How many cards pop up when the reader stops time on a moment. David chose three. */
+    static final int POP_COUNT = 3;
+
+    /** How long each pop-up takes, from the first dim to gone; the card holds for part of it. */
+    static final int POP_MS = 1800;
 
     /** The line that starts a card's direction, on its own paragraph. */
     static final String WHAT_TO_DO = "What to do now: ";
@@ -64,6 +78,61 @@ final class TransitCard {
             default -> "fading";
         };
         return phase + (hit.isFast() ? " this week" : " this season");
+    }
+
+    /** The id of a contact's card on the Now page, so its pop-up lands on that card. */
+    static String id(NowCards.TransitHit hit) {
+        return "transit-" + idOf(hit.transiting()) + "-"
+            + hit.aspect().label.toLowerCase(Locale.ROOT) + "-" + idOf(hit.natal());
+    }
+
+    /**
+     * The cards to pop up when time stops: the contacts nearest their exact moment, before or
+     * after it, up to {@code n}. David, 2026-10-17: "in order of occurrence"; he chose exact
+     * time over the weight of the contact. Only contacts that have a plain card take part.
+     *
+     * @param daysFromExact how many days the contact is from exact; infinite for none found
+     */
+    static List<NowCards.TransitHit> firstToPop(List<NowCards.TransitHit> hits,
+            ToDoubleFunction<NowCards.TransitHit> daysFromExact, int n) {
+        Map<NowCards.TransitHit, Double> days = new HashMap<>();
+        List<NowCards.TransitHit> out = new ArrayList<>();
+        for (NowCards.TransitHit h : hits) {
+            if (of(h) != null) {
+                days.put(h, daysFromExact.applyAsDouble(h));
+                out.add(h);
+            }
+        }
+        out.sort(Comparator.comparingDouble((NowCards.TransitHit h) -> days.get(h))
+            .thenComparingDouble(NowCards.TransitHit::orb));
+        return out.size() > n ? new ArrayList<>(out.subList(0, n)) : out;
+    }
+
+    /**
+     * Days between {@code jd} and the nearest moment this contact is exact, from
+     * {@link Transits#exactDates}, which counts a retrograde body's extra passes. Searched over
+     * a window that suits the planet's speed; infinite when no pass falls inside it.
+     */
+    static double daysFromExact(SwissEph sw, NowCards.TransitHit hit, double jd) {
+        double w = windowDays(hit.transiting());
+        double best = Double.POSITIVE_INFINITY;
+        for (double d : Transits.exactDates(sw, hit.transiting(), hit.natalLon(), hit.aspect(),
+                jd - w, jd + w)) {
+            best = Math.min(best, Math.abs(d - jd));
+        }
+        return best;
+    }
+
+    /** How far either side of now to look for an exact pass: a few of the planet's orbs. */
+    private static double windowDays(String body) {
+        return switch (body) {
+            case "Moon" -> 3.0;
+            case "Sun", "Mercury", "Venus" -> 30.0;
+            case "Mars" -> 60.0;
+            case "Jupiter" -> 240.0;
+            case "Saturn", "Chiron" -> 400.0;
+            default -> 800.0;
+        };
     }
 
     private static String idOf(String name) {

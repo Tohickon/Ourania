@@ -1182,9 +1182,8 @@ public class OuraniaWindow extends JFrame {
             HtmlPanes.setHtml(transitPane, lastTransitHtml);
             return;
         }
-        WheelRing now = skymapPanel.outerRing.kind.readsAsEvent()
-            ? skymapPanel.outerRing
-            : (skymapPanel.skyRing.time != null ? skymapPanel.skyRing : skymapPanel.outerRing);
+        // The wheel's rule, so the page and the pop-ups that land on it read the same ring.
+        WheelRing now = skymapPanel.nowRing();
         HtmlPanes.setHtml(transitPane, NowCards.html(now, skymapPanel.natalRing,
             skymapPanel.activeCusps, Settings.astrologerView(), lastTransitHtml));
     }
