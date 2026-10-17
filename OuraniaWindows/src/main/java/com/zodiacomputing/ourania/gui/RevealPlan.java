@@ -113,6 +113,36 @@ record RevealPlan(String title, String body, List<String> ticks, boolean confirm
             new ArrayList<>(points));
     }
 
+    /** The id of the real card on the page, which the flying card lands on. */
+    static final String CARD_ID = "reveal-card";
+
+    /**
+     * The card the reveal forms, as one {@link ReadingCard}: the painter draws it and the page
+     * shows it through {@link ReadingCard#html}, so the two cannot say different things.
+     */
+    ReadingCard card() {
+        return new ReadingCard(title.toUpperCase(java.util.Locale.ROOT), title, body, List.of());
+    }
+
+    /**
+     * The page with this card at the top of its body, as real HTML that stays.
+     *
+     * <b>The card that flies must land on something.</b> David, 2026-10-17: the painted card
+     * "disappears too soon and makes no sense". It landed on the top of a page that said
+     * something else, and when it faded nothing on the page matched it. Now the page opens on
+     * the same card, and the flying one lands exactly on it.
+     */
+    String onTop(String html) {
+        String card = "<div id='" + CARD_ID + "'>" + ReadingCard.html(List.of(card()), false)
+            + "</div>";
+        if (html == null) {
+            return card;
+        }
+        int body = html.indexOf("<body");
+        int open = body < 0 ? -1 : html.indexOf('>', body);
+        return open < 0 ? card + html : html.substring(0, open + 1) + card + html.substring(open + 1);
+    }
+
     /** Whether the ticks carry technique names, which only Astrologer view gives them. */
     boolean labelled() {
         for (String t : ticks) {

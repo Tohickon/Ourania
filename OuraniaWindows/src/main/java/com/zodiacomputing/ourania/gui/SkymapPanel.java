@@ -2642,6 +2642,8 @@ implements WheelSource, GlobeSource {
     private boolean selectionTransit;
     /** The reading the card on screen was cut from, which a placement's reveal takes its words from. */
     private String selectionReading = "";
+    /** The placement card the card on screen opens on, or null for a transit or an angle. */
+    private RevealPlan selectionPlan;
 
     /** Which sections of the selection card the reader has opened. Survives re-selection. */
     private final java.util.Set<String> selectionOpen = new java.util.LinkedHashSet<>();
@@ -2683,6 +2685,17 @@ implements WheelSource, GlobeSource {
             BODY_NAMES[n], SIGN_NAMES[signIdx], degree, decan, house,
             this.getActiveAspectsFor(n, transit), lon);
         this.selectionReading = reading;
+        // A natal placement opens on its card, which a click's reveal lands on.
+        this.selectionPlan = !transit && !Bodies.at(n).isAngle()
+            ? RevealPlan.forPlacement(BODY_NAMES[n], this.getActiveAspectsFor(n, false), reading)
+            : null;
+        if (this.selectionPlan != null) {
+            sb = new StringBuilder(this.selectionPlan.onTop(sb.toString()));
+            close = sb.lastIndexOf("</body>");
+            if (close < 0) {
+                close = sb.length();
+            }
+        }
 
         StringBuilder extra = new StringBuilder();
         String lead = leadParagraph(reading);
@@ -4295,12 +4308,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // remembered by the checkbox that sets it: this tab regenerates on every
                     // open, so a state held in the widget would be lost the first time the
                     // reader looked at another page.
-                    if (asked) {
-                        this.revealPlan = RevealPlan.firstHeadline(
-                            NarrativeSynthesizer.yearThemes(chartFrame, profection, yearScan, list3,
-                                bl, SkymapPanel.this.isRelationshipChart()),
-                            Settings.astrologerView());
-                    }
+                    // Asked or not: the page opens on the headline's card either way, so a
+                    // rebuild does not take away the card a reveal landed on.
+                    this.revealPlan = RevealPlan.firstHeadline(
+                        NarrativeSynthesizer.yearThemes(chartFrame, profection, yearScan, list3,
+                            bl, SkymapPanel.this.isRelationshipChart()),
+                        Settings.astrologerView());
                     return NarrativeSynthesizer.generateReport(chartFrame, result, list, result2, chartFrame2, profection, list2, yearScan, list3, bl,
                         SkymapPanel.this.isRelationshipChart(), Settings.readingMechanics());
                 }
@@ -4323,12 +4336,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (readingTier == ReadingTier.REPORT) {
                         SkymapPanel.this.window.showReport(string2, string, (String)this.get());
                     } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
-                        String html = (String)this.get();
-                        RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, this.revealPlan)
-                            ? SkymapPanel.this.revealScene(this.revealPlan, REVEAL_AT_CENTRE) : null;
+                        RevealPlan plan = this.revealPlan;
+                        String html = plan == null ? (String)this.get() : plan.onTop((String)this.get());
+                        RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, plan)
+                            ? SkymapPanel.this.revealScene(plan, REVEAL_AT_CENTRE) : null;
                         if (scene != null) {
                             SkymapPanel.this.reveal().play(scene,
-                                () -> SkymapPanel.this.window.showSynthesis(html));
+                                () -> SkymapPanel.this.window.showSynthesis(html),
+                                SkymapPanel.this.landingFor(plan));
                         } else {
                             SkymapPanel.this.window.showSynthesis(html);
                         }
@@ -4456,15 +4471,23 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     private boolean revealPlacement(int body, String card) {
         boolean asked = this.readingAsked;
         this.readingAsked = false;
-        RevealPlan plan = asked ? RevealPlan.forPlacement(BODY_NAMES[body],
-            this.getActiveAspectsFor(body, false), this.selectionReading) : null;
+        RevealPlan plan = asked ? this.selectionPlan : null;
         RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, plan)
             ? this.revealScene(plan, body) : null;
         if (scene == null) {
             return false;
         }
-        this.reveal().play(scene, () -> this.window.showSelection(card));
+        // From the top, so the card the reveal lands on is the one in view.
+        this.reveal().play(scene, () -> this.window.showSelection(card, true),
+            this.landingFor(plan));
         return true;
+    }
+
+    /** Where a plan's real card is on the page, asked of the window's layered pane. */
+    private java.util.function.Supplier<java.awt.Rectangle> landingFor(RevealPlan plan) {
+        javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(this.chartPanel);
+        return root == null ? null
+            : () -> ReadingReveal.cardOnPage(root.getLayeredPane(), plan.title());
     }
 
     private ReadingReveal reveal() {

@@ -55,6 +55,7 @@ public final class RevealCheck {
         part("Part E: only a request plays it", RevealCheck::theTrigger);
         part("Part F: a placement forms at its planet, from its own reading", RevealCheck::thePlacement);
         part("Part G: the real wheel's placement factors and focal point", RevealCheck::theRealWheel);
+        part("Part H: the card lands on a real card that stays", RevealCheck::theRealCard);
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -225,8 +226,8 @@ public final class RevealCheck {
             at(RevealPainter.AT_OUT - 1, p).getRGB(inTarget.x, inTarget.y));
         BufferedImage gone = at(RevealPainter.TOTAL_MS, p);
         eq("then fades away entirely", GREY.getRGB(), gone.getRGB(inTarget.x, inTarget.y));
-        yes("and the reading lands when the card has formed, not after the hold",
-            Math.abs(RevealPainter.LANDS_AT * RevealPainter.TOTAL_MS - RevealPainter.FORM_MS) < 1e-6);
+        yes("and the reading lands as the card starts to fly, so it has a real card to land on",
+            Math.abs(RevealPainter.LANDS_AT * RevealPainter.TOTAL_MS - RevealPainter.AT_TRAVEL) < 1e-6);
     }
 
     // ------------------------------------------------------------------ C
@@ -366,7 +367,7 @@ public final class RevealCheck {
             .contains("this.askForReading(ReadingTier.SYNTHESIZE)"));
         String show = body(s, "void showReading(final ReadingTier readingTier)");
         yes("a request is read once and cleared", show.contains("this.readingAsked = false;"));
-        yes("the reveal is gated by shouldPlay", s.contains("ReadingReveal.shouldPlay(asked, this.revealPlan)"));
+        yes("the reveal is gated by shouldPlay", s.contains("ReadingReveal.shouldPlay(asked, plan)"));
         yes("and the batch reports do not ask",
             !Files.readString(src.resolveSibling("BatchReports.java")).contains("askForReading"));
 
@@ -385,7 +386,7 @@ public final class RevealCheck {
         yes("and forms at its planet, not at the centre",
             place.contains("this.revealScene(plan, body)"));
         yes("and lands the very card the click built",
-            place.contains("this.window.showSelection(card)"));
+            place.contains("this.window.showSelection(card, true)"));
         yes("only the placement exit reads the request",
             !body(s, "private void handleChartClick(int n, int n2)").contains("readingAsked"));
     }
@@ -678,6 +679,113 @@ public final class RevealCheck {
                 !(Boolean) CheckReflect.get(sky, "readingAsked"));
         } finally {
             SwingUtilities.invokeAndWait(() -> w[0].dispose());
+        }
+    }
+
+    // ------------------------------------------------------------------ H
+
+    /**
+     * David, 2026-10-17: the card "disappears too soon and makes no sense". It landed on a
+     * page that said something else. Now the page opens on the same card, as real HTML, and
+     * the flying card lands on that card's own box.
+     */
+    private static void theRealCard() throws Exception {
+        RevealPlan p = placement();
+        ReadingCard c = p.card();
+        eq("the card's label is the title, as the painter draws it", "VENUS IN LIBRA", c.label());
+        eq("its headline is the title", p.title(), c.headline());
+        eq("its body is the plan's", p.body(), c.body());
+        String page = p.onTop("<html><body style='color:white;'><p>The rest.</p></body></html>");
+        int card = page.indexOf("id='" + RevealPlan.CARD_ID + "'");
+        yes("the page opens on the card", card > 0 && card < page.indexOf("The rest."));
+        yes("straight after its body tag", page.indexOf("<body style='color:white;'><div id=") > 0);
+        yes("rendered by the cards' own renderer",
+            page.contains(ReadingCard.html(List.of(c), false)));
+        yes("a page with no body tag still gets it first", p.onTop("<p>x</p>").startsWith("<div id="));
+
+        // The painter: the wheel is clear before the flight, and the slot is held from landing.
+        BufferedImage flying = placedAt(RevealPainter.AT_TRAVEL + 60, p);
+        near("the wheel is itself again when the card flies", 128, red(flying, ELSEWHERE), 1);
+        Point corner = new Point(TARGET.x + 3, TARGET.y + 3);
+        eq("before landing the page is untouched", GREY.getRGB(),
+            placedAt(RevealPainter.AT_TRAVEL - 20, p).getRGB(corner.x, corner.y));
+        eq("from landing, the real card's slot is held empty", RevealPainter.CARD_FILL.getRGB(),
+            flying.getRGB(corner.x, corner.y));
+        eq("no words in the slot until the card arrives", 0,
+            lit(flying, new Rectangle(TARGET.x, TARGET.y, 120, TARGET.height)));
+
+        // The real card, found on a real page, and its box is the card's own.
+        javax.swing.JFrame[] frame = new javax.swing.JFrame[1];
+        javax.swing.JEditorPane[] pane = new javax.swing.JEditorPane[1];
+        Rectangle[] found = new Rectangle[3];
+        BufferedImage[] shot = new BufferedImage[1];
+        SwingUtilities.invokeAndWait(() -> {
+            frame[0] = new javax.swing.JFrame();
+            frame[0].setUndecorated(true);
+            pane[0] = new javax.swing.JEditorPane("text/html", "");
+            pane[0].setEditable(false);
+            pane[0].setBackground(Color.BLACK);
+            pane[0].setText(p.onTop("<html><body style='color:white; font-family:Arial;'>"
+                + "<p>Below the card.</p></body></html>"));
+            frame[0].getContentPane().add(pane[0]);
+            frame[0].setSize(320, 420);
+            frame[0].setLocation(-3000, -3000);
+            frame[0].setVisible(true);
+        });
+        try {
+            SwingUtilities.invokeAndWait(() -> { });
+            SwingUtilities.invokeAndWait(() -> {
+                JLayeredPane lp = frame[0].getLayeredPane();
+                found[0] = ReadingReveal.cardOnPage(lp, p.title());
+                found[1] = ReadingReveal.cardOnPage(lp, "Mars in Aries");
+                shot[0] = new BufferedImage(pane[0].getWidth(), pane[0].getHeight(),
+                    BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = shot[0].createGraphics();
+                pane[0].paint(g);
+                g.dispose();
+            });
+            Rectangle r = found[0];
+            yes("the real card is found on the page, " + r, r != null);
+            if (r != null) {
+                Rectangle inPane = SwingUtilities.convertRectangle(frame[0].getLayeredPane(), r,
+                    pane[0]);
+                yes("at the top of the page, " + inPane, inPane.y < 30);
+                yes("as wide as the page, " + inPane, inPane.width > pane[0].getWidth() - 40);
+                yes("and as tall as a card, " + inPane, inPane.height > 40 && inPane.height < 200);
+                eq("its box is the card on screen, by its colour", RevealPainter.CARD_FILL.getRGB(),
+                    shot[0].getRGB(inPane.x + 4, inPane.y + inPane.height - 4));
+                yes("and the page below it is not", shot[0].getRGB(inPane.x + 4,
+                    inPane.y + inPane.height + 30) != RevealPainter.CARD_FILL.getRGB());
+            }
+            yes("a card with another heading is not taken for it", found[1] == null);
+            SwingUtilities.invokeAndWait(() -> frame[0].setVisible(false));
+            SwingUtilities.invokeAndWait(() -> found[2] =
+                ReadingReveal.cardOnPage(frame[0].getLayeredPane(), p.title()));
+            yes("a page that is not on screen is not landed on", found[2] == null);
+
+            // The reveal takes the measured box as its landing once the page is there.
+            SwingUtilities.invokeAndWait(() -> frame[0].setVisible(true));
+            Settings.setAnimateRings(true);
+            Settings.setAnimateReadings(true);
+            JLayeredPane lp = frame[0].getLayeredPane();
+            ReadingReveal reveal = new ReadingReveal(lp);
+            Rectangle real = new Rectangle(20, 30, 200, 90);
+            AtomicInteger landed = new AtomicInteger();
+            SwingUtilities.invokeAndWait(() -> reveal.play(placed(p), landed::incrementAndGet,
+                () -> landed.get() > 0 ? real : null));
+            eq("before landing it aims at the scene's own target", TARGET,
+                reveal.scene().target());
+            long deadline = System.currentTimeMillis() + 4000;
+            while (reveal.progress() < RevealPainter.LANDS_AT + 0.05
+                    && System.currentTimeMillis() < deadline) {
+                Thread.sleep(10);
+            }
+            SwingUtilities.invokeAndWait(() -> { });
+            eq("the reading has landed", 1, landed.get());
+            eq("and the card now flies to the real card", real, reveal.scene().target());
+            SwingUtilities.invokeAndWait(() -> reveal.interrupt());
+        } finally {
+            SwingUtilities.invokeAndWait(() -> frame[0].dispose());
         }
     }
 
