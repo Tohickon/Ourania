@@ -127,12 +127,7 @@ public final class NowCards {
         String category = hit.isFast ? "THIS WEEK · CATALYST" : "THIS SEASON · THE LONG ARC";
         String label = "[ " + hit.timingBadge() + " ] · " + category;
 
-        List<String> why = new ArrayList<>();
-        why.add("Transiting " + hit.transiting + " in " + PlacementText.capitalise(Zodiac.signName(hit.transitLon))
-            + (hit.transitHouse > 0 ? ", " + Zodiac.ordinal(hit.transitHouse) + " house" : ""));
-        why.add(hit.aspect.label + " Natal " + hit.natal + " in " + PlacementText.capitalise(Zodiac.signName(hit.natalLon))
-            + (hit.natalHouse > 0 ? ", " + Zodiac.ordinal(hit.natalHouse) + " house" : ""));
-        why.add(String.format("Orb: %.2f° (%s)", hit.orb, hit.timingBadge().toLowerCase()));
+        List<String> why = whyLines(hit);
 
         ReadingCard card = ReadingCard.fromLead(label, prose, why);
         if (card != null) {
@@ -162,6 +157,21 @@ public final class NowCards {
     }
 
     /**
+     * The astrology behind a transit card, one line each: shared by this page's card and the
+     * plain {@link TransitCard}, so the two cannot name the contact differently.
+     */
+    static List<String> whyLines(TransitHit hit) {
+        List<String> why = new ArrayList<>();
+        why.add("Transiting " + hit.transiting + " in " + PlacementText.capitalise(Zodiac.signName(hit.transitLon))
+            + (hit.transitHouse > 0 ? ", " + Zodiac.ordinal(hit.transitHouse) + " house" : ""));
+        why.add(hit.aspect.label + " Natal " + hit.natal + " in " + PlacementText.capitalise(Zodiac.signName(hit.natalLon))
+            + (hit.natalHouse > 0 ? ", " + Zodiac.ordinal(hit.natalHouse) + " house" : ""));
+        why.add(String.format("Orb: %.2f° (%s)", hit.orb, hit.timingBadge().toLowerCase()));
+
+        return why;
+    }
+
+    /**
      * Builds the complete page HTML for the Now / Transits pane.
      */
     public static String html(WheelRing transitRing, WheelRing natalRing, double[] cusps,
@@ -175,7 +185,12 @@ public final class NowCards {
         List<ReadingCard> thisSeasonCards = new ArrayList<>();
 
         for (TransitHit hit : hits) {
-            ReadingCard card = toCard(hit);
+            // Plain view: the transit as a part of life and a direction (TransitCard), majors
+            // only. Astrologer view keeps the corpus card for every contact.
+            ReadingCard card = showWhy ? toCard(hit) : TransitCard.of(hit);
+            if (card == null) {
+                continue;
+            }
             if (hit.isFast) {
                 if (thisWeekCards.size() < 6) {
                     thisWeekCards.add(card);

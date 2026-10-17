@@ -32,6 +32,7 @@ public final class NowCardsCheck {
         testTimingBadges();
         testCardGeneration();
         testHtmlRendering();
+        testTransitCards();
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -135,6 +136,118 @@ public final class NowCardsCheck {
         yes("astrologer view includes raw coordinates drawer", astrologerHtml.contains("Placements \u00b7 Raw Coordinates"));
         yes("astrologer view includes raw table content", astrologerHtml.contains("raw coordinates table"));
         yes("astrologer view includes why box", astrologerHtml.contains("Why &mdash; the astrology:"));
+
+        // The plain page is made of TransitCards: a part of life and a direction.
+        yes("plain view names the part of life, " + plainHtml.length(),
+            plainHtml.contains("FUN, ROMANCE, CREATIVITY AND CHILDREN"));
+        yes("plain view says what the sky does to which need",
+            plainHtml.contains("A push of energy fuses with your sense of who you are"));
+        yes("plain view says what to do now", plainHtml.contains(TransitCard.WHAT_TO_DO));
+        yes("plain view shows no corpus jargon", !plainHtml.contains("transiting")
+            && !plainHtml.contains("Natal") && !plainHtml.contains("Orb:"));
+        yes("astrologer view keeps the corpus card", astrologerHtml.contains("[ PEAK ]"));
+    }
+
+    private static void testTransitCards() {
+        System.out.println("=== Part E: the plain transit card (2026-10-17) ===");
+        InterpretationService svc = InterpretationService.getInstance();
+        String[] sky = {"sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus",
+            "neptune", "pluto", "chiron"};
+        String[] aspects = {"conjunction", "sextile", "square", "trine", "opposition"};
+        String[] natal = {"sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus",
+            "neptune", "pluto", "chiron", "north_node", "south_node"};
+        List<String> missing = new ArrayList<>();
+        List<String> unfinished = new ArrayList<>();
+        java.util.Set<String> todos = new java.util.HashSet<>();
+        for (String s : sky) {
+            for (String key : new String[] {"trigger." + s, "acts." + s}) {
+                need(svc, key, missing);
+            }
+            ends(svc.getTransitCardPart("acts." + s), "acts." + s, unfinished);
+            // The aspect verbs are singular ("clashes with"), so a trigger joined by "and" must
+            // be one thing: "A rush of thoughts and messages", not "Busy thoughts and messages".
+            String trigger = svc.getTransitCardPart("trigger." + s);
+            if (trigger != null && trigger.contains(" and ") && !trigger.matches("^(A|An|The) .*")) {
+                unfinished.add("trigger." + s + " reads as plural");
+            }
+            for (String a : aspects) {
+                String todo = need(svc, "todo." + s + "." + a, missing);
+                ends(todo, "todo." + s + "." + a, unfinished);
+                if (todo != null) {
+                    todos.add(todo);
+                }
+            }
+        }
+        for (String a : aspects) {
+            need(svc, "aspect." + a, missing);
+            ends(need(svc, "feel." + a, missing), "feel." + a, unfinished);
+        }
+        for (String n : natal) {
+            String need = need(svc, "need." + n, missing);
+            if (need != null && !Character.isLowerCase(need.charAt(0))) {
+                unfinished.add("need." + n + " must read mid-sentence");
+            }
+        }
+        eq("every part a card needs is written", "[]", missing.toString());
+        eq("and each sentence ends as a sentence", "[]", unfinished.toString());
+        eq("all 55 directions are different", 55, todos.size());
+        for (Aspects.Type t : Aspects.Type.values()) {
+            String verb = svc.getTransitCardPart("aspect." + t.label.toLowerCase(java.util.Locale.ROOT));
+            boolean major = java.util.List.of("conjunction", "sextile", "square", "trine",
+                "opposition").contains(t.label.toLowerCase(java.util.Locale.ROOT));
+            if ((verb != null) != major) {
+                missing.add("aspect." + t.label + (major ? " missing" : " must not be written"));
+            }
+        }
+        eq("the file holds the five majors and no other aspect", "[]", missing.toString());
+
+        NowCards.TransitHit pluto = new NowCards.TransitHit("Pluto", 304.0, 0.01, 2, "Mars", 214.8,
+            11, Aspects.Type.SQUARE, 1.2, true, false);
+        ReadingCard c = TransitCard.of(pluto);
+        yes("a major transit to a written need makes a card", c != null);
+        if (c != null) {
+            eq("its label is the part of life, then the timing",
+                "FRIENDS, GROUPS AND HOPES FOR THE FUTURE · BUILDING THIS SEASON", c.label());
+            eq("its headline is trigger, contact and need",
+                "Deep pressure to change clashes with how you stand up for yourself", c.headline());
+            yes("its body says what the planet does and how it feels",
+                c.body().startsWith(svc.getTransitCardPart("acts.pluto") + " "
+                    + svc.getTransitCardPart("feel.square")));
+            yes("and ends on what to do, in its own paragraph", c.body().endsWith(
+                "\n\n" + TransitCard.WHAT_TO_DO + svc.getTransitCardPart("todo.pluto.square")));
+            yes("the why box is the Now page's own", c.why().equals(NowCards.whyLines(pluto)));
+            String html = ReadingCard.html(List.of(c), false);
+            yes("the direction renders as its own paragraph",
+                html.contains("<p style='font-size:13px; margin-top:6px;'>" + TransitCard.WHAT_TO_DO));
+        }
+        eq("a fast contact at its peak reads as this week", "at its peak this week",
+            TransitCard.timing(new NowCards.TransitHit("Venus", 214.9, 1.2, 11, "Mars", 214.8, 11,
+                Aspects.Type.CONJUNCTION, 0.1, true, true)));
+        eq("a separating one is fading", "fading this season",
+            TransitCard.timing(new NowCards.TransitHit("Neptune", 1, 0.01, 4, "Sun", 1, 9,
+                Aspects.Type.TRINE, 0.9, false, false)));
+        yes("a minor aspect makes no plain card", TransitCard.of(new NowCards.TransitHit("Sun",
+            0, 1, 1, "Uranus", 36, 12, Aspects.Type.DECILE, 0.02, true, true)) == null);
+        yes("a natal point with no written need makes none", TransitCard.of(
+            new NowCards.TransitHit("Sun", 0, 1, 1, "Ceres", 0, 1, Aspects.Type.CONJUNCTION, 0.1,
+                true, true)) == null);
+        yes("nor does a sky point with no trigger", TransitCard.of(new NowCards.TransitHit(
+            "North Node", 0, -0.05, 1, "Moon", 90, 5, Aspects.Type.SQUARE, 0.5, true, false)) == null);
+    }
+
+    private static String need(InterpretationService svc, String key, List<String> missing) {
+        String v = svc.getTransitCardPart(key);
+        if (v == null || v.isBlank()) {
+            missing.add(key);
+            return null;
+        }
+        return v;
+    }
+
+    private static void ends(String s, String key, List<String> unfinished) {
+        if (s != null && !s.endsWith(".")) {
+            unfinished.add(key);
+        }
     }
 
     private static void yes(String claim, boolean condition) {
