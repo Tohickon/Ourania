@@ -895,6 +895,39 @@ public final class Transits {
         return deduped;
     }
 
+    /** One exact moment of a body to one of several fixed degrees. */
+    public record Exact(int target, Aspects.Type type, double jd) {
+    }
+
+    /**
+     * Every exact moment of one body to each of several fixed degrees, for each aspect type,
+     * in the range, sorted by time.
+     *
+     * {@link #exactDates} for many targets at once, through one {@link LonCache}: the coarse
+     * walk samples the same moments for every target, so the body's longitude is computed once
+     * per sample, not once per sample per target. Measured on 2026-10-17: thirteen natal
+     * points, five aspects and eleven bodies took 2.9 s one target at a time. The root finding
+     * itself is {@link #perfections}, the same rule as every other caller.
+     */
+    public static List<Exact> exactDates(SwissEph sw, String body, double[] targets,
+                                         List<Aspects.Type> types, double jdFrom, double jdTo) {
+        LonCache cache = new LonCache(sw, body);
+        double step = stepFor(body);
+        List<Exact> out = new ArrayList<>();
+        for (int i = 0; i < targets.length; i++) {
+            if (Double.isNaN(targets[i])) {
+                continue;
+            }
+            for (Aspects.Type type : types) {
+                for (double jd : perfections(cache, targets[i], type, jdFrom, jdTo, step)) {
+                    out.add(new Exact(i, type, jd));
+                }
+            }
+        }
+        out.sort(Comparator.comparingDouble(Exact::jd));
+        return out;
+    }
+
     /** Longitude speed of a body at a moment, for the retrograde flag. NaN if unknown. */
     private static double speedOf(SwissEph sw, double jd, String body) {
         int ipl = Almanac.iplOf(body);

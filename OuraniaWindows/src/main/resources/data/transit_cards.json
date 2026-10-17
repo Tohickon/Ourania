@@ -1,7 +1,7 @@
 {
   "transit_card": {
     "trigger.sun": "The spotlight",
-    "trigger.moon": "Today's mood",
+    "trigger.moon": "Your mood",
     "trigger.mercury": "A rush of thoughts and messages",
     "trigger.venus": "The wish for closeness and pleasure",
     "trigger.mars": "A push of energy",
@@ -56,11 +56,11 @@
     "todo.sun.trine": "Be yourself, openly. Things go your way when you do not hold back.",
     "todo.sun.opposition": "Listen to the people who push back. Find a middle way between you and them.",
 
-    "todo.moon.conjunction": "Notice how you feel today, and give yourself what you need. Rest if you are tired.",
+    "todo.moon.conjunction": "Notice how you feel, and give yourself what you need. Rest if you are tired.",
     "todo.moon.sextile": "Do one small thing that makes you feel at home.",
-    "todo.moon.square": "Your mood may run high today. Wait a few hours before a big reply.",
-    "todo.moon.trine": "Trust your gut today. Spend time with people who make you feel safe.",
-    "todo.moon.opposition": "Other people's moods may pull at you today. Notice which feelings are yours.",
+    "todo.moon.square": "Your mood may run high. Wait a few hours before a big reply.",
+    "todo.moon.trine": "Trust your gut. Spend time with people who make you feel safe.",
+    "todo.moon.opposition": "Other people's moods may pull at you. Notice which feelings are yours.",
 
     "todo.mercury.conjunction": "Write things down and say what you mean. It is a good time for plans, calls and decisions.",
     "todo.mercury.sextile": "Send the message or make the call you have been putting off.",

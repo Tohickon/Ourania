@@ -33,6 +33,7 @@ public final class NowCardsCheck {
         testCardGeneration();
         testHtmlRendering();
         testTransitCards();
+        testTimeline();
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -129,7 +130,7 @@ public final class NowCardsCheck {
 
         String plainHtml = NowCards.html(transitRing, natalRing, cusps, false, "<p>raw</p>");
         yes("plain view does not show raw coordinates", !plainHtml.contains("Placements \u00b7 Raw Coordinates"));
-        yes("plain view has catalysts header", plainHtml.contains("This Week"));
+        yes("plain view opens on right now", plainHtml.contains(">Right now</h3>"));
         yes("plain view has PEAK badge", plainHtml.contains("PEAK"));
 
         String astrologerHtml = NowCards.html(transitRing, natalRing, cusps, true, "<p>raw coordinates table</p>");
@@ -191,6 +192,24 @@ public final class NowCardsCheck {
         eq("every part a card needs is written", "[]", missing.toString());
         eq("and each sentence ends as a sentence", "[]", unfinished.toString());
         eq("all 55 directions are different", 55, todos.size());
+        // The timeline says when a card happens; a part that names a day says it wrongly on
+        // every card that falls on another one ("Today's mood" under Tomorrow).
+        List<String> dated = new ArrayList<>();
+        for (String s : sky) {
+            for (String kind : new String[] {"trigger.", "acts."}) {
+                String v = svc.getTransitCardPart(kind + s);
+                if (v != null && v.matches("(?is).*\b(today|tonight|tomorrow)('s)?\b.*")) {
+                    dated.add(kind + s);
+                }
+            }
+            for (String a : aspects) {
+                String v = svc.getTransitCardPart("todo." + s + "." + a);
+                if (v != null && v.matches("(?is).*\b(today|tonight|tomorrow)('s)?\b.*")) {
+                    dated.add("todo." + s + "." + a);
+                }
+            }
+        }
+        eq("no part names a day; the timeline does", "[]", dated.toString());
         for (Aspects.Type t : Aspects.Type.values()) {
             String verb = svc.getTransitCardPart("aspect." + t.label.toLowerCase(java.util.Locale.ROOT));
             boolean major = java.util.List.of("conjunction", "sextile", "square", "trine",
@@ -233,6 +252,125 @@ public final class NowCardsCheck {
                 true, true)) == null);
         yes("nor does a sky point with no trigger", TransitCard.of(new NowCards.TransitHit(
             "North Node", 0, -0.05, 1, "Moon", 90, 5, Aspects.Type.SQUARE, 0.5, true, false)) == null);
+    }
+
+    private static void testTimeline() {
+        System.out.println("=== Part F: the Now page as one timeline (2026-10-17) ===");
+        java.time.ZoneId ny = java.time.ZoneId.of("America/New_York");
+        // Saturday 17 October 2026, noon in New York.
+        double sat = jd(java.time.ZonedDateTime.of(2026, 10, 17, 12, 0, 0, 0, ny));
+        eq("two hours on is today", NowTimeline.Window.TODAY, NowTimeline.windowOf(sat + 2 / 24.0, sat, ny));
+        eq("5 pm is still today", NowTimeline.Window.TODAY, win(2026, 10, 17, 17, sat, ny));
+        eq("7 pm is tonight", NowTimeline.Window.TONIGHT, win(2026, 10, 17, 19, sat, ny));
+        eq("3 am is still tonight", NowTimeline.Window.TONIGHT, win(2026, 10, 18, 3, sat, ny));
+        eq("Sunday morning is tomorrow", NowTimeline.Window.TOMORROW, win(2026, 10, 18, 10, sat, ny));
+        eq("a Saturday's week has ended, so Monday is next week", NowTimeline.Window.NEXT_WEEK,
+            win(2026, 10, 19, 9, sat, ny));
+        eq("the Monday after is this month", NowTimeline.Window.THIS_MONTH, win(2026, 10, 26, 9, sat, ny));
+        eq("November is next month", NowTimeline.Window.NEXT_MONTH, win(2026, 11, 5, 9, sat, ny));
+        eq("January is later this year", NowTimeline.Window.LATER, win(2027, 1, 20, 9, sat, ny));
+        eq("past a year is off the page", null, NowTimeline.windowOf(sat + 400, sat, ny));
+        eq("the past is not on the timeline", null, NowTimeline.windowOf(sat - 1, sat, ny));
+        double tue = jd(java.time.ZonedDateTime.of(2026, 10, 20, 12, 0, 0, 0, ny));
+        eq("on a Tuesday, Thursday is this week", NowTimeline.Window.THIS_WEEK, win(2026, 10, 22, 9, tue, ny));
+        eq("and next Tuesday is next week", NowTimeline.Window.NEXT_WEEK, win(2026, 10, 27, 9, tue, ny));
+
+        eq("today's card says the time", "strongest at 3:40 PM", NowTimeline.when(
+            NowTimeline.Window.TODAY, jd(java.time.ZonedDateTime.of(2026, 10, 17, 15, 40, 0, 0, ny)), ny));
+        eq("this week's says the day", "strongest on Thursday", NowTimeline.when(
+            NowTimeline.Window.THIS_WEEK, jd(java.time.ZonedDateTime.of(2026, 10, 22, 9, 0, 0, 0, ny)), ny));
+        eq("later says the year", "strongest on 20 January 2027", NowTimeline.when(
+            NowTimeline.Window.LATER, jd(java.time.ZonedDateTime.of(2027, 1, 20, 9, 0, 0, 0, ny)), ny));
+
+        // A real sky over a made-up natal chart.
+        de.thmac.swisseph.SwissEph sw = new de.thmac.swisseph.SwissEph(
+            com.zodiacomputing.ourania.astro.Ephemeris.PATH);
+        WheelRing sky = WheelRing.of(WheelRing.Kind.SKY);
+        WheelRing natal = WheelRing.of(WheelRing.Kind.CHART_A);
+        java.time.ZonedDateTime noon = java.time.ZonedDateTime.of(2026, 10, 17, 12, 0, 0, 0, ny);
+        sky.time = noon;
+        sky.sd = new de.thmac.swisseph.SweDate(2026, 10, 17, 16.0);
+        for (String b : NowTimeline.SKY) {
+            int i = Bodies.indexOfName(b);
+            sky.valid[i] = true;
+            sky.lon[i] = com.zodiacomputing.ourania.astro.Almanac.bodyLongitude(sw, sat, b);
+            sky.speed[i] = (com.zodiacomputing.ourania.astro.Almanac.bodyLongitude(sw, sat + 0.5, b)
+                - com.zodiacomputing.ourania.astro.Almanac.bodyLongitude(sw, sat - 0.5, b));
+        }
+        String[] points = {"Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"};
+        for (int k = 0; k < points.length; k++) {
+            int i = Bodies.indexOfName(points[k]);
+            natal.valid[i] = true;
+            natal.lon[i] = (k * 51.3 + 7.0) % 360.0;
+        }
+        double[] cusps = new double[13];
+        for (int i = 1; i <= 12; i++) {
+            cusps[i] = (i - 1) * 30.0;
+        }
+        List<NowTimeline.Entry> all = NowTimeline.build(sw, sky, natal, cusps);
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        List<String> twice = new ArrayList<>();
+        List<String> misplaced = new ArrayList<>();
+        double last = Double.NEGATIVE_INFINITY;
+        boolean inOrder = true;
+        boolean ahead = false;
+        for (NowTimeline.Entry e : all) {
+            if (!ids.add(TransitCard.id(e.hit()))) {
+                twice.add(TransitCard.id(e.hit()));
+            }
+            if (e.window() == NowTimeline.Window.RIGHT_NOW) {
+                continue;
+            }
+            if (NowTimeline.windowOf(e.jd(), sat, ny) != e.window()) {
+                misplaced.add(TransitCard.id(e.hit()) + " in " + e.window());
+            }
+            inOrder &= e.jd() >= last;
+            last = e.jd();
+            ahead |= e.window().ordinal() >= NowTimeline.Window.THIS_MONTH.ordinal();
+        }
+        yes("the timeline has contacts, " + all.size(), all.size() > 10);
+        eq("each contact once", "[]", twice.toString());
+        eq("each in the window of its exact moment", "[]", misplaced.toString());
+        yes("in time order", inOrder);
+        yes("and it reaches past this week", ahead);
+
+        List<NowTimeline.Entry> shown = NowCards.visible(all);
+        java.util.Map<NowTimeline.Window, Integer> per = new java.util.EnumMap<>(NowTimeline.Window.class);
+        int lastWindow = -1;
+        boolean windowsInOrder = true;
+        for (NowTimeline.Entry e : shown) {
+            per.merge(e.window(), 1, Integer::sum);
+            windowsInOrder &= e.window().ordinal() >= lastWindow;
+            lastWindow = e.window().ordinal();
+        }
+        yes("the page shows at most three a window, " + per, per.values().stream().allMatch(n -> n <= 3));
+        yes("and the windows in the reader's order", windowsInOrder);
+
+        String page = NowCards.timelineHtml(all, true);
+        int at = -1;
+        boolean headings = true;
+        for (NowTimeline.Window w : NowTimeline.Window.values()) {
+            int h = page.indexOf(">" + w.title + "</h3>");
+            if (h >= 0) {
+                headings &= h > at;
+                at = h;
+            }
+        }
+        yes("the headings run right now, today ... later this year", headings);
+        long hidden = all.size() - shown.size();
+        yes("the rest are counted, not dropped, " + hidden, hidden == 0 || page.contains(" more "));
+        yes("each card can be landed on", shown.stream().allMatch(
+            e -> page.contains("<div id='" + TransitCard.id(e.hit()) + "'>")));
+        yes("a running clock shows right now and says the rest follows",
+            NowCards.html(sky, natal, cusps, false, "", null).contains("Stop the clock"));
+    }
+
+    private static NowTimeline.Window win(int y, int m, int d, int h, double now, java.time.ZoneId z) {
+        return NowTimeline.windowOf(jd(java.time.ZonedDateTime.of(y, m, d, h, 0, 0, 0, z)), now, z);
+    }
+
+    private static double jd(java.time.ZonedDateTime t) {
+        return t.toInstant().toEpochMilli() / 86_400_000.0 + 2440587.5;
     }
 
     private static String need(InterpretationService svc, String key, List<String> missing) {

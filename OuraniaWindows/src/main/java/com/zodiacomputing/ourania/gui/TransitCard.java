@@ -49,6 +49,14 @@ final class TransitCard {
 
     /** The card for one transit, or null when it is not one a plain card is made for. */
     static ReadingCard of(NowCards.TransitHit hit) {
+        return of(hit, timing(hit));
+    }
+
+    /**
+     * As above, with the timing said in the caller's words: the timeline's "strongest at
+     * 3:40 pm" rather than this page's "building this season".
+     */
+    static ReadingCard of(NowCards.TransitHit hit, String when) {
         String sky = idOf(hit.transiting());
         String natal = idOf(hit.natal());
         String aspect = hit.aspect().label.toLowerCase(Locale.ROOT);
@@ -64,8 +72,8 @@ final class TransitCard {
             return null;
         }
         String area = LifeAreas.of(hit.natalHouse());
-        String when = timing(hit).toUpperCase(Locale.ROOT);
-        String label = area == null ? when : area.toUpperCase(Locale.ROOT) + " · " + when;
+        String upper = when.toUpperCase(Locale.ROOT);
+        String label = area == null ? upper : area.toUpperCase(Locale.ROOT) + " · " + upper;
         return new ReadingCard(label, trigger + " " + verb + " " + need,
             acts + " " + feel + "\n\n" + WHAT_TO_DO + todo, NowCards.whyLines(hit));
     }
@@ -133,6 +141,11 @@ final class TransitCard {
             case "Saturn", "Chiron" -> 400.0;
             default -> 800.0;
         };
+    }
+
+    /** Whether a natal point has a written need, so a card can be made for it. */
+    static boolean hasNeed(String name) {
+        return InterpretationService.getInstance().getTransitCardPart("need." + idOf(name)) != null;
     }
 
     private static String idOf(String name) {

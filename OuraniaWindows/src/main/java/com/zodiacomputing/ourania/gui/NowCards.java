@@ -172,10 +172,28 @@ public final class NowCards {
     }
 
     /**
-     * Builds the complete page HTML for the Now / Transits pane.
+     * Builds the complete page HTML for the Now / Transits pane, with no ephemeris: in plain
+     * view, the timeline's "right now" alone.
      */
     public static String html(WheelRing transitRing, WheelRing natalRing, double[] cusps,
                               boolean showWhy, String rawPlacementsHtml) {
+        return html(transitRing, natalRing, cusps, showWhy, rawPlacementsHtml, null);
+    }
+
+    /**
+     * Builds the complete page HTML for the Now / Transits pane.
+     *
+     * <b>Plain view is the timeline</b> ({@link NowTimeline}): right now, today, tonight ...
+     * later this year, in the order a reader asks. With {@code sw} null - while time is
+     * running - only "right now" is worked out, and the page says the rest follows.
+     * Astrologer view keeps the two lists of what is in orb, with the corpus cards.
+     */
+    public static String html(WheelRing transitRing, WheelRing natalRing, double[] cusps,
+                              boolean showWhy, String rawPlacementsHtml,
+                              de.thmac.swisseph.SwissEph sw) {
+        if (!showWhy) {
+            return timelineHtml(NowTimeline.build(sw, transitRing, natalRing, cusps), sw != null);
+        }
         List<TransitHit> hits = findHits(transitRing, natalRing, cusps);
 
         StringBuilder sb = ReadingCard.page("Now \u00b7 Active Cycles",
@@ -187,9 +205,7 @@ public final class NowCards {
         List<String> thisSeasonIds = new ArrayList<>();
 
         for (TransitHit hit : shown(hits, showWhy)) {
-            // Plain view: the transit as a part of life and a direction (TransitCard), majors
-            // only. Astrologer view keeps the corpus card for every contact.
-            ReadingCard card = showWhy ? toCard(hit) : TransitCard.of(hit);
+            ReadingCard card = toCard(hit);
             if (hit.isFast) {
                 thisWeekCards.add(card);
                 thisWeekIds.add(TransitCard.id(hit));
@@ -200,11 +216,7 @@ public final class NowCards {
         }
 
         if (thisWeekCards.isEmpty() && thisSeasonCards.isEmpty()) {
-            sb.append("<table width='100%' cellpadding='10' cellspacing='0' bgcolor='#1B2230' style='margin-bottom:12px;'><tr><td>")
-              .append("<div style='color:#7FA7C9; font-size:10px; font-weight:bold;'>QUIET SKY</div>")
-              .append("<div style='color:#FFFFFF; font-size:15px; font-weight:bold; margin-top:4px;'>A Quiet Stretch in the Sky</div>")
-              .append("<p style='font-size:13px; margin-top:6px; color:#E0E0E0;'>Nothing in the sky is pressing on your chart right now. Life runs on steady habit for the moment, not on outside pressure.</p>")
-              .append("</td></tr></table>");
+            sb.append(QUIET_SKY);
         }
 
         if (!thisWeekCards.isEmpty()) {
@@ -225,6 +237,73 @@ public final class NowCards {
             sb.append("</div>");
         }
 
+        sb.append("</body></html>");
+        return sb.toString();
+    }
+
+    /** The card a page shows when nothing in the sky is touching the chart. */
+    private static final String QUIET_SKY =
+        "<table width='100%' cellpadding='10' cellspacing='0' bgcolor='#1B2230' style='margin-bottom:12px;'><tr><td>"
+        + "<div style='color:#7FA7C9; font-size:10px; font-weight:bold;'>QUIET SKY</div>"
+        + "<div style='color:#FFFFFF; font-size:15px; font-weight:bold; margin-top:4px;'>A Quiet Stretch in the Sky</div>"
+        + "<p style='font-size:13px; margin-top:6px; color:#E0E0E0;'>Nothing in the sky is pressing on your chart right now. Life runs on steady habit for the moment, not on outside pressure.</p>"
+        + "</td></tr></table>";
+
+    /**
+     * The timeline's entries the page shows, in its order: up to {@link NowTimeline#PER_WINDOW}
+     * in each window. One rule for the page and for the pop-ups that land on it.
+     */
+    static List<NowTimeline.Entry> visible(List<NowTimeline.Entry> entries) {
+        List<NowTimeline.Entry> out = new ArrayList<>();
+        java.util.Map<NowTimeline.Window, Integer> count = new java.util.EnumMap<>(
+            NowTimeline.Window.class);
+        for (NowTimeline.Window w : NowTimeline.Window.values()) {
+            for (NowTimeline.Entry e : entries) {
+                if (e.window() == w && count.merge(w, 1, Integer::sum) <= NowTimeline.PER_WINDOW) {
+                    out.add(e);
+                }
+            }
+        }
+        return out;
+    }
+
+    /** The plain page: the timeline's windows in order, each with its cards. */
+    static String timelineHtml(List<NowTimeline.Entry> entries, boolean complete) {
+        StringBuilder sb = ReadingCard.page("Now",
+            "What the sky is doing to your chart, from right now to a year ahead.");
+        List<NowTimeline.Entry> shown = visible(entries);
+        if (entries.isEmpty()) {
+            sb.append(QUIET_SKY);
+        }
+        for (NowTimeline.Window w : NowTimeline.Window.values()) {
+            List<ReadingCard> cards = new ArrayList<>();
+            List<String> ids = new ArrayList<>();
+            int all = 0;
+            for (NowTimeline.Entry e : entries) {
+                if (e.window() == w) {
+                    all++;
+                    if (shown.contains(e)) {
+                        cards.add(e.card());
+                        ids.add(TransitCard.id(e.hit()));
+                    }
+                }
+            }
+            if (all == 0) {
+                continue;
+            }
+            sb.append("<h3 style='color:#7FB3FF; margin-top:14px; margin-bottom:6px;'>")
+              .append(w.title).append("</h3>");
+            sb.append(cardsHtml(cards, ids, false));
+            if (all > cards.size()) {
+                sb.append("<p style='color:#9AA5B1; font-size:12px; margin-top:-6px;'>And ")
+                  .append(all - cards.size()).append(" more ")
+                  .append(w.title.toLowerCase(java.util.Locale.ROOT)).append(".</p>");
+            }
+        }
+        if (!complete) {
+            sb.append("<p style='color:#9AA5B1; font-size:12px;'>Stop the clock to see what is"
+                + " coming later.</p>");
+        }
         sb.append("</body></html>");
         return sb.toString();
     }

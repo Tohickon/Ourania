@@ -4469,9 +4469,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * the chart and the Now page are rebuilt for this moment before anything is read.
      */
     private void timeSettled() {
-        if (this.window != null && ReadingReveal.allowed()) {
-            javax.swing.SwingUtilities.invokeLater(this::popTransits);
+        if (this.window == null) {
+            return;
         }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            // The whole timeline, which the page leaves out while time is running.
+            this.window.refreshTransitsPane();
+            if (ReadingReveal.allowed()) {
+                this.popTransits();
+            }
+        });
     }
 
     /**
@@ -4505,20 +4512,33 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             return;
         }
         double jd = now.sd.getJulDay();
-        // Only contacts the Now page shows a card for, so each pop-up has a card to land on.
-        List<NowCards.TransitHit> pop = TransitCard.firstToPop(
-            NowCards.shown(NowCards.findHits(now, this.natalRing, this.activeCusps),
-                Settings.astrologerView()),
-            h -> TransitCard.daysFromExact(this.sw, h, jd), TransitCard.POP_COUNT);
         List<Object[]> chain = new ArrayList<>();
-        for (NowCards.TransitHit h : pop) {
-            RevealPlan plan = RevealPlan.forTransit(h, TransitCard.of(h));
-            RevealPainter.Scene scene = this.revealScene(plan, REVEAL_AT_FIRST);
-            if (scene != null) {
-                chain.add(new Object[] {scene, TransitCard.id(h), plan});
+        if (!Settings.astrologerView()) {
+            // Plain view: the first cards of the timeline, in its order - right now, then
+            // today, and on - which is the order they occur.
+            List<NowTimeline.Entry> page = NowCards.visible(
+                NowTimeline.build(this.sw, now, this.natalRing, this.activeCusps));
+            for (NowTimeline.Entry e : page.subList(0, Math.min(TransitCard.POP_COUNT, page.size()))) {
+                this.chainUp(chain, e.hit(), e.card());
+            }
+        } else {
+            // Only contacts the Now page shows a card for, so each pop-up has a card to land on.
+            for (NowCards.TransitHit h : TransitCard.firstToPop(
+                    NowCards.shown(NowCards.findHits(now, this.natalRing, this.activeCusps), true),
+                    h -> TransitCard.daysFromExact(this.sw, h, jd), TransitCard.POP_COUNT)) {
+                this.chainUp(chain, h, TransitCard.of(h));
             }
         }
         this.popNext(chain, 0);
+    }
+
+    /** One pop-up in a chain: the card, the scene it forms in, and its card's id on the page. */
+    private void chainUp(List<Object[]> chain, NowCards.TransitHit h, ReadingCard card) {
+        RevealPlan plan = RevealPlan.forTransit(h, card);
+        RevealPainter.Scene scene = this.revealScene(plan, REVEAL_AT_FIRST);
+        if (scene != null) {
+            chain.add(new Object[] {scene, TransitCard.id(h), plan});
+        }
     }
 
     private void popNext(List<Object[]> chain, int k) {
