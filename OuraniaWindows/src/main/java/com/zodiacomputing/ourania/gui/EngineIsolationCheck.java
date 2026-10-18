@@ -48,12 +48,13 @@ public final class EngineIsolationCheck {
      * stage 4), and the globe renderer itself with the two enums it asks its questions in
      * terms of - the foldable layers and an angle's role - which is what M11 stage 4
      * finished: the renderer had seventy references into {@code SkymapPanel} and one AWT
-     * import, and has neither now.
+     * import, and has neither now. And the table of zodiac bands the renderer draws from as the
+     * globe turns into the wheel (2026-10-18), which reads the wheel's layout to do it.
      */
     static final Set<String> SHARED = new TreeSet<>(List.of(
         "Settings", "SavedCharts", "InterpretationService", "ErrorLog", "Json",
         "NarrativeSynthesizer", "Atlas", "WheelLayout", "Globe", "Glossary",
-        "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer",
+        "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer", "GlobeBands",
         "AspectGate", "ChartPalette"));
 
     /** The Java level Android builds accept. */

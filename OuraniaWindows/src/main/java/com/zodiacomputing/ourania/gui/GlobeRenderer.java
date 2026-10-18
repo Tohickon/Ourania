@@ -3,6 +3,7 @@ package com.zodiacomputing.ourania.gui;
 import com.zodiacomputing.ourania.astro.Bodies;
 import com.zodiacomputing.ourania.astro.LunarMansions;
 import com.zodiacomputing.ourania.astro.Zodiac;
+import com.zodiacomputing.ourania.gui.GlobeBands.Band;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +47,8 @@ public final class GlobeRenderer {
     private final int h;
     private final double origin;
     private final GlobeSource panel;
+    /** Where each band of the zodiac is drawn from this camera - see {@link GlobeBands}. */
+    private final GlobeBands bands;
     private final List<Piece> pieces = new ArrayList<>();
 
     private GlobeRenderer(Pen g, Globe cam, int w, int h, double origin,
@@ -56,6 +59,7 @@ public final class GlobeRenderer {
         this.h = h;
         this.origin = origin;
         this.panel = panel;
+        this.bands = GlobeBands.of(panel, cam, w, h);
     }
 
     /**
@@ -267,8 +271,8 @@ public final class GlobeRenderer {
      * @return the radius for wheel 0 (Chart A), 1 (the outer ring) and 2 (the sky)
      */
     static double[] wheelRadii(GlobeSource panel, int w, int h) {
-        int[] rings = WheelLayout.ringRadii(w, h, 1.0, 1.0);
-        double k = Globe.SHELL_SIGN_INNER / Math.max(1, rings[WheelLayout.RING_SIGN_INNER]);
+        int[] rings = GlobeBands.wheelRings(panel, w, h);
+        double k = GlobeBands.scaleOf(rings);
         int natalTop = panel.bodyBaseRadius(rings);
         int natalFloor = natalTop - WheelLayout.natalBandDepth(Math.max(1, natalTop));
         return new double[] {
@@ -711,24 +715,24 @@ public final class GlobeRenderer {
             double[][] arc = new double[25][];
             for (int i = 0; i <= 24; i++) {
                 arc[i] = Globe.onShell(from + (30.0 * i) / 24, this.origin,
-                    Globe.SHELL_SIGN_OUTER, 0.0);
+                    bands.at(Band.SIGNS, Globe.SHELL_SIGN_OUTER), 0.0);
             }
             polyline(arc, faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 190),
                 Layer.SIGNS), 2.4f);
 
             // The division at the sign's start, drawn across the band's depth.
-            double[] a = Globe.onShell(from, this.origin, Globe.SHELL_SIGN_INNER, 0.0);
-            double[] b = Globe.onShell(from, this.origin, Globe.SHELL_SIGN_OUTER, 0.0);
+            double[] a = Globe.onShell(from, this.origin, bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER), 0.0);
+            double[] b = Globe.onShell(from, this.origin, bands.at(Band.SIGNS, Globe.SHELL_SIGN_OUTER), 0.0);
             segment(a, b, new Ink(150, 150, 150, 140), 1.0f);
 
             double[] mid = Globe.onShell(from + 15.0, this.origin,
-                (Globe.SHELL_SIGN_INNER + Globe.SHELL_SIGN_OUTER) / 2, 0.0);
+                bands.at(Band.SIGNS, (Globe.SHELL_SIGN_INNER + Globe.SHELL_SIGN_OUTER) / 2), 0.0);
             billboard(mid, WheelLayout.zodiacSymbol(sign), ink, 15);
         }
         // The degree scale, at every ten, on the tick shell just inside the signs.
         for (int d = 0; d < 360; d += 10) {
-            double[] a = Globe.onShell(d, this.origin, Globe.SHELL_TICK, 0.0);
-            double[] b = Globe.onShell(d, this.origin, Globe.SHELL_TICK - 0.06, 0.0);
+            double[] a = Globe.onShell(d, this.origin, bands.at(Band.DECANS, Globe.SHELL_TICK), 0.0);
+            double[] b = Globe.onShell(d, this.origin, bands.at(Band.DECANS, Globe.SHELL_TICK - 0.06), 0.0);
             segment(a, b, new Ink(140, 148, 160, 130), d % 30 == 0 ? 1.4f : 0.6f);
         }
     }
@@ -770,13 +774,13 @@ public final class GlobeRenderer {
         // wedge brightens and swells past the surface, so it reads as the slice of sky coming
         // forward rather than as a patch of colour changing.
         if (this.shown(Layer.SIGNS)) {
-            wedgeOnSphere(sign * 30.0, sign * 30.0 + 30.0, Globe.SHELL_SIGN_INNER + 0.09,
+            wedgeOnSphere(sign * 30.0, sign * 30.0 + 30.0, bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER + 0.09),
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 74),
                     Layer.SIGNS));
             // And its segment of the flat ring, so the answer is legible from edge-on too -
             // seen along the plane the sphere wedge is a sliver and the ring is not.
             quadRing(sign * 30.0, sign * 30.0 + 30.0,
-                Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER + 0.07,
+                bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER), bands.at(Band.SIGNS, Globe.SHELL_SIGN_OUTER + 0.07),
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 150),
                     Layer.SIGNS));
         }
@@ -795,7 +799,7 @@ public final class GlobeRenderer {
             // The house stays flat because the houses are: they are spokes in the plane, and
             // a house wedge standing up out of it would be claiming a shape nothing else in
             // the view gives them.
-            wedge(from, from + span, 0.10, Globe.SHELL_HOUSE + 0.06,
+            wedge(from, from + span, bands.at(Band.HOUSES, 0.10), bands.at(Band.HOUSES, Globe.SHELL_HOUSE + 0.06),
                 faded(new Ink(236, 224, 188, 70), Layer.HOUSES));
         }
     }
@@ -859,7 +863,7 @@ public final class GlobeRenderer {
             // against - the degree scale hangs off its outer edge. This was a full disc from
             // the band to the centre, which washed the whole chart in sign colour and left
             // the aspect network to be read through it.
-            quadRing(from, from + 30.0, Globe.SHELL_SIGN_INNER, Globe.SHELL_SIGN_OUTER,
+            quadRing(from, from + 30.0, bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER), bands.at(Band.SIGNS, Globe.SHELL_SIGN_OUTER),
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 96),
                     Layer.SIGNS));
         }
@@ -905,7 +909,7 @@ public final class GlobeRenderer {
             boolean angular = i == 1 || i == 4 || i == 7 || i == 10;
             int alpha = angular ? 24 : (i % 2 == 1 ? 16 : 7);
             Ink ink = angular ? new Ink(226, 214, 184) : new Ink(150, 152, 164);
-            wedgeOnSphere(from, from + span, Globe.SHELL_HOUSE,
+            wedgeOnSphere(from, from + span, bands.at(Band.HOUSES, Globe.SHELL_HOUSE),
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), alpha),
                     Layer.HOUSES));
         }
@@ -1102,12 +1106,12 @@ public final class GlobeRenderer {
      * @param north which end of the house's meridian this label sits on
      */
     private static double[] houseLabelAt(double[] cusps, int house, double origin,
-                                         boolean north) {
+                                         boolean north, GlobeBands bands) {
         double span = ((cusps[house == 12 ? 1 : house + 1] - cusps[house]) % 360.0 + 360.0)
             % 360.0;
         double lat = north ? HOUSE_LABEL_LAT : -HOUSE_LABEL_LAT;
-        return Globe.onShell(cusps[house] + span / 2.0, origin, Globe.SHELL_HOUSE,
-            Globe.SHELL_HOUSE * Math.sin(lat));
+        double shell = bands.at(Band.HOUSES, Globe.SHELL_HOUSE);
+        return Globe.onShell(cusps[house] + span / 2.0, origin, shell, shell * Math.sin(lat));
     }
 
     /**
@@ -1124,12 +1128,13 @@ public final class GlobeRenderer {
             return -1;
         }
         double origin = panel.pinLongitude();
+        GlobeBands bands = GlobeBands.of(panel, cam, w, h);
         int best = -1;
         double bestDist = 14.0;
         for (int i = 1; i <= 12; i++) {
             // Both ends of the gore, because both are drawn and either may be the one facing.
             for (int end = 0; end < 2; end++) {
-                double[] pt = houseLabelAt(cusps, i, origin, end == 0);
+                double[] pt = houseLabelAt(cusps, i, origin, end == 0, bands);
                 Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
                 if (!q.visible) {
                     continue;
@@ -1153,9 +1158,9 @@ public final class GlobeRenderer {
             boolean here = i == lit;
             Ink ink = faded(here ? new Ink(255, 238, 170) : new Ink(206, 208, 216),
                 Layer.HOUSES);
-            billboard(houseLabelAt(cusps, i, this.origin, true), String.valueOf(i),
+            billboard(houseLabelAt(cusps, i, this.origin, true, this.bands), String.valueOf(i),
                 ink, here ? 15 : 12);
-            billboard(houseLabelAt(cusps, i, this.origin, false), String.valueOf(i),
+            billboard(houseLabelAt(cusps, i, this.origin, false, this.bands), String.valueOf(i),
                 ink, here ? 15 : 12);
         }
 
@@ -1167,9 +1172,9 @@ public final class GlobeRenderer {
         // wants the house rather than the placement.
         if (lit >= 1 && lit <= 12 && Settings.globeHouseFill()) {
             double span = arc(cusps[lit], cusps[lit == 12 ? 1 : lit + 1]);
-            wedgeOnSphere(cusps[lit], cusps[lit] + span, Globe.SHELL_SIGN_INNER + 0.11,
+            wedgeOnSphere(cusps[lit], cusps[lit] + span, bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER + 0.11),
                 faded(new Ink(236, 224, 188, 66), Layer.HOUSES));
-            wedge(cusps[lit], cusps[lit] + span, 0.10, Globe.SHELL_HOUSE + 0.06,
+            wedge(cusps[lit], cusps[lit] + span, bands.at(Band.HOUSES, 0.10), bands.at(Band.HOUSES, Globe.SHELL_HOUSE + 0.06),
                 faded(new Ink(236, 224, 188, 74), Layer.HOUSES));
         }
     }
@@ -1203,9 +1208,10 @@ public final class GlobeRenderer {
         // Both scales since 2026-10-18: the rim's, hanging from the mansions, and the inner one
         // under the signs. Each measured at the middle of a typical tick, so a long tick and a
         // short one are as easy to hit as each other.
+        GlobeBands bands = GlobeBands.of(panel, cam, w, h);
         double[] radii = {
-            Globe.SHELL_RIM_SCALE - rimTickDepth(5, false),
-            Globe.SHELL_SIGN_INNER - innerTickDepth(5) / 2.0,
+            bands.at(Band.DEGREES, Globe.SHELL_RIM_SCALE - rimTickDepth(5, false)),
+            bands.at(Band.INNER_SCALE, Globe.SHELL_SIGN_INNER - innerTickDepth(5) / 2.0),
         };
         int best = -1;
         double bestDist = 14.0;
@@ -1255,7 +1261,7 @@ public final class GlobeRenderer {
         // space of the item". Sampled across the band's width and along every two degrees; the
         // margin is small because the degree scale starts just outside, and a wider one would
         // take its ticks.
-        int lonAt = bandAt(cam, w, h, panel, px, py, Globe.SHELL_SIGN_OUTER + 0.02,
+        int lonAt = bandAt(cam, w, h, panel, px, py, Band.DECANS, Globe.SHELL_SIGN_OUTER + 0.02,
             Globe.SHELL_DECAN + 0.02, 5.0);
         return lonAt < 0 ? -1 : lonAt / 10;
     }
@@ -1266,9 +1272,11 @@ public final class GlobeRenderer {
      * One sampler for every band, so they are hit the same way.
      */
     static int bandAt(Globe cam, int w, int h, GlobeSource panel, int px, int py,
-                      double inner, double outer, double margin) {
+                      Band band, double inner, double outer, double margin) {
         double origin = panel.pinLongitude();
-        double[] radii = {inner, (inner + outer) / 2.0, outer};
+        GlobeBands bands = GlobeBands.of(panel, cam, w, h);
+        double[] radii = {bands.at(band, inner), bands.at(band, (inner + outer) / 2.0),
+            bands.at(band, outer)};
         int best = -1;
         double bestDist = margin;
         for (double lon = 1.0; lon < 360.0; lon += 2.0) {
@@ -1297,7 +1305,7 @@ public final class GlobeRenderer {
         // gap to the decans on either side of the glyphs, so a click on one ring of glyphs is
         // not taken by the other.
         double half = (Globe.SHELL_BOUND - Globe.SHELL_DECAN) / 2.0;
-        return bandAt(cam, w, h, panel, px, py, Globe.SHELL_BOUND - half,
+        return bandAt(cam, w, h, panel, px, py, Band.BOUNDS, Globe.SHELL_BOUND - half,
             Globe.SHELL_BOUND + half, 4.0);
     }
 
@@ -1315,6 +1323,7 @@ public final class GlobeRenderer {
             return -1;
         }
         double origin = panel.pinLongitude();
+        GlobeBands bands = GlobeBands.of(panel, cam, w, h);
         int best = -1;
         // Denser than the bands: seen edge-on the plane is foreshortened, and a click map at a
         // low camera showed dead flecks between samples 3 degrees and 0.18 apart.
@@ -1323,7 +1332,7 @@ public final class GlobeRenderer {
             double span = arc(cusps[i], cusps[i == 12 ? 1 : i + 1]);
             for (double t = 1.0; t < span; t += 2.0) {
                 for (double r = 0.2; r <= Globe.SHELL_HOUSE + 0.02; r += 0.11) {
-                    double[] pt = Globe.onShell(cusps[i] + t, origin, r, 0.0);
+                    double[] pt = Globe.onShell(cusps[i] + t, origin, bands.at(Band.HOUSES, r), 0.0);
                     Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
                     if (!q.visible) {
                         continue;
@@ -1349,8 +1358,10 @@ public final class GlobeRenderer {
         }
         double origin = panel.pinLongitude();
         double span = Globe.SHELL_SIGN_OUTER - Globe.SHELL_SIGN_INNER;
-        double[] radii = {Globe.SHELL_SIGN_INNER + span * 0.2, Globe.SHELL_SIGN_INNER + span * 0.5,
-            Globe.SHELL_SIGN_INNER + span * 0.8};
+        GlobeBands bands = GlobeBands.of(panel, cam, w, h);
+        double[] radii = {bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER + span * 0.2),
+            bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER + span * 0.5),
+            bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER + span * 0.8)};
         int best = -1;
         double bestDist = 11.0;
         for (double lon = 1.0; lon < 360.0; lon += 2.0) {
@@ -1375,7 +1386,8 @@ public final class GlobeRenderer {
             return -1;
         }
         double origin = panel.pinLongitude();
-        double mid = (Globe.SHELL_MANSION_INNER + Globe.SHELL_MANSION_OUTER) / 2.0;
+        double mid = GlobeBands.of(panel, cam, w, h).at(Band.MANSIONS,
+            (Globe.SHELL_MANSION_INNER + Globe.SHELL_MANSION_OUTER) / 2.0);
         int best = -1;
         double bestDist = 13.0;
         for (int m = 1; m <= LunarMansions.COUNT; m++) {
@@ -1415,8 +1427,8 @@ public final class GlobeRenderer {
      * wheel's ring, this one, and both hit tests all read, so one button means one thing.
      */
     private void mansionRing() {
-        double inner = Globe.SHELL_MANSION_INNER;
-        double outer = Globe.SHELL_MANSION_OUTER;
+        double inner = bands.at(Band.MANSIONS, Globe.SHELL_MANSION_INNER);
+        double outer = bands.at(Band.MANSIONS, Globe.SHELL_MANSION_OUTER);
         double mid = (inner + outer) / 2.0;
         // The one hue, from the one place the flat ring reads it, so the two bands cannot
         // drift to different lavenders.
@@ -1444,7 +1456,7 @@ public final class GlobeRenderer {
         if (lit >= 1 && fill) {
             LunarMansions.Mansion m = LunarMansions.byNumber(lit);
             quadRing(m.start, m.end(), inner, outer, wash(base, 130));
-            wedgeOnSphere(m.start, m.end(), Globe.SHELL_SIGN_INNER + 0.09, wash(base, 60));
+            wedgeOnSphere(m.start, m.end(), bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER + 0.09), wash(base, 60));
         }
 
         // The band's two edges, so the stations read as divisions of something.
@@ -1499,8 +1511,8 @@ public final class GlobeRenderer {
             Ink ink = here ? new Ink(255, 238, 170, 245)
                 : (sign ? new Ink(214, 218, 226, 225)
                     : (ten ? new Ink(172, 178, 190, 195) : new Ink(138, 144, 156, 150)));
-            segment(Globe.onShell(d, this.origin, top, 0.0),
-                Globe.onShell(d, this.origin, top - depth, 0.0),
+            segment(Globe.onShell(d, this.origin, bands.at(Band.DEGREES, top), 0.0),
+                Globe.onShell(d, this.origin, bands.at(Band.DEGREES, top - depth), 0.0),
                 faded(ink, Layer.DEGREES),
                 here ? 2.2f : (sign ? 1.4f : (ten ? 1.0f : 0.6f)));
         }
@@ -1513,13 +1525,13 @@ public final class GlobeRenderer {
         // made the same mistake the sign highlight made - the sphere is where the bodies are,
         // so a degree that lights only the disc is pointing at half of itself.
         if (lit >= 0 && Settings.globeDegreeFill()) {
-            wedgeOnSphere(lit, lit + 1.0, Globe.SHELL_SIGN_INNER + 0.09,
+            wedgeOnSphere(lit, lit + 1.0, bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER + 0.09),
                 faded(new Ink(255, 238, 170, 96), Layer.DEGREES));
-            quadRing(lit, lit + 1.0, 0.10, top,
+            quadRing(lit, lit + 1.0, bands.at(Band.HOUSES, 0.10), bands.at(Band.DEGREES, top),
                 faded(new Ink(255, 238, 170, 70), Layer.DEGREES));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
-        polyline(Globe.equator(this.origin, top, 144),
+        polyline(Globe.equator(this.origin, bands.at(Band.DEGREES, top), 144),
             faded(new Ink(158, 164, 176, 170), Layer.DEGREES), 1.0f);
         innerDegreeRing();
     }
@@ -1540,17 +1552,20 @@ public final class GlobeRenderer {
         double top = Globe.SHELL_SIGN_INNER;
         Ink tick = faded(new Ink(150, 150, 150, 200), Layer.DEGREES);
         for (int d = 0; d < 360; d++) {
-            segment(Globe.onShell(d, this.origin, top, 0.0),
-                Globe.onShell(d, this.origin, top - innerTickDepth(d), 0.0), tick,
+            segment(Globe.onShell(d, this.origin, bands.at(Band.INNER_SCALE, top), 0.0),
+                Globe.onShell(d, this.origin,
+                    bands.at(Band.INNER_SCALE, top - innerTickDepth(d)), 0.0), tick,
                 d % 10 == 0 ? 1.2f : 0.5f);
         }
         double mid = (Globe.SHELL_SIGN_INNER + Globe.SHELL_INNER_SCALE) / 2.0;
         Ink label = faded(new Ink(130, 138, 148), Layer.DEGREES);
         for (int d = 0; d < 360; d += 10) {
-            billboard(Globe.onShell(d + 5.0, this.origin, mid, 0.0), String.valueOf(d % 30),
+            billboard(Globe.onShell(d + 5.0, this.origin, bands.at(Band.INNER_SCALE, mid), 0.0),
+                String.valueOf(d % 30),
                 label, 8);
         }
-        polyline(Globe.equator(this.origin, Globe.SHELL_INNER_SCALE, 144),
+        polyline(Globe.equator(this.origin,
+            bands.at(Band.INNER_SCALE, Globe.SHELL_INNER_SCALE), 144),
             faded(new Ink(158, 164, 176, 170), Layer.DEGREES), 1.0f);
     }
 
@@ -1597,7 +1612,7 @@ public final class GlobeRenderer {
                 if (bi < 0) {
                     continue;
                 }
-                billboard(Globe.onShell(mid, this.origin, Globe.SHELL_BOUND, 0.0),
+                billboard(Globe.onShell(mid, this.origin, bands.at(Band.BOUNDS, Globe.SHELL_BOUND), 0.0),
                     WheelLayout.glyphOf(bi),
                     faded(panel.bodyInk(bi), Layer.BOUNDS), 10);
             }
@@ -1614,14 +1629,14 @@ public final class GlobeRenderer {
                 String ruler = Zodiac.chaldeanDecanRuler(Zodiac.SIGNS[sign], d % 3 + 1);
                 int bi = Bodies.indexOfName(ruler);
                 if (bi >= 0) {
-                    billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
+                    billboard(Globe.onShell(mid, this.origin, bands.at(Band.DECANS, Globe.SHELL_DECAN), 0.0),
                         WheelLayout.glyphOf(bi),
                         faded(panel.bodyInk(bi), Layer.DECANS), 10);
                     continue;
                 }
             }
             int face = Zodiac.triplicityDecanSignIndex(sign, d % 3 + 1);
-            billboard(Globe.onShell(mid, this.origin, Globe.SHELL_DECAN, 0.0),
+            billboard(Globe.onShell(mid, this.origin, bands.at(Band.DECANS, Globe.SHELL_DECAN), 0.0),
                 WheelLayout.zodiacSymbol(face),
                 faded(panel.elementInk(Zodiac.elementIndex(face)),
                     Layer.DECANS), 10);
@@ -1648,13 +1663,13 @@ public final class GlobeRenderer {
         // perspective.
         for (int i = 1; i <= 12; i++) {
             boolean angle = i == 1 || i == 4 || i == 7 || i == 10;
-            segment(Globe.onShell(cusps[i], this.origin, 0.02, 0.0),
-                Globe.onShell(cusps[i], this.origin, Globe.SHELL_HOUSE, 0.0),
+            segment(Globe.onShell(cusps[i], this.origin, bands.at(Band.HOUSES, 0.02), 0.0),
+                Globe.onShell(cusps[i], this.origin, bands.at(Band.HOUSES, Globe.SHELL_HOUSE), 0.0),
                 faded(angle ? new Ink(226, 214, 184, 220) : new Ink(150, 152, 164, 140),
                     Layer.HOUSES), angle ? 1.8f : 1.0f);
         }
         // The rim the spokes end on, so the houses read as a ring rather than as loose lines.
-        polyline(Globe.equator(this.origin, Globe.SHELL_HOUSE, 96),
+        polyline(Globe.equator(this.origin, bands.at(Band.HOUSES, Globe.SHELL_HOUSE), 96),
             faded(new Ink(150, 152, 164, 120), Layer.HOUSES), 0.9f);
     }
 
@@ -1672,8 +1687,8 @@ public final class GlobeRenderer {
      */
     private void signMeridians() {
         for (int sign = 0; sign < 12; sign++) {
-            segment(Globe.onShell(sign * 30.0, this.origin, Globe.SHELL_SIGN_INNER, 0.0),
-                Globe.onShell(sign * 30.0, this.origin, Globe.SHELL_SIGN_OUTER, 0.0),
+            segment(Globe.onShell(sign * 30.0, this.origin, bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER), 0.0),
+                Globe.onShell(sign * 30.0, this.origin, bands.at(Band.SIGNS, Globe.SHELL_SIGN_OUTER), 0.0),
                 faded(new Ink(196, 204, 216, 190), Layer.SIGNS), 1.1f);
         }
     }
@@ -1829,7 +1844,7 @@ public final class GlobeRenderer {
             // sort puts it behind the glyph rather than over it.
             if (Settings.showDegreeLines()) {
                 Globe.Projected mark = at(Globe.onShell(lon[i], this.origin,
-                    Globe.SHELL_SIGN_INNER, 0.0, inclinationFor(deck, this.stacked, this.cam)));
+                    bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER), 0.0, inclinationFor(deck, this.stacked, this.cam)));
                 if (mark.visible) {
                     boolean leaderLit = panel.onGlobeFocus(i, outer);
                     Ink leaderInk = panel.leaderInk();

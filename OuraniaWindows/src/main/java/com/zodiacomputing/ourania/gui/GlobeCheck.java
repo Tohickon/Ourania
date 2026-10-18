@@ -169,6 +169,13 @@ public final class GlobeCheck {
         report("Part T", before);
 
         System.out.println();
+        System.out.println("=== Part U: from straight above, the bands are the wheel's ===");
+        before = failures.size();
+        theBandsAreTheWheels();
+        report("Part U", before);
+
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
         } else {
@@ -573,7 +580,8 @@ public final class GlobeCheck {
      */
     private static void housesTurnTheRightWay() throws Exception {
         java.lang.reflect.Method label = GlobeRenderer.class.getDeclaredMethod(
-            "houseLabelAt", double[].class, int.class, double.class, boolean.class);
+            "houseLabelAt", double[].class, int.class, double.class, boolean.class,
+            GlobeBands.class);
         label.setAccessible(true);
         double[] cusps = new double[13];
         for (int i = 1; i <= 12; i++) {
@@ -650,7 +658,7 @@ public final class GlobeCheck {
         justBelow.pitch = Globe.MIN_PITCH;
         double worstJump = 0.0;
         for (int i = 1; i <= 12; i++) {
-            double[] pt = (double[]) label.invoke(null, cusps, i, origin, true);
+            double[] pt = (double[]) label.invoke(null, cusps, i, origin, true, GlobeBands.GLOBE);
             Globe.Projected up = justAbove.project(pt[0], pt[1], pt[2], w, h);
             Globe.Projected down = justBelow.project(pt[0], pt[1], pt[2], w, h);
             worstJump = Math.max(worstJump, Math.hypot(up.x - down.x, up.y - down.y));
@@ -664,7 +672,7 @@ public final class GlobeCheck {
         Globe below = new Globe();
         below.pitch = 0.32;
         Globe.Projected mid = below.project(0, 0, 0, w, h);
-        double[] asc = (double[]) label.invoke(null, cusps, 1, origin, true);
+        double[] asc = (double[]) label.invoke(null, cusps, 1, origin, true, GlobeBands.GLOBE);
         Globe.Projected qa = below.project(asc[0], asc[1], asc[2], w, h);
         Globe above = new Globe();
         above.pitch = -0.32;
@@ -683,8 +691,8 @@ public final class GlobeCheck {
         Globe under = new Globe();
         under.pitch = 0.32;
         Globe.Projected c = under.project(0, 0, 0, w, h);
-        double[] p1 = (double[]) label.invoke(null, cusps, 1, origin, true);
-        double[] p4 = (double[]) label.invoke(null, cusps, 4, origin, true);
+        double[] p1 = (double[]) label.invoke(null, cusps, 1, origin, true, GlobeBands.GLOBE);
+        double[] p4 = (double[]) label.invoke(null, cusps, 4, origin, true, GlobeBands.GLOBE);
         Globe.Projected q1 = under.project(p1[0], p1[1], p1[2], w, h);
         Globe.Projected q4 = under.project(p4[0], p4[1], p4[2], w, h);
         double turn = Math.atan2(q4.y - c.y, q4.x - c.x) - Math.atan2(q1.y - c.y, q1.x - c.x);
@@ -1480,7 +1488,8 @@ public final class GlobeCheck {
             // <b>Both ends of the gore.</b> A house number is written toward each pole since
             // 2026-09-22, so there are two targets per house and either may be the one facing.
             java.lang.reflect.Method labelAt = GlobeRenderer.class.getDeclaredMethod(
-                "houseLabelAt", double[].class, int.class, double.class, boolean.class);
+                "houseLabelAt", double[].class, int.class, double.class, boolean.class,
+            GlobeBands.class);
             labelAt.setAccessible(true);
             int found = 0;
             for (double yaw : new double[] {0.0, 2.2, 4.4}) {
@@ -1488,7 +1497,8 @@ public final class GlobeCheck {
                 for (int house = 1; house <= 12; house++) {
                     for (int end = 0; end < 2; end++) {
                         double[] at = (double[]) labelAt.invoke(
-                            null, cusps, house, origin, end == 0);
+                            null, cusps, house, origin, end == 0,
+                            GlobeBands.of(panel, cam, w, h));
                         Globe.Projected q = cam.project(at[0], at[1], at[2], w, h);
                         if (!q.visible) {
                             continue;
@@ -1515,8 +1525,8 @@ public final class GlobeCheck {
                 double to = cusps[house == 12 ? 1 : house + 1];
                 double span = ((to - from) % 360.0 + 360.0) % 360.0;
                 double expect = from + span / 2.0;
-                double[] north = (double[]) labelAt.invoke(null, cusps, house, origin, true);
-                double[] south = (double[]) labelAt.invoke(null, cusps, house, origin, false);
+                double[] north = (double[]) labelAt.invoke(null, cusps, house, origin, true, GlobeBands.GLOBE);
+                double[] south = (double[]) labelAt.invoke(null, cusps, house, origin, false, GlobeBands.GLOBE);
 
                 // <b>On the house's own meridian, at both ends of its gore.</b> Asserted by
                 // properties rather than by restating the formula: the two labels mirror each
@@ -1554,7 +1564,8 @@ public final class GlobeCheck {
             cam.yaw = 0;
             panel.setLayer(Layer.HOUSES, false);
             Thread.sleep(1200);
-            double[] one = (double[]) labelAt.invoke(null, cusps, 1, origin, true);
+            double[] one = (double[]) labelAt.invoke(null, cusps, 1, origin, true,
+                GlobeBands.of(panel, cam, w, h));
             Globe.Projected qh = cam.project(one[0], one[1], one[2], w, h);
             eq("folded houses answer nothing", -1, GlobeRenderer.houseNumberAt(cam, w, h,
                 panel, (int) Math.round(qh.x), (int) Math.round(qh.y)));
@@ -3447,6 +3458,228 @@ public final class GlobeCheck {
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
+    }
+
+    /**
+     * David, 18 Oct: "keep the wheel looking as it does now but by moving its axis it becomes
+     * the globe that we have now". Part T holds the first step, the three charts. This holds
+     * the second: from straight above Chart A every band of the zodiac - the houses, the
+     * bounds, the signs, the decans, the rim degree scale and the mansions - lies where the
+     * wheel draws it, at an ordinary tilt nothing has moved by so much as a bit, the change
+     * between is a glide, and each band's hit test follows its painter all the way.
+     *
+     * <p>The wheel side is read from {@link WheelLayout#ringRadii} and the globe side from
+     * the camera's projection of what the painter draws, never from
+     * {@link GlobeBands#wheelEdges}, which is the thing under test.
+     *
+     * <p>Measured at two panel sizes because the wheel's bands are fixed in pixels while the
+     * globe's are fixed in proportion: at 900 by 820 the two layouts are within a few pixels of
+     * each other and a band left at the globe's radius would pass a hit test by its margin
+     * alone, so the hit tests are asserted where the two have come well apart.
+     */
+    private static void theBandsAreTheWheels() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            final SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            long end = System.nanoTime() + 15_000_000_000L;
+            while (System.nanoTime() < end && panel.natalRing.time == null) {
+                Thread.sleep(20);
+            }
+            panel.setLayer(Layer.MANSIONS, true);
+            Thread.sleep(1200);
+            double origin = panel.pinLongitude();
+
+            // 1. At every ordinary tilt, and from underneath, every radius is the globe's own -
+            // returned, not recomputed, so the globe a reader has been using is bit for bit
+            // the same.
+            Globe cam = new Globe();
+            double[] probes = {0.0, 0.10, 0.5, 1.75, 1.92, 1.99, 2.08, 2.2, 2.3, 2.33, 2.38,
+                2.42, 2.53, 2.55, 2.62, 2.70, 2.9};
+            for (double p : new double[] {new Globe().pitch, -0.32, 0.0, 0.32, Globe.MAX_PITCH,
+                    -GlobeRenderer.FLAT_FROM}) {
+                cam.pitch = p;
+                GlobeBands b = GlobeBands.of(panel, cam, 900, 820);
+                boolean same = true;
+                for (GlobeBands.Band band : GlobeBands.Band.values()) {
+                    for (double r : probes) {
+                        same &= b.at(band, r) == r;
+                    }
+                }
+                yes("at pitch " + p + " every band is drawn at the globe's own radius", same);
+            }
+
+            Globe top = new Globe();
+            top.pitch = -Globe.MAX_PITCH;
+            for (int[] size : new int[][] {{900, 820}, {1500, 1300}}) {
+                int w = size[0];
+                int h = size[1];
+                GlobeBands b = GlobeBands.of(panel, top, w, h);
+                int[] rings = WheelLayout.ringRadii(w, h, 1.0, 1.0,
+                    panel.layerOpen(Layer.DECANS), panel.layerOpen(Layer.SIGNS),
+                    panel.layerOpen(Layer.BOUNDS), panel.layerOpen(Layer.DEGREES),
+                    panel.layerOpen(Layer.MANSIONS), 0.0);
+                double wheelSign = rings[WheelLayout.RING_SIGN_INNER];
+                double globeSign = screenRadius(top, w, h, origin,
+                    b.at(GlobeBands.Band.SIGNS, Globe.SHELL_SIGN_INNER));
+                String at = " at " + w + "x" + h;
+
+                // 2. Each thing the painter draws, where the wheel draws the same thing, as a
+                // share of the sign band's inner edge (matching the two views' scale is stage 3).
+                Object[][] marks = {
+                    {"the house rim on the floor of the zodiac", GlobeBands.Band.HOUSES,
+                        Globe.SHELL_HOUSE, (double) rings[WheelLayout.RING_DEGREE_INNER]},
+                    {"the sign band's outer edge", GlobeBands.Band.SIGNS,
+                        Globe.SHELL_SIGN_OUTER, (double) rings[WheelLayout.RING_SIGN_OUTER]},
+                    {"the decan glyphs in the middle of the decan band", GlobeBands.Band.DECANS,
+                        Globe.SHELL_DECAN, (rings[WheelLayout.RING_SIGN_OUTER]
+                            + rings[WheelLayout.RING_DECAN_OUTER]) / 2.0},
+                    {"the inner degree scale's floor on the wheel's", GlobeBands.Band.INNER_SCALE,
+                        Globe.SHELL_INNER_SCALE, (double) rings[WheelLayout.RING_DEGREE_INNER]},
+                    {"the bound glyphs in the middle of the bound band", GlobeBands.Band.BOUNDS,
+                        Globe.SHELL_BOUND, (rings[WheelLayout.RING_TERM_INNER]
+                            + rings[WheelLayout.RING_TERM_OUTER]) / 2.0},
+                    {"the rim scale's line on the mansions' inner edge", GlobeBands.Band.DEGREES,
+                        Globe.SHELL_RIM_SCALE, (double) rings[WheelLayout.RING_MANSION_INNER]},
+                    {"the mansions' inner edge", GlobeBands.Band.MANSIONS,
+                        Globe.SHELL_MANSION_INNER, (double) rings[WheelLayout.RING_MANSION_INNER]},
+                    {"the mansions' outer edge on the rim", GlobeBands.Band.MANSIONS,
+                        Globe.SHELL_MANSION_OUTER, (double) rings[WheelLayout.RING_OUTER]},
+                };
+                for (Object[] m : marks) {
+                    double g = screenRadius(top, w, h, origin,
+                        b.at((GlobeBands.Band) m[1], (Double) m[2]));
+                    near("overhead, " + m[0] + at, (Double) m[3] / wheelSign, g / globeSign, 0.002);
+                }
+                double bound = screenRadius(top, w, h, origin,
+                    b.at(GlobeBands.Band.BOUNDS, Globe.SHELL_BOUND)) / globeSign * wheelSign;
+                yes("overhead, the bound glyphs are inside the bound band" + at + ": " + bound,
+                    bound > rings[WheelLayout.RING_TERM_INNER]
+                        && bound < rings[WheelLayout.RING_TERM_OUTER]);
+
+                // 3. One order on both since 2026-10-18: signs, decans, bounds, rim scale.
+                double decan = b.at(GlobeBands.Band.DECANS, Globe.SHELL_DECAN);
+                double boundR = b.at(GlobeBands.Band.BOUNDS, Globe.SHELL_BOUND);
+                double scale = b.at(GlobeBands.Band.DEGREES, Globe.SHELL_RIM_SCALE);
+                yes("overhead the decans, the bounds and the rim scale run outward, as on the wheel"
+                    + at, decan < boundR && boundR < scale);
+            }
+            yes("and at the ordinary tilt the same order",
+                Globe.SHELL_DECAN < Globe.SHELL_BOUND && Globe.SHELL_BOUND < Globe.SHELL_RIM_SCALE);
+
+            // 4. A glide, not a switch: every band moves a little at a time all the way up.
+            double worst = 0.0;
+            double[] prev = null;
+            int steps = 4000;
+            for (int i = 0; i <= steps; i++) {
+                cam.pitch = -Globe.MAX_PITCH * i / steps;
+                GlobeBands b = GlobeBands.of(panel, cam, 1500, 1300);
+                double[] now = {
+                    b.at(GlobeBands.Band.HOUSES, Globe.SHELL_HOUSE),
+                    b.at(GlobeBands.Band.SIGNS, Globe.SHELL_SIGN_OUTER),
+                    b.at(GlobeBands.Band.DECANS, Globe.SHELL_DECAN),
+                    b.at(GlobeBands.Band.DEGREES, Globe.SHELL_RIM_SCALE),
+                    b.at(GlobeBands.Band.MANSIONS, Globe.SHELL_MANSION_OUTER),
+                };
+                for (int k = 0; prev != null && k < now.length; k++) {
+                    worst = Math.max(worst, Math.abs(now[k] - prev[k]));
+                }
+                prev = now;
+            }
+            yes("climbing to overhead no band steps more than 0.002 in one of " + steps
+                + " pitch steps: worst " + worst, worst < 0.002);
+
+            // 5. Each hit test answers where its band is drawn, overhead, where the bands have
+            // left the globe's radii far behind.
+            int w = 1500;
+            int h = 1300;
+            GlobeBands b = GlobeBands.of(panel, top, w, h);
+            int decanMiss = 0;
+            for (int d = 0; d < 36; d++) {
+                double[] pt = Globe.onShell(d * 10.0 + 5.0, origin,
+                    b.at(GlobeBands.Band.DECANS, Globe.SHELL_DECAN), 0.0);
+                Globe.Projected q = top.project(pt[0], pt[1], pt[2], w, h);
+                decanMiss += GlobeRenderer.decanAt(top, w, h, panel, (int) Math.round(q.x),
+                    (int) Math.round(q.y)) == d ? 0 : 1;
+            }
+            eq("overhead, every decan answers where its glyph is drawn", 0, decanMiss);
+            int signMiss = 0;
+            for (int s = 0; s < 12; s++) {
+                double[] pt = Globe.onShell(s * 30.0 + 15.0, origin, b.at(GlobeBands.Band.SIGNS,
+                    (Globe.SHELL_SIGN_INNER + Globe.SHELL_SIGN_OUTER) / 2.0), 0.0);
+                Globe.Projected q = top.project(pt[0], pt[1], pt[2], w, h);
+                signMiss += GlobeRenderer.signAt(top, w, h, panel, (int) Math.round(q.x),
+                    (int) Math.round(q.y)) == s ? 0 : 1;
+            }
+            eq("overhead, every sign answers where its band is drawn", 0, signMiss);
+            int boundMiss = 0;
+            for (int s = 0; s < 12; s++) {
+                double lon = s * 30.0 + 15.0;
+                double[] pt = Globe.onShell(lon, origin,
+                    b.at(GlobeBands.Band.BOUNDS, Globe.SHELL_BOUND), 0.0);
+                Globe.Projected q = top.project(pt[0], pt[1], pt[2], w, h);
+                int got = GlobeRenderer.boundAt(top, w, h, panel, (int) Math.round(q.x),
+                    (int) Math.round(q.y));
+                boundMiss += got >= 0 && Math.abs(got - lon) <= 3.0 ? 0 : 1;
+            }
+            eq("overhead, the bounds answer where their glyphs are drawn", 0, boundMiss);
+            if (panel.layerShown(Layer.MANSIONS)) {
+                int mansionMiss = 0;
+                for (int m = 1; m <= com.zodiacomputing.ourania.astro.LunarMansions.COUNT; m++) {
+                    double lon = (m - 0.5) * com.zodiacomputing.ourania.astro.LunarMansions.WIDTH;
+                    double[] pt = Globe.onShell(lon, origin, b.at(GlobeBands.Band.MANSIONS,
+                        (Globe.SHELL_MANSION_INNER + Globe.SHELL_MANSION_OUTER) / 2.0), 0.0);
+                    Globe.Projected q = top.project(pt[0], pt[1], pt[2], w, h);
+                    mansionMiss += GlobeRenderer.mansionAt(top, w, h, panel,
+                        (int) Math.round(q.x), (int) Math.round(q.y)) == m ? 0 : 1;
+                }
+                eq("overhead, every mansion answers where its station is drawn", 0, mansionMiss);
+            }
+
+            // 6. And the painter writes them there. The hit tests above and the painter both
+            // ask GlobeBands, so a painter that went on drawing at the globe's radii would
+            // leave every assertion above green. The mansion numbers 13 to 28 are the probe
+            // (the houses stop at 12): each must be written in the middle of the mansion band
+            // as it is overhead, through the real renderer and a pen that only listens.
+            yes("the mansions are open for the painter probe", panel.layerShown(Layer.MANSIONS));
+            java.util.List<int[]> written = new java.util.ArrayList<>();
+            Pen listening = (Pen) java.lang.reflect.Proxy.newProxyInstance(
+                Pen.class.getClassLoader(), new Class<?>[] {Pen.class},
+                (proxy, method, args) -> {
+                    if (method.getName().equals("drawString") && ((String) args[0]).matches(
+                            "1[3-9]|2[0-8]")) {
+                        written.add(new int[] {(Integer) args[1], (Integer) args[2]});
+                    }
+                    return method.getReturnType() == int.class ? 0 : null;
+                });
+            GlobeRenderer.paint(listening, top, w, h, panel, false);
+            Globe.Projected middle = top.project(0, 0, 0, w, h);
+            double expectR = screenRadius(top, w, h, origin, b.at(GlobeBands.Band.MANSIONS,
+                (Globe.SHELL_MANSION_INNER + Globe.SHELL_MANSION_OUTER) / 2.0));
+            double worstOff = 0.0;
+            for (int[] at : written) {
+                // A billboard is written from (x - width/2, y + points/3); the pen reports a
+                // width of nought, and a mansion number is 9 or 11 points, so 3 either way.
+                double r = Math.hypot(at[0] - middle.x, at[1] - 3 - middle.y);
+                worstOff = Math.max(worstOff, Math.abs(r - expectR));
+            }
+            yes("overhead the painter writes all sixteen of the mansion numbers 13 to 28: "
+                + written.size(), written.size() == 16);
+            yes("and writes them in the wheel's mansion band: worst " + worstOff + " px off",
+                worstOff < 3.0);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /** How far from the middle of the panel a radius in the plane is drawn by this camera. */
+    private static double screenRadius(Globe cam, int w, int h, double origin, double r) {
+        Globe.Projected c = cam.project(0, 0, 0, w, h);
+        double[] p = Globe.onShell(origin + 90.0, origin, r, 0.0);
+        Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
+        return Math.hypot(q.x - c.x, q.y - c.y);
     }
 
     private static void yes(String label, boolean condition) {
