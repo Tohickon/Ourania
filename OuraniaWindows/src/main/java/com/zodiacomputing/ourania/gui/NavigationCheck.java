@@ -2341,8 +2341,50 @@ public final class NavigationCheck {
             final javax.swing.JEditorPane selectionPane =
                 (javax.swing.JEditorPane) fieldOf(w[0], "selectionPane");
 
+            // <b>Pinned to a fixed moment that has an aspect pattern.</b> A fresh install opens on
+            // the sky as it is NOW, so whether this page listed a pattern was whatever the sky was
+            // doing when the suite ran. With no pattern the banner below stands in a figure the
+            // chart does not have, the reading finds nothing to show for it, and the two reading
+            // assertions fail - the 10-or-12 that known-red.txt put down to the clock. So the page
+            // is cast for the first of a fixed list of moments that has a real pattern: the same
+            // chart every run, and a figure whose reading exists.
+            final SkymapPanel wheel = (SkymapPanel) fieldOf(w[0], "skymapPanel");
+            long ready = System.nanoTime() + 15_000_000_000L;
+            while (System.nanoTime() < ready && wheel.natalRing.time == null) {
+                Thread.sleep(20);
+            }
+            java.lang.reflect.Method install = SkymapPanel.class.getDeclaredMethod(
+                "installSubjects", com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class);
+            install.setAccessible(true);
             final String[] html = new String[1];
-            SwingUtilities.invokeAndWait(() -> html[0] = natal.getText());
+            String pinned = null;
+            for (int month = 1; month <= 12 && pinned == null; month++) {
+                final String[] before = new String[1];
+                SwingUtilities.invokeAndWait(() -> before[0] = natal.getText());
+                com.zodiacomputing.ourania.astro.ChartSubject moment =
+                    com.zodiacomputing.ourania.astro.ChartSubject.of("Sky",
+                        java.time.ZonedDateTime.of(2026, month, 1, 12, 0, 0, 0,
+                            java.time.ZoneId.of("America/Los_Angeles")),
+                        "Los Angeles", 34.05, -118.24, "America/Los_Angeles", false);
+                install.invoke(wheel,
+                    com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart A"),
+                    com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart B"), moment);
+                SwingUtilities.invokeAndWait(() -> wheel.updateChartData());
+                // Waited for, not slept through: the worker casts it, then rewrites this page.
+                long cast = System.nanoTime() + 15_000_000_000L;
+                do {
+                    Thread.sleep(50);
+                    SwingUtilities.invokeAndWait(() -> html[0] = natal.getText());
+                } while (System.nanoTime() < cast && !(moment.moment.equals(wheel.natalRing.time)
+                    && !html[0].equals(before[0])));
+                if (html[0].contains("pattern|")) {
+                    pinned = moment.moment.toString();
+                }
+            }
+            ok("a fixed moment with an aspect pattern was found to cast the page for: " + pinned,
+                pinned != null);
             if (!html[0].contains("pattern|")) {
                 String banner = PlacementText.patternEntryHtml(figure("Grand trine",
                     java.util.List.of("Moon", "Sun", "Venus"), null, "air", null));
