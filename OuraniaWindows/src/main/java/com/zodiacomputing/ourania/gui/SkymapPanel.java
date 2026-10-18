@@ -2023,6 +2023,24 @@ implements WheelSource, GlobeSource {
             return this.arc;
         }
 
+        /**
+         * Where an aspect line ends: at the body itself.
+         *
+         * <p><b>Body to body since 2026-10-18.</b> David: "Aspects i want standard default to be
+         * lines from body to body concerned with the aspect not as they are in the wheel not
+         * connected to any body just in the center". The lines used to end at each body's
+         * longitude on one of three nested discs in the middle (aspectDisc), which kept them out
+         * of the glyphs and left them joined to nothing. The painter, the hover test and the
+         * chord hit test all read this, so a line is pointed at where it is drawn.
+         *
+         * @param wheel which ring the body is on, WheelLayout.WHEEL_NATAL / _OUTER / _SKY
+         */
+        int chordEnd(int wheel, int body) {
+            int[] r = wheel == WheelLayout.WHEEL_NATAL ? natalRadii()
+                : (wheel == WheelLayout.WHEEL_OUTER ? transitRadii() : triRadii());
+            return r[body];
+        }
+
         int[] triRadii() {
             if (this.tri == null) {
                 this.tri = WheelLayout.bloomed(
@@ -4984,7 +5002,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
                     if (!WheelLayout.aspecting(n18, this.natalRing.valid)) continue;
                     for (int i = n18 + 1; i < BODY_COUNT; ++i) {
-                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(0), g.aspectDisc(0), this.natalRing.lon[n18], this.natalRing.lon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
+                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.chordEnd(WHEEL_NATAL, n18), g.chordEnd(WHEEL_NATAL, i), this.natalRing.lon[n18], this.natalRing.lon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
                         return;
                     }
                 }
@@ -4993,7 +5011,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
                     if (!WheelLayout.aspecting(n18, this.outerRing.valid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
-                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(1), g.aspectDisc(1), this.outerRing.lon[n18], this.natalRing.lon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
+                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.chordEnd(WHEEL_OUTER, n18), g.chordEnd(WHEEL_NATAL, i), this.outerRing.lon[n18], this.natalRing.lon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
                         return;
                     }
                 }
@@ -5006,8 +5024,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!WheelLayout.aspecting(n18, this.skyRing.valid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
                         if (!WheelLayout.aspecting(i, this.natalRing.valid)
-                            || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(2),
-                                g.aspectDisc(2), this.skyRing.lon[n18], this.natalRing.lon[i],
+                            || !this.checkAspectHit(n, n2, n7, n8, d8, g.chordEnd(WHEEL_SKY, n18),
+                                g.chordEnd(WHEEL_NATAL, i), this.skyRing.lon[n18], this.natalRing.lon[i],
                                 "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) {
                             continue;
                         }
@@ -6410,14 +6428,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         // Outside the widest field there is nothing to test, which is most of the wheel and
         // most of the mouse moves.
-        if (Math.hypot(x - g.cx, y - g.cy) > g.aspectDisc(2) + CHORD_GRAB) {
+        if (Math.hypot(x - g.cx, y - g.cy) > g.rings[RING_SIGN_INNER] + CHORD_GRAB) {
             return null;
         }
         double pin = g.pin;
         double near = CHORD_GRAB;
         int[] found = null;
         if (this.drawsNatalAspects()) {
-            int disc = g.aspectDisc(0);
             for (int a = 0; a < BODY_COUNT; a++) {
                 if (!WheelLayout.aspecting(a, this.natalRing.valid)) {
                     continue;
@@ -6428,7 +6445,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         || this.aspectInkFor(this.natalRing.lon[a], this.natalRing.lon[b], a, b, false) == null) {
                         continue;
                     }
-                    double d = chordDistance(x, y, g.cx, g.cy, pin, disc, disc,
+                    double d = chordDistance(x, y, g.cx, g.cy, pin,
+                        g.chordEnd(WHEEL_NATAL, a), g.chordEnd(WHEEL_NATAL, b),
                         this.natalRing.lon[a], this.natalRing.lon[b]);
                     if (d < near) {
                         near = d;
@@ -6442,7 +6460,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 if (wheel == WHEEL_OUTER ? !this.outerRingDrawn() : !this.triRingDrawn()) {
                     continue;
                 }
-                int disc = g.aspectDisc(wheel);
                 double[] lon = this.wheelLon(wheel);
                 boolean[] valid = this.wheelValid(wheel);
                 for (int a = 0; a < BODY_COUNT; a++) {
@@ -6455,7 +6472,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                                 wheel == WHEEL_OUTER) == null) {
                             continue;
                         }
-                        double d = chordDistance(x, y, g.cx, g.cy, pin, disc, disc,
+                        double d = chordDistance(x, y, g.cx, g.cy, pin,
+                            g.chordEnd(wheel, a), g.chordEnd(WHEEL_NATAL, b),
                             lon[a], this.natalRing.lon[b]);
                         if (d < near) {
                             near = d;

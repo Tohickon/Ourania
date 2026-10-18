@@ -1285,14 +1285,14 @@ public final class GlobeRenderer {
                 this.panel.elementInk(Zodiac.elementIndex(i - 1)), f);
             Ink ink = faded(here ? new Ink(255, 238, 170) : plain, Layer.HOUSES);
             int size = here ? 15 : (int) Math.round(12 + 3 * f);
-            billboard(houseLabelAt(cusps, i, this.origin, true, this.bands), String.valueOf(i),
-                ink, size);
+            billboardBold(houseLabelAt(cusps, i, this.origin, true, this.bands),
+                String.valueOf(i), ink, size);
             // The southern number fades as the globe becomes the wheel: from above it is
             // underneath its northern twin, and the wheel writes each house once.
             Ink south = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(),
                 (int) Math.round(ink.getAlpha() * (1.0 - this.bands.flatness())));
-            billboard(houseLabelAt(cusps, i, this.origin, false, this.bands), String.valueOf(i),
-                south, size);
+            billboardBold(houseLabelAt(cusps, i, this.origin, false, this.bands),
+                String.valueOf(i), south, size);
         }
 
         // <b>The house cut through the sphere, and only from its number.</b> A house is a
@@ -1888,14 +1888,11 @@ public final class GlobeRenderer {
             if (points[ring][c[1]] == null || points[0][c[2]] == null) {
                 continue;
             }
-            // Body to body on the globe; on the wheel, from each body's longitude on the disc
-            // its ring's lines are drawn on. The two ends slide between, and arcPathFor
-            // straightens the bow as they go.
-            double disc = this.bands.aspectDisc(ring);
-            double[] from = this.bands.blend(points[ring][c[1]],
-                Globe.onShell(lons[ring][c[1]], origin, disc, 0.0));
-            double[] to = this.bands.blend(points[0][c[2]],
-                Globe.onShell(lons[0][c[2]], origin, disc, 0.0));
+            // Body to body, on the globe and on the wheel alike since 2026-10-18 (David: "lines
+            // from body to body concerned with the aspect"). Near the top arcPathFor straightens
+            // the bow, so straight down the line is the wheel's.
+            double[] from = points[ring][c[1]];
+            double[] to = points[0][c[2]];
             // <b>The hovered chord, at full strength and on its own ring.</b> The globe drew
             // every chord alike, so pointing at a cell of the grid lit the flat wheel and did
             // nothing at all here - a reader who had switched views lost the one gesture that
@@ -2019,8 +2016,22 @@ public final class GlobeRenderer {
             // Near the top an angle becomes the wheel's marker: a gold disc with its label
             // written on it in a dark ink.
             final double toMarker = Bodies.at(i).isAngle() ? this.bands.flatness() : 0.0;
+            final double moonPhase = moonPhaseOf(i, lon, valid);
             this.pieces.add(new Piece(q.depth, () -> {
-                int rad = lit ? 11 : 9;
+                int rad = sphereRadius(bodyIndex) + (lit ? 2 : 0);
+                if (moonPhase >= 0.0) {
+                    drawMoonPhase(this.g, (int) q.x, (int) q.y, rad, moonPhase, alpha);
+                    if (outer) {
+                        this.g.stroke(lit ? 2.0f : 1.4f);
+                        this.g.color(lit ? shade(new Ink(255, 238, 170), alpha) : chartRim);
+                        this.g.drawOval((int) q.x - rad - 2, (int) q.y - rad - 2,
+                            (rad + 2) * 2, (rad + 2) * 2);
+                    }
+                    this.g.font(12);
+                    this.g.color(shade(ink, (int) (alpha * 0.92)));
+                    this.g.drawString(glyph, (int) q.x + rad + 3, (int) q.y + 4);
+                    return;
+                }
                 if (asPlanet) {
                     drawPlanet(bodyIndex, (int) q.x, (int) q.y, rad, alpha, lit);
                     // Whose planet it is. Only on the outer rings: Chart A is the reader's own
@@ -2069,6 +2080,17 @@ public final class GlobeRenderer {
         }
     }
 
+    /** The Moon's phase on this ring as a share of a turn, or -1 for any other body. */
+    static double moonPhaseOf(int body, double[] lon, boolean[] valid) {
+        int moon = Bodies.indexOfName("Moon");
+        int sun = Bodies.indexOfName("Sun");
+        if (body != moon || sun < 0 || sun >= valid.length || !valid[sun]) {
+            return -1.0;
+        }
+        double e = ((lon[moon] - lon[sun]) % 360.0 + 360.0) % 360.0;
+        return e / 360.0;
+    }
+
     // ------------------------------------------------------------------ the planets
 
     private static final int FACE_NONE = 0;
@@ -2114,7 +2136,8 @@ public final class GlobeRenderer {
                     faces[i] = FACE_PLAIN;
                     break;
                 default:
-                    faces[i] = FACE_NONE;
+                    // The asteroids are worlds too: tiny plain spheres (2026-10-18).
+                    faces[i] = Bodies.at(i).kind == Bodies.Kind.ASTEROID ? FACE_PLAIN : FACE_NONE;
                     break;
             }
         }
@@ -2178,6 +2201,73 @@ public final class GlobeRenderer {
     /** Draws a body as itself, on this renderer's pen; see the static form. */
     private void drawPlanet(int body, int x, int y, int rad, int alpha, boolean lit) {
         drawPlanet(this.g, body, x, y, rad, alpha, lit, this.turning);
+    }
+
+    /**
+     * How big a body is drawn, in pixels of radius - one rule for the globe and the wheel.
+     *
+     * <p>David, 2026-10-18: "I want the Sun and moon to be the largest of the bodies, outer
+     * planets only slightly smaller than the two yet a little bigger than the inner planets,
+     * asteroids should be very tiny spheres comparatively". Everything drawn as a bead - the
+     * nodes, the calculated points - keeps the bead's nine.
+     */
+    static int sphereRadius(int body) {
+        Bodies.Kind kind = Bodies.at(body).kind;
+        if (kind == Bodies.Kind.LUMINARY) {
+            return 12;
+        }
+        if (kind == Bodies.Kind.ASTEROID) {
+            return 4;
+        }
+        if (kind == Bodies.Kind.PLANET) {
+            switch (Bodies.at(body).name) {
+                case "Mercury":
+                case "Venus":
+                case "Mars":
+                    return 8;
+                default:
+                    return 10;
+            }
+        }
+        return 9;
+    }
+
+    /**
+     * The Moon as its phase: a dark disc lit from the side the Sun is on, the terminator an
+     * ellipse - the wheel's moon, drawn on any pen so the globe and the wheel show one Moon
+     * (2026-10-18: "have the changing moon phase be the standard").
+     *
+     * @param phase the Moon's elongation from the Sun as a share of a turn, 0 new, 0.5 full
+     */
+    static void drawMoonPhase(Pen g, int x, int y, int r, double phase, int alpha) {
+        int d = r * 2;
+        Ink dark = new Ink(0, 0, 0, alpha);
+        Ink lit = new Ink(255, 255, 255, alpha);
+        g.color(dark);
+        g.fillOval(x - r, y - r, d, d);
+        boolean waxing = phase <= 0.5;
+        // The lit half: the right side while waxing, the left while waning.
+        int steps = 24;
+        int[] xs = new int[steps + 1];
+        int[] ys = new int[steps + 1];
+        for (int i = 0; i <= steps; i++) {
+            double a = Math.PI * i / steps - Math.PI / 2;
+            xs[i] = (int) Math.round(x + (waxing ? 1 : -1) * r * Math.cos(a));
+            ys[i] = (int) Math.round(y + r * Math.sin(a));
+        }
+        g.color(lit);
+        g.fillPolygon(xs, ys, xs.length);
+        double q = waxing ? phase : phase - 0.5;
+        boolean crescent = q <= 0.25;
+        double share = crescent ? 1.0 - q / 0.25 : (q - 0.25) / 0.25;
+        int w = (int) (d * share);
+        // Waxing: a crescent hides the lit half's inside with dark, a gibbous adds light past
+        // the middle. Waning, the other way round.
+        g.color(waxing ? (crescent ? dark : lit) : (crescent ? lit : dark));
+        g.fillOval(x - w / 2, y - r, w, d);
+        g.stroke(1.0f);
+        g.color(new Ink(150, 150, 150, alpha));
+        g.drawOval(x - r, y - r, d, d);
     }
 
     /** True when a body has a face of its own - a Sun, a banded or ringed or plain world. */
@@ -2767,6 +2857,20 @@ public final class GlobeRenderer {
         final int half = this.g.textWidth(text, points) / 2;
         this.pieces.add(new Piece(p.depth, () -> {
             this.g.font(points);
+            this.g.color(ink);
+            this.g.drawString(text, (int) p.x - half, (int) p.y + points / 3);
+        }));
+    }
+
+    /** As {@link #billboard}, in the bold face - the house numbers, as the wheel writes them. */
+    private void billboardBold(double[] world, String text, Ink ink, int points) {
+        Globe.Projected p = at(world);
+        if (!p.visible) {
+            return;
+        }
+        final int half = this.g.textWidth(text, points) / 2;
+        this.pieces.add(new Piece(p.depth, () -> {
+            this.g.fontBold(points);
             this.g.color(ink);
             this.g.drawString(text, (int) p.x - half, (int) p.y + points / 3);
         }));

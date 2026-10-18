@@ -420,12 +420,8 @@ final class WheelCanvas extends JPanel {
         int[] nArray = g.natalRadii();
         int[] nArray2 = g.transitRadii();
         int[] nArrayC = g.triRadii();
-        // The three aspect fields. Lines are drawn on these, not between the glyphs -
-        // see SkymapPanel.Geometry.aspectDisc for why, and note that the hit test reads the same
-        // three numbers, because a line you can see has to be a line you can hover.
-        int discNatal = g.aspectDisc(0);
-        int discOuter = g.aspectDisc(1);
-        int discSky = g.aspectDisc(2);
+        // Aspect lines run body to body since 2026-10-18 - see SkymapPanel.Geometry.chordEnd,
+        // which the hit tests read too, because a line you can see has to be a line you can hover.
         // <b>One circle, where the lines stop and the bodies start.</b> Three nested
         // fields of chords with nothing around them read as weather in the middle of the
         // wheel; a single boundary at the natal band's floor turns them into a thing with
@@ -456,7 +452,7 @@ final class WheelCanvas extends JPanel {
                 if (!WheelLayout.aspecting(n7, panel.natalRing().valid)) continue;
                 for (n6 = n7 + 1; n6 < SkymapPanel.BODY_COUNT; ++n6) {
                     if (!WheelLayout.aspecting(n6, panel.natalRing().valid) || Bodies.isOppositePair(n7, n6)) continue;
-                    this.drawAspectLine(graphics2D, panel.natalRing().lon[n7], panel.natalRing().lon[n6], d4, n12, n13, discNatal, discNatal, WheelLayout.WHEEL_NATAL, n7, n6);
+                    this.drawAspectLine(graphics2D, panel.natalRing().lon[n7], panel.natalRing().lon[n6], d4, n12, n13, g.chordEnd(WheelLayout.WHEEL_NATAL, n7), g.chordEnd(WheelLayout.WHEEL_NATAL, n6), WheelLayout.WHEEL_NATAL, n7, n6);
                 }
             }
         }
@@ -465,7 +461,7 @@ final class WheelCanvas extends JPanel {
                 if (!WheelLayout.aspecting(n7, panel.outerRing().valid)) continue;
                 for (n6 = 0; n6 < SkymapPanel.BODY_COUNT; ++n6) {
                     if (!WheelLayout.aspecting(n6, panel.natalRing().valid)) continue;
-                    this.drawAspectLine(graphics2D, panel.outerRing().lon[n7], panel.natalRing().lon[n6], d4, n12, n13, discOuter, discOuter, WheelLayout.WHEEL_OUTER, n7, n6);
+                    this.drawAspectLine(graphics2D, panel.outerRing().lon[n7], panel.natalRing().lon[n6], d4, n12, n13, g.chordEnd(WheelLayout.WHEEL_OUTER, n7), g.chordEnd(WheelLayout.WHEEL_NATAL, n6), WheelLayout.WHEEL_OUTER, n7, n6);
                 }
             }
         }
@@ -479,7 +475,8 @@ final class WheelCanvas extends JPanel {
                 for (n6 = 0; n6 < SkymapPanel.BODY_COUNT; ++n6) {
                     if (!WheelLayout.aspecting(n6, panel.natalRing().valid)) continue;
                     this.drawAspectLine(graphics2D, panel.skyRing().lon[n7],
-                        panel.natalRing().lon[n6], d4, n12, n13, discSky, discSky,
+                        panel.natalRing().lon[n6], d4, n12, n13,
+                        g.chordEnd(WheelLayout.WHEEL_SKY, n7), g.chordEnd(WheelLayout.WHEEL_NATAL, n6),
                         WheelLayout.WHEEL_SKY, n7, n6);
                 }
             }
@@ -510,7 +507,8 @@ final class WheelCanvas extends JPanel {
                         continue;
                     }
                     this.drawAspectLine(graphics2D, panel.natalRing().lon[pa],
-                        panel.natalRing().lon[pb], d4, n12, n13, discNatal, discNatal,
+                        panel.natalRing().lon[pb], d4, n12, n13,
+                        g.chordEnd(WheelLayout.WHEEL_NATAL, pa), g.chordEnd(WheelLayout.WHEEL_NATAL, pb),
                         WheelLayout.WHEEL_NATAL, pa, pb);
                 }
             }
@@ -524,13 +522,12 @@ final class WheelCanvas extends JPanel {
             // every cross-chart line, so a hovered sky aspect was drawn again on the
             // partner ring - a bright chord in the wrong field, next to the faint one it
             // was meant to be.
-            int hlDisc = hlWheel == WheelLayout.WHEEL_SKY ? discSky
-                : (hlWheel == WheelLayout.WHEEL_OUTER ? discOuter : discNatal);
             if (WheelLayout.aspecting(hlA, panel.wheelValid(hlWheel))
                 && WheelLayout.aspecting(hlB, panel.natalRing().valid)) {
                 this.drawAspectLine(graphics2D,
                     panel.wheelLon(hlWheel)[hlA], panel.natalRing().lon[hlB],
-                    d4, n12, n13, hlDisc, hlDisc, hlWheel, hlA, hlB);
+                    d4, n12, n13, g.chordEnd(hlWheel, hlA),
+                    g.chordEnd(WheelLayout.WHEEL_NATAL, hlB), hlWheel, hlA, hlB);
             }
         }
         // The transform the bodies are drawn in, so a hovered glyph's swell is undone
@@ -597,13 +594,37 @@ final class WheelCanvas extends JPanel {
             }
             WheelLayout.GlyphSize glyphSize = WheelLayout.natalSize(n7);
             graphics2D.setFont(glyphFont(glyphSize));
-            if (Settings.globePlanets() && GlobeRenderer.hasPlanetFace(n7)) {
+            double moonPhase = GlobeRenderer.moonPhaseOf(n7, panel.natalRing().lon,
+                panel.natalRing().valid);
+            if (moonPhase >= 0.0) {
+                // <b>The Moon as its phase, as on the globe.</b> David, 2026-10-18: "have the
+                // changing moon phase be the standard" - one painter for both views, at the
+                // luminaries' size, its glyph beside it like every other world.
+                int rad = GlobeRenderer.sphereRadius(n7);
+                GlobeRenderer.drawMoonPhase(new AwtPen(graphics2D), n4, n26, rad, moonPhase, 255);
+                graphics2D.setColor(panel.bodyColor(n7));
+                object = SkymapPanel.glyphFor(n7, glyphFont(glyphSize));
+                graphics2D.drawString((String)object, n4 + rad + 3, n26 + 5);
+            } else if (Bodies.at(n7).kind == Bodies.Kind.NODE) {
+                // <b>The nodes as dark beads, as on the globe</b> (2026-10-18): the globe's bead
+                // ink, ringed and labelled in the body's own colour.
+                int rad = GlobeRenderer.sphereRadius(n7);
+                graphics2D.setColor(SkymapPanel.ringBead(AngleRole.ANCHOR));
+                graphics2D.fillOval(n4 - rad, n26 - rad, rad * 2, rad * 2);
+                graphics2D.setColor(panel.bodyColor(n7));
+                graphics2D.setStroke(new BasicStroke(1.0f));
+                graphics2D.drawOval(n4 - rad, n26 - rad, rad * 2, rad * 2);
+                object = SkymapPanel.glyphFor(n7, glyphFont(glyphSize));
+                java.awt.FontMetrics nodeFm = graphics2D.getFontMetrics();
+                graphics2D.drawString((String)object,
+                    n4 - nodeFm.stringWidth((String)object) / 2, n26 + nodeFm.getAscent() / 2 - 1);
+            } else if (Settings.globePlanets() && GlobeRenderer.hasPlanetFace(n7)) {
                 // <b>The planet as the globe draws it, the glyph beside it.</b> David: "keep them
                 // like they are in globe so the sun shines". The globe's own painter, so the two
                 // views cannot draw one planet two ways; the same setting decides for both. The
                 // glyph is set off to the right, as on the globe, because a planet nine pixels
                 // across is recognisable and not readable.
-                int rad = Math.max(9, glyphSize.radius - 4);
+                int rad = GlobeRenderer.sphereRadius(n7);
                 GlobeRenderer.drawPlanet(new AwtPen(graphics2D), n7, n4, n26, rad, 255,
                     panel.hoverBody() == n7, false);
                 graphics2D.setColor(panel.bodyColor(n7));

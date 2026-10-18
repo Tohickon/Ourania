@@ -3760,7 +3760,7 @@ public final class GlobeCheck {
             Pen listening = (Pen) java.lang.reflect.Proxy.newProxyInstance(
                 Pen.class.getClassLoader(), new Class<?>[] {Pen.class},
                 (proxy, method, args) -> {
-                    if (method.getName().equals("font")) {
+                    if (method.getName().startsWith("font")) {
                         pts[0] = (Integer) args[0];
                     }
                     if (method.getName().equals("drawString")) {
