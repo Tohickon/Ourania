@@ -192,6 +192,13 @@ public final class GlobeCheck {
         betweenChartsAndThePulse();
         report("Part X", before);
 
+        System.out.println();
+        System.out.println("=== Part Y: one view - the turn eases, the wheel at rest, no chip ===");
+        before = failures.size();
+        oneView();
+        report("Part Y", before);
+
+
 
 
 
@@ -4058,6 +4065,86 @@ public final class GlobeCheck {
                 }
             });
             near("with the hover gone nothing swells", 1.0, p.swell(body, ring), 0.0);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * David, 18 Oct: "we can finally merge wheel and globe together and get rid of the globe
+     * wheel button". The wheel is the globe straight down: any turn eases away near the top so
+     * the two are drawn the same way round, the camera at rest straight down hands back to the
+     * wheel, and there is no chip to switch between them.
+     */
+    private static void oneView() throws Exception {
+        // The turn eases away: straight down, a turned globe projects exactly as an unturned one.
+        Globe turned = new Globe();
+        Globe plain = new Globe();
+        turned.pitch = -Globe.MAX_PITCH;
+        plain.pitch = -Globe.MAX_PITCH;
+        turned.yaw = 1.3;
+        plain.yaw = 0.0;
+        double worst = 0.0;
+        for (double lon = 0; lon < 360; lon += 15) {
+            double[] p = Globe.onShell(lon, 0.0, Globe.SHELL_SIGN_INNER, 0.0);
+            Globe.Projected a = turned.project(p[0], p[1], p[2], 900, 820);
+            Globe.Projected b = plain.project(p[0], p[1], p[2], 900, 820);
+            worst = Math.max(worst, Math.hypot(a.x - b.x, a.y - b.y));
+        }
+        near("straight down a turn of 1.3 radians draws as no turn at all", 0.0, worst, 1e-9);
+        // ...and at the ordinary tilt the turn is the reader's, untouched.
+        turned.pitch = new Globe().pitch;
+        plain.pitch = new Globe().pitch;
+        double[] p = Globe.onShell(40.0, 0.0, Globe.SHELL_SIGN_INNER, 0.0);
+        Globe.Projected a = turned.project(p[0], p[1], p[2], 900, 820);
+        Globe.Projected b = plain.project(p[0], p[1], p[2], 900, 820);
+        yes("at the ordinary tilt the turn shows: " + Math.hypot(a.x - b.x, a.y - b.y) + " px",
+            Math.hypot(a.x - b.x, a.y - b.y) > 50.0);
+        // The turn eases the short way: 2*PI + 0.2 is the same as 0.2.
+        Globe wound = new Globe();
+        Globe once = new Globe();
+        wound.yaw = 2.0 * Math.PI + 0.2;
+        once.yaw = 0.2;
+        wound.pitch = -1.3;
+        once.pitch = -1.3;
+        Globe.Projected w1 = wound.project(p[0], p[1], p[2], 900, 820);
+        Globe.Projected w2 = once.project(p[0], p[1], p[2], 900, 820);
+        near("a turn wound once round eases as the short turn it is", 0.0,
+            Math.hypot(w1.x - w2.x, w1.y - w2.y), 1e-6);
+
+        // At rest straight down, at the opening distance and centred: the wheel.
+        Globe top = new Globe();
+        top.pitch = -Globe.MAX_PITCH;
+        yes("at rest straight down the globe is the wheel", top.atTheWheel());
+        top.distance = Globe.DEFAULT_DISTANCE * 0.8;
+        yes("zoomed in, it is not", !top.atTheWheel());
+        top.distance = Globe.DEFAULT_DISTANCE;
+        top.targetX = 0.3;
+        yes("moved off centre, it is not", !top.atTheWheel());
+        top.targetX = 0.0;
+        top.pitch = -1.2;
+        yes("tilted, it is not", !top.atTheWheel());
+
+        // No chip: the strip carries no Globe or Wheel switch.
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            java.awt.Container bar = (java.awt.Container) panel.ringBarComponent();
+            boolean switchShown = false;
+            for (java.awt.Component c : bar.getComponents()) {
+                try {
+                    java.lang.reflect.Field lf = c.getClass().getDeclaredField("label");
+                    lf.setAccessible(true);
+                    Object label = lf.get(c);
+                    switchShown |= "Globe".equals(label) || "Wheel".equals(label);
+                } catch (NoSuchFieldException notAChip) {
+                    // not a chip
+                }
+            }
+            yes("the strip has no Globe/Wheel chip", !switchShown);
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }

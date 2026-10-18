@@ -639,21 +639,22 @@ final class WheelCanvas extends JPanel {
                     panel.swell(n7, WheelLayout.WHEEL_NATAL)));
             if (panel.onHighlightedLine(n7, WheelLayout.WHEEL_NATAL)) {
                 WheelShapes.drawHighlightHalo(graphics2D, n4, n26,
-                    Bodies.at(n7).isAngle() ? 13 : WheelLayout.natalSize(n7).radius);
+                    Bodies.at(n7).isAngle() ? GlobeRenderer.ANGLE_DOT
+                        : WheelLayout.natalSize(n7).radius);
             }
             if (Bodies.at(n7).isAngle()) {
-                graphics2D.setFont(SkymapPanel.ANGLE_FONT);
-                // The angle marker follows the template: gold is invisible on a white
-                // ground and is the only warm thing in a cool palette.
+                // <b>A tiny gold dot, its label beside it</b> - one rule with the globe
+                // (GlobeRenderer.ANGLE_DOT). David, 2026-10-18: the angles "are way too big they
+                // should be tiny". The gold follows the template: it is the only warm thing in a
+                // cool palette.
                 Color angle = AwtPen.colorOr(ChartPalette.angleHex("#D4AF37"),
                     new Color(212, 175, 55));
-                WheelShapes.drawBodyMarker(graphics2D, n4, n26, 13, angle,
-                    Settings.natalMarker());
-                // The glyph reads against its own bead rather than against a fixed dark
-                // brown, which disappears on a pale marker.
-                graphics2D.setColor(SkymapPanel.readableOn(angle));
+                int dot = GlobeRenderer.ANGLE_DOT;
+                graphics2D.setColor(angle);
+                graphics2D.fillOval(n4 - dot, n26 - dot, dot * 2, dot * 2);
+                graphics2D.setFont(SkymapPanel.ANGLE_FONT);
                 object = Bodies.at((int)n7).glyph;
-                graphics2D.drawString((String)object, n4 - graphics2D.getFontMetrics().stringWidth((String)object) / 2, n26 + 4);
+                graphics2D.drawString((String)object, n4 + dot + 2, n26 + 4);
                 continue;
             }
             // A body recedes with its lines unless it IS the focus or aspects it. Without

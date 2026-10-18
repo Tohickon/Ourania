@@ -252,6 +252,37 @@ public final class Globe {
         }
     }
 
+    /**
+     * The pitch, in radians above the chart's plane, at which the globe starts to become the
+     * wheel; see {@link #flatness}. Here since 2026-10-18, when the projection began to read it
+     * (the turn eases away near the top); GlobeRenderer.FLAT_FROM is this.
+     */
+    static final double FLAT_FROM = 0.9;
+
+    /**
+     * How far the globe has become the wheel at this pitch: 0 at every ordinary tilt, 1 looking
+     * straight down on Chart A, a smoothstep between. Only from above.
+     */
+    static double flatness(double pitch) {
+        double over = -pitch;
+        double t = (over - FLAT_FROM) / (MAX_PITCH - FLAT_FROM);
+        if (t <= 0.0) {
+            return 0.0;
+        }
+        if (t >= 1.0) {
+            return 1.0;
+        }
+        return t * t * (3.0 - 2.0 * t);
+    }
+
+    /** True when the camera is at rest straight down at its opening distance and centre. */
+    boolean atTheWheel() {
+        return this.pitch <= -MAX_PITCH + 1e-3
+            && Math.abs(this.distance - DEFAULT_DISTANCE) < 0.05
+            && Math.abs(this.targetX) < 1e-3 && Math.abs(this.targetY) < 1e-3
+            && Math.abs(this.targetZ) < 1e-3 && !this.coasting();
+    }
+
     /** Rotation about the vertical axis, radians. The reader drags this. */
     public double yaw;
     /** Tilt toward the reader, radians. Clamped so the globe never turns inside out. */
@@ -575,8 +606,13 @@ public final class Globe {
         double x = worldX - this.targetX;
         double y = worldY - this.targetY;
         double z = worldZ - this.targetZ;
-        double cy = Math.cos(this.yaw);
-        double sy = Math.sin(this.yaw);
+        // <b>Near the top the turn eases away</b> (2026-10-18), so straight down the globe is the
+        // wheel the right way round - Ascendant on the left - whatever it was turned to on the
+        // way up; and since the turn is folded into (-PI, PI] first, it eases the short way.
+        double turn = Math.IEEEremainder(this.yaw, 2.0 * Math.PI);
+        double shown = turn * (1.0 - flatness(this.pitch));
+        double cy = Math.cos(shown);
+        double sy = Math.sin(shown);
         double xr = x * cy + z * sy;
         double zr = -x * sy + z * cy;
 

@@ -391,15 +391,8 @@ public final class GlobeRenderer {
         if (cam == null) {
             return 0.0;
         }
-        double over = -cam.pitch;               // straight down onto Chart A is -MAX_PITCH
-        double t = (over - FLAT_FROM) / (Globe.MAX_PITCH - FLAT_FROM);
-        if (t <= 0.0) {
-            return 0.0;
-        }
-        if (t >= 1.0) {
-            return 1.0;
-        }
-        return t * t * (3.0 - 2.0 * t);
+        // One rule with the projection, which eases the turn by it (Globe.flatness).
+        return Globe.flatness(cam.pitch);
     }
 
     /**
@@ -408,7 +401,7 @@ public final class GlobeRenderer {
      * stacked is well short of it, and there are still forty degrees of climb for the change
      * to happen in, which is slow enough to watch.
      */
-    static final double FLAT_FROM = 0.9;
+    static final double FLAT_FROM = Globe.FLAT_FROM;
 
     static double liftOf(int deck, boolean stacked) {
         if (!stacked) {
@@ -2249,18 +2242,19 @@ public final class GlobeRenderer {
                     return;
                 }
                 if (toMarker > 0.0) {
+                    // Near the top, the wheel's angle: a tiny gold dot with its label beside it
+                    // (2026-10-18: "they should be tiny"). The bead shrinks into the dot and the
+                    // label moves out to its side.
                     Ink gold = Ink.of(ChartPalette.angleHex("#D4AF37"), new Ink(212, 175, 55));
-                    int r = (int) Math.round(rad + (13 - rad) * toMarker);
+                    int r = (int) Math.round(rad + (ANGLE_DOT - rad) * toMarker);
                     int labelPts = (int) Math.round(13 + (10 - 13) * toMarker);
                     this.g.color(mix(shade(bead, alpha), shade(gold, alpha), toMarker));
                     this.g.fillOval((int) q.x - r, (int) q.y - r, r * 2, r * 2);
-                    this.g.stroke(lit ? 2.0f : 1.0f);
-                    this.g.color(mix(shade(lit ? new Ink(255, 238, 170) : ink, alpha),
-                        shade(gold, alpha), toMarker));
-                    this.g.drawOval((int) q.x - r, (int) q.y - r, r * 2, r * 2);
-                    this.g.font(labelPts);
-                    this.g.color(mix(shade(ink, alpha), shade(new Ink(30, 24, 8), alpha), toMarker));
-                    this.g.drawString(glyph, (int) q.x - this.g.textWidth(glyph, labelPts) / 2,
+                    this.g.fontBold(labelPts);
+                    this.g.color(mix(shade(ink, alpha), shade(gold, alpha), toMarker));
+                    int inside = (int) q.x - this.g.textWidth(glyph, labelPts) / 2;
+                    int beside = (int) q.x + r + 2;
+                    this.g.drawString(glyph, (int) Math.round(inside + (beside - inside) * toMarker),
                         (int) q.y + labelPts / 3 + 1);
                     return;
                 }
@@ -2407,6 +2401,9 @@ public final class GlobeRenderer {
      * asteroids should be very tiny spheres comparatively". Everything drawn as a bead - the
      * nodes, the calculated points - keeps the bead's nine.
      */
+    /** An angle's dot, in pixels of radius, on the wheel and on the globe straight down. */
+    static final int ANGLE_DOT = 4;
+
     static int sphereRadius(int body) {
         Bodies.Kind kind = Bodies.at(body).kind;
         if (kind == Bodies.Kind.LUMINARY) {

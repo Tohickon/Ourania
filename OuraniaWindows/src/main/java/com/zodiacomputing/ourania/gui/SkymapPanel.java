@@ -597,6 +597,11 @@ implements WheelSource, GlobeSource {
             this.globeGlide = new javax.swing.Timer(16, e -> {
                 if (!this.globe.settle()) {
                     this.globeGlide.stop();
+                    // <b>At rest straight down, the globe is the wheel</b> (2026-10-18): the
+                    // view hands back to the flat painter, which draws the same picture.
+                    if (this.globeMode && !this.globeDragging && this.globe.atTheWheel()) {
+                        this.setGlobeMode(false);
+                    }
                 }
                 this.chartPanel.repaint();
             });
@@ -3360,10 +3365,33 @@ implements WheelSource, GlobeSource {
                     SkymapPanel.this.chartPanel.repaint();
                     return;
                 }
-                // <b>The flat wheel pans when it is zoomed in.</b> At fit there is nowhere to go,
-                // so a drag stays a click with a shaky hand, as it always was.
+                // <b>The flat wheel pans when it is zoomed in, and tilts at fit.</b> David,
+                // 2026-10-18: "we can finally merge wheel and globe together and get rid of the
+                // globe wheel button". The wheel is the globe straight down, so an up-or-down drag
+                // at fit hands the drag to the globe's camera, opened straight down; dragging up
+                // tilts it away from the top, and letting it come back to rest there returns the
+                // wheel (startGlobeGlide).
                 if (!SkymapPanel.this.globeMode) {
                     if (SkymapPanel.this.viewIsFit()) {
+                        int tdx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
+                        int tdy = mouseEvent.getY() - SkymapPanel.this.dragFrom.y;
+                        if (tdx * tdx + tdy * tdy < 9 || Math.abs(tdy) < Math.abs(tdx)) {
+                            return;
+                        }
+                        Globe top = SkymapPanel.this.globe;
+                        top.yaw = 0.0;
+                        top.pitch = -Globe.MAX_PITCH;
+                        top.distance = Globe.DEFAULT_DISTANCE;
+                        top.targetX = 0.0;
+                        top.targetY = 0.0;
+                        top.targetZ = 0.0;
+                        SkymapPanel.this.setGlobeMode(true);
+                        SkymapPanel.this.globeTurned = true;
+                        SkymapPanel.this.globeDragging = true;
+                        top.drag(tdx, tdy, SkymapPanel.this.chartPanel.getHeight());
+                        SkymapPanel.this.dragFrom = mouseEvent.getPoint();
+                        SkymapPanel.this.startGlobeGlide();
+                        SkymapPanel.this.chartPanel.repaint();
                         return;
                     }
                     int pdx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
