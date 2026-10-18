@@ -1443,13 +1443,19 @@ public final class GlobeCheck {
             int w = 1000;
             int h = 1000;
             double origin = panel.pinLongitude();
-            double inner = Globe.SHELL_SIGN_OUTER + 0.03;
+            // Both scales since 2026-10-18: the rim scale hanging from the mansions and the inner
+            // one under the signs, each aimed at the middle of the tick the painter draws.
+            double[] aims = {
+                Globe.SHELL_RIM_SCALE - GlobeRenderer.rimTickDepth(5, false),
+                Globe.SHELL_SIGN_INNER - GlobeRenderer.innerTickDepth(5) / 2.0,
+            };
 
             int tested = 0;
+            for (double aim : aims)
             for (double yaw : new double[] {0.0, 1.7, 3.9}) {
                 cam.yaw = yaw;
                 for (int d = 0; d < 360; d += 7) {
-                    double[] pt = Globe.onShell(d + 0.5, origin, inner + 0.09, 0.0);
+                    double[] pt = Globe.onShell(d + 0.5, origin, aim, 0.0);
                     Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
                     if (!q.visible) {
                         continue;
@@ -1457,7 +1463,7 @@ public final class GlobeCheck {
                     tested++;
                     int got = GlobeRenderer.degreeAt(cam, w, h, panel,
                         (int) Math.round(q.x), (int) Math.round(q.y));
-                    eq("pointing at degree " + d + " finds it (yaw=" + yaw + ")", d, got);
+                    eq("pointing at degree " + d + " finds it (yaw=" + yaw + ", radius " + aim + ")", d, got);
                 }
             }
             yes("the sweep reached some ticks: " + tested, tested > 100);
@@ -1558,7 +1564,7 @@ public final class GlobeCheck {
             // no target: it answers when they meant to click through it.
             panel.setLayer(Layer.DEGREES, false);
             Thread.sleep(1200);
-            double[] pt = Globe.onShell(90.5, origin, inner + 0.09, 0.0);
+            double[] pt = Globe.onShell(90.5, origin, aims[0], 0.0);
             Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
             eq("a folded scale answers nothing", -1, GlobeRenderer.degreeAt(cam, w, h, panel,
                 (int) Math.round(q.x), (int) Math.round(q.y)));
@@ -2753,12 +2759,18 @@ public final class GlobeCheck {
         yes("and keeps a margin, so a panel that is not square still holds it",
             worst < half * 0.94);
 
-        // 2. It clears the degree scale, including the tick that grows under the cursor.
-        double tickInner = Globe.SHELL_SIGN_OUTER + 0.03;
-        yes("the longest degree tick stops short of the band",
-            tickInner + Globe.TICK_HOVER_REACH < Globe.SHELL_MANSION_INNER);
+        // 2. The outer degree scale hangs from the band's inner edge, as the wheel's rim scale
+        // does (2026-10-18), and even the tick that grows under the cursor stops short of the
+        // bound glyphs inside it.
+        yes("the outer degree scale hangs from the mansion band's inner edge",
+            Globe.SHELL_RIM_SCALE == Globe.SHELL_MANSION_INNER);
+        yes("the longest degree tick stops short of the bounds",
+            Globe.SHELL_RIM_SCALE - Globe.TICK_HOVER_REACH > Globe.SHELL_BOUND);
         yes("a hovered tick is still the longest on the scale",
-            Globe.TICK_HOVER_REACH > 0.20);
+            Globe.TICK_HOVER_REACH > GlobeRenderer.rimTickDepth(0, false));
+        yes("the inner degree scale sits under the signs, above the houses",
+            Globe.SHELL_INNER_SCALE >= Globe.SHELL_HOUSE
+                && Globe.SHELL_INNER_SCALE < Globe.SHELL_SIGN_INNER);
         yes("the band has depth to read as a band",
             Globe.SHELL_MANSION_OUTER - Globe.SHELL_MANSION_INNER > 0.10);
 

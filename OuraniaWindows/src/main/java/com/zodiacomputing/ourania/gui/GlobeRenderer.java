@@ -1200,21 +1200,27 @@ public final class GlobeRenderer {
             return -1;
         }
         double origin = panel.pinLongitude();
-        double inner = Globe.SHELL_SIGN_OUTER + 0.03;
+        // Both scales since 2026-10-18: the rim's, hanging from the mansions, and the inner one
+        // under the signs. Each measured at the middle of a typical tick, so a long tick and a
+        // short one are as easy to hit as each other.
+        double[] radii = {
+            Globe.SHELL_RIM_SCALE - rimTickDepth(5, false),
+            Globe.SHELL_SIGN_INNER - innerTickDepth(5) / 2.0,
+        };
         int best = -1;
         double bestDist = 14.0;
-        for (int d = 0; d < 360; d++) {
-            // Measured at the middle of the tick, so a long tick and a short one are as easy
-            // to hit as each other.
-            double[] pt = Globe.onShell(d + 0.5, origin, inner + 0.09, 0.0);
-            Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
-            if (!q.visible) {
-                continue;
-            }
-            double dist = Math.hypot(q.x - px, q.y - py);
-            if (dist < bestDist) {
-                bestDist = dist;
-                best = d;
+        for (double r : radii) {
+            for (int d = 0; d < 360; d++) {
+                double[] pt = Globe.onShell(d + 0.5, origin, r, 0.0);
+                Globe.Projected q = cam.project(pt[0], pt[1], pt[2], w, h);
+                if (!q.visible) {
+                    continue;
+                }
+                double dist = Math.hypot(q.x - px, q.y - py);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = d;
+                }
             }
         }
         return best;
@@ -1468,12 +1474,19 @@ public final class GlobeRenderer {
         return faded(shade(c, alpha), Layer.MANSIONS);
     }
 
+    /** How long an outer-scale tick is, by what it marks; the hovered one is the longest. */
+    static double rimTickDepth(int d, boolean here) {
+        return here ? Globe.TICK_HOVER_REACH
+            : (d % 30 == 0 ? 0.06 : (d % 10 == 0 ? 0.045 : (d % 5 == 0 ? 0.03 : 0.018)));
+    }
+
     private void degreeRing() {
-        // <b>Outside the signs, where a scale belongs.</b> It sat inside the sign band, which
-        // put the finest division of the zodiac underneath the coarsest and left the ticks
-        // competing with the aspect network for the same space. Around the outside it is the
-        // rim of the whole thing, which is where the flat wheel has always kept it.
-        double inner = Globe.SHELL_SIGN_OUTER + 0.03;
+        // <b>At the rim, hanging from the mansions, as on the wheel.</b> It sat inside the sign
+        // band once, then grew outward from just beyond the signs, through the decans. Since
+        // 2026-10-18 it hangs inward from the mansion band's inner edge, which is where the
+        // wheel's rim scale hangs - David: "match the outer degree ring just inside the mansions
+        // as is on the wheel".
+        double top = Globe.SHELL_RIM_SCALE;
         int lit = this.panel.focusedDegree();
         for (int d = 0; d < 360; d++) {
             boolean sign = d % 30 == 0;
@@ -1482,13 +1495,12 @@ public final class GlobeRenderer {
             // <b>The hovered tick stands out of the scale.</b> A degree is a hair's width on a
             // ring of three hundred and sixty, so brightening one is not enough to find it -
             // it has to be longer than its neighbours to be the one the reader is pointing at.
-            double depth = here ? Globe.TICK_HOVER_REACH
-                : (sign ? 0.20 : (ten ? 0.13 : (d % 5 == 0 ? 0.08 : 0.05)));
+            double depth = rimTickDepth(d, here);
             Ink ink = here ? new Ink(255, 238, 170, 245)
                 : (sign ? new Ink(214, 218, 226, 225)
                     : (ten ? new Ink(172, 178, 190, 195) : new Ink(138, 144, 156, 150)));
-            segment(Globe.onShell(d, this.origin, inner, 0.0),
-                Globe.onShell(d, this.origin, inner + depth, 0.0),
+            segment(Globe.onShell(d, this.origin, top, 0.0),
+                Globe.onShell(d, this.origin, top - depth, 0.0),
                 faded(ink, Layer.DEGREES),
                 here ? 2.2f : (sign ? 1.4f : (ten ? 1.0f : 0.6f)));
         }
@@ -1503,11 +1515,42 @@ public final class GlobeRenderer {
         if (lit >= 0 && Settings.globeDegreeFill()) {
             wedgeOnSphere(lit, lit + 1.0, Globe.SHELL_SIGN_INNER + 0.09,
                 faded(new Ink(255, 238, 170, 96), Layer.DEGREES));
-            quadRing(lit, lit + 1.0, 0.10, inner + Globe.TICK_HOVER_REACH,
+            quadRing(lit, lit + 1.0, 0.10, top,
                 faded(new Ink(255, 238, 170, 70), Layer.DEGREES));
         }
         // The scale itself, so the ticks hang off a line rather than floating.
-        polyline(Globe.equator(this.origin, inner, 144),
+        polyline(Globe.equator(this.origin, top, 144),
+            faded(new Ink(158, 164, 176, 170), Layer.DEGREES), 1.0f);
+        innerDegreeRing();
+    }
+
+    /** How long an inner-scale tick is: the tens across the whole strip, as on the wheel. */
+    static double innerTickDepth(int d) {
+        double strip = Globe.SHELL_SIGN_INNER - Globe.SHELL_INNER_SCALE;
+        return d % 10 == 0 ? strip : (d % 5 == 0 ? strip * 0.375 : strip * 0.19);
+    }
+
+    /**
+     * The inner degree scale, under the signs, numbered 0/10/20 within each sign - the wheel's
+     * {@code WheelShapes.drawInnerDegreeRing} on the globe (2026-10-18). Ticks hang from the
+     * sign band's inner edge, the tens across the whole strip and the fives and ones shorter,
+     * in the wheel's proportions; the numbers sit between the tens, so none is on its own tick.
+     */
+    private void innerDegreeRing() {
+        double top = Globe.SHELL_SIGN_INNER;
+        Ink tick = faded(new Ink(150, 150, 150, 200), Layer.DEGREES);
+        for (int d = 0; d < 360; d++) {
+            segment(Globe.onShell(d, this.origin, top, 0.0),
+                Globe.onShell(d, this.origin, top - innerTickDepth(d), 0.0), tick,
+                d % 10 == 0 ? 1.2f : 0.5f);
+        }
+        double mid = (Globe.SHELL_SIGN_INNER + Globe.SHELL_INNER_SCALE) / 2.0;
+        Ink label = faded(new Ink(130, 138, 148), Layer.DEGREES);
+        for (int d = 0; d < 360; d += 10) {
+            billboard(Globe.onShell(d + 5.0, this.origin, mid, 0.0), String.valueOf(d % 30),
+                label, 8);
+        }
+        polyline(Globe.equator(this.origin, Globe.SHELL_INNER_SCALE, 144),
             faded(new Ink(158, 164, 176, 170), Layer.DEGREES), 1.0f);
     }
 
@@ -1964,7 +2007,29 @@ public final class GlobeRenderer {
         };
     }
 
+    /** Draws a body as itself, on this renderer's pen; see the static form. */
     private void drawPlanet(int body, int x, int y, int rad, int alpha, boolean lit) {
+        drawPlanet(this.g, body, x, y, rad, alpha, lit, this.turning);
+    }
+
+    /** True when a body has a face of its own - a Sun, a banded or ringed or plain world. */
+    static boolean hasPlanetFace(int body) {
+        return body >= 0 && body < PLANET_FACE.length && PLANET_FACE[body] != FACE_NONE;
+    }
+
+    /**
+     * Draws a body as itself on any pen: the Sun with its corona, Jupiter banded, Saturn
+     * ringed, the plain worlds shaded.
+     *
+     * <p><b>Static since 2026-10-18, so the wheel draws its planets with it.</b> David: "on the
+     * wheel put all the planets in a golden band like the globe has ... keep them like they are
+     * in globe so the sun shines". One painter for both views, so a planet cannot look one way
+     * on the wheel and another on the globe it is meant to be the top of.
+     *
+     * @param turning true while the globe is being dragged, which drops the soft glow
+     */
+    static void drawPlanet(Pen g, int body, int x, int y, int rad, int alpha, boolean lit,
+                           boolean turning) {
         int face = PLANET_FACE[body];
         Ink base = faceColour(body);
         int d = rad * 2;
@@ -1977,19 +2042,19 @@ public final class GlobeRenderer {
             // one fact about it nobody has to be taught.
             for (int i = 5; i >= 1; i--) {
                 int glow = rad + i * 5;
-                this.g.color(new Ink(255, 186, 82,
+                g.color(new Ink(255, 186, 82,
                     Math.max(0, Math.min(255, (int) (alpha * 0.16 / i)))));
-                this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
+                g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
             }
-            this.g.fillOvalRadial(x - rad, y - rad, d, d, x - rad * 0.22f, y - rad * 0.22f,
+            g.fillOvalRadial(x - rad, y - rad, d, d, x - rad * 0.22f, y - rad * 0.22f,
                 Math.max(1f, rad * 1.5f), new float[] {0f, 0.35f, 0.75f, 1f},
                 new Ink[] {shade(new Ink(255, 255, 246), alpha),
                     shade(new Ink(255, 232, 158), alpha),
                     shade(new Ink(255, 168, 56), alpha),
                     shade(new Ink(214, 96, 28), alpha)});
-            this.g.color(shade(new Ink(255, 214, 130), alpha));
-            this.g.stroke(lit ? 2.0f : 1.0f);
-            this.g.drawOval(x - rad, y - rad, d, d);
+            g.color(shade(new Ink(255, 214, 130), alpha));
+            g.stroke(lit ? 2.0f : 1.0f);
+            g.drawOval(x - rad, y - rad, d, d);
             return;
         }
 
@@ -1998,9 +2063,9 @@ public final class GlobeRenderer {
         if (face == FACE_RINGED) {
             // Behind the planet, then the planet, then in front - which is the whole reason
             // Saturn reads as Saturn rather than as a disc with a line through it.
-            this.g.color(shade(new Ink(206, 186, 142), (int) (alpha * 0.72)));
-            this.g.stroke(1.4f);
-            this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 0, 180);
+            g.color(shade(new Ink(206, 186, 142), (int) (alpha * 0.72)));
+            g.stroke(1.4f);
+            g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 0, 180);
         }
 
         // <b>A halo in the body's own colour, before the disc.</b> The planets were already
@@ -2009,44 +2074,44 @@ public final class GlobeRenderer {
         // sitting on the band rather than a light sitting above it. The Sun keeps its own,
         // stronger corona above: it should stay the brightest thing on the ring, which is the
         // one fact about it nobody has to be taught.
-        if (!this.turning) {
+        if (!turning) {
             for (float[] pass : bodyHaloPasses()) {
                 int glow = rad + Math.round(pass[0]);
-                this.g.color(shade(lighten(base, 0.35),
+                g.color(shade(lighten(base, 0.35),
                     (int) Math.round(alpha * pass[1])));
-                this.g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
+                g.fillOval(x - glow, y - glow, glow * 2, glow * 2);
             }
         }
 
-        this.g.fillOvalRadial(x - rad, y - rad, d, d, x - rad * 0.35f, y - rad * 0.35f,
+        g.fillOvalRadial(x - rad, y - rad, d, d, x - rad * 0.35f, y - rad * 0.35f,
             Math.max(1f, rad * 1.5f), new float[] {0f, 1f},
             new Ink[] {shade(lighten(base, 0.45), alpha), shade(darken(base, 0.5), alpha)});
 
         if (face == FACE_BANDED) {
             // Jupiter's belts, clipped to the disc so they end where it does.
-            this.g.clipOval(x - rad, y - rad, d, d);
-            this.g.stroke(1.0f);
+            g.clipOval(x - rad, y - rad, d, d);
+            g.stroke(1.0f);
             for (int i = -2; i <= 2; i++) {
                 if (i == 0) {
                     continue;
                 }
                 int by = y + (int) Math.round(i * rad * 0.34);
-                this.g.color(shade(i % 2 == 0 ? darken(base, 0.72) : lighten(base, 0.25),
+                g.color(shade(i % 2 == 0 ? darken(base, 0.72) : lighten(base, 0.25),
                     (int) (alpha * 0.85)));
-                this.g.drawLine(x - rad, by, x + rad, by);
+                g.drawLine(x - rad, by, x + rad, by);
             }
-            this.g.unclip();
+            g.unclip();
         }
 
         if (face == FACE_RINGED) {
-            this.g.color(shade(new Ink(232, 214, 170), alpha));
-            this.g.stroke(1.6f);
-            this.g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 180, 180);
+            g.color(shade(new Ink(232, 214, 170), alpha));
+            g.stroke(1.6f);
+            g.drawArc(x - rw, y - rh, rw * 2, rh * 2, 180, 180);
         }
 
-        this.g.color(shade(lit ? new Ink(255, 238, 170) : darken(base, 0.5), alpha));
-        this.g.stroke(lit ? 2.0f : 0.8f);
-        this.g.drawOval(x - rad, y - rad, d, d);
+        g.color(shade(lit ? new Ink(255, 238, 170) : darken(base, 0.5), alpha));
+        g.stroke(lit ? 2.0f : 0.8f);
+        g.drawOval(x - rad, y - rad, d, d);
     }
 
     private static Ink lighten(Ink c, double t) {

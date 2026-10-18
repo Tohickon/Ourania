@@ -536,6 +536,31 @@ final class WheelCanvas extends JPanel {
         // The transform the bodies are drawn in, so a hovered glyph's swell is undone
         // before anything else is painted - every loop below resets to it.
         final java.awt.geom.AffineTransform bodyTx = graphics2D.getTransform();
+        // <b>Chart A's planets stand in a golden band, as on the globe.</b> David, 2026-10-18:
+        // "on the wheel put all the planets in a golden band like the globe has". The globe
+        // gives each chart a translucent ribbon with a glowing rim (GlobeRenderer.ribbon); this
+        // is Chart A's, seen from straight above - the same gold, the same fill alpha of 54 and
+        // the same three-pass rims, across the band the wheel spreads Chart A's bodies in, and
+        // folding with Chart A's chip. Under the bodies and over the aspect lines, which is
+        // where the globe paints its ribbons too.
+        if (panel.layerShown(Layer.NATAL)) {
+            double open = panel.layerOpen(Layer.NATAL);
+            Ink gold = GlobeRenderer.chartInk(0);
+            graphics2D.setColor(new Color(gold.getRed(), gold.getGreen(), gold.getBlue(),
+                (int) Math.round(54 * open)));
+            graphics2D.fill(SkymapPanel.wedge(g, g.natalFloor, g.bodyBase, 0.0, 360.0));
+            Stroke priorRim = graphics2D.getStroke();
+            for (float[] pass : GlobeRenderer.rimPasses()) {
+                int alpha = (int) Math.round(Math.max(10, Math.min(255, 54 * pass[1])) * open);
+                graphics2D.setColor(new Color(gold.getRed(), gold.getGreen(), gold.getBlue(),
+                    alpha));
+                graphics2D.setStroke(new BasicStroke(pass[0]));
+                for (int rim : new int[] {g.natalFloor, g.bodyBase}) {
+                    graphics2D.drawOval(n12 - rim, n13 - rim, rim * 2, rim * 2);
+                }
+            }
+            graphics2D.setStroke(priorRim);
+        }
         for (n7 = 0; panel.layerShown(Layer.NATAL) && n7 < SkymapPanel.BODY_COUNT; ++n7) {
             if (!panel.natalRing().valid[n7]) continue;
             double d10 = Math.toRadians(180.0 + d4 - panel.natalRing().lon[n7]);
@@ -572,6 +597,19 @@ final class WheelCanvas extends JPanel {
             }
             WheelLayout.GlyphSize glyphSize = WheelLayout.natalSize(n7);
             graphics2D.setFont(glyphFont(glyphSize));
+            if (Settings.globePlanets() && GlobeRenderer.hasPlanetFace(n7)) {
+                // <b>The planet as the globe draws it, the glyph beside it.</b> David: "keep them
+                // like they are in globe so the sun shines". The globe's own painter, so the two
+                // views cannot draw one planet two ways; the same setting decides for both. The
+                // glyph is set off to the right, as on the globe, because a planet nine pixels
+                // across is recognisable and not readable.
+                int rad = Math.max(9, glyphSize.radius - 4);
+                GlobeRenderer.drawPlanet(new AwtPen(graphics2D), n7, n4, n26, rad, 255,
+                    panel.hoverBody() == n7, false);
+                graphics2D.setColor(panel.bodyColor(n7));
+                object = SkymapPanel.glyphFor(n7, glyphFont(glyphSize));
+                graphics2D.drawString((String)object, n4 + rad + 3, n26 + 5);
+            } else {
             WheelShapes.drawBodyMarker(graphics2D, n4, n26, glyphSize.radius,
                 new Color(192, 192, 192), Settings.natalMarker());
             if (n7 == SkymapPanel.MOON && panel.natalRing().valid[SkymapPanel.SUN]) {
@@ -584,6 +622,7 @@ final class WheelCanvas extends JPanel {
                 graphics2D.setColor(panel.bodyColor(n7));
                 object = SkymapPanel.glyphFor(n7, glyphFont(glyphSize));
                 WheelShapes.drawBodyLabel(graphics2D, (String)object, n4, n26, glyphSize.baseline);
+            }
             }
             graphics2D.setTransform(bodyTx);
             // The leader from the glyph to the degree it actually occupies. Bodies are

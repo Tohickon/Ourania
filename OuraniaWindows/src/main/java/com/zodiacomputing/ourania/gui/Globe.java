@@ -93,14 +93,15 @@ public final class Globe {
     public static final double SHELL_TICK = 2.42;
 
     /**
-     * How far a hovered degree tick stands out of the scale.
+     * How far a hovered degree tick stands out of the outer scale.
      *
-     * <b>Named because the mansion band is placed against it.</b> It was 0.34, which put the
-     * reach of the ticks at 2.67 and left no room outside them for another ring that the panel
-     * could still hold. At 0.21 the lit tick is still the longest on the scale - a sign
-     * boundary reaches 0.20 - and it stops a hair short of the band rather than crossing it.
+     * <b>Short since 2026-10-18, because the scale moved to the rim.</b> It was 0.21, on a scale
+     * that grew outward from just beyond the signs and so had room to reach; now the scale
+     * hangs inward from the mansion band, as the wheel's rim scale does, into the strip between
+     * the mansions and the bounds. The lit tick is still the longest on the scale - a sign
+     * boundary reaches 0.06 - and it stops short of the bound glyphs at {@link #SHELL_BOUND}.
      */
-    public static final double TICK_HOVER_REACH = 0.21;
+    public static final double TICK_HOVER_REACH = 0.08;
 
     /**
      * The lunar mansion band, outside everything else.
@@ -118,6 +119,26 @@ public final class Globe {
 
     /** The outside of that band. */
     public static final double SHELL_MANSION_OUTER = 2.70;
+
+    /**
+     * The line the outer degree scale hangs from: the mansion band's inner edge.
+     *
+     * <p>David, 2026-10-18: "on the globe match the outer degree ring just inside the mansions
+     * as is on the wheel". The wheel's rim scale hangs from {@code RING_MANSION_INNER} inward;
+     * this is the same edge on the globe, and the ticks run inward from it. Until that day the
+     * scale grew outward from just beyond the signs, through the decans.
+     */
+    public static final double SHELL_RIM_SCALE = SHELL_MANSION_INNER;
+
+    /**
+     * The inner degree scale's inner edge: it runs from the houses' shell up to the signs.
+     *
+     * <p>David, the same message: "add the inner ring that goes 0/10/20 under the signs as it
+     * has the same in the wheel". The wheel's inner scale sits directly under the sign band,
+     * between {@code RING_DEGREE_INNER} and {@code RING_SIGN_INNER}; on the globe that is the
+     * strip the bounds left when they moved out past the decans.
+     */
+    public static final double SHELL_INNER_SCALE = SHELL_HOUSE;
 
     /**
      * How far above and below the equator a filled shell reaches, in radians of latitude.
