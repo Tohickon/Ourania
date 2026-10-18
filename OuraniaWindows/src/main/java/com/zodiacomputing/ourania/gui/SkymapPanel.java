@@ -4277,7 +4277,10 @@ implements WheelSource, GlobeSource {
                 Chronometry time = Chronometry.at(SkymapPanel.this.sw, chartFrame, d, dNow, list,
                     bl ? d4 : Double.NaN, d5, d6, d2, d3, c,
                     readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE
-                        || readingTier == ReadingTier.TIMELINE);
+                        || readingTier == ReadingTier.TIMELINE,
+                    // Your year is the twelve months from now (David, 2026-10-17); the report
+                    // and Coming up keep the birthday year.
+                    readingTier == ReadingTier.SYNTHESIZE);
                 profection = time.profection;
                 chartFrame2 = time.transit;
                 list2 = time.hits;
@@ -4336,8 +4339,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (readingTier == ReadingTier.REPORT) {
                         SkymapPanel.this.window.showReport(string2, string, (String)this.get());
                     } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
+                        // The page draws its own year card, with the id the reveal lands on.
                         RevealPlan plan = this.revealPlan;
-                        String html = plan == null ? (String)this.get() : plan.onTop((String)this.get());
+                        String html = (String)this.get();
                         RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, plan)
                             ? SkymapPanel.this.revealScene(plan, REVEAL_AT_CENTRE) : null;
                         if (scene != null) {

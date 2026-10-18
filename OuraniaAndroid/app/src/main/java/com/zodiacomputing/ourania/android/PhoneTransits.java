@@ -83,8 +83,11 @@ final class PhoneTransits {
         double lon = natal.place.longitude;
         if (!natal.timeUnknown) {
             double birthJd = Moments.sweDate(natal.moment.when).getJulDay();
+            // The year scan is the reading's, and the reading is the twelve months from now,
+            // as the desktop's Your year is (2026-10-17) - one window, or the two would date the
+            // same chart's year differently.
             Chronometry time = Chronometry.at(sw, natal.frame, birthJd, jd, ranked, jd, lat, lon,
-                lat, lon, PhoneChart.houseSystem(), scanYear);
+                lat, lon, PhoneChart.houseSystem(), scanYear, scanYear);
             return new Sky(when, time.transit, time.hits, time.profection,
                 scanYear ? time : null);
         }

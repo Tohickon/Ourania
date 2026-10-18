@@ -455,9 +455,12 @@ public final class InterpretationHierarchyCheck {
         // meant a deliberate renumbering did not merely fail here: it took two live guards
         // dark and reported one red instead of three. A section heading can be renumbered
         // again; it cannot stop being called what it is called.
-        int a = syn.indexOf("Planetary Placements");
-        int b = syn.indexOf("Structural Tensions");
-        ok("H2: the placements section is still before the tensions section", a > 0 && b > a);
+        // 2026-10-17: the placements left the mechanics and became the reader's own section,
+        // "Your placements, strongest first", which the When section follows. Same block, same
+        // guards on what is inside it; only where it starts and ends moved.
+        int a = syn.indexOf("Your placements, strongest first");
+        int b = syn.indexOf("tier(\"When\")");
+        ok("H2: the placements section is found, and ends where When begins", a > 0 && b > a);
         if (a > 0 && b > a) {
             String block = syn.substring(a, b);
             int sign = block.indexOf("getPlanetInSign");

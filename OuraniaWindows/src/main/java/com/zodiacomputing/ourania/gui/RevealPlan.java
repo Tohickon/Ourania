@@ -75,9 +75,11 @@ record RevealPlan(String title, String body, List<String> ticks, boolean confirm
                 points.add(v.point());
             }
         }
-        String area = LifeAreas.of(r.theme.house());
-        String body = area == null ? "" : "Shows up in: " + area + ".";
-        return new RevealPlan(r.theme.label, body, ticks, r.headline(), new ArrayList<>(points));
+        // The page's own year card, word for word (2026-10-17: David, the card "makes no
+        // sense as to what it does" - it now says what the year asks and what to do).
+        ReadingCard card = ReadingCard.forYearTheme(r);
+        return new RevealPlan(card.headline(), card.body(), ticks, r.headline(),
+            new ArrayList<>(points), card.label());
     }
 
     /**
@@ -137,8 +139,11 @@ record RevealPlan(String title, String body, List<String> ticks, boolean confirm
             new ArrayList<>(points));
     }
 
+    /** The line that starts a year card's direction; the card's own. */
+    static final String WHAT_TO_DO_THIS_YEAR = ReadingCard.WHAT_TO_DO_THIS_YEAR;
+
     /** The id of the real card on the page, which the flying card lands on. */
-    static final String CARD_ID = "reveal-card";
+    static final String CARD_ID = ReadingCard.REVEAL_ID;
 
     /**
      * The card the reveal forms, as one {@link ReadingCard}: the painter draws it and the page

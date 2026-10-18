@@ -118,8 +118,11 @@ public final class RevealCheck {
         yes("confirmed is the Rule of Three", astro.confirmed() == r.headline());
         eq("the factors are the points voted on", "[MC, Saturn]", astro.points().toString());
         eq("the title is the theme's plain name", ThemeConvergence.Theme.CAREER.label, astro.title());
-        eq("the body is the life area the app already names",
-            "Shows up in: " + LifeAreas.of(10) + ".", astro.body());
+        InterpretationService svc = InterpretationService.getInstance();
+        eq("the body is what the year asks, the life area the app already names, and what to do",
+            svc.getTransitCardPart("year.career.asks") + " Shows up in: " + LifeAreas.of(10)
+                + ".\n\n" + RevealPlan.WHAT_TO_DO_THIS_YEAR
+                + svc.getTransitCardPart("year.career.todo"), astro.body());
         yes("plain view carries no technique names", !plain.labelled());
         eq("but the same number of ticks", astro.ticks().size(), plain.ticks().size());
 
