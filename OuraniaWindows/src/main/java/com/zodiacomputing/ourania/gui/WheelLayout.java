@@ -267,7 +267,7 @@ public final class WheelLayout {
     /**
      * How deep the zodiac and its scales are, from the rim down to where the bodies may start.
      *
-     * <p>Read outward-in: the rim, the decans, the signs, the Egyptian bounds and the inner
+     * <p>Read outward-in: the rim, the Egyptian bounds, the decans, the signs and the inner
      * degree scale - the chain {@link #ringRadii} subtracts with every band fully open, which
      * is the worst case and therefore the one a fit has to survive.
      */
@@ -460,11 +460,17 @@ public final class WheelLayout {
      */
     public static final int RING_BODY_TOP = 6;
     /**
-     * Floor of the bound (term) band, whose ceiling is {@code RING_SIGN_INNER}.
+     * Floor of the bound (term) band, whose ceiling is {@link #RING_TERM_OUTER}.
      *
-     * <b>The signs sit between their two subdivisions now, not under both.</b> Decans outside,
-     * signs, then the Egyptian bounds inside - so the sign band is framed by the two rings
-     * that divide it rather than carrying them both on one side.
+     * <b>Outside the decans since 2026-10-18, as on the globe.</b> The bounds sat inside the
+     * signs, so the sign band was framed by its two subdivisions. David moved them on the globe
+     * to beside the decans, outside the signs, and the wheel follows because the wheel is to be
+     * the globe seen from straight above: "the only thing i would change in globe is to move
+     * the bounds to be next to the decans under the signs". Outward from the middle the zodiac
+     * now reads inner degree scale, signs, decans, bounds, rim.
+     *
+     * <p>So this edge is also the decans' outer edge, {@link #RING_DECAN_OUTER}: with the bounds
+     * open they are the same radius, and with the bounds folded the decans reach the rim.
      */
     public static final int RING_TERM_INNER = 7;
     /**
@@ -509,6 +515,14 @@ public final class WheelLayout {
      * pixel as it did before this existed.
      */
     public static final int RING_ARC_INNER = 10;
+    /**
+     * Ceiling of the bound band, which is the floor of the rim (2026-10-18).
+     *
+     * <p>Appended, like the mansions and the directed band, so no index before it changes. It
+     * exists because the bounds moved outside the decans: their ceiling used to be
+     * {@link #RING_SIGN_INNER} and needed no name of its own.
+     */
+    public static final int RING_TERM_OUTER = 11;
     /** How deep the bound band is. Two pixels shallower than the decans, being finer. */
     static final int TERM_BAND_DEPTH = 18;
     /** How deep the inner degree scale is. Ticks only, so it needs little. */
@@ -645,12 +659,16 @@ public final class WheelLayout {
         int open = (t > 0.001 ? 1 : 0) + (ar > 0.001 ? 1 : 0) + (o > 0.001 ? 1 : 0);
         int depth = WheelLayout.outerBandDepth(outer, open);
         // The zodiac sits at fixed radii just inside the rim; it no longer moves when a body
-        // ring opens, which is the point of putting it outside them.
-        int decanOuter = outer - 20;
+        // ring opens, which is the point of putting it outside them. Inward from the rim: the
+        // bounds, the decans, the signs, the inner degree scale (the bounds moved out from
+        // under the signs on 2026-10-18 - see RING_TERM_INNER). The same five depths in a new
+        // order, so the body bands below start exactly where they did.
+        int termOuter = outer - 20;
+        int termInner = (int) Math.round(termOuter - TERM_BAND_DEPTH * bd);
+        int decanOuter = termInner;
         int signOuter = (int) Math.round(decanOuter - 20 * dc);
         int signInner = (int) Math.round(signOuter - 35 * sg);
-        int termInner = (int) Math.round(signInner - TERM_BAND_DEPTH * bd);
-        int degreeInner = (int) Math.round(termInner - DEGREE_RING_DEPTH * dg);
+        int degreeInner = (int) Math.round(signInner - DEGREE_RING_DEPTH * dg);
         // The body bands hang below the inner degree scale, each opening downward, outermost
         // first: the sky, then the directed chart, then the middle ring. A band at zero takes
         // no room, so with the directed band shut this is the two-link chain it always was.
@@ -663,7 +681,7 @@ public final class WheelLayout {
         int mansionInner = (int) Math.round(outer - MANSION_BAND_DEPTH * mn);
         return new int[] {
             outer, tri, transit, decanOuter, signOuter, signInner, bodyTop,
-            termInner, degreeInner, mansionInner, arcInner };
+            termInner, degreeInner, mansionInner, arcInner, termOuter };
     }
     /**
      * Where each body band's edge falls, for any number of bands (G17).

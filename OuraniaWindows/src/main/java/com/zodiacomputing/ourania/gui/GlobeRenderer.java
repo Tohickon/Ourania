@@ -1287,8 +1287,12 @@ public final class GlobeRenderer {
         if (!panel.layerShown(Layer.BOUNDS)) {
             return -1;
         }
-        return bandAt(cam, w, h, panel, px, py, Globe.SHELL_HOUSE + 0.03,
-            Globe.SHELL_SIGN_INNER - 0.02, 6.0);
+        // Outside the decans since 2026-10-18 (see Globe.SHELL_BOUND): a band as wide as the
+        // gap to the decans on either side of the glyphs, so a click on one ring of glyphs is
+        // not taken by the other.
+        double half = (Globe.SHELL_BOUND - Globe.SHELL_DECAN) / 2.0;
+        return bandAt(cam, w, h, panel, px, py, Globe.SHELL_BOUND - half,
+            Globe.SHELL_BOUND + half, 4.0);
     }
 
     /**

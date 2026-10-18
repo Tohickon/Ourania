@@ -2331,9 +2331,9 @@ implements WheelSource, GlobeSource {
      * What a point on the globe opens, other than a body: {kind, value}, kind GLOBE_NONE when
      * nothing. The one order for the globe's click and its hover, so what lights is what opens.
      *
-     * House numbers first (a label the reader aimed at), then the decan band before the degree
-     * ticks that crowd it, the mansions, the signs, the bounds, and last the house wedges of the
-     * plane, which lie under everything else.
+     * House numbers first (a label the reader aimed at), then the decan band and the bounds
+     * outside it before the degree ticks that crowd them both, the mansions, the signs, and
+     * last the house wedges of the plane, which lie under everything else.
      */
     int[] globeTargetAt(int x, int y) {
         int w = this.chartPanel.getWidth();
@@ -2346,6 +2346,13 @@ implements WheelSource, GlobeSource {
         if (v >= 0) {
             return new int[]{GLOBE_DECAN, v};
         }
+        // <b>The bounds before the ticks, as the decans are.</b> Since 2026-10-18 the bounds
+        // ride just outside the decans, where the degree ticks also run, and a glyph is what
+        // the reader means when they are on one - the same reason the decans come first.
+        v = GlobeRenderer.boundAt(this.globe, w, h, this, x, y);
+        if (v >= 0) {
+            return new int[]{GLOBE_BOUND, v};
+        }
         v = GlobeRenderer.degreeAt(this.globe, w, h, this, x, y);
         if (v >= 0) {
             return new int[]{GLOBE_DEGREE, v};
@@ -2357,10 +2364,6 @@ implements WheelSource, GlobeSource {
         v = GlobeRenderer.signAt(this.globe, w, h, this, x, y);
         if (v >= 0) {
             return new int[]{GLOBE_SIGN, v};
-        }
-        v = GlobeRenderer.boundAt(this.globe, w, h, this, x, y);
-        if (v >= 0) {
-            return new int[]{GLOBE_BOUND, v};
         }
         v = GlobeRenderer.houseAreaAt(this.globe, w, h, this, x, y);
         if (v >= 1) {
@@ -2454,7 +2457,7 @@ implements WheelSource, GlobeSource {
     }
 
     /** An annular wedge between two radii and two longitudes, in screen coordinates. */
-    private static java.awt.Shape wedge(Geometry g, double r0, double r1, double lonFrom,
+    static java.awt.Shape wedge(Geometry g, double r0, double r1, double lonFrom,
                                         double lonTo) {
         java.awt.geom.Path2D.Double p = new java.awt.geom.Path2D.Double();
         int steps = Math.max(2, (int) Math.ceil(Math.abs(lonTo - lonFrom) / 2.0));
@@ -2529,15 +2532,15 @@ implements WheelSource, GlobeSource {
             }
             case HOVER_DEGREE: {
                 g2.setColor(wash);
-                g2.fill(wedge(g, rings[RING_DEGREE_INNER], rings[RING_TERM_INNER] + 2, idx - 0.5,
+                g2.fill(wedge(g, rings[RING_DEGREE_INNER], rings[RING_SIGN_INNER] + 2, idx - 0.5,
                     idx + 0.5));
                 double a = Math.toRadians(180.0 + g.pin - idx);
                 g2.setColor(new Color(255, 255, 255, 220));
                 g2.setStroke(new BasicStroke(2.5f));
                 g2.drawLine(g.cx + (int) (rings[RING_DEGREE_INNER] * Math.cos(a)),
                     g.cy + (int) (rings[RING_DEGREE_INNER] * Math.sin(a)),
-                    g.cx + (int) ((rings[RING_TERM_INNER] + 4) * Math.cos(a)),
-                    g.cy + (int) ((rings[RING_TERM_INNER] + 4) * Math.sin(a)));
+                    g.cx + (int) ((rings[RING_SIGN_INNER] + 4) * Math.cos(a)),
+                    g.cy + (int) ((rings[RING_SIGN_INNER] + 4) * Math.sin(a)));
                 break;
             }
             case HOVER_HOUSE: {
@@ -2583,7 +2586,7 @@ implements WheelSource, GlobeSource {
                         double from = sign * 30.0 + edges[e];
                         double to = sign * 30.0 + edges[e + 1];
                         g2.setColor(wash);
-                        g2.fill(wedge(g, rings[RING_TERM_INNER], rings[RING_SIGN_INNER], from, to));
+                        g2.fill(wedge(g, rings[RING_TERM_INNER], rings[RING_TERM_OUTER], from, to));
                         int bi = Bodies.indexOfName(
                             com.zodiacomputing.ourania.astro.Dignity.boundRulerOf((from + to) / 2.0));
                         if (bi >= 0 && bi < BODY_GLYPHS.length) {
@@ -2591,7 +2594,7 @@ implements WheelSource, GlobeSource {
                                 (int) Math.round(11 * HOVER_SCALE * 1.2)));
                             g2.setColor(this.bodyColor(bi));
                             centred(g2, g, BODY_GLYPHS[bi], (from + to) / 2.0,
-                                (rings[RING_TERM_INNER] + rings[RING_SIGN_INNER]) / 2.0);
+                                (rings[RING_TERM_INNER] + rings[RING_TERM_OUTER]) / 2.0);
                         }
                     }
                 }
@@ -6339,7 +6342,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     static final int BAND_DEGREE = 3;
     /** The bounds ring and the open middle, which name the sign the wedge belongs to. */
     static final int BAND_OPEN = 4;
-    /** The Egyptian bounds ring, between the degree scale and the signs. */
+    /** The Egyptian bounds ring, between the decans and the rim (since 2026-10-18). */
     static final int BAND_BOUND = 5;
 
     /**
@@ -6362,6 +6365,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * @param bodyBase the floor of the natal band, where the open middle starts
      */
     static int bandAt(double r, int[] rings, int bodyBase) {
+        // The bounds ring answers for its own bound. It named the sign until 2026-09-14, for
+        // want of a reading - which made a click on a bound open something else. Outside the
+        // decans since 2026-10-18, as on the globe.
+        if (r >= rings[RING_TERM_INNER] && r < rings[RING_TERM_OUTER]) {
+            return BAND_BOUND;
+        }
         if (r >= rings[RING_SIGN_OUTER] && r < rings[RING_DECAN_OUTER]) {
             return BAND_DECAN;
         }
@@ -6370,13 +6379,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         // Before the open middle, because it lies inside it: the degree scale is a drawn ring
         // and the middle is the space around it.
-        if (r >= rings[RING_DEGREE_INNER] && r < rings[RING_TERM_INNER]) {
+        if (r >= rings[RING_DEGREE_INNER] && r < rings[RING_SIGN_INNER]) {
             return BAND_DEGREE;
-        }
-        // The bounds ring answers for its own bound. It named the sign until 2026-09-14, for
-        // want of a reading - which made a click on a bound open something else.
-        if (r >= rings[RING_TERM_INNER] && r < rings[RING_SIGN_INNER]) {
-            return BAND_BOUND;
         }
         if (r >= bodyBase && r < rings[RING_SIGN_INNER]) {
             return BAND_OPEN;

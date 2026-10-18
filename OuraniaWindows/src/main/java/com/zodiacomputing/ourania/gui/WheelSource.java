@@ -73,6 +73,9 @@ interface WheelSource {
 
     boolean layerShown(Layer layer);
 
+    /** How far a layer is open, 0 folded to 1 shown - for a wash that fades with its chip. */
+    double layerOpen(Layer layer);
+
     boolean outerRingDrawn();
 
     boolean triRingDrawn();

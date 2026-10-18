@@ -804,11 +804,15 @@ public final class GlobeCheck {
         yes("the shells nest outward",
             Globe.SHELL_CORE < Globe.SHELL_CHART
                 && Globe.SHELL_CHART < Globe.SHELL_HOUSE
-                && Globe.SHELL_HOUSE < Globe.SHELL_BOUND
-                && Globe.SHELL_BOUND < Globe.SHELL_SIGN_INNER
+                && Globe.SHELL_HOUSE < Globe.SHELL_SIGN_INNER
                 && Globe.SHELL_SIGN_INNER < Globe.SHELL_SIGN_OUTER
                 && Globe.SHELL_SIGN_OUTER < Globe.SHELL_DECAN
                 && Globe.SHELL_DECAN < Globe.SHELL_TICK);
+        // Since 2026-10-18 the bounds are outside the decans, as on the wheel, and still inside
+        // the mansions at the rim.
+        yes("the bounds ride outside the decans and inside the mansions",
+            Globe.SHELL_DECAN < Globe.SHELL_BOUND
+                && Globe.SHELL_BOUND < Globe.SHELL_MANSION_INNER);
         yes("every body ring is inside the zodiac plane",
             Globe.SHELL_SKY < Globe.SHELL_SIGN_INNER
                 && Globe.SHELL_PARTNER < Globe.SHELL_SIGN_INNER
@@ -3043,6 +3047,7 @@ public final class GlobeCheck {
             && GlobeRenderer.deckInk(GlobeRenderer.DECK_UPPER).getRGB()
                 != GlobeRenderer.deckInk(GlobeRenderer.DECK_LOWER).getRGB());
         yes("and the houses inside the bounds", Globe.SHELL_HOUSE < Globe.SHELL_BOUND);
+        yes("and the bounds outside the signs", Globe.SHELL_SIGN_OUTER < Globe.SHELL_BOUND);
 
         // ---- the decks are a share of the radius apart, and symmetric about the middle
         near("the upper deck rides its share of the radius",

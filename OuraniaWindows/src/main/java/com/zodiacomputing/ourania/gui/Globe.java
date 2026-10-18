@@ -72,12 +72,24 @@ public final class Globe {
      */
     public static final double SHELL_SKY = SHELL_CHART;
     public static final double SHELL_HOUSE = 1.92;
-    /** Egyptian bounds, just inside the signs - the flat wheel's order, kept. */
-    public static final double SHELL_BOUND = 1.99;
     public static final double SHELL_SIGN_INNER = 2.08;
     public static final double SHELL_SIGN_OUTER = 2.30;
     /** Decans, just outside the signs, as on the flat wheel. */
     public static final double SHELL_DECAN = 2.38;
+    /**
+     * Egyptian bounds, just outside the decans.
+     *
+     * <b>Moved out from inside the signs on 2026-10-18,</b> at 1.99 until then. David: "the only
+     * thing i would change in globe is to move the bounds to be next to the decans under the
+     * signs" - under as the globe is seen at its normal tilt, where the outer rings sit below
+     * the sign band on screen. The wheel moved its bounds the same way, so the two read
+     * signs, decans, bounds outward. As far beyond the decans as the decans are beyond the
+     * signs, which is what keeps the two rings of glyphs from touching.
+     *
+     * <p>The degree ticks run out through this ring as they run through the decans; see
+     * {@link SkymapPanel#globeTargetAt} for which answers a click where they cross.
+     */
+    public static final double SHELL_BOUND = SHELL_DECAN + (SHELL_DECAN - SHELL_SIGN_OUTER);
     public static final double SHELL_TICK = 2.42;
 
     /**

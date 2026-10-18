@@ -196,6 +196,7 @@ final class WheelCanvas extends JPanel {
         int n18 = rings[WheelLayout.RING_SIGN_INNER];
         int nBodyTop = rings[WheelLayout.RING_BODY_TOP];
         int nTermInner = rings[WheelLayout.RING_TERM_INNER];
+        int nTermOuter = rings[WheelLayout.RING_TERM_OUTER];
         int nDegreeInner = rings[WheelLayout.RING_DEGREE_INNER];
         // The rim scale's outer edge: the rim itself with the mansions folded, and the
         // underside of the mansion band once they open.
@@ -210,6 +211,21 @@ final class WheelCanvas extends JPanel {
         }
         double[] dArray = panel.activeCusps();
         double d4 = panel.getPinLongitude();
+        // <b>The signs shaded in their element's colour, as the globe shades them.</b> David,
+        // 2026-10-18: "on the wheel shade color the signs". The wheel is to be the globe seen
+        // from straight above, and the globe's sign band is a wash of element colour
+        // (GlobeRenderer.signPlane): the same colours, from the same place, at the same alpha,
+        // folding with the same chip. Under every stroke, so the ring lines and the glyphs sit
+        // on the colour rather than under it.
+        if (panel.layerShown(Layer.SIGNS)) {
+            int washAlpha = (int) Math.round(96 * panel.layerOpen(Layer.SIGNS));
+            for (int sign = 0; sign < 12; sign++) {
+                Color el = SkymapPanel.elementColorFor(Zodiac.elementIndex(sign));
+                graphics2D.setColor(new Color(el.getRed(), el.getGreen(), el.getBlue(),
+                    washAlpha));
+                graphics2D.fill(SkymapPanel.wedge(g, n18, n17, sign * 30.0, sign * 30.0 + 30.0));
+            }
+        }
         graphics2D.setColor(SkymapPanel.inkColor());
         graphics2D.setStroke(new BasicStroke(1.0f));
         graphics2D.drawLine(n12 - 10, n13, n12 + 10, n13);
@@ -223,8 +239,12 @@ final class WheelCanvas extends JPanel {
         if (panel.layerShown(Layer.DECANS)) {
             graphics2D.drawOval(n12 - n16, n13 - n16, n16 * 2, n16 * 2);
         }
+        // The bound band's two edges, outside the decans since 2026-10-18. Its inner edge is the
+        // decans' outer edge, drawn again here so it stands when the decans are folded.
         graphics2D.drawOval(n12 - nTermInner, n13 - nTermInner,
             nTermInner * 2, nTermInner * 2);
+        graphics2D.drawOval(n12 - nTermOuter, n13 - nTermOuter,
+            nTermOuter * 2, nTermOuter * 2);
         graphics2D.drawOval(n12 - nDegreeInner, n13 - nDegreeInner,
             nDegreeInner * 2, nDegreeInner * 2);
         if (panel.outerRingDrawn()) {
@@ -281,7 +301,7 @@ final class WheelCanvas extends JPanel {
         // segments, five to a sign, each ruled by one of the five non-luminary planets -
         // read from Dignity rather than from a second copy of the table.
         if (panel.layerShown(Layer.BOUNDS)) {
-            WheelShapes.drawBoundRing(graphics2D, n12, n13, n18, nTermInner, d4,
+            WheelShapes.drawBoundRing(graphics2D, n12, n13, nTermOuter, nTermInner, d4,
                 panel::bodyColor);
         }
 
@@ -290,7 +310,7 @@ final class WheelCanvas extends JPanel {
         // a body against; this one is where a body's leader line lands, so a reader can
         // follow a glyph out to the degree it actually occupies.
         if (panel.layerShown(Layer.DEGREES)) {
-            WheelShapes.drawInnerDegreeRing(graphics2D, n12, n13, nTermInner,
+            WheelShapes.drawInnerDegreeRing(graphics2D, n12, n13, n18,
                 nDegreeInner, d4);
         }
 
@@ -300,7 +320,7 @@ final class WheelCanvas extends JPanel {
         // now carved out of the rim by the chain - WheelLayout.RING_MANSION_INNER - and the ticks below
         // read from the same number, so the two cannot overlap. Carving it here rather than
         // inside the zodiac is what keeps the bodies where they are: every radius from
-        // WheelLayout.RING_DECAN_OUTER inward is untouched.
+        // WheelLayout.RING_TERM_OUTER inward is untouched.
         if (panel.layerShown(Layer.MANSIONS)) {
             WheelShapes.drawMansionRing(graphics2D, n12, n13, n14, nMansionInner, d4,
                 panel.moonMansion());
