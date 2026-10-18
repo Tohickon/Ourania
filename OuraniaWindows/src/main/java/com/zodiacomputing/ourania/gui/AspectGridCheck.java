@@ -1071,17 +1071,26 @@ public final class AspectGridCheck {
                 // behind two hundred lines of triggers. Asserted as four positions in order
                 // rather than four contains(), because the failure this guards against is not a
                 // missing tier, it is a tier sliding back below the mechanics.
-                int glance = html.indexOf("1. At a glance");
-                int byTheme = html.indexOf("2. The year by theme");
-                int dates = html.indexOf("3. Dates to watch");
-                int mech = html.indexOf("4. The mechanics");
-                ok("Part Q: " + label + " carries all four tiers",
-                    glance >= 0 && byTheme >= 0 && dates >= 0 && mech >= 0);
-                ok("Part Q: " + label + " puts the summary before the machinery",
-                    glance >= 0 && glance < byTheme && byTheme < dates && dates < mech);
-                ok("Part Q: " + label + " summarises the chart's shape at the top",
-                    glance >= 0 && mech > glance
-                        && html.substring(glance, mech).contains("The chart</b>"));
+                // <b>2026-10-17, David moved the line:</b> the summary and the Rule of Three
+                // are machinery too, and the placements are where the reading makes sense. So
+                // the order is the year's card, the placements, where the dates are, and then
+                // everything that is working under one Mechanics heading.
+                int year = html.indexOf(">Your year<");
+                int placed = html.indexOf(">Your placements, strongest first<");
+                int when = html.indexOf(">When<");
+                int mech = html.indexOf(">" + NarrativeSynthesizer.MECHANICS + "<");
+                int glance = html.indexOf(">The year at a glance<");
+                int byTheme = html.indexOf(">The year by theme (the Rule of Three)<");
+                int dates = html.indexOf(">Dates, in detail<");
+                ok("Part Q: " + label + " carries every section",
+                    year >= 0 && placed >= 0 && when >= 0 && mech >= 0 && glance >= 0
+                        && byTheme >= 0 && dates >= 0);
+                ok("Part Q: " + label + " puts the answer before the machinery",
+                    year >= 0 && year < placed && placed < when && when < mech);
+                ok("Part Q: " + label + " keeps the summary, themes and dates under Mechanics",
+                    mech >= 0 && mech < glance && glance < byTheme && byTheme < dates);
+                ok("Part Q: " + label + " still summarises the chart's shape",
+                    glance >= 0 && html.substring(glance).contains("The chart</b>"));
 
                 // <b>The mechanics tier is optional, and the choice must not reach the
                 // answers.</b> A reader turning the audit trail off is asking not to be handed
@@ -1091,19 +1100,21 @@ public final class AspectGridCheck {
                 // pass by accident - four contains() would survive a reworded summary.
                 String lean = NarrativeSynthesizer.generateReport(
                     f, g, ranked, themes, tf, prof, hits, null, null, withTime, rel, false);
-                int leanMech = lean.indexOf("4. The mechanics");
+                int leanMech = lean.indexOf(">" + NarrativeSynthesizer.MECHANICS + "<");
                 ok("Part Q: " + label + " names the mechanics tier even when it is withheld",
                     leanMech >= 0);
                 ok("Part Q: " + label + " says where the mechanics went",
                     lean.contains("Show the mechanics"));
-                ok("Part Q: " + label + " withholding the mechanics leaves tiers 1 to 3 untouched",
+                ok("Part Q: " + label + " withholding the mechanics leaves the answer untouched",
                     mech >= 0 && leanMech >= 0
                         && lean.substring(0, leanMech).equals(html.substring(0, mech)));
                 ok("Part Q: " + label + " without the mechanics is the shorter reading",
                     lean.length() < html.length());
-                ok("Part Q: " + label + " without the mechanics drops the placements and transits",
-                    !lean.contains("4.2 Planetary Placements")
+                ok("Part Q: " + label + " without the mechanics drops the working and the transits",
+                    !lean.contains(">The year at a glance<")
                         && !lean.contains("4.10 Current Transits"));
+                ok("Part Q: " + label + " but keeps the placements, which are the answer",
+                    lean.contains(">Your placements, strongest first<"));
 
                 // <b>A named pattern must carry its reading.</b> Section 5 used to print one
                 // bare line per pattern and no prose, so a T-square - the loudest thing in a

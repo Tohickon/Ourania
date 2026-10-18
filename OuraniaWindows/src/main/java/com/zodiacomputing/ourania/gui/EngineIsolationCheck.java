@@ -54,7 +54,10 @@ public final class EngineIsolationCheck {
         "Settings", "SavedCharts", "InterpretationService", "ErrorLog", "Json",
         "NarrativeSynthesizer", "Atlas", "WheelLayout", "Globe", "Glossary",
         "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer",
-        "AspectGate", "ChartPalette"));
+        "AspectGate", "ChartPalette",
+        // The plain card and the life areas it names (2026-10-17): the reading opens on the
+        // year's card, and the phone's reading is the same page.
+        "ReadingCard", "LifeAreas"));
 
     /** The Java level Android builds accept. */
     static final String RELEASE = "17";

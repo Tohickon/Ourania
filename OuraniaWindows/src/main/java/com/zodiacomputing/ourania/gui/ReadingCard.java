@@ -58,6 +58,34 @@ public record ReadingCard(String label, String headline, String body, List<Strin
             b.toString(), why);
     }
 
+    /** The id of the card a reveal lands on, wherever a page puts it. */
+    static final String REVEAL_ID = "reveal-card";
+
+    /** The line that starts a year card's direction, on its own paragraph. */
+    static final String WHAT_TO_DO_THIS_YEAR = "What to do this year: ";
+
+    /**
+     * The card for one theme of the year: what the year asks, the part of life it shows up in,
+     * and what to do this year (2026-10-17). One card for the page and for the reveal that
+     * lands on it, and here rather than in the reveal so the phone's reading, which is this
+     * same page, can make it too.
+     */
+    static ReadingCard forYearTheme(com.zodiacomputing.ourania.astro.ThemeConvergence.Result r) {
+        String area = LifeAreas.of(r.theme.house());
+        String body = area == null ? "" : "Shows up in: " + area + ".";
+        String key = r.theme.name().toLowerCase(java.util.Locale.ROOT);
+        InterpretationService svc = InterpretationService.getInstance();
+        String asks = svc.getTransitCardPart("year." + key + ".asks");
+        String todo = svc.getTransitCardPart("year." + key + ".todo");
+        if (asks != null) {
+            body = asks + (body.isEmpty() ? "" : " " + body);
+        }
+        if (todo != null) {
+            body = body + "\n\n" + WHAT_TO_DO_THIS_YEAR + todo;
+        }
+        return new ReadingCard("THIS YEAR", r.theme.label, body, List.of());
+    }
+
     /**
      * A card from a reading whose bold lead is its finding, or null when it has no lead.
      *
