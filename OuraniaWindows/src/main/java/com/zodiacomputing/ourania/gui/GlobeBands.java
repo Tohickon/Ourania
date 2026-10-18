@@ -57,16 +57,22 @@ final class GlobeBands {
     };
 
     /** The globe as it is at an ordinary tilt: every radius is its own. */
-    static final GlobeBands GLOBE = new GlobeBands(0.0, null, 1.0);
+    static final GlobeBands GLOBE = new GlobeBands(0.0, null, 1.0, 0, 0);
 
     private final double flatness;
     private final int[] rings;
     private final double scale;
+    /** The natal band's two edges on the wheel, in wheel pixels. */
+    private final int natalTop;
+    private final int natalFloor;
 
-    private GlobeBands(double flatness, int[] rings, double scale) {
+    private GlobeBands(double flatness, int[] rings, double scale, int natalTop,
+                       int natalFloor) {
         this.flatness = flatness;
         this.rings = rings;
         this.scale = scale;
+        this.natalTop = natalTop;
+        this.natalFloor = natalFloor;
     }
 
     /**
@@ -74,30 +80,39 @@ final class GlobeBands {
      *
      * <p><b>The wheel side is the wheel's own chain.</b> {@link WheelLayout#ringRadii}, with
      * the zodiac's layers as open as the reader has them, so a band folded on the wheel is
-     * folded here too. Both outer body bands are taken as open, which is the globe's rule for
-     * the charts - see {@link GlobeRenderer#wheelRadii}, which reads its rings from here so
-     * the charts and the bands are measured on one wheel.
+     * folded here too, and the outer body bands as open as the wheel has them, so with only
+     * Chart A in the chart its ring takes the width the wheel gives it. That gave up the globe's
+     * 30 Sep rule that a chart keeps the place it would have with every ring open: straight down
+     * is to be the wheel as it is drawn, not a wheel with rings that are not there. See
+     * {@link GlobeRenderer#wheelRadii}, which reads its rings from here so the charts and the
+     * bands are measured on one wheel.
      */
     static GlobeBands of(GlobeSource panel, Globe cam, int w, int h) {
         double f = GlobeRenderer.flatness(cam);
         int[] rings = wheelRings(panel, w, h);
-        return new GlobeBands(f, rings, scaleOf(rings));
+        int natalTop = panel.bodyBaseRadius(rings);
+        int natalFloor = natalTop - WheelLayout.natalBandDepth(Math.max(1, natalTop));
+        return new GlobeBands(f, rings, scaleOf(w, h), natalTop, natalFloor);
     }
 
-    /** The wheel's rings at this panel size, the outer body bands open. */
+    /** The wheel's rings at this panel size, every band as open as the wheel has it. */
     static int[] wheelRings(GlobeSource panel, int w, int h) {
-        return WheelLayout.ringRadii(w, h, 1.0, 1.0,
+        return WheelLayout.ringRadii(w, h, panel.outerOpenFraction(), panel.triOpenFraction(),
             panel.layerOpen(Layer.DECANS), panel.layerOpen(Layer.SIGNS),
             panel.layerOpen(Layer.BOUNDS), panel.layerOpen(Layer.DEGREES),
             panel.layerOpen(Layer.MANSIONS), 0.0);
     }
 
-    /**
-     * Wheel pixels to globe units: the wheel's sign band meets the globe's at its inner edge,
-     * so every ring stays inside the frame that measures it.
-     */
-    static double scaleOf(int[] rings) {
-        return Globe.SHELL_SIGN_INNER / Math.max(1, rings[WheelLayout.RING_SIGN_INNER]);
+    /** Wheel pixels to globe units, such that straight down a wheel radius is drawn in place. */
+    static double scaleOf(int w, int h) {
+        // <b>The camera's own pixels, so straight down is the wheel at its own size.</b> This
+        // made the wheel's sign band meet the globe's, which kept the proportions and left the
+        // globe straight down smaller than the wheel at fit. Seen from straight above, every
+        // point in the plane is the camera's distance away, so a world radius R draws at
+        // focal * R / distance pixels; at the opening distance this scale makes a wheel radius
+        // in pixels draw at exactly that many pixels. The opening distance, not the current
+        // one, so a reader who zooms still zooms.
+        return Globe.DEFAULT_DISTANCE / Math.max(1.0, Globe.focal(w, h));
     }
 
     /** The wheel's rings this was built from, or null for {@link #GLOBE}. */
@@ -146,6 +161,93 @@ final class GlobeBands {
                 return new double[] {rings[WheelLayout.RING_MANSION_INNER],
                     rings[WheelLayout.RING_OUTER]};
         }
+    }
+
+    /**
+     * Where each body of a ring sits on the wheel, in globe units: the wheel's own spread, so
+     * a crowd fans outward along the radius as it does there instead of climbing the shell.
+     *
+     * <p>Read from {@link WheelLayout#bandRadii}, the method the wheel places its bodies with,
+     * between the same two edges the wheel gives each ring. Null for {@link #GLOBE}, which has
+     * no wheel to ask.
+     *
+     * @param ring 0 Chart A, 1 the outer ring, 2 the sky
+     */
+    double[] wheelBodyRadii(int ring, double[] lon, boolean[] valid) {
+        if (this.rings == null) {
+            return null;
+        }
+        int[] px = ring == 0
+            ? WheelLayout.bandRadii(lon, valid, this.natalTop, this.natalFloor,
+                WheelLayout.NATAL_EDGE, WheelLayout.NATAL_SPACING)
+            : (ring == 1
+                ? WheelLayout.bandRadii(lon, valid, this.rings[WheelLayout.RING_ARC_INNER],
+                    this.rings[WheelLayout.RING_BODY_TOP])
+                : WheelLayout.bandRadii(lon, valid, this.rings[WheelLayout.RING_TRI],
+                    this.rings[WheelLayout.RING_TRANSIT]));
+        double[] out = new double[px.length];
+        for (int i = 0; i < px.length; i++) {
+            out[i] = px[i] * this.scale;
+        }
+        return out;
+    }
+
+    /**
+     * A radius that is not a band's, carried from the globe's value to a wheel radius given in
+     * wheel pixels. Returned unchanged at an ordinary tilt, like {@link #at}.
+     */
+    double toward(double globeRadius, double wheelPixels) {
+        if (this.flatness <= 0.0 || this.rings == null) {
+            return globeRadius;
+        }
+        return globeRadius + (wheelPixels * this.scale - globeRadius) * this.flatness;
+    }
+
+    /**
+     * A point carried from where the globe draws it to where the wheel draws it, in a straight
+     * line. The globe's own point is handed back at an ordinary tilt, not a copy of it.
+     */
+    double[] blend(double[] globe, double[] wheel) {
+        if (this.flatness <= 0.0 || this.rings == null) {
+            return globe;
+        }
+        double f = this.flatness;
+        return new double[] {
+            globe[0] + (wheel[0] - globe[0]) * f,
+            globe[1] + (wheel[1] - globe[1]) * f,
+            globe[2] + (wheel[2] - globe[2]) * f,
+        };
+    }
+
+    /** The wheel's house-number ring, in globe units. */
+    double houseNumberRadius() {
+        return this.rings == null ? 0.0
+            : WheelLayout.houseNumberRadius(this.natalFloor) * this.scale;
+    }
+
+    /**
+     * The disc a ring's aspect lines are drawn on, in globe units: the wheel ends a line at
+     * each body's longitude on one of three nested discs, not at the glyph.
+     *
+     * @param level 0 Chart A's own aspects, 1 the outer ring's, 2 the sky's
+     */
+    double aspectDisc(int level) {
+        if (this.rings == null) {
+            return 0.0;
+        }
+        int[] discs = WheelLayout.aspectDiscs(this.natalFloor);
+        return discs[Math.max(0, Math.min(discs.length - 1, level))] * this.scale;
+    }
+
+    /**
+     * Where a leader line ends: the inner edge of the signs on the globe, and the rim degree
+     * scale on the wheel, which is where David asked the wheel's leaders to reach on
+     * 2026-09-16.
+     */
+    double leaderRadius() {
+        double globe = at(Band.SIGNS, Globe.SHELL_SIGN_INNER);
+        return this.rings == null ? globe
+            : toward(globe, this.rings[WheelLayout.RING_MANSION_INNER]);
     }
 
     /** A band's two edges on the globe, inner then outer. */

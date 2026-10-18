@@ -39,6 +39,19 @@ public interface GlobeSource {
 
     boolean triRingDrawn();
 
+    /**
+     * How far the outer ring's band is open, 0 shut to 1 open - what the wheel lays its bands
+     * out from. Defaults to drawn or not, for a source with no bloom.
+     */
+    default double outerOpenFraction() {
+        return outerRingDrawn() ? 1.0 : 0.0;
+    }
+
+    /** As above, for the sky's band. */
+    default double triOpenFraction() {
+        return triRingDrawn() ? 1.0 : 0.0;
+    }
+
     /** Which deck - upper, middle, lower - a ring rides on. */
     int ringDeck(int ring);
 

@@ -3408,9 +3408,18 @@ public final class GlobeCheck {
             yes("overhead the rings nest as the wheel's do - Chart A inside, the outer ring, the "
                 + "sky outermost: " + java.util.Arrays.toString(shells),
                 shells[0] < shells[1] && shells[1] < shells[2]);
-            yes("and all of them inside the signs", shells[2] < Globe.SHELL_SIGN_INNER);
+            // Inside the sign band as it is drawn from straight above, which since 2026-10-18 is
+            // the wheel's, at the wheel's own pixels (GlobeBands.scaleOf).
+            GlobeBands overhead = GlobeBands.of(panel, top, w, h);
+            yes("and all of them inside the signs",
+                shells[2] < overhead.at(GlobeBands.Band.SIGNS, Globe.SHELL_SIGN_INNER));
 
-            int[] rings = WheelLayout.ringRadii(w, h, 1.0, 1.0);
+            // The wheel as it is drawn: the outer bands as open as the panel has them, which is
+            // what the globe straight down follows since 2026-10-18.
+            int[] rings = WheelLayout.ringRadii(w, h, panel.outerOpenFraction(),
+                panel.triOpenFraction(), panel.layerOpen(Layer.DECANS),
+                panel.layerOpen(Layer.SIGNS), panel.layerOpen(Layer.BOUNDS),
+                panel.layerOpen(Layer.DEGREES), panel.layerOpen(Layer.MANSIONS), 0.0);
             double wheelSign = rings[WheelLayout.RING_SIGN_INNER];
             int natalTop = panel.bodyBaseRadius(rings);
             double[] wheelMid = {
@@ -3419,7 +3428,8 @@ public final class GlobeCheck {
                 (rings[WheelLayout.RING_TRI] + rings[WheelLayout.RING_TRANSIT]) / 2.0,
             };
             Globe.Projected centre = top.project(0, 0, 0, w, h);
-            double[] sign = Globe.onShell(0.0, origin, Globe.SHELL_SIGN_INNER, 0.0);
+            double[] sign = Globe.onShell(0.0, origin,
+                overhead.at(GlobeBands.Band.SIGNS, Globe.SHELL_SIGN_INNER), 0.0);
             Globe.Projected signAt = top.project(sign[0], sign[1], sign[2], w, h);
             double globeSign = Math.hypot(signAt.x - centre.x, signAt.y - centre.y);
             java.util.List<double[]> wheelLons = java.util.List.of(panel.natalRing.lon,
@@ -3645,10 +3655,17 @@ public final class GlobeCheck {
             // as it is overhead, through the real renderer and a pen that only listens.
             yes("the mansions are open for the painter probe", panel.layerShown(Layer.MANSIONS));
             java.util.List<int[]> written = new java.util.ArrayList<>();
+            // The mansion numbers are 9 or 11 points; the inner degree scale writes "20" at 8,
+            // and since 2026-10-18 it is on the globe too, so the probe goes by size as well.
+            final int[] points = {0};
             Pen listening = (Pen) java.lang.reflect.Proxy.newProxyInstance(
                 Pen.class.getClassLoader(), new Class<?>[] {Pen.class},
                 (proxy, method, args) -> {
-                    if (method.getName().equals("drawString") && ((String) args[0]).matches(
+                    if (method.getName().equals("font")) {
+                        points[0] = (Integer) args[0];
+                    }
+                    if (method.getName().equals("drawString") && points[0] >= 9
+                            && ((String) args[0]).matches(
                             "1[3-9]|2[0-8]")) {
                         written.add(new int[] {(Integer) args[1], (Integer) args[2]});
                     }

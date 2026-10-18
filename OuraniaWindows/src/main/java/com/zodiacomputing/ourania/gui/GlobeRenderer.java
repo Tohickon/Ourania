@@ -165,22 +165,21 @@ public final class GlobeRenderer {
         }
 
         if (r.shown(Layer.ASPECTS)) {
-            r.aspectChords(panel, shells);
+            r.aspectChords(panel);
         }
         if (r.shown(Layer.NATAL)) {
             int innerDeck = panel.ringDeck(0);
             r.ribbon(natalR, r.faded(shade(deckInk(innerDeck), 54), Layer.NATAL),
                 inclinationFor(innerDeck, r.stacked, r.cam),
                 liftFor(innerDeck, r.stacked, r.cam), turning);
-            r.bodies(panel.ringLon(0), panel.ringValid(0), natalR, AngleRole.ANCHOR, panel,
-                false, 0);
+            r.bodies(panel.ringLon(0), panel.ringValid(0), AngleRole.ANCHOR, panel, false, 0);
         }
         if (panel.outerRingDrawn()) {
-            r.bodies(panel.ringLon(1), panel.ringValid(1), partnerR,
-                panel.angleRoleFor(false, true), panel, true, 1);
+            r.bodies(panel.ringLon(1), panel.ringValid(1), panel.angleRoleFor(false, true),
+                panel, true, 1);
         }
         if (panel.triRingDrawn()) {
-            r.bodies(panel.ringLon(2), panel.ringValid(2), skyR, AngleRole.SKY, panel, true, 2);
+            r.bodies(panel.ringLon(2), panel.ringValid(2), AngleRole.SKY, panel, true, 2);
         }
 
         r.flush();
@@ -259,20 +258,18 @@ public final class GlobeRenderer {
      *
      * <b>Asked of the wheel, not restated.</b> The radii come from
      * {@link SkymapPanel#ringRadii} and {@link SkymapPanel#bodyBaseRadius} - the chain the
-     * wheel is painted and hit-tested from - at this panel's size, with both outer bands open,
-     * which is the globe's own rule: a chart keeps its place whether or not the others are
-     * drawn. Each wheel goes to the middle of its band.
+     * wheel is painted and hit-tested from - at this panel's size, with the bands as open as
+     * the wheel has them (see GlobeBands.of for why that changed on 2026-10-18). Each wheel goes
+     * to the middle of its band.
      *
-     * <b>Scaled so the two zodiacs meet.</b> The wheel's sign band's inner edge lands on the
-     * globe's, {@link Globe#SHELL_SIGN_INNER}, so every ring stays inside the frame that
-     * measures it. Matching the globe's bands to the wheel's proportions as well is the next
-     * step and will make this scale the whole map.
+     * <b>Scaled to the camera's own pixels</b> (GlobeBands.scaleOf), so straight down a ring is
+     * drawn at the pixel radius the wheel draws it at.
      *
      * @return the radius for wheel 0 (Chart A), 1 (the outer ring) and 2 (the sky)
      */
     static double[] wheelRadii(GlobeSource panel, int w, int h) {
         int[] rings = GlobeBands.wheelRings(panel, w, h);
-        double k = GlobeBands.scaleOf(rings);
+        double k = GlobeBands.scaleOf(w, h);
         int natalTop = panel.bodyBaseRadius(rings);
         int natalFloor = natalTop - WheelLayout.natalBandDepth(Math.max(1, natalTop));
         return new double[] {
@@ -420,6 +417,44 @@ public final class GlobeRenderer {
     }
 
     /**
+     * Where each body of a ring is drawn from this camera, in world units - one statement for
+     * the painter, the aspect lines and the hit test, which each worked it out for themselves
+     * until 2026-10-18 and so had three chances to disagree.
+     *
+     * <p><b>A crowd climbs the shell on the globe and fans outward on the wheel.</b> Seen from
+     * straight above, height is invisible, so a stack of bodies would draw as one glyph on top
+     * of another. So as {@link #flatness} rises the step up the shell is eased away and each
+     * body slides from the deck's shell to the radius the wheel gives it - the wheel's own
+     * spread, from {@link GlobeBands#wheelBodyRadii}. At an ordinary tilt the arithmetic is
+     * exactly what it was.
+     *
+     * @return one point per body, null where the body is not valid
+     */
+    static double[][] bodyPoints(GlobeSource panel, Globe cam, GlobeBands bands, int ring,
+                                 boolean stacked) {
+        double[] lon = panel.ringLon(ring);
+        boolean[] valid = panel.ringValid(ring);
+        int deck = panel.ringDeck(ring);
+        double f = bands.flatness();
+        double shell = DECK_RADIUS[deck];
+        double[] wheel = f > 0.0 ? bands.wheelBodyRadii(ring, lon, valid) : null;
+        int[] level = Globe.stackLevels(lon, valid, 7.0);
+        double lift = liftFor(deck, stacked, cam);
+        double incline = inclinationFor(deck, stacked, cam);
+        double origin = panel.pinLongitude();
+        double[][] out = new double[lon.length][];
+        for (int i = 0; i < Bodies.count() && i < lon.length; i++) {
+            if (!valid[i]) {
+                continue;
+            }
+            double radius = wheel == null ? shell : shell + (wheel[i] - shell) * f;
+            double step = level[i] * Globe.STACK_STEP * (1.0 - f);
+            out[i] = Globe.onShell(lon[i], origin, radius, lift + step, incline);
+        }
+        return out;
+    }
+
+    /**
      * The body under the cursor on the globe, packed the way {@code bodyAt} packs it, or -1.
      *
      * <b>Reads the same shells the painter does, and applies the same stack.</b> A hit test
@@ -439,10 +474,9 @@ public final class GlobeRenderer {
      * exists to prevent.
      */
     public static int bodyAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
-        double origin = panel.pinLongitude();
-        double[] shells = shellRadii(panel, cam, w, h);
         // Once for the whole hit test, for the reason set out on inclinationOf.
         boolean stacked = Settings.globeStackedRings();
+        GlobeBands bands = GlobeBands.of(panel, cam, w, h);
         int best = -1;
         double bestDist = 15.0;                 // a glyph's bead, in pixels
 
@@ -457,15 +491,12 @@ public final class GlobeRenderer {
             if (ring == 2 && !panel.triRingDrawn()) {
                 continue;
             }
-            int[] level = Globe.stackLevels(lon, valid, 7.0);
+            double[][] at = bodyPoints(panel, cam, bands, ring, stacked);
             for (int i = 0; i < Bodies.count() && i < lon.length; i++) {
-                if (!valid[i]) {
+                if (!valid[i] || at[i] == null) {
                     continue;
                 }
-                int deck = panel.ringDeck(ring);
-                double[] p = Globe.onShell(lon[i], origin, shells[ring],
-                    liftFor(deck, stacked, cam) + level[i] * Globe.STACK_STEP,
-                    inclinationFor(deck, stacked, cam));
+                double[] p = at[i];
                 Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
                 if (!q.visible) {
                     continue;
@@ -1111,7 +1142,11 @@ public final class GlobeRenderer {
             % 360.0;
         double lat = north ? HOUSE_LABEL_LAT : -HOUSE_LABEL_LAT;
         double shell = bands.at(Band.HOUSES, Globe.SHELL_HOUSE);
-        return Globe.onShell(cusps[house] + span / 2.0, origin, shell, shell * Math.sin(lat));
+        double mid = cusps[house] + span / 2.0;
+        // From near the pole on the globe to the wheel's own house-number ring, in the plane:
+        // seen from straight above, a label at the pole would sit in the middle of the chart.
+        return bands.blend(Globe.onShell(mid, origin, shell, shell * Math.sin(lat)),
+            Globe.onShell(mid, origin, bands.houseNumberRadius(), 0.0));
     }
 
     /**
@@ -1160,8 +1195,12 @@ public final class GlobeRenderer {
                 Layer.HOUSES);
             billboard(houseLabelAt(cusps, i, this.origin, true, this.bands), String.valueOf(i),
                 ink, here ? 15 : 12);
+            // The southern number fades as the globe becomes the wheel: from above it is
+            // underneath its northern twin, and the wheel writes each house once.
+            Ink south = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(),
+                (int) Math.round(ink.getAlpha() * (1.0 - this.bands.flatness())));
             billboard(houseLabelAt(cusps, i, this.origin, false, this.bands), String.valueOf(i),
-                ink, here ? 15 : 12);
+                south, here ? 15 : 12);
         }
 
         // <b>The house cut through the sphere, and only from its number.</b> A house is a
@@ -1707,7 +1746,7 @@ public final class GlobeRenderer {
      * - see Globe.arc - so the widest ride highest and the figure has a silhouette from the
      * side as well as a shape from above.
      */
-    private void aspectChords(GlobeSource panel, double[] shells) {
+    private void aspectChords(GlobeSource panel) {
         // <b>Body to body, so every glyph is a node.</b> The chords were drawn on nested
         // circles inside the wheels, which is what the flat chart has to do - a line between
         // two glyphs on a disc crosses everything between them. A sphere does not have that
@@ -1720,10 +1759,10 @@ public final class GlobeRenderer {
         // which is the clearest thing this view does: a synastry contact looks like a contact.
         int[][] chords = panel.globeChords(() -> buildChords(panel));
         double origin = this.origin;
-        int[][] levels = {
-            Globe.stackLevels(panel.ringLon(0), panel.ringValid(0), 7.0),
-            Globe.stackLevels(panel.ringLon(1), panel.ringValid(1), 7.0),
-            Globe.stackLevels(panel.ringLon(2), panel.ringValid(2), 7.0),
+        double[][][] points = {
+            bodyPoints(panel, this.cam, this.bands, 0, this.stacked),
+            bodyPoints(panel, this.cam, this.bands, 1, this.stacked),
+            bodyPoints(panel, this.cam, this.bands, 2, this.stacked),
         };
         double[][] lons = {panel.ringLon(0), panel.ringLon(1), panel.ringLon(2)};
 
@@ -1747,16 +1786,17 @@ public final class GlobeRenderer {
             if (ring == 2 && !panel.triRingDrawn()) {
                 continue;
             }
-            int deck = panel.ringDeck(ring);
-            int innerDeck = panel.ringDeck(0);
-            double[] from = Globe.onShell(lons[ring][c[1]], origin, shells[ring],
-                liftFor(deck, this.stacked, this.cam)
-                    + levels[ring][c[1]] * Globe.STACK_STEP,
-                inclinationFor(deck, this.stacked, this.cam));
-            double[] to = Globe.onShell(panel.ringLon(0)[c[2]], origin, shells[0],
-                liftFor(innerDeck, this.stacked, this.cam)
-                    + levels[0][c[2]] * Globe.STACK_STEP,
-                inclinationFor(innerDeck, this.stacked, this.cam));
+            if (points[ring][c[1]] == null || points[0][c[2]] == null) {
+                continue;
+            }
+            // Body to body on the globe; on the wheel, from each body's longitude on the disc
+            // its ring's lines are drawn on. The two ends slide between, and arcPathFor
+            // straightens the bow as they go.
+            double disc = this.bands.aspectDisc(ring);
+            double[] from = this.bands.blend(points[ring][c[1]],
+                Globe.onShell(lons[ring][c[1]], origin, disc, 0.0));
+            double[] to = this.bands.blend(points[0][c[2]],
+                Globe.onShell(lons[0][c[2]], origin, disc, 0.0));
             // <b>The hovered chord, at full strength and on its own ring.</b> The globe drew
             // every chord alike, so pointing at a cell of the grid lit the flat wheel and did
             // nothing at all here - a reader who had switched views lost the one gesture that
@@ -1815,20 +1855,15 @@ public final class GlobeRenderer {
     }
 
     /** One ring of bodies on its shell, stacked up the shell where longitudes crowd. */
-    private void bodies(double[] lon, boolean[] valid, double radius,
-                        AngleRole role, GlobeSource panel, boolean outer,
-                        int ring) {
-        int[] level = Globe.stackLevels(lon, valid, 7.0);
+    private void bodies(double[] lon, boolean[] valid, AngleRole role, GlobeSource panel,
+                        boolean outer, int ring) {
+        double[][] points = bodyPoints(panel, this.cam, this.bands, ring, this.stacked);
+        int deck = this.panel.ringDeck(ring);
         for (int i = 0; i < Bodies.count() && i < lon.length; i++) {
-            if (!valid[i]) {
+            if (!valid[i] || points[i] == null) {
                 continue;
             }
-            int deck = this.panel.ringDeck(ring);
-            double y = liftFor(deck, this.stacked, this.cam)
-                + level[i] * Globe.STACK_STEP;
-            double[] p = Globe.onShell(lon[i], this.origin, radius, y,
-                inclinationFor(deck, this.stacked, this.cam));
-            Globe.Projected q = at(p);
+            Globe.Projected q = at(points[i]);
             if (!q.visible) {
                 continue;
             }
@@ -1844,7 +1879,7 @@ public final class GlobeRenderer {
             // sort puts it behind the glyph rather than over it.
             if (Settings.showDegreeLines()) {
                 Globe.Projected mark = at(Globe.onShell(lon[i], this.origin,
-                    bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER), 0.0, inclinationFor(deck, this.stacked, this.cam)));
+                    bands.leaderRadius(), 0.0, inclinationFor(deck, this.stacked, this.cam)));
                 if (mark.visible) {
                     boolean leaderLit = panel.onGlobeFocus(i, outer);
                     Ink leaderInk = panel.leaderInk();
@@ -2324,6 +2359,38 @@ public final class GlobeRenderer {
      * happen a third time.
      */
     static double[][] arcPathFor(double[] a, double[] b, double rise, int segments) {
+        return arcPathFor(a, b, rise, segments, 0.0);
+    }
+
+    /**
+     * As above, straightened toward its chord by {@code flat}, 0 the globe's bow and 1 the
+     * wheel's straight line.
+     *
+     * <p><b>Point by point, between the bow and the chord with the same number of points.</b>
+     * Flattening the rise instead cannot work: the bow's height is a target shell worked out
+     * from the aspect's width, not a number that scales. And a second, straight builder for the
+     * wheel end would be the two-builders trap this method exists to end. So the path is the
+     * bow, walked toward the chord as the globe comes round to straight above, and at 1 it is
+     * the chord exactly.
+     */
+    static double[][] arcPathFor(double[] a, double[] b, double rise, int segments,
+                                 double flat) {
+        double[][] bow = bowPathFor(a, b, rise, segments);
+        if (flat <= 0.0 || rise == 0.0) {
+            return bow;
+        }
+        double[][] line = Globe.arc(a, b, segments, 0.0);
+        double f = Math.min(1.0, flat);
+        for (int i = 0; i < bow.length; i++) {
+            for (int k = 0; k < 3; k++) {
+                bow[i][k] += (line[i][k] - bow[i][k]) * f;
+            }
+        }
+        return bow;
+    }
+
+    /** The globe's own bow, before any straightening. */
+    private static double[][] bowPathFor(double[] a, double[] b, double rise, int segments) {
         if (rise == 0.0) {
             return Globe.arc(a, b, segments, 0.0);
         }
@@ -2368,7 +2435,7 @@ public final class GlobeRenderer {
         // The crown is taken from the builder the painter draws with, at its coarsest, so
         // the estimate cannot drift away from the shape - see arcPathFor.
         Globe.Projected crown = this.bowed && rise != 0.0
-            ? at(arcPathFor(a, b, rise, 2)[1]) : null;
+            ? at(arcPathFor(a, b, rise, 2, this.bands.flatness())[1]) : null;
         int sub = bowed ? subdivisions(pa, pb, crown, steps, this.turning) : 1;
         // <b>The direction comes in, the distance is worked out here.</b> riseFor says which
         // way this line's deck bows; how far is a question about which shell the arc should top
@@ -2401,7 +2468,7 @@ public final class GlobeRenderer {
         // <b>Hair on the head, not a wire above it.</b> The bow used to be a straight push off
         // the chord, so the path left the sphere entirely; arcOverShell keeps every point on a
         // real radius, running from one body's, over the crown, to the other's.
-        double[][] path = arcPathFor(a, b, rise, steps * sub);
+        double[][] path = arcPathFor(a, b, rise, steps * sub, this.bands.flatness());
         Globe.Projected[] p = new Globe.Projected[path.length];
         for (int i = 0; i < path.length; i++) {
             p[i] = at(path[i]);

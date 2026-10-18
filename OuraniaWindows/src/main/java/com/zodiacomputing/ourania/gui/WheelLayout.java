@@ -868,6 +868,18 @@ public final class WheelLayout {
      * changes; see {@code Geometry.aspectDisc} for why each ring has its own. Here so the phone
      * draws its lines on the same circles (M4).
      */
+    /**
+     * Where the wheel writes its house numbers: just inside the natal band's floor.
+     *
+     * <p>Here rather than inline in the painter since 2026-10-18, because the globe now puts its
+     * house numbers on this ring as it comes round to straight above, and a second copy of the
+     * sixteen pixels would be the two-surfaces defect waiting for the day one of them moves.
+     * The reason for the ring itself is in the painter, where the number is drawn.
+     */
+    public static int houseNumberRadius(int natalFloor) {
+        return natalFloor - 16;
+    }
+
     public static int[] aspectDiscs(int natalFloor) {
         int top = Math.max(30, natalFloor - 14);
         return new int[] {

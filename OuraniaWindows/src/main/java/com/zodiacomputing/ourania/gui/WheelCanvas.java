@@ -385,7 +385,7 @@ final class WheelCanvas extends JPanel {
             // band, and an 11 px digit among the bound glyphs and the 0/10/20 labels read as
             // no house numbers at all (reported 2026-09-14). The rim of the aspect disc is
             // the one ring on the wheel nothing else is drawn on.
-            int houseR = g.natalFloor - 16;
+            int houseR = WheelLayout.houseNumberRadius(g.natalFloor);
             int n22 = n12 + (int)((double)houseR * Math.cos(d8));
             int n23 = n13 + (int)((double)houseR * Math.sin(d8));
             graphics2D.setColor(panel.getElementColor(Zodiac.elementIndex(n8 - 1)));

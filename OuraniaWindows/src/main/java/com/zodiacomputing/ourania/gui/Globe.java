@@ -257,7 +257,10 @@ public final class Globe {
     /** Tilt toward the reader, radians. Clamped so the globe never turns inside out. */
     public double pitch;
     /** Camera distance in world units. The reader scrolls this. */
-    public double distance = 5.6;
+    public double distance = DEFAULT_DISTANCE;
+
+    /** Where the camera opens, and the distance at which straight down is the wheel at fit. */
+    public static final double DEFAULT_DISTANCE = 5.6;
 
     /**
      * Focal length as a multiple of the panel's smaller side.
@@ -268,6 +271,14 @@ public final class Globe {
      * scale outside the decans, further out than the old sky ring, so this came down with it.
      */
     private static final double ZOOM = 0.82;
+
+    /**
+     * Pixels per world unit, at unit depth, on a panel this size - the projection's own scale.
+     * Read by {@link GlobeBands} so the globe straight down lands on the wheel's pixels.
+     */
+    static double focal(int width, int height) {
+        return Math.min(width, height) * ZOOM;
+    }
 
     /**
      * The far end of the tilt: overhead, looking straight down at the chart.
