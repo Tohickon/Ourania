@@ -1745,7 +1745,8 @@ implements WheelSource, GlobeSource {
         if (this.focusBody < 0) {
             return Double.NaN;
         }
-        double[] lon = this.focusTransit ? this.outerRing.lon : this.natalRing.lon;
+        // From the focused ring, so a sky body lights the sky body's sign (2026-10-18).
+        double[] lon = this.wheelLon(this.focusRing);
         return this.focusBody < lon.length ? lon[this.focusBody] : Double.NaN;
     }
 
@@ -2170,16 +2171,58 @@ implements WheelSource, GlobeSource {
      *
      * @param a the body on the line's own ring
      * @param b the body on the natal ring, where every line lands
-     * @param transitPair true when {@code a} is on an outer ring
+     * @param wheel the ring {@code a} is on, WheelLayout.WHEEL_NATAL / _OUTER / _SKY
      */
-    public boolean focusTouches(int a, int b, boolean transitPair) {
+    public boolean focusTouches(int a, int b, int wheel) {
         if (this.noFocus()) {
             return false;
         }
-        if (this.focusTransit) {
-            return transitPair && a == this.focusBody;
+        if (this.focusRing != WheelLayout.WHEEL_NATAL) {
+            // Between charts and transits too (2026-10-18), and by ring: a Chart B body and a
+            // sky body of the same index are two different bodies.
+            return wheel == this.focusRing && a == this.focusBody;
         }
-        return b == this.focusBody || (!transitPair && a == this.focusBody);
+        return b == this.focusBody || (wheel == WheelLayout.WHEEL_NATAL && a == this.focusBody);
+    }
+
+    /**
+     * Which ring the focused body is on - WHEEL_NATAL, _OUTER or _SKY. focusTransit could not
+     * tell the partner ring from the sky (2026-10-18), so the rays read this.
+     */
+    int focusRing = WheelLayout.WHEEL_NATAL;
+
+    /**
+     * As below, by ring (2026-10-18): a line between charts or a transit fades or holds by
+     * whether it is the focused body's own, on the ring it is actually on.
+     */
+    @Override
+    public double focusWeight(int a, int b, int wheel) {
+        if (this.noFocus()) {
+            return 1.0;
+        }
+        return this.focusTouches(a, b, wheel) ? 1.0 : FOCUS_DIM;
+    }
+
+    /**
+     * How strongly to draw a body on any ring under the focus: full for the focused body and
+     * the bodies it aspects, faded for the rest - by ring, so the sky is not read as Chart B.
+     */
+    @Override
+    public double glyphWeight(int i, int ring) {
+        if (this.noFocus()) {
+            return 1.0;
+        }
+        if (i == this.focusBody && ring == this.focusRing) {
+            return 1.0;
+        }
+        double[] mine = this.wheelLon(ring);
+        double[] theirs = this.wheelLon(this.focusRing);
+        if (this.focusBody >= theirs.length || i >= mine.length) {
+            return FOCUS_DIM;
+        }
+        Aspects.Profile profile = this.profileForPair(ring != this.focusRing);
+        double sep = Aspects.separation(mine[i], theirs[this.focusBody]);
+        return this.visibleAspect(sep, i, this.focusBody, profile) != null ? 1.0 : FOCUS_DIM;
     }
 
     public double focusWeight(int a, int b, boolean transitPair) {
@@ -2282,12 +2325,94 @@ implements WheelSource, GlobeSource {
 
     /** Sets the drawing transform to base, swollen about (x, y) when on. */
     static void bulge(Graphics2D g2, java.awt.geom.AffineTransform base, int x, int y, boolean on) {
+        bulge(g2, base, x, y, on ? HOVER_SCALE : 1.0);
+    }
+
+    /** As above, by a scale - the partners of a hovered body swell as the sparks reach them. */
+    static void bulge(Graphics2D g2, java.awt.geom.AffineTransform base, int x, int y,
+                      double scale) {
         g2.setTransform(base);
-        if (on) {
+        if (scale != 1.0) {
             g2.translate(x, y);
-            g2.scale(HOVER_SCALE, HOVER_SCALE);
+            g2.scale(scale, scale);
             g2.translate(-x, -y);
         }
+    }
+
+    // ------------------------------------------------------------------ the hover pulse
+    //
+    // David, 2026-10-18: "when hovering over a point it bulge magnifies the point while sending
+    // off an animated sparks of electricity down the aspect lines to the bodies its aspecting if
+    // the point has any and also bulge magnifies the bodies it is aspecting with while dimming
+    // everything else". A short animation started when the focus lands on a body: the sparks
+    // run from it along its own lines (focusTouches) to the far ends, and each body at a far end
+    // swells as they arrive. The dimming is the focus's own (FOCUS_DIM). Both views read the
+    // pulse; with the ring animations switched off in Settings there are no sparks and the
+    // partners swell at once.
+
+    /** How long the sparks take to run their lines, in milliseconds. */
+    static final long PULSE_MS = 900L;
+
+    /** When the pulse began, or -1 with none running. */
+    private long pulseStart = -1L;
+
+    private javax.swing.Timer pulseTimer;
+
+    private void startPulse() {
+        if (!Settings.animateRings()) {
+            this.pulseStart = -1L;
+            return;
+        }
+        this.pulseStart = System.nanoTime();
+        if (this.pulseTimer == null) {
+            this.pulseTimer = new javax.swing.Timer(16, e -> {
+                if (this.pulse() < 0.0) {
+                    ((javax.swing.Timer) e.getSource()).stop();
+                }
+                this.repaintWheel();
+            });
+        }
+        this.pulseTimer.restart();
+    }
+
+    /**
+     * How far the sparks have run, 0 to 1, or -1 when none are running - which is also what a
+     * finished pulse reads, so the partners stay swollen and the sparks are gone.
+     */
+    @Override
+    public double pulse() {
+        if (this.pulseStart < 0L || this.noFocus()) {
+            return -1.0;
+        }
+        double t = (System.nanoTime() - this.pulseStart) / 1e6 / PULSE_MS;
+        return t >= 1.0 ? -1.0 : t;
+    }
+
+    /**
+     * How much a body swells under the hover: the hovered body by HOVER_SCALE, a body it aspects
+     * by as much once the sparks have reached it, everything else not at all.
+     */
+    @Override
+    public double swell(int body, int ring) {
+        if (this.noFocus() || body < 0) {
+            return 1.0;
+        }
+        if (body == this.focusBody && ring == this.focusRing) {
+            return HOVER_SCALE;
+        }
+        if (this.glyphWeight(body, ring) < 1.0) {
+            return 1.0;
+        }
+        double p = this.pulse();
+        double arrived = p < 0.0 ? 1.0 : Math.max(0.0, Math.min(1.0, (p - 0.45) / 0.35));
+        double eased = arrived * arrived * (3.0 - 2.0 * arrived);
+        return 1.0 + (HOVER_SCALE - 1.0) * 0.85 * eased;
+    }
+
+    /** True when the focused body is the first end of this line, where its sparks set off. */
+    @Override
+    public boolean focusAtFirstEnd(int a, int wheel) {
+        return !this.noFocus() && a == this.focusBody && wheel == this.focusRing;
     }
 
     // ------------------------------------------------------------------ zoom and pan
@@ -2653,11 +2778,18 @@ implements WheelSource, GlobeSource {
         }
         int body = packed < 0 ? -1 : (packed & (TRANSIT_BIT - 1));
         boolean transit = packed >= 0 && (packed & TRANSIT_BIT) != 0;
-        if (body == this.focusBody && transit == this.focusTransit) {
+        int ring = packed < 0 ? WheelLayout.WHEEL_NATAL : WheelLayout.hitRing(packed);
+        if (body == this.focusBody && transit == this.focusTransit && ring == this.focusRing) {
             return false;
         }
         this.focusBody = body;
         this.focusTransit = transit;
+        this.focusRing = ring;
+        if (body >= 0) {
+            startPulse();
+        } else {
+            this.pulseStart = -1L;
+        }
         return true;
     }
 
@@ -6111,7 +6243,112 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             members[i] = patternIndices(found.get(i).bodies);
         }
         this.autoPatterns = members;
+        refreshCrossFigures();
     }
+
+    /** The prefix that marks a name as the outer ring's body, and the sky's. */
+    private static final String OUTER_TAG = "B|";
+    private static final String SKY_TAG = "S|";
+
+    /**
+     * The aspect figures that run between charts: at least one body on the outer ring or the
+     * sky, the rest anywhere. David, 2026-10-18: "these new rules will apply to aspects between
+     * charts and transits also" - so a transit that completes a T-square gets its glass plane.
+     * Each member is a packed hit (body and ring), so a plane can find its corners on the ring
+     * each one is drawn on.
+     */
+    private void refreshCrossFigures() {
+        java.util.List<int[]> figures = new java.util.ArrayList<>();
+        java.util.List<String> names = new java.util.ArrayList<>();
+        try {
+            java.util.List<String> tag = new java.util.ArrayList<>();
+            java.util.List<Double> lon = new java.util.ArrayList<>();
+            java.util.List<Integer> packed = new java.util.ArrayList<>();
+            int[] rings = {WHEEL_NATAL, WHEEL_OUTER, WHEEL_SKY};
+            for (int ring : rings) {
+                // The rings the chart is meant to show, not how far their blooms have opened:
+                // this runs once per chart change, often while a ring is still unfolding.
+                if (ring == WHEEL_OUTER && !this.showTransitChart
+                        || ring == WHEEL_SKY && !this.showTriWheel) {
+                    continue;
+                }
+                double[] l = this.wheelLon(ring);
+                boolean[] v = this.wheelValid(ring);
+                for (int i = 0; i < BODY_COUNT && i < l.length; i++) {
+                    if (!v[i]) {
+                        continue;
+                    }
+                    String prefix = ring == WHEEL_OUTER ? OUTER_TAG : (ring == WHEEL_SKY ? SKY_TAG : "");
+                    tag.add(prefix + Bodies.at(i).name);
+                    lon.add(l[i]);
+                    packed.add(WheelLayout.packHit(i, ring));
+                }
+            }
+            if (tag.size() == packed.size() && packed.stream().anyMatch(p -> WheelLayout.hitRing(p) != WHEEL_NATAL)) {
+                java.util.List<com.zodiacomputing.ourania.astro.Aspects.Hit> hits =
+                    new java.util.ArrayList<>();
+                for (int i = 0; i < tag.size(); i++) {
+                    for (int j = i + 1; j < tag.size(); j++) {
+                        // Judged under the bodies' own names - the orbs are looked up by
+                        // name - and then given the names that tell the charts apart.
+                        com.zodiacomputing.ourania.astro.Aspects.Hit h =
+                            com.zodiacomputing.ourania.astro.Aspects.hitBetween(
+                                untag(tag.get(i)), lon.get(i), untag(tag.get(j)), lon.get(j));
+                        if (h != null) {
+                            h.a = tag.get(i);
+                            h.b = tag.get(j);
+                            hits.add(h);
+                        }
+                    }
+                }
+                java.util.List<com.zodiacomputing.ourania.astro.AspectPatterns.Pattern> found =
+                    com.zodiacomputing.ourania.astro.AspectPatterns.findPatterns(hits,
+                        SkymapPanel::untag);
+                // <b>Only the figures that join Chart A to another chart, and only the tightest
+                // few.</b> Three charts of seventeen bodies make dozens of figures - 46 on the
+                // first chart measured, sixteen of them Grand crosses - and a sheet for each is
+                // a wall of glass. A figure with no natal body is the other charts' own; a
+                // figure of natal bodies only is Chart A's, already drawn. Of the rest, the
+                // CROSS_FIGURES tightest by their widest orb.
+                found.removeIf(p -> p.bodies.stream().allMatch(n -> untag(n).equals(n))
+                    || p.bodies.stream().noneMatch(n -> untag(n).equals(n)));
+                found.sort(java.util.Comparator.comparingDouble(p -> p.widestOrb));
+                if (found.size() > CROSS_FIGURES) {
+                    found = new java.util.ArrayList<>(found.subList(0, CROSS_FIGURES));
+                }
+                for (com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p : found) {
+                    int[] m = new int[p.bodies.size()];
+                    for (int k = 0; k < m.length; k++) {
+                        m[k] = packed.get(tag.indexOf(p.bodies.get(k)));
+                    }
+                    figures.add(m);
+                    names.add(p.name);
+                }
+            }
+        } catch (Exception e) {
+            figures.clear();
+            names.clear();
+        }
+        this.crossFigures = figures.toArray(new int[0][]);
+        this.crossFigureNames = names.toArray(new String[0]);
+    }
+
+    /** A body's own name, from a name that may carry its chart's tag. */
+    static String untag(String name) {
+        return name.startsWith(OUTER_TAG) || name.startsWith(SKY_TAG) ? name.substring(2) : name;
+    }
+
+    /** How many figures between charts get a glass plane: the tightest few. */
+    static final int CROSS_FIGURES = 4;
+
+    int[][] crossFigures = new int[0][];
+    String[] crossFigureNames = new String[0];
+
+    /** The figures that run between charts, each member a packed hit (body and ring). */
+    @Override public int[][] crossFigures() { return this.crossFigures; }
+
+    /** Their names, in the same order. */
+    @Override public String[] crossFigureNames() { return this.crossFigureNames; }
 
     /** True when this line is the one the grid is hovering, or part of the lit pattern. */
     public boolean isHighlighted(int a, int b, int wheel) {

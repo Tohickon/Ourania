@@ -226,6 +226,29 @@ final class WheelCanvas extends JPanel {
                 graphics2D.fill(SkymapPanel.wedge(g, n18, n17, sign * 30.0, sign * 30.0 + 30.0));
             }
         }
+        // <b>The focused body's sign and house, lit as the globe lights them</b> (2026-10-18):
+        // the sign's wedge in its element's colour from the middle to the signs, its segment of
+        // the sign band brighter, and - with the house fill on - the house it stands in. The
+        // globe's focusWedges, seen from straight above.
+        double focusLon = panel.focusedLongitude();
+        if (!Double.isNaN(focusLon) && panel.layerShown(Layer.SIGNS)) {
+            int focusSign = (int) (((focusLon % 360.0) + 360.0) % 360.0 / 30.0);
+            Color el = SkymapPanel.elementColorFor(Zodiac.elementIndex(focusSign));
+            graphics2D.setColor(new Color(el.getRed(), el.getGreen(), el.getBlue(), 74));
+            graphics2D.fill(SkymapPanel.wedge(g, 0, n18, focusSign * 30.0, focusSign * 30.0 + 30.0));
+            graphics2D.setColor(new Color(el.getRed(), el.getGreen(), el.getBlue(), 150));
+            graphics2D.fill(SkymapPanel.wedge(g, n18, n17, focusSign * 30.0, focusSign * 30.0 + 30.0));
+        }
+        if (!Double.isNaN(focusLon) && panel.layerShown(Layer.HOUSES) && Settings.globeHouseFill()
+                && dArray != null && dArray.length >= 13) {
+            int house = Zodiac.houseOf(focusLon, dArray);
+            if (house >= 1 && house <= 12) {
+                double from = WheelLayout.houseStart(dArray, house);
+                graphics2D.setColor(new Color(236, 224, 188, 70));
+                graphics2D.fill(SkymapPanel.wedge(g, 0, nDegreeInner, from,
+                    from + WheelLayout.houseSpan(dArray, house)));
+            }
+        }
         graphics2D.setColor(SkymapPanel.inkColor());
         graphics2D.setStroke(new BasicStroke(1.0f));
         graphics2D.drawLine(n12 - 10, n13, n12 + 10, n13);
@@ -423,24 +446,37 @@ final class WheelCanvas extends JPanel {
         // <b>Each aspect figure as a glass plane, as on the globe</b> (2026-10-18): a faint sheet
         // between its bodies in its figure's colour (GlobeRenderer.patternInk), its edges glowing
         // with the ribbons' three passes. Under the lines, which stay.
-        if (panel.layerShown(Layer.ASPECTS) && panel.autoPatterns().length > 0) {
+        int natalFigures = panel.autoPatterns().length;
+        int allFigures = natalFigures + panel.crossFigures().length;
+        if (panel.layerShown(Layer.ASPECTS) && allFigures > 0) {
             String[] figureNames = panel.patternNames();
-            int[] radii = g.natalRadii();
-            double[] natalLon = panel.natalRing().lon;
+            String[] crossNames = panel.crossFigureNames();
+            double[][] lons = {panel.natalRing().lon, panel.wheelLon(WheelLayout.WHEEL_OUTER),
+                panel.wheelLon(WheelLayout.WHEEL_SKY)};
             Stroke priorPlane = graphics2D.getStroke();
-            for (int k = 0; k < panel.autoPatterns().length; k++) {
-                int[] members = GlobeRenderer.aroundTheZodiac(panel.autoPatterns()[k], natalLon);
+            for (int k = 0; k < allFigures; k++) {
+                // Chart A's own figures (natal indices are natal packed hits), then the figures
+                // between charts and transits (2026-10-18), each corner on its own ring.
+                boolean own = k < natalFigures;
+                int[] packed = own ? panel.autoPatterns()[k]
+                    : panel.crossFigures()[k - natalFigures];
+                int[] members = GlobeRenderer.aroundTheZodiacPacked(packed, lons);
                 if (members.length < 3) {
                     continue;
                 }
                 int[] xs = new int[members.length];
                 int[] ys = new int[members.length];
                 for (int m = 0; m < members.length; m++) {
-                    double a = Math.toRadians(180.0 + d4 - natalLon[members[m]]);
-                    xs[m] = n12 + (int) Math.round(radii[members[m]] * Math.cos(a));
-                    ys[m] = n13 + (int) Math.round(radii[members[m]] * Math.sin(a));
+                    int ring = WheelLayout.hitRing(members[m]);
+                    int body = WheelLayout.hitBody(members[m]);
+                    double a = Math.toRadians(180.0 + d4 - lons[ring][body]);
+                    int r = g.chordEnd(ring, body);
+                    xs[m] = n12 + (int) Math.round(r * Math.cos(a));
+                    ys[m] = n13 + (int) Math.round(r * Math.sin(a));
                 }
-                Ink base = GlobeRenderer.patternInk(k < figureNames.length ? figureNames[k] : "");
+                String figure = own ? (k < figureNames.length ? figureNames[k] : "")
+                    : (k - natalFigures < crossNames.length ? crossNames[k - natalFigures] : "");
+                Ink base = GlobeRenderer.patternInk(figure);
                 graphics2D.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(), 40));
                 graphics2D.fillPolygon(xs, ys, xs.length);
                 for (float[] pass : GlobeRenderer.rimPasses()) {
@@ -597,7 +633,10 @@ final class WheelCanvas extends JPanel {
             double d10 = Math.toRadians(180.0 + d4 - panel.natalRing().lon[n7]);
             n4 = n12 + (int)((double)nArray[n7] * Math.cos(d10));
             int n26 = n13 + (int)((double)nArray[n7] * Math.sin(d10));
-            SkymapPanel.bulge(graphics2D, bodyTx, n4, n26, panel.hoverBody() == n7);
+            // The hovered body swells, and the bodies it aspects swell as its sparks arrive.
+            SkymapPanel.bulge(graphics2D, bodyTx, n4, n26,
+                Math.max(panel.hoverBody() == n7 ? SkymapPanel.HOVER_SCALE : 1.0,
+                    panel.swell(n7, WheelLayout.WHEEL_NATAL)));
             if (panel.onHighlightedLine(n7, WheelLayout.WHEEL_NATAL)) {
                 WheelShapes.drawHighlightHalo(graphics2D, n4, n26,
                     Bodies.at(n7).isAngle() ? 13 : WheelLayout.natalSize(n7).radius);
@@ -885,6 +924,42 @@ final class WheelCanvas extends JPanel {
      */
     private static final int GLOW_PASSES = 3;
 
+    /**
+     * A spark of electricity on its way down an aspect line: a short jagged bolt, white at its
+     * head and gold behind, a fraction {@code run} of the way from (x0, y0) to (x1, y1). The
+     * jag is drawn from the run itself, so it flickers as the spark moves and stands still
+     * when it does not.
+     */
+    static void drawSpark(Graphics2D g2, int x0, int y0, int x1, int y1, double run) {
+        double t = Math.min(1.0, run / 0.8);
+        double len = Math.hypot(x1 - x0, y1 - y0);
+        if (len < 1.0) {
+            return;
+        }
+        double ux = (x1 - x0) / len;
+        double uy = (y1 - y0) / len;
+        double tail = Math.min(t, 28.0 / len);
+        int n = 5;
+        int[] xs = new int[n + 1];
+        int[] ys = new int[n + 1];
+        for (int i = 0; i <= n; i++) {
+            double s = t - tail + tail * i / n;
+            double jag = (i == 0 || i == n) ? 0.0
+                : (((int) (run * 60) + i) % 2 == 0 ? 3.0 : -3.0);
+            xs[i] = (int) Math.round(x0 + (x1 - x0) * s - uy * jag);
+            ys[i] = (int) Math.round(y0 + (y1 - y0) * s + ux * jag);
+        }
+        Stroke was = g2.getStroke();
+        g2.setColor(new Color(255, 190, 70, 120));
+        g2.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.drawPolyline(xs, ys, xs.length);
+        g2.setColor(new Color(255, 248, 220, 240));
+        g2.setStroke(new BasicStroke(1.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.drawPolyline(xs, ys, xs.length);
+        g2.fillOval(xs[n] - 3, ys[n] - 3, 6, 6);
+        g2.setStroke(was);
+    }
+
     private void drawAspectLine(Graphics2D graphics2D, double d, double d2, double d3, int n, int n2, int n3, int n4, int wheel, int n5, int n6) {
         double d4 = Math.abs(d - d2);
         if (d4 > 180.0) {
@@ -942,7 +1017,7 @@ final class WheelCanvas extends JPanel {
             // Focus, applied on top of the orb fade rather than instead of it: a loose
             // aspect to the focused body is still a loose aspect and should still look
             // like one.
-            double focus = panel.focusWeight(n5, n6, bl);
+            double focus = panel.focusWeight(n5, n6, wheel);
             n7 = Math.max(6, (int)(n7 * focus));
             // <b>Weight is the aspect's own force times how close it is to exact.</b> Before
             // this the width carried only proximity, so a semisextile at 0 degrees inked
@@ -975,7 +1050,7 @@ final class WheelCanvas extends JPanel {
             int n10 = n + (int)((double)rb * Math.cos(d9));
             int n11 = n2 + (int)((double)rb * Math.sin(d9));
             Stroke stroke = graphics2D.getStroke();
-            if (panel.focusTouches(n5, n6, bl)) {
+            if (panel.focusTouches(n5, n6, wheel)) {
                 // <b>The focus rays.</b> A line of the focused body's own glows gold and orange
                 // underneath, so its network stands out while everything else has faded
                 // (2026-10-18). The globe draws the same rays.
@@ -987,6 +1062,13 @@ final class WheelCanvas extends JPanel {
                 graphics2D.setStroke(new BasicStroke(f2 + 3.0f, BasicStroke.CAP_ROUND,
                     BasicStroke.JOIN_ROUND));
                 graphics2D.drawLine(n8, n9, n10, n11);
+            }
+            double sparkRun = panel.pulse();
+            if (sparkRun >= 0.0 && panel.focusTouches(n5, n6, wheel)) {
+                // The sparks: from the hovered body down this line to the body at its far end.
+                boolean fromFirst = panel.focusAtFirstEnd(n5, wheel);
+                drawSpark(graphics2D, fromFirst ? n8 : n10, fromFirst ? n9 : n11,
+                    fromFirst ? n10 : n8, fromFirst ? n11 : n9, sparkRun);
             }
             if (highlighted) {
                 // White halo underneath, so the line reads against whichever aspect colour

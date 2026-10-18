@@ -186,6 +186,13 @@ public final class GlobeCheck {
         theAspectIdeas();
         report("Part W", before);
 
+        System.out.println();
+        System.out.println("=== Part X: between charts, and the hover pulse ===");
+        before = failures.size();
+        betweenChartsAndThePulse();
+        report("Part X", before);
+
+
 
 
 
@@ -3851,16 +3858,27 @@ public final class GlobeCheck {
             ft.setAccessible(true);
             int was = fb.getInt(panel);
             fb.setInt(panel, -1);
-            yes("with nothing focused no line is a ray", !panel.focusTouches(sun, moon, false));
+            yes("with nothing focused no line is a ray", !panel.focusTouches(sun, moon, WheelLayout.WHEEL_NATAL));
             fb.setInt(panel, sun);
             ft.setBoolean(panel, false);
             yes("the Sun focused: its natal line to the Moon is a ray",
-                panel.focusTouches(sun, moon, false));
-            yes("and from the Moon's end too", panel.focusTouches(moon, sun, false));
-            yes("and a transit landing on the natal Sun", panel.focusTouches(moon, sun, true));
-            yes("but the Moon to Venus is not", !panel.focusTouches(moon, venus, false));
+                panel.focusTouches(sun, moon, WheelLayout.WHEEL_NATAL));
+            yes("and from the Moon's end too", panel.focusTouches(moon, sun, WheelLayout.WHEEL_NATAL));
+            yes("and a transit landing on the natal Sun", panel.focusTouches(moon, sun, WheelLayout.WHEEL_OUTER));
+            yes("but the Moon to Venus is not", !panel.focusTouches(moon, venus, WheelLayout.WHEEL_NATAL));
             yes("nor a transiting Sun's line, which is not the natal Sun",
-                !panel.focusTouches(sun, moon, true));
+                !panel.focusTouches(sun, moon, WheelLayout.WHEEL_OUTER));
+            // Between charts and transits too, and by ring: a focused sky body's own line is a
+            // ray, and a Chart B body of the same index is a different body (2026-10-18).
+            java.lang.reflect.Field fr = SkymapPanel.class.getDeclaredField("focusRing");
+            fr.setAccessible(true);
+            fr.setInt(panel, WheelLayout.WHEEL_SKY);
+            ft.setBoolean(panel, true);
+            yes("the sky's Sun focused: its line to the natal Moon is a ray",
+                panel.focusTouches(sun, moon, WheelLayout.WHEEL_SKY));
+            yes("but Chart B's Sun's line is not", !panel.focusTouches(sun, moon, WheelLayout.WHEEL_OUTER));
+            fr.setInt(panel, WheelLayout.WHEEL_NATAL);
+            ft.setBoolean(panel, false);
             fb.setInt(panel, was);
 
             // 2. The renderer lays a sheet down for a figure, and none without one.
@@ -3892,6 +3910,154 @@ public final class GlobeCheck {
             fp.set(panel, before);
             yes("a figure of three bodies lays down a three-cornered glass sheet: " + with
                 + " against " + without + " without", with > without);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * David, 18 Oct: "these new rules will apply to aspects between charts and transits also",
+     * and the hover pulse - "when hovering over a point it bulge magnifies the point while
+     * sending off an animated sparks of electricity down the aspect lines to the bodies its
+     * aspecting ... and also bulge magnifies the bodies it is aspecting". A synastry with the
+     * sky, cast for fixed moments, so the figures do not depend on the day the suite runs.
+     */
+    private static void betweenChartsAndThePulse() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            final SkymapPanel p = (SkymapPanel) fs.get(hold[0]);
+            long end = System.nanoTime() + 15_000_000_000L;
+            while (System.nanoTime() < end && p.natalRing.time == null) {
+                Thread.sleep(20);
+            }
+            String[] names = {"chartMode", "showTransitChart", "showTriWheel", "aspectFilter"};
+            Object[] values = {ChartMode.SYNASTRY, Boolean.TRUE, Boolean.TRUE, "Both"};
+            for (int i = 0; i < names.length; i++) {
+                java.lang.reflect.Field f = SkymapPanel.class.getDeclaredField(names[i]);
+                f.setAccessible(true);
+                f.set(p, values[i]);
+            }
+            p.natalRing.time = java.time.ZonedDateTime.of(1972, 9, 22, 18, 38, 0, 0,
+                java.time.ZoneId.of("America/Los_Angeles"));
+            p.outerRing.time = java.time.ZonedDateTime.of(1975, 3, 14, 9, 20, 0, 0,
+                java.time.ZoneId.of("America/New_York"));
+            p.skyRing.time = java.time.ZonedDateTime.of(2026, 7, 1, 12, 0, 0, 0,
+                java.time.ZoneId.of("America/Los_Angeles"));
+            javax.swing.SwingUtilities.invokeAndWait(p::updateChartData);
+            java.lang.reflect.Method refresh = SkymapPanel.class.getDeclaredMethod("refreshCrossFigures");
+            refresh.setAccessible(true);
+            long cast = System.nanoTime() + 15_000_000_000L;
+            while (System.nanoTime() < cast && p.crossFigures().length == 0) {
+                Thread.sleep(100);
+                refresh.invoke(p);
+            }
+
+            // The figures between charts: some, no more than the cap, each joining Chart A to
+            // another chart, each with a name.
+            int[][] figures = p.crossFigures();
+            yes("a synastry with the sky has figures between its charts: " + figures.length,
+                figures.length > 0);
+            yes("no more than the tightest " + SkymapPanel.CROSS_FIGURES,
+                figures.length <= SkymapPanel.CROSS_FIGURES);
+            boolean joined = true;
+            for (int[] f : figures) {
+                boolean natal = false;
+                boolean other = false;
+                for (int m : f) {
+                    natal |= WheelLayout.hitRing(m) == WheelLayout.WHEEL_NATAL;
+                    other |= WheelLayout.hitRing(m) != WheelLayout.WHEEL_NATAL;
+                }
+                joined &= natal && other;
+            }
+            yes("every one joins Chart A to another chart", joined);
+            eq("and each has its name", figures.length, p.crossFigureNames().length);
+
+            // The pulse: focus a body of the first figure that is not natal.
+            int packed = -1;
+            for (int m : figures[0]) {
+                if (WheelLayout.hitRing(m) != WheelLayout.WHEEL_NATAL) {
+                    packed = m;
+                    break;
+                }
+            }
+            java.lang.reflect.Method focus = SkymapPanel.class.getDeclaredMethod("setFocus", int.class);
+            focus.setAccessible(true);
+            final int target = packed;
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                try {
+                    focus.invoke(p, target);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            int body = WheelLayout.hitBody(packed);
+            int ring = WheelLayout.hitRing(packed);
+            near("the hovered body swells by the hover scale", SkymapPanel.HOVER_SCALE,
+                p.swell(body, ring), 1e-9);
+            yes("the focus is on the ring it was found on", p.focusRing == ring);
+            if (Settings.animateRings()) {
+                double run = p.pulse();
+                yes("hovering starts the sparks running: " + run, run >= 0.0 && run < 1.0);
+            }
+            // The outer rings opened at once, as FourWheelCheck settles them: a ring still
+            // unfolding is not drawn, and neither are its lines.
+            for (String bloom : new String[] {"outerBloom", "triBloom"}) {
+                java.lang.reflect.Field bf = SkymapPanel.class.getDeclaredField(bloom);
+                bf.setAccessible(true);
+                Object b = bf.get(p);
+                java.lang.reflect.Method now = b.getClass().getDeclaredMethod("setImmediately", boolean.class);
+                now.setAccessible(true);
+                now.invoke(b, Boolean.TRUE);
+            }
+            yes("both outer rings are drawn for the spark probe", p.outerRingDrawn() && p.triRingDrawn());
+            // Freeze the pulse half-way and listen for a spark's head on the globe.
+            java.lang.reflect.Field ps = SkymapPanel.class.getDeclaredField("pulseStart");
+            ps.setAccessible(true);
+            ps.setLong(p, System.nanoTime() - (long) (SkymapPanel.PULSE_MS * 0.5e6));
+            final int[] heads = {0};
+            final Ink[] now = {null};
+            Pen listening = (Pen) java.lang.reflect.Proxy.newProxyInstance(
+                Pen.class.getClassLoader(), new Class<?>[] {Pen.class},
+                (proxy, method, args) -> {
+                    if (method.getName().equals("color")) {
+                        now[0] = (Ink) args[0];
+                    }
+                    if (method.getName().equals("fillOval") && now[0] != null
+                            && now[0].getRGB() == new Ink(255, 248, 220, 240).getRGB()) {
+                        heads[0]++;
+                    }
+                    return method.getReturnType() == int.class ? 0 : null;
+                });
+            GlobeRenderer.paint(listening, new Globe(), 900, 820, p, false);
+            yes("half-way through the pulse the globe draws sparks on the hovered body's lines: "
+                + heads[0], heads[0] > 0);
+            // Once the pulse is over the sparks are gone and a partner stays swollen.
+            ps.setLong(p, System.nanoTime() - (long) (SkymapPanel.PULSE_MS * 2e6));
+            heads[0] = 0;
+            GlobeRenderer.paint(listening, new Globe(), 900, 820, p, false);
+            eq("after the pulse there are no sparks", 0, heads[0]);
+            boolean partnerSwells = false;
+            for (int r = 0; r < 3 && !partnerSwells; r++) {
+                boolean[] valid = p.ringValid(r);
+                for (int i = 0; i < valid.length; i++) {
+                    if (valid[i] && !(i == body && r == ring) && p.swell(i, r) > 1.0) {
+                        partnerSwells = true;
+                        break;
+                    }
+                }
+            }
+            yes("and a body it aspects stays swollen", partnerSwells);
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                try {
+                    focus.invoke(p, -1);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            near("with the hover gone nothing swells", 1.0, p.swell(body, ring), 0.0);
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }

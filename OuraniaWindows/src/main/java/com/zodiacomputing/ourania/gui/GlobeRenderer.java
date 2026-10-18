@@ -688,6 +688,22 @@ public final class GlobeRenderer {
         }
     }
 
+    /** As {@link #aroundTheZodiac}, for members packed with their ring (WheelLayout.packHit). */
+    static int[] aroundTheZodiacPacked(int[] packed, double[][] lons) {
+        Integer[] boxed = new Integer[packed.length];
+        for (int i = 0; i < packed.length; i++) {
+            boxed[i] = packed[i];
+        }
+        java.util.Arrays.sort(boxed, (a, b) -> Double.compare(
+            lons[WheelLayout.hitRing(a)][WheelLayout.hitBody(a)],
+            lons[WheelLayout.hitRing(b)][WheelLayout.hitBody(b)]));
+        int[] out = new int[boxed.length];
+        for (int i = 0; i < boxed.length; i++) {
+            out[i] = boxed[i];
+        }
+        return out;
+    }
+
     /** A figure's members in order round the zodiac, so its plane does not cross itself. */
     static int[] aroundTheZodiac(int[] members, double[] lon) {
         Integer[] boxed = new Integer[members.length];
@@ -711,19 +727,35 @@ public final class GlobeRenderer {
      * everything else, so a body in front of a sheet is in front of it.
      */
     private void patternPlanes() {
-        int[][] figures = this.panel.autoPatterns();
-        if (figures == null || figures.length == 0) {
-            return;
+        double[][][] points = {
+            bodyPoints(this.panel, this.cam, this.bands, 0, this.stacked),
+            bodyPoints(this.panel, this.cam, this.bands, 1, this.stacked),
+            bodyPoints(this.panel, this.cam, this.bands, 2, this.stacked),
+        };
+        double[][] lons = {this.panel.ringLon(0), this.panel.ringLon(1), this.panel.ringLon(2)};
+        // Chart A's own figures, packed as natal hits, then the figures between charts.
+        int[][] natal = this.panel.autoPatterns();
+        int[][] cross = this.panel.crossFigures();
+        String[] natalNames = this.panel.patternNames();
+        String[] crossNames = this.panel.crossFigureNames();
+        int[][] figures = new int[natal.length + cross.length][];
+        String[] names = new String[figures.length];
+        for (int k = 0; k < natal.length; k++) {
+            figures[k] = natal[k];
+            names[k] = k < natalNames.length ? natalNames[k] : "";
         }
-        String[] names = this.panel.patternNames();
-        double[][] points = bodyPoints(this.panel, this.cam, this.bands, 0, this.stacked);
-        double[] lon = this.panel.ringLon(0);
+        for (int k = 0; k < cross.length; k++) {
+            figures[natal.length + k] = cross[k];
+            names[natal.length + k] = k < crossNames.length ? crossNames[k] : "";
+        }
         for (int k = 0; k < figures.length; k++) {
-            int[] members = aroundTheZodiac(figures[k], lon);
+            int[] members = aroundTheZodiacPacked(figures[k], lons);
             java.util.List<double[]> corners = new java.util.ArrayList<>();
             for (int m : members) {
-                if (m >= 0 && m < points.length && points[m] != null) {
-                    corners.add(points[m]);
+                int ring = WheelLayout.hitRing(m);
+                int body = WheelLayout.hitBody(m);
+                if (body < points[ring].length && points[ring][body] != null) {
+                    corners.add(points[ring][body]);
                 }
             }
             if (corners.size() < 3) {
@@ -744,7 +776,7 @@ public final class GlobeRenderer {
             if (!visible) {
                 continue;
             }
-            Ink base = patternInk(k < names.length ? names[k] : "");
+            Ink base = patternInk(names[k]);
             final Ink fill = faded(shade(base, 40), Layer.ASPECTS);
             this.pieces.add(new Piece(depth, () -> {
                 this.g.color(fill);
@@ -2008,14 +2040,19 @@ public final class GlobeRenderer {
             // <b>The focus rays, as on the wheel</b> (2026-10-18). With a body focused, its own
             // lines glow gold and orange at full strength and every other line fades to the
             // wheel's FOCUS_DIM - the same weights the wheel reads.
-            if (panel.focusTouches(c[1], c[2], ring > 0)) {
+            if (panel.focusTouches(c[1], c[2], ring)) {
+                double run = panel.pulse();
+                if (run >= 0.0) {
+                    boolean fromFirst = panel.focusAtFirstEnd(c[1], ring);
+                    spark(fromFirst ? from : to, fromFirst ? to : from, rise, run);
+                }
                 chord(from, to, rise, faded(new Ink(255, 150, 40, 70), Layer.ASPECTS), 7.0f,
                     false);
                 chord(from, to, rise, faded(new Ink(255, 206, 110, 150), Layer.ASPECTS), 3.5f,
                     false);
                 ink = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 255);
             } else {
-                double weight = panel.focusWeight(c[1], c[2], ring > 0);
+                double weight = panel.focusWeight(c[1], c[2], ring);
                 if (weight < 1.0) {
                     ink = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(),
                         (int) Math.round(ink.getAlpha() * weight));
@@ -2029,6 +2066,43 @@ public final class GlobeRenderer {
             chord(from, to, rise, faded(ink, Layer.ASPECTS), lit ? 2.4f : 1.0f,
                 !lit);
         }
+    }
+
+    /**
+     * A spark on its way down an arc, from {@code a} to {@code b}: the hover pulse's bolt,
+     * following the same curve the line is drawn on (arcPathFor), at the depth of its head.
+     */
+    private void spark(double[] a, double[] b, double rise, double run) {
+        double t = Math.min(1.0, run / 0.8);
+        double[][] path = arcPathFor(a, b, rise, 48, this.bands.flatness());
+        int head = (int) Math.round(t * (path.length - 1));
+        int tailStart = Math.max(0, head - 4);
+        int n = head - tailStart;
+        if (n < 1) {
+            return;
+        }
+        final int[] xs = new int[n + 1];
+        final int[] ys = new int[n + 1];
+        double depth = 0.0;
+        for (int i = 0; i <= n; i++) {
+            Globe.Projected q = at(path[tailStart + i]);
+            if (!q.visible) {
+                return;
+            }
+            double jag = (i == 0 || i == n) ? 0.0 : (((int) (run * 60) + i) % 2 == 0 ? 3.0 : -3.0);
+            xs[i] = (int) Math.round(q.x + jag);
+            ys[i] = (int) Math.round(q.y - jag);
+            depth = q.depth;
+        }
+        this.pieces.add(new Piece(depth - 0.02, () -> {
+            this.g.color(new Ink(255, 190, 70, 120));
+            this.g.stroke(4.0f);
+            this.g.drawPolyline(xs, ys, xs.length);
+            this.g.color(new Ink(255, 248, 220, 240));
+            this.g.stroke(1.4f);
+            this.g.drawPolyline(xs, ys, xs.length);
+            this.g.fillOval(xs[n] - 3, ys[n] - 3, 6, 6);
+        }));
     }
 
     /**
@@ -2118,7 +2192,7 @@ public final class GlobeRenderer {
             // the whole back hemisphere disappeared into the ground.
             double far = q.depth > this.cam.distance ? 0.55 : 1.0;
             // A body not in the focused body's network fades with its lines (the focus rays).
-            final int alpha = (int) Math.round(255 * far * panel.glyphWeight(i, outer));
+            final int alpha = (int) Math.round(255 * far * panel.glyphWeight(i, ring));
 
             // <b>The planets themselves, when the reader asks for it.</b> This was Chart A
             // alone, because three Jupiters drawn as Jupiter are one Jupiter three times over
@@ -2137,8 +2211,10 @@ public final class GlobeRenderer {
             // written on it in a dark ink.
             final double toMarker = Bodies.at(i).isAngle() ? this.bands.flatness() : 0.0;
             final double moonPhase = moonPhaseOf(i, lon, valid);
+            final double swell = panel.swell(i, ring);
             this.pieces.add(new Piece(q.depth, () -> {
-                int rad = sphereRadius(bodyIndex) + (lit ? 2 : 0);
+                // The hovered body and, as the sparks reach them, the bodies it aspects swell.
+                int rad = (int) Math.round(sphereRadius(bodyIndex) * Math.max(lit ? 1.2 : 1.0, swell));
                 if (moonPhase >= 0.0) {
                     drawMoonPhase(this.g, (int) q.x, (int) q.y, rad, moonPhase, alpha);
                     if (outer) {

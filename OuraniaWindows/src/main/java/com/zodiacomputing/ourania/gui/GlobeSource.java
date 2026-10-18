@@ -54,18 +54,43 @@ public interface GlobeSource {
     }
 
     /** How strongly an aspect line is drawn under the reader's focus, 1 when none. */
-    default double focusWeight(int a, int b, boolean transitPair) {
+    default double focusWeight(int a, int b, int wheel) {
         return 1.0;
     }
 
-    /** How strongly a body is drawn under the reader's focus, 1 when none. */
-    default double glyphWeight(int body, boolean transit) {
+    /** How strongly a body on a ring is drawn under the reader's focus, 1 when none. */
+    default double glyphWeight(int body, int ring) {
         return 1.0;
     }
 
     /** Whether a line is one of the focused body's own, which glows. */
-    default boolean focusTouches(int a, int b, boolean transitPair) {
+    default boolean focusTouches(int a, int b, int wheel) {
         return false;
+    }
+
+    /** How far a hover pulse's sparks have run, 0 to 1, or -1 when none are running. */
+    default double pulse() {
+        return -1.0;
+    }
+
+    /** How much a body swells under the hover, 1 when not at all. */
+    default double swell(int body, int ring) {
+        return 1.0;
+    }
+
+    /** True when the focused body is the first end of this line. */
+    default boolean focusAtFirstEnd(int a, int wheel) {
+        return false;
+    }
+
+    /** Figures that run between charts, each member packed with its ring (WheelLayout.packHit). */
+    default int[][] crossFigures() {
+        return new int[0][];
+    }
+
+    /** Their names, in the same order. */
+    default String[] crossFigureNames() {
+        return new String[0];
     }
 
     default double outerOpenFraction() {

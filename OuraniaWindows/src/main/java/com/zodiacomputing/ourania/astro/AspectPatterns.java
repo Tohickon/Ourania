@@ -155,9 +155,32 @@ public final class AspectPatterns {
         return findPatterns(null, hits);
     }
 
+    /**
+     * Patterns among bodies from more than one chart (2026-10-18): David, of the glass planes,
+     * "these new rules will apply to aspects between charts and transits also". The bodies keep
+     * names that tell the charts apart - a transiting Mars is not the natal Mars - and
+     * {@code identity} says which body each name is, for the one test that cares: whether it
+     * is a body figures are drawn between at all.
+     */
+    public static List<Pattern> findPatterns(List<Aspects.Hit> hits,
+                                             java.util.function.Function<String, String> identity) {
+        List<Aspects.Hit> usable = new ArrayList<>();
+        for (Aspects.Hit h : hits) {
+            if (PATTERN_BODIES.contains(identity.apply(h.a))
+                && PATTERN_BODIES.contains(identity.apply(h.b)) && h.offBy <= MAX_ORB) {
+                usable.add(h);
+            }
+        }
+        return detect(null, usable);
+    }
+
     /** Patterns, classified by modality and element when a frame is supplied. */
     public static List<Pattern> findPatterns(ChartFrame f, List<Aspects.Hit> hits) {
-        List<Aspects.Hit> usable = eligible(hits);
+        return detect(f, eligible(hits));
+    }
+
+    /** The figures among hits already judged eligible - by name, or by a body's identity. */
+    private static List<Pattern> detect(ChartFrame f, List<Aspects.Hit> usable) {
         Set<Pattern> found = new HashSet<>();
 
         List<Aspects.Hit> oppositions = ofType(usable, Aspects.Type.OPPOSITION);
