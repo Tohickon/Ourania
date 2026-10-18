@@ -174,6 +174,13 @@ public final class GlobeCheck {
         theBandsAreTheWheels();
         report("Part U", before);
 
+        System.out.println();
+        System.out.println("=== Part V: from straight above, the wheel's look ===");
+        before = failures.size();
+        theWheelsLookFromAbove();
+        report("Part V", before);
+
+
 
         System.out.println();
         if (failures.isEmpty()) {
@@ -3697,6 +3704,94 @@ public final class GlobeCheck {
         double[] p = Globe.onShell(origin + 90.0, origin, r, 0.0);
         Globe.Projected q = cam.project(p[0], p[1], p[2], w, h);
         return Math.hypot(q.x - c.x, q.y - c.y);
+    }
+
+    /**
+     * David, 18 Oct, on the last differences between the wheel and the globe straight down:
+     * "For house-number style, gold band width, ring lines, ASC/MC markers and house shading,
+     * the globe eases into the wheel's look near the top. Normal tilt stays as it is." So
+     * straight down: Chart A's ribbon covers the wheel's gold band edge to edge, the cusp lines
+     * run out to the signs, the house numbers are written at the wheel's size, and an angle is
+     * the wheel's gold marker with its label on it. At an ordinary tilt, none of it.
+     *
+     * <p>The wheel side is read from {@link WheelLayout}, the globe side from what the renderer
+     * draws through a pen that only listens.
+     */
+    private static void theWheelsLookFromAbove() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            final SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            long end = System.nanoTime() + 15_000_000_000L;
+            while (System.nanoTime() < end && panel.natalRing.time == null) {
+                Thread.sleep(20);
+            }
+            final int w = 900;
+            final int h = 820;
+            Globe top = new Globe();
+            top.pitch = -Globe.MAX_PITCH;
+            GlobeBands b = GlobeBands.of(panel, top, w, h);
+            int[] rings = WheelLayout.ringRadii(w, h, panel.outerOpenFraction(),
+                panel.triOpenFraction(), panel.layerOpen(Layer.DECANS),
+                panel.layerOpen(Layer.SIGNS), panel.layerOpen(Layer.BOUNDS),
+                panel.layerOpen(Layer.DEGREES), panel.layerOpen(Layer.MANSIONS), 0.0);
+            int natalTop = panel.bodyBaseRadius(rings);
+            int natalFloor = natalTop - WheelLayout.natalBandDepth(Math.max(1, natalTop));
+            double k = GlobeBands.scaleOf(w, h);
+
+            // 1. The gold band: Chart A's ribbon reaches the wheel's band, edge to edge.
+            double[] band = b.wheelRingBand(0);
+            near("overhead, Chart A's ribbon starts at the wheel band's floor", natalFloor * k,
+                band[0], 1e-9);
+            near("and ends at its top", natalTop * k, band[1], 1e-9);
+
+            // 2. The cusp lines run out to the signs, as the wheel's do; and only from above.
+            near("overhead, a cusp line reaches the inner edge of the signs",
+                rings[WheelLayout.RING_SIGN_INNER] * k, b.cuspReach(), 1e-9);
+            Globe tilted = new Globe();
+            near("at the ordinary tilt it stops at the houses' shell", Globe.SHELL_HOUSE,
+                GlobeBands.of(panel, tilted, w, h).cuspReach(), 0.0);
+
+            // 3 and 4. What the renderer writes, by size: house numbers and angle labels.
+            final java.util.Map<String, Integer> sizes = new java.util.HashMap<>();
+            final int[] pts = {0};
+            Pen listening = (Pen) java.lang.reflect.Proxy.newProxyInstance(
+                Pen.class.getClassLoader(), new Class<?>[] {Pen.class},
+                (proxy, method, args) -> {
+                    if (method.getName().equals("font")) {
+                        pts[0] = (Integer) args[0];
+                    }
+                    if (method.getName().equals("drawString")) {
+                        sizes.merge((String) args[0] + "@" + pts[0], 1, Integer::sum);
+                    }
+                    return method.getReturnType() == int.class ? 0 : null;
+                });
+            GlobeRenderer.paint(listening, top, w, h, panel, false);
+            String ascGlyph = com.zodiacomputing.ourania.astro.Bodies.at(
+                com.zodiacomputing.ourania.astro.Bodies.indexOfName("Ascendant")).glyph;
+            yes("overhead the house numbers are written at the wheel's size, 15: "
+                + sizes.keySet().stream().filter(s -> s.startsWith("7@")).toList(),
+                sizes.containsKey("7@15"));
+            yes("overhead the Ascendant's label is written on its marker at 10 points: "
+                + sizes.keySet().stream().filter(s -> s.startsWith(ascGlyph + "@")).toList(),
+                sizes.containsKey(ascGlyph + "@10"));
+            sizes.clear();
+            GlobeRenderer.paint(listening, tilted, w, h, panel, false);
+            yes("at the ordinary tilt the house numbers keep the globe's 12",
+                sizes.containsKey("7@12") && !sizes.containsKey("7@15"));
+            yes("and the Ascendant keeps its bead's 13",
+                sizes.containsKey(ascGlyph + "@13") && !sizes.containsKey(ascGlyph + "@10"));
+
+            // 5. Mixing is the globe's ink at nought and the wheel's at one, exactly.
+            Ink a = new Ink(10, 20, 30, 40);
+            Ink z = new Ink(200, 150, 100, 250);
+            yes("a mix at nought is the globe's own ink", GlobeRenderer.mix(a, z, 0.0) == a);
+            eq("and at one the wheel's", z.getRGB(), GlobeRenderer.mix(a, z, 1.0).getRGB());
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
     }
 
     private static void yes(String label, boolean condition) {

@@ -219,6 +219,42 @@ final class GlobeBands {
         };
     }
 
+    /**
+     * A ring's band on the wheel, inner then outer, in globe units: where the wheel spreads that
+     * ring's bodies. Chart A's is the band the wheel washes gold.
+     *
+     * @param ring 0 Chart A, 1 the outer ring, 2 the sky
+     */
+    double[] wheelRingBand(int ring) {
+        if (this.rings == null) {
+            return null;
+        }
+        int inner = ring == 0 ? this.natalFloor
+            : (ring == 1 ? this.rings[WheelLayout.RING_BODY_TOP] : this.rings[WheelLayout.RING_TRANSIT]);
+        int outer = ring == 0 ? this.natalTop
+            : (ring == 1 ? this.rings[WheelLayout.RING_ARC_INNER] : this.rings[WheelLayout.RING_TRI]);
+        return new double[] {inner * this.scale, outer * this.scale};
+    }
+
+    /**
+     * How far out a house cusp line runs: to the houses' shell on the globe, and to the inner
+     * edge of the signs on the wheel, where the wheel's cusp lines end.
+     */
+    double cuspReach() {
+        return this.rings == null ? Globe.SHELL_HOUSE
+            : toward(Globe.SHELL_HOUSE, this.rings[WheelLayout.RING_SIGN_INNER]);
+    }
+
+    /** The natal band's floor, where the wheel draws its circle round the aspect discs. */
+    double natalFloorRadius() {
+        return this.rings == null ? 0.0 : toward(Globe.SHELL_CHART, this.natalFloor);
+    }
+
+    /** A ring edge of the wheel's body bands, carried from the deck's shell like a chart. */
+    double bodyEdgeRadius(int ringIndex) {
+        return this.rings == null ? 0.0 : toward(Globe.SHELL_CHART, this.rings[ringIndex]);
+    }
+
     /** The wheel's house-number ring, in globe units. */
     double houseNumberRadius() {
         return this.rings == null ? 0.0

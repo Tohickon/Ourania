@@ -149,19 +149,20 @@ public final class GlobeRenderer {
             r.houseMeridians(panel.activeCusps());
             r.houseNumbers(panel.activeCusps());
         }
+        r.wheelRingLines();
         // The three charts as ribbons, each lying in its own plane. Painted before the
         // chords and the bodies so they read as the ground those sit on.
         if (panel.outerRingDrawn()) {
             int outerDeck = panel.ringDeck(1);
             r.ribbon(partnerR, shade(deckInk(outerDeck), 54),
                 inclinationFor(outerDeck, r.stacked, r.cam),
-                liftFor(outerDeck, r.stacked, r.cam), turning);
+                liftFor(outerDeck, r.stacked, r.cam), turning, 1);
         }
         if (panel.triRingDrawn()) {
             int triDeck = panel.ringDeck(2);
             r.ribbon(skyR, shade(deckInk(triDeck), 54),
                 inclinationFor(triDeck, r.stacked, r.cam),
-                liftFor(triDeck, r.stacked, r.cam), turning);
+                liftFor(triDeck, r.stacked, r.cam), turning, 2);
         }
 
         if (r.shown(Layer.ASPECTS)) {
@@ -171,7 +172,7 @@ public final class GlobeRenderer {
             int innerDeck = panel.ringDeck(0);
             r.ribbon(natalR, r.faded(shade(deckInk(innerDeck), 54), Layer.NATAL),
                 inclinationFor(innerDeck, r.stacked, r.cam),
-                liftFor(innerDeck, r.stacked, r.cam), turning);
+                liftFor(innerDeck, r.stacked, r.cam), turning, 0);
             r.bodies(panel.ringLon(0), panel.ringValid(0), AngleRole.ANCHOR, panel, false, 0);
         }
         if (panel.outerRingDrawn()) {
@@ -599,8 +600,22 @@ public final class GlobeRenderer {
      * near wall paints over the far one.
      */
     private void ribbon(double radius, Ink fill, double inclination, double lift,
-                        boolean turning) {
+                        boolean turning, int ring) {
         final int steps = 96;
+        // <b>Near the top, Chart A's ribbon lies down into the wheel's gold band.</b> David,
+        // 2026-10-18: the globe eases into the wheel's look near straight down. The band stands
+        // up as a short wall on the globe; seen from above a wall is a hairline, and the wheel
+        // washes Chart A's whole band gold. So each edge of the ribbon slides from the top and
+        // bottom of the wall to the inner and outer edge of the wheel's band. The outer rings
+        // have no wash on the wheel, so their ribbons fade instead.
+        double f = this.bands.flatness();
+        if (ring != 0 && f > 0.0) {
+            fill = shade(fill, (int) Math.round(fill.getAlpha() * (1.0 - f)));
+            if (fill.getAlpha() <= 0) {
+                return;
+            }
+        }
+        final double[] wheel = ring == 0 && f > 0.0 ? this.bands.wheelRingBand(0) : null;
         // <b>Rims only while the hand is moving.</b> Three bands are two hundred and
         // eighty-eight quads a frame, and measuring rather than assuming: they took a drag at
         // 1100 pixels from 24ms to 40ms, which is the difference between turning a globe and
@@ -611,10 +626,10 @@ public final class GlobeRenderer {
         for (int i = 0; !turning && i < steps; i++) {
             double la = (i * 360.0) / steps;
             double lb = ((i + 1) * 360.0) / steps;
-            quad(bandPoint(la, radius, -RIBBON_HALF, inclination, lift),
-                bandPoint(lb, radius, -RIBBON_HALF, inclination, lift),
-                bandPoint(lb, radius, RIBBON_HALF, inclination, lift),
-                bandPoint(la, radius, RIBBON_HALF, inclination, lift),
+            quad(ribbonEdge(la, radius, -1, inclination, lift, wheel),
+                ribbonEdge(lb, radius, -1, inclination, lift, wheel),
+                ribbonEdge(lb, radius, 1, inclination, lift, wheel),
+                ribbonEdge(la, radius, 1, inclination, lift, wheel),
                 fill);
         }
         // The two rims, which are what a band reads by when it turns edge-on.
@@ -622,11 +637,79 @@ public final class GlobeRenderer {
         double[][] bottom = new double[steps + 1][];
         for (int i = 0; i <= steps; i++) {
             double lon = (i * 360.0) / steps;
-            top[i] = bandPoint(lon, radius, RIBBON_HALF, inclination, lift);
-            bottom[i] = bandPoint(lon, radius, -RIBBON_HALF, inclination, lift);
+            top[i] = ribbonEdge(lon, radius, 1, inclination, lift, wheel);
+            bottom[i] = ribbonEdge(lon, radius, -1, inclination, lift, wheel);
         }
         glowingRim(top, fill, turning);
         glowingRim(bottom, fill, turning);
+    }
+
+    /** One edge of a ribbon: the wall's top or bottom, or near the top the wheel band's edge. */
+    private double[] ribbonEdge(double lon, double radius, int side, double inclination,
+                                double lift, double[] wheel) {
+        double[] globe = bandPoint(lon, radius, side * RIBBON_HALF, inclination, lift);
+        if (wheel == null) {
+            return globe;
+        }
+        return this.bands.blend(globe,
+            Globe.onShell(lon, this.origin, side > 0 ? wheel[1] : wheel[0], 0.0));
+    }
+
+    /** Two inks mixed, alpha included: {@code a} at 0, {@code b} at 1. */
+    static Ink mix(Ink a, Ink b, double t) {
+        if (t <= 0.0) {
+            return a;
+        }
+        double u = Math.min(1.0, t);
+        return new Ink(
+            (int) Math.round(a.getRed() + (b.getRed() - a.getRed()) * u),
+            (int) Math.round(a.getGreen() + (b.getGreen() - a.getGreen()) * u),
+            (int) Math.round(a.getBlue() + (b.getBlue() - a.getBlue()) * u),
+            (int) Math.round(a.getAlpha() + (b.getAlpha() - a.getAlpha()) * u));
+    }
+
+    /**
+     * The wheel's ring lines, faded in near the top: the solid circles that bound each band of
+     * the wheel's zodiac, its circle round the aspect discs, and the outer body bands' edges.
+     * The globe draws these faint or not at all; the wheel draws them in its ink. Each circle
+     * is at the radius its band is drawn at from this camera, so the line and the band arrive
+     * together. Absent at every ordinary tilt.
+     */
+    private void wheelRingLines() {
+        double f = this.bands.flatness();
+        if (f <= 0.0 || this.bands.rings() == null) {
+            return;
+        }
+        Ink ink = Ink.of(ChartPalette.inkHex("#DCDCDC"), new Ink(220, 220, 220));
+        Ink line = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), (int) Math.round(255 * f));
+        double half = (Globe.SHELL_BOUND - Globe.SHELL_DECAN) / 2.0;
+        java.util.List<Double> radii = new java.util.ArrayList<>();
+        if (this.shown(Layer.SIGNS)) {
+            radii.add(bands.at(Band.SIGNS, Globe.SHELL_SIGN_INNER));
+            radii.add(bands.at(Band.SIGNS, Globe.SHELL_SIGN_OUTER));
+        }
+        if (this.shown(Layer.DECANS)) {
+            radii.add(bands.at(Band.DECANS, 2.0 * Globe.SHELL_DECAN - Globe.SHELL_SIGN_OUTER));
+        }
+        radii.add(bands.at(Band.BOUNDS, Globe.SHELL_BOUND - half));
+        radii.add(bands.at(Band.BOUNDS, Globe.SHELL_BOUND + half));
+        radii.add(bands.at(Band.INNER_SCALE, Globe.SHELL_INNER_SCALE));
+        for (double r : radii) {
+            polyline(Globe.equator(this.origin, r, 144), line, 2.0f);
+        }
+        polyline(Globe.equator(this.origin, this.bands.natalFloorRadius(), 144),
+            new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), (int) Math.round(190 * f)), 1.5f);
+        if (this.panel.outerRingDrawn()) {
+            Ink band = new Ink(80, 40, 80, (int) Math.round(255 * f));
+            polyline(Globe.equator(this.origin,
+                this.bands.bodyEdgeRadius(WheelLayout.RING_TRANSIT), 144), band, 2.0f);
+            polyline(Globe.equator(this.origin,
+                this.bands.bodyEdgeRadius(WheelLayout.RING_BODY_TOP), 144), band, 2.0f);
+        }
+        if (this.panel.triRingDrawn()) {
+            polyline(Globe.equator(this.origin, this.bands.bodyEdgeRadius(WheelLayout.RING_TRI),
+                144), new Ink(30, 60, 80, (int) Math.round(255 * f)), 2.0f);
+        }
     }
 
     /**
@@ -939,6 +1022,11 @@ public final class GlobeRenderer {
             // than either one's weight, so the pair is kept close and both are kept low.
             boolean angular = i == 1 || i == 4 || i == 7 || i == 10;
             int alpha = angular ? 24 : (i % 2 == 1 ? 16 : 7);
+            // The wheel shades no houses, so near the top the faces fade.
+            alpha = (int) Math.round(alpha * (1.0 - this.bands.flatness()));
+            if (alpha <= 0) {
+                continue;
+            }
             Ink ink = angular ? new Ink(226, 214, 184) : new Ink(150, 152, 164);
             wedgeOnSphere(from, from + span, bands.at(Band.HOUSES, Globe.SHELL_HOUSE),
                 faded(new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), alpha),
@@ -1191,16 +1279,20 @@ public final class GlobeRenderer {
         int lit = this.panel.focusedHouse();
         for (int i = 1; i <= 12; i++) {
             boolean here = i == lit;
-            Ink ink = faded(here ? new Ink(255, 238, 170) : new Ink(206, 208, 216),
-                Layer.HOUSES);
+            // Near the top, the wheel's house number: its sign's element colour, and larger.
+            double f = this.bands.flatness();
+            Ink plain = mix(new Ink(206, 208, 216),
+                this.panel.elementInk(Zodiac.elementIndex(i - 1)), f);
+            Ink ink = faded(here ? new Ink(255, 238, 170) : plain, Layer.HOUSES);
+            int size = here ? 15 : (int) Math.round(12 + 3 * f);
             billboard(houseLabelAt(cusps, i, this.origin, true, this.bands), String.valueOf(i),
-                ink, here ? 15 : 12);
+                ink, size);
             // The southern number fades as the globe becomes the wheel: from above it is
             // underneath its northern twin, and the wheel writes each house once.
             Ink south = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(),
                 (int) Math.round(ink.getAlpha() * (1.0 - this.bands.flatness())));
             billboard(houseLabelAt(cusps, i, this.origin, false, this.bands), String.valueOf(i),
-                south, here ? 15 : 12);
+                south, size);
         }
 
         // <b>The house cut through the sphere, and only from its number.</b> A house is a
@@ -1700,16 +1792,23 @@ public final class GlobeRenderer {
         // is a flat plane. Everything the reader measures against is in the ecliptic plane, so
         // the divisions of it belong there too. Same spokes the flat wheel draws, seen in
         // perspective.
+        // Near the top, the wheel's cusp lines: out to the signs, the angles in its ink and
+        // thick, the rest dark grey.
+        double f = this.bands.flatness();
+        Ink wheelInk = Ink.of(ChartPalette.inkHex("#DCDCDC"), new Ink(220, 220, 220));
         for (int i = 1; i <= 12; i++) {
             boolean angle = i == 1 || i == 4 || i == 7 || i == 10;
+            Ink spoke = angle ? mix(new Ink(226, 214, 184, 220), wheelInk, f)
+                : mix(new Ink(150, 152, 164, 140), new Ink(64, 64, 64, 255), f);
+            float width = (float) (angle ? 1.8 + 1.2 * f : 1.0 + 1.0 * f);
             segment(Globe.onShell(cusps[i], this.origin, bands.at(Band.HOUSES, 0.02), 0.0),
-                Globe.onShell(cusps[i], this.origin, bands.at(Band.HOUSES, Globe.SHELL_HOUSE), 0.0),
-                faded(angle ? new Ink(226, 214, 184, 220) : new Ink(150, 152, 164, 140),
-                    Layer.HOUSES), angle ? 1.8f : 1.0f);
+                Globe.onShell(cusps[i], this.origin, bands.cuspReach(), 0.0),
+                faded(spoke, Layer.HOUSES), width);
         }
         // The rim the spokes end on, so the houses read as a ring rather than as loose lines.
+        // The wheel has its own circle there, so this one fades as that one comes in.
         polyline(Globe.equator(this.origin, bands.at(Band.HOUSES, Globe.SHELL_HOUSE), 96),
-            faded(new Ink(150, 152, 164, 120), Layer.HOUSES), 0.9f);
+            faded(new Ink(150, 152, 164, (int) Math.round(120 * (1.0 - f))), Layer.HOUSES), 0.9f);
     }
 
     /**
@@ -1917,6 +2016,9 @@ public final class GlobeRenderer {
             final Ink chartRim = shade(deckInk(panel.ringDeck(ring)), alpha);
             final int bodyIndex = i;
             final int half = this.g.textWidth(glyph, 13) / 2;
+            // Near the top an angle becomes the wheel's marker: a gold disc with its label
+            // written on it in a dark ink.
+            final double toMarker = Bodies.at(i).isAngle() ? this.bands.flatness() : 0.0;
             this.pieces.add(new Piece(q.depth, () -> {
                 int rad = lit ? 11 : 9;
                 if (asPlanet) {
@@ -1937,6 +2039,22 @@ public final class GlobeRenderer {
                     this.g.font(12);
                     this.g.color(shade(ink, (int) (alpha * 0.92)));
                     this.g.drawString(glyph, (int) q.x + rad + 3, (int) q.y + 4);
+                    return;
+                }
+                if (toMarker > 0.0) {
+                    Ink gold = Ink.of(ChartPalette.angleHex("#D4AF37"), new Ink(212, 175, 55));
+                    int r = (int) Math.round(rad + (13 - rad) * toMarker);
+                    int labelPts = (int) Math.round(13 + (10 - 13) * toMarker);
+                    this.g.color(mix(shade(bead, alpha), shade(gold, alpha), toMarker));
+                    this.g.fillOval((int) q.x - r, (int) q.y - r, r * 2, r * 2);
+                    this.g.stroke(lit ? 2.0f : 1.0f);
+                    this.g.color(mix(shade(lit ? new Ink(255, 238, 170) : ink, alpha),
+                        shade(gold, alpha), toMarker));
+                    this.g.drawOval((int) q.x - r, (int) q.y - r, r * 2, r * 2);
+                    this.g.font(labelPts);
+                    this.g.color(mix(shade(ink, alpha), shade(new Ink(30, 24, 8), alpha), toMarker));
+                    this.g.drawString(glyph, (int) q.x - this.g.textWidth(glyph, labelPts) / 2,
+                        (int) q.y + labelPts / 3 + 1);
                     return;
                 }
                 this.g.color(shade(bead, alpha));
