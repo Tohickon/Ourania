@@ -420,6 +420,40 @@ final class WheelCanvas extends JPanel {
         int[] nArray = g.natalRadii();
         int[] nArray2 = g.transitRadii();
         int[] nArrayC = g.triRadii();
+        // <b>Each aspect figure as a glass plane, as on the globe</b> (2026-10-18): a faint sheet
+        // between its bodies in its figure's colour (GlobeRenderer.patternInk), its edges glowing
+        // with the ribbons' three passes. Under the lines, which stay.
+        if (panel.layerShown(Layer.ASPECTS) && panel.autoPatterns().length > 0) {
+            String[] figureNames = panel.patternNames();
+            int[] radii = g.natalRadii();
+            double[] natalLon = panel.natalRing().lon;
+            Stroke priorPlane = graphics2D.getStroke();
+            for (int k = 0; k < panel.autoPatterns().length; k++) {
+                int[] members = GlobeRenderer.aroundTheZodiac(panel.autoPatterns()[k], natalLon);
+                if (members.length < 3) {
+                    continue;
+                }
+                int[] xs = new int[members.length];
+                int[] ys = new int[members.length];
+                for (int m = 0; m < members.length; m++) {
+                    double a = Math.toRadians(180.0 + d4 - natalLon[members[m]]);
+                    xs[m] = n12 + (int) Math.round(radii[members[m]] * Math.cos(a));
+                    ys[m] = n13 + (int) Math.round(radii[members[m]] * Math.sin(a));
+                }
+                Ink base = GlobeRenderer.patternInk(k < figureNames.length ? figureNames[k] : "");
+                graphics2D.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(), 40));
+                graphics2D.fillPolygon(xs, ys, xs.length);
+                for (float[] pass : GlobeRenderer.rimPasses()) {
+                    int alpha = (int) Math.round(Math.max(10, Math.min(255, 60 * pass[1])));
+                    graphics2D.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(),
+                        alpha));
+                    graphics2D.setStroke(new BasicStroke(pass[0], BasicStroke.CAP_ROUND,
+                        BasicStroke.JOIN_ROUND));
+                    graphics2D.drawPolygon(xs, ys, xs.length);
+                }
+            }
+            graphics2D.setStroke(priorPlane);
+        }
         // Aspect lines run body to body since 2026-10-18 - see SkymapPanel.Geometry.chordEnd,
         // which the hit tests read too, because a line you can see has to be a line you can hover.
         // <b>One circle, where the lines stop and the bodies start.</b> Three nested
@@ -941,6 +975,19 @@ final class WheelCanvas extends JPanel {
             int n10 = n + (int)((double)rb * Math.cos(d9));
             int n11 = n2 + (int)((double)rb * Math.sin(d9));
             Stroke stroke = graphics2D.getStroke();
+            if (panel.focusTouches(n5, n6, bl)) {
+                // <b>The focus rays.</b> A line of the focused body's own glows gold and orange
+                // underneath, so its network stands out while everything else has faded
+                // (2026-10-18). The globe draws the same rays.
+                graphics2D.setColor(new Color(255, 150, 40, 70));
+                graphics2D.setStroke(new BasicStroke(f2 + 7.0f, BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_ROUND));
+                graphics2D.drawLine(n8, n9, n10, n11);
+                graphics2D.setColor(new Color(255, 206, 110, 150));
+                graphics2D.setStroke(new BasicStroke(f2 + 3.0f, BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_ROUND));
+                graphics2D.drawLine(n8, n9, n10, n11);
+            }
             if (highlighted) {
                 // White halo underneath, so the line reads against whichever aspect colour
                 // it is and against the wheel's own spokes.

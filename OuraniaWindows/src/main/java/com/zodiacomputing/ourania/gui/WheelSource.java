@@ -73,6 +73,12 @@ interface WheelSource {
 
     boolean layerShown(Layer layer);
 
+    /** The name of each figure in autoPatterns, in the same order - for its glass plane. */
+    String[] patternNames();
+
+    /** Whether a line is one of the focused body's own, which glows gold (the focus rays). */
+    boolean focusTouches(int a, int b, boolean transitPair);
+
     /** How far a layer is open, 0 folded to 1 shown - for a wash that fades with its chip. */
     double layerOpen(Layer layer);
 

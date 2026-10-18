@@ -43,6 +43,31 @@ public interface GlobeSource {
      * How far the outer ring's band is open, 0 shut to 1 open - what the wheel lays its bands
      * out from. Defaults to drawn or not, for a source with no bloom.
      */
+    /** The chart's aspect figures, as natal body indices, for their glass planes. */
+    default int[][] autoPatterns() {
+        return new int[0][];
+    }
+
+    /** The name of each figure in {@link #autoPatterns}, in the same order. */
+    default String[] patternNames() {
+        return new String[0];
+    }
+
+    /** How strongly an aspect line is drawn under the reader's focus, 1 when none. */
+    default double focusWeight(int a, int b, boolean transitPair) {
+        return 1.0;
+    }
+
+    /** How strongly a body is drawn under the reader's focus, 1 when none. */
+    default double glyphWeight(int body, boolean transit) {
+        return 1.0;
+    }
+
+    /** Whether a line is one of the focused body's own, which glows. */
+    default boolean focusTouches(int a, int b, boolean transitPair) {
+        return false;
+    }
+
     default double outerOpenFraction() {
         return outerRingDrawn() ? 1.0 : 0.0;
     }

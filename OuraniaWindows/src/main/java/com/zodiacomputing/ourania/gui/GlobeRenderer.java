@@ -166,6 +166,7 @@ public final class GlobeRenderer {
         }
 
         if (r.shown(Layer.ASPECTS)) {
+            r.patternPlanes();
             r.aspectChords(panel);
         }
         if (r.shown(Layer.NATAL)) {
@@ -653,6 +654,108 @@ public final class GlobeRenderer {
         }
         return this.bands.blend(globe,
             Globe.onShell(lon, this.origin, side > 0 ? wheel[1] : wheel[0], 0.0));
+    }
+
+    /**
+     * The colour of an aspect figure's glass plane - one rule for the globe and the wheel.
+     *
+     * <p>David, 2026-10-18, the volumetric harmonic planes: "A Grand Trine renders as a glowing
+     * sapphire-blue glass sheet suspended inside the core, while a T-Square renders as a sharp
+     * crimson glass pyramid slice." The flowing figures in blues and greens, the tense ones in
+     * reds, the Yod and the Boomerang, figures of adjustment, in violet.
+     */
+    static Ink patternInk(String name) {
+        switch (name == null ? "" : name) {
+            case "Grand trine":
+                return new Ink(60, 110, 230);
+            case "Grand sextile":
+                return new Ink(80, 170, 230);
+            case "Kite":
+                return new Ink(70, 170, 200);
+            case "Mystic rectangle":
+                return new Ink(90, 190, 160);
+            case "Cradle":
+                return new Ink(110, 200, 140);
+            case "T-square":
+                return new Ink(220, 40, 60);
+            case "Grand cross":
+                return new Ink(200, 30, 40);
+            case "Yod":
+            case "Boomerang":
+                return new Ink(160, 90, 220);
+            default:
+                return new Ink(200, 200, 210);
+        }
+    }
+
+    /** A figure's members in order round the zodiac, so its plane does not cross itself. */
+    static int[] aroundTheZodiac(int[] members, double[] lon) {
+        Integer[] boxed = new Integer[members.length];
+        for (int i = 0; i < members.length; i++) {
+            boxed[i] = members[i];
+        }
+        java.util.Arrays.sort(boxed, (a, b) -> Double.compare(lon[a], lon[b]));
+        int[] out = new int[boxed.length];
+        for (int i = 0; i < boxed.length; i++) {
+            out[i] = boxed[i];
+        }
+        return out;
+    }
+
+    /**
+     * Each aspect figure as a sheet of glass between its bodies, glowing at its edges.
+     *
+     * <p>The figure's own lines stay; the sheet is what makes three or four lines read as one
+     * shape. Its fill is faint and its rims carry the light, the ribbons' three-pass bloom
+     * standing in for the Fresnel edge a shader would give. Sorted at its mean depth with
+     * everything else, so a body in front of a sheet is in front of it.
+     */
+    private void patternPlanes() {
+        int[][] figures = this.panel.autoPatterns();
+        if (figures == null || figures.length == 0) {
+            return;
+        }
+        String[] names = this.panel.patternNames();
+        double[][] points = bodyPoints(this.panel, this.cam, this.bands, 0, this.stacked);
+        double[] lon = this.panel.ringLon(0);
+        for (int k = 0; k < figures.length; k++) {
+            int[] members = aroundTheZodiac(figures[k], lon);
+            java.util.List<double[]> corners = new java.util.ArrayList<>();
+            for (int m : members) {
+                if (m >= 0 && m < points.length && points[m] != null) {
+                    corners.add(points[m]);
+                }
+            }
+            if (corners.size() < 3) {
+                continue;
+            }
+            int n = corners.size();
+            final int[] xs = new int[n];
+            final int[] ys = new int[n];
+            double depth = 0.0;
+            boolean visible = true;
+            for (int i = 0; i < n; i++) {
+                Globe.Projected q = at(corners.get(i));
+                visible &= q.visible;
+                xs[i] = (int) Math.round(q.x);
+                ys[i] = (int) Math.round(q.y);
+                depth += q.depth / n;
+            }
+            if (!visible) {
+                continue;
+            }
+            Ink base = patternInk(k < names.length ? names[k] : "");
+            final Ink fill = faded(shade(base, 40), Layer.ASPECTS);
+            this.pieces.add(new Piece(depth, () -> {
+                this.g.color(fill);
+                this.g.fillPolygon(xs, ys, xs.length);
+            }));
+            double[][] rim = new double[n + 1][];
+            for (int i = 0; i <= n; i++) {
+                rim[i] = corners.get(i % n);
+            }
+            glowingRim(rim, faded(shade(base, 60), Layer.ASPECTS), this.turning);
+        }
     }
 
     /** Two inks mixed, alpha included: {@code a} at 0, {@code b} at 1. */
@@ -1902,6 +2005,22 @@ public final class GlobeRenderer {
             boolean lit = panel.lightsChord(c[1], c[2], ring);
             Ink ink = new Ink(c[3], true);
             double rise = riseFor(panel, ring, this.bowed);
+            // <b>The focus rays, as on the wheel</b> (2026-10-18). With a body focused, its own
+            // lines glow gold and orange at full strength and every other line fades to the
+            // wheel's FOCUS_DIM - the same weights the wheel reads.
+            if (panel.focusTouches(c[1], c[2], ring > 0)) {
+                chord(from, to, rise, faded(new Ink(255, 150, 40, 70), Layer.ASPECTS), 7.0f,
+                    false);
+                chord(from, to, rise, faded(new Ink(255, 206, 110, 150), Layer.ASPECTS), 3.5f,
+                    false);
+                ink = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(), 255);
+            } else {
+                double weight = panel.focusWeight(c[1], c[2], ring > 0);
+                if (weight < 1.0) {
+                    ink = new Ink(ink.getRed(), ink.getGreen(), ink.getBlue(),
+                        (int) Math.round(ink.getAlpha() * weight));
+                }
+            }
             if (lit) {
                 chord(from, to, rise, faded(new Ink(255, 255, 255, 110),
                     Layer.ASPECTS), 4.0f, false);
@@ -1998,7 +2117,8 @@ public final class GlobeRenderer {
             // Far enough back to read as behind, near enough to still be legible - at 0.38
             // the whole back hemisphere disappeared into the ground.
             double far = q.depth > this.cam.distance ? 0.55 : 1.0;
-            final int alpha = (int) Math.round(255 * far);
+            // A body not in the focused body's network fades with its lines (the focus rays).
+            final int alpha = (int) Math.round(255 * far * panel.glyphWeight(i, outer));
 
             // <b>The planets themselves, when the reader asks for it.</b> This was Chart A
             // alone, because three Jupiters drawn as Jupiter are one Jupiter three times over
@@ -2465,11 +2585,20 @@ public final class GlobeRenderer {
         double front = cameraDistance - Globe.SHELL_SKY;
         double t = (depth - front) / (2.0 * Globe.SHELL_SKY);
         t = Math.max(0.0, Math.min(1.0, t));
-        return 1.0 - (1.0 - CHORD_BEHIND) * t;
+        // <b>A smoothstep, so the front stays crisp.</b> David, 2026-10-18: "Aspect chords on the
+        // front hemisphere remain crisp, neon, and high-contrast, while chords crossing the back
+        // hemisphere fade into soft translucent wireframes." The straight ramp began thinning a
+        // line the moment it left the very front; the smoothstep holds the front near full and
+        // lets the back fall away. Still exactly halfway at the centre.
+        double eased = t * t * (3.0 - 2.0 * t);
+        return 1.0 - (1.0 - CHORD_BEHIND) * eased;
     }
 
-    /** What a chord at the very back of the sphere keeps of its colour. */
-    private static final double CHORD_BEHIND = 0.28;
+    /**
+     * What a chord at the very back of the sphere keeps of its colour: 0.12 since 2026-10-18,
+     * when the back became a faint wireframe behind the crisp front (it was 0.28).
+     */
+    static final double CHORD_BEHIND = 0.12;
 
     /** The most solid steps a straight chord is drawn in, when not turning. */
     private static final int CHORD_STEPS = 6;
@@ -2721,8 +2850,11 @@ public final class GlobeRenderer {
             // correctly overpainted piece by piece rather than all at its mean. The middle of
             // the piece is the depth its colour is mixed at.
             final double stepDepth = p[lo + sub / 2].depth;
-            final Ink step = shade(ink, (int) Math.round(ink.getAlpha()
-                * chordDepthFade(stepDepth, this.cam.distance)));
+            final double fade = chordDepthFade(stepDepth, this.cam.distance);
+            final Ink step = shade(ink, (int) Math.round(ink.getAlpha() * fade));
+            // And thinner toward the back, so the far side reads as a wireframe rather than
+            // as the front at lower alpha (2026-10-18): full width in front, 0.6 of it behind.
+            final float stepWidth = (float) (width * (0.6 + 0.4 * fade));
             final int[] xs = new int[sub + 1];
             final int[] ys = new int[sub + 1];
             for (int k = 0; k <= sub; k++) {
@@ -2730,7 +2862,7 @@ public final class GlobeRenderer {
                 ys[k] = (int) Math.round(p[lo + k].y);
             }
             this.pieces.add(new Piece(stepDepth, () -> {
-                this.g.stroke(width);
+                this.g.stroke(stepWidth);
                 this.g.color(step);
                 this.g.drawPolyline(xs, ys, xs.length);
             }));

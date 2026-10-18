@@ -2160,6 +2160,28 @@ implements WheelSource, GlobeSource {
      * context that makes one body's web mean anything, and removing it would leave a reader
      * looking at five lines in an empty circle.
      */
+    /**
+     * Whether a line is one of the focused body's own: it ends on that body.
+     *
+     * <p>David, 2026-10-18, the focus rays: tapping or hovering a planet "isolates its immediate
+     * aspect network into intense glowing gold and orange vector rays, while all non-connected
+     * background planets and lines fade". The fading was already here (focusWeight, glyphWeight
+     * at FOCUS_DIM); this says which lines get the glow. Both views ask it.
+     *
+     * @param a the body on the line's own ring
+     * @param b the body on the natal ring, where every line lands
+     * @param transitPair true when {@code a} is on an outer ring
+     */
+    public boolean focusTouches(int a, int b, boolean transitPair) {
+        if (this.noFocus()) {
+            return false;
+        }
+        if (this.focusTransit) {
+            return transitPair && a == this.focusBody;
+        }
+        return b == this.focusBody || (!transitPair && a == this.focusBody);
+    }
+
     public double focusWeight(int a, int b, boolean transitPair) {
         if (this.noFocus()) {
             return 1.0;
@@ -6680,6 +6702,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     @Override public int highlightWheel() { return this.highlightWheel; }
     @Override public int[] highlightPattern() { return this.highlightPattern; }
     @Override public int[][] autoPatterns() { return this.autoPatterns; }
+
+    /** The name of each figure in {@link #autoPatterns}, in the same order. */
+    @Override public String[] patternNames() {
+        java.util.List<com.zodiacomputing.ourania.astro.AspectPatterns.Pattern> found =
+            this.currentPatterns;
+        String[] names = new String[found == null ? 0 : found.size()];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = found.get(i).name;
+        }
+        return names;
+    }
     @Override public int focusBody() { return this.focusBody; }
     @Override public boolean focusTransit() { return this.focusTransit; }
     @Override public int hoverBody() { return this.hoverBody; }

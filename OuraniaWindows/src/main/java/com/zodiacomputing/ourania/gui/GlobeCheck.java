@@ -180,6 +180,13 @@ public final class GlobeCheck {
         theWheelsLookFromAbove();
         report("Part V", before);
 
+        System.out.println();
+        System.out.println("=== Part W: focus rays, the far side, glass planes ===");
+        before = failures.size();
+        theAspectIdeas();
+        report("Part W", before);
+
+
 
 
         System.out.println();
@@ -3789,6 +3796,102 @@ public final class GlobeCheck {
             Ink z = new Ink(200, 150, 100, 250);
             yes("a mix at nought is the globe's own ink", GlobeRenderer.mix(a, z, 0.0) == a);
             eq("and at one the wheel's", z.getRGB(), GlobeRenderer.mix(a, z, 1.0).getRGB());
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * David, 18 Oct, three of the aspect ideas: the focus rays ("Tapping or hovering over a
+     * planet ... isolates its immediate aspect network into intense glowing gold and orange
+     * vector rays"), the back hemisphere fading ("chords crossing the back hemisphere fade into
+     * soft translucent wireframes") and the glass planes ("A Grand Trine renders as a glowing
+     * sapphire-blue glass sheet ... a T-Square renders as a sharp crimson glass").
+     */
+    private static void theAspectIdeas() throws Exception {
+        // 3. The fade: crisp in front, a twelfth-ish at the back, eased between.
+        double front = 4.0 - Globe.SHELL_SKY;
+        double back = 4.0 + Globe.SHELL_SKY;
+        near("a chord at the very back keeps 0.12 of its colour", GlobeRenderer.CHORD_BEHIND,
+            GlobeRenderer.chordDepthFade(back, 4.0), 1e-9);
+        double quarter = front + 0.5 * Globe.SHELL_SKY;
+        double linear = 1.0 - (1.0 - GlobeRenderer.CHORD_BEHIND) * 0.25;
+        yes("a quarter of the way back a chord is still brighter than a straight ramp keeps it: "
+            + GlobeRenderer.chordDepthFade(quarter, 4.0) + " against " + linear,
+            GlobeRenderer.chordDepthFade(quarter, 4.0) > linear);
+
+        // 2. The planes' colours, and their corners in order round the zodiac.
+        Ink trine = GlobeRenderer.patternInk("Grand trine");
+        Ink square = GlobeRenderer.patternInk("T-square");
+        yes("a Grand trine's plane is sapphire blue", trine.getBlue() > trine.getRed() + 80);
+        yes("a T-square's plane is crimson", square.getRed() > square.getBlue() + 80);
+        double[] lon = {200.0, 10.0, 120.0};
+        eq("corners go round the zodiac: first", 1,
+            GlobeRenderer.aroundTheZodiac(new int[] {0, 1, 2}, lon)[0]);
+        eq("then", 2, GlobeRenderer.aroundTheZodiac(new int[] {0, 1, 2}, lon)[1]);
+
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            final SkymapPanel panel = (SkymapPanel) fs.get(hold[0]);
+            long end = System.nanoTime() + 15_000_000_000L;
+            while (System.nanoTime() < end && panel.natalRing.time == null) {
+                Thread.sleep(20);
+            }
+            int sun = SkymapPanel.SUN;
+            int moon = SkymapPanel.MOON;
+            int venus = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Venus");
+
+            // 5. Which lines are the focused body's own.
+            java.lang.reflect.Field fb = SkymapPanel.class.getDeclaredField("focusBody");
+            fb.setAccessible(true);
+            java.lang.reflect.Field ft = SkymapPanel.class.getDeclaredField("focusTransit");
+            ft.setAccessible(true);
+            int was = fb.getInt(panel);
+            fb.setInt(panel, -1);
+            yes("with nothing focused no line is a ray", !panel.focusTouches(sun, moon, false));
+            fb.setInt(panel, sun);
+            ft.setBoolean(panel, false);
+            yes("the Sun focused: its natal line to the Moon is a ray",
+                panel.focusTouches(sun, moon, false));
+            yes("and from the Moon's end too", panel.focusTouches(moon, sun, false));
+            yes("and a transit landing on the natal Sun", panel.focusTouches(moon, sun, true));
+            yes("but the Moon to Venus is not", !panel.focusTouches(moon, venus, false));
+            yes("nor a transiting Sun's line, which is not the natal Sun",
+                !panel.focusTouches(sun, moon, true));
+            fb.setInt(panel, was);
+
+            // 2. The renderer lays a sheet down for a figure, and none without one.
+            java.lang.reflect.Field fp = SkymapPanel.class.getDeclaredField("autoPatterns");
+            fp.setAccessible(true);
+            int[][] before = (int[][]) fp.get(panel);
+            final int[] sheets = {0};
+            final int[] alphaNow = {0};
+            Pen listening = (Pen) java.lang.reflect.Proxy.newProxyInstance(
+                Pen.class.getClassLoader(), new Class<?>[] {Pen.class},
+                (proxy, method, args) -> {
+                    if (method.getName().equals("color")) {
+                        alphaNow[0] = ((Ink) args[0]).getAlpha();
+                    }
+                    if (method.getName().equals("fillPolygon") && alphaNow[0] > 0
+                            && alphaNow[0] <= 40 && (Integer) args[2] == 3) {
+                        sheets[0]++;
+                    }
+                    return method.getReturnType() == int.class ? 0 : null;
+                });
+            Globe tilted = new Globe();
+            fp.set(panel, new int[0][]);
+            GlobeRenderer.paint(listening, tilted, 900, 820, panel, false);
+            int without = sheets[0];
+            sheets[0] = 0;
+            fp.set(panel, new int[][] {{sun, moon, venus}});
+            GlobeRenderer.paint(listening, tilted, 900, 820, panel, false);
+            int with = sheets[0];
+            fp.set(panel, before);
+            yes("a figure of three bodies lays down a three-cornered glass sheet: " + with
+                + " against " + without + " without", with > without);
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
