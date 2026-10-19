@@ -1653,6 +1653,17 @@ public class OuraniaWindow extends JFrame {
         // path, because a pattern href is not a body label and triggerPlanetInterpretation
         // would quietly do nothing with it - which is exactly how every transit cell in this
         // grid came to be unclickable for months.
+        // A figure between the charts, from the Transits page: what it means (2026-10-18).
+        if (command != null && command.startsWith("figure:")) {
+            if (skymapPanel != null) {
+                try {
+                    skymapPanel.showFigure(Integer.parseInt(command.substring("figure:".length())));
+                } catch (NumberFormatException e) {
+                    // not a figure index; nothing to open
+                }
+            }
+            return;
+        }
         String[] pattern = InterpretationPanel.parsePatternHref(command);
         if (pattern != null) {
             if (interpretationPanel != null) {
@@ -1895,6 +1906,16 @@ public class OuraniaWindow extends JFrame {
      * It hid the card itself, which inside the rail left the Interpretation tab opening onto a
      * blank page for the rest of the session - the card stayed hidden when the tab showed it.
      */
+    /** Puts both side drawers away: a click on the chart's background (2026-10-18). */
+    void closeSideDrawers() {
+        if (chartRail != null) {
+            chartRail.setOpen(false);
+        }
+        if (menuRail != null) {
+            menuRail.setOpen(false);
+        }
+    }
+
     public void closeInterpretationPanel() {
         if (chartRail != null && READING_PAGE.equals(currentPage())) {
             chartRail.setOpen(false);

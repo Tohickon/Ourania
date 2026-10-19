@@ -39,6 +39,79 @@ public interface GlobeSource {
 
     boolean triRingDrawn();
 
+    /**
+     * How far the outer ring's band is open, 0 shut to 1 open - what the wheel lays its bands
+     * out from. Defaults to drawn or not, for a source with no bloom.
+     */
+    /** The chart's aspect figures, as natal body indices, for their glass planes. */
+    default int[][] autoPatterns() {
+        return new int[0][];
+    }
+
+    /** The name of each figure in {@link #autoPatterns}, in the same order. */
+    default String[] patternNames() {
+        return new String[0];
+    }
+
+    /** How strongly an aspect line is drawn under the reader's focus, 1 when none. */
+    default double focusWeight(int a, int b, int wheel) {
+        return 1.0;
+    }
+
+    /** How strongly a body on a ring is drawn under the reader's focus, 1 when none. */
+    default double glyphWeight(int body, int ring) {
+        return 1.0;
+    }
+
+    /** Whether a line is one of the focused body's own, which glows. */
+    default boolean focusTouches(int a, int b, int wheel) {
+        return false;
+    }
+
+    /** How strongly a figure's glass plane is drawn, by its allFigures index; 1 with no hover. */
+    default double planeWeight(int k) {
+        return 1.0;
+    }
+
+    /** Where the natal lines' slow current is in its cycle, 0 to 1, or -1 when it is off. */
+    default double current() {
+        return -1.0;
+    }
+
+    /** How far a hover pulse's sparks have run, 0 to 1, or -1 when none are running. */
+    default double pulse() {
+        return -1.0;
+    }
+
+    /** How much a body swells under the hover, 1 when not at all. */
+    default double swell(int body, int ring) {
+        return 1.0;
+    }
+
+    /** True when the focused body is the first end of this line. */
+    default boolean focusAtFirstEnd(int a, int wheel) {
+        return false;
+    }
+
+    /** Figures that run between charts, each member packed with its ring (WheelLayout.packHit). */
+    default int[][] crossFigures() {
+        return new int[0][];
+    }
+
+    /** Their names, in the same order. */
+    default String[] crossFigureNames() {
+        return new String[0];
+    }
+
+    default double outerOpenFraction() {
+        return outerRingDrawn() ? 1.0 : 0.0;
+    }
+
+    /** As above, for the sky's band. */
+    default double triOpenFraction() {
+        return triRingDrawn() ? 1.0 : 0.0;
+    }
+
     /** Which deck - upper, middle, lower - a ring rides on. */
     int ringDeck(int ring);
 

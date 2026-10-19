@@ -54,6 +54,13 @@ final class AwtPen implements Pen {
         return FONTS.computeIfAbsent(points, p -> new Font("SansSerif", 0, p));
     }
 
+    private static final java.util.Map<Integer, Font> BOLD = new java.util.HashMap<>();
+
+    @Override
+    public void fontBold(int points) {
+        this.g.setFont(BOLD.computeIfAbsent(points, p -> new Font("SansSerif", Font.BOLD, p)));
+    }
+
     @Override
     public void color(Ink ink) {
         this.g.setColor(awt(ink));
