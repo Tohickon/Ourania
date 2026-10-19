@@ -4095,6 +4095,14 @@ public final class GlobeCheck {
             }
             p.setHighlightedAspect(null);
             yes("let go, nothing is lit and the sparks stop", !p.aspectLit() && p.pulse() < 0.0);
+            // A transit row of a selected transit body lights its aspect on the outer ring.
+            p.setHighlightedAspect("aspect|transit_Mars|Sun|Square");
+            near("a transit row lights its transiting body on the outer ring", SkymapPanel.HOVER_SCALE,
+                p.swell(marsI, WheelLayout.WHEEL_OUTER), 1e-9);
+            yes("and its line to the natal body is the ray",
+                p.focusTouches(marsI, sunI, WheelLayout.WHEEL_OUTER));
+            p.setHighlightedAspect(null);
+
 
             // A figure lights from its entry in a page and from its plane on the chart, and its
             // plane says what it is (2026-10-18: "when i hover over grand cross nothing happens").

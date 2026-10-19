@@ -521,9 +521,16 @@ public class InterpretationPanel extends JPanel {
                     String whoseChart = (aspectData.length > 3 && aspectData[3] != null
                         && !aspectData[3].isEmpty()) ? aspectData[3]
                         : (partner ? "your" : "Natal");
-                    html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect)
-                        .append("</i> to ").append(whoseChart).append(" ").append(otherPlanet)
-                        .append("</h3>");
+                    // <b>A link, so hovering the row lights the aspect</b> (2026-10-18), as the
+                    // natal rows do: both bodies swell, its line sparkles, the rest fades. The
+                    // href has no ring field, so the transit_ prefix puts its first body on the
+                    // outer ring - the ring this card's body was picked from.
+                    html.append("<h3 style='color:#E0E0E0;'><a href='aspect|transit_")
+                        .append(displayPlanetName).append("|").append(otherPlanet).append("|")
+                        .append(aspectType)
+                        .append("' style='color:#E0E0E0; text-decoration:none;'><i>")
+                        .append(displayAspect).append("</i> to ").append(whoseChart).append(" ")
+                        .append(otherPlanet).append("</a></h3>");
                     // Between two people this is an interaspect, not a transit hit.
                     String prose = partner
                         ? svc.getSynastryInteraspect(displayPlanetName, otherPlanet, aspectType)
