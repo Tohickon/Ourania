@@ -2355,7 +2355,7 @@ implements WheelSource, GlobeSource {
     // pulse; with the ring animations switched off in Settings there are no sparks and the
     // partners swell at once.
 
-    /** How long the sparks take to run their lines, in milliseconds. */
+    /** How long one round of sparks takes, in milliseconds; they repeat while the hover lasts. */
     static final long PULSE_MS = 900L;
 
     /** When the pulse began, or -1 with none running. */
@@ -2381,16 +2381,19 @@ implements WheelSource, GlobeSource {
     }
 
     /**
-     * How far the sparks have run, 0 to 1, or -1 when none are running - which is also what a
-     * finished pulse reads, so the partners stay swollen and the sparks are gone.
+     * How long the sparks have been running, in pulses (PULSE_MS each), or -1 when none are.
+     *
+     * <p><b>They run until the hover ends.</b> David, 2026-10-18: "can you have them continue
+     * until its hover offed?" So this keeps counting while a body is focused - the sparks'
+     * positions cycle (GlobeRenderer.sparkPositions) and the partners, once reached, stay
+     * swollen - and the timer stops the moment the focus goes.
      */
     @Override
     public double pulse() {
         if (this.pulseStart < 0L || this.noFocus()) {
             return -1.0;
         }
-        double t = (System.nanoTime() - this.pulseStart) / 1e6 / PULSE_MS;
-        return t >= 1.0 ? -1.0 : t;
+        return (System.nanoTime() - this.pulseStart) / 1e6 / PULSE_MS;
     }
 
     /**

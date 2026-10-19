@@ -4042,11 +4042,13 @@ public final class GlobeCheck {
             GlobeRenderer.paint(listening, new Globe(), 900, 820, p, false);
             yes("half-way through the pulse the globe draws sparks of light on the hovered body's lines: "
                 + heads[0], heads[0] > 0);
-            // Once the pulse is over the sparks are gone and a partner stays swollen.
-            ps.setLong(p, System.nanoTime() - (long) (SkymapPanel.PULSE_MS * 2e6));
+            // The sparks keep running while the hover lasts (2026-10-18), and a partner stays
+            // swollen.
+            ps.setLong(p, System.nanoTime() - (long) (SkymapPanel.PULSE_MS * 2.5e6));
             heads[0] = 0;
             GlobeRenderer.paint(listening, new Globe(), 900, 820, p, false);
-            eq("after the pulse there are no sparks", 0, heads[0]);
+            yes("two and a half rounds on, the sparks are still running: " + heads[0],
+                heads[0] > 0);
             boolean partnerSwells = false;
             for (int r = 0; r < 3 && !partnerSwells; r++) {
                 boolean[] valid = p.ringValid(r);
@@ -4066,6 +4068,10 @@ public final class GlobeCheck {
                 }
             });
             near("with the hover gone nothing swells", 1.0, p.swell(body, ring), 0.0);
+            yes("and the sparks stop", p.pulse() < 0.0);
+            heads[0] = 0;
+            GlobeRenderer.paint(listening, new Globe(), 900, 820, p, false);
+            eq("none is drawn once the hover is gone", 0, heads[0]);
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
