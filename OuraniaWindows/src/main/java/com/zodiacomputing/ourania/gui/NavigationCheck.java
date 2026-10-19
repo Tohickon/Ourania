@@ -1992,12 +1992,14 @@ public final class NavigationCheck {
             int signOuter = rings[WheelLayout.RING_SIGN_OUTER];
             int signInner = rings[WheelLayout.RING_SIGN_INNER];
             int termInner = rings[WheelLayout.RING_TERM_INNER];
+            int termOuter = rings[WheelLayout.RING_TERM_OUTER];
             int degreeInner = rings[WheelLayout.RING_DEGREE_INNER];
             int bodyBase = 226;
 
-            // The chain has to be in this order, or the bands below describe nothing.
-            ok("the ring chain runs outward", degreeInner < termInner
-                && termInner <= signInner && signInner < signOuter && signOuter < decanOuter);
+            // The chain has to be in this order, or the bands below describe nothing. Since
+            // 2026-10-18 the bounds are outside the decans, as on the globe.
+            ok("the ring chain runs outward", degreeInner < signInner && signInner < signOuter
+                && signOuter < decanOuter && decanOuter <= termInner && termInner < termOuter);
             ok("the open middle starts inside the degree scale", bodyBase < degreeInner);
 
             eq("the decan ring reads a decan", SkymapPanel.BAND_DECAN,
@@ -2005,15 +2007,15 @@ public final class NavigationCheck {
             eq("the sign ring reads a sign", SkymapPanel.BAND_SIGN,
                 SkymapPanel.bandAt((signInner + signOuter) / 2.0, rings, bodyBase));
             eq("the inner degree scale reads a degree", SkymapPanel.BAND_DEGREE,
-                SkymapPanel.bandAt((degreeInner + termInner) / 2.0, rings, bodyBase));
+                SkymapPanel.bandAt((degreeInner + signInner) / 2.0, rings, bodyBase));
             // The bounds ring has its own reading since 2026-09-14; naming the sign was a click on
             // one item opening another.
             eq("the bounds ring reads a bound", SkymapPanel.BAND_BOUND,
-                SkymapPanel.bandAt((termInner + signInner) / 2.0, rings, bodyBase));
+                SkymapPanel.bandAt((termInner + termOuter) / 2.0, rings, bodyBase));
             eq("the open middle names its sign", SkymapPanel.BAND_OPEN,
                 SkymapPanel.bandAt((bodyBase + degreeInner) / 2.0, rings, bodyBase));
-            eq("outside the decan ring is nothing", SkymapPanel.BAND_NONE,
-                SkymapPanel.bandAt(decanOuter + 2.0, rings, bodyBase));
+            eq("outside the bound ring is nothing", SkymapPanel.BAND_NONE,
+                SkymapPanel.bandAt(termOuter + 2.0, rings, bodyBase));
             eq("inside the natal band is nothing", SkymapPanel.BAND_NONE,
                 SkymapPanel.bandAt(bodyBase - 2.0, rings, bodyBase));
 
@@ -2021,7 +2023,7 @@ public final class NavigationCheck {
             // enough to answer for four rings. Walking every pixel is what catches it, where
             // five sample points in the middle of each band would not.
             java.util.Map<Integer, Integer> width = new java.util.TreeMap<>();
-            for (int r = 0; r <= decanOuter + 20; r++) {
+            for (int r = 0; r <= termOuter + 20; r++) {
                 width.merge(SkymapPanel.bandAt(r, rings, bodyBase), 1, Integer::sum);
             }
             ok("the decan ring is as deep as it is drawn",
@@ -2029,13 +2031,13 @@ public final class NavigationCheck {
             ok("the sign ring is as deep as it is drawn",
                 width.getOrDefault(SkymapPanel.BAND_SIGN, 0) == signOuter - signInner);
             ok("the degree scale is as deep as it is drawn",
-                width.getOrDefault(SkymapPanel.BAND_DEGREE, 0) == termInner - degreeInner);
+                width.getOrDefault(SkymapPanel.BAND_DEGREE, 0) == signInner - degreeInner);
             ok("the bounds ring is as deep as it is drawn",
-                width.getOrDefault(SkymapPanel.BAND_BOUND, 0) == signInner - termInner);
-            // Less the bounds ring as well as the degree scale, now that it is a band of its own.
+                width.getOrDefault(SkymapPanel.BAND_BOUND, 0) == termOuter - termInner);
+            // Less the degree scale; the bounds no longer lie inside the signs.
             ok("the open middle is what is left",
                 width.getOrDefault(SkymapPanel.BAND_OPEN, 0)
-                    == (signInner - bodyBase) - (termInner - degreeInner) - (signInner - termInner));
+                    == (signInner - bodyBase) - (signInner - degreeInner));
 
             // ---- half two: the chords, on a real tri-wheel ----
             boolean[] every = new boolean[com.zodiacomputing.ourania.astro.Bodies.ALL.length];

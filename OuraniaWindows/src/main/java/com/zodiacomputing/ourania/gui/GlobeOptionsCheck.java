@@ -148,10 +148,18 @@ public final class GlobeOptionsCheck {
         BufferedImage off = stableFrame(panel);
 
         int moved = differingPixels(on, off);
+        System.out.println("  sign shell: " + moved + " pixels change, ink " + inkedPixels(on)
+            + " with it against " + inkedPixels(off) + " without");
         ok("turning the sign shell off changes the globe, " + moved + " pixels", moved > 2000);
+        // <b>A share of what changed, not a fixed count.</b> This asked for 2,000 more inked
+        // pixels. On 2026-10-18 the globe gained the wheel's inner degree scale under the signs,
+        // whose ticks lie over part of the sign band on screen near edge-on, and the count fell
+        // to 1,973 of 9,900 changed - the shell still adding ink, by a margin set before there was
+        // anything under it. A shell that only moved would add next to none, so the claim is
+        // that a tenth of what changes is new ink.
         ok("and it is the shell that goes: the frame with it has more ink, "
-                + inkedPixels(on) + " against " + inkedPixels(off),
-            inkedPixels(on) > inkedPixels(off) + 2000);
+                + inkedPixels(on) + " against " + inkedPixels(off) + ", of " + moved + " changed",
+            inkedPixels(on) - inkedPixels(off) > moved / 10);
 
         // <b>Off is not the same as hiding the signs.</b> The boundaries, the band at the equator
         // and the degree scale stay; only the wash goes. Hiding the layer takes all of them, so

@@ -521,9 +521,16 @@ public class InterpretationPanel extends JPanel {
                     String whoseChart = (aspectData.length > 3 && aspectData[3] != null
                         && !aspectData[3].isEmpty()) ? aspectData[3]
                         : (partner ? "your" : "Natal");
-                    html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect)
-                        .append("</i> to ").append(whoseChart).append(" ").append(otherPlanet)
-                        .append("</h3>");
+                    // <b>A link, so hovering the row lights the aspect</b> (2026-10-18), as the
+                    // natal rows do: both bodies swell, its line sparkles, the rest fades. The
+                    // href has no ring field, so the transit_ prefix puts its first body on the
+                    // outer ring - the ring this card's body was picked from.
+                    html.append("<h3 style='color:#E0E0E0;'><a href='aspect|transit_")
+                        .append(displayPlanetName).append("|").append(otherPlanet).append("|")
+                        .append(aspectType)
+                        .append("' style='color:#E0E0E0; text-decoration:none;'><i>")
+                        .append(displayAspect).append("</i> to ").append(whoseChart).append(" ")
+                        .append(otherPlanet).append("</a></h3>");
                     // Between two people this is an interaspect, not a transit hit.
                     String prose = partner
                         ? svc.getSynastryInteraspect(displayPlanetName, otherPlanet, aspectType)
@@ -724,7 +731,15 @@ public class InterpretationPanel extends JPanel {
                 String aspectType = aspectData[1];
                 String applyState = (aspectData.length > 2) ? aspectData[2] : "";
                 String displayAspect = applyState.isEmpty() ? aspectType : applyState + " " + aspectType;
-                html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect).append("</i> ").append(otherPlanet).append("</h3>");
+                // <b>A link, so hovering the row lights the aspect on the chart</b> (2026-10-18):
+                // both bodies swell, sparks of light run along its line and the rest dims - the
+                // same effect a hovered body has. The href is the aspect grid's, which the
+                // selection pane's hover already sends to the wheel; styled as the heading it was.
+                html.append("<h3 style='color:#E0E0E0;'><a href='aspect|").append(planetName)
+                    .append("|").append(otherPlanet).append("|").append(aspectType)
+                    .append("|0' style='color:#E0E0E0; text-decoration:none;'><i>")
+                    .append(displayAspect).append("</i> ").append(otherPlanet)
+                    .append("</a></h3>");
                 html.append("<p>").append(InterpretationService.getInstance().getAspect(planetName, otherPlanet, aspectType)).append("</p>");
             }
         }
@@ -1798,7 +1813,9 @@ public class InterpretationPanel extends JPanel {
         if (found == null) {
             highlightOnWheel(null);
             html.append("<h2 style='color:#FFD166;'>").append(name).append("</h2>");
-            html.append("<p>This figure is not in the chart as currently cast.</p>");
+            html.append("<p style='color:#9AA5B1;'>This figure is not in the chart as currently"
+                + " cast. What the figure means:</p>");
+            appendFigureMeaning(html, name);
             if (withBack) {
                 appendBack(html);
             }
@@ -3303,6 +3320,55 @@ public class InterpretationPanel extends JPanel {
                 .append(orbText(o.bestOffBy)).append(")</span></td></tr>");
         }
         html.append("</table>");
+    }
+
+    /**
+     * What a figure means, as a page for the Selection pane: its name, whose bodies hold it, and
+     * its reading. For a figure clicked on the chart or on the Transits page, which may join
+     * Chart A to another chart - so it is not looked up in Chart A's own patterns, as the
+     * pattern page is, and needs nothing but the figure's name.
+     *
+     * @param members the bodies, each with its chart, as HTML
+     */
+    static String figureMeaningHtml(String name, String members, boolean between) {
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
+        html.append("<h2 style='color:#FFD166;'>").append(name).append("</h2>");
+        html.append("<p style='color:#9AA5B1;'>")
+            .append(between ? "A figure between the charts" : "A figure in Chart A")
+            .append("</p>");
+        html.append("<p>").append(members).append("</p>");
+        appendFigureMeaning(html, name);
+        return style(Prose.decorate(html.append("</body></html>").toString()));
+    }
+
+    /** The reading key for a figure by name: AspectPatterns.Pattern.detailKey's rule. */
+    static String figureKey(String name) {
+        return "pattern_" + name.toLowerCase().replace("-", "").replace(" ", "");
+    }
+
+    /** What a figure means in one sentence, for its hover card, or "" when none is written. */
+    static String figureGist(String name) {
+        String text = InterpretationService.getInstance().getMacroDynamic(figureKey(name));
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        int stop = text.indexOf(". ");
+        return stop > 0 && stop < 220 ? text.substring(0, stop + 1)
+            : text.length() <= 220 ? text : text.substring(0, 217) + "...";
+    }
+
+    /** Appends a figure's reading by name, or says plainly that none is written. */
+    private static void appendFigureMeaning(StringBuilder html, String name) {
+        int before = html.length();
+        appendMacro(html, figureKey(name));
+        String theirs = InterpretationService.getInstance().getMacroDynamic(name);
+        if (theirs != null && !theirs.isEmpty()) {
+            html.append("<p><i>").append(theirs).append("</i></p>");
+        }
+        if (html.length() == before) {
+            html.append("<p>No reading is written for this figure yet.</p>");
+        }
     }
 
     /** Appends a macro-dynamics paragraph if the key is non-null and the data has it. */

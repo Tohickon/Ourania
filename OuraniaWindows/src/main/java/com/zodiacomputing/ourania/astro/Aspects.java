@@ -975,6 +975,15 @@ public final class Aspects {
         return out;
     }
 
+    /**
+     * The aspect between two named positions, or null - for bodies that are not in one frame,
+     * such as a natal body and a transiting one. Speeds are not known there, so applying is
+     * left false.
+     */
+    public static Hit hitBetween(String nameA, double lonA, String nameB, double lonB) {
+        return hit(nameA, lonA, 0.0, nameB, lonB, 0.0);
+    }
+
     private static Hit hit(String nameA, double lonA, double speedA,
                            String nameB, double lonB, double speedB) {
         double sep = separation(lonA, lonB);

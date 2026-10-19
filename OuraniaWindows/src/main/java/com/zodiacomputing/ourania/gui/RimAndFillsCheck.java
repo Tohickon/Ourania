@@ -73,6 +73,8 @@ public final class RimAndFillsCheck {
             part("F: the controls, including the one that is not there",
                 () -> controls(hold[0]));
             part("G: each section selects its own points", () -> sections(hold[0]));
+            part("H: the wheel's signs wear their element's colour, as the globe's do",
+                () -> signWash(sky, chart));
         } finally {
             Settings.setShowDegreeLines(true);
             Settings.setGlobeHouseFill(true);
@@ -111,12 +113,14 @@ public final class RimAndFillsCheck {
                         1.0, 1.0, 1.0, 1.0);
                     int outer = open[WheelLayout.RING_OUTER];
 
-                    // Eleven since G17 step 3 appended the directed band's floor. Both
+                    // Twelve since 2026-10-18, when the bounds moved outside the decans and their
+                    // ceiling became RING_TERM_OUTER; eleven since G17 step 3 appended the directed
+                    // band's floor. Both
                     // appended radii are pinned to what they must equal below rather than the
                     // count being trusted on its own: a length assertion alone would pass on
                     // an appended band that quietly took depth from the wheel, which is the
                     // thing that would actually move the bodies.
-                    eq("the chain has eleven radii" + at, 11, open.length);
+                    eq("the chain has twelve radii" + at, 12, open.length);
                     eq("a shut directed band takes no room" + at,
                         open[WheelLayout.RING_TRANSIT], open[WheelLayout.RING_ARC_INNER]);
                     eq("folded, the band has no depth" + at,
@@ -518,6 +522,65 @@ public final class RimAndFillsCheck {
     }
 
     /** Paints until two frames agree, so a frame is of a settled wheel rather than a bloom. */
+    /**
+     * David, 2026-10-18: "on the wheel shade color the signs". The globe's sign band is a wash
+     * of element colour at alpha 96 and the wheel is to be the globe seen from straight above,
+     * so the wheel's sign band carries the same wash, from the same colours.
+     *
+     * <p>Measured as a colour, not as a difference: the wash is the first thing painted over
+     * the wheel's ground, so at a point clear of every stroke the pixel is exactly the element
+     * colour composited at 96 over that ground. A wash left out, put on the wrong element, or
+     * drawn at another strength misses it.
+     *
+     * <p>Six points a sign, halfway across the band and clear of its boundary and its glyph,
+     * and most of them must match: the house axes run out through the sign band, and the first
+     * version, one point a sign, put Virgo's on the Midheaven line.
+     */
+    private static void signWash(SkymapPanel sky, Component chart) throws Exception {
+        on(sky, Layer.SIGNS, true);
+        Object g = geometry(sky);
+        int cx = intField(g, "cx");
+        int cy = intField(g, "cy");
+        int[] rings = ringsOf(sky);
+        double mid = (rings[WheelLayout.RING_SIGN_INNER] + rings[WheelLayout.RING_SIGN_OUTER]) / 2.0;
+        double pin = sky.getPinLongitude();
+        BufferedImage im = stable(chart);
+        Color ground = AwtPen.colorOr(ChartPalette.wheelHex(null),
+            AwtPen.colorOr(ChartPalette.backgroundHex(null), Color.BLACK));
+        int matched = 0;
+        for (int sign = 0; sign < 12; sign++) {
+            Color el = SkymapPanel.elementColorFor(
+                com.zodiacomputing.ourania.astro.Zodiac.elementIndex(sign));
+            int[] want = {
+                blend(el.getRed(), ground.getRed()),
+                blend(el.getGreen(), ground.getGreen()),
+                blend(el.getBlue(), ground.getBlue()),
+            };
+            int hits = 0;
+            String sample = "";
+            for (double into : new double[] {6.0, 8.5, 11.0, 19.0, 21.5, 24.0}) {
+                double a = Math.toRadians(180.0 + pin - (sign * 30.0 + into));
+                int x = (int) Math.round(cx + mid * Math.cos(a));
+                int y = (int) Math.round(cy + mid * Math.sin(a));
+                Color got = new Color(im.getRGB(x, y));
+                int off = Math.max(Math.abs(got.getRed() - want[0]), Math.max(
+                    Math.abs(got.getGreen() - want[1]), Math.abs(got.getBlue() - want[2])));
+                hits += off <= 3 ? 1 : 0;
+                sample = got.toString();
+            }
+            matched += hits;
+            ok("sign " + sign + " is washed in its element's colour at most of six points: "
+                + hits + " (last " + sample + ", want " + java.util.Arrays.toString(want) + ")",
+                hits >= 4);
+        }
+        System.out.println("  sign wash: " + matched + " of 72 points are the globe's alpha 96");
+    }
+
+    /** One channel of a colour laid at the globe's alpha of 96 over another. */
+    private static int blend(int over, int under) {
+        return (int) Math.round(under + (over - under) * 96 / 255.0);
+    }
+
     private static BufferedImage stable(Component chart) throws Exception {
         BufferedImage last = paint(chart);
         for (int i = 0; i < 60; i++) {

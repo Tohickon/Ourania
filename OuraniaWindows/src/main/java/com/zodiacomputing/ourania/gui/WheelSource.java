@@ -73,6 +73,45 @@ interface WheelSource {
 
     boolean layerShown(Layer layer);
 
+    /** The name of each figure in autoPatterns, in the same order - for its glass plane. */
+    String[] patternNames();
+
+    /** Whether a line is one of the focused body's own, which glows gold (the focus rays). */
+    boolean focusTouches(int a, int b, int wheel);
+
+    /** How strongly a body on a ring is drawn under the focus or a lit aspect, 1 when neither. */
+    double glyphWeight(int body, int ring);
+
+    /** How strongly a line on a ring is drawn under the focus, 1 when none. */
+    double focusWeight(int a, int b, int wheel);
+
+    /** How strongly a figure's glass plane is drawn, by its allFigures index; 1 with no hover. */
+    double planeWeight(int k);
+
+    /** Where the natal lines' slow current is in its cycle, 0 to 1, or -1 when it is off. */
+    double current();
+
+    /** How far a hover pulse's sparks have run, 0 to 1, or -1 when none are running. */
+    double pulse();
+
+    /** How much a body swells under the hover, 1 when not at all. */
+    double swell(int body, int ring);
+
+    /** True when the focused body is the first end of this line. */
+    boolean focusAtFirstEnd(int a, int wheel);
+
+    /** Figures that run between charts, each member packed with its ring (WheelLayout.packHit). */
+    int[][] crossFigures();
+
+    /** Their names, in the same order. */
+    String[] crossFigureNames();
+
+    /** The focused body's longitude, or NaN - the wheel lights its sign, as the globe does. */
+    double focusedLongitude();
+
+    /** How far a layer is open, 0 folded to 1 shown - for a wash that fades with its chip. */
+    double layerOpen(Layer layer);
+
     boolean outerRingDrawn();
 
     boolean triRingDrawn();

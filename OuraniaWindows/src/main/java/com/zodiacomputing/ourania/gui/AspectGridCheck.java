@@ -2277,11 +2277,16 @@ public final class AspectGridCheck {
                 int depth = Math.max(22, Math.min(2 * 20 + 2 * 13, outer / 6));
                 // The zodiac is fixed just inside the rim and no longer moves when a body
                 // ring opens - that is what the 2026-09-06 reorder was for.
-                int decanOuter = outer - 20;
+                // Since 2026-10-18 the bounds sit outside the decans, as on the globe: inward
+                // from the rim, the bounds, the decans, the signs, the inner degree scale. The
+                // same five depths in a new order, so degreeInner - and every body band under
+                // it - is where it always was.
+                int termOuter = outer - 20;
+                int termInner = termOuter - 18;
+                int decanOuter = termInner;
                 int signOuter = decanOuter - 20;
                 int signInner = signOuter - 35;
-                int termInner = signInner - 18;
-                int degreeInner = termInner - 16;
+                int degreeInner = signInner - 16;
                 String at = " (" + w + "x" + h + ")";
 
                 for (boolean partner : new boolean[] {false, true}) {
@@ -2304,7 +2309,9 @@ public final class AspectGridCheck {
                         // length alone would pass on an appended band that quietly took depth
                         // from the wheel, which is the thing that would actually move the
                         // bodies - so both appended radii are pinned to what they must equal.
-                        ok("ring chain returns eleven radii" + tag, got.length == 11);
+                        ok("ring chain returns twelve radii" + tag, got.length == 12);
+                        ok("the bound band's ceiling is the rim's floor" + tag,
+                            got[WheelLayout.RING_TERM_OUTER] == termOuter);
                         ok("a folded mansion band leaves the rim where it was" + tag,
                             got[WheelLayout.RING_MANSION_INNER] == got[WheelLayout.RING_OUTER]);
                         ok("a shut directed band takes no room" + tag,
@@ -2314,9 +2321,11 @@ public final class AspectGridCheck {
                         ok("outer matches" + tag, got[WheelLayout.RING_OUTER] == outer);
                         ok("decan outer matches" + tag,
                             got[WheelLayout.RING_DECAN_OUTER] == decanOuter);
-                        ok("the bound band hangs under the signs" + tag,
-                            got[WheelLayout.RING_TERM_INNER] == termInner);
-                        ok("the inner degree scale hangs under the bounds" + tag,
+                        ok("the bound band sits outside the decans" + tag,
+                            got[WheelLayout.RING_TERM_INNER] == termInner
+                                && got[WheelLayout.RING_TERM_INNER]
+                                    == got[WheelLayout.RING_DECAN_OUTER]);
+                        ok("the inner degree scale hangs under the signs" + tag,
                             got[WheelLayout.RING_DEGREE_INNER] == degreeInner);
                         ok("sign outer matches" + tag,
                             got[WheelLayout.RING_SIGN_OUTER] == signOuter);
@@ -2349,14 +2358,14 @@ public final class AspectGridCheck {
                         // Everything nests, outermost first, at any size the window can be.
                         if (outer > 120) {
                             ok("rings nest outward-in" + tag,
-                                got[WheelLayout.RING_OUTER] > got[WheelLayout.RING_DECAN_OUTER]
-                                    && got[WheelLayout.RING_DECAN_OUTER]
+                                got[WheelLayout.RING_OUTER] > got[WheelLayout.RING_TERM_OUTER]
+                                    && got[WheelLayout.RING_TERM_OUTER]
+                                        > got[WheelLayout.RING_TERM_INNER]
+                                    && got[WheelLayout.RING_TERM_INNER]
                                         > got[WheelLayout.RING_SIGN_OUTER]
                                     && got[WheelLayout.RING_SIGN_OUTER]
                                         > got[WheelLayout.RING_SIGN_INNER]
                                     && got[WheelLayout.RING_SIGN_INNER]
-                                        > got[WheelLayout.RING_TERM_INNER]
-                                    && got[WheelLayout.RING_TERM_INNER]
                                         > got[WheelLayout.RING_DEGREE_INNER]
                                     && got[WheelLayout.RING_DEGREE_INNER]
                                         >= got[WheelLayout.RING_TRI]
@@ -2453,21 +2462,25 @@ public final class AspectGridCheck {
         ok("28 mansions tile the circle exactly",
             Math.abs(com.zodiacomputing.ourania.astro.LunarMansions.WIDTH * 28 - 360.0) < 1e-9);
 
-        // <b>The whole rim is the mansion target, from the decan ring out.</b> It used to split
+        // <b>The whole rim is the mansion target, from the bound ring out.</b> (From the decan
+        // ring out until 2026-10-18, when the bounds moved outside the decans.) It used to split
         // into a mansion band, an undrawn Sabian strip and a dead strip; a click map of the
         // wheel (2026-09-14) showed the inner half of the visible rim opening a Sabian nothing
         // pointed at, or nothing. The Sabian symbols are read from the inner degree scale.
         int[] r = WheelLayout.ringRadii(900, 900, false);
         int outer = r[WheelLayout.RING_OUTER];
-        int decanOuter = r[WheelLayout.RING_DECAN_OUTER];
+        int termOuter = r[WheelLayout.RING_TERM_OUTER];
         boolean wholeRim = true;
-        for (int radius = decanOuter; radius <= outer; radius++) {
+        for (int radius = termOuter; radius <= outer; radius++) {
             wholeRim &= SkymapPanel.inMansionBand(radius, outer);
         }
-        ok("every radius from the decan ring to the rim is a mansion target", wholeRim);
-        ok("and the decan ring itself is not",
-            !SkymapPanel.inMansionBand(decanOuter - 1, outer));
-        eq("the decan ring's last pixel still reads a decan", SkymapPanel.BAND_DECAN,
+        ok("every radius from the bound ring to the rim is a mansion target", wholeRim);
+        ok("and the bound ring itself is not",
+            !SkymapPanel.inMansionBand(termOuter - 1, outer));
+        eq("the bound ring's last pixel still reads a bound", SkymapPanel.BAND_BOUND,
+            SkymapPanel.bandAt(termOuter - 1, r, 200));
+        int decanOuter = r[WheelLayout.RING_DECAN_OUTER];
+        eq("and the decan ring's last pixel still reads a decan", SkymapPanel.BAND_DECAN,
             SkymapPanel.bandAt(decanOuter - 1, r, 200));
         ok("every longitude on the ring resolves to a mansion", mansionAtEveryDegree());
     }
