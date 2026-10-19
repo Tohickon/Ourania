@@ -477,10 +477,13 @@ final class WheelCanvas extends JPanel {
                 String figure = own ? (k < figureNames.length ? figureNames[k] : "")
                     : (k - natalFigures < crossNames.length ? crossNames[k - natalFigures] : "");
                 Ink base = GlobeRenderer.patternInk(figure);
-                graphics2D.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(), 40));
+                // Faded behind whatever else is under the cursor, unless it is this figure.
+                double weight = panel.planeWeight(k);
+                graphics2D.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(),
+                    (int) Math.round(40 * weight)));
                 graphics2D.fillPolygon(xs, ys, xs.length);
                 for (float[] pass : GlobeRenderer.rimPasses()) {
-                    int alpha = (int) Math.round(Math.max(10, Math.min(255, 60 * pass[1])));
+                    int alpha = (int) Math.round(Math.max(10, Math.min(255, 60 * pass[1])) * weight);
                     graphics2D.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(),
                         alpha));
                     graphics2D.setStroke(new BasicStroke(pass[0], BasicStroke.CAP_ROUND,

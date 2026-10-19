@@ -2613,9 +2613,74 @@ implements WheelSource, GlobeSource {
                     : (this.isSynastryChart() ? "Chart B" : "transits"))
                 .append(")</span>");
         }
-        return "<html><div style='padding:4px;'><b>" + names[k] + "</b><br>"
-            + (between ? "A figure between the charts" : "A figure in Chart A")
-            + "<br>" + who + "</div></html>";
+        // The body card's own ground and ink (PlacementText.hoverCard), so it reads on any
+        // tooltip - the first version had neither and came out light grey on white.
+        return "<html><body style='width:250px; font-family:SansSerif; font-size:11px;"
+            + " background:#12151A; color:#E0E0E0;'>"
+            + "<div style='font-size:13px;'><b>" + names[k] + "</b></div>"
+            + "<div style='color:#9AA5B1;'>"
+            + (between ? "A figure between the charts" : "A figure in Chart A") + "</div>"
+            + "<div style='margin-top:4px;'>" + who + "</div></body></html>";
+    }
+
+    /**
+     * The figures between the charts, as a section for the top of the Transits page (or Chart
+     * B's): what each glass plane is, and whose bodies hold it. David, 2026-10-18: "there is
+     * still no info at the top of transits letting me know what that blue square is". Each
+     * entry is a link a hover lights on the chart, as a pattern's entry is.
+     */
+    String crossFiguresSection() {
+        this.refreshCrossFigures();
+        if (this.crossFigures.length == 0) {
+            return "";
+        }
+        int natal = this.autoPatterns.length;
+        StringBuilder sb = new StringBuilder();
+        sb.append("<h2 style='color:#E0E0E0; margin-top:10px;'><b>Figures between the charts</b></h2>");
+        sb.append("<p style='color:#9AA5B1; font-size:11px;'>The coloured glass planes on the"
+            + " chart: patterns your chart makes with the other one. Hover one to light it.</p>");
+        for (int k = 0; k < this.crossFigures.length; k++) {
+            // A colon, not a bar: the grid's aspect hrefs end in "|<ring>'", and AspectGridCheck
+            // counts those to tell which rings the grid carries - "figure|2'" read as a sky cell.
+            String href = "figure:" + (natal + k);
+            sb.append("<div style='margin-bottom:4px;'><a href='").append(href)
+                .append("' style='color:#FFD166; text-decoration:none;'><b>")
+                .append(this.crossFigureNames[k]).append("</b></a>");
+            StringBuilder who = new StringBuilder();
+            for (int m : this.crossFigures[k]) {
+                int ring = WheelLayout.hitRing(m);
+                if (who.length() > 0) {
+                    who.append(", ");
+                }
+                who.append(Bodies.at(WheelLayout.hitBody(m)).name).append(" (")
+                    .append(ring == WheelLayout.WHEEL_NATAL ? "Chart A"
+                        : ring == WheelLayout.WHEEL_SKY ? "sky"
+                        : (this.isSynastryChart() ? "Chart B" : "transits"))
+                    .append(")");
+            }
+            sb.append("<div style='font-size:11px;'><a href='").append(href)
+                .append("' style='color:#dddddd; text-decoration:none;'>").append(who)
+                .append("</a></div></div>");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * How strongly a figure's glass plane is drawn: full with nothing hovered, full for the lit
+     * figure itself, and faded behind anything else under the cursor - a body, an aspect or
+     * another figure. David, 2026-10-18: "When an aspect is hovered over even the triangle and
+     * square should fade into the back unless its the thing being hovered over".
+     *
+     * @param k the figure, in allFigures order
+     */
+    @Override
+    public double planeWeight(int k) {
+        if (this.figureLit()) {
+            int[][] all = this.allFigures();
+            return k >= 0 && k < all.length && java.util.Arrays.equals(all[k], this.litFigure)
+                ? 1.0 : FOCUS_DIM;
+        }
+        return this.aspectLit() || !this.noFocus() ? FOCUS_DIM : 1.0;
     }
 
     /** True for one of the lit aspect's two bodies, on the ring it is on. */
@@ -6354,9 +6419,25 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     public boolean setHighlightedAspect(String href) {
         // A pattern's entry under the cursor lights its figure (2026-10-18).
         String[] figure = InterpretationPanel.parsePatternHref(href);
-        boolean figureMoved = this.setLitFigure(figure == null ? null
-            : patternIndices(java.util.Arrays.asList(figure[1].split(","))), figure == null ? null : figure[0]);
-        if (figure != null) {
+        int figureIndex = -1;
+        if (figure == null && href != null && href.startsWith("figure:")) {
+            try {
+                figureIndex = Integer.parseInt(href.substring("figure:".length()));
+            } catch (NumberFormatException e) {
+                figureIndex = -1;
+            }
+        }
+        int[][] all = figureIndex >= 0 ? this.allFigures() : null;
+        boolean figureMoved;
+        if (all != null && figureIndex < all.length) {
+            figureMoved = this.setLitFigure(all[figureIndex], this.allFigureNames()[figureIndex]);
+            href = null;
+        } else {
+            figureMoved = this.setLitFigure(figure == null ? null
+                : patternIndices(java.util.Arrays.asList(figure[1].split(","))),
+                figure == null ? null : figure[0]);
+        }
+        if (figure != null || figureIndex >= 0) {
             href = null;
         }
         String[] parsed = parseAspectHref(href);
@@ -8171,6 +8252,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // be mislabelled by this method.
         this.assignRingKinds();
         final boolean outerIsPerson = this.outerRing.kind.isPerson;
+        // What the glass planes between the charts are, before the placements (2026-10-18).
+        if ((this.showTransitChart && (outerIsPerson ? wantChartB : wantTransits))
+                || (wantTransits && this.triRingDrawn())) {
+            stringBuilder.append(this.crossFiguresSection());
+        }
         if (this.showTransitChart && (outerIsPerson ? wantChartB : wantTransits)) {
             stringArray = this.outerCastLabel();
             if (stringArray.isEmpty() && this.outerRing.time != null) {

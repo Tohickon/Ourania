@@ -845,7 +845,9 @@ public final class GlobeRenderer {
                 continue;
             }
             Ink base = patternInk(names[k]);
-            final Ink fill = faded(shade(base, 40), Layer.ASPECTS);
+            // Faded behind whatever else is under the cursor, unless it is this figure.
+            double weight = this.panel.planeWeight(k);
+            final Ink fill = faded(shade(base, (int) Math.round(40 * weight)), Layer.ASPECTS);
             this.pieces.add(new Piece(depth, () -> {
                 this.g.color(fill);
                 this.g.fillPolygon(xs, ys, xs.length);
@@ -854,7 +856,8 @@ public final class GlobeRenderer {
             for (int i = 0; i <= n; i++) {
                 rim[i] = corners.get(i % n);
             }
-            glowingRim(rim, faded(shade(base, 60), Layer.ASPECTS), this.turning);
+            glowingRim(rim, faded(shade(base, (int) Math.round(60 * weight)), Layer.ASPECTS),
+                this.turning);
         }
     }
 

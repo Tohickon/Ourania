@@ -68,6 +68,11 @@ public interface GlobeSource {
         return false;
     }
 
+    /** How strongly a figure's glass plane is drawn, by its allFigures index; 1 with no hover. */
+    default double planeWeight(int k) {
+        return 1.0;
+    }
+
     /** How far a hover pulse's sparks have run, 0 to 1, or -1 when none are running. */
     default double pulse() {
         return -1.0;

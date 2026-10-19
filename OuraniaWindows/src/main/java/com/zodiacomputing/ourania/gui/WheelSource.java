@@ -85,6 +85,9 @@ interface WheelSource {
     /** How strongly a line on a ring is drawn under the focus, 1 when none. */
     double focusWeight(int a, int b, int wheel);
 
+    /** How strongly a figure's glass plane is drawn, by its allFigures index; 1 with no hover. */
+    double planeWeight(int k);
+
     /** How far a hover pulse's sparks have run, 0 to 1, or -1 when none are running. */
     double pulse();
 

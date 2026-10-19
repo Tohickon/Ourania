@@ -4127,6 +4127,21 @@ public final class GlobeCheck {
             eq("the plane on the wheel answers at its middle", 0, found[0]);
             String card = p.figureHoverHtml(0);
             yes("and its hover card says what it is: " + card, card != null && card.contains("Sun"));
+            yes("on the body card's own dark ground, so it can be read", card.contains("#12151A"));
+            near("with nothing hovered the plane is at full strength", 1.0, p.planeWeight(0), 0.0);
+            p.setHighlightedAspect("aspect|Venus|Mars|Square|0");
+            yes("behind a lit aspect it fades", p.planeWeight(0) < 1.0);
+            p.setHighlightedAspect(null);
+            p.setLitFigure(p.allFigures()[0], "T-square");
+            near("its own figure lit, it stays at full strength", 1.0, p.planeWeight(0), 0.0);
+            p.setLitFigure(null, null);
+            String section = p.crossFiguresSection();
+            yes("the Transits page says what the figures between the charts are",
+                section.contains("Figures between the charts") && section.contains("figure:"));
+            p.setHighlightedAspect("figure:" + p.autoPatterns().length);
+            yes("and hovering an entry lights that figure", p.figureLit());
+            p.setHighlightedAspect(null);
+
             ap.set(p, keep);
 
 
