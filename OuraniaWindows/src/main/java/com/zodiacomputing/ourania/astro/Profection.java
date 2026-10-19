@@ -54,6 +54,8 @@ public final class Profection {
 
     /** How long one profected month runs, in days. NaN until the sub-periods are computed. */
     public double monthLength = Double.NaN;
+    /** Where this profection year ends: the next solar return, the birthday it turns at. */
+    public double yearUntil = Double.NaN;
 
     private Profection() { }
 
@@ -166,6 +168,7 @@ public final class Profection {
         if (!(yearLength > 0.0)) {
             return;
         }
+        this.yearUntil = nextReturnJd;
         // <b>The year turns at the return, and at() could only guess that.</b> at() takes the
         // age from the calendar month and day, having no ephemeris to ask; the javadoc on
         // solarReturnJd already says why that is not the boundary - "a reading generated within

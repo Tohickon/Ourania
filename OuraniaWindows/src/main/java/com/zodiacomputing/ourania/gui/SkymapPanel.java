@@ -2640,6 +2640,10 @@ implements WheelSource, GlobeSource {
     private double selectionLon;
     private double selectionSpeed;
     private boolean selectionTransit;
+    /** The reading the card on screen was cut from, which a placement's reveal takes its words from. */
+    private String selectionReading = "";
+    /** The placement card the card on screen opens on, or null for a transit or an angle. */
+    private RevealPlan selectionPlan;
 
     /** Which sections of the selection card the reader has opened. Survives re-selection. */
     private final java.util.Set<String> selectionOpen = new java.util.LinkedHashSet<>();
@@ -2680,6 +2684,18 @@ implements WheelSource, GlobeSource {
         String reading = this.window == null ? "" : this.window.planetReadingHtml(
             BODY_NAMES[n], SIGN_NAMES[signIdx], degree, decan, house,
             this.getActiveAspectsFor(n, transit), lon);
+        this.selectionReading = reading;
+        // A natal placement opens on its card, which a click's reveal lands on.
+        this.selectionPlan = !transit && !Bodies.at(n).isAngle()
+            ? RevealPlan.forPlacement(BODY_NAMES[n], this.getActiveAspectsFor(n, false), reading)
+            : null;
+        if (this.selectionPlan != null) {
+            sb = new StringBuilder(this.selectionPlan.onTop(sb.toString()));
+            close = sb.lastIndexOf("</body>");
+            if (close < 0) {
+                close = sb.length();
+            }
+        }
 
         StringBuilder extra = new StringBuilder();
         String lead = leadParagraph(reading);
@@ -2799,7 +2815,7 @@ implements WheelSource, GlobeSource {
      * appears here, and neither can quietly fall behind the other. Index-keyed, so the open
      * set survives moving between bodies with the same shape of reading.
      */
-    private static java.util.List<String[]> readingSections(String html) {
+    static java.util.List<String[]> readingSections(String html) {
         java.util.List<String[]> out = new java.util.ArrayList<String[]>();
         if (html == null || html.isEmpty()) {
             return out;
@@ -3124,7 +3140,13 @@ implements WheelSource, GlobeSource {
                     return;
                 }
                 java.awt.Point at = SkymapPanel.this.toWheel(mouseEvent.getX(), mouseEvent.getY());
-                SkymapPanel.this.handleChartClick(at.x, at.y);
+                // A single click asks for what it opens, so a placement may form at its planet.
+                // The second click of a double has already been answered by the first.
+                if (mouseEvent.getClickCount() == 1) {
+                    SkymapPanel.this.askForPlacement(at.x, at.y);
+                } else {
+                    SkymapPanel.this.handleChartClick(at.x, at.y);
+                }
             }
 
             @Override
@@ -3647,7 +3669,7 @@ implements WheelSource, GlobeSource {
      * same place, same house system, same ephemeris - so this is a second view of chart B,
      * not a second opinion about it.
      */
-    private ChartFrame synastryChartB() {
+    ChartFrame synastryChartB() {
         if (this.sw == null || this.outerRing.sd == null) {
             return null;
         }
@@ -3709,8 +3731,7 @@ implements WheelSource, GlobeSource {
                 || this.sw == null || this.natalRing.sd == null || this.outerRing.sd == null) {
             return null;
         }
-        ChartFrame host = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
-            this.innerLat(), this.innerLon(), this.houseSystem);
+        ChartFrame host = this.synastryChartA();
         ChartFrame visitor = this.synastryChartB();
         if (host == null || visitor == null) {
             return null;
@@ -3724,12 +3745,30 @@ implements WheelSource, GlobeSource {
         return null;
     }
 
-    private String generateSynastryCrossHtml() {
+    /**
+     * Chart A's frame as a synastry reads it, or null when there is no pair to read.
+     *
+     * <b>The one construction of chart A for every cross-chart question</b> - the hover's
+     * angle contact, the cross-contact section and the Together page. Until 2026-10-16 the
+     * hover cast it from {@link #innerLat} and the section from the natal ring's own place,
+     * which agree only while the inner wheel is a birth chart. The inner wheel's place is the
+     * right one: it is the chart being drawn.
+     */
+    ChartFrame synastryChartA() {
         if (this.sw == null || this.natalRing.sd == null || this.outerRing.sd == null) {
-            return "";
+            return null;
         }
-        ChartFrame chartFrame = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
-            this.natalRing.latitude, this.natalRing.longitude, this.houseSystem);
+        return this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
+            this.innerLat(), this.innerLon(), this.houseSystem);
+    }
+
+    /** The reader's aspect switches, by {@link Aspects.Type} ordinal; a copy, for the Together page. */
+    boolean[] aspectSelection() {
+        return this.aspectShown == null ? null : this.aspectShown.clone();
+    }
+
+    private String generateSynastryCrossHtml() {
+        ChartFrame chartFrame = this.synastryChartA();
         ChartFrame chartFrame2 = this.synastryChartB();
         if (chartFrame == null || chartFrame2 == null) {
             return "";
@@ -4034,13 +4073,13 @@ implements WheelSource, GlobeSource {
             return;
         }
         if ("SNAPSHOT".equals(name)) {
-            this.showReading(ReadingTier.PARAGRAPH);
+            this.askForReading(ReadingTier.PARAGRAPH);
         } else if ("REPORT".equals(name)) {
-            this.showReading(ReadingTier.REPORT);
+            this.askForReading(ReadingTier.REPORT);
         } else if ("SYNTHESIZE".equals(name)) {
-            this.showReading(ReadingTier.SYNTHESIZE);
+            this.askForReading(ReadingTier.SYNTHESIZE);
         } else if ("TIMELINE".equals(name)) {
-            this.showReading(ReadingTier.TIMELINE);
+            this.askForReading(ReadingTier.TIMELINE);
         }
     }
 
@@ -4131,8 +4170,33 @@ implements WheelSource, GlobeSource {
         }.execute();
     }
 
+    /**
+     * True for the one showReading that the reader asked for; read and cleared at its start.
+     *
+     * <b>The reveal plays only for a request, never for a rebuild.</b> refreshReadingIfShown
+     * calls showReading on every chart change, which the transport makes several times a
+     * second; a reading forming on the wheel each time would turn a demonstration into noise.
+     * So the buttons and the sidebar come through {@link #askForReading}, and nothing else does.
+     */
+    private boolean readingAsked;
+
+    /** The reveal that shows a reading forming from its chart factors; made on first use. */
+    private ReadingReveal reveal;
+
+    /** A reading the reader asked for, which may be revealed rather than simply shown. */
+    void askForReading(ReadingTier tier) {
+        this.readingAsked = true;
+        this.showReading(tier);
+    }
+
     /** Package-private since B8, so a batch can ask for the same reading a reader would. */
     void showReading(final ReadingTier readingTier) {
+        final boolean asked = this.readingAsked;
+        this.readingAsked = false;
+        // Whatever is still forming lands now, so it cannot land later over this reading.
+        if (this.reveal != null) {
+            this.reveal.interrupt();
+        }
         if (this.sw == null || this.natalRing.sd == null || this.window == null || readingTier == ReadingTier.NONE) {
             return;
         }
@@ -4166,6 +4230,9 @@ implements WheelSource, GlobeSource {
         final double dNow = this.skyRing.sd != null
             ? this.skyRing.sd.getJulDay() : Double.NaN;
         new SwingWorker<String, Void>(){
+
+            /** The headline theme to reveal, when the reader asked and the year has one. */
+            private RevealPlan revealPlan;
 
             @Override
             protected String doInBackground() {
@@ -4210,7 +4277,10 @@ implements WheelSource, GlobeSource {
                 Chronometry time = Chronometry.at(SkymapPanel.this.sw, chartFrame, d, dNow, list,
                     bl ? d4 : Double.NaN, d5, d6, d2, d3, c,
                     readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE
-                        || readingTier == ReadingTier.TIMELINE);
+                        || readingTier == ReadingTier.TIMELINE,
+                    // Your year is the twelve months from now (David, 2026-10-17); the report
+                    // and Coming up keep the birthday year.
+                    readingTier == ReadingTier.SYNTHESIZE);
                 profection = time.profection;
                 chartFrame2 = time.transit;
                 list2 = time.hits;
@@ -4241,6 +4311,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // remembered by the checkbox that sets it: this tab regenerates on every
                     // open, so a state held in the widget would be lost the first time the
                     // reader looked at another page.
+                    // Asked or not: the page opens on the headline's card either way, so a
+                    // rebuild does not take away the card a reveal landed on.
+                    this.revealPlan = RevealPlan.firstHeadline(
+                        NarrativeSynthesizer.yearThemes(chartFrame, profection, yearScan, list3,
+                            bl, SkymapPanel.this.isRelationshipChart()),
+                        Settings.astrologerView());
                     return NarrativeSynthesizer.generateReport(chartFrame, result, list, result2, chartFrame2, profection, list2, yearScan, list3, bl,
                         SkymapPanel.this.isRelationshipChart(), Settings.readingMechanics());
                 }
@@ -4263,7 +4339,18 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (readingTier == ReadingTier.REPORT) {
                         SkymapPanel.this.window.showReport(string2, string, (String)this.get());
                     } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
-                        SkymapPanel.this.window.showSynthesis((String)this.get());
+                        // The page draws its own year card, with the id the reveal lands on.
+                        RevealPlan plan = this.revealPlan;
+                        String html = (String)this.get();
+                        RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, plan)
+                            ? SkymapPanel.this.revealScene(plan, REVEAL_AT_CENTRE) : null;
+                        if (scene != null) {
+                            SkymapPanel.this.reveal().play(scene,
+                                () -> SkymapPanel.this.window.showSynthesis(html),
+                                SkymapPanel.this.landingFor(plan));
+                        } else {
+                            SkymapPanel.this.window.showSynthesis(html);
+                        }
                     } else {
                         SkymapPanel.this.window.showSnapshotCards(string2, string, (String)this.get());
                     }
@@ -4275,7 +4362,283 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }.execute();
     }
 
+    /** The focal point a headline theme forms at: the chart's centre, not any one body. */
+    static final int REVEAL_AT_CENTRE = -1;
+
+    /**
+     * Where a reveal is drawn: the wheel's centre and radius, the chart factors' glyphs, and the
+     * reading pane, all in the window's layered pane. Null when the wheel cannot show it - the
+     * globe is up, the wheel is not on screen, or none of the factors is drawn - in which case
+     * the reading is simply shown.
+     *
+     * @param focalBody the natal body the card forms at, or {@link #REVEAL_AT_CENTRE}
+     */
+    RevealPainter.Scene revealScene(RevealPlan plan, int focalBody) {
+        if (plan == null || this.chartPanel == null || !this.chartPanel.isShowing()
+                || this.isGlobeMode() || this.window == null) {
+            return null;
+        }
+        javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(this.chartPanel);
+        return root == null ? null : this.sceneOn(plan, focalBody, root.getLayeredPane());
+    }
+
+    /**
+     * The scene itself, on a given layered pane. Split from {@link #revealScene} so a check can
+     * ask where a reveal would be drawn without putting a window on the screen.
+     *
+     * <b>Positions are the painter's own</b>: {@link Geometry#natalRadii} and the canonical
+     * screenX/screenY, the same chain the hit test uses, so a thread ends on the glyph it names
+     * and a placement's card forms on the glyph that was clicked.
+     */
+    RevealPainter.Scene sceneOn(RevealPlan plan, int focalBody, javax.swing.JLayeredPane lp) {
+        Geometry g = this.geometry();
+        if (plan == null || g == null || this.window == null) {
+            return null;
+        }
+        List<java.awt.Point> points = new ArrayList<>();
+        for (String name : plan.points()) {
+            java.awt.Point p = this.pointOn(g, name, lp);
+            if (p != null) {
+                points.add(p);
+            }
+        }
+        if (points.isEmpty()) {
+            return null;
+        }
+        java.awt.Point centre = this.onScreen(g.cx, g.cy, lp);
+        java.awt.Point focal = focalBody == REVEAL_AT_CENTRE ? centre
+            : focalBody == REVEAL_AT_FIRST ? this.pointOn(g, plan.points().get(0), lp)
+            : this.glyphOn(g, this.natalRing, g.natalRadii(), focalBody, lp);
+        if (focal == null) {
+            return null;
+        }
+        int radius = (int) Math.round(this.view.zoom()
+            * Math.min(this.chartPanel.getWidth(), this.chartPanel.getHeight()) / 2.0);
+        return new RevealPainter.Scene(centre, radius, points, focal,
+            this.window.readingLanding(lp), plan, Color.BLACK);
+    }
+
+    /** The focal point of a transit's card: its first factor, the planet in the sky. */
+    static final int REVEAL_AT_FIRST = -2;
+
+    /**
+     * A plan's point on screen: a natal body by name, or {@link RevealPlan#SKY} + a name for
+     * a body on the ring the Now page reads ({@link #nowRing}), when that ring is drawn.
+     */
+    private java.awt.Point pointOn(Geometry g, String name, javax.swing.JLayeredPane lp) {
+        boolean sky = name.startsWith(RevealPlan.SKY);
+        String bare = sky ? name.substring(RevealPlan.SKY.length()) : name;
+        int i = Bodies.indexOfName(bare);
+        if (i < 0) {
+            i = Bodies.indexOf(bare.toLowerCase(java.util.Locale.ROOT));
+        }
+        if (!sky) {
+            return this.glyphOn(g, this.natalRing, g.natalRadii(), i, lp);
+        }
+        WheelRing now = this.nowRing();
+        if (now == this.outerRing && this.outerRingDrawn()) {
+            return this.glyphOn(g, now, g.transitRadii(), i, lp);
+        }
+        if (now == this.skyRing && this.triRingDrawn()) {
+            return this.glyphOn(g, now, g.triRadii(), i, lp);
+        }
+        return null;
+    }
+
+    /** A body's glyph on one ring, in the layered pane, or null when it is not drawn. */
+    private java.awt.Point glyphOn(Geometry g, WheelRing ring, int[] radii, int i,
+            javax.swing.JLayeredPane lp) {
+        if (i < 0 || i >= ring.lon.length || !ring.valid[i]) {
+            return null;
+        }
+        return this.onScreen(SkymapPanel.screenX(g.cx, g.pin, ring.lon[i], radii[i]),
+            SkymapPanel.screenY(g.cy, g.pin, ring.lon[i], radii[i]), lp);
+    }
+
+    /**
+     * The ring the Now page reads its transits from: the outer ring when it holds a moment,
+     * else the sky ring when it has one. One rule, asked by the page and by its pop-ups, so a
+     * card cannot form at a planet on a different ring from the one its card describes.
+     */
+    WheelRing nowRing() {
+        return this.outerRing.kind.readsAsEvent() ? this.outerRing
+            : (this.skyRing.time != null ? this.skyRing : this.outerRing);
+    }
+
+    /**
+     * Time has stopped on a moment the reader chose: Pause, the end of a scrub, or Now.
+     *
+     * <b>Never a tick of Play</b>, which moves time several times a second; pop-ups on every
+     * tick would be noise, the reason the reading's rebuild never reveals either. Queued, so
+     * the chart and the Now page are rebuilt for this moment before anything is read.
+     */
+    private void timeSettled() {
+        if (this.window == null) {
+            return;
+        }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            // The whole timeline, which the page leaves out while time is running.
+            this.window.refreshTransitsPane();
+            if (ReadingReveal.allowed()) {
+                this.popTransits();
+            }
+        });
+    }
+
+    /**
+     * The transits of this moment as pop-ups: the three nearest their exact moment, in that
+     * order, each forming at its planet in the sky with a thread to the natal point it touches,
+     * and landing on its own card on the Now page. A click or a key ends the chain.
+     */
+    void popTransits() {
+        if (this.isPlaying || this.isScrubbing() || this.sw == null || this.natalRing.sd == null
+                || this.window == null) {
+            return;
+        }
+        // <b>The page first, then the wheel is measured.</b> Opening the rail moves the wheel and
+        // the pages lay out as it opens, so a chain that opened the page at its first landing
+        // measured a card 150 px wide, and its threads pointed at where the glyphs had been.
+        this.window.revealPage(OuraniaWindow.TRANSITS_PAGE);
+        javax.swing.Timer settle = new javax.swing.Timer(RAIL_SETTLE_MS, e -> this.playTransits());
+        settle.setRepeats(false);
+        settle.start();
+    }
+
+    /** How long the rail takes to open, so the wheel is measured where it comes to rest. */
+    static final int RAIL_SETTLE_MS = 450;
+
+    private void playTransits() {
+        if (this.isPlaying || this.isScrubbing()) {
+            return;
+        }
+        WheelRing now = this.nowRing();
+        if (now == null || now.sd == null) {
+            return;
+        }
+        double jd = now.sd.getJulDay();
+        List<Object[]> chain = new ArrayList<>();
+        if (!Settings.astrologerView()) {
+            // Plain view: the first cards of the timeline, in its order - right now, then
+            // today, and on - which is the order they occur.
+            List<NowTimeline.Entry> page = NowCards.visible(
+                NowTimeline.build(this.sw, now, this.natalRing, this.activeCusps));
+            for (NowTimeline.Entry e : page.subList(0, Math.min(TransitCard.POP_COUNT, page.size()))) {
+                this.chainUp(chain, e.hit(), e.card());
+            }
+        } else {
+            // Only contacts the Now page shows a card for, so each pop-up has a card to land on.
+            for (NowCards.TransitHit h : TransitCard.firstToPop(
+                    NowCards.shown(NowCards.findHits(now, this.natalRing, this.activeCusps), true),
+                    h -> TransitCard.daysFromExact(this.sw, h, jd), TransitCard.POP_COUNT)) {
+                this.chainUp(chain, h, TransitCard.of(h));
+            }
+        }
+        this.popNext(chain, 0);
+    }
+
+    /** One pop-up in a chain: the card, the scene it forms in, and its card's id on the page. */
+    private void chainUp(List<Object[]> chain, NowCards.TransitHit h, ReadingCard card) {
+        RevealPlan plan = RevealPlan.forTransit(h, card);
+        RevealPainter.Scene scene = this.revealScene(plan, REVEAL_AT_FIRST);
+        if (scene != null) {
+            chain.add(new Object[] {scene, TransitCard.id(h), plan});
+        }
+    }
+
+    private void popNext(List<Object[]> chain, int k) {
+        if (k >= chain.size() || this.window == null) {
+            return;
+        }
+        Object[] item = chain.get(k);
+        RevealPlan plan = (RevealPlan) item[2];
+        // The page is already open. Astrologer view shows the corpus card for the contact, so
+        // there the card is found by its id alone.
+        this.reveal().play((RevealPainter.Scene) item[0], null,
+            this.landingFor((String) item[1], Settings.astrologerView() ? null : plan.title()),
+            TransitCard.POP_MS, () -> this.popNext(chain, k + 1));
+    }
+
+    /**
+     * A wheel point where the reader sees it, in the layered pane. Through the view's own
+     * transform, the one the painter draws with, so a zoomed or panned wheel's card still forms
+     * on the glyph that was clicked.
+     */
+    private java.awt.Point onScreen(int x, int y, javax.swing.JLayeredPane lp) {
+        java.awt.geom.Point2D p = this.viewTransform(this.viewW(), this.viewH())
+            .transform(new java.awt.geom.Point2D.Double(x, y), null);
+        return javax.swing.SwingUtilities.convertPoint(this.chartPanel,
+            (int) Math.round(p.getX()), (int) Math.round(p.getY()), lp);
+    }
+
+    /**
+     * A click on the wheel, as the reader's request for what it opens.
+     *
+     * <b>The same one-shot flag {@link #askForReading} sets</b>, and cleared on every exit:
+     * handleChartClick has many, and only the natal-placement one reads it. A flag left set by
+     * a click on empty space would make the next transport rebuild play a reveal.
+     */
+    void askForPlacement(int x, int y) {
+        this.readingAsked = true;
+        try {
+            this.handleChartClick(x, y);
+        } finally {
+            this.readingAsked = false;
+        }
+    }
+
+    /**
+     * Plays a placement's reveal, forming at its planet, and lands {@code card} at the end.
+     *
+     * <b>The factors are the reading's own.</b> The planet, and each body in the aspect list
+     * the reading was written from - {@link #getActiveAspectsFor}, which asks visibleAspect,
+     * the gate glyphWeight lights the wheel by. The words are the reading's heading and its
+     * first sentence under it. No ticks: a placement is not a vote, so nothing is counted.
+     *
+     * <b>The click that asked does not interrupt it.</b> The reveal starts on MOUSE_CLICKED,
+     * after this click's press; only a later press or key lands it.
+     *
+     * @return whether a reveal is playing; false means the caller shows the card at once
+     */
+    private boolean revealPlacement(int body, String card) {
+        boolean asked = this.readingAsked;
+        this.readingAsked = false;
+        RevealPlan plan = asked ? this.selectionPlan : null;
+        RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, plan)
+            ? this.revealScene(plan, body) : null;
+        if (scene == null) {
+            return false;
+        }
+        // From the top, so the card the reveal lands on is the one in view.
+        this.reveal().play(scene, () -> this.window.showSelection(card, true),
+            this.landingFor(plan));
+        return true;
+    }
+
+    /** Where a plan's real card is on the page, asked of the window's layered pane. */
+    private java.util.function.Supplier<java.awt.Rectangle> landingFor(RevealPlan plan) {
+        return this.landingFor(RevealPlan.CARD_ID, plan.title());
+    }
+
+    /** Where the card with this id, and this heading if one is given, is on the page. */
+    private java.util.function.Supplier<java.awt.Rectangle> landingFor(String id, String headline) {
+        javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(this.chartPanel);
+        return root == null ? null
+            : () -> ReadingReveal.cardOnPage(root.getLayeredPane(), id, headline, true);
+    }
+
+    private ReadingReveal reveal() {
+        if (this.reveal == null) {
+            this.reveal = new ReadingReveal(
+                javax.swing.SwingUtilities.getRootPane(this.chartPanel).getLayeredPane());
+        }
+        return this.reveal;
+    }
+
     private void refreshReadingIfShown() {
+        // The chart moved, so a reveal's threads would point at where the glyphs were.
+        if (this.reveal != null) {
+            this.reveal.interrupt();
+        }
         if (this.readingTier == ReadingTier.NONE || this.isPlaying) {
             return;
         }
@@ -4408,16 +4771,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         jButton6.addActionListener(actionEvent -> jumpToNow());
         JButton jButton7 = new JButton("Snapshot");
         jButton7.setToolTipText("Read the natal chart as it currently stands");
-        jButton7.addActionListener(actionEvent -> this.showReading(ReadingTier.PARAGRAPH));
+        jButton7.addActionListener(actionEvent -> this.askForReading(ReadingTier.PARAGRAPH));
         JButton jButton8 = new JButton("Report");
         jButton8.setToolTipText("The full reading: shape, weights, repeated themes, tensions");
-        jButton8.addActionListener(actionEvent -> this.showReading(ReadingTier.REPORT));
+        jButton8.addActionListener(actionEvent -> this.askForReading(ReadingTier.REPORT));
         JButton jButton9 = new JButton("Synthesize");
         jButton9.setToolTipText("Generate a narrative reading based on the chart");
-        jButton9.addActionListener(actionEvent -> this.showReading(ReadingTier.SYNTHESIZE));
+        jButton9.addActionListener(actionEvent -> this.askForReading(ReadingTier.SYNTHESIZE));
         JButton jButton9_2 = new JButton("Predict");
         jButton9_2.setToolTipText("Generate a timeline prediction based on the chart");
-        jButton9_2.addActionListener(actionEvent -> this.showReading(ReadingTier.TIMELINE));
+        jButton9_2.addActionListener(actionEvent -> this.askForReading(ReadingTier.TIMELINE));
         JButton jButton10 = new JButton("Calendar");
         jButton10.setToolTipText("Ingresses, stations, lunations and mundane aspects for the year");
         jButton10.addActionListener(actionEvent -> this.showAnnualCalendar());
@@ -4720,10 +5083,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             double[] spd = this.focusTransit ? this.outerRing.speed : this.natalRing.speed;
             if (this.focusBody < lon.length) {
                 // The same card the tooltip builds - one description of a body, shown in two
-                // places rather than written twice.
-                this.window.showSelection(
-                    this.selectionHtml(this.focusBody, lon[this.focusBody], spd[this.focusBody],
-                        this.focusTransit));
+                // places rather than written twice. A natal placement the reader asked for
+                // forms at its planet first, and this same card lands at the end.
+                String card = this.selectionHtml(this.focusBody, lon[this.focusBody],
+                    spd[this.focusBody], this.focusTransit);
+                boolean placement = !this.focusTransit && !Bodies.at(this.focusBody).isAngle();
+                if (!placement || !this.revealPlacement(this.focusBody, card)) {
+                    this.window.showSelection(card);
+                }
                 // <b>The natal-body exit, which this method's own list of exits promised and
                 // did not have.</b> Everything below resolves by radius, and the last two
                 // branches are "inside the body ring is a house, outside it is a sign" - so a
@@ -4738,7 +5105,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // angles, which showAngleAt reads in full, and anything on the transit or sky
                 // ring, whose branches list its contacts back to Chart A and Chart B. Guarding
                 // only on isAngle cost exactly those two sky assertions in AspectGridCheck.
-                if (!this.focusTransit && !Bodies.at(this.focusBody).isAngle()) {
+                if (placement) {
                     // <b>And the full reading, not just the card.</b> The card is a summary -
                     // degree, house, decan, one line of Sabian - and reaching the placement's
                     // actual meaning took four more steps: Interpretations, then the index,
@@ -5882,12 +6249,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * the fourth caller rather than copied into it.
      */
     static String boldLead(String prose) {
-        if (prose == null) {
-            return null;
-        }
-        int open = prose.indexOf("<b>");
-        int close = prose.indexOf("</b>", open + 3);
-        return open >= 0 && close > open ? prose.substring(open + 3, close) : null;
+        // Lives on ReadingCard since 2026-10-16, beside the code that splits a reading into a
+        // card; kept here as one line so the panel's own callers did not all have to move.
+        return ReadingCard.boldLead(prose);
     }
 
     /** The bold lead of the interpretation - the one-sentence finding - or null. */
@@ -6735,7 +7099,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     void endScrub() {
+        boolean was = this.scrub.isScrubbing();
         this.scrub.end();
+        if (was) {
+            this.timeSettled();
+        }
     }
 
     /**
@@ -6819,6 +7187,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     /** Starts or stops time, leaving the direction and rate alone. */
     void playPause() {
         this.isPlaying = !this.isPlaying;
+        if (!this.isPlaying) {
+            this.timeSettled();
+        }
     }
 
     /** True while time is running, so a check can see what the control did. */
@@ -6856,6 +7227,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.chartPanel != null) {
             this.chartPanel.repaint();
         }
+        this.timeSettled();
     }
 
     /**
@@ -7274,6 +7646,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             System.arraycopy(this.natalRing.cusps, 0, this.activeCusps, 0, this.activeCusps.length);
             this.activeAscendant = this.natalRing.ascendant;
         }
+        this.pushPlacementPages();
+        this.refreshTimeReadout();
+        this.refreshReadingIfShown();
+        // Which charts are on the wheel decides which scrub bars there are.
+        this.refreshScrubBars();
+    }
+
+    /** Writes every placements page to its accordion section. */
+    private void pushPlacementPages() {
         if (this.window != null) {
             // Three parts, three accordion sections. One document would mean the
             // sidebar could only show or hide all of it at once, which is what it did before.
@@ -7284,10 +7665,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.generatePlanetPlacementsHtml(PlacementPart.SYNASTRY),
                 this.generatePlanetPlacementsHtml(PlacementPart.CHART_B));
         }
-        this.refreshTimeReadout();
-        this.refreshReadingIfShown();
-        // Which charts are on the wheel decides which scrub bars there are.
-        this.refreshScrubBars();
+    }
+
+    /**
+     * Opens or closes the body paragraphs on the Together page, and redraws the pages.
+     * The open/closed state lives in {@link SynastryPage}, which draws the links.
+     */
+    public void toggleSynastryDetail(String key) {
+        SynastryPage.toggleDetail(key);
+        this.pushPlacementPages();
     }
 
     /**

@@ -2341,14 +2341,32 @@ public final class NavigationCheck {
             final javax.swing.JEditorPane selectionPane =
                 (javax.swing.JEditorPane) fieldOf(w[0], "selectionPane");
 
-            final String[] html = new String[1];
-            SwingUtilities.invokeAndWait(() -> html[0] = natal.getText());
-            if (!html[0].contains("pattern|")) {
-                String banner = PlacementText.patternEntryHtml(figure("Grand trine",
-                    java.util.List.of("Moon", "Sun", "Venus"), null, "air", null));
-                SwingUtilities.invokeAndWait(() -> natal.setText(
-                    html[0].replaceFirst("(?i)<body[^>]*>", "$0" + banner)));
-            }
+            final SkymapPanel sky = (SkymapPanel) fieldOf(w[0], "skymapPanel");
+            com.zodiacomputing.ourania.astro.ChartSubject skyNow =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Sky",
+                    java.time.ZonedDateTime.of(2026, 3, 1, 12, 0, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            com.zodiacomputing.ourania.astro.ChartSubject person =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart A",
+                    java.time.ZonedDateTime.of(1982, 8, 10, 15, 1, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            java.lang.reflect.Method install = SkymapPanel.class.getDeclaredMethod(
+                "installSubjects",
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class);
+            install.setAccessible(true);
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    install.invoke(sky, person,
+                        com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart B"), skyNow);
+                    sky.updateChartData();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
             final java.util.Map<String, java.awt.Point> links = new java.util.LinkedHashMap<>();
             SwingUtilities.invokeAndWait(() -> {
@@ -2395,7 +2413,7 @@ public final class NavigationCheck {
             for (java.util.Map.Entry<String, java.awt.Point> link : links.entrySet()) {
                 final boolean isPattern = link.getKey().startsWith("pattern|");
                 SwingUtilities.invokeAndWait(() -> {
-                    rail.reveal(OuraniaWindow.CHART_PAGE);
+                    w[0].revealPage(OuraniaWindow.CHART_PAGE);
                     if (isPattern) {
                         // Filler, scrolled well down a real-sized viewport, so a page that
                         // neither changes nor returns to its heading is seen doing neither.
@@ -2510,7 +2528,7 @@ public final class NavigationCheck {
             for (int i = 0; i < points.size(); i++) {
                 final java.awt.Point pt = points.get(i);
                 SwingUtilities.invokeAndWait(() -> {
-                    rail.reveal(OuraniaWindow.CHART_PAGE);
+                    w[0].revealPage(OuraniaWindow.CHART_PAGE);
                     selectionPane.setText("<html><body></body></html>");
                     long t = System.currentTimeMillis();
                     for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
@@ -2522,7 +2540,8 @@ public final class NavigationCheck {
                 });
                 SwingUtilities.invokeAndWait(() -> { });
                 boolean opened = OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage())
-                    && selectionPane.getText().toLowerCase().contains(owners.get(i).toLowerCase());
+                    && selectionPane.getText().replaceAll("<[^>]+>", "").toLowerCase()
+                        .contains(owners.get(i).toLowerCase());
                 if (!opened) {
                     dead.computeIfAbsent(owners.get(i), k -> new StringBuilder()).append(glyphs.get(i));
                 }

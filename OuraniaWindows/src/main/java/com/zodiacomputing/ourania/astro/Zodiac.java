@@ -439,15 +439,13 @@ public final class Zodiac {
      * shape every defect in the work plan's recurring-defect section starts as.
      */
     public static String ordinal(int n) {
-        switch (n) {
-            case 1:  return "1st";
-            case 2:  return "2nd";
-            case 3:  return "3rd";
-            case 21: return "21st";
-            case 22: return "22nd";
-            case 23: return "23rd";
-            default: return n + "th";
-        }
+        // General, not a table: the table stopped at 23 and said "31th", which a profection
+        // year or an age reaches. The gui then grew four private copies that got it right,
+        // and the copies had begun to disagree with the original. One rule, here.
+        int t = n % 100;
+        String suffix = t >= 11 && t <= 13 ? "th"
+            : n % 10 == 1 ? "st" : n % 10 == 2 ? "nd" : n % 10 == 3 ? "rd" : "th";
+        return n + suffix;
     }
 
     /**

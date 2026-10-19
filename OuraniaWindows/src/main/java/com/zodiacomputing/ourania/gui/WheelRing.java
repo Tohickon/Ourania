@@ -209,4 +209,15 @@ public final class WheelRing {
     /** Where this ring was cast for. Greenwich until something says otherwise. */
     public double latitude = 51.4779;
     public double longitude = 0.0;
+
+    /**
+     * Whether a plain page should list this body: on this ring, or past what the ring knows.
+     *
+     * <b>One test for every page that lists "what the wheel shows"</b> - Life areas and both
+     * Together pages. An index past the array counts as shown, because a body the ring was
+     * never sized for is a body nobody switched off.
+     */
+    boolean shows(int index) {
+        return valid == null || index >= valid.length || valid[index];
+    }
 }

@@ -49,8 +49,16 @@ public class OuraniaWindow extends JFrame {
     private javax.swing.JEditorPane natalPane;
     private javax.swing.JEditorPane transitPane;
     private javax.swing.JEditorPane chartBPane;
+    /** Together's own pages: where two charts meet, and the chemistry between them. */
+    private SubRail together;
+    /** Where you meet. Kept under its old name; it is the pane the Synastry page always was. */
     private javax.swing.JEditorPane synastryPane;
+    private javax.swing.JEditorPane chemistryPane;
     private javax.swing.JEditorPane selectionPane;
+    /** Every "Show the astrology" box on a plain page, so ticking one shows in all of them. */
+    private final java.util.List<javax.swing.JCheckBox> astrologerChecks = new java.util.ArrayList<>();
+    private String lastTransitHtml = "";
+    private String lastSynastryHtml = "";
     /** The right rail: what the app can do, and the grid that is read against the wheel. */
     private DrawerRail menuRail;
     /** The Index tab's content (G11). Package-private so the check can ask what it is showing. */
@@ -89,7 +97,22 @@ public class OuraniaWindow extends JFrame {
      * "where did the transit tab go in a synastry transits chart". One tab was doing two jobs.
      */
     public static final String CHART_B_PAGE = "Chart B";
+    /**
+     * The Together door, and also the first page behind it, Where you meet - the same string
+     * for both, as Chart is for Blueprint, so every caller that held this name still lands on
+     * the pair's first page. Write {@link #MEET_PAGE} where the page is meant, not the door.
+     *
+     * <b>The trap this carries, as Blueprint's does:</b> {@code setPageLabel(SYNASTRY_PAGE)}
+     * finds the page inside the strip first and renames that. Rename the door on
+     * {@code chartRail} directly.
+     */
     public static final String SYNASTRY_PAGE = "Synastry";
+    /** The Where you meet page, by the key it shares with its door; see {@link #SYNASTRY_PAGE}. */
+    public static final String MEET_PAGE = SYNASTRY_PAGE;
+    /** What the Where you meet page is called on its tab. */
+    static final String MEET_LABEL = "Where you meet";
+    /** The second page behind Together: the aspects between two charts (2026-10-16). */
+    public static final String CHEMISTRY_PAGE = "Chemistry";
     public static final String SELECTION_PAGE = "Selection";
     /** What kind of chart this is, before any of the detail. */
     public static final String OVERVIEW_PAGE = "Overview";
@@ -320,13 +343,23 @@ public class OuraniaWindow extends JFrame {
         chronometry = new SubRail();
         blueprint.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
         blueprint.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
-        chronometry.addPage(TRANSITS_PAGE, HtmlPanes.scroller(transitPane));
-        // <b>Synastry is a rail tab with one page, and that is not an oversight.</b> It is a
-        // question about a pair, which is neither of the two people and not a moment either -
-        // so it is its own door. A SubRail holding one tab would draw a strip with a single
-        // item in it, which is furniture claiming to be navigation.
+        chronometry.addPage(TRANSITS_PAGE, astrologerPage(transitPane, "<html>Astrologer view: "
+            + "on, show the exact aspects, orbs, and planetary coordinates.<br>Off: plain weekly "
+            + "and seasonal takeaways only.</html>"));
+        // <b>Together is a question about a pair</b>, which is neither of the two people and not
+        // a moment either - so it is its own door. It was one page until Phase 4 (2026-10-16);
+        // it is two now, where the charts meet and the chemistry between them, so it has a
+        // strip like the other two doors. A strip of one would be furniture claiming to be
+        // navigation, which is why it had none before.
+        chemistryPane = HtmlPanes.chartPane(this);
+        together = new SubRail();
+        String pairTip = "<html>Astrologer view: on, show the houses, signs, angles and orbs "
+            + "behind each card.<br>Off: the plain reading only.</html>";
+        together.addPage(MEET_PAGE, astrologerPage(synastryPane, pairTip));
+        together.addPage(CHEMISTRY_PAGE, astrologerPage(chemistryPane, pairTip));
+        together.setPageLabel(MEET_PAGE, MEET_LABEL);
         chartRail.addPage(BLUEPRINT_PAGE, blueprint);
-        chartRail.addPage(SYNASTRY_PAGE, HtmlPanes.scroller(synastryPane));
+        chartRail.addPage(SYNASTRY_PAGE, together);
         chartRail.addPage(CHRONOMETRY_PAGE, chronometry);
         // <b>The separators are gone, and so is what they were for.</b> They drew the
         // boundary between the charts, the views of them and the documents about them. That
@@ -357,6 +390,7 @@ public class OuraniaWindow extends JFrame {
         chartRail.setPageLabel(CHRONOMETRY_PAGE, NOW_LABEL);
         chartRail.prepare(BLUEPRINT_PAGE);
         blueprint.prepare(CHART_PAGE);
+        together.prepare(MEET_PAGE);
         chronometry.prepare(TRANSITS_PAGE);
         add(chartRail, BorderLayout.WEST);
 
@@ -430,8 +464,7 @@ public class OuraniaWindow extends JFrame {
         // has to rebuild Predict, not reveal a stale card. The rail reports the tab; the tab
         // asks its own strip to report the page, and the one listener below handles both.
         chartRail.setOnSelect(tab -> {
-            SubRail inside = BLUEPRINT_PAGE.equals(tab) ? blueprint
-                : CHRONOMETRY_PAGE.equals(tab) ? chronometry : null;
+            SubRail inside = strips().get(tab);
             if (inside != null) {
                 inside.refire();
             }
@@ -457,6 +490,14 @@ public class OuraniaWindow extends JFrame {
                 }
                 return;
             }
+            if (TRANSITS_PAGE.equals(page)) {
+                refreshTransitsPane();
+                return;
+            }
+            if (MEET_PAGE.equals(page) || CHEMISTRY_PAGE.equals(page)) {
+                refreshTogetherPanes();
+                return;
+            }
             for (String[] r : READINGS) {
                 if (r[0].equals(page)) {
                     // Regenerated on each open. A reading is a snapshot of a moment, and the
@@ -468,6 +509,7 @@ public class OuraniaWindow extends JFrame {
             }
         };
         blueprint.setOnSelect(onPage);
+        together.setOnSelect(onPage);
         chronometry.setOnSelect(onPage);
 
         // Nothing has been clicked yet, so Selection has nothing to show.
@@ -540,6 +582,11 @@ public class OuraniaWindow extends JFrame {
 
         // After skymapPanel, because applying a selection calls straight into it.
         contentPanel.add(new SettingsPanel(this), "SETTINGS");
+
+        // Sync the wheel's ring bar so chips reflect whether charts exist on cold open
+        if (skymapPanel != null) {
+            syncRingBar(skymapPanel.ringBarComponent());
+        }
     }
 
     /**
@@ -1076,6 +1123,7 @@ public class OuraniaWindow extends JFrame {
 
     public void updateChartSections(String natalHtml, String transitHtml, String gridHtml,
             String synastryHtml, String chartBHtml) {
+        this.lastTransitHtml = transitHtml;
         if (chartBPane != null) {
             HtmlPanes.setHtml(chartBPane, chartBHtml);
         }
@@ -1084,20 +1132,20 @@ public class OuraniaWindow extends JFrame {
             // transits: a tab that opens onto nothing reads as broken rather than as empty.
             setPageEnabled(CHART_B_PAGE, hasContent(chartBHtml));
         }
-        if (synastryPane != null) {
-            HtmlPanes.setHtml(synastryPane, synastryHtml);
-        }
+        this.lastSynastryHtml = synastryHtml;
+        refreshTogetherPanes();
         if (chartRail != null) {
             // Greyed unless there are two people, for the reason the Transits page is greyed
             // without transits: a tab that opens onto nothing reads as broken rather than empty.
-            setPageEnabled(SYNASTRY_PAGE, hasContent(synastryHtml));
+            // Both pages, so the door greys too - setPageEnabled greys a tab only when
+            // everything behind it is greyed.
+            setPageEnabled(MEET_PAGE, hasContent(synastryHtml));
+            setPageEnabled(CHEMISTRY_PAGE, hasContent(synastryHtml));
         }
         if (natalPane != null) {
             HtmlPanes.setHtml(natalPane, natalHtml);
         }
-        if (transitPane != null) {
-            HtmlPanes.setHtml(transitPane, transitHtml);
-        }
+        refreshTransitsPane();
         // <b>Greyed out on a chart drawn without transits.</b> The wheel still emits a transit
         // section for a single chart - the document wrapper with nothing in it - so the tab
         // opened onto a blank panel, which reads as broken rather than as empty. Measured on
@@ -1117,6 +1165,123 @@ public class OuraniaWindow extends JFrame {
         if (chartSetupPanel != null) {
             chartSetupPanel.refreshProfiles();
         }
+    }
+
+    /**
+     * Redraws the Now page as plain cards from the last transit section the wheel sent, in the
+     * current Astrologer view. <b>The one place that decides which ring is "now":</b> an event
+     * chart in the outer ring is the moment being read; otherwise the live sky, if it has one.
+     * An empty section is written as it came, so the greyed-tab state is unchanged.
+     */
+    public void refreshTransitsPane() {
+        syncAstrologerChecks();
+        if (transitPane == null) {
+            return;
+        }
+        if (skymapPanel == null || !hasContent(lastTransitHtml)) {
+            HtmlPanes.setHtml(transitPane, lastTransitHtml);
+            return;
+        }
+        // The wheel's rule, so the page and the pop-ups that land on it read the same ring.
+        WheelRing now = skymapPanel.nowRing();
+        // The timeline's dates cost a walk of the ephemeris, which the page does not take
+        // while time is running; it shows what is happening right now, and the rest when
+        // time stops (SkymapPanel.timeSettled).
+        boolean moving = skymapPanel.isPlaying() || skymapPanel.isScrubbing();
+        HtmlPanes.setHtml(transitPane, NowCards.html(now, skymapPanel.natalRing,
+            skymapPanel.activeCusps, Settings.astrologerView(), lastTransitHtml,
+            moving ? null : skymapPanel.sw));
+    }
+
+    /**
+     * Redraws the two Together pages as plain cards from the pair on the wheel, in the current
+     * Astrologer view. Without a pair - no second chart, or the wheel not built yet - the
+     * section is written as it came, so the greyed-tab state is unchanged.
+     */
+    private void refreshTogetherPanes() {
+        syncAstrologerChecks();
+        if (synastryPane == null || chemistryPane == null) {
+            return;
+        }
+        TogetherCards.Pair pair = synastryPair();
+        if (pair == null || !hasContent(lastSynastryHtml)) {
+            HtmlPanes.setHtml(synastryPane, lastSynastryHtml);
+            HtmlPanes.setHtml(chemistryPane, lastSynastryHtml);
+            return;
+        }
+        boolean why = Settings.astrologerView();
+        HtmlPanes.setHtml(synastryPane, TogetherCards.meetHtml(pair, why));
+        HtmlPanes.setHtml(chemistryPane, TogetherCards.chemistryHtml(pair, why));
+    }
+
+    /** Every page drawn as plain cards, after Astrologer view changes. */
+    void refreshPlainPages() {
+        refreshTransitsPane();
+        refreshTogetherPanes();
+    }
+
+    /**
+     * The two charts on the wheel when it is a synastry, else null.
+     *
+     * <b>Filtered by the grid's own switches:</b> the bodies are the ones the inner ring shows
+     * ({@link WheelRing#shows}, as Life areas asks it) and the aspects the ones the reader has
+     * on (the panel's selection, which {@link AspectGate} reads for the grid).
+     */
+    private TogetherCards.Pair synastryPair() {
+        if (skymapPanel == null || !skymapPanel.isSynastryChart()) {
+            return null;
+        }
+        com.zodiacomputing.ourania.astro.ChartFrame you = skymapPanel.synastryChartA();
+        com.zodiacomputing.ourania.astro.ChartFrame them = skymapPanel.synastryChartB();
+        if (you == null || them == null) {
+            return null;
+        }
+        WheelRing ring = skymapPanel.natalRing;
+        return new TogetherCards.Pair(you, them, ring == null ? null : ring::shows,
+            skymapPanel.aspectSelection());
+    }
+
+    /** Ticks every page's "Show the astrology" box to match the setting. */
+    private void syncAstrologerChecks() {
+        for (javax.swing.JCheckBox box : astrologerChecks) {
+            if (box.isSelected() != Settings.astrologerView()) {
+                box.setSelected(Settings.astrologerView());
+            }
+        }
+    }
+
+    /**
+     * A plain page: the "Show the astrology" box above the pane.
+     *
+     * <b>One box per page, one setting behind all of them.</b> The pane is HTML 3.2 and cannot
+     * collapse a drawer itself (see {@link ReadingCard}), so the choice is made before the page
+     * is built - and a reader who ticks it on Now expects Together to have changed too.
+     */
+    private JComponent astrologerPage(javax.swing.JEditorPane pane, String tip) {
+        javax.swing.JCheckBox box = new javax.swing.JCheckBox("Show the astrology",
+            Settings.astrologerView());
+        box.setForeground(Theme.TEXT);
+        box.setBackground(Color.BLACK);
+        box.setFont(Theme.BODY);
+        box.setFocusPainted(false);
+        box.setToolTipText(tip);
+        box.addItemListener(e -> {
+            // Guarded, because syncAstrologerChecks sets the other boxes and each would
+            // otherwise redraw every page again.
+            if (box.isSelected() != Settings.astrologerView()) {
+                Settings.setAstrologerView(box.isSelected());
+                refreshPlainPages();
+            }
+        });
+        astrologerChecks.add(box);
+        JPanel strip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
+        strip.setBackground(Color.BLACK);
+        strip.add(box);
+        JPanel page = new JPanel(new BorderLayout());
+        page.setBackground(Color.BLACK);
+        page.add(strip, BorderLayout.NORTH);
+        page.add(HtmlPanes.scroller(pane), BorderLayout.CENTER);
+        return page;
     }
 
     /**
@@ -1163,19 +1328,43 @@ public class OuraniaWindow extends JFrame {
      * something.
      */
     private SubRail homeOf(String page) {
-        if (blueprint != null && blueprint.pages().contains(page)) {
-            return blueprint;
-        }
-        if (chronometry != null && chronometry.pages().contains(page)) {
-            return chronometry;
+        for (SubRail strip : strips().values()) {
+            if (strip.pages().contains(page)) {
+                return strip;
+            }
         }
         return null;
     }
 
     /** The rail tab that holds a page - the page itself, when it is a rail tab. */
     private String tabOf(String page) {
-        SubRail home = homeOf(page);
-        return home == null ? page : home == blueprint ? BLUEPRINT_PAGE : CHRONOMETRY_PAGE;
+        for (java.util.Map.Entry<String, SubRail> e : strips().entrySet()) {
+            if (e.getValue().pages().contains(page)) {
+                return e.getKey();
+            }
+        }
+        return page;
+    }
+
+    /**
+     * Each door and the strip behind it, in rail order.
+     *
+     * <b>The one place that pairs a door with its strip.</b> Each method below used to name
+     * Blueprint and Chronometry itself, so a third door with a strip (Together, 2026-10-16)
+     * would have been five edits, and a missed one would route a page to no tab at all.
+     */
+    private java.util.Map<String, SubRail> strips() {
+        java.util.Map<String, SubRail> out = new java.util.LinkedHashMap<>();
+        if (blueprint != null) {
+            out.put(BLUEPRINT_PAGE, blueprint);
+        }
+        if (together != null) {
+            out.put(SYNASTRY_PAGE, together);
+        }
+        if (chronometry != null) {
+            out.put(CHRONOMETRY_PAGE, chronometry);
+        }
+        return out;
     }
 
     /**
@@ -1203,13 +1392,8 @@ public class OuraniaWindow extends JFrame {
             return null;
         }
         String tab = chartRail.selected();
-        if (BLUEPRINT_PAGE.equals(tab) && blueprint != null) {
-            return blueprint.selected();
-        }
-        if (CHRONOMETRY_PAGE.equals(tab) && chronometry != null) {
-            return chronometry.selected();
-        }
-        return tab;
+        SubRail inside = strips().get(tab);
+        return inside != null ? inside.selected() : tab;
     }
 
     /**
@@ -1270,11 +1454,11 @@ public class OuraniaWindow extends JFrame {
         if (chartRail == null) {
             return out;
         }
+        java.util.Map<String, SubRail> strips = strips();
         for (String tab : chartRail.pageNames()) {
-            if (BLUEPRINT_PAGE.equals(tab) && blueprint != null) {
-                out.addAll(blueprint.pages());
-            } else if (CHRONOMETRY_PAGE.equals(tab) && chronometry != null) {
-                out.addAll(chronometry.pages());
+            SubRail inside = strips.get(tab);
+            if (inside != null) {
+                out.addAll(inside.pages());
             } else {
                 out.add(tab);
             }
@@ -1292,6 +1476,11 @@ public class OuraniaWindow extends JFrame {
     /** Blueprint's strip, for the suites. */
     SubRail blueprintRail() {
         return blueprint;
+    }
+
+    /** Together's strip, for the suites. */
+    SubRail togetherRail() {
+        return together;
     }
 
     /** Chronometry's strip, for the suites. */
@@ -1428,6 +1617,7 @@ public class OuraniaWindow extends JFrame {
                 + "only.</html>");
             why.addItemListener(e -> {
                 Settings.setAstrologerView(why.isSelected());
+                refreshPlainPages();
                 runReading("SNAPSHOT");
             });
             JPanel strip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
@@ -1665,6 +1855,13 @@ public class OuraniaWindow extends JFrame {
             }
             return;
         }
+        // The Together page's "Show details" links, for the same reason as the one below.
+        if (command != null && command.startsWith(SynastryPage.DETAIL_LINK)) {
+            if (skymapPanel != null) {
+                skymapPanel.toggleSynastryDetail(command.substring(SynastryPage.DETAIL_LINK.length()));
+            }
+            return;
+        }
         // A selection-card expander, before the body path: "selexp|house" is not a body
         // label and triggerPlanetInterpretation would silently do nothing with it, which is
         // how the transit grid cells were dead for months.
@@ -1792,6 +1989,21 @@ public class OuraniaWindow extends JFrame {
             revalidate();
             repaint();
         }
+    }
+
+    /**
+     * Where a revealed reading's card lands, in the layered pane's coordinates: the top of the
+     * left rail, where {@link #showSynthesis} puts the reading. A rail that is shut has no
+     * bounds yet, so the card lands where the rail opens - showSynthesis opens it on landing.
+     */
+    java.awt.Rectangle readingLanding(javax.swing.JLayeredPane lp) {
+        int h = RevealPainter.CARD_H;
+        if (chartRail != null && chartRail.isShowing() && chartRail.getWidth() > 60) {
+            java.awt.Rectangle r = javax.swing.SwingUtilities.convertRectangle(
+                chartRail.getParent(), chartRail.getBounds(), lp);
+            return new java.awt.Rectangle(r.x + 8, r.y + 48, Math.max(200, r.width - 16), h);
+        }
+        return new java.awt.Rectangle(8, 96, 324, h);
     }
 
     public void showSynthesis(String html) {
@@ -2044,6 +2256,9 @@ public class OuraniaWindow extends JFrame {
     public void drawSavedChart() {
         if (chartSetupPanel != null) {
             chartSetupPanel.drawSavedChartA();
+        }
+        if (skymapPanel != null) {
+            syncRingBar(skymapPanel.ringBarComponent());
         }
     }
 

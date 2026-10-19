@@ -178,12 +178,18 @@ public class PhoneReadingTest {
         assertTrue("the title is the top level", r.startsWith("<h1>Chart Synthesis</h1>"));
         assertEquals("exactly one h1 - the title", 1, count(r, "<h1>"));
 
-        // the four tiers, one level under it
-        for (String tier : new String[] {"1. At a glance", "2. The year by theme",
-                                         "3. Dates to watch", "4. The mechanics"}) {
-            assertTrue("tier is an h2: " + tier, r.contains("<h2>" + tier));
+        // the sections, one level under it: the answer, then Mechanics and what it holds
+        // (2026-10-17, the desktop's Your year reordered; the phone renders the same page)
+        String[] tiers = {"Your year", "Your placements, strongest first", "When", "Mechanics",
+            "The year at a glance", "The year by theme (the Rule of Three)", "Dates, in detail",
+            "The chart's working"};
+        int at = -1;
+        for (String tier : tiers) {
+            int h = r.indexOf("<h2>" + tier);
+            assertTrue("section is an h2, in order: " + tier, h > at);
+            at = h;
         }
-        assertEquals("four tiers and no more", 4, count(r, "<h2>"));
+        assertEquals("these sections and no more", tiers.length, count(r, "<h2>"));
 
         // the mechanics' sections, one level under the tiers
         assertTrue("a section is an h3", r.contains("<h3>4.1 Core Architecture"));
@@ -196,7 +202,7 @@ public class PhoneReadingTest {
         // A body's name inside the placements section was an h3 on the desktop - the same level
         // the sections themselves now take on the phone. Pushed to h4 so it stays underneath.
         String r = PhoneReading.synthesis(sydney(LocalTime.of(14, 15)));
-        int section = r.indexOf("<h3>4.2 Planetary Placements");
+        int section = r.indexOf("<h2>Your placements, strongest first");
         assertTrue("the placements section is there", section > 0);
         int sub = r.indexOf("<h4>", section);
         assertTrue("and a body's name under it is an h4", sub > section);
@@ -242,17 +248,19 @@ public class PhoneReadingTest {
 
             assertTrue("the full reading carries the sections", full.contains("4.1 Core"));
             assertFalse("the lean one does not", lean.contains("4.1 Core"));
-            assertTrue("and is much shorter: " + lean.length() + " vs " + full.length(),
-                lean.length() * 4 < full.length());
+            assertTrue("and is shorter: " + lean.length() + " vs " + full.length(),
+                lean.length() < full.length());
+            assertTrue("but keeps the placements, which are the answer",
+                lean.contains("Your placements, strongest first"));
             // It must still SAY the tier exists, or a reader who forgot the setting sees a
             // reading that looks like it ran out.
-            assertTrue("the tier is still named", lean.contains("<h2>4. The mechanics"));
+            assertTrue("the tier is still named", lean.contains("<h2>Mechanics"));
             assertTrue("and says how to get it back", lean.contains("Show the mechanics"));
             // The tiers above it are untouched either way - the reader chooses whether to be
             // handed the working, not which answer they get.
-            int fullMech = full.indexOf("4. The mechanics");
-            int leanMech = lean.indexOf("4. The mechanics");
-            assertEquals("tiers 1 to 3 are identical", full.substring(0, fullMech),
+            int fullMech = full.indexOf("<h2>Mechanics");
+            int leanMech = lean.indexOf("<h2>Mechanics");
+            assertEquals("the answer above it is identical", full.substring(0, fullMech),
                 lean.substring(0, leanMech));
         } finally {
             Settings.setReadingMechanics(kept);

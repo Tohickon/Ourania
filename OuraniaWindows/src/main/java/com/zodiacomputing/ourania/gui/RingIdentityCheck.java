@@ -565,10 +565,16 @@ public final class RingIdentityCheck {
             // eleven on the two strips and Synastry, which is a tab in its own right.
             List<String> every = new ArrayList<>(w[0].blueprintRail().pages());
             every.addAll(w[0].chronometryRail().pages());
-            every.add(OuraniaWindow.SYNASTRY_PAGE);
-            // Thirteen since Life areas joined Blueprint (2026-10-13): twelve kept, one added.
-            eq("twelve pages went in, twelve came out, and Life areas joined them", 13,
-                every.size());
+            // Together has a strip of its own since Phase 4 (2026-10-16): Synastry is its
+            // first page, under the same name, and Chemistry is new.
+            eq("Together holds the pair's two pages",
+                Arrays.asList(OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE),
+                w[0].togetherRail().pages());
+            every.addAll(w[0].togetherRail().pages());
+            // Thirteen since Life areas joined Blueprint (2026-10-13), fourteen since
+            // Chemistry joined Together: twelve kept, two added.
+            eq("twelve pages went in, twelve came out, and Life areas and Chemistry joined them",
+                14, every.size());
 
             // And each is still addressable by the name its callers hold. revealPage has to
             // land on the page itself, not merely on the tab above it - opening the right
