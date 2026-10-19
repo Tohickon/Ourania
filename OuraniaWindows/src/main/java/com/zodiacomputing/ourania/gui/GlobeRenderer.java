@@ -681,6 +681,81 @@ public final class GlobeRenderer {
         }
     }
 
+    /**
+     * The figure whose glass plane is under a point of the globe, or -1: its corners projected
+     * exactly as patternPlanes projects them, and of two planes over one point the smaller.
+     * Figures are Chart A's own then those between charts, the order allFigures gives them.
+     */
+    static int figureAt(Globe cam, int w, int h, GlobeSource panel, int px, int py) {
+        if (!panel.layerShown(Layer.ASPECTS)) {
+            return -1;
+        }
+        GlobeBands bands = GlobeBands.of(panel, cam, w, h);
+        boolean stacked = Settings.globeStackedRings();
+        double[][][] points = {
+            bodyPoints(panel, cam, bands, 0, stacked),
+            bodyPoints(panel, cam, bands, 1, stacked),
+            bodyPoints(panel, cam, bands, 2, stacked),
+        };
+        double[][] lons = {panel.ringLon(0), panel.ringLon(1), panel.ringLon(2)};
+        int[][] natal = panel.autoPatterns();
+        int[][] cross = panel.crossFigures();
+        int best = -1;
+        double bestArea = Double.MAX_VALUE;
+        for (int k = 0; k < natal.length + cross.length; k++) {
+            int[] figure = k < natal.length ? natal[k] : cross[k - natal.length];
+            int[] members = aroundTheZodiacPacked(figure, lons);
+            if (members.length < 3) {
+                continue;
+            }
+            int[] xs = new int[members.length];
+            int[] ys = new int[members.length];
+            boolean visible = true;
+            for (int i = 0; i < members.length; i++) {
+                int ring = WheelLayout.hitRing(members[i]);
+                int body = WheelLayout.hitBody(members[i]);
+                double[] at = body < points[ring].length ? points[ring][body] : null;
+                if (at == null) {
+                    visible = false;
+                    break;
+                }
+                Globe.Projected q = cam.project(at[0], at[1], at[2], w, h);
+                visible &= q.visible;
+                xs[i] = (int) Math.round(q.x);
+                ys[i] = (int) Math.round(q.y);
+            }
+            if (visible && insidePolygon(xs, ys, px, py)) {
+                double area = polygonArea(xs, ys, xs.length);
+                if (area < bestArea) {
+                    bestArea = area;
+                    best = k;
+                }
+            }
+        }
+        return best;
+    }
+
+    /** Whether a point is inside a polygon, by the crossing rule - no AWT, for the phone. */
+    static boolean insidePolygon(int[] xs, int[] ys, int px, int py) {
+        boolean inside = false;
+        for (int i = 0, j = xs.length - 1; i < xs.length; j = i++) {
+            if ((ys[i] > py) != (ys[j] > py)
+                && px < (double) (xs[j] - xs[i]) * (py - ys[i]) / (ys[j] - ys[i]) + xs[i]) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+
+    /** A polygon's area, by the shoelace rule. */
+    static double polygonArea(int[] xs, int[] ys, int n) {
+        double twice = 0.0;
+        for (int i = 0, j = n - 1; i < n; j = i++) {
+            twice += (double) xs[j] * ys[i] - (double) xs[i] * ys[j];
+        }
+        return Math.abs(twice) / 2.0;
+    }
+
     /** As {@link #aroundTheZodiac}, for members packed with their ring (WheelLayout.packHit). */
     static int[] aroundTheZodiacPacked(int[] packed, double[][] lons) {
         Integer[] boxed = new Integer[packed.length];

@@ -4096,6 +4096,40 @@ public final class GlobeCheck {
             p.setHighlightedAspect(null);
             yes("let go, nothing is lit and the sparks stop", !p.aspectLit() && p.pulse() < 0.0);
 
+            // A figure lights from its entry in a page and from its plane on the chart, and its
+            // plane says what it is (2026-10-18: "when i hover over grand cross nothing happens").
+            p.setHighlightedAspect("pattern|T-square|Sun,Moon,Mars");
+            yes("a pattern's entry under the cursor lights its figure", p.figureLit());
+            near("its bodies swell", SkymapPanel.HOVER_SCALE, p.swell(marsI, 0), 1e-9);
+            yes("its lines are the rays", p.focusTouches(sunI, marsI, 0) && p.focusTouches(moonI, sunI, 0));
+            yes("a line outside it fades", p.focusWeight(venusI, sunI, 0) < 1.0);
+            p.setHighlightedAspect(null);
+            yes("moving off clears it", !p.figureLit());
+            java.lang.reflect.Field ap = SkymapPanel.class.getDeclaredField("autoPatterns");
+            ap.setAccessible(true);
+            int[][] keep = (int[][]) ap.get(p);
+            ap.set(p, new int[][] {{sunI, moonI, marsI}});
+            SkymapPanel.Geometry gm = p.geometry(900, 820);
+            double cxs = 0;
+            double cys = 0;
+            for (int corner : new int[] {sunI, moonI, marsI}) {
+                double a = Math.toRadians(180.0 + gm.pin - p.natalRing.lon[corner]);
+                cxs += (gm.cx + gm.chordEnd(WheelLayout.WHEEL_NATAL, corner) * Math.cos(a)) / 3.0;
+                cys += (gm.cy + gm.chordEnd(WheelLayout.WHEEL_NATAL, corner) * Math.sin(a)) / 3.0;
+            }
+            final int fcx = (int) Math.round(cxs);
+            final int fcy = (int) Math.round(cys);
+            final int[] found = {-2};
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                p.chartComponent().setSize(900, 820);
+                found[0] = p.figureAtWheel(fcx, fcy);
+            });
+            eq("the plane on the wheel answers at its middle", 0, found[0]);
+            String card = p.figureHoverHtml(0);
+            yes("and its hover card says what it is: " + card, card != null && card.contains("Sun"));
+            ap.set(p, keep);
+
+
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }
