@@ -198,6 +198,12 @@ public final class GlobeCheck {
         oneView();
         report("Part Y", before);
 
+        System.out.println();
+        System.out.println("=== Part Z: the background lets go, figures say what they mean, the current ===");
+        before = failures.size();
+        theBackgroundAndTheMeanings();
+        report("Part Z", before);
+
 
 
 
@@ -4233,6 +4239,85 @@ public final class GlobeCheck {
                 }
             }
             yes("the strip has no Globe/Wheel chip", !switchShown);
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
+        }
+    }
+
+    /**
+     * David, 2026-10-18: a click on the background lets go of the selection and puts the drawers
+     * away; a clicked figure says what it means; Chart A's lines carry a slow current.
+     */
+    private static void theBackgroundAndTheMeanings() throws Exception {
+        // What a figure means, by name alone, so a figure between the charts has its reading too.
+        String reading = InterpretationService.getInstance().getMacroDynamic("pattern_grandcross");
+        yes("the grand cross has a reading in the data", !reading.isEmpty());
+        String page = InterpretationPanel.figureMeaningHtml("Grand cross", "Sun (Chart A)", true);
+        String plain = page.replaceAll("<[^>]*>", "");
+        yes("the figure page carries the reading",
+            plain.contains(reading.substring(0, Math.min(30, reading.length())).replaceAll("<[^>]*>", "")));
+        yes("the figure page says it is between the charts", page.contains("between the charts"));
+        yes("the kite's card has a line of meaning", !InterpretationPanel.figureGist("Kite").isEmpty());
+        yes("a grand trine's card has a line of meaning",
+            !InterpretationPanel.figureGist("Grand trine").isEmpty());
+        yes("a name with no reading gives no line", InterpretationPanel.figureGist("Nonesuch").isEmpty());
+        yes("a name with no reading says so plainly",
+            InterpretationPanel.figureMeaningHtml("Nonesuch", "", false).contains("No reading"));
+
+        // The current: brightest at its centre, never on a body.
+        double[][] mid = GlobeRenderer.currentPieces(0.5);
+        double best = -1.0;
+        double bestAt = -1.0;
+        for (double[] piece : mid) {
+            if (piece[2] > best) {
+                best = piece[2];
+                bestAt = (piece[0] + piece[1]) / 2.0;
+            }
+        }
+        near("the current is brightest at its centre", 0.5, bestAt, 0.03);
+        boolean clear = true;
+        for (double s : new double[] {0.0, 0.02, 0.98, 1.0}) {
+            for (double[] piece : GlobeRenderer.currentPieces(s)) {
+                clear &= piece[0] >= 0.04 && piece[1] <= 0.96;
+            }
+        }
+        yes("the current never reaches a body", clear);
+        yes("the lines start at different points of the cycle",
+            GlobeRenderer.currentOffset(0, 1) != GlobeRenderer.currentOffset(1, 2));
+
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        try {
+            java.lang.reflect.Field fs = OuraniaWindow.class.getDeclaredField("skymapPanel");
+            fs.setAccessible(true);
+            final SkymapPanel p = (SkymapPanel) fs.get(hold[0]);
+            yes("a chart painted off screen has no current, so it paints the same each time",
+                p.current() < 0.0);
+            java.lang.reflect.Field cr = OuraniaWindow.class.getDeclaredField("chartRail");
+            java.lang.reflect.Field mr = OuraniaWindow.class.getDeclaredField("menuRail");
+            cr.setAccessible(true);
+            mr.setAccessible(true);
+            final DrawerRail chart = (DrawerRail) cr.get(hold[0]);
+            final DrawerRail menu = (DrawerRail) mr.get(hold[0]);
+            java.lang.reflect.Method pin = SkymapPanel.class.getDeclaredMethod("pinFocus", int.class);
+            pin.setAccessible(true);
+            java.lang.reflect.Field pinned = SkymapPanel.class.getDeclaredField("focusPinned");
+            pinned.setAccessible(true);
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart.setOpen(true);
+                menu.setOpen(true);
+                try {
+                    pin.invoke(p, 0);
+                } catch (ReflectiveOperationException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            yes("set up: a body is pinned", pinned.getBoolean(p));
+            yes("set up: both drawers are open", chart.isOpen() && menu.isOpen());
+            javax.swing.SwingUtilities.invokeAndWait(p::clickedBackground);
+            yes("a background click lets go of the pinned body", !pinned.getBoolean(p));
+            yes("a background click puts the chart drawer away", !chart.isOpen());
+            yes("a background click puts the menu drawer away", !menu.isOpen());
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }

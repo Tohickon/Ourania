@@ -2136,6 +2136,73 @@ public final class GlobeRenderer {
             }
             chord(from, to, rise, faded(ink, Layer.ASPECTS), lit ? 2.4f : 1.0f,
                 !lit);
+            double current = panel.current();
+            if (ring == 0 && !lit && current >= 0.0) {
+                current(from, to, rise, (current + currentOffset(c[1], c[2])) % 1.0, ink);
+            }
+        }
+    }
+
+    /**
+     * Where a natal line's current is in its cycle, against the others: each line starts at its
+     * own point, so the currents do not all run in step (2026-10-18).
+     */
+    static double currentOffset(int a, int b) {
+        return Math.floorMod(a * 7 + b * 13, 17) / 17.0;
+    }
+
+    /**
+     * The pieces of the natal lines' slow current centred at {@code s}: {from, to, brightness}
+     * along the line, brightest at the centre and none within a short way of either body. One
+     * rule for the wheel and the globe.
+     */
+    static double[][] currentPieces(double s) {
+        final double half = 0.12;
+        final int steps = 8;
+        java.util.List<double[]> out = new java.util.ArrayList<>();
+        for (int k = 0; k < steps; k++) {
+            double u0 = s - half + 2.0 * half * k / steps;
+            double u1 = s - half + 2.0 * half * (k + 1) / steps;
+            double lo = Math.max(0.04, u0);
+            double hi = Math.min(0.96, u1);
+            if (hi <= lo) {
+                continue;
+            }
+            double light = 1.0 - Math.abs((u0 + u1) / 2.0 - s) / half;
+            out.add(new double[] {lo, hi, Math.max(0.0, light)});
+        }
+        return out.toArray(new double[0][]);
+    }
+
+    /** The natal current on one arc, on the same curve the line is drawn on. */
+    private void current(double[] a, double[] b, double rise, double s, Ink ink) {
+        double[][] path = arcPathFor(a, b, rise, 48, this.bands.flatness());
+        Ink bright = new Ink((ink.getRed() + 255) / 2, (ink.getGreen() + 255) / 2,
+            (ink.getBlue() + 255) / 2, 255);
+        for (double[] piece : currentPieces(s)) {
+            Globe.Projected p0 = at(path[(int) Math.round(piece[0] * (path.length - 1))]);
+            Globe.Projected p1 = at(path[(int) Math.round(piece[1] * (path.length - 1))]);
+            if (!p0.visible || !p1.visible) {
+                continue;
+            }
+            int alpha = (int) Math.round(Math.min(255, ink.getAlpha() * 1.2) * piece[2]);
+            if (alpha < 4) {
+                continue;
+            }
+            final int[] xs = {(int) Math.round(p0.x), (int) Math.round(p1.x)};
+            final int[] ys = {(int) Math.round(p0.y), (int) Math.round(p1.y)};
+            final Ink halo = faded(new Ink(bright.getRed(), bright.getGreen(), bright.getBlue(),
+                alpha / 3), Layer.ASPECTS);
+            final Ink core = faded(new Ink(bright.getRed(), bright.getGreen(), bright.getBlue(),
+                alpha), Layer.ASPECTS);
+            this.pieces.add(new Piece((p0.depth + p1.depth) / 2.0 - 0.01, () -> {
+                this.g.stroke(5.0f);
+                this.g.color(halo);
+                this.g.drawPolyline(xs, ys, 2);
+                this.g.stroke(1.8f);
+                this.g.color(core);
+                this.g.drawPolyline(xs, ys, 2);
+            }));
         }
     }
 

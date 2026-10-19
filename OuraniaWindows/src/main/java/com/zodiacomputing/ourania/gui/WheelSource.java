@@ -88,6 +88,9 @@ interface WheelSource {
     /** How strongly a figure's glass plane is drawn, by its allFigures index; 1 with no hover. */
     double planeWeight(int k);
 
+    /** Where the natal lines' slow current is in its cycle, 0 to 1, or -1 when it is off. */
+    double current();
+
     /** How far a hover pulse's sparks have run, 0 to 1, or -1 when none are running. */
     double pulse();
 

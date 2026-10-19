@@ -1813,7 +1813,9 @@ public class InterpretationPanel extends JPanel {
         if (found == null) {
             highlightOnWheel(null);
             html.append("<h2 style='color:#FFD166;'>").append(name).append("</h2>");
-            html.append("<p>This figure is not in the chart as currently cast.</p>");
+            html.append("<p style='color:#9AA5B1;'>This figure is not in the chart as currently"
+                + " cast. What the figure means:</p>");
+            appendFigureMeaning(html, name);
             if (withBack) {
                 appendBack(html);
             }
@@ -3318,6 +3320,55 @@ public class InterpretationPanel extends JPanel {
                 .append(orbText(o.bestOffBy)).append(")</span></td></tr>");
         }
         html.append("</table>");
+    }
+
+    /**
+     * What a figure means, as a page for the Selection pane: its name, whose bodies hold it, and
+     * its reading. For a figure clicked on the chart or on the Transits page, which may join
+     * Chart A to another chart - so it is not looked up in Chart A's own patterns, as the
+     * pattern page is, and needs nothing but the figure's name.
+     *
+     * @param members the bodies, each with its chart, as HTML
+     */
+    static String figureMeaningHtml(String name, String members, boolean between) {
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
+        html.append("<h2 style='color:#FFD166;'>").append(name).append("</h2>");
+        html.append("<p style='color:#9AA5B1;'>")
+            .append(between ? "A figure between the charts" : "A figure in Chart A")
+            .append("</p>");
+        html.append("<p>").append(members).append("</p>");
+        appendFigureMeaning(html, name);
+        return style(Prose.decorate(html.append("</body></html>").toString()));
+    }
+
+    /** The reading key for a figure by name: AspectPatterns.Pattern.detailKey's rule. */
+    static String figureKey(String name) {
+        return "pattern_" + name.toLowerCase().replace("-", "").replace(" ", "");
+    }
+
+    /** What a figure means in one sentence, for its hover card, or "" when none is written. */
+    static String figureGist(String name) {
+        String text = InterpretationService.getInstance().getMacroDynamic(figureKey(name));
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        int stop = text.indexOf(". ");
+        return stop > 0 && stop < 220 ? text.substring(0, stop + 1)
+            : text.length() <= 220 ? text : text.substring(0, 217) + "...";
+    }
+
+    /** Appends a figure's reading by name, or says plainly that none is written. */
+    private static void appendFigureMeaning(StringBuilder html, String name) {
+        int before = html.length();
+        appendMacro(html, figureKey(name));
+        String theirs = InterpretationService.getInstance().getMacroDynamic(name);
+        if (theirs != null && !theirs.isEmpty()) {
+            html.append("<p><i>").append(theirs).append("</i></p>");
+        }
+        if (html.length() == before) {
+            html.append("<p>No reading is written for this figure yet.</p>");
+        }
     }
 
     /** Appends a macro-dynamics paragraph if the key is non-null and the data has it. */

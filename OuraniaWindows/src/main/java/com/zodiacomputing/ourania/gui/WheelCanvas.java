@@ -930,6 +930,37 @@ final class WheelCanvas extends JPanel {
     private static final int GLOW_PASSES = 3;
 
     /**
+     * The natal lines' slow current at one point of its cycle: a soft bright stretch of the
+     * line, centred at {@code s} (0 at the first end, 1 at the second), brightest in the
+     * middle. Scaled by the line's own alpha, so a loose aspect's current is as faint as its
+     * line. The stretch is {@link GlobeRenderer#currentPieces}, which the globe draws by too.
+     */
+    static void drawCurrent(Graphics2D g2, int x0, int y0, int x1, int y1, double s,
+                            Color c, float width) {
+        Color bright = new Color((c.getRed() + 255) / 2, (c.getGreen() + 255) / 2,
+            (c.getBlue() + 255) / 2);
+        for (double[] piece : GlobeRenderer.currentPieces(s)) {
+            int alpha = (int) Math.round(Math.min(255, c.getAlpha() * 1.2) * piece[2]);
+            if (alpha < 4) {
+                continue;
+            }
+            int ax = (int) Math.round(x0 + (x1 - x0) * piece[0]);
+            int ay = (int) Math.round(y0 + (y1 - y0) * piece[0]);
+            int bx = (int) Math.round(x0 + (x1 - x0) * piece[1]);
+            int by = (int) Math.round(y0 + (y1 - y0) * piece[1]);
+            g2.setColor(new Color(bright.getRed(), bright.getGreen(), bright.getBlue(),
+                alpha / 3));
+            g2.setStroke(new BasicStroke(width + 4.0f, BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_ROUND));
+            g2.drawLine(ax, ay, bx, by);
+            g2.setColor(new Color(bright.getRed(), bright.getGreen(), bright.getBlue(), alpha));
+            g2.setStroke(new BasicStroke(width + 0.8f, BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_ROUND));
+            g2.drawLine(ax, ay, bx, by);
+        }
+    }
+
+    /**
      * The hover pulse's sparks on one aspect line: little points of light, some leaving the
      * hovered body for the body at the line's far end and some coming back from it.
      *
@@ -1079,7 +1110,11 @@ final class WheelCanvas extends JPanel {
             // line, so a tight aspect glows and a loose one barely does: the fade already
             // in this method is what makes the weave legible, and the glow must not undo it
             // by lighting up the aspects the ramp is busy hiding.
-            if (!bl) {
+            // <b>Every chart's lines glow, not only Chart A's.</b> David, 2026-10-18: "im not
+            // liking the dashed line look of the transits can we make them like the natal
+            // lines". A partner's, a transit's and the sky's lines are solid and glow as the
+            // natal lines do; their colours and the focus still tell them apart.
+            {
                 for (int pass = GLOW_PASSES; pass >= 1; pass--) {
                     int glowAlpha = (int) (n7 * 0.10f * f / pass);
                     if (glowAlpha < 3) {
@@ -1094,21 +1129,21 @@ final class WheelCanvas extends JPanel {
             }
 
             graphics2D.setColor(color);
-            // <b>Which chart this line belongs to, from the ring itself.</b> This was
-            // `if (bl)` - not the natal ring - so a partner's line, a transit and the sky
-            // were dashed identically and a reader could not tell them apart. The ring knows
-            // what it is since 383408c8; the pattern is its own.
-            float[] dash = panel.ringAt(wheel).kind.dashPattern();
-            if (dash != null) {
-                graphics2D.setStroke(new BasicStroke(f2, 0, 0, 10.0f, dash, 0.0f));
-            } else {
-                // Thinner core than before (was f2 alone at up to 1.0). A strand reads as
-                // light when the bright part is narrow and the spill is wide; a thick core
-                // with a glow around it just looks like a thick line.
-                graphics2D.setStroke(new BasicStroke(Math.max(0.6f, f2 * 0.8f),
-                    BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            }
+            // Solid for every chart since 2026-10-18; the ring kinds' dash patterns are no
+            // longer drawn here. Thinner core than before (was f2 alone at up to 1.0). A strand
+            // reads as light when the bright part is narrow and the spill is wide; a thick core
+            // with a glow around it just looks like a thick line.
+            graphics2D.setStroke(new BasicStroke(Math.max(0.6f, f2 * 0.8f),
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             graphics2D.drawLine(n8, n9, n10, n11);
+            // <b>The natal lines' slow current.</b> David, 2026-10-18: "Natal aspect lines
+            // should have a slow electric pulse on their lines". A soft bright stretch runs along
+            // each of Chart A's lines, each line at its own point in the cycle.
+            double current = panel.current();
+            if (!bl && !highlighted && current >= 0.0) {
+                drawCurrent(graphics2D, n8, n9, n10, n11,
+                    (current + GlobeRenderer.currentOffset(n5, n6)) % 1.0, color, f2);
+            }
             graphics2D.setStroke(stroke);
         }
     }

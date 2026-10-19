@@ -2304,6 +2304,71 @@ implements WheelSource, GlobeSource {
         return changed || !this.focusPinned;
     }
 
+    /**
+     * A click on the background outside the chart: lets go of everything selected and puts the
+     * side drawers away. David, 2026-10-18: "selecting the background outside the chart should
+     * automatically deselect any element that is selected and close any side drawers as well".
+     */
+    void clickedBackground() {
+        boolean changed = this.pinFocus(-1);
+        changed |= this.setHighlightedChord(null);
+        changed |= this.setLitFigure(null, null);
+        changed |= this.setHover(-1, -1);
+        changed |= this.setFocusDegree(-1);
+        changed |= this.setFocusHouse(-1);
+        changed |= this.setFocusMansion(-1);
+        if (changed && this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+        if (this.window != null) {
+            this.window.closeSideDrawers();
+        }
+    }
+
+    /**
+     * Opens what a figure means on the Selection page: its name, whose bodies hold it, and its
+     * reading. David, 2026-10-18: "when i hover over grand cross, kite, grand trine there is no
+     * information about what any of those mean when clicked on".
+     *
+     * @param k the figure, in allFigures order
+     */
+    void showFigure(int k) {
+        int[][] figures = this.allFigures();
+        String[] names = this.allFigureNames();
+        if (k < 0 || k >= figures.length || this.window == null) {
+            return;
+        }
+        this.window.showSelection(InterpretationPanel.figureMeaningHtml(names[k],
+            this.figureMembers(figures[k]), this.figureBetween(figures[k])), true);
+    }
+
+    /** Whether a figure joins Chart A to another chart. */
+    private boolean figureBetween(int[] figure) {
+        for (int m : figure) {
+            if (WheelLayout.hitRing(m) != WheelLayout.WHEEL_NATAL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** A figure's bodies, each with its chart, for a card or a page. */
+    private String figureMembers(int[] figure) {
+        StringBuilder who = new StringBuilder();
+        for (int m : figure) {
+            int ring = WheelLayout.hitRing(m);
+            if (who.length() > 0) {
+                who.append(" &middot; ");
+            }
+            who.append(Bodies.at(WheelLayout.hitBody(m)).name).append(" <span style='color:#9AA5B1;'>(")
+                .append(ring == WheelLayout.WHEEL_NATAL ? "Chart A"
+                    : ring == WheelLayout.WHEEL_SKY ? "sky"
+                    : (this.isSynastryChart() ? "Chart B" : "transits"))
+                .append(")</span>");
+        }
+        return who.toString();
+    }
+
     // ---------------------------------------------------------------- hover swell
 
     /**
@@ -2378,6 +2443,42 @@ implements WheelSource, GlobeSource {
     // swells as they arrive. The dimming is the focus's own (FOCUS_DIM). Both views read the
     // pulse; with the ring animations switched off in Settings there are no sparks and the
     // partners swell at once.
+
+    /** How long the natal lines' slow current takes to run the length of a line, in ms. */
+    static final long CURRENT_MS = 4200L;
+
+    private javax.swing.Timer currentTimer;
+
+    /**
+     * Where the natal lines' slow current is in its cycle, 0 to 1, or -1 when it is off.
+     *
+     * <p>David, 2026-10-18: "Natal aspect lines should have a slow electric pulse on their
+     * lines". It runs while the chart is on screen and the ring animations are on in Settings;
+     * a chart painted off screen (a check, an export) has none, so it paints the same each time.
+     * The first paint that asks starts a slow timer (20 frames a second) that repaints the wheel
+     * and stops itself when the chart is hidden or the animations are switched off.
+     */
+    @Override
+    public double current() {
+        if (!Settings.animateRings() || this.chartPanel == null || !this.chartPanel.isShowing()) {
+            return -1.0;
+        }
+        if (this.currentTimer == null) {
+            this.currentTimer = new javax.swing.Timer(50, e -> {
+                if (!Settings.animateRings() || this.chartPanel == null
+                        || !this.chartPanel.isShowing()) {
+                    ((javax.swing.Timer) e.getSource()).stop();
+                    return;
+                }
+                this.repaintWheel();
+            });
+        }
+        if (!this.currentTimer.isRunning()) {
+            this.currentTimer.start();
+        }
+        long ms = System.nanoTime() / 1_000_000L;
+        return (ms % CURRENT_MS) / (double) CURRENT_MS;
+    }
 
     /** How long one round of sparks takes, in milliseconds; they repeat while the hover lasts. */
     static final long PULSE_MS = 900L;
@@ -2599,20 +2700,10 @@ implements WheelSource, GlobeSource {
         if (k < 0 || k >= figures.length) {
             return null;
         }
-        boolean between = false;
-        StringBuilder who = new StringBuilder();
-        for (int m : figures[k]) {
-            int ring = WheelLayout.hitRing(m);
-            between |= ring != WheelLayout.WHEEL_NATAL;
-            if (who.length() > 0) {
-                who.append(" &middot; ");
-            }
-            who.append(Bodies.at(WheelLayout.hitBody(m)).name).append(" <span style='color:#9AA5B1;'>(")
-                .append(ring == WheelLayout.WHEEL_NATAL ? "Chart A"
-                    : ring == WheelLayout.WHEEL_SKY ? "sky"
-                    : (this.isSynastryChart() ? "Chart B" : "transits"))
-                .append(")</span>");
-        }
+        boolean between = this.figureBetween(figures[k]);
+        String who = this.figureMembers(figures[k]);
+        // What it means, in a line, and where the rest is (2026-10-18).
+        String gist = InterpretationPanel.figureGist(names[k]);
         // The body card's own ground and ink (PlacementText.hoverCard), so it reads on any
         // tooltip - the first version had neither and came out light grey on white.
         return "<html><body style='width:250px; font-family:SansSerif; font-size:11px;"
@@ -2620,7 +2711,10 @@ implements WheelSource, GlobeSource {
             + "<div style='font-size:13px;'><b>" + names[k] + "</b></div>"
             + "<div style='color:#9AA5B1;'>"
             + (between ? "A figure between the charts" : "A figure in Chart A") + "</div>"
-            + "<div style='margin-top:4px;'>" + who + "</div></body></html>";
+            + "<div style='margin-top:4px;'>" + who + "</div>"
+            + (gist.isEmpty() ? "" : "<div style='margin-top:6px;'>" + gist + "</div>")
+            + "<div style='margin-top:6px; color:#FFD166;'>Click to read what it means.</div>"
+            + "</body></html>";
     }
 
     /**
@@ -5137,7 +5231,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // Nothing under the cursor but the scaffolding: a house number opens its
                 // house, a tick opens its degree. Same order the hover uses, so what lights
                 // under the cursor is what opens when it is clicked.
+                int fig = GlobeRenderer.figureAt(this.globe, this.chartPanel.getWidth(),
+                    this.chartPanel.getHeight(), this, n, n2);
+                if (fig >= 0) {
+                    this.showFigure(fig);
+                    return;
+                }
                 int[] target = this.globeTargetAt(n, n2);
+                if (target[0] == GLOBE_NONE) {
+                    this.clickedBackground();
+                    return;
+                }
                 if (this.window == null) {
                     return;
                 }
@@ -5239,6 +5343,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 }
             }
         }
+        // A figure's glass plane, when no body was hit: what the figure means. Ahead of the
+        // house underneath, as the hover is (2026-10-18).
+        if (this.focusBody < 0 && this.window != null) {
+            int fig = this.figureAtWheel(n, n2);
+            if (fig >= 0) {
+                this.showFigure(fig);
+                return;
+            }
+        }
         double d;
         double d2;
         double d3;
@@ -5267,6 +5380,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // until 2026-08-23 - the hit test computing the rings independently of the code that
         // draws them, which is how a glyph you can see becomes a glyph you cannot click.
         int[] rings = g.rings;
+        // Outside the mansions, the outermost band: the background (2026-10-18).
+        if (d6 > rings[RING_OUTER] + 18) {
+            this.clickedBackground();
+            return;
+        }
         int n9 = n4 = rings[RING_OUTER];
         int nTri = rings[RING_TRI];
         int n10 = rings[RING_TRANSIT];

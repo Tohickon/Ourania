@@ -73,6 +73,11 @@ public interface GlobeSource {
         return 1.0;
     }
 
+    /** Where the natal lines' slow current is in its cycle, 0 to 1, or -1 when it is off. */
+    default double current() {
+        return -1.0;
+    }
+
     /** How far a hover pulse's sparks have run, 0 to 1, or -1 when none are running. */
     default double pulse() {
         return -1.0;
