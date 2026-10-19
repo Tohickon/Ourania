@@ -237,6 +237,7 @@ public class InterpretationService {
         "composite_minor_aspects.json",
         "synastry_overlays.json",
         "synastry_angle_contacts.json",
+        "synastry_bodies.json",
         "composite_angles.json",
         "composite_sabian.json",
         "composite_transits_ptolemaic_t.json",
@@ -674,6 +675,8 @@ public class InterpretationService {
     private final Map<String, String> compositeHouses = new HashMap<>();
     private final Map<String, String> overlayHouses = new HashMap<>();
     private final Map<String, String> angleContacts = new HashMap<>();
+    /** What each body does to a household when it comes from the other chart, keyed by body id. */
+    private final Map<String, String> overlayBodies = new HashMap<>();
     private final Map<String, String> synastryAspects = new HashMap<>();
 
     /**
@@ -805,6 +808,7 @@ public class InterpretationService {
         if (line.startsWith("\"overlay_planet_house\"")) return overlayPlanetHouses;
         if (line.startsWith("\"overlay_planet_angle\"")) return overlayPlanetAngles;
         if (line.startsWith("\"angle_contact\""))   return angleContacts;
+        if (line.startsWith("\"overlay_body\""))    return overlayBodies;
         if (line.startsWith("\"synastry_interaspect\"")) return synastryInteraspects;
         if (line.startsWith("\"composite_planet_house\"")) return compositePlanetHouses;
         if (line.startsWith("\"composite_planet_sign\"")) return compositePlanetSigns;
@@ -1108,6 +1112,11 @@ public class InterpretationService {
             return null;
         }
         return overlayPlanetAngles.get(bodyKey(bodyName) + "_" + bodyKey(angle));
+    }
+
+    /** The plain-language reading of one body arriving from the other chart, or null. */
+    public String getOverlayBody(String bodyName) {
+        return bodyName == null ? null : overlayBodies.get(bodyKey(bodyName));
     }
 
     public String getOverlayHouse(int house) {

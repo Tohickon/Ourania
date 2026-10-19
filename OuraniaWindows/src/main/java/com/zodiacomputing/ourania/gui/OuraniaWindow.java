@@ -1855,6 +1855,13 @@ public class OuraniaWindow extends JFrame {
             }
             return;
         }
+        // The Together page's "Show details" links, for the same reason as the one below.
+        if (command != null && command.startsWith(SynastryPage.DETAIL_LINK)) {
+            if (skymapPanel != null) {
+                skymapPanel.toggleSynastryDetail(command.substring(SynastryPage.DETAIL_LINK.length()));
+            }
+            return;
+        }
         // A selection-card expander, before the body path: "selexp|house" is not a body
         // label and triggerPlanetInterpretation would silently do nothing with it, which is
         // how the transit grid cells were dead for months.

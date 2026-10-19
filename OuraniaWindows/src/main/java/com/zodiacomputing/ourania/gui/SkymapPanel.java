@@ -7646,6 +7646,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             System.arraycopy(this.natalRing.cusps, 0, this.activeCusps, 0, this.activeCusps.length);
             this.activeAscendant = this.natalRing.ascendant;
         }
+        this.pushPlacementPages();
+        this.refreshTimeReadout();
+        this.refreshReadingIfShown();
+        // Which charts are on the wheel decides which scrub bars there are.
+        this.refreshScrubBars();
+    }
+
+    /** Writes every placements page to its accordion section. */
+    private void pushPlacementPages() {
         if (this.window != null) {
             // Three parts, three accordion sections. One document would mean the
             // sidebar could only show or hide all of it at once, which is what it did before.
@@ -7656,10 +7665,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.generatePlanetPlacementsHtml(PlacementPart.SYNASTRY),
                 this.generatePlanetPlacementsHtml(PlacementPart.CHART_B));
         }
-        this.refreshTimeReadout();
-        this.refreshReadingIfShown();
-        // Which charts are on the wheel decides which scrub bars there are.
-        this.refreshScrubBars();
+    }
+
+    /**
+     * Opens or closes the body paragraphs on the Together page, and redraws the pages.
+     * The open/closed state lives in {@link SynastryPage}, which draws the links.
+     */
+    public void toggleSynastryDetail(String key) {
+        SynastryPage.toggleDetail(key);
+        this.pushPlacementPages();
     }
 
     /**
