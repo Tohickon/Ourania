@@ -4033,13 +4033,14 @@ public final class GlobeCheck {
                         now[0] = (Ink) args[0];
                     }
                     if (method.getName().equals("fillOval") && now[0] != null
-                            && now[0].getRGB() == new Ink(255, 248, 220, 240).getRGB()) {
+                            && now[0].getRed() == 255 && now[0].getGreen() == 248 && now[0].getBlue() == 220
+                            && now[0].getAlpha() > 0) {
                         heads[0]++;
                     }
                     return method.getReturnType() == int.class ? 0 : null;
                 });
             GlobeRenderer.paint(listening, new Globe(), 900, 820, p, false);
-            yes("half-way through the pulse the globe draws sparks on the hovered body's lines: "
+            yes("half-way through the pulse the globe draws sparks of light on the hovered body's lines: "
                 + heads[0], heads[0] > 0);
             // Once the pulse is over the sparks are gone and a partner stays swollen.
             ps.setLong(p, System.nanoTime() - (long) (SkymapPanel.PULSE_MS * 2e6));

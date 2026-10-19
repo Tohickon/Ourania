@@ -2062,40 +2062,60 @@ public final class GlobeRenderer {
     }
 
     /**
-     * A spark on its way down an arc, from {@code a} to {@code b}: the hover pulse's bolt,
-     * following the same curve the line is drawn on (arcPathFor), at the depth of its head.
+     * Where the hover pulse's sparks are on a line, from 0 at the hovered body to 1 at the far
+     * end, and how bright each is: three leaving the hovered body and three coming back to it,
+     * each fading in near the body it leaves and out near the one it reaches. One rule for the
+     * wheel and the globe (2026-10-18, "little sparks of light coming from and to the bodies").
+     *
+     * @return {position, brightness} pairs
+     */
+    static double[][] sparkPositions(double run) {
+        double[][] out = new double[6][];
+        for (int k = 0; k < 3; k++) {
+            double going = (run * 1.6 + k / 3.0) % 1.0;
+            double coming = 1.0 - ((run * 1.6 + k / 3.0 + 1.0 / 6.0) % 1.0);
+            out[2 * k] = new double[] {going, sparkLight(going)};
+            out[2 * k + 1] = new double[] {coming, sparkLight(coming)};
+        }
+        return out;
+    }
+
+    /** A spark's brightness at a point on its line: dim at both bodies, full between. */
+    private static double sparkLight(double s) {
+        double edge = Math.min(s, 1.0 - s) / 0.15;
+        return Math.max(0.0, Math.min(1.0, edge));
+    }
+
+    /**
+     * The hover pulse's sparks on one arc, from {@code a} (the hovered body) to {@code b}:
+     * little points of light on the same curve the line is drawn on (arcPathFor), each at the
+     * depth where it is.
      */
     private void spark(double[] a, double[] b, double rise, double run) {
-        double t = Math.min(1.0, run / 0.8);
         double[][] path = arcPathFor(a, b, rise, 48, this.bands.flatness());
-        int head = (int) Math.round(t * (path.length - 1));
-        int tailStart = Math.max(0, head - 4);
-        int n = head - tailStart;
-        if (n < 1) {
-            return;
-        }
-        final int[] xs = new int[n + 1];
-        final int[] ys = new int[n + 1];
-        double depth = 0.0;
-        for (int i = 0; i <= n; i++) {
-            Globe.Projected q = at(path[tailStart + i]);
-            if (!q.visible) {
-                return;
+        for (double[] spark : sparkPositions(run)) {
+            double light = spark[1];
+            if (light <= 0.0) {
+                continue;
             }
-            double jag = (i == 0 || i == n) ? 0.0 : (((int) (run * 60) + i) % 2 == 0 ? 3.0 : -3.0);
-            xs[i] = (int) Math.round(q.x + jag);
-            ys[i] = (int) Math.round(q.y - jag);
-            depth = q.depth;
+            Globe.Projected q = at(path[(int) Math.round(spark[0] * (path.length - 1))]);
+            if (!q.visible) {
+                continue;
+            }
+            final int x = (int) Math.round(q.x);
+            final int y = (int) Math.round(q.y);
+            final Ink glow = new Ink(255, 196, 90, (int) Math.round(90 * light));
+            final Ink halo = new Ink(255, 232, 170, (int) Math.round(160 * light));
+            final Ink core = new Ink(255, 248, 220, (int) Math.round(240 * light));
+            this.pieces.add(new Piece(q.depth - 0.02, () -> {
+                this.g.color(glow);
+                this.g.fillOval(x - 5, y - 5, 10, 10);
+                this.g.color(halo);
+                this.g.fillOval(x - 3, y - 3, 6, 6);
+                this.g.color(core);
+                this.g.fillOval(x - 1, y - 1, 3, 3);
+            }));
         }
-        this.pieces.add(new Piece(depth - 0.02, () -> {
-            this.g.color(new Ink(255, 190, 70, 120));
-            this.g.stroke(4.0f);
-            this.g.drawPolyline(xs, ys, xs.length);
-            this.g.color(new Ink(255, 248, 220, 240));
-            this.g.stroke(1.4f);
-            this.g.drawPolyline(xs, ys, xs.length);
-            this.g.fillOval(xs[n] - 3, ys[n] - 3, 6, 6);
-        }));
     }
 
     /**

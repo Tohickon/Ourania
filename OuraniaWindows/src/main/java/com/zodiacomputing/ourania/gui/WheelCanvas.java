@@ -926,39 +926,28 @@ final class WheelCanvas extends JPanel {
     private static final int GLOW_PASSES = 3;
 
     /**
-     * A spark of electricity on its way down an aspect line: a short jagged bolt, white at its
-     * head and gold behind, a fraction {@code run} of the way from (x0, y0) to (x1, y1). The
-     * jag is drawn from the run itself, so it flickers as the spark moves and stands still
-     * when it does not.
+     * The hover pulse's sparks on one aspect line: little points of light, some leaving the
+     * hovered body for the body at the line's far end and some coming back from it.
+     *
+     * <p>David, 2026-10-18: "instead of having electric swiggle lines animating from the body
+     * being hovered over can we have just like little sparks of light coming from and to the
+     * bodies down its aspect lines". Each spark is a soft warm glow round a bright core, and
+     * fades in as it leaves a body and out as it reaches one, so none of them sits on a glyph.
+     * The positions come from {@link GlobeRenderer#sparkPositions}, which the globe draws by too.
      */
     static void drawSpark(Graphics2D g2, int x0, int y0, int x1, int y1, double run) {
-        double t = Math.min(1.0, run / 0.8);
-        double len = Math.hypot(x1 - x0, y1 - y0);
-        if (len < 1.0) {
-            return;
+        for (double[] spark : GlobeRenderer.sparkPositions(run)) {
+            double s = spark[0];
+            double light = spark[1];
+            int x = (int) Math.round(x0 + (x1 - x0) * s);
+            int y = (int) Math.round(y0 + (y1 - y0) * s);
+            g2.setColor(new Color(255, 196, 90, (int) Math.round(90 * light)));
+            g2.fillOval(x - 5, y - 5, 10, 10);
+            g2.setColor(new Color(255, 232, 170, (int) Math.round(160 * light)));
+            g2.fillOval(x - 3, y - 3, 6, 6);
+            g2.setColor(new Color(255, 248, 220, (int) Math.round(240 * light)));
+            g2.fillOval(x - 1, y - 1, 3, 3);
         }
-        double ux = (x1 - x0) / len;
-        double uy = (y1 - y0) / len;
-        double tail = Math.min(t, 28.0 / len);
-        int n = 5;
-        int[] xs = new int[n + 1];
-        int[] ys = new int[n + 1];
-        for (int i = 0; i <= n; i++) {
-            double s = t - tail + tail * i / n;
-            double jag = (i == 0 || i == n) ? 0.0
-                : (((int) (run * 60) + i) % 2 == 0 ? 3.0 : -3.0);
-            xs[i] = (int) Math.round(x0 + (x1 - x0) * s - uy * jag);
-            ys[i] = (int) Math.round(y0 + (y1 - y0) * s + ux * jag);
-        }
-        Stroke was = g2.getStroke();
-        g2.setColor(new Color(255, 190, 70, 120));
-        g2.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2.drawPolyline(xs, ys, xs.length);
-        g2.setColor(new Color(255, 248, 220, 240));
-        g2.setStroke(new BasicStroke(1.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2.drawPolyline(xs, ys, xs.length);
-        g2.fillOval(xs[n] - 3, ys[n] - 3, 6, 6);
-        g2.setStroke(was);
     }
 
     private void drawAspectLine(Graphics2D graphics2D, double d, double d2, double d3, int n, int n2, int n3, int n4, int wheel, int n5, int n6) {
