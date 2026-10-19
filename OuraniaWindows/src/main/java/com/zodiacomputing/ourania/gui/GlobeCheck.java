@@ -4072,6 +4072,30 @@ public final class GlobeCheck {
             heads[0] = 0;
             GlobeRenderer.paint(listening, new Globe(), 900, 820, p, false);
             eq("none is drawn once the hover is gone", 0, heads[0]);
+
+            // A lit aspect - a row of Active Aspects or a grid cell under the cursor - drives the
+            // same effects: its two bodies swell, its line is the one ray, the rest fades, and
+            // its sparks run until it is let go (2026-10-18).
+            int sunI = SkymapPanel.SUN;
+            int moonI = SkymapPanel.MOON;
+            int venusI = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Venus");
+            int marsI = com.zodiacomputing.ourania.astro.Bodies.indexOfName("Mars");
+            p.setHighlightedAspect("aspect|Sun|Moon|Trine|0");
+            yes("a lit aspect is lit", p.aspectLit());
+            near("its first body swells", SkymapPanel.HOVER_SCALE, p.swell(sunI, 0), 1e-9);
+            near("and its second", SkymapPanel.HOVER_SCALE, p.swell(moonI, 0), 1e-9);
+            near("a body outside it does not", 1.0, p.swell(venusI, 0), 1e-9);
+            yes("its line is the ray, either way round", p.focusTouches(sunI, moonI, 0)
+                && p.focusTouches(moonI, sunI, 0));
+            yes("another line is not", !p.focusTouches(venusI, marsI, 0));
+            yes("and fades", p.focusWeight(venusI, marsI, 0) < 1.0);
+            yes("a body outside it fades", p.glyphWeight(venusI, 0) < 1.0);
+            if (Settings.animateRings()) {
+                yes("its sparks run", p.pulse() >= 0.0);
+            }
+            p.setHighlightedAspect(null);
+            yes("let go, nothing is lit and the sparks stop", !p.aspectLit() && p.pulse() < 0.0);
+
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> hold[0].dispose());
         }

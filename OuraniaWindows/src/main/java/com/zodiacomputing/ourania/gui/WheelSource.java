@@ -79,6 +79,9 @@ interface WheelSource {
     /** Whether a line is one of the focused body's own, which glows gold (the focus rays). */
     boolean focusTouches(int a, int b, int wheel);
 
+    /** How strongly a body on a ring is drawn under the focus or a lit aspect, 1 when neither. */
+    double glyphWeight(int body, int ring);
+
     /** How strongly a line on a ring is drawn under the focus, 1 when none. */
     double focusWeight(int a, int b, int wheel);
 

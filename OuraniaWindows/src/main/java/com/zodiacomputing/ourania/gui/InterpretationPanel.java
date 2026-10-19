@@ -724,7 +724,15 @@ public class InterpretationPanel extends JPanel {
                 String aspectType = aspectData[1];
                 String applyState = (aspectData.length > 2) ? aspectData[2] : "";
                 String displayAspect = applyState.isEmpty() ? aspectType : applyState + " " + aspectType;
-                html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect).append("</i> ").append(otherPlanet).append("</h3>");
+                // <b>A link, so hovering the row lights the aspect on the chart</b> (2026-10-18):
+                // both bodies swell, sparks of light run along its line and the rest dims - the
+                // same effect a hovered body has. The href is the aspect grid's, which the
+                // selection pane's hover already sends to the wheel; styled as the heading it was.
+                html.append("<h3 style='color:#E0E0E0;'><a href='aspect|").append(planetName)
+                    .append("|").append(otherPlanet).append("|").append(aspectType)
+                    .append("|0' style='color:#E0E0E0; text-decoration:none;'><i>")
+                    .append(displayAspect).append("</i> ").append(otherPlanet)
+                    .append("</a></h3>");
                 html.append("<p>").append(InterpretationService.getInstance().getAspect(planetName, otherPlanet, aspectType)).append("</p>");
             }
         }

@@ -661,10 +661,11 @@ final class WheelCanvas extends JPanel {
             // this the web dims and the glyphs stay bright, which reads as the lines being
             // broken rather than as one body being singled out.
             java.awt.Composite priorComposite = graphics2D.getComposite();
-            if (!panel.noFocus()) {
+            // By ring, so a lit aspect fades the bodies outside it as a focus does (2026-10-18).
+            float natalWeight = (float) panel.glyphWeight(n7, WheelLayout.WHEEL_NATAL);
+            if (natalWeight < 1.0f) {
                 graphics2D.setComposite(java.awt.AlphaComposite.getInstance(
-                    java.awt.AlphaComposite.SRC_OVER,
-                    (float) panel.glyphWeight(n7, false)));
+                    java.awt.AlphaComposite.SRC_OVER, natalWeight));
             }
             WheelLayout.GlyphSize glyphSize = WheelLayout.natalSize(n7);
             graphics2D.setFont(glyphFont(glyphSize));

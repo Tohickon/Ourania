@@ -2179,6 +2179,9 @@ implements WheelSource, GlobeSource {
      * @param wheel the ring {@code a} is on, WheelLayout.WHEEL_NATAL / _OUTER / _SKY
      */
     public boolean focusTouches(int a, int b, int wheel) {
+        if (this.aspectLit()) {
+            return this.isLitAspect(a, b, wheel);
+        }
         if (this.noFocus()) {
             return false;
         }
@@ -2202,6 +2205,9 @@ implements WheelSource, GlobeSource {
      */
     @Override
     public double focusWeight(int a, int b, int wheel) {
+        if (this.aspectLit()) {
+            return this.isLitAspect(a, b, wheel) ? 1.0 : FOCUS_DIM;
+        }
         if (this.noFocus()) {
             return 1.0;
         }
@@ -2214,6 +2220,9 @@ implements WheelSource, GlobeSource {
      */
     @Override
     public double glyphWeight(int i, int ring) {
+        if (this.aspectLit()) {
+            return this.inLitAspect(i, ring) ? 1.0 : FOCUS_DIM;
+        }
         if (this.noFocus()) {
             return 1.0;
         }
@@ -2390,7 +2399,7 @@ implements WheelSource, GlobeSource {
      */
     @Override
     public double pulse() {
-        if (this.pulseStart < 0L || this.noFocus()) {
+        if (this.pulseStart < 0L || this.noFocus() && !this.aspectLit()) {
             return -1.0;
         }
         return (System.nanoTime() - this.pulseStart) / 1e6 / PULSE_MS;
@@ -2402,6 +2411,9 @@ implements WheelSource, GlobeSource {
      */
     @Override
     public double swell(int body, int ring) {
+        if (this.aspectLit()) {
+            return this.inLitAspect(body, ring) ? HOVER_SCALE : 1.0;
+        }
         if (this.noFocus() || body < 0) {
             return 1.0;
         }
@@ -2420,7 +2432,36 @@ implements WheelSource, GlobeSource {
     /** True when the focused body is the first end of this line, where its sparks set off. */
     @Override
     public boolean focusAtFirstEnd(int a, int wheel) {
+        if (this.aspectLit()) {
+            return a == this.highlightA && wheel == this.highlightWheel;
+        }
         return !this.noFocus() && a == this.focusBody && wheel == this.focusRing;
+    }
+
+    /**
+     * Whether one aspect is lit - a row of a body's Active Aspects or a cell of the aspect grid
+     * under the cursor. David, 2026-10-18: "under selected and then in active aspects for each
+     * one can we make that same magnify bulge hover over electric animate effect for each aspect
+     * when hovered over also". While it is, the hover effects follow it rather than a body: its
+     * two bodies swell, the sparks run along its line, and the rest dims.
+     */
+    boolean aspectLit() {
+        return this.highlightA >= 0 && this.highlightB >= 0;
+    }
+
+    /** True for the lit aspect's own line: its ring's body to its natal body, either way round. */
+    private boolean isLitAspect(int a, int b, int wheel) {
+        if (wheel != this.highlightWheel) {
+            return false;
+        }
+        return (a == this.highlightA && b == this.highlightB)
+            || (wheel == WheelLayout.WHEEL_NATAL && a == this.highlightB && b == this.highlightA);
+    }
+
+    /** True for one of the lit aspect's two bodies, on the ring it is on. */
+    private boolean inLitAspect(int body, int ring) {
+        return (ring == this.highlightWheel && body == this.highlightA)
+            || (ring == WheelLayout.WHEEL_NATAL && body == this.highlightB);
     }
 
     // ------------------------------------------------------------------ zoom and pan
@@ -6156,6 +6197,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         this.highlightA = a;
         this.highlightB = b;
         this.highlightWheel = wheel;
+        if (a >= 0 && b >= 0) {
+            startPulse();
+        } else if (this.noFocus()) {
+            this.pulseStart = -1L;
+        }
         if (this.chartPanel != null) {
             this.chartPanel.repaint();
         }
@@ -6792,6 +6838,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         this.highlightA = a;
         this.highlightB = b;
         this.highlightWheel = wheel;
+        // A chord under the cursor is a lit aspect too: its sparks run (2026-10-18).
+        if (a >= 0 && b >= 0) {
+            startPulse();
+        } else if (this.noFocus()) {
+            this.pulseStart = -1L;
+        }
         return true;
     }
 
