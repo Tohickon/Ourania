@@ -57,7 +57,7 @@ final class LifeAreasPanel extends JPanel {
                 + "say which parts of life the chart puts its weight on.</p></body></html>")
                 .toString();
         }
-        sb.append("<h2>Life areas</h2>");
+        sb.append("<h2>Life areas</h2>").append(WhoseChart.html(skymap));
         sb.append(ReadingCard.html(cards(f), Settings.astrologerView()));
         List<String> quiet = quietAreas(f);
         if (!quiet.isEmpty()) {

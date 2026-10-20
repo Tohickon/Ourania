@@ -352,7 +352,7 @@ final class OverviewPanel extends JPanel {
                 + "what kind of chart it is.</p></body></html>");
             return sb.toString();
         }
-        sb.append("<h2>Chart shape</h2>");
+        sb.append("<h2>Chart shape</h2>").append(WhoseChart.html(skymap));
         for (Card c : cards) {
             // In Astrologer view every card starts open, and a click closes it instead.
             boolean open = expanded.contains(c.id) != Settings.astrologerView();

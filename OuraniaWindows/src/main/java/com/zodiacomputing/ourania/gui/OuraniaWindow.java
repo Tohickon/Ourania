@@ -469,45 +469,7 @@ public class OuraniaWindow extends JFrame {
                 inside.refire();
             }
         });
-        java.util.function.Consumer<String> onPage = page -> {
-            // The same rule as the readings below: a card swap is not a door, and a page built
-            // once would go on describing a chart the transport buttons have already left.
-            if (OVERVIEW_PAGE.equals(page)) {
-                if (overviewPanel != null) {
-                    overviewPanel.refresh();
-                }
-                return;
-            }
-            if (READING_PAGE.equals(page)) {
-                if (interpretationPanel != null) {
-                    interpretationPanel.updateInterpretations();
-                }
-                return;
-            }
-            if (LIFE_AREAS_PAGE.equals(page)) {
-                if (lifeAreasPanel != null) {
-                    lifeAreasPanel.refresh();
-                }
-                return;
-            }
-            if (TRANSITS_PAGE.equals(page)) {
-                refreshTransitsPane();
-                return;
-            }
-            if (MEET_PAGE.equals(page) || CHEMISTRY_PAGE.equals(page)) {
-                refreshTogetherPanes();
-                return;
-            }
-            for (String[] r : READINGS) {
-                if (r[0].equals(page)) {
-                    // Regenerated on each open. A reading is a snapshot of a moment, and the
-                    // moment moves whenever the transport buttons do, so a cached page would
-                    // quietly describe a chart that is no longer on screen.
-                    runReading(r[1]);
-                    return;
-                }
-            }
-        };
+        java.util.function.Consumer<String> onPage = page -> rebuildPage(page, true);
         blueprint.setOnSelect(onPage);
         together.setOnSelect(onPage);
         chronometry.setOnSelect(onPage);
@@ -1790,7 +1752,11 @@ public class OuraniaWindow extends JFrame {
             // the reader called this chart and summary() is the line a control uses to say what
             // it will draw - writing either out again here would be a second copy of a rule this
             // project has already had six copies of once.
-            com.zodiacomputing.ourania.astro.ChartSubject who = skymapPanel.chartASubject();
+            // The chart the reading is about, which Chart B's chip can change.
+            com.zodiacomputing.ourania.astro.ChartSubject who = skymapPanel.describedSubject();
+            if (who == null) {
+                who = skymapPanel.chartASubject();
+            }
             ChartExporter.saveReadingPdf(this, skymapPanel.chartComponent(),
                 interpretationPanel.getEditorPane(),
                 who == null ? "" : who.label,
@@ -2270,6 +2236,75 @@ public class OuraniaWindow extends JFrame {
             boolean chartBIn) {
         if (skymapPanel != null) {
             skymapPanel.applyChartMode(mode, transits, chartAIn, chartBIn);
+            // <b>A chip changes who the pages are about, so the page in front must say so now.</b>
+            // These pages are built when they are opened, and a chip press does not open one -
+            // so Chart B could be selected while the Overview, Life areas and Reading pages
+            // went on describing Chart A until the reader left and came back.
+            rebuildOpenPage();
+        }
+    }
+
+    /**
+     * Builds one page from the chart now on the wheel.
+     *
+     * <b>The one place a page is made on open</b>, shared by the rail (a reader opening it) and a
+     * chip (the chart under it changed). A card swap is not a door, and a page built once would
+     * go on describing a chart the reader has already left.
+     *
+     * @param runReadings whether the Snapshot/Report/Synthesize tabs are re-run. A chip press
+     *     leaves them out: the wheel re-runs the reading on screen itself, and re-running it here
+     *     would replay its reveal for a reading nobody asked for.
+     */
+    private void rebuildPage(String page, boolean runReadings) {
+        if (OVERVIEW_PAGE.equals(page)) {
+            if (overviewPanel != null) {
+                overviewPanel.refresh();
+            }
+            return;
+        }
+        if (READING_PAGE.equals(page)) {
+            // A reading on this page is refreshed by the wheel; the general page is not.
+            if (interpretationPanel != null && (runReadings || !skymapPanel.readingOpen())) {
+                interpretationPanel.updateInterpretations();
+            }
+            return;
+        }
+        if (LIFE_AREAS_PAGE.equals(page)) {
+            if (lifeAreasPanel != null) {
+                lifeAreasPanel.refresh();
+            }
+            return;
+        }
+        if (TRANSITS_PAGE.equals(page)) {
+            refreshTransitsPane();
+            return;
+        }
+        if (MEET_PAGE.equals(page) || CHEMISTRY_PAGE.equals(page)) {
+            refreshTogetherPanes();
+            return;
+        }
+        if (!runReadings) {
+            return;
+        }
+        for (String[] r : READINGS) {
+            if (r[0].equals(page)) {
+                // Regenerated on each open. A reading is a snapshot of a moment, and the
+                // moment moves whenever the transport buttons do, so a cached page would
+                // quietly describe a chart that is no longer on screen.
+                runReading(r[1]);
+                return;
+            }
+        }
+    }
+
+    /** Rebuilds the page the reader is looking at, if the left rail is open on one. */
+    private void rebuildOpenPage() {
+        if (chartRail == null || !chartRail.isOpen()) {
+            return;
+        }
+        String page = currentPage();
+        if (page != null) {
+            rebuildPage(page, false);
         }
     }
 

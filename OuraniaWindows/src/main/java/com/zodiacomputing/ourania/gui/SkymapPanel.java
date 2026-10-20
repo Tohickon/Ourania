@@ -1071,9 +1071,50 @@ implements WheelSource, GlobeSource {
         return this.ringAOn;
     }
 
+    /** Whether a Snapshot, Report or Synthesis is the reading on screen. */
+    boolean readingOpen() {
+        return this.readingTier != ReadingTier.NONE;
+    }
+
     /** Whether Chart B is in the chart. */
     boolean chartBIn() {
         return this.ringBOn;
+    }
+
+    /**
+     * The chart the You pages describe: whoever sits on the inner wheel, or null for the sky.
+     *
+     * <b>Derived from the chips, not remembered.</b> {@code castRoles} already picks this
+     * subject from the ring state, and every page reads the frame cast from it. This only
+     * names it, so a page can say whose chart it is without keeping a second answer.
+     */
+    public com.zodiacomputing.ourania.astro.ChartSubject describedSubject() {
+        return this.anchorSubject;
+    }
+
+    /**
+     * One short plain sentence that says which chart the You pages describe.
+     *
+     * Chart A on its own, Chart B on its own, both (the inner one is read; the other is named
+     * and the way to read it is given), a composite, or the sky when neither person is in.
+     */
+    public String whoseChart() {
+        if (this.isRelationshipChart()) {
+            return "These pages describe the composite of Chart A and Chart B.";
+        }
+        com.zodiacomputing.ourania.astro.ChartSubject who = this.anchorSubject;
+        if (who == null) {
+            return "These pages describe the sky: " + this.subjectSky.summary() + ".";
+        }
+        boolean isA = who == this.subjectA;
+        String slot = isA ? "Chart A" : "Chart B";
+        String name = who.label == null || who.label.isEmpty() || who.label.equals(slot)
+            ? slot : slot + " (" + who.label + ")";
+        String s = "These pages describe " + name + ": " + who.summary() + ".";
+        if (isA && this.ringBOn && this.subjectB.entered()) {
+            s += " Chart B is on the wheel too. Turn Chart A off to read Chart B here.";
+        }
+        return s;
     }
 
     /**

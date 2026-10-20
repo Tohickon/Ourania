@@ -1186,6 +1186,7 @@ public class InterpretationPanel extends JPanel {
             }
             html.append("</p>");
         }
+        html.append(WhoseChart.html(skymapPanel));
         html.append(cardsHtml).append("</body></html>");
         setHtml(html.toString(), false);
     }
@@ -1212,6 +1213,7 @@ public class InterpretationPanel extends JPanel {
             }
             html.append("</p>");
         }
+        html.append(WhoseChart.html(skymapPanel));
         html.append("<pre style='font-family:Consolas,monospace; font-size:10px; color:#E0E0E0;'>")
             .append(escape(report))
             .append("</pre>");
@@ -1224,7 +1226,7 @@ public class InterpretationPanel extends JPanel {
      * Uses normal flow layout (preformatted=false) since it is regular markup, not a table.
      */
     public void showSynthesis(String html) {
-        setHtml(html, false);
+        setHtml(WhoseChart.into(html, skymapPanel), false);
     }
 
     /**
@@ -3900,6 +3902,7 @@ public class InterpretationPanel extends JPanel {
             .append(" &middot; ")
             .append(escape(time.getZone().getId().replace('_', ' ')))
             .append("</div>");
+        html.append(WhoseChart.html(skymapPanel));
         html.append("<div style='font-size:11px; margin:8px 0 14px 0;'>"
             + "<a href='index' style='color:" + CARD_LINK + ";'>"
             + "Browse everything the app knows &rarr;</a></div>");
