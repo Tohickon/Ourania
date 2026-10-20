@@ -363,6 +363,23 @@ public final class NowCardsCheck {
             e -> page.contains("<div id='" + TransitCard.id(e.hit()) + "'>")));
         yes("a running clock shows right now and says the rest follows",
             NowCards.html(sky, natal, cusps, false, "", null).contains("Stop the clock"));
+
+        // Coming up (2026-10-20): the same contacts to the chart, cut to the near term.
+        String coming = NowCards.comingUpHtml(all, sat);
+        yes("Coming up is its own page", coming.contains("Coming up"));
+        List<String> wrong = new ArrayList<>();
+        int near = 0;
+        for (NowTimeline.Entry e : all) {
+            boolean inside = Double.isNaN(e.jd()) || e.jd() <= sat + NowCards.COMING_UP_DAYS;
+            boolean onPage = coming.contains("<div id='" + TransitCard.id(e.hit()) + "'>");
+            near += inside ? 1 : 0;
+            if (inside != onPage) {
+                wrong.add(TransitCard.id(e.hit()) + (inside ? " missing" : " past 90 days"));
+            }
+        }
+        yes("Coming up has contacts in its 90 days, " + near, near > 0);
+        yes("and something past them to leave out", near < all.size());
+        eq("every contact in the 90 days and none after", "[]", wrong.toString());
     }
 
     private static NowTimeline.Window win(int y, int m, int d, int h, double now, java.time.ZoneId z) {

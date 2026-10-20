@@ -4191,10 +4191,16 @@ implements WheelSource, GlobeSource {
     }
 
     private void showAnnualCalendar() {
-        if (this.sw == null || this.natalRing.time == null || this.window == null) {
+        if (this.sw == null || this.window == null) {
             return;
         }
-        final int n = this.natalRing.time.getYear();
+        // <b>The year of the moment being read, not of the birth (2026-10-20).</b> This read
+        // natalRing.time, which is the inner wheel's moment - the birth - so a 1982 chart got
+        // the 1982 sky on a tab behind Now. skyRing carries the reading's moment in every mode
+        // and follows the transport buttons; the profection is read at it too. The
+        // calendar is the sky's own events, so it needs no chart at all.
+        final int n = this.skyRing.time != null ? this.skyRing.time.getYear()
+            : java.time.Year.now().getValue();
         this.readingTier = ReadingTier.NONE;
         this.window.showCalendar(n, "Scanning the ephemeris for " + n + "...");
         new SwingWorker<String, Void>(){
@@ -4809,6 +4815,10 @@ implements WheelSource, GlobeSource {
         // chronometry below needs this and not the transit wheel's.
         final double dNow = this.skyRing.sd != null
             ? this.skyRing.sd.getJulDay() : Double.NaN;
+        // Coming up reads the pair the Now page reads, by the same rule, so the two agree.
+        final WheelRing comingSky = this.nowRing();
+        final WheelRing comingNatal = this.natalRing;
+        final double[] comingCusps = this.activeCusps.clone();
         new SwingWorker<String, Void>(){
 
             /** The headline theme to reveal, when the reader asked and the year has one. */
@@ -4856,10 +4866,10 @@ implements WheelSource, GlobeSource {
                 // phone both call it. The comments that explained each step moved with them.
                 Chronometry time = Chronometry.at(SkymapPanel.this.sw, chartFrame, d, dNow, list,
                     bl ? d4 : Double.NaN, d5, d6, d2, d3, c,
-                    readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE
-                        || readingTier == ReadingTier.TIMELINE,
+                    // Not Coming up: it walks its own timeline and reads no year scan.
+                    readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE,
                     // Your year is the twelve months from now (David, 2026-10-17); the report
-                    // and Coming up keep the birthday year.
+                    // keeps the birthday year.
                     readingTier == ReadingTier.SYNTHESIZE);
                 profection = time.profection;
                 chartFrame2 = time.transit;
@@ -4880,9 +4890,18 @@ implements WheelSource, GlobeSource {
                     return (String)object;
                 }
                 
-if (readingTier == ReadingTier.TIMELINE) {
-    return com.zodiacomputing.ourania.gui.TimelinePredictor.generate(chartFrame, chartFrame2);
-}
+                // <b>Coming up is transits to the chart, by date (2026-10-20).</b> It was
+                // TimelinePredictor, which read the sky alone - see NowCards.comingUpHtml.
+                // Its own ephemeris: the panel's is the EDT's, and this is a worker.
+                if (readingTier == ReadingTier.TIMELINE) {
+                    if (comingSky == null || comingSky.sd == null) {
+                        return NowCards.comingUpHtml(java.util.List.of(), Double.NaN);
+                    }
+                    return NowCards.comingUpHtml(
+                        NowTimeline.build(new SwissEph(SkymapPanel.EPHE_PATH), comingSky,
+                            comingNatal, comingCusps),
+                        comingSky.sd.getJulDay());
+                }
 if (readingTier == ReadingTier.SYNTHESIZE) {
                     // The mode decides which prose the reading speaks. Captured from the
                     // panel rather than sniffed from the frame: syntheticMoment is true for

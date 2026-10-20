@@ -269,9 +269,43 @@ public final class NowCards {
 
     /** The plain page: the timeline's windows in order, each with its cards. */
     static String timelineHtml(List<NowTimeline.Entry> entries, boolean complete) {
-        StringBuilder sb = ReadingCard.page("Now",
-            "What the sky is doing to your chart, from right now to a year ahead.");
-        List<NowTimeline.Entry> shown = visible(entries);
+        return timelineHtml("Now",
+            "What the sky is doing to your chart, from right now to a year ahead.",
+            entries, visible(entries), complete);
+    }
+
+    /** How far ahead Coming up looks: the near term, which is what that page is for. */
+    static final double COMING_UP_DAYS = 90.0;
+
+    /**
+     * The Coming up page: the same timeline as Now, cut to the next {@link #COMING_UP_DAYS}
+     * days, with every contact in that stretch shown rather than three a window.
+     *
+     * <b>David, 2026-10-20.</b> Coming up was written by TimelinePredictor, which read the
+     * transit sky <i>in place of</i> the chart and listed the aspects the sky's planets made to
+     * each other - so nothing on it was about the reader, and its Past, Present and Future were
+     * fixed lists of bodies rather than dates. The Now timeline was already the right engine:
+     * transits to the chart, at the moments they are exact. One engine, two lengths of view.
+     *
+     * @param now the moment the timeline was built from, as a Julian day
+     */
+    static String comingUpHtml(List<NowTimeline.Entry> entries, double now) {
+        List<NowTimeline.Entry> near = new ArrayList<>();
+        for (NowTimeline.Entry e : entries) {
+            // Right now has no date of its own: it is in orb at this moment.
+            if (Double.isNaN(e.jd()) || e.jd() <= now + COMING_UP_DAYS) {
+                near.add(e);
+            }
+        }
+        return timelineHtml("Coming up",
+            "What the sky does to your chart in the next " + (int) COMING_UP_DAYS
+                + " days, in date order.",
+            near, near, true);
+    }
+
+    private static String timelineHtml(String title, String lede,
+            List<NowTimeline.Entry> entries, List<NowTimeline.Entry> shown, boolean complete) {
+        StringBuilder sb = ReadingCard.page(title, lede);
         if (entries.isEmpty()) {
             sb.append(QUIET_SKY);
         }
