@@ -369,8 +369,9 @@ public final class TogetherCardsCheck {
             @SuppressWarnings("unchecked")
             List<javax.swing.JCheckBox> boxes =
                 (List<javax.swing.JCheckBox>) CheckReflect.get(w, "astrologerChecks");
-            yes("Now and both Together pages carry the box (" + boxes.size() + ")",
-                boxes.size() == 3);
+            // Coming up, Where you meet, Chemistry, and Coming up together (2026-10-20).
+            yes("Coming up, both pair pages and Coming up together carry the box ("
+                + boxes.size() + ")", boxes.size() == 4);
             boolean was = Settings.astrologerView();
             try {
                 SwingUtilities.invokeAndWait(() -> boxes.get(0).setSelected(!was));

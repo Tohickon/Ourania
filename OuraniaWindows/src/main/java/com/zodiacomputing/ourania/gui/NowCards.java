@@ -306,6 +306,21 @@ public final class NowCards {
     private static String timelineHtml(String title, String lede,
             List<NowTimeline.Entry> entries, List<NowTimeline.Entry> shown, boolean complete) {
         StringBuilder sb = ReadingCard.page(title, lede);
+        sb.append(windowsHtml(entries, shown));
+        if (!complete) {
+            sb.append("<p style='color:#9AA5B1; font-size:12px;'>Stop the clock to see what is"
+                + " coming later.</p>");
+        }
+        sb.append("</body></html>");
+        return sb.toString();
+    }
+
+    /**
+     * The timeline's windows in order, each headed and with its cards - the body of a timeline
+     * page, without the page around it. Coming up together draws one of these per person.
+     */
+    static String windowsHtml(List<NowTimeline.Entry> entries, List<NowTimeline.Entry> shown) {
+        StringBuilder sb = new StringBuilder();
         if (entries.isEmpty()) {
             sb.append(QUIET_SKY);
         }
@@ -334,11 +349,6 @@ public final class NowCards {
                   .append(w.title.toLowerCase(java.util.Locale.ROOT)).append(".</p>");
             }
         }
-        if (!complete) {
-            sb.append("<p style='color:#9AA5B1; font-size:12px;'>Stop the clock to see what is"
-                + " coming later.</p>");
-        }
-        sb.append("</body></html>");
         return sb.toString();
     }
 

@@ -312,7 +312,6 @@ public final class NavigationCheck {
         }
         for (String p : new String[] {OuraniaWindow.CHART_PAGE, OuraniaWindow.TRANSITS_PAGE,
                                       OuraniaWindow.SYNASTRY_PAGE,
-                                      OuraniaWindow.SELECTION_PAGE,
                                       OuraniaWindow.READING_PAGE}) {
             ok("the rail has a page for " + p, pages.contains(p));
         }
@@ -2417,6 +2416,8 @@ public final class NavigationCheck {
                 final boolean isPattern = link.getKey().startsWith("pattern|");
                 SwingUtilities.invokeAndWait(() -> {
                     w[0].revealPage(OuraniaWindow.CHART_PAGE);
+                    // Shut, so each click has to open it for itself.
+                    w[0].closeSelection();
                     if (isPattern) {
                         // Filler, scrolled well down a real-sized viewport, so a page that
                         // neither changes nor returns to its heading is seen doing neither.
@@ -2441,9 +2442,19 @@ public final class NavigationCheck {
                 String h = link.getKey();
                 String kind = h.equals("index") ? "the Index link"
                     : h.startsWith("pattern|") ? "a pattern link" : "the body link " + h;
-                ok(kind + " leaves the Chart page for the page it wrote to, showing "
-                    + w[0].currentPage(),
-                    !OuraniaWindow.CHART_PAGE.equals(w[0].currentPage()) && rail.isOpen());
+                // <b>A selection opens under the wheel and leaves the page alone (2026-10-20).</b>
+                // A body or a pattern goes to the Selected drawer, so the reader keeps the
+                // Chart page they clicked on; the index link still goes to the whole reading.
+                if (h.equals("index")) {
+                    ok(kind + " leaves the Chart page for the reading, showing "
+                        + w[0].currentPage(),
+                        !OuraniaWindow.CHART_PAGE.equals(w[0].currentPage()) && rail.isOpen());
+                } else {
+                    ok(kind + " opens the Selected drawer and keeps the Chart page, showing "
+                        + w[0].currentPage(),
+                        w[0].selectionShowing()
+                            && OuraniaWindow.CHART_PAGE.equals(w[0].currentPage()));
+                }
                 if (!h.equals("index") && !h.startsWith("pattern|")) {
                     continue;
                 }
@@ -2455,8 +2466,8 @@ public final class NavigationCheck {
                 // <b>A figure is a selection.</b> David: "interpretation was meant to be a tab
                 // to interpret the entire chart, selection was meant to define and show what
                 // was selected" - and it should bloom out whole, not stop short.
-                ok(kind + " opens on the Selection page, not " + w[0].currentPage(),
-                    OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage()));
+                // The Selected drawer under the wheel since 2026-10-20, not a rail page.
+                ok(kind + " opens the Selected drawer", w[0].selectionShowing());
                 // Two turns of the queue: setHtml restores the old position later, and the
                 // return to the top is queued behind that.
                 SwingUtilities.invokeAndWait(() -> { });
@@ -2542,7 +2553,7 @@ public final class NavigationCheck {
                     }
                 });
                 SwingUtilities.invokeAndWait(() -> { });
-                boolean opened = OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage())
+                boolean opened = w[0].selectionShowing()
                     && selectionPane.getText().replaceAll("<[^>]+>", "").toLowerCase()
                         .contains(owners.get(i).toLowerCase());
                 if (!opened) {
@@ -2630,8 +2641,9 @@ public final class NavigationCheck {
                     // <b>A clicked thing is a selection.</b> David: "interpretation was meant to
                     // be a tab to interpret the entire chart, selection was meant to define and
                     // show what was selected". Every one of these wrote over Interpretation.
-                    ok("the " + route + " route opens on Selection, showing " + w[0].currentPage(),
-                        OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage()) && rail.isOpen());
+                    // In the drawer under the wheel; the rail keeps the page the reader had.
+                    ok("the " + route + " route opens the Selected drawer",
+                        w[0].selectionShowing());
                     String sel = selection.getText();
                     ok("the " + route + " route put its reading there, " + sel.length() + " chars",
                         sel.length() > 400 && !sel.equals(lastSelection[0]));
@@ -2680,10 +2692,8 @@ public final class NavigationCheck {
                 w[0].handlePlacementClick("sign|Aquarius");
             });
             SwingUtilities.invokeAndWait(() -> { });
-            ok("a sign linked inside a Selection reading opens on Selection, showing "
-                + w[0].currentPage(),
-                OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage())
-                    && selection.getText().contains("Aquarius"));
+            ok("a sign linked inside a Selection reading stays in the Selected drawer",
+                w[0].selectionShowing() && selection.getText().contains("Aquarius"));
             SwingUtilities.invokeAndWait(() -> w[0].handlePlacementClick("back"));
             SwingUtilities.invokeAndWait(() -> { });
             ok("\"back\" goes to the whole chart on Interpretation, showing "

@@ -551,22 +551,25 @@ public final class RingIdentityCheck {
                 column.getComponents().length == tabs.size());
 
             // The pages, one level down, in the order they are read.
-            eq("Placements holds the two charts, their shape, then the body clicked",
+            // Selected is the drawer under the wheel, not a page (2026-10-20).
+            eq("Placements holds the two charts, then their shape",
                 Arrays.asList(OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
-                    OuraniaWindow.OVERVIEW_PAGE, OuraniaWindow.SELECTION_PAGE),
+                    OuraniaWindow.OVERVIEW_PAGE),
                 w[0].placementsRail().pages());
             eq("Interpretation holds the readings in the spec's order, then the pair's pages",
                 Arrays.asList("Snapshot", OuraniaWindow.LIFE_AREAS_PAGE,
                     OuraniaWindow.READING_PAGE, "Synthesize", "Report",
                     OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE),
                 w[0].interpretationRail().pages());
-            eq("Prediction holds what is coming, the year, then the calendar",
-                Arrays.asList(OuraniaWindow.TRANSITS_PAGE, OuraniaWindow.YEAR_PAGE, "Calendar"),
+            eq("Prediction holds what is coming, for one and for two, the year, the calendar",
+                Arrays.asList(OuraniaWindow.TRANSITS_PAGE, OuraniaWindow.PAIR_COMING_PAGE,
+                    OuraniaWindow.YEAR_PAGE, "Calendar"),
                 w[0].predictionRail().pages());
 
             // <b>Nothing was lost in the move.</b> Fourteen pages before 2026-10-20; Predict
-            // went (its 90-day list was the Now timeline again) and Synthesize became two
-            // pages, the chart's themes and Your year - so fourteen still.
+            // went (its 90-day list was the Now timeline again), Synthesize became two pages,
+            // the chart's themes and Your year, Selected became the drawer, and Coming up
+            // together is new - fourteen.
             List<String> every = new ArrayList<>(w[0].placementsRail().pages());
             every.addAll(w[0].interpretationRail().pages());
             every.addAll(w[0].predictionRail().pages());

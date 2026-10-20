@@ -56,7 +56,11 @@ public class OuraniaWindow extends JFrame {
     /** Where you meet. Kept under its old name; it is the pane the Synastry page always was. */
     private javax.swing.JEditorPane synastryPane;
     private javax.swing.JEditorPane chemistryPane;
+    /** Coming up together: the sky over both charts, when there are two (PairTimeline). */
+    private javax.swing.JEditorPane pairComingPane;
     private javax.swing.JEditorPane selectionPane;
+    /** Where selectionPane is shown: a drawer under the wheel, since 2026-10-20. */
+    private SelectionDrawer selectionDrawer;
     /** Every "Show the astrology" box on a plain page, so ticking one shows in all of them. */
     private final java.util.List<javax.swing.JCheckBox> astrologerChecks = new java.util.ArrayList<>();
     private String lastTransitHtml = "";
@@ -115,7 +119,8 @@ public class OuraniaWindow extends JFrame {
     static final String MEET_LABEL = "Where you meet";
     /** The second page behind Together: the aspects between two charts (2026-10-16). */
     public static final String CHEMISTRY_PAGE = "Chemistry";
-    public static final String SELECTION_PAGE = "Selection";
+    /** What the sky does to both charts and to each, behind Prediction (2026-10-20). */
+    public static final String PAIR_COMING_PAGE = "Coming up together";
     /** What kind of chart this is, before any of the detail. */
     public static final String OVERVIEW_PAGE = "Overview";
     public static final String READING_PAGE = "Interpretation";
@@ -373,6 +378,11 @@ public class OuraniaWindow extends JFrame {
         prediction.addPage(TRANSITS_PAGE, astrologerPage(transitPane, "<html>Astrologer view: "
             + "on, show the exact aspects, orbs, and planetary coordinates.<br>Off: plain "
             + "cards, from right now to a year ahead.</html>"));
+        // The pair's timeline sits next to the one-person timeline it is built from.
+        pairComingPane = HtmlPanes.chartPane(this);
+        prediction.addPage(PAIR_COMING_PAGE, astrologerPage(pairComingPane, "<html>Astrologer "
+            + "view: on, show the placements behind each card.<br>Off: the plain cards only."
+            + "</html>"));
         // <b>The pair's pages are built here, before the wheel</b>, whose constructor already
         // writes to them; the readings that come before them on the strip are put in front of
         // them further down (SubRail.addPageBefore).
@@ -416,7 +426,9 @@ public class OuraniaWindow extends JFrame {
         Accessibility.name(skymapPanel, "Chart wheel",
             "The chart, drawn. Every position it shows is also listed in words on the "
             + "Placements page of the left rail.");
-        contentPanel.add(skymapPanel, "SKYMAP");
+        // The wheel goes in with the Selected drawer under it (SelectionDrawer).
+        selectionDrawer = new SelectionDrawer(skymapPanel, HtmlPanes.scroller(selectionPane));
+        contentPanel.add(selectionDrawer.withWheel(), "SKYMAP");
 
         nameListPanel = new NameListPanel(skymapPanel, this);
         contentPanel.add(nameListPanel, "NAME_LIST");
@@ -446,12 +458,11 @@ public class OuraniaWindow extends JFrame {
             readings.put(r[0], readingPage(r[1], HtmlPanes.scroller(pane)));
         }
         // <b>The order on each strip is the spec's, top to bottom.</b> Placements: Chart A,
-        // Chart B, Chart shape, then Selected - the one body clicked, the narrowest scope, until
-        // it has a drawer of its own. Interpretation: At a glance, Life areas, Reading,
+        // Chart B, Chart shape. Selected is not a page: it is the drawer under the wheel.
+        // Interpretation: At a glance, Life areas, Reading,
         // Synthesize, Full report, then the pair's two pages. Prediction: Coming up, Your year,
         // Calendar.
         placements.addPage(OVERVIEW_PAGE, overviewPanel);
-        placements.addPage(SELECTION_PAGE, HtmlPanes.scroller(selectionPane));
         interpretation.addPageBefore("Snapshot", readings.get("Snapshot"), MEET_PAGE);
         interpretation.addPageBefore(LIFE_AREAS_PAGE, lifeAreasPanel, MEET_PAGE);
         interpretation.addPageBefore(READING_PAGE, interpretationPanel, MEET_PAGE);
@@ -482,9 +493,6 @@ public class OuraniaWindow extends JFrame {
         placements.setOnSelect(onPage);
         interpretation.setOnSelect(onPage);
         prediction.setOnSelect(onPage);
-
-        // Nothing has been clicked yet, so Selection has nothing to show.
-        placements.setPageEnabled(SELECTION_PAGE, false);
 
         // <b>One strip on the east edge, with a tab each.</b> The grid was tried across the
         // top, where its handle was a bar lying between two vertical strips and read as a
@@ -1026,8 +1034,7 @@ public class OuraniaWindow extends JFrame {
         "Synthesize", "Synthesize",
         YEAR_PAGE, "Your year",
         OVERVIEW_PAGE, "Chart shape",
-        READING_PAGE, "Reading",
-        SELECTION_PAGE, "Selected");
+        READING_PAGE, "Reading");
 
     /**
      * A chart page is named for whose chart it is.
@@ -1106,6 +1113,7 @@ public class OuraniaWindow extends JFrame {
             // everything behind it is greyed.
             setPageEnabled(MEET_PAGE, hasContent(synastryHtml));
             setPageEnabled(CHEMISTRY_PAGE, hasContent(synastryHtml));
+            setPageEnabled(PAIR_COMING_PAGE, hasContent(synastryHtml));
         }
         if (natalPane != null) {
             HtmlPanes.setHtml(natalPane, natalHtml);
@@ -1177,6 +1185,29 @@ public class OuraniaWindow extends JFrame {
         boolean why = Settings.astrologerView();
         HtmlPanes.setHtml(synastryPane, TogetherCards.meetHtml(pair, why));
         HtmlPanes.setHtml(chemistryPane, TogetherCards.chemistryHtml(pair, why));
+        refreshPairComing(why);
+    }
+
+    /**
+     * Coming up together, from each person's own timeline (PairTimeline).
+     *
+     * Built only when the page is in front: two timelines are two walks of the ephemeris, and
+     * the Together pages are redrawn on every chart change whichever page is showing.
+     */
+    private void refreshPairComing(boolean why) {
+        if (pairComingPane == null || skymapPanel == null || skymapPanel.sw == null
+                || !PAIR_COMING_PAGE.equals(currentPage())) {
+            return;
+        }
+        WheelRing sky = skymapPanel.nowRing();
+        String a = whoseChart(skymapPanel.chartASubject(), WheelRing.Kind.CHART_A, "Chart A");
+        String b = whoseChart(skymapPanel.chartBSubject(), WheelRing.Kind.CHART_B, "Chart B");
+        HtmlPanes.setHtml(pairComingPane, PairTimeline.html(
+            NowTimeline.build(skymapPanel.sw, sky, skymapPanel.natalRing, skymapPanel.activeCusps),
+            a,
+            NowTimeline.build(skymapPanel.sw, sky, skymapPanel.outerRing,
+                skymapPanel.outerRing.cusps),
+            b, why));
     }
 
     /** Every page drawn as plain cards, after Astrologer view changes. */
@@ -1543,10 +1574,22 @@ public class OuraniaWindow extends JFrame {
                 }
             }
         }
-        if (chartRail != null) {
-            // There is something selected now, so the tab stops being greyed out.
-            setPageEnabled(SELECTION_PAGE, true);
-            revealPage(SELECTION_PAGE);
+        // <b>Under the wheel, and the rail is left as it was.</b> The reader keeps the page
+        // they were reading; what they clicked opens beside it rather than in its place.
+        if (selectionDrawer != null) {
+            selectionDrawer.open();
+        }
+    }
+
+    /** Whether the Selected drawer is open under the wheel. */
+    boolean selectionShowing() {
+        return selectionDrawer != null && selectionDrawer.isOpen();
+    }
+
+    /** Puts the Selected drawer away. */
+    void closeSelection() {
+        if (selectionDrawer != null) {
+            selectionDrawer.close();
         }
     }
 
@@ -2321,7 +2364,8 @@ public class OuraniaWindow extends JFrame {
             refreshTransitsPane();
             return;
         }
-        if (MEET_PAGE.equals(page) || CHEMISTRY_PAGE.equals(page)) {
+        if (MEET_PAGE.equals(page) || CHEMISTRY_PAGE.equals(page)
+                || PAIR_COMING_PAGE.equals(page)) {
             refreshTogetherPanes();
             return;
         }
