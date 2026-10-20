@@ -536,9 +536,9 @@ public final class RingIdentityCheck {
         try {
             DrawerRail rail = w[0].chartRail();
 
-            // Three doors, in the order a chart is read: the person, the pair, the moment.
-            eq("the rail is three tabs", Arrays.asList(OuraniaWindow.BLUEPRINT_PAGE,
-                OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHRONOMETRY_PAGE),
+            // Three tabs, the spec's since 2026-10-20: the data, the reading, the timing.
+            eq("the rail is three tabs", Arrays.asList(OuraniaWindow.PLACEMENTS_DOOR,
+                OuraniaWindow.INTERPRETATION_DOOR, OuraniaWindow.PREDICTION_DOOR),
                 rail.pageNames());
 
             // <b>No rules left, and that is asserted rather than assumed.</b> A separator
@@ -551,30 +551,27 @@ public final class RingIdentityCheck {
                 column.getComponents().length == tabs.size());
 
             // The pages, one level down, in the order they are read.
-            eq("Blueprint holds the two charts, the views of them, then the documents",
+            eq("Placements holds the two charts, their shape, then the body clicked",
                 Arrays.asList(OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
-                    OuraniaWindow.OVERVIEW_PAGE, OuraniaWindow.LIFE_AREAS_PAGE,
-                    OuraniaWindow.READING_PAGE,
-                    OuraniaWindow.SELECTION_PAGE, "Snapshot", "Report", "Synthesize"),
-                w[0].blueprintRail().pages());
-            eq("Chronometry holds the sky, then the documents about time",
-                Arrays.asList(OuraniaWindow.TRANSITS_PAGE, "Predict", "Calendar"),
-                w[0].chronometryRail().pages());
+                    OuraniaWindow.OVERVIEW_PAGE, OuraniaWindow.SELECTION_PAGE),
+                w[0].placementsRail().pages());
+            eq("Interpretation holds the readings in the spec's order, then the pair's pages",
+                Arrays.asList("Snapshot", OuraniaWindow.LIFE_AREAS_PAGE,
+                    OuraniaWindow.READING_PAGE, "Synthesize", "Report",
+                    OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE),
+                w[0].interpretationRail().pages());
+            eq("Prediction holds what is coming, the year, then the calendar",
+                Arrays.asList(OuraniaWindow.TRANSITS_PAGE, OuraniaWindow.YEAR_PAGE, "Calendar"),
+                w[0].predictionRail().pages());
 
-            // <b>Nothing was lost on the way down.</b> Twelve pages before, twelve now -
-            // eleven on the two strips and Synastry, which is a tab in its own right.
-            List<String> every = new ArrayList<>(w[0].blueprintRail().pages());
-            every.addAll(w[0].chronometryRail().pages());
-            // Together has a strip of its own since Phase 4 (2026-10-16): Synastry is its
-            // first page, under the same name, and Chemistry is new.
-            eq("Together holds the pair's two pages",
-                Arrays.asList(OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE),
-                w[0].togetherRail().pages());
-            every.addAll(w[0].togetherRail().pages());
-            // Thirteen since Life areas joined Blueprint (2026-10-13), fourteen since
-            // Chemistry joined Together: twelve kept, two added.
-            eq("twelve pages went in, twelve came out, and Life areas and Chemistry joined them",
-                14, every.size());
+            // <b>Nothing was lost in the move.</b> Fourteen pages before 2026-10-20; Predict
+            // went (its 90-day list was the Now timeline again) and Synthesize became two
+            // pages, the chart's themes and Your year - so fourteen still.
+            List<String> every = new ArrayList<>(w[0].placementsRail().pages());
+            every.addAll(w[0].interpretationRail().pages());
+            every.addAll(w[0].predictionRail().pages());
+            eq("fourteen pages, each on one strip", 14, every.size());
+            eq("and none on two", 14, new java.util.HashSet<>(every).size());
 
             // And each is still addressable by the name its callers hold. revealPage has to
             // land on the page itself, not merely on the tab above it - opening the right
@@ -599,14 +596,14 @@ public final class RingIdentityCheck {
             // <b>A tab greys when there is nothing left inside it.</b> A door to an empty
             // room is the defect the placeholder cards were pulled for; the page greying was
             // always honest and the tab above it had no opinion at all.
-            for (String page : w[0].chronometryRail().pages()) {
+            for (String page : w[0].predictionRail().pages()) {
                 w[0].setPageEnabled(page, false);
             }
-            ok("Chronometry greys out when all of its pages are greyed",
-                !rail.isPageEnabled(OuraniaWindow.CHRONOMETRY_PAGE));
+            ok("Prediction greys out when all of its pages are greyed",
+                !rail.isPageEnabled(OuraniaWindow.PREDICTION_DOOR));
             w[0].setPageEnabled(OuraniaWindow.TRANSITS_PAGE, true);
             ok("and lights again as soon as one of them comes back",
-                rail.isPageEnabled(OuraniaWindow.CHRONOMETRY_PAGE));
+                rail.isPageEnabled(OuraniaWindow.PREDICTION_DOOR));
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }

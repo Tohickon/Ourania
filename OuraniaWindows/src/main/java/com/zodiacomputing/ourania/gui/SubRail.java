@@ -67,11 +67,28 @@ final class SubRail extends JPanel {
 
     /** Add a page. The first one added is the one shown. */
     void addPage(String name, JComponent page) {
+        this.addPageBefore(name, page, null);
+    }
+
+    /**
+     * Add a page in front of another one, or at the end when {@code before} is not here.
+     *
+     * <b>The strip's order is the reading order, and the pages are not all built at once.</b>
+     * The pair's pages exist before the wheel does, because the wheel's constructor already
+     * writes to them; the readings that come first on the same strip are built after it. So
+     * order cannot be the order of construction (2026-10-20, the Interpretation strip).
+     */
+    void addPageBefore(String name, JComponent page, String before) {
         Tab tab = new Tab(name);
         this.tabs.put(name, tab);
-        this.order.add(name);
-        this.strip.add(tab);
-        this.body.add(page, name);
+        int at = before == null ? -1 : this.order.indexOf(before);
+        if (at < 0) {
+            at = this.order.size();
+        }
+        this.order.add(at, name);
+        this.strip.add(tab, at);
+        // The card at the same index as its tab: a suite reads the stack in strip order.
+        this.body.add(page, name, at);
         this.bodies.put(name, page);
         if (this.selected == null) {
             this.selected = name;

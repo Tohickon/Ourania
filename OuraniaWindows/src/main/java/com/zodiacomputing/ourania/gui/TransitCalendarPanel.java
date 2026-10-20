@@ -70,6 +70,16 @@ public final class TransitCalendarPanel extends JPanel {
     final DayCell[] cells = new DayCell[42];
 
     public TransitCalendarPanel(OuraniaWindow window) {
+        this(window, false);
+    }
+
+    /**
+     * @param compact the shape for the Calendar tab of the left rail (2026-10-20): no title (the
+     *     tab is the title), the controls on two rows, and the day's detail under the grid
+     *     rather than beside it - the rail is 340 px wide and the screen's side column alone
+     *     was 320.
+     */
+    TransitCalendarPanel(OuraniaWindow window, boolean compact) {
         this.window = window;
         this.sw = new SwissEph(Ephemeris.PATH);
         setLayout(new BorderLayout());
@@ -97,16 +107,20 @@ public final class TransitCalendarPanel extends JPanel {
         thisMonth.addActionListener(e -> showMonth(YearMonth.now()));
         monthLabel.setForeground(Theme.TEXT);
         monthLabel.setFont(Theme.font("Segoe UI", Font.BOLD, 16));
-        monthLabel.setPreferredSize(new Dimension(170, 28));
+        monthLabel.setPreferredSize(new Dimension(compact ? 120 : 170, 28));
         status.setForeground(Theme.TEXT_DIM);
         status.setFont(Theme.SMALL);
         nav.add(prev);
         nav.add(monthLabel);
         nav.add(next);
         nav.add(thisMonth);
-        nav.add(legend("Intense", intenseColor()));
-        nav.add(legend("Notable", notableColor()));
-        nav.add(status);
+        // A FlowLayout reports one row's height whatever it wraps to (SubRail.WrapRow says why),
+        // so the narrow shape puts the key on a row of its own rather than trusting a wrap.
+        JPanel key = compact ? new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2)) : nav;
+        key.setOpaque(false);
+        key.add(legend("Intense", intenseColor()));
+        key.add(legend("Notable", notableColor()));
+        key.add(status);
 
         JPanel head = new JPanel();
         head.setLayout(new javax.swing.BoxLayout(head, javax.swing.BoxLayout.Y_AXIS));
@@ -115,9 +129,15 @@ public final class TransitCalendarPanel extends JPanel {
         title.setAlignmentX(LEFT_ALIGNMENT);
         lede.setAlignmentX(LEFT_ALIGNMENT);
         nav.setAlignmentX(LEFT_ALIGNMENT);
-        head.add(title);
-        head.add(lede);
+        if (!compact) {
+            head.add(title);
+            head.add(lede);
+        }
         head.add(nav);
+        if (key != nav) {
+            key.setAlignmentX(LEFT_ALIGNMENT);
+            head.add(key);
+        }
         add(head, BorderLayout.NORTH);
 
         grid.setOpaque(false);
@@ -139,9 +159,15 @@ public final class TransitCalendarPanel extends JPanel {
         detail.setEditable(false);
         detail.setBackground(Theme.SURFACE);
         javax.swing.JScrollPane side = HtmlPanes.scroller(detail);
-        side.setPreferredSize(new Dimension(320, 400));
-        side.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Theme.EDGE));
-        add(side, BorderLayout.EAST);
+        if (compact) {
+            side.setPreferredSize(new Dimension(300, 220));
+            side.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Theme.EDGE));
+            add(side, BorderLayout.SOUTH);
+        } else {
+            side.setPreferredSize(new Dimension(320, 400));
+            side.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Theme.EDGE));
+            add(side, BorderLayout.EAST);
+        }
         layoutCells();
     }
 

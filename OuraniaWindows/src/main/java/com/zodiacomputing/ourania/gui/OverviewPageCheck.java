@@ -108,10 +108,10 @@ public final class OverviewPageCheck {
         // "reachable" needs the tab AND the page - a page on a strip nobody can open is as
         // unreachable as no page at all.
         List<String> pages = pagesOf(rail);
-        yes("Blueprint is one of the rail's three tabs: " + pages,
-            pages.contains(OuraniaWindow.BLUEPRINT_PAGE));
-        yes("Overview is one of Blueprint's pages: " + w.blueprintRail().pages(),
-            w.blueprintRail().pages().contains(OuraniaWindow.OVERVIEW_PAGE));
+        yes("Placements is one of the rail's three tabs: " + pages,
+            pages.contains(OuraniaWindow.PLACEMENTS_DOOR));
+        yes("Chart shape is one of Placements' pages: " + w.placementsRail().pages(),
+            w.placementsRail().pages().contains(OuraniaWindow.OVERVIEW_PAGE));
 
         SwingUtilities.invokeAndWait(() -> rail.select(OuraniaWindow.OVERVIEW_PAGE));
         SwingUtilities.invokeAndWait(() -> { });

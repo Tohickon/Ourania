@@ -4707,6 +4707,8 @@ implements WheelSource, GlobeSource {
             this.askForReading(ReadingTier.SYNTHESIZE);
         } else if ("TIMELINE".equals(name)) {
             this.askForReading(ReadingTier.TIMELINE);
+        } else if ("THEMES".equals(name)) {
+            this.askForReading(ReadingTier.THEMES);
         }
     }
 
@@ -4879,6 +4881,10 @@ implements WheelSource, GlobeSource {
                 // whether a house holds together across its three witnesses.
                 List<Topics.Topic> topics = Topics.analyse(chartFrame, list);
                 Themes.Result result2 = Themes.extract(chartFrame, result, list, topics);
+                // Synthesize reads the chart alone, so it needs none of the timing below.
+                if (readingTier == ReadingTier.THEMES) {
+                    return ThemeCards.html(result2, Settings.astrologerView());
+                }
                 ChartFrame chartFrame2 = null;
                 Profection profection = null;
                 List<Transits.Hit> list2 = null;
@@ -4978,6 +4984,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 try {
                     if (readingTier == ReadingTier.REPORT) {
                         SkymapPanel.this.window.showReport(string2, string, (String)this.get());
+                    } else if (readingTier == ReadingTier.THEMES) {
+                        SkymapPanel.this.window.showSynthesis((String)this.get());
                     } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
                         // The page draws its own year card, with the id the reveal lands on.
                         RevealPlan plan = this.revealPlan;
@@ -8978,7 +8986,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         PARAGRAPH,
         REPORT,
         SYNTHESIZE,
-        TIMELINE;
+        TIMELINE,
+        /** The chart's own themes, three witnesses each: the Synthesize page (2026-10-20). */
+        THEMES;
 
     }
 }

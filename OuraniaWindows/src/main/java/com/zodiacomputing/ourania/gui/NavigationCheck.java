@@ -299,11 +299,12 @@ public final class NavigationCheck {
             java.util.List<String> boxes = facts.readingControls
                 .getOrDefault(r[0], java.util.Collections.emptyList());
             if ("SYNTHESIZE".equals(r[1])) {
-                ok("the Synthesize page carries the mechanics checkbox",
+                ok("the Your year page carries the mechanics checkbox",
                     boxes.contains("Show the mechanics"));
-            } else if ("SNAPSHOT".equals(r[1])) {
-                // The plain cards' "why" boxes (2026-10-13), behind Astrologer view.
-                ok("the Snapshot page carries the astrology checkbox",
+            } else if ("SNAPSHOT".equals(r[1]) || "THEMES".equals(r[1])) {
+                // The plain cards' "why" boxes (2026-10-13), behind Astrologer view; Synthesize's
+                // cards carry their witnesses in the same box (2026-10-20).
+                ok("the " + r[0] + " page carries the astrology checkbox",
                     boxes.equals(java.util.List.of("Show the astrology")));
             } else {
                 ok("the reading " + r[0] + " carries no checkbox of its own", boxes.isEmpty());
@@ -2615,8 +2616,8 @@ public final class NavigationCheck {
                 // interpretation panel painted over whichever page was chosen. That panel is
                 // a card in Blueprint's own stack now, so a claim about the rail's three
                 // cards cannot reach it - the guard would still pass while the bug returned.
-                for (SubRail strip : new SubRail[] {w[0].blueprintRail(),
-                                                    w[0].chronometryRail()}) {
+                for (SubRail strip : new SubRail[] {w[0].placementsRail(),
+                        w[0].interpretationRail(), w[0].predictionRail()}) {
                     java.util.List<String> inside = visibleCards(strip.cards(), strip.pages());
                     ok("after the " + route + " route one card is visible inside the strip, "
                         + "the selected " + strip.selected() + ", not " + inside,
@@ -2657,10 +2658,13 @@ public final class NavigationCheck {
                         continue;
                     }
                     SwingUtilities.invokeAndWait(() -> w[0].revealPage(page));
-                    SubRail home = w[0].blueprintRail().pages().contains(page)
-                        ? w[0].blueprintRail()
-                        : w[0].chronometryRail().pages().contains(page)
-                            ? w[0].chronometryRail() : null;
+                    SubRail home = null;
+                    for (SubRail strip : new SubRail[] {w[0].placementsRail(),
+                            w[0].interpretationRail(), w[0].predictionRail()}) {
+                        if (strip.pages().contains(page)) {
+                            home = strip;
+                        }
+                    }
                     java.util.List<String> shown = home == null
                         ? visibleCards(cards, pages)
                         : visibleCards(home.cards(), home.pages());
@@ -2704,9 +2708,10 @@ public final class NavigationCheck {
             // is on screen, which it always is.
             ok("and the Interpretation page still opens onto its panel, rail showing "
                 + visibleCards(cards, pages),
-                visibleCards(cards, pages).equals(java.util.List.of(OuraniaWindow.BLUEPRINT_PAGE)));
-            ok("with the interpretation panel the one card visible inside Blueprint",
-                visibleCards(w[0].blueprintRail().cards(), w[0].blueprintRail().pages())
+                visibleCards(cards, pages).equals(
+                    java.util.List.of(OuraniaWindow.INTERPRETATION_DOOR)));
+            ok("with the interpretation panel the one card visible inside Interpretation",
+                visibleCards(w[0].interpretationRail().cards(), w[0].interpretationRail().pages())
                     .equals(java.util.List.of(OuraniaWindow.READING_PAGE)));
 
             // <b>Every reading door opens the rail, not just the one that was noticed.</b>

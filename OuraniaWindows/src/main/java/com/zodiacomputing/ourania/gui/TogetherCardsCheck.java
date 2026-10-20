@@ -333,18 +333,20 @@ public final class TogetherCardsCheck {
         SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
         OuraniaWindow w = hold[0];
         try {
-            SubRail together = w.togetherRail();
-            yes("the Together door has a strip", together != null);
+            // The pair's pages are the last two of Interpretation since 2026-10-20.
+            SubRail together = w.interpretationRail();
+            yes("the Interpretation tab has a strip", together != null);
             if (together == null) {
                 return;
             }
-            yes("Together holds Where you meet, then Chemistry: " + together.pages(),
-                together.pages().equals(List.of(OuraniaWindow.SYNASTRY_PAGE,
-                    OuraniaWindow.CHEMISTRY_PAGE)));
+            List<String> strip = together.pages();
+            yes("Interpretation ends with Where you meet, then Chemistry: " + strip,
+                strip.size() >= 2 && strip.subList(strip.size() - 2, strip.size()).equals(
+                    List.of(OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE)));
             yes("the first page reads Where you meet",
                 OuraniaWindow.MEET_LABEL.equals(together.pageLabel(OuraniaWindow.SYNASTRY_PAGE)));
-            yes("the door reads Together", OuraniaWindow.TOGETHER_LABEL.equals(
-                w.chartRail().pageLabel(OuraniaWindow.SYNASTRY_PAGE)));
+            yes("the door reads Interpretation", OuraniaWindow.INTERPRETATION_TAB_LABEL.equals(
+                w.chartRail().pageLabel(OuraniaWindow.INTERPRETATION_DOOR)));
 
             String blank = "<html><body></body></html>";
             String body = "<html><body>Angle contacts</body></html>";

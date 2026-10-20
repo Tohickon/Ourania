@@ -58,7 +58,21 @@ final class LifeAreasPanel extends JPanel {
                 .toString();
         }
         sb.append("<h2>Life areas</h2>").append(WhoseChart.html(skymap));
-        sb.append(ReadingCard.html(cards(f), Settings.astrologerView()));
+        for (Group g : GROUPS) {
+            List<ReadingCard> in = new ArrayList<>();
+            for (int house : g.houses()) {
+                ReadingCard c = card(f, house);
+                if (c != null) {
+                    in.add(c);
+                }
+            }
+            if (in.isEmpty()) {
+                continue;
+            }
+            sb.append("<h3 style='color:#7FB3FF; margin-top:14px; margin-bottom:6px;'>")
+              .append(esc(g.title())).append("</h3>");
+            sb.append(ReadingCard.html(in, Settings.astrologerView()));
+        }
         List<String> quiet = quietAreas(f);
         if (!quiet.isEmpty()) {
             sb.append("<p style='color:#9AA5B1; font-size:12px;'><b>Quieter parts of life:</b> ")
@@ -69,33 +83,60 @@ final class LifeAreasPanel extends JPanel {
         return sb.append("</body></html>").toString();
     }
 
+    /** One heading of the page and the parts of life under it. */
+    record Group(String title, int[] houses) { }
+
+    /**
+     * The four headings of the tab spec (2026-10-20), each over the houses it is about.
+     *
+     * <b>Twelve cards kept, four headings over them.</b> The spec groups life areas into
+     * career, love, money and home, and the inner life; a reader who wants one of those finds it
+     * by its heading, and nothing the twelve cards say is merged away. Each house is under one
+     * heading only: the sixth (daily work and health) is under work, and the eighth (shared
+     * money and intimacy) under love, which is where the spec puts intimacy.
+     */
+    static final List<Group> GROUPS = List.of(
+        new Group("Career and work", new int[] {10, 6}),
+        new Group("Love and the people close to you", new int[] {7, 5, 8, 3, 11}),
+        new Group("Money and home", new int[] {2, 4}),
+        new Group("Body, mind and soul", new int[] {1, 9, 12}));
+
     /** One card per occupied house, in house order. Package-visible for a check. */
     List<ReadingCard> cards(ChartFrame f) {
-        InterpretationService svc = InterpretationService.getInstance();
         List<ReadingCard> out = new ArrayList<>();
         for (int house = 1; house <= 12; house++) {
-            List<String> lines = new ArrayList<>();
-            List<String> why = new ArrayList<>();
-            for (int i = 0; i < f.bodies.length; i++) {
-                ChartFrame.Body b = f.bodies[i];
-                Bodies.Def def = Bodies.at(i);
-                if (b == null || !b.ok || def.isAngle() || !shown(i)
-                        || Zodiac.houseOf(b.lon, f.cusps) != house) {
-                    continue;
-                }
-                PlainSnapshot.Line line = PlainSnapshot.plain(svc.getPlanetInHouse(def.name, house));
-                lines.add(line == null ? def.name + " is here."
-                    : line.whole ? PlacementText.capitalise(line.text) + "."
-                    : def.name + ": " + line.text + ".");
-                why.add(def.name + " in " + PlacementText.capitalise(Zodiac.signName(b.lon)) + ", "
-                    + Zodiac.ordinal(house) + " house");
-            }
-            if (!lines.isEmpty()) {
-                out.add(new ReadingCard(lines.size() > 2 ? "A BUSY PART OF YOUR LIFE" : null,
-                    PlacementText.capitalise(LifeAreas.of(house)), String.join(" ", lines), why));
+            ReadingCard c = card(f, house);
+            if (c != null) {
+                out.add(c);
             }
         }
         return out;
+    }
+
+    /** The card for one house, or null when nothing the wheel shows sits there. */
+    private ReadingCard card(ChartFrame f, int house) {
+        InterpretationService svc = InterpretationService.getInstance();
+        List<String> lines = new ArrayList<>();
+        List<String> why = new ArrayList<>();
+        for (int i = 0; i < f.bodies.length; i++) {
+            ChartFrame.Body b = f.bodies[i];
+            Bodies.Def def = Bodies.at(i);
+            if (b == null || !b.ok || def.isAngle() || !shown(i)
+                    || Zodiac.houseOf(b.lon, f.cusps) != house) {
+                continue;
+            }
+            PlainSnapshot.Line line = PlainSnapshot.plain(svc.getPlanetInHouse(def.name, house));
+            lines.add(line == null ? def.name + " is here."
+                : line.whole ? PlacementText.capitalise(line.text) + "."
+                : def.name + ": " + line.text + ".");
+            why.add(def.name + " in " + PlacementText.capitalise(Zodiac.signName(b.lon)) + ", "
+                + Zodiac.ordinal(house) + " house");
+        }
+        if (lines.isEmpty()) {
+            return null;
+        }
+        return new ReadingCard(lines.size() > 2 ? "A BUSY PART OF YOUR LIFE" : null,
+            PlacementText.capitalise(LifeAreas.of(house)), String.join(" ", lines), why);
     }
 
     private List<String> quietAreas(ChartFrame f) {
