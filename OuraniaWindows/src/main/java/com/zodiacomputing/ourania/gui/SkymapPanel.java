@@ -5163,23 +5163,14 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (now == null || now.sd == null) {
             return;
         }
-        double jd = now.sd.getJulDay();
         List<Object[]> chain = new ArrayList<>();
-        if (!Settings.astrologerView()) {
-            // Plain view: the first cards of the timeline, in its order - right now, then
-            // today, and on - which is the order they occur.
-            List<NowTimeline.Entry> page = NowCards.visible(
-                NowTimeline.build(this.sw, now, this.natalRing, this.activeCusps));
-            for (NowTimeline.Entry e : page.subList(0, Math.min(TransitCard.POP_COUNT, page.size()))) {
-                this.chainUp(chain, e.hit(), e.card());
-            }
-        } else {
-            // Only contacts the Now page shows a card for, so each pop-up has a card to land on.
-            for (NowCards.TransitHit h : TransitCard.firstToPop(
-                    NowCards.shown(NowCards.findHits(now, this.natalRing, this.activeCusps), true),
-                    h -> TransitCard.daysFromExact(this.sw, h, jd), TransitCard.POP_COUNT)) {
-                this.chainUp(chain, h, TransitCard.of(h));
-            }
+        // The first cards of the timeline, in its order - right now, then today, and on -
+        // which is the order they occur. One timeline in both views since 2026-10-20, so each
+        // pop-up has its card on the page whichever view is on.
+        List<NowTimeline.Entry> page = NowCards.visible(
+            NowTimeline.build(this.sw, now, this.natalRing, this.activeCusps));
+        for (NowTimeline.Entry e : page.subList(0, Math.min(TransitCard.POP_COUNT, page.size()))) {
+            this.chainUp(chain, e.hit(), e.card());
         }
         this.popNext(chain, 0);
     }

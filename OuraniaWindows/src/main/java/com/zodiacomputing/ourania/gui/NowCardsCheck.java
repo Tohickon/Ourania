@@ -30,7 +30,6 @@ public final class NowCardsCheck {
 
         testFastSlowClassification();
         testTimingBadges();
-        testCardGeneration();
         testHtmlRendering();
         testTransitCards();
         testTimeline();
@@ -87,21 +86,6 @@ public final class NowCardsCheck {
         eq("separating with orb > 0.25 reports WINDING DOWN", "WINDING DOWN", separatingHit.timingBadge());
     }
 
-    private static void testCardGeneration() {
-        System.out.println("=== Part C: card generation ===");
-        NowCards.TransitHit hit = new NowCards.TransitHit(
-            "Jupiter", 120.05, 0.08, 9, "Sun", 120.0, 5,
-            Aspects.Type.CONJUNCTION, 0.05, false, false
-        );
-        ReadingCard card = NowCards.toCard(hit);
-        yes("card label contains timing badge", card.label().contains("PEAK"));
-        yes("card label contains season category", card.label().contains("THIS SEASON"));
-        yes("card headline is populated", card.headline() != null && !card.headline().isEmpty());
-        yes("card body is populated", card.body() != null && !card.body().isEmpty());
-        yes("card why box contains technical details", !card.why().isEmpty());
-        yes("why box mentions exact aspect", card.why().stream().anyMatch(w -> w.contains("Conjunction")));
-    }
-
     private static void testHtmlRendering() {
         System.out.println("=== Part D: html rendering ===");
         int count = Bodies.count();
@@ -129,12 +113,12 @@ public final class NowCardsCheck {
         }
 
         String plainHtml = NowCards.html(transitRing, natalRing, cusps, false, "<p>raw</p>");
-        yes("plain view does not show raw coordinates", !plainHtml.contains("Placements \u00b7 Raw Coordinates"));
+        yes("plain view does not show the sky's positions", !plainHtml.contains("Where the planets are now"));
         yes("plain view opens on right now", plainHtml.contains(">Right now</h3>"));
         yes("plain view has PEAK badge", plainHtml.contains("PEAK"));
 
         String astrologerHtml = NowCards.html(transitRing, natalRing, cusps, true, "<p>raw coordinates table</p>");
-        yes("astrologer view includes raw coordinates drawer", astrologerHtml.contains("Placements \u00b7 Raw Coordinates"));
+        yes("astrologer view adds the sky's positions", astrologerHtml.contains("Where the planets are now"));
         yes("astrologer view includes raw table content", astrologerHtml.contains("raw coordinates table"));
         yes("astrologer view includes why box", astrologerHtml.contains("Why &mdash; the astrology:"));
 
@@ -146,7 +130,14 @@ public final class NowCardsCheck {
         yes("plain view says what to do now", plainHtml.contains(TransitCard.WHAT_TO_DO));
         yes("plain view shows no corpus jargon", !plainHtml.contains("transiting")
             && !plainHtml.contains("Natal") && !plainHtml.contains("Orb:"));
-        yes("astrologer view keeps the corpus card", astrologerHtml.contains("[ PEAK ]"));
+        // <b>The same reading with the astrology added (2026-10-20)</b>, not a second page of
+        // corpus cards: David found its titles unplain and its readings all alike.
+        yes("astrologer view is the same timeline", astrologerHtml.contains(">Right now</h3>")
+            && astrologerHtml.contains("A push of energy fuses with your sense of who you are"));
+        yes("with none of the old page's titles or template", !astrologerHtml.contains("[ PEAK ]")
+            && !astrologerHtml.contains("Catalysts") && !astrologerHtml.contains("Long Arc")
+            && !astrologerHtml.contains("In the transiting structure")
+            && !astrologerHtml.contains("General "));
     }
 
     private static void testTransitCards() {

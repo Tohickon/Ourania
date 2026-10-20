@@ -376,8 +376,8 @@ public class OuraniaWindow extends JFrame {
         // right now to a year ahead (David, 2026-10-17), and the pop-ups land on its cards - so
         // it moved whole rather than being rebuilt as a reading.
         prediction.addPage(TRANSITS_PAGE, astrologerPage(transitPane, "<html>Astrologer view: "
-            + "on, show the exact aspects, orbs, and planetary coordinates.<br>Off: plain "
-            + "cards, from right now to a year ahead.</html>"));
+            + "on, under each card the placements it is read from, and the planets' positions"
+            + " at the end.<br>Off: the plain cards only.</html>"));
         // The pair's timeline sits next to the one-person timeline it is built from.
         pairComingPane = HtmlPanes.chartPane(this);
         prediction.addPage(PAIR_COMING_PAGE, astrologerPage(pairComingPane, "<html>Astrologer "

@@ -112,10 +112,10 @@ final class PairTimeline {
         }
         sb.append("<h2 style='color:#ffa500; margin-top:20px;'>").append(esc(nameA))
           .append("</h2>");
-        sb.append(NowCards.windowsHtml(a, NowCards.visible(a)));
+        sb.append(NowCards.windowsHtml(a, NowCards.visible(a), showWhy));
         sb.append("<h2 style='color:#ffa500; margin-top:20px;'>").append(esc(nameB))
           .append("</h2>");
-        sb.append(NowCards.windowsHtml(b, NowCards.visible(b)));
+        sb.append(NowCards.windowsHtml(b, NowCards.visible(b), showWhy));
         return sb.append("</body></html>").toString();
     }
 

@@ -983,7 +983,7 @@ public final class RevealCheck {
             yes("they respect reduced motion",
                 body(s, "private void timeSettled()").contains("ReadingReveal.allowed()"));
             yes("they choose from the cards the page shows",
-                body(s, "private void playTransits()").contains("NowCards.shown("));
+                body(s, "private void playTransits()").contains("NowCards.visible("));
             yes("the page reads the wheel's own ring rule", Files.readString(
                 src.resolveSibling("OuraniaWindow.java")).contains("skymapPanel.nowRing()"));
         }

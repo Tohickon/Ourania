@@ -118,47 +118,8 @@ public final class NowCards {
     }
 
     /**
-     * Converts a transit contact into a clean plain-English ReadingCard.
-     */
-    public static ReadingCard toCard(TransitHit hit) {
-        InterpretationService svc = InterpretationService.getInstance();
-        String prose = svc.getTransitAspect(hit.transiting, hit.natal, hit.aspect.label);
-
-        String category = hit.isFast ? "THIS WEEK · CATALYST" : "THIS SEASON · THE LONG ARC";
-        String label = "[ " + hit.timingBadge() + " ] · " + category;
-
-        List<String> why = whyLines(hit);
-
-        ReadingCard card = ReadingCard.fromLead(label, prose, why);
-        if (card != null) {
-            return card;
-        }
-
-        String headline;
-        String bodyText;
-
-        if (prose != null && !prose.trim().isEmpty() && !prose.startsWith("<i>(No transit reading")) {
-            headline = hit.transiting + " " + hit.aspect.label.toLowerCase() + " natal " + hit.natal;
-            bodyText = prose.replaceAll("(?i)<[^>]+>", " ").replaceAll("\\s+", " ").trim();
-        } else {
-            headline = hit.transiting + " " + hit.aspect.label.toLowerCase() + " natal " + hit.natal;
-            if (hit.isFast) {
-                bodyText = "A fast-moving daily catalyst activating your natal " + hit.natal
-                    + (hit.natalHouse > 0 ? " in the " + Zodiac.ordinal(hit.natalHouse) + " house" : "")
-                    + ". Events, interactions, and immediate choices around this theme move quickly.";
-            } else {
-                bodyText = "An enduring developmental arc steadily reshaping, testing, and deepening your natal "
-                    + hit.natal + (hit.natalHouse > 0 ? " in the " + Zodiac.ordinal(hit.natalHouse) + " house" : "")
-                    + ". This theme is doing foundational work throughout this season.";
-            }
-        }
-
-        return new ReadingCard(label, headline, bodyText, why);
-    }
-
-    /**
-     * The astrology behind a transit card, one line each: shared by this page's card and the
-     * plain {@link TransitCard}, so the two cannot name the contact differently.
+     * The astrology behind a transit card, one line each: the "why" box of every
+     * {@link TransitCard}, shown in Astrologer view.
      */
     static List<String> whyLines(TransitHit hit) {
         List<String> why = new ArrayList<>();
@@ -180,66 +141,50 @@ public final class NowCards {
         return html(transitRing, natalRing, cusps, showWhy, rawPlacementsHtml, null);
     }
 
+    /** The page's title and the line under it, in both views. */
+    static final String TITLE = "Coming up";
+    static final String LEDE = "What the sky does to your chart, from right now to a year ahead.";
+
     /**
-     * Builds the complete page HTML for the Now / Transits pane.
+     * Builds the complete page HTML for the Coming up pane.
      *
-     * <b>Plain view is the timeline</b> ({@link NowTimeline}): right now, today, tonight ...
-     * later this year, in the order a reader asks. With {@code sw} null - while time is
-     * running - only "right now" is worked out, and the page says the rest follows.
-     * Astrologer view keeps the two lists of what is in orb, with the corpus cards.
+     * <b>One timeline in both views (2026-10-20).</b> The timeline ({@link NowTimeline}) runs
+     * right now, today, tonight ... later this year, in the order a reader asks. With {@code sw}
+     * null - while time is running - only "right now" is worked out, and the page says the rest
+     * follows. Astrologer view adds, and only adds: under each card the placements it was read
+     * from, and at the foot the sky's positions.
+     *
+     * <b>Astrologer view used to be a second page.</b> It swapped the timeline for two lists,
+     * "This Week · Catalysts" and "This Season · The Long Arc", of corpus cards: every minor
+     * aspect and every minor point, each written to one template - "In the transiting
+     * structure ... This geometry specifically bridges the temporary cosmic current to ..." -
+     * and, where the corpus had no line, "General Semisextile meaning" and "(Specific text ...
+     * not found)". David, 2026-10-20: the titles "arent plain english user friendly and most of
+     * the readings say the same thing". The plain cards are built from parts per planet,
+     * aspect and need, so ticking a box to see the astrology now shows the astrology of the
+     * same reading rather than a different reading.
      */
     public static String html(WheelRing transitRing, WheelRing natalRing, double[] cusps,
                               boolean showWhy, String rawPlacementsHtml,
                               de.thmac.swisseph.SwissEph sw) {
-        if (!showWhy) {
-            return timelineHtml(NowTimeline.build(sw, transitRing, natalRing, cusps), sw != null);
+        List<NowTimeline.Entry> entries = NowTimeline.build(sw, transitRing, natalRing, cusps);
+        StringBuilder sb = ReadingCard.page(TITLE, LEDE);
+        sb.append(windowsHtml(entries, visible(entries), showWhy));
+        if (sw == null) {
+            sb.append(STOP_THE_CLOCK);
         }
-        List<TransitHit> hits = findHits(transitRing, natalRing, cusps);
-
-        StringBuilder sb = ReadingCard.page("Now \u00b7 Active Cycles",
-            "The sky passing over your chart &mdash; immediate catalysts this week and major cycles this season.");
-
-        List<ReadingCard> thisWeekCards = new ArrayList<>();
-        List<ReadingCard> thisSeasonCards = new ArrayList<>();
-        List<String> thisWeekIds = new ArrayList<>();
-        List<String> thisSeasonIds = new ArrayList<>();
-
-        for (TransitHit hit : shown(hits, showWhy)) {
-            ReadingCard card = toCard(hit);
-            if (hit.isFast) {
-                thisWeekCards.add(card);
-                thisWeekIds.add(TransitCard.id(hit));
-            } else {
-                thisSeasonCards.add(card);
-                thisSeasonIds.add(TransitCard.id(hit));
-            }
-        }
-
-        if (thisWeekCards.isEmpty() && thisSeasonCards.isEmpty()) {
-            sb.append(QUIET_SKY);
-        }
-
-        if (!thisWeekCards.isEmpty()) {
-            sb.append("<h3 style='color:#7FB3FF; margin-top:14px; margin-bottom:6px;'>This Week \u00b7 Catalysts</h3>");
-            sb.append(cardsHtml(thisWeekCards, thisWeekIds, showWhy));
-        }
-
-        if (!thisSeasonCards.isEmpty()) {
-            sb.append("<h3 style='color:#FFD166; margin-top:18px; margin-bottom:6px;'>This Season \u00b7 The Long Arc</h3>");
-            sb.append(cardsHtml(thisSeasonCards, thisSeasonIds, showWhy));
-        }
-
-        // Astrologer view drawer: append raw placement tables when enabled
         if (showWhy && rawPlacementsHtml != null && !rawPlacementsHtml.trim().isEmpty()) {
             sb.append("<div style='margin-top:24px; border-top:1px solid #333; padding-top:12px;'>");
-            sb.append("<h3 style='color:#add8e6; margin-bottom:8px;'>Placements \u00b7 Raw Coordinates</h3>");
+            sb.append("<h3 style='color:#add8e6; margin-bottom:8px;'>Where the planets are now</h3>");
             sb.append(stripEnclosingHtml(rawPlacementsHtml));
             sb.append("</div>");
         }
-
         sb.append("</body></html>");
         return sb.toString();
     }
+
+    private static final String STOP_THE_CLOCK = "<p style='color:#9AA5B1; font-size:12px;'>"
+        + "Stop the clock to see what is coming later.</p>";
 
     /** The card a page shows when nothing in the sky is touching the chart. */
     private static final String QUIET_SKY =
@@ -269,9 +214,7 @@ public final class NowCards {
 
     /** The plain page: the timeline's windows in order, each with its cards. */
     static String timelineHtml(List<NowTimeline.Entry> entries, boolean complete) {
-        return timelineHtml("Now",
-            "What the sky is doing to your chart, from right now to a year ahead.",
-            entries, visible(entries), complete);
+        return timelineHtml(TITLE, LEDE, entries, visible(entries), complete);
     }
 
     /** How far ahead Coming up looks: the near term, which is what that page is for. */
@@ -306,10 +249,9 @@ public final class NowCards {
     private static String timelineHtml(String title, String lede,
             List<NowTimeline.Entry> entries, List<NowTimeline.Entry> shown, boolean complete) {
         StringBuilder sb = ReadingCard.page(title, lede);
-        sb.append(windowsHtml(entries, shown));
+        sb.append(windowsHtml(entries, shown, false));
         if (!complete) {
-            sb.append("<p style='color:#9AA5B1; font-size:12px;'>Stop the clock to see what is"
-                + " coming later.</p>");
+            sb.append(STOP_THE_CLOCK);
         }
         sb.append("</body></html>");
         return sb.toString();
@@ -319,7 +261,8 @@ public final class NowCards {
      * The timeline's windows in order, each headed and with its cards - the body of a timeline
      * page, without the page around it. Coming up together draws one of these per person.
      */
-    static String windowsHtml(List<NowTimeline.Entry> entries, List<NowTimeline.Entry> shown) {
+    static String windowsHtml(List<NowTimeline.Entry> entries, List<NowTimeline.Entry> shown,
+            boolean showWhy) {
         StringBuilder sb = new StringBuilder();
         if (entries.isEmpty()) {
             sb.append(QUIET_SKY);
@@ -342,7 +285,7 @@ public final class NowCards {
             }
             sb.append("<h3 style='color:#7FB3FF; margin-top:14px; margin-bottom:6px;'>")
               .append(w.title).append("</h3>");
-            sb.append(cardsHtml(cards, ids, false));
+            sb.append(cardsHtml(cards, ids, showWhy));
             if (all > cards.size()) {
                 sb.append("<p style='color:#9AA5B1; font-size:12px; margin-top:-6px;'>And ")
                   .append(all - cards.size()).append(" more ")
