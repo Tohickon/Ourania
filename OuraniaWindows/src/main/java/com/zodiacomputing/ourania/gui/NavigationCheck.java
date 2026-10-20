@@ -1239,22 +1239,17 @@ public final class NavigationCheck {
             ok("the wheel and the form agree about whether there is a Chart A",
                 formA == sky.hasChartA());
 
-            // And when there is one, the wheel is drawing it rather than this moment.
-            if (formA) {
-                java.lang.reflect.Field fd = setup.getClass()
-                    .getDeclaredField("baseDateField");
-                fd.setAccessible(true);
-                String formDate =
-                    ((javax.swing.text.JTextComponent) fd.get(setup)).getText().trim();
-                Object drawn = sky.natalRing.time;
-                ok("the wheel has a moment to draw", drawn != null);
-                String drawnDate = drawn == null ? "" : drawn.toString().substring(0, 10);
-                System.out.println("  the form says " + formDate
-                    + ", the wheel is drawing " + drawnDate);
-                eq("the wheel draws the date the form holds", formDate, drawnDate);
-                ok("and it is not simply today",
-                    !drawnDate.equals(java.time.LocalDate.now().toString()));
-            }
+            // <b>The wheel opens on the sky, with Chart A loaded behind its chip (2026-10-20).</b>
+            // David: "the chart default should always open up to the current sky", and "keep it
+            // loaded for now". So the chart is the form's, and what is drawn is this moment.
+            ok("the wheel opens on the sky, not on a birth chart", !sky.innerIsBirthChart());
+            ok("with Chart A out of the chart", !sky.chartAIn());
+            Object drawn = sky.natalRing.time;
+            ok("the wheel has a moment to draw", drawn != null);
+            String drawnDate = drawn == null ? "" : drawn.toString().substring(0, 10);
+            // Today where the sky is, not where this machine is: the two differ near midnight.
+            eq("and it is today", drawn == null ? "" : java.time.LocalDate.now(
+                ((java.time.ZonedDateTime) drawn).getZone()).toString(), drawnDate);
 
             // The chips carry the names the form and the readout use.
             java.lang.reflect.Field fr = SkymapPanel.class.getDeclaredField("ringBar");

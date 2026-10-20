@@ -41,6 +41,7 @@ public final class ThemeCardsCheck {
         Set<String> met = new TreeSet<>();
         List<String> belowThreshold = new ArrayList<>();
         List<String> jargon = new ArrayList<>();
+        List<String> noTakeaway = new ArrayList<>();
         int withCards = 0;
         int charts = 200;
         Pattern banned = Pattern.compile("\\b(" + String.join("|", JargonCheck.BANNED) + ")\\b",
@@ -55,16 +56,14 @@ public final class ThemeCardsCheck {
             Themes.Result t = Themes.extract(f, g, ranked, Topics.analyse(f, ranked));
             for (Themes.Signature s : Themes.signaturesAtThreshold(t)) {
                 met.add(s.theme);
-                if (!ThemeCards.PLAIN.containsKey(s.theme)) {
+                if (ThemeCards.plain(s.theme) == null) {
                     unknown.add(s.theme);
                 }
             }
             for (Themes.Contradiction c : t.contradictions) {
-                for (String w : new String[] {c.themeA, c.themeB}) {
-                    met.add(w);
-                    if (!ThemeCards.PLAIN.containsKey(w)) {
-                        unknown.add(w);
-                    }
+                met.add(c.themeA + "_vs_" + c.themeB);
+                if (ThemeCards.tension(c.themeA, c.themeB) == null) {
+                    unknown.add(c.themeA + "_vs_" + c.themeB);
                 }
             }
             List<ReadingCard> cards = ThemeCards.cards(t);
@@ -76,6 +75,9 @@ public final class ThemeCardsCheck {
             }
             for (ReadingCard c : cards) {
                 String plain = c.headline() + " " + c.body();
+                if (!c.body().contains("\n\nTakeaway: ")) {
+                    noTakeaway.add(c.headline());
+                }
                 if (banned.matcher(plain).find()) {
                     jargon.add(plain);
                 }
@@ -84,10 +86,22 @@ public final class ThemeCardsCheck {
         yes("the sweep met real themes, " + met.size() + " words: " + met, met.size() >= 10);
         yes("most charts have something to say, " + withCards + " of " + charts,
             withCards > charts / 2);
-        eq("every theme the engine names has plain words", "[]", unknown.toString());
+        eq("every theme and tension the engine names has plain words", "[]", unknown.toString());
+        // And every card says it the way David set out: a headline, the week, a takeaway.
+        List<String> shapeless = new ArrayList<>();
+        for (String w : met) {
+            ThemeCards.Plain p = w.contains("_vs_")
+                ? ThemeCards.tension(w.split("_vs_")[0], w.split("_vs_")[1]) : ThemeCards.plain(w);
+            if (p != null && !p.body().contains("In an ordinary week")) {
+                shapeless.add(w);
+            }
+        }
+        eq("each body says what it is like in an ordinary week", "[]", shapeless.toString());
         eq("one card per theme at the threshold and per tension", "[]",
             belowThreshold.toString());
         eq("and no plain card uses a banned word", "[]", jargon.toString());
+        eq("every card ends on its takeaway, as a line of its own", "[]",
+            new TreeSet<>(noTakeaway).toString());
 
         // The page itself.
         String empty = ThemeCards.html(null, false);

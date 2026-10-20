@@ -1125,7 +1125,9 @@ public class OuraniaWindow extends JFrame {
         // the markup rather than asked of the wheel, because this method is the only thing
         // that sees the section and it already has it in hand.
         if (chartRail != null) {
-            setPageEnabled(TRANSITS_PAGE, hasContent(transitHtml));
+            // The sky alone has a Coming up of its own (SkyTimeline), so only a wheel of birth
+            // charts with no sky over them greys it (David, 2026-10-20).
+            setPageEnabled(TRANSITS_PAGE, hasContent(transitHtml) || skyOnly());
             nameTheChartPages();
         }
         if (gridPane != null) {
@@ -1151,6 +1153,10 @@ public class OuraniaWindow extends JFrame {
         if (transitPane == null) {
             return;
         }
+        if (skyOnly()) {
+            refreshSkyComing(Settings.astrologerView());
+            return;
+        }
         if (skymapPanel == null || !hasContent(lastTransitHtml)) {
             HtmlPanes.setHtml(transitPane, lastTransitHtml);
             return;
@@ -1164,6 +1170,43 @@ public class OuraniaWindow extends JFrame {
         HtmlPanes.setHtml(transitPane, NowCards.html(now, skymapPanel.natalRing,
             skymapPanel.activeCusps, Settings.astrologerView(), lastTransitHtml,
             moving ? null : skymapPanel.sw));
+    }
+
+    /** True when the wheel holds the sky and no birth chart. */
+    private boolean skyOnly() {
+        return skymapPanel != null && !skymapPanel.innerIsBirthChart()
+            && skymapPanel.natalRing.sd != null;
+    }
+
+    /** The sky's year, kept for the hour of sky time it was worked out for. */
+    private java.util.List<SkyTimeline.Entry> skyComing;
+    private long skyComingHour = Long.MIN_VALUE;
+
+    /**
+     * Coming up for the sky alone (SkyTimeline).
+     *
+     * <b>On this thread, only when the page is open, and kept for an hour of sky time.</b> A
+     * year of sky events takes about a second. It ran on a worker first, and that broke two
+     * suites that never open this page: the ephemeris library and Almanac's scan step are
+     * shared state, so a second thread casting at the same moment as the window gave other
+     * charts wrong points (lots at no longitude). So nothing is cast unless the reader is
+     * looking at the page, and the events of a year are reused within the hour, in the view
+     * the reader has now.
+     */
+    private void refreshSkyComing(boolean why) {
+        if (!TRANSITS_PAGE.equals(currentPage())) {
+            return;
+        }
+        WheelRing sky = skymapPanel.natalRing;
+        double now = sky.sd.getJulDay();
+        long hour = (long) Math.floor(now * 24.0);
+        if (skyComing == null || hour != skyComingHour) {
+            java.time.ZoneId zone = sky.time != null ? sky.time.getZone()
+                : java.time.ZoneId.systemDefault();
+            skyComing = SkyTimeline.build(skymapPanel.sw, now, zone);
+            skyComingHour = hour;
+        }
+        HtmlPanes.setHtml(transitPane, SkyTimeline.html(skyComing, why));
     }
 
     /**
@@ -1662,11 +1705,18 @@ public class OuraniaWindow extends JFrame {
                 + "was read from; on Chart shape, every card's detail open; on Reading, the "
                 + "degrees, decans, houses and Sabian symbols.<br>Off: the plain reading "
                 + "only.</html>");
+            // <b>One setting, every box (2026-10-20).</b> This box was not in astrologerChecks,
+            // so ticking the box on Coming up turned the setting on while this one still showed
+            // it off - and Synthesize showed the astrology under an empty box. Guarded as
+            // astrologerPage's is, because syncAstrologerChecks sets every box.
             why.addItemListener(e -> {
-                Settings.setAstrologerView(why.isSelected());
-                refreshPlainPages();
-                runReading(kind);
+                if (why.isSelected() != Settings.astrologerView()) {
+                    Settings.setAstrologerView(why.isSelected());
+                    refreshPlainPages();
+                    runReading(kind);
+                }
             });
+            astrologerChecks.add(why);
             JPanel strip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
             strip.setBackground(Color.BLACK);
             strip.add(why);
@@ -2398,10 +2448,15 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
-    /** Draws the saved Chart A, if there is one. Called when the application starts. */
+    /** Loads the saved Chart A, if there is one, and opens the wheel on the sky. At start-up. */
     public void drawSavedChart() {
         if (chartSetupPanel != null) {
             chartSetupPanel.drawSavedChartA();
+            // <b>The app opens on the sky (David, 2026-10-20).</b> "the chart default should
+            // always open up to the current sky". Chart A is still loaded - its chip is ready and
+            // one press puts it back on the wheel - but what the reader meets first is now.
+            // The same call the chips make, so the form, the chips and the wheel agree.
+            chartSetupPanel.applyRings(false, false, true);
         }
         if (skymapPanel != null) {
             syncRingBar(skymapPanel.ringBarComponent());

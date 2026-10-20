@@ -5139,8 +5139,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * and landing on its own card on the Now page. A click or a key ends the chain.
      */
     void popTransits() {
+        // Not with the sky alone: a pop-up is a contact to a birth chart, and the sky's own
+        // Coming up (SkyTimeline) has no chart for one to reach.
         if (this.isPlaying || this.isScrubbing() || this.sw == null || this.natalRing.sd == null
-                || this.window == null) {
+                || this.window == null || !this.innerIsBirthChart) {
             return;
         }
         // <b>The page first, then the wheel is measured.</b> Opening the rail moves the wheel and

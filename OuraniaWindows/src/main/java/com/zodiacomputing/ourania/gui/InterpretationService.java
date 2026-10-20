@@ -202,6 +202,9 @@ public class InterpretationService {
         // touches - and one "what to do now" line for each sky planet and major aspect.
         // See TransitCard. Its own file and section, so nothing else can overwrite it.
         "transit_cards.json",
+        // The Synthesize page's cards (2026-10-20): a headline, a body and a takeaway per theme
+        // word and per tension. See ThemeCards. Its own file and section, like the line above.
+        "synthesize_cards.json",
         "aspect_prose_v2.json",
         "spirit_prose.json",
         "minor_aspect_prose.json",
@@ -791,6 +794,9 @@ public class InterpretationService {
     /** The parts the plain transit cards are built from, keyed kind.body[.aspect]. */
     private final Map<String, String> transitCardParts = new HashMap<>();
 
+    /** The Synthesize cards' words, keyed theme.part or a_vs_b.part. */
+    private final Map<String, String> synthesizeParts = new HashMap<>();
+
     /** The pictures with a specific reading of their own, keyed directed_a_b. */
     private final Map<String, String> arcPictures = new HashMap<>();
 
@@ -827,6 +833,7 @@ public class InterpretationService {
         if (line.startsWith("\"arc_catalyst\"")) return arcCatalysts;
         if (line.startsWith("\"arc_picture\"")) return arcPictures;
         if (line.startsWith("\"transit_card\"")) return transitCardParts;
+        if (line.startsWith("\"synthesize_card\"")) return synthesizeParts;
         return null;
     }
 
@@ -1315,6 +1322,11 @@ public class InterpretationService {
      */
     public String getTransitCardPart(String key) {
         return key == null ? null : transitCardParts.get(key);
+    }
+
+    /** A part of a Synthesize card, or null: "watery.headline", "fiery_vs_watery.body". */
+    public String getSynthesizePart(String key) {
+        return key == null ? null : synthesizeParts.get(key);
     }
 
     public String getArcCatalyst(String bodyName) {

@@ -379,7 +379,12 @@ public final class RingIdentityCheck {
             ok("with no second person the Chart B tab is greyed out",
                 !w[0].isPageEnabled(OuraniaWindow.CHART_B_PAGE));
             ok("and so is Synastry", !w[0].isPageEnabled(OuraniaWindow.SYNASTRY_PAGE));
-            ok("and so is Transits", !w[0].isPageEnabled(OuraniaWindow.TRANSITS_PAGE));
+            // <b>Coming up is not greyed for the sky alone (2026-10-20).</b> The sky has its own
+            // Coming up (SkyTimeline), so only a wheel of birth charts with no sky greys it.
+            // This window has no birth chart, so the sky is all it holds.
+            SkymapPanel wheel = (SkymapPanel) CheckReflect.get(w[0], "skymapPanel");
+            ok("and Coming up is greyed exactly when a birth chart has no sky over it",
+                w[0].isPageEnabled(OuraniaWindow.TRANSITS_PAGE) == !wheel.innerIsBirthChart());
 
             javax.swing.SwingUtilities.invokeAndWait(
                 () -> w[0].updateChartSections(blank, blank, blank, blank, body));
