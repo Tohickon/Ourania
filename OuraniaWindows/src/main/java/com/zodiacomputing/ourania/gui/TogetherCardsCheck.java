@@ -333,20 +333,24 @@ public final class TogetherCardsCheck {
         SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
         OuraniaWindow w = hold[0];
         try {
-            // The pair's pages are the last two of Interpretation since 2026-10-20.
-            SubRail together = w.interpretationRail();
-            yes("the Interpretation tab has a strip", together != null);
+            // The pair's pages are on the one strip, shown under the Synastry tab (2026-10-20).
+            SubRail together = w.pagesRail();
+            yes("the chart tabs have a strip", together != null);
             if (together == null) {
                 return;
             }
             List<String> strip = together.pages();
-            yes("Interpretation ends with Where you meet, then Chemistry: " + strip,
-                strip.size() >= 2 && strip.subList(strip.size() - 2, strip.size()).equals(
-                    List.of(OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE)));
+            int meet = strip.indexOf(OuraniaWindow.SYNASTRY_PAGE);
+            yes("Where you meet is followed by Chemistry: " + strip,
+                meet >= 0 && meet + 1 < strip.size()
+                    && OuraniaWindow.CHEMISTRY_PAGE.equals(strip.get(meet + 1)));
+            yes("and both are pages of the Synastry tab", OuraniaWindow.CHART_TAB_PAGES
+                .get(ChartTab.SYNASTRY).containsAll(List.of(OuraniaWindow.SYNASTRY_PAGE,
+                    OuraniaWindow.CHEMISTRY_PAGE)));
             yes("the first page reads Where you meet",
                 OuraniaWindow.MEET_LABEL.equals(together.pageLabel(OuraniaWindow.SYNASTRY_PAGE)));
-            yes("the door reads Interpretation", OuraniaWindow.INTERPRETATION_TAB_LABEL.equals(
-                w.chartRail().pageLabel(OuraniaWindow.INTERPRETATION_DOOR)));
+            yes("the Synastry tab reads Synastry", "Synastry".equals(
+                w.chartRail().pageLabel(ChartTab.SYNASTRY.door)));
 
             String blank = "<html><body></body></html>";
             String body = "<html><body>Angle contacts</body></html>";
@@ -358,7 +362,15 @@ public final class TogetherCardsCheck {
             yes("with two both pages light",
                 w.isPageEnabled(OuraniaWindow.SYNASTRY_PAGE)
                     && w.isPageEnabled(OuraniaWindow.CHEMISTRY_PAGE));
+            // Chemistry is a Synastry page, and naming a page never changes the chart, so the
+            // Synastry tab is put in front first (2026-10-20).
             SwingUtilities.invokeAndWait(() -> w.revealPage(OuraniaWindow.CHEMISTRY_PAGE));
+            yes("from the Sky tab, naming Chemistry leaves the Sky in front",
+                ChartTab.SKY.door.equals(w.chartRail().selected()));
+            SwingUtilities.invokeAndWait(() -> {
+                w.chartRail().choose(ChartTab.SYNASTRY.door);
+                w.revealPage(OuraniaWindow.CHEMISTRY_PAGE);
+            });
             yes("revealPage lands on Chemistry itself, not just its door",
                 OuraniaWindow.CHEMISTRY_PAGE.equals(w.currentPage()));
             yes("allPages lists both Together pages",

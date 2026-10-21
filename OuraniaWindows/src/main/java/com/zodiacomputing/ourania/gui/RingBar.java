@@ -273,7 +273,14 @@ public final class RingBar extends JPanel {
         boolean composite = mode == ChartMode.COMPOSITE_MIDPOINT
             || mode == ChartMode.COMPOSITE_DAVISON;
         partner.enabled = !composite;
-        partner.label = composite ? "In composite" : "Chart B";
+        // <b>A chip wears its person's name (David, 2026-10-20): Chart A and B "should take
+        // the names of the person the chart is for".</b> The same rule as the chart tabs and
+        // the Placements page (OuraniaWindow.whoseChart), so the three cannot disagree.
+        chartA.label = OuraniaWindow.whoseChart(subjectA, WheelRing.Kind.CHART_A, "Chart A");
+        partner.label = composite ? "In composite"
+            : OuraniaWindow.whoseChart(subjectB, WheelRing.Kind.CHART_B, "Chart B");
+        // A name is wider than "Chart A", and a chip's width is its label's.
+        revalidate();
         repaintChips();
     }
 

@@ -1258,7 +1258,12 @@ public final class NavigationCheck {
             ok("the wheel has a ring bar", bar != null);
             java.util.List<String> labels = chipLabels(bar);
             System.out.println("  chips: " + labels);
-            for (String want : new String[] {"Chart A", "Chart B", "Sky"}) {
+            // A chip wears its person's name once the chart has one (2026-10-20), and its slot's
+            // name until then - the same rule the chart tabs use.
+            for (String want : new String[] {
+                    OuraniaWindow.whoseChart(sky.chartASubject(), WheelRing.Kind.CHART_A, "Chart A"),
+                    OuraniaWindow.whoseChart(sky.chartBSubject(), WheelRing.Kind.CHART_B, "Chart B"),
+                    "Sky"}) {
                 ok("a chip is named " + want, labels.contains(want));
             }
             for (String gone : new String[] {"Natal", "Partner"}) {
@@ -2622,8 +2627,7 @@ public final class NavigationCheck {
                 // interpretation panel painted over whichever page was chosen. That panel is
                 // a card in Blueprint's own stack now, so a claim about the rail's three
                 // cards cannot reach it - the guard would still pass while the bug returned.
-                for (SubRail strip : new SubRail[] {w[0].placementsRail(),
-                        w[0].interpretationRail(), w[0].predictionRail()}) {
+                for (SubRail strip : new SubRail[] {w[0].pagesRail()}) {
                     java.util.List<String> inside = visibleCards(strip.cards(), strip.pages());
                     ok("after the " + route + " route one card is visible inside the strip, "
                         + "the selected " + strip.selected() + ", not " + inside,
@@ -2661,17 +2665,15 @@ public final class NavigationCheck {
                     // whether opening Chart B shows Chart B on a chart with no second person
                     // is asking the wrong question. That it CANNOT be opened is asserted in
                     // SubRailCheck Part D, where it belongs.
-                    if (!w[0].isPageEnabled(page)) {
+                    // And only the pages the chart in front shows: a page another chart tab
+                    // holds is not reached by naming it (revealPage keeps the chart).
+                    if (!w[0].isPageEnabled(page) || (w[0].pagesRail().pages().contains(page)
+                            && !w[0].pagesRail().isPageShown(page))) {
                         continue;
                     }
                     SwingUtilities.invokeAndWait(() -> w[0].revealPage(page));
-                    SubRail home = null;
-                    for (SubRail strip : new SubRail[] {w[0].placementsRail(),
-                            w[0].interpretationRail(), w[0].predictionRail()}) {
-                        if (strip.pages().contains(page)) {
-                            home = strip;
-                        }
-                    }
+                    SubRail home = w[0].pagesRail().pages().contains(page)
+                        ? w[0].pagesRail() : null;
                     java.util.List<String> shown = home == null
                         ? visibleCards(cards, pages)
                         : visibleCards(home.cards(), home.pages());
@@ -2713,10 +2715,9 @@ public final class NavigationCheck {
             // is on screen, which it always is.
             ok("and the Interpretation page still opens onto its panel, rail showing "
                 + visibleCards(cards, pages),
-                visibleCards(cards, pages).equals(
-                    java.util.List.of(OuraniaWindow.INTERPRETATION_DOOR)));
-            ok("with the interpretation panel the one card visible inside Interpretation",
-                visibleCards(w[0].interpretationRail().cards(), w[0].interpretationRail().pages())
+                visibleCards(cards, pages).equals(java.util.List.of(rail.selected())));
+            ok("with the interpretation panel the one card visible on the strip",
+                visibleCards(w[0].pagesRail().cards(), w[0].pagesRail().pages())
                     .equals(java.util.List.of(OuraniaWindow.READING_PAGE)));
 
             // <b>Every reading door opens the rail, not just the one that was noticed.</b>

@@ -35,8 +35,8 @@ public final class LifeAreasCheck {
             }
             LifeAreasPanel panel = (LifeAreasPanel) CheckReflect.get(w, "lifeAreasPanel");
             yes("the window has a Life areas page", panel != null);
-            yes("it is one of the Interpretation tab's pages: " + w.interpretationRail().pages(),
-                w.interpretationRail().pages().contains(OuraniaWindow.LIFE_AREAS_PAGE));
+            yes("it is one of the pages under the chart tabs: " + w.pagesRail().pages(),
+                w.pagesRail().pages().contains(OuraniaWindow.LIFE_AREAS_PAGE));
             ChartFrame f = sky.getCurrentChart();
             yes("a chart was cast to read", f != null);
             if (panel == null || f == null) {

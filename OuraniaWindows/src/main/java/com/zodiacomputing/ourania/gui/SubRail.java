@@ -111,7 +111,8 @@ final class SubRail extends JPanel {
      * choosing it.
      */
     void reveal(String name) {
-        if (!this.tabs.containsKey(name) || !this.tabs.get(name).enabled) {
+        if (!this.tabs.containsKey(name) || !this.tabs.get(name).enabled
+                || !this.tabs.get(name).isVisible()) {
             return;
         }
         this.selected = name;
@@ -185,6 +186,35 @@ final class SubRail extends JPanel {
                 }
             }
         }
+    }
+
+    /**
+     * Show or hide a tab: for a page the chart in front has no use for (2026-10-20). Your year
+     * has no birthday to read on the sky; a pair's pages have no pair on Chart A. A hidden tab
+     * that is showing steps aside to the first page still shown, as a greyed one does.
+     */
+    void setPageShown(String name, boolean on) {
+        Tab tab = this.tabs.get(name);
+        if (tab == null || tab.isVisible() == on) {
+            return;
+        }
+        tab.setVisible(on);
+        this.strip.revalidate();
+        this.strip.repaint();
+        if (!on && name.equals(this.selected)) {
+            for (String other : this.order) {
+                Tab t = this.tabs.get(other);
+                if (t.enabled && t.isVisible()) {
+                    this.reveal(other);
+                    return;
+                }
+            }
+        }
+    }
+
+    boolean isPageShown(String name) {
+        Tab tab = this.tabs.get(name);
+        return tab != null && tab.isVisible();
     }
 
     boolean isPageEnabled(String name) {
@@ -308,6 +338,10 @@ final class SubRail extends JPanel {
             int rowHeight = 0;
             int widest = 0;
             for (java.awt.Component c : parent.getComponents()) {
+                // A hidden tab takes no room: the chart in front has no use for that page.
+                if (!c.isVisible()) {
+                    continue;
+                }
                 Dimension d = c.getPreferredSize();
                 if (x > in.left && x - in.left + d.width > avail) {
                     x = in.left;

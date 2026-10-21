@@ -541,58 +541,66 @@ public final class RingIdentityCheck {
         try {
             DrawerRail rail = w[0].chartRail();
 
-            // Three tabs, the spec's since 2026-10-20: the data, the reading, the timing.
-            eq("the rail is three tabs", Arrays.asList(OuraniaWindow.PLACEMENTS_DOOR,
-                OuraniaWindow.INTERPRETATION_DOOR, OuraniaWindow.PREDICTION_DOOR),
-                rail.pageNames());
+            // <b>One tab per chart, in the order a chart is read (2026-10-20):</b> the two people,
+            // the sky, then the pair as a synastry and as a composite.
+            List<String> doors = new ArrayList<>();
+            for (ChartTab t : ChartTab.values()) {
+                doors.add(t.door);
+            }
+            eq("the rail is the five chart tabs", doors, rail.pageNames());
 
             // <b>No rules left, and that is asserted rather than assumed.</b> A separator
-            // still in the column would sit between two of three tabs and divide nothing -
-            // furniture left behind by the structure it used to explain.
+            // still in the column would sit between two tabs and divide nothing - furniture
+            // left behind by the structure it used to explain.
             javax.swing.JPanel column = (javax.swing.JPanel) CheckReflect.get(rail, "rail");
             java.util.Collection<?> tabs = (java.util.Collection<?>) CheckReflect.get(rail, "tabs");
-            ok("the drawn column holds the three tabs and nothing else ("
+            ok("the drawn column holds the tabs and nothing else ("
                 + column.getComponents().length + " drawn, " + tabs.size() + " selectable)",
                 column.getComponents().length == tabs.size());
 
-            // The pages, one level down, in the order they are read.
-            // Selected is the drawer under the wheel, not a page (2026-10-20).
-            eq("Placements holds the two charts, then their shape",
+            // The pages, on the one strip every chart tab holds, in the order they are read:
+            // the chart, the reading, the pair's pages, then the timing.
+            eq("the strip holds the pages in reading order",
                 Arrays.asList(OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
-                    OuraniaWindow.OVERVIEW_PAGE),
-                w[0].placementsRail().pages());
-            eq("Interpretation holds the readings in the spec's order, then the pair's pages",
-                Arrays.asList("Snapshot", OuraniaWindow.LIFE_AREAS_PAGE,
+                    OuraniaWindow.OVERVIEW_PAGE, "Snapshot", OuraniaWindow.LIFE_AREAS_PAGE,
                     OuraniaWindow.READING_PAGE, "Synthesize", "Report",
-                    OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE),
-                w[0].interpretationRail().pages());
-            eq("Prediction holds what is coming, for one and for two, the year, the calendar",
-                Arrays.asList(OuraniaWindow.TRANSITS_PAGE, OuraniaWindow.PAIR_COMING_PAGE,
+                    OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE,
+                    OuraniaWindow.TRANSITS_PAGE, OuraniaWindow.PAIR_COMING_PAGE,
                     OuraniaWindow.YEAR_PAGE, "Calendar"),
-                w[0].predictionRail().pages());
+                w[0].pagesRail().pages());
+            List<String> every = new ArrayList<>(w[0].pagesRail().pages());
+            eq("fourteen pages, none twice", 14, new java.util.HashSet<>(every).size());
+            eq("and the window lists each once", every, w[0].allPages());
 
-            // <b>Nothing was lost in the move.</b> Fourteen pages before 2026-10-20; Predict
-            // went (its 90-day list was the Now timeline again), Synthesize became two pages,
-            // the chart's themes and Your year, Selected became the drawer, and Coming up
-            // together is new - fourteen.
-            List<String> every = new ArrayList<>(w[0].placementsRail().pages());
-            every.addAll(w[0].interpretationRail().pages());
-            every.addAll(w[0].predictionRail().pages());
-            eq("fourteen pages, each on one strip", 14, every.size());
-            eq("and none on two", 14, new java.util.HashSet<>(every).size());
+            // <b>What each chart tab shows.</b> Your year needs a birthday, so only a person's
+            // tab has it; the pair's pages are the Synastry tab's.
+            for (ChartTab t : ChartTab.values()) {
+                List<String> shown = OuraniaWindow.CHART_TAB_PAGES.get(t);
+                ok(t + " shows its Placements and the Calendar",
+                    shown.contains(OuraniaWindow.CHART_PAGE) && shown.contains("Calendar"));
+                eq(t + " has Your year exactly when it is a person's tab",
+                    t == ChartTab.CHART_A || t == ChartTab.CHART_B,
+                    shown.contains(OuraniaWindow.YEAR_PAGE));
+                eq(t + " has the pair's pages exactly when it is the synastry",
+                    t == ChartTab.SYNASTRY, shown.contains(OuraniaWindow.SYNASTRY_PAGE));
+            }
 
-            // And each is still addressable by the name its callers hold. revealPage has to
-            // land on the page itself, not merely on the tab above it - opening the right
-            // door and the wrong room is the failure this whole routing exists to prevent.
+            // The window opens on the Sky tab, and the strip shows the Sky's pages.
+            eq("the Sky tab is in front at the start", ChartTab.SKY.door, rail.selected());
             for (String page : every) {
+                eq(page + " is shown under the Sky exactly when the Sky has it",
+                    OuraniaWindow.CHART_TAB_PAGES.get(ChartTab.SKY).contains(page),
+                    w[0].pagesRail().isPageShown(page));
+            }
+
+            // And each page the Sky shows is still addressable by the name its callers hold.
+            // revealPage has to land on the page itself, not merely on the tab above it.
+            for (String page : OuraniaWindow.CHART_TAB_PAGES.get(ChartTab.SKY)) {
                 w[0].setPageEnabled(page, true);
                 ok(page + " is a page the window still knows", w[0].isPageEnabled(page));
-                // <b>The five readings are addressed but not opened.</b> Opening one runs it,
-                // and a reading is generated against a chart this fixture does not have - the
-                // first version of this loop revealed all twelve and the part died inside a
-                // SwingWorker. That a reading regenerates on open is NavigationCheck's claim
-                // and it has a cast chart to make it against; the claim here is only that the
-                // page still has an address.
+                // <b>The readings are addressed but not opened.</b> Opening one runs it, and a
+                // reading is generated against a chart this fixture does not have. That a
+                // reading regenerates on open is NavigationCheck's claim.
                 if (OuraniaWindow.TIMED_READINGS.contains(page) || isReading(page)) {
                     continue;
                 }
@@ -601,17 +609,37 @@ public final class RingIdentityCheck {
                 eq("and revealPage lands on " + page, page, w[0].currentPage());
             }
 
-            // <b>A tab greys when there is nothing left inside it.</b> A door to an empty
-            // room is the defect the placeholder cards were pulled for; the page greying was
-            // always honest and the tab above it had no opinion at all.
-            for (String page : w[0].predictionRail().pages()) {
-                w[0].setPageEnabled(page, false);
+            // <b>Opening a page never changes the chart.</b> Your year is not a Sky page, so
+            // naming it leaves the Sky tab in front rather than moving the strip under another.
+            javax.swing.SwingUtilities.invokeAndWait(
+                () -> w[0].revealPage(OuraniaWindow.YEAR_PAGE));
+            eq("a page the Sky does not show leaves the Sky in front", ChartTab.SKY.door,
+                rail.selected());
+
+            // <b>Which tab the wheel's chart is (ChartTab.of)</b>: the one rule a chip press and
+            // a start-up both use to move the tab.
+            eq("a composite is the Composite tab", ChartTab.COMPOSITE,
+                ChartTab.of(ChartMode.COMPOSITE_MIDPOINT, true, true, true));
+            eq("a Davison is the Composite tab too", ChartTab.COMPOSITE,
+                ChartTab.of(ChartMode.COMPOSITE_DAVISON, true, true, true));
+            eq("a synastry is the Synastry tab", ChartTab.SYNASTRY,
+                ChartTab.of(ChartMode.SYNASTRY, true, true, true));
+            eq("Chart A under the sky is Chart A's tab", ChartTab.CHART_A,
+                ChartTab.of(ChartMode.TRANSIT, true, true, false));
+            eq("Chart B alone is Chart B's tab", ChartTab.CHART_B,
+                ChartTab.of(ChartMode.TRANSIT, true, false, true));
+            eq("no birth chart is the Sky tab", ChartTab.SKY,
+                ChartTab.of(ChartMode.SINGLE, false, false, false));
+            for (ChartTab t : ChartTab.values()) {
+                eq(t + "'s key finds it again", t, ChartTab.ofDoor(t.door));
             }
-            ok("Prediction greys out when all of its pages are greyed",
-                !rail.isPageEnabled(OuraniaWindow.PREDICTION_DOOR));
-            w[0].setPageEnabled(OuraniaWindow.TRANSITS_PAGE, true);
-            ok("and lights again as soon as one of them comes back",
-                rail.isPageEnabled(OuraniaWindow.PREDICTION_DOOR));
+
+            // <b>A chart tab is greyed by its chart, not by its pages.</b> This window has no
+            // birth chart, so the people's and the pair's tabs are greyed and the Sky is not.
+            for (ChartTab t : ChartTab.values()) {
+                eq(t + "'s tab is open exactly when its chart exists", t == ChartTab.SKY,
+                    rail.isPageEnabled(t.door));
+            }
         } finally {
             javax.swing.SwingUtilities.invokeAndWait(() -> w[0].dispose());
         }

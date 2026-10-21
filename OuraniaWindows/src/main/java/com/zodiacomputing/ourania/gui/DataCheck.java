@@ -55,7 +55,9 @@ public final class DataCheck {
      * prose and would fail every one of them; the corruption checks still run on them.
      */
     private static boolean isPartsSection(String section) {
-        return "transit_card".equals(section);
+        // The Synthesize cards are parts too (2026-10-20): a headline, a body and a takeaway that
+        // ThemeCards puts together, plain text with no bold lead of their own.
+        return "transit_card".equals(section) || "synthesize_card".equals(section);
     }
 
     /** Sections whose values are the bold-summary placement format. */

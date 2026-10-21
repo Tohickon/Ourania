@@ -42,17 +42,15 @@ public class OuraniaWindow extends JFrame {
     private SidePanel sidePanel;
     /** The left rail: what this chart is, opposite the menu that says what the app does. */
     private DrawerRail chartRail;
-    /** The Placements tab's pages: the charts and their shape - the data, not the reading. */
-    private SubRail placements;
+    /** The pages, one strip shared by every chart tab: it moves into the tab in front. */
+    private SubRail pages;
+    /** Each chart tab's body, which holds the strip while that tab is in front. */
+    private final java.util.Map<String, JPanel> chartHolders = new java.util.LinkedHashMap<>();
     private LifeAreasPanel lifeAreasPanel;
-    /** The Prediction tab's: what is coming, the year, and the calendar. */
-    private SubRail prediction;
     private OverviewPanel overviewPanel;
     private javax.swing.JEditorPane natalPane;
     private javax.swing.JEditorPane transitPane;
     private javax.swing.JEditorPane chartBPane;
-    /** The Interpretation tab's: the readings of the chart, and of the pair when there is one. */
-    private SubRail interpretation;
     /** Where you meet. Kept under its old name; it is the pane the Synastry page always was. */
     private javax.swing.JEditorPane synastryPane;
     private javax.swing.JEditorPane chemistryPane;
@@ -154,25 +152,43 @@ public class OuraniaWindow extends JFrame {
      * door with no room behind it teaches a reader: see the note on the four placeholder
      * cards pulled on 2 September.
      */
-    public static final String PLACEMENTS_DOOR = "door.placements";
-    public static final String INTERPRETATION_DOOR = "door.interpretation";
-    public static final String PREDICTION_DOOR = "door.prediction";
-
     /**
-     * <b>The three tabs are the spec's since 2026-10-20: Placements, Interpretation,
-     * Prediction.</b> David adopted a tab spec that sorts the pages by what kind of answer they
-     * give - the data, the reading, the timing - where You, Together and Now sorted them by whose
-     * chart and which moment. Who is on the wheel is already chosen by the chips, so a door
-     * choosing it a second time was two controls for one question.
+     * <b>The left rail's tabs are the charts since 2026-10-20</b> - see {@link ChartTab}, which
+     * holds their keys. For three hours that day they were Placements, Interpretation and
+     * Prediction, from a tab spec David pasted; on seeing it he asked for the charts instead,
+     * with those three kinds of page under each.
      *
-     * <b>Door keys are not page keys any more.</b> Blueprint's key was CHART_PAGE's string and
-     * Chronometry's was TRANSITS_PAGE's, so setPageLabel on a door found the page first and
-     * renamed that - a trap the comments here warned about three times. A key that no page can
-     * have ends it.
+     * <b>Which pages each chart shows.</b> Your year is read from a birthday, which the sky and
+     * a composite do not have. Chart B's own placements page belongs to the synastry, where both
+     * charts are on the wheel; on a person's own tab the Placements page is theirs. The pair's
+     * pages need a pair.
      */
-    static final String PLACEMENTS_TAB_LABEL = "Placements";
-    static final String INTERPRETATION_TAB_LABEL = "Interpretation";
-    static final String PREDICTION_TAB_LABEL = "Prediction";
+    static final java.util.Map<ChartTab, java.util.List<String>> CHART_TAB_PAGES;
+    static {
+        java.util.List<String> reading = java.util.List.of(OVERVIEW_PAGE, "Snapshot",
+            LIFE_AREAS_PAGE, READING_PAGE, "Synthesize", "Report");
+        java.util.Map<ChartTab, java.util.List<String>> m = new java.util.EnumMap<>(ChartTab.class);
+        for (ChartTab t : ChartTab.values()) {
+            java.util.List<String> l = new java.util.ArrayList<>();
+            l.add(CHART_PAGE);
+            if (t == ChartTab.SYNASTRY) {
+                l.add(CHART_B_PAGE);
+                l.add(MEET_PAGE);
+                l.add(CHEMISTRY_PAGE);
+                l.add(TRANSITS_PAGE);
+                l.add(PAIR_COMING_PAGE);
+            } else {
+                l.addAll(reading);
+                l.add(TRANSITS_PAGE);
+                if (t == ChartTab.CHART_A || t == ChartTab.CHART_B) {
+                    l.add(YEAR_PAGE);
+                }
+            }
+            l.add("Calendar");
+            m.put(t, java.util.List.copyOf(l));
+        }
+        CHART_TAB_PAGES = java.util.Collections.unmodifiableMap(m);
+    }
 
     /**
      * The five readings, each its own tab rather than rows inside a Readings section.
@@ -363,53 +379,52 @@ public class OuraniaWindow extends JFrame {
         synastryPane = HtmlPanes.chartPane(this);
         selectionPane = HtmlPanes.chartPane(this);
         chartRail = new DrawerRail(Drawer.Side.LEFT, 340);
-        // <b>Three tabs: the data, the reading, the timing (2026-10-20).</b> The tab spec David
-        // adopted sorts every page by the kind of answer it gives. Placements holds the charts as
-        // positions and their shape; Interpretation the readings, the pair's two pages last;
-        // Prediction what is coming, the year and the calendar. Who is read is the chips' job.
-        placements = new SubRail();
-        interpretation = new SubRail();
-        prediction = new SubRail();
-        placements.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
-        placements.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
-        // <b>The Now page is Coming up.</b> It is the timeline of transits to the chart, from
-        // right now to a year ahead (David, 2026-10-17), and the pop-ups land on its cards - so
-        // it moved whole rather than being rebuilt as a reading.
-        prediction.addPage(TRANSITS_PAGE, astrologerPage(transitPane, "<html>Astrologer view: "
-            + "on, under each card the placements it is read from, and the planets' positions"
-            + " at the end.<br>Off: the plain cards only.</html>"));
-        // The pair's timeline sits next to the one-person timeline it is built from.
-        pairComingPane = HtmlPanes.chartPane(this);
-        prediction.addPage(PAIR_COMING_PAGE, astrologerPage(pairComingPane, "<html>Astrologer "
-            + "view: on, show the placements behind each card.<br>Off: the plain cards only."
-            + "</html>"));
+        // <b>One tab per chart, the same pages under each (2026-10-20).</b> David: "it should be
+        // separated by charts with placements, interpretations and predictions going under the
+        // chart tabs". A tab says which chart is read (ChartTab); the strip says what is read
+        // about it. There is one strip, and it moves into whichever tab is in front, because
+        // each page is one component and a component has one parent (DrawerRail.setOnShow).
+        pages = new SubRail();
+        pages.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
+        pages.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
         // <b>The pair's pages are built here, before the wheel</b>, whose constructor already
         // writes to them; the readings that come before them on the strip are put in front of
         // them further down (SubRail.addPageBefore).
         chemistryPane = HtmlPanes.chartPane(this);
         String pairTip = "<html>Astrologer view: on, show the houses, signs, angles and orbs "
             + "behind each card.<br>Off: the plain reading only.</html>";
-        interpretation.addPage(MEET_PAGE, astrologerPage(synastryPane, pairTip));
-        interpretation.addPage(CHEMISTRY_PAGE, astrologerPage(chemistryPane, pairTip));
-        interpretation.setPageLabel(MEET_PAGE, MEET_LABEL);
-        chartRail.addPage(PLACEMENTS_DOOR, placements);
-        chartRail.addPage(INTERPRETATION_DOOR, interpretation);
-        chartRail.addPage(PREDICTION_DOOR, prediction);
+        pages.addPage(MEET_PAGE, astrologerPage(synastryPane, pairTip));
+        pages.addPage(CHEMISTRY_PAGE, astrologerPage(chemistryPane, pairTip));
+        pages.setPageLabel(MEET_PAGE, MEET_LABEL);
+        // <b>The Now page is Coming up.</b> It is the timeline of transits to the chart, from
+        // right now to a year ahead (David, 2026-10-17), and the pop-ups land on its cards - so
+        // it moved whole rather than being rebuilt as a reading.
+        pages.addPage(TRANSITS_PAGE, astrologerPage(transitPane, "<html>Astrologer view: "
+            + "on, under each card the placements it is read from, and the planets' positions"
+            + " at the end.<br>Off: the plain cards only.</html>"));
+        // The pair's timeline sits next to the one-person timeline it is built from.
+        pairComingPane = HtmlPanes.chartPane(this);
+        pages.addPage(PAIR_COMING_PAGE, astrologerPage(pairComingPane, "<html>Astrologer "
+            + "view: on, show the placements behind each card.<br>Off: the plain cards only."
+            + "</html>"));
+        for (ChartTab tab : ChartTab.values()) {
+            JPanel holder = new JPanel(new BorderLayout());
+            holder.setBackground(Theme.BG);
+            chartHolders.put(tab.door, holder);
+            chartRail.addPage(tab.door, holder);
+            chartRail.setPageLabel(tab.door, tab.label);
+        }
+        chartRail.setOnShow(this::showChartTab);
         // <b>Their plain identity, before any chart exists to name them.</b> A SubRail tab
         // shows its own key until something renames it, and updateChartSections - which sets
         // these from the ring headings - returns early while skymapPanel is still being
         // built. So the strip opened reading "Chart > Chart" on a cold start: the key leaking
         // through as a label, in the one state a new reader sees first.
-        placements.setPageLabel(CHART_PAGE, CHART_A_LABEL);
-        prediction.setPageLabel(TRANSITS_PAGE, COMING_UP_LABEL);
-        chartRail.setPageLabel(PLACEMENTS_DOOR, PLACEMENTS_TAB_LABEL);
-        chartRail.setPageLabel(INTERPRETATION_DOOR, INTERPRETATION_TAB_LABEL);
-        chartRail.setPageLabel(PREDICTION_DOOR, PREDICTION_TAB_LABEL);
-        // Open on Chart A at launch, without animating - the Natal section used to be the one
-        // section open when the app started, and this is where that content went.
-        chartRail.prepare(PLACEMENTS_DOOR);
-        placements.prepare(CHART_PAGE);
-        prediction.prepare(TRANSITS_PAGE);
+        pages.setPageLabel(CHART_PAGE, PLACEMENTS_LABEL);
+        pages.setPageLabel(TRANSITS_PAGE, COMING_UP_LABEL);
+        // The app opens on the sky (drawSavedChart), so its tab is the one in front.
+        chartRail.prepare(ChartTab.SKY.door);
+        pages.prepare(CHART_PAGE);
         add(chartRail, BorderLayout.WEST);
 
         // Built here rather than beside the rail below, because SkymapPanel's constructor
@@ -457,42 +472,42 @@ public class OuraniaWindow extends JFrame {
             readingPanes.put(r[0], pane);
             readings.put(r[0], readingPage(r[1], HtmlPanes.scroller(pane)));
         }
-        // <b>The order on each strip is the spec's, top to bottom.</b> Placements: Chart A,
-        // Chart B, Chart shape. Selected is not a page: it is the drawer under the wheel.
-        // Interpretation: At a glance, Life areas, Reading,
-        // Synthesize, Full report, then the pair's two pages. Prediction: Coming up, Your year,
-        // Calendar.
-        placements.addPage(OVERVIEW_PAGE, overviewPanel);
-        interpretation.addPageBefore("Snapshot", readings.get("Snapshot"), MEET_PAGE);
-        interpretation.addPageBefore(LIFE_AREAS_PAGE, lifeAreasPanel, MEET_PAGE);
-        interpretation.addPageBefore(READING_PAGE, interpretationPanel, MEET_PAGE);
-        interpretation.addPageBefore("Synthesize", readings.get("Synthesize"), MEET_PAGE);
-        interpretation.addPageBefore("Report", readings.get("Report"), MEET_PAGE);
+        // <b>The order on the strip: the chart, then the reading, then the timing.</b>
+        // Placements (and Chart B's, in a synastry), Chart shape, At a glance, Life areas,
+        // Reading, Synthesize, Full report, the pair's two pages, Coming up, Coming up together,
+        // Your year, Calendar. Each tab shows the ones its chart can answer (CHART_TAB_PAGES).
+        pages.addPageBefore(OVERVIEW_PAGE, overviewPanel, MEET_PAGE);
+        pages.addPageBefore("Snapshot", readings.get("Snapshot"), MEET_PAGE);
+        pages.addPageBefore(LIFE_AREAS_PAGE, lifeAreasPanel, MEET_PAGE);
+        pages.addPageBefore(READING_PAGE, interpretationPanel, MEET_PAGE);
+        pages.addPageBefore("Synthesize", readings.get("Synthesize"), MEET_PAGE);
+        pages.addPageBefore("Report", readings.get("Report"), MEET_PAGE);
         for (String timed : TIMED_READINGS) {
-            prediction.addPage(timed, readings.get(timed));
+            pages.addPage(timed, readings.get(timed));
         }
-        interpretation.prepare("Snapshot");
         PLAIN_LABELS.forEach(this::setPageLabel);
+        showChartTab(ChartTab.SKY.door);
+        // The wheel's first chart update arrives while it is still being built, before this
+        // window has a skymapPanel to ask, so the tabs are named and greyed once here.
+        nameTheChartTabs();
 
         // <b>Opening a tab has to produce the page, not just reveal it.</b> The readings were
         // buttons that ran something; turned into tabs they revealed panes nothing had ever
         // written to, so five of them opened onto blank panels and Interpretation opened onto
         // an empty one. A card swap is not a door - the thing behind the door has to be made.
-        // <b>Opening a rail tab has to re-open the page inside it.</b> The sub-rail keeps
-        // showing whichever page was last chosen, and a reading is a snapshot of a moment the
-        // transport buttons keep moving - so coming back to Prediction with Your year in front
-        // has to rebuild it, not reveal a stale card. The rail reports the tab; the tab asks
-        // its own strip to report the page, and the one listener below handles both.
-        chartRail.setOnSelect(tab -> {
-            SubRail inside = strips().get(tab);
-            if (inside != null) {
-                inside.refire();
+        // <b>A chart tab puts its chart on the wheel, then re-opens the page in front</b>,
+        // which is now a page about that chart. The chips go through the same door.
+        chartRail.setOnSelect(door -> {
+            ChartTab tab = ChartTab.ofDoor(door);
+            if (tab != null && chartSetupPanel != null
+                    && tab != ChartTab.of(chartSetupPanel.currentMode(),
+                        skymapPanel.innerIsBirthChart(), skymapPanel.chartAIn(),
+                        skymapPanel.chartBIn())) {
+                chartSetupPanel.showChart(tab);
             }
+            pages.refire();
         });
-        java.util.function.Consumer<String> onPage = page -> rebuildPage(page, true);
-        placements.setOnSelect(onPage);
-        interpretation.setOnSelect(onPage);
-        prediction.setOnSelect(onPage);
+        pages.setOnSelect(page -> rebuildPage(page, true));
 
         // <b>One strip on the east edge, with a tab each.</b> The grid was tried across the
         // top, where its handle was a bar lying between two vertical strips and read as a
@@ -932,16 +947,14 @@ public class OuraniaWindow extends JFrame {
         if (chartRail == null || skymapPanel == null) {
             return;
         }
-        setPageLabel(CHART_PAGE, whoseChart(skymapPanel.chartASubject(),
-            skymapPanel.natalRing.kind, CHART_A_LABEL));
-        // <b>And the second person's page wears their name too.</b> It was the literal
-        // "Chart B" - which says what the page is for and nothing about whose it is, on the
-        // one page whose entire reason for existing is that it belongs to somebody else.
-        setPageLabel(CHART_B_PAGE, whoseChart(skymapPanel.chartBSubject(),
-            WheelRing.Kind.CHART_B, CHART_B_PAGE));
-        // <b>The second page is Coming up, whatever rings are drawn (2026-10-20).</b> It was
-        // named for the rings on it by secondPageTitle; under Prediction it is the timeline of
-        // what reaches the chart, and that does not change with the outer ring.
+        // <b>The tabs wear the names now (2026-10-20).</b> A person's chart tab is named for
+        // them; the Placements page under it says Placements, and in a synastry the two
+        // placements pages are named for the two people (showChartTab).
+        nameTheChartTabs();
+        followTheWheel();
+        if (chartRail.selected() != null) {
+            showChartTab(chartRail.selected());
+        }
     }
 
     /**
@@ -1375,12 +1388,17 @@ public class OuraniaWindow extends JFrame {
         return null;
     }
 
-    /** The rail tab that holds a page - the page itself, when it is a rail tab. */
+    /**
+     * The rail tab a page opens under: the chart tab in front, for a page on the strip.
+     *
+     * <b>Opening a page never changes which chart is read (2026-10-20).</b> Every chart tab holds
+     * the same strip, so "which tab is this page behind" has five answers, and choosing another
+     * one would move the strip without moving the wheel - a page about one chart under the tab
+     * of another. A page this chart does not show stays where it is; see revealPage.
+     */
     private String tabOf(String page) {
-        for (java.util.Map.Entry<String, SubRail> e : strips().entrySet()) {
-            if (e.getValue().pages().contains(page)) {
-                return e.getKey();
-            }
+        if (homeOf(page) != null && chartRail != null && chartRail.selected() != null) {
+            return chartRail.selected();
         }
         return page;
     }
@@ -1394,16 +1412,81 @@ public class OuraniaWindow extends JFrame {
      */
     private java.util.Map<String, SubRail> strips() {
         java.util.Map<String, SubRail> out = new java.util.LinkedHashMap<>();
-        if (placements != null) {
-            out.put(PLACEMENTS_DOOR, placements);
-        }
-        if (interpretation != null) {
-            out.put(INTERPRETATION_DOOR, interpretation);
-        }
-        if (prediction != null) {
-            out.put(PREDICTION_DOOR, prediction);
+        if (pages != null) {
+            for (ChartTab t : ChartTab.values()) {
+                out.put(t.door, pages);
+            }
         }
         return out;
+    }
+
+    /**
+     * A chart tab came to the front: the strip moves into it, and shows that chart's pages.
+     *
+     * Called on every showing - a click, a reveal, a prepare - so a tab is never empty. The
+     * chart on the wheel is not changed here: a click changes it (setOnSelect), and a chip
+     * changes it and then moves the tab (followTheWheel).
+     */
+    private void showChartTab(String door) {
+        ChartTab tab = ChartTab.ofDoor(door);
+        JPanel holder = chartHolders.get(door);
+        if (tab == null || holder == null || pages == null) {
+            return;
+        }
+        if (pages.getParent() != holder) {
+            holder.add(pages, BorderLayout.CENTER);
+            holder.revalidate();
+            holder.repaint();
+        }
+        java.util.List<String> shown = CHART_TAB_PAGES.get(tab);
+        for (String page : pages.pages()) {
+            pages.setPageShown(page, shown.contains(page));
+        }
+        // In a synastry the two Placements pages are the two people; on one chart it is theirs.
+        if (tab == ChartTab.SYNASTRY && skymapPanel != null) {
+            pages.setPageLabel(CHART_PAGE, whoseChart(skymapPanel.chartASubject(),
+                WheelRing.Kind.CHART_A, CHART_A_LABEL));
+            pages.setPageLabel(CHART_B_PAGE, whoseChart(skymapPanel.chartBSubject(),
+                WheelRing.Kind.CHART_B, CHART_B_PAGE));
+        } else {
+            pages.setPageLabel(CHART_PAGE, PLACEMENTS_LABEL);
+        }
+    }
+
+    /**
+     * Moves the chart tab to the chart the wheel holds, after a chip or the setup screen
+     * changed it. Neither opens nor closes the rail, and does not re-cast anything.
+     */
+    private void followTheWheel() {
+        if (chartRail == null || skymapPanel == null || chartSetupPanel == null) {
+            return;
+        }
+        ChartTab tab = ChartTab.of(chartSetupPanel.currentMode(),
+            skymapPanel.innerIsBirthChart(), skymapPanel.chartAIn(), skymapPanel.chartBIn());
+        if (!tab.door.equals(chartRail.selected())) {
+            chartRail.choose(tab.door);
+        }
+    }
+
+    /**
+     * Each chart tab's name and whether it can be opened: a person's tab wears their name
+     * (David, 2026-10-20: Chart A and B "should take the names of the person the chart is
+     * for"), a tab for a chart that is not entered is greyed, and the sky is always there.
+     */
+    private void nameTheChartTabs() {
+        if (chartRail == null || skymapPanel == null) {
+            return;
+        }
+        boolean a = skymapPanel.hasChartA();
+        boolean b = skymapPanel.chartBSubject() != null && skymapPanel.chartBSubject().entered();
+        chartRail.setPageLabel(ChartTab.CHART_A.door, whoseChart(skymapPanel.chartASubject(),
+            WheelRing.Kind.CHART_A, ChartTab.CHART_A.label));
+        chartRail.setPageLabel(ChartTab.CHART_B.door, whoseChart(skymapPanel.chartBSubject(),
+            WheelRing.Kind.CHART_B, ChartTab.CHART_B.label));
+        chartRail.setPageEnabled(ChartTab.CHART_A.door, a);
+        chartRail.setPageEnabled(ChartTab.CHART_B.door, b);
+        chartRail.setPageEnabled(ChartTab.SYNASTRY.door, a && b);
+        chartRail.setPageEnabled(ChartTab.COMPOSITE.door, a && b);
     }
 
     /**
@@ -1450,10 +1533,8 @@ public class OuraniaWindow extends JFrame {
             }
             return;
         }
+        // A chart tab is greyed by whether its chart exists (nameTheChartTabs), not by its pages.
         home.setPageEnabled(page, on);
-        if (chartRail != null) {
-            chartRail.setPageEnabled(tabOf(page), !home.allDisabled());
-        }
     }
 
     boolean isPageEnabled(String page) {
@@ -1493,13 +1574,15 @@ public class OuraniaWindow extends JFrame {
         if (chartRail == null) {
             return out;
         }
+        // Every chart tab holds the same strip, so its pages are listed once, not once a tab.
         java.util.Map<String, SubRail> strips = strips();
+        java.util.Set<SubRail> listed = new java.util.HashSet<>();
         for (String tab : chartRail.pageNames()) {
             SubRail inside = strips.get(tab);
-            if (inside != null) {
-                out.addAll(inside.pages());
-            } else {
+            if (inside == null) {
                 out.add(tab);
+            } else if (listed.add(inside)) {
+                out.addAll(inside.pages());
             }
         }
         return out;
@@ -1512,19 +1595,9 @@ public class OuraniaWindow extends JFrame {
             : chartRail != null ? chartRail.page(page) : null;
     }
 
-    /** The Placements tab's strip, for the suites. */
-    SubRail placementsRail() {
-        return placements;
-    }
-
-    /** The Interpretation tab's strip, for the suites. */
-    SubRail interpretationRail() {
-        return interpretation;
-    }
-
-    /** The Prediction tab's strip, for the suites. */
-    SubRail predictionRail() {
-        return prediction;
+    /** The pages' strip, the one every chart tab holds, for the suites. */
+    SubRail pagesRail() {
+        return pages;
     }
 
     DrawerRail chartRail() {
@@ -2371,6 +2444,8 @@ public class OuraniaWindow extends JFrame {
             boolean chartBIn) {
         if (skymapPanel != null) {
             skymapPanel.applyChartMode(mode, transits, chartAIn, chartBIn);
+            // A chip or the setup screen chose the chart: the chart tab follows it.
+            followTheWheel();
             // <b>A chip changes who the pages are about, so the page in front must say so now.</b>
             // These pages are built when they are opened, and a chip press does not open one -
             // so Chart B could be selected while the Overview, Life areas and Reading pages

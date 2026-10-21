@@ -186,7 +186,7 @@ public final class DrawerRail extends JPanel {
             return;
         }
         selected = label;
-        cards.show(pages, label);
+        show(label);
         setOpen(true);
         repaintTabs();
         if (onSelect != null) {
@@ -197,6 +197,37 @@ public final class DrawerRail extends JPanel {
     /** Called with a page name each time that page is opened by a click. */
     public void setOnSelect(java.util.function.Consumer<String> listener) {
         this.onSelect = listener;
+    }
+
+    private java.util.function.Consumer<String> onShow;
+
+    /**
+     * Called with a page name each time that page comes to the front, by a click or not.
+     *
+     * <b>For tabs that share one body (2026-10-20).</b> The chart tabs all hold the same strip
+     * of pages, and a component has one parent, so the strip has to move into whichever tab is
+     * in front - on a reveal or a prepare as much as on a click, or a programmatic reveal would
+     * show an empty tab.
+     */
+    public void setOnShow(java.util.function.Consumer<String> listener) {
+        this.onShow = listener;
+    }
+
+    private void show(String label) {
+        if (onShow != null) {
+            onShow.accept(label);
+        }
+        cards.show(pages, label);
+    }
+
+    /**
+     * Puts a page in front without opening or closing the rail and without telling the
+     * click listener: for the chart tabs following a chart chosen some other way.
+     */
+    public void choose(String label) {
+        selected = label;
+        show(label);
+        repaintTabs();
     }
 
     /**
@@ -259,7 +290,7 @@ public final class DrawerRail extends JPanel {
     /** Shows a page without the toggle, for a caller that needs it visible either way. */
     public void reveal(String label) {
         selected = label;
-        cards.show(pages, label);
+        show(label);
         setOpen(true);
         repaintTabs();
     }
@@ -323,7 +354,7 @@ public final class DrawerRail extends JPanel {
      */
     public void prepare(String label) {
         selected = label;
-        cards.show(pages, label);
+        show(label);
         targetWidth = 0;
         applyWidth(0);
         repaintTabs();
@@ -332,7 +363,7 @@ public final class DrawerRail extends JPanel {
     /** Opens without animating, for a caller that wants it open from the first frame. */
     public void revealImmediately(String label) {
         selected = label;
-        cards.show(pages, label);
+        show(label);
         targetWidth = widthFor(label);
         applyWidth(targetWidth);
         repaintTabs();
