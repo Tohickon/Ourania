@@ -218,151 +218,24 @@ public class NarrativeSynthesizer {
             }
         }
 
-        // 4.2 Planetary Placements
-        sb.append(tier("Your placements, strongest first"));
-        sb.append("<p style='color:#AAAAAA;'>What each part of your chart does, starting with"
-            + " the one that speaks loudest.</p>");
-        for (BodyScore.Vector v : ranked) {
-            ChartFrame.Body b = f.body(v.body);
-            Dignity.Result dr = Dignity.evaluate(v.body, b.lon, isDiurnal);
-            sb.append("<div style='margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px dotted #333;'>");
-            sb.append("<h3 style='color: #FFFFFF; margin-bottom: 5px;'>").append(v.body).append(" (").append(String.format("%.1f%%", v.prominence * 100)).append(" Prominence)</h3>");
-            
-            sb.append("<p style='font-size: 13px; color: #BBBBBB;'>");
-            if (dr.score >= Dignity.PTS_EXALTATION) sb.append("<b>Highly Dignified.</b> ");
-            if (dr.domicile) sb.append("<b>In Domicile.</b> ");
-            if (v.house > 0) sb.append("Residing in House ").append(v.house).append(". ");
-            sb.append("</p>");
-            
-            String core = svc.getBodyCore(v.body);
-            if (core != null && !core.isEmpty()) {
-                sb.append("<p><b>Core function:</b> ").append(core).append("</p>");
+        // <b>The year's biggest moments, not the birth chart (David, 2026-10-22).</b> "should be
+        // only your year and how each point effects natal points throughout the year (i.e.
+        // biggest moments during the year and when they occur and by what and what it means".
+        // This was the natal placements, strongest first: every planet's sign, house and
+        // aspects, none of it about this year, and the longest thing on the page. The
+        // placements have their own page under each chart. See YearMoments.
+        if (!relationship && yearThemes != null) {
+            List<ReadingCard> moments = YearMoments.cards(f, scan, prof == null ? null : prof.lord);
+            sb.append(tier("The year's biggest moments"));
+            if (moments.isEmpty()) {
+                sb.append("<p>No slow planet meets one of your main points this year. It is a"
+                    + " year for steady work, not for big turns.</p>");
+            } else {
+                sb.append("<p style='color:#AAAAAA;'>When each one comes, what makes it, and what"
+                    + " it means, in the order they happen.</p>");
+                sb.append(ReadingCard.html(moments, Settings.astrologerView()));
             }
-            
-            String sign = Zodiac.signName(b.lon);
-            // Composite prose for a composite chart. The natal entry describes a person; the
-            // composite entry describes what the pairing does with that placement.
-            String signText = relationship ? svc.getCompositePlanetSign(v.body, sign) : null;
-            if (signText == null) {
-                signText = svc.getPlanetInSign(v.body, sign);
-            }
-            if (!signText.startsWith("Interpretation not found")) {
-                sb.append("<p><b>In ").append(Character.toUpperCase(sign.charAt(0))).append(sign.substring(1)).append(":</b> ").append(signText).append("</p>");
-            }
-            
-            if (v.house > 0) {
-                String houseText = relationship
-                    ? svc.getCompositePlanetHouse(v.body, v.house) : null;
-                if (houseText == null) {
-                    houseText = svc.getPlanetInHouse(v.body, v.house);
-                }
-                if (!houseText.startsWith("Interpretation not found")) {
-                    sb.append("<p><b>In House ").append(v.house).append(":</b> ").append(houseText).append("</p>");
-                }
-            }
-
-            // Angles
-            if (v.nearestAngle != null && v.angularity > 0.5) {
-                String angleText = relationship
-                    ? svc.getCompositeAngle(v.nearestAngle, sign) : null;
-                if (angleText == null) {
-                    angleText = svc.getAngleInterpretation(v.nearestAngle, sign);
-                }
-                if (angleText != null && !angleText.isEmpty() && !angleText.startsWith("Interpretation not found")) {
-                    sb.append("<p><b>On the ").append(v.nearestAngle).append(":</b> ").append(angleText).append("</p>");
-                }
-            }
-            
-            // Major Aspects
-            if (v.aspects != null && !v.aspects.isEmpty()) {
-                // <b>Both ends minor means there is no actor to express the contact</b>, so it
-                // is listed as background rather than under a heading that calls it major. The
-                // K4 decision asked for these sixty asteroid-to-asteroid cells to be left
-                // unwritten; measured 2026-09-03 all sixty are written, so the prose stays and
-                // the claim above it is the thing that changes. A Pallas square Juno that
-                // arrives titled "Major Contacts" is the app asserting something false about
-                // its own weight - which is precisely Tompkins' clutter and Cunningham's
-                // alarm fatigue, reached through wording rather than through line-drawing.
-                StringBuilder major = new StringBuilder();
-                StringBuilder background = new StringBuilder();
-                for (int i = 0; i < Math.min(3, v.aspects.size()); i++) {
-                    Aspects.Hit h = v.aspects.get(i);
-                    String other = v.body.equals(h.a) ? h.b : h.a;
-                    String aspectText = relationship
-                        ? svc.getCompositeAspect(v.body, other, h.type.label) : null;
-                    // <b>With no composite reading for the pair this borrows the NATAL one</b>
-                    // - and the natal corpus describes two drives inside one person. The
-                    // geometry is right and the voice is wrong: nothing in that sentence knows
-                    // both ends belong to a relationship. As of 2026-08-31 that is 1,404 of
-                    // 3,300 cells, every one of them a minor aspect.
-                    //
-                    // The frame is the one sentence the natal dataset cannot say, and it has
-                    // sat in composite_aspects.json since that file was written - eleven
-                    // entries, one per aspect type. <b>InterpretationPanel has shown it all
-                    // along; this surface never called it.</b> Same data, same getter, one
-                    // reader taught and its neighbour left behind.
-                    //
-                    // <b>Deliberately narrower here than on the panel</b>, which frames every
-                    // relationship aspect it renders. That page carries one aspect; this report
-                    // carries three per body across every body, so an unconditional frame would
-                    // repeat one of eleven sentences dozens of times. It appears only where it
-                    // does work - in front of borrowed natal wording. A difference driven by
-                    // the surface, not by drift.
-                    String frame = null;
-                    if (aspectText == null) {
-                        aspectText = svc.getAspect(v.body, other, h.type.label);
-                        if (relationship) {
-                            frame = svc.getCompositeAspectFrame(h.type.label);
-                            // <b>When the natal fallback is ITSELF only the aspect general</b>,
-                            // the frame already says that in the relationship's voice, so it
-                            // replaces the text rather than sitting on top of it. Printed as a
-                            // pair they said the same thing twice - "half a square and it
-                            // behaves like one" in both paragraphs - and the second one closed
-                            // by apologising for prose that is not written, which is a note to
-                            // the authors, not a reading for the couple.
-                            //
-                            // A natal reading written for the actual PAIR is different and is
-                            // kept: the geometry it describes is real, and the frame in front
-                            // of it supplies the one thing it cannot know.
-                            if (frame != null && aspectText != null
-                                    && aspectText.contains("is not written yet.")) {
-                                aspectText = frame;
-                                frame = null;
-                            }
-                        }
-                    }
-                    // Mutual: both bodies belong to the same person, so either end can
-                    // carry the contact. Same rule the returns table asks directionally.
-                    StringBuilder into = Bodies.hasPrimaryActor(v.body, other, false)
-                        ? major : background;
-                    if (!aspectText.startsWith("Interpretation not found") && !aspectText.startsWith("General ")) {
-                        into.append("<li><b>").append(h.type.label).append(" to ").append(other)
-                            .append(":</b> ");
-                        if (frame != null) {
-                            into.append(frame).append("<br><br>");
-                        }
-                        into.append(aspectText).append("</li>");
-                    } else {
-                        into.append("<li><b>").append(h.type.label).append(" to ").append(other).append("</b> (").append(String.format("%.1f&deg;", h.offBy)).append(").</li>");
-                    }
-                }
-                if (major.length() > 0) {
-                    sb.append("<p><b>Major Contacts:</b></p><ul>").append(major).append("</ul>");
-                }
-                if (background.length() > 0) {
-                    sb.append("<p><b>Background Resonance:</b> <span style='font-size:11px;")
-                      .append(" color:#B9B2D6;'>minor bodies at both ends - texture beneath the")
-                      .append(" planetary signatures, not beside them.</span></p><ul>")
-                      .append(background).append("</ul>");
-                }
-            }
-            sb.append("</div>");
         }
-
-        // ------------------------------------------------------------------ When
-        sb.append(tier("When"));
-        sb.append("<p>The dates for all of this are on the <b>Now</b> page, in order: right now,"
-            + " today, tonight, and on to later this year.</p>");
 
         // ------------------------------------------------------------------ Tier 4
         //

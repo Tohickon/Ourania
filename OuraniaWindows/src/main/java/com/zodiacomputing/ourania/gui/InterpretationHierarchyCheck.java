@@ -456,19 +456,19 @@ public final class InterpretationHierarchyCheck {
         // dark and reported one red instead of three. A section heading can be renumbered
         // again; it cannot stop being called what it is called.
         // 2026-10-17: the placements left the mechanics and became the reader's own section,
-        // "Your placements, strongest first", which the When section follows. Same block, same
-        // guards on what is inside it; only where it starts and ends moved.
-        int a = syn.indexOf("Your placements, strongest first");
-        int b = syn.indexOf("tier(\"When\")");
-        ok("H2: the placements section is found, and ends where When begins", a > 0 && b > a);
+        // "Your placements, strongest first".
+        // 2026-10-22: David took them off the year's page altogether - it is "only your year",
+        // and each chart has its own Placements page. So the guard is now the other way round:
+        // the part a reader sees, from Your year to the Mechanics, reads no natal placement
+        // prose at all.
+        int a = syn.indexOf("tier(\"Your year\")");
+        int b = syn.indexOf("tier(MECHANICS)");
+        ok("H2: the year's page is found, and ends where the Mechanics begin", a > 0 && b > a);
         if (a > 0 && b > a) {
             String block = syn.substring(a, b);
-            int sign = block.indexOf("getPlanetInSign");
-            int house = block.indexOf("getPlanetInHouse");
-            int aspect = block.indexOf("getAspect(");
-            ok("H2: each body reads sign, then house, then aspects (" + sign + ", " + house
-                + ", " + aspect + ")", sign > 0 && house > sign && aspect > house);
-            ok("H3: nothing from Level 4 inside a body's block",
+            ok("H2: the year's page reads no natal sign, house or aspect prose",
+                !block.matches("(?s).*\\b(getPlanetInSign|getPlanetInHouse|getAspect)\\(.*"));
+            ok("H3: nothing from Level 4 on the year's page",
                 !block.matches("(?s).*\\b(getSabian|getBodySabian|getBodyMansion|getDegree)\\w*\\(.*"));
         }
     }

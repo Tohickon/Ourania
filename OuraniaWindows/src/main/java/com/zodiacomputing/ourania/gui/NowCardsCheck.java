@@ -241,8 +241,10 @@ public final class NowCardsCheck {
         yes("a natal point with no written need makes none", TransitCard.of(
             new NowCards.TransitHit("Sun", 0, 1, 1, "Ceres", 0, 1, Aspects.Type.CONJUNCTION, 0.1,
                 true, true)) == null);
+        // Ceres, not the North Node: the Node was given its card lines on 2026-10-22, for the
+        // year's biggest moments, and so has a plain card here too.
         yes("nor does a sky point with no trigger", TransitCard.of(new NowCards.TransitHit(
-            "North Node", 0, -0.05, 1, "Moon", 90, 5, Aspects.Type.SQUARE, 0.5, true, false)) == null);
+            "Ceres", 0, 0.3, 1, "Moon", 90, 5, Aspects.Type.SQUARE, 0.5, true, false)) == null);
     }
 
     private static void testTimeline() {

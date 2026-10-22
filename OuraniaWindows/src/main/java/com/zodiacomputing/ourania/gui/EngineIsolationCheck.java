@@ -58,7 +58,9 @@ public final class EngineIsolationCheck {
         "AspectGate", "ChartPalette",
         // The plain card and the life areas it names (2026-10-17): the reading opens on the
         // year's card, and the phone's reading is the same page.
-        "ReadingCard", "LifeAreas"));
+        "ReadingCard", "LifeAreas",
+        // The year's biggest moments (2026-10-22), which the year's page is built from.
+        "YearMoments"));
 
     /** The Java level Android builds accept. */
     static final String RELEASE = "17";

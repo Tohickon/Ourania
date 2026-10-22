@@ -34,6 +34,15 @@ public class PhoneReadingTest {
         return PhoneChart.cast(new SwissEph(Ephemeris.PATH), LocalDate.of(1975, 7, 4), time, place);
     }
 
+    /** A desktop reading's heading levels in miniature: two tiers, two sections, three subs. */
+    private static final String SAMPLE = "<html><body><h1>Chart Synthesis</h1>"
+        + "<h2 class='tier' style='color:#FFFFFF;'>Your year</h2><p>a</p>"
+        + "<h2 class='tier' style='color:#FFFFFF;'>Mechanics</h2>"
+        + "<h2 style='color: #FFD700;'>4.1 Core Architecture</h2>"
+        + "<h3 style='color:#FFD166;'>Grand Trine</h3><p>b</p><h3>Kite</h3>"
+        + "<h2 style='color: #FFD700;'>4.10 Current Transits</h2>"
+        + "<h3>Transits to Natal Sun</h3></body></html>";
+
     @Test
     public void everyPlanetHasItsSignHouseAndAspectReadings() {
         PhoneChart.Cast c = sydney(LocalTime.of(14, 15));
@@ -159,10 +168,13 @@ public class PhoneReadingTest {
         PhoneChart.Cast c = sydney(LocalTime.of(14, 15));
         String r = PhoneReading.synthesis(c);
         assertTrue(r, r.startsWith("<h1>Chart Synthesis</h1>"));
-        assertTrue("it ranks the planets", r.contains("Prominence"));
+        // The natal placements, "Prominence" and all, left the year's page on 2026-10-22.
+        assertTrue("it reads the chart's working", r.contains("Core Architecture"));
         assertFalse("no colours written for a black pane", r.contains("style=")
             || r.contains("<body") || r.contains("<html"));
-        assertTrue("and is long", r.length() > 10000);
+        // 10,000 until 2026-10-22, when the natal placements - most of the page - left it. The
+        // phone passes no year scan, so its year has no moments to replace them yet.
+        assertTrue("and is not a stub: " + r.length(), r.length() > 2500);
     }
 
     // ------------------------------------------------------------ the reading's four levels
@@ -179,8 +191,10 @@ public class PhoneReadingTest {
         assertEquals("exactly one h1 - the title", 1, count(r, "<h1>"));
 
         // the sections, one level under it: the answer, then Mechanics and what it holds
-        // (2026-10-17, the desktop's Your year reordered; the phone renders the same page)
-        String[] tiers = {"Your year", "Your placements, strongest first", "When", "Mechanics",
+        // (2026-10-17, the desktop's Your year reordered; the phone renders the same page;
+        // 2026-10-22, the natal placements left it. The year's biggest moments sit between
+        // Your year and Mechanics when there is a year scan; the phone passes none.)
+        String[] tiers = {"Your year", "Mechanics",
             "The year at a glance", "The year by theme (the Rule of Three)", "Dates, in detail",
             "The chart's working"};
         int at = -1;
@@ -199,16 +213,17 @@ public class PhoneReadingTest {
 
     @Test
     public void aSectionsOwnSubHeadingsSitUnderIt() {
-        // A body's name inside the placements section was an h3 on the desktop - the same level
-        // the sections themselves now take on the phone. Pushed to h4 so it stays underneath.
-        String r = PhoneReading.synthesis(sydney(LocalTime.of(14, 15)));
-        int section = r.indexOf("<h2>Your placements, strongest first");
-        assertTrue("the placements section is there", section > 0);
+        // A section's own sub-heading is an h3 on the desktop - the same level the sections
+        // themselves take on the phone. Pushed to h4 so it stays underneath. Asked of a fixed
+        // page since 2026-10-22: the natal placements, whose bodies were the phone's only
+        // sub-headings, left the reading, and the year scan that brings others is desktop-only.
+        String r = PhoneReading.forPhone(SAMPLE);
+        int section = r.indexOf("<h3>4.1 Core Architecture");
+        assertTrue("the section is there", section > 0);
         int sub = r.indexOf("<h4>", section);
-        assertTrue("and a body's name under it is an h4", sub > section);
-        assertTrue("which is a planet: " + r.substring(sub, Math.min(sub + 40, r.length())),
-            r.substring(sub, Math.min(sub + 40, r.length())).contains("Prominence")
-                || r.substring(sub, Math.min(sub + 60, r.length())).contains("%"));
+        assertTrue("and its sub-heading is an h4", sub > section);
+        assertTrue("which is its own: " + r.substring(sub, Math.min(sub + 40, r.length())),
+            r.substring(sub, Math.min(sub + 40, r.length())).contains("Grand Trine"));
     }
 
     @Test
@@ -217,12 +232,11 @@ public class PhoneReadingTest {
         // section lands at h4 with the sub-headings; tokenise the tiers after demoting and
         // they land at h3 with the sections. Either way the levels collapse and the page looks
         // plausible, which is why this asserts the counts rather than eyeballing one heading.
-        String r = PhoneReading.synthesis(sydney(LocalTime.of(14, 15)));
+        String r = PhoneReading.forPhone(SAMPLE);
         assertEquals("nothing is left at h5", 0, count(r, "<h5>"));
-        assertTrue("there are sections", count(r, "<h3>") >= 8);
-        assertTrue("and sub-headings beneath them", count(r, "<h4>") > 0);
-        assertTrue("more sub-headings than sections, since each section has several",
-            count(r, "<h4>") > count(r, "<h3>"));
+        assertEquals("the tiers stay h2", 2, count(r, "<h2>"));
+        assertEquals("the sections are h3", 2, count(r, "<h3>"));
+        assertEquals("and the sub-headings beneath them h4", 3, count(r, "<h4>"));
     }
 
     @Test
@@ -250,8 +264,8 @@ public class PhoneReadingTest {
             assertFalse("the lean one does not", lean.contains("4.1 Core"));
             assertTrue("and is shorter: " + lean.length() + " vs " + full.length(),
                 lean.length() < full.length());
-            assertTrue("but keeps the placements, which are the answer",
-                lean.contains("Your placements, strongest first"));
+            assertTrue("but keeps the year, which is the answer",
+                lean.contains("<h2>Your year"));
             // It must still SAY the tier exists, or a reader who forgot the setting sees a
             // reading that looks like it ran out.
             assertTrue("the tier is still named", lean.contains("<h2>Mechanics"));

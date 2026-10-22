@@ -1075,18 +1075,23 @@ public final class AspectGridCheck {
                 // are machinery too, and the placements are where the reading makes sense. So
                 // the order is the year's card, the placements, where the dates are, and then
                 // everything that is working under one Mechanics heading.
+                // <b>2026-10-22, David again:</b> the page is only the year - "biggest moments
+                // during the year and when they occur and by what and what it means". The
+                // placements and the When pointer left; the moments, when the year scan ran,
+                // sit between the year's card and the Mechanics.
                 int year = html.indexOf(">Your year<");
-                int placed = html.indexOf(">Your placements, strongest first<");
-                int when = html.indexOf(">When<");
+                int moments = html.indexOf(">The year's biggest moments<");
                 int mech = html.indexOf(">" + NarrativeSynthesizer.MECHANICS + "<");
                 int glance = html.indexOf(">The year at a glance<");
                 int byTheme = html.indexOf(">The year by theme (the Rule of Three)<");
                 int dates = html.indexOf(">Dates, in detail<");
                 ok("Part Q: " + label + " carries every section",
-                    year >= 0 && placed >= 0 && when >= 0 && mech >= 0 && glance >= 0
-                        && byTheme >= 0 && dates >= 0);
+                    year >= 0 && mech >= 0 && glance >= 0 && byTheme >= 0 && dates >= 0);
                 ok("Part Q: " + label + " puts the answer before the machinery",
-                    year >= 0 && year < placed && placed < when && when < mech);
+                    year >= 0 && year < mech && (moments < 0 || (year < moments && moments < mech)));
+                ok("Part Q: " + label + " no longer lists the natal placements",
+                    !html.contains(">Your placements, strongest first<")
+                        && !html.contains(">When<"));
                 ok("Part Q: " + label + " keeps the summary, themes and dates under Mechanics",
                     mech >= 0 && mech < glance && glance < byTheme && byTheme < dates);
                 ok("Part Q: " + label + " still summarises the chart's shape",
@@ -1113,8 +1118,8 @@ public final class AspectGridCheck {
                 ok("Part Q: " + label + " without the mechanics drops the working and the transits",
                     !lean.contains(">The year at a glance<")
                         && !lean.contains("4.10 Current Transits"));
-                ok("Part Q: " + label + " but keeps the placements, which are the answer",
-                    lean.contains(">Your placements, strongest first<"));
+                ok("Part Q: " + label + " but keeps the year, which is the answer",
+                    lean.contains(">Your year<"));
 
                 // <b>A named pattern must carry its reading.</b> Section 5 used to print one
                 // bare line per pattern and no prose, so a T-square - the loudest thing in a
