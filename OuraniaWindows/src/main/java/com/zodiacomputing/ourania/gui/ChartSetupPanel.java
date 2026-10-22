@@ -1101,6 +1101,18 @@ public class ChartSetupPanel extends JPanel {
         }
     }
 
+    /**
+     * The Transits tab's wheel (2026-10-22): the people chosen, with the sky over them. A
+     * composite is left first, as {@link #showChart} does, because applyRings leaves one alone.
+     */
+    void showTransits(boolean chartA, boolean chartB) {
+        if (selectedMode == ChartMode.COMPOSITE_MIDPOINT
+                || selectedMode == ChartMode.COMPOSITE_DAVISON) {
+            setMode(ChartMode.SYNASTRY);
+        }
+        applyRings(chartA, chartB, true);
+    }
+
     /** True when Chart B has enough entered to draw a ring from. */
     boolean hasPartnerData() {
         return transitDateField != null

@@ -564,23 +564,34 @@ public final class RingIdentityCheck {
                 Arrays.asList(OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
                     OuraniaWindow.OVERVIEW_PAGE, "Snapshot", OuraniaWindow.LIFE_AREAS_PAGE,
                     OuraniaWindow.READING_PAGE, "Synthesize", "Report",
+                    OuraniaWindow.SKY_PLACEMENTS_PAGE, OuraniaWindow.SKY_GLANCE_PAGE,
+                    OuraniaWindow.SKY_READING_PAGE,
                     OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE,
                     OuraniaWindow.TRANSITS_PAGE, OuraniaWindow.PAIR_COMING_PAGE,
                     OuraniaWindow.YEAR_PAGE, "Calendar"),
                 w[0].pagesRail().pages());
             List<String> every = new ArrayList<>(w[0].pagesRail().pages());
-            eq("fourteen pages, none twice", 14, new java.util.HashSet<>(every).size());
+            eq("seventeen pages, none twice", 17, new java.util.HashSet<>(every).size());
             eq("and the window lists each once", every, w[0].allPages());
 
-            // <b>What each chart tab shows.</b> Your year needs a birthday, so only a person's
-            // tab has it; the pair's pages are the Synastry tab's.
+            // <b>What each chart tab shows.</b> Since 2026-10-22 a person's timing is read on
+            // the Transits tab: Coming up, Your year and the Calendar left Chart A and Chart B
+            // for it (David: "coming up, yearly and calendar can all be moved under the new
+            // transits tab"), and its first three pages are its own. The pair's pages are the
+            // Synastry tab's.
             for (ChartTab t : ChartTab.values()) {
                 List<String> shown = OuraniaWindow.CHART_TAB_PAGES.get(t);
-                ok(t + " shows its Placements and the Calendar",
-                    shown.contains(OuraniaWindow.CHART_PAGE) && shown.contains("Calendar"));
-                eq(t + " has Your year exactly when it is a person's tab",
-                    t == ChartTab.CHART_A || t == ChartTab.CHART_B,
-                    shown.contains(OuraniaWindow.YEAR_PAGE));
+                boolean person = t == ChartTab.CHART_A || t == ChartTab.CHART_B;
+                eq(t + " shows the chart's own Placements exactly when it is not Transits",
+                    t != ChartTab.TRANSITS, shown.contains(OuraniaWindow.CHART_PAGE));
+                eq(t + " shows the sky's placements exactly when it is Transits",
+                    t == ChartTab.TRANSITS, shown.contains(OuraniaWindow.SKY_PLACEMENTS_PAGE));
+                eq(t + " has the Calendar exactly when it is not a person's tab",
+                    !person, shown.contains("Calendar"));
+                eq(t + " has Coming up exactly when it is the sky, Transits or a pair",
+                    !person, shown.contains(OuraniaWindow.TRANSITS_PAGE));
+                eq(t + " has Your year exactly when it is Transits",
+                    t == ChartTab.TRANSITS, shown.contains(OuraniaWindow.YEAR_PAGE));
                 eq(t + " has the pair's pages exactly when it is the synastry",
                     t == ChartTab.SYNASTRY, shown.contains(OuraniaWindow.SYNASTRY_PAGE));
             }

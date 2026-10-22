@@ -13,6 +13,14 @@ enum ChartTab {
     CHART_A("door.chart_a", "Chart A"),
     CHART_B("door.chart_b", "Chart B"),
     SKY("door.sky", "Sky"),
+    /**
+     * The current sky read against the selected people (David, 2026-10-22): "a separate tab
+     * ... that takes the sky chart and its transit effect on chart a or chart b or both
+     * whichever is selected". A way of reading rather than a wheel of its own - Chart A with
+     * the sky is the same wheel as Chart A's tab - so {@link #of} never names it; the window
+     * keeps it in front while the sky and a person are on the wheel.
+     */
+    TRANSITS("door.transits", "Transits"),
     SYNASTRY("door.synastry", "Synastry"),
     COMPOSITE("door.composite", "Composite");
 

@@ -4650,6 +4650,22 @@ implements WheelSource, GlobeSource {
         return this.radixChart();
     }
 
+    /**
+     * A person's chart cast on its own, for a reading of the sky against someone who is not
+     * on the wheel (2026-10-22). Null for a chart with no moment.
+     */
+    ChartFrame frameOf(com.zodiacomputing.ourania.astro.ChartSubject who) {
+        if (who == null || who.moment == null) {
+            return null;
+        }
+        double jd = who.moment.toInstant().toEpochMilli() / 86400000.0 + 2440587.5;
+        return who.timeUnknown
+            ? ChartFrame.computeTimeUnknown(this.sw, jd, who.latitude, who.longitude,
+                this.houseSystem, false, 0.0)
+            : ChartFrame.compute(this.sw, jd, who.latitude, who.longitude, this.houseSystem,
+                false, 0.0);
+    }
+
     /** The chart as cast, before any harmonic. The house frame the harmonic keeps. */
     public ChartFrame radixChart() {
         boolean composite = this.chartMode == ChartMode.COMPOSITE_MIDPOINT

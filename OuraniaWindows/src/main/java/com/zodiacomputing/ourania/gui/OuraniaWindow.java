@@ -56,6 +56,9 @@ public class OuraniaWindow extends JFrame {
     private javax.swing.JEditorPane chemistryPane;
     /** Coming up together: the sky over both charts, when there are two (PairTimeline). */
     private javax.swing.JEditorPane pairComingPane;
+    /** The Transits tab's pages, by key (SKY_PAGES). */
+    private final java.util.Map<String, javax.swing.JEditorPane> skyPanes =
+        new java.util.LinkedHashMap<>();
     private javax.swing.JEditorPane selectionPane;
     /** Where selectionPane is shown: a drawer under the wheel, since 2026-10-20. */
     private SelectionDrawer selectionDrawer;
@@ -119,6 +122,16 @@ public class OuraniaWindow extends JFrame {
     public static final String CHEMISTRY_PAGE = "Chemistry";
     /** What the sky does to both charts and to each, behind Prediction (2026-10-20). */
     public static final String PAIR_COMING_PAGE = "Coming up together";
+    /**
+     * The Transits tab's own pages (2026-10-22): the current sky on each selected chart. Their
+     * own keys and panes, labelled like the pages they mirror, so a person's Placements and the
+     * sky's placements in that person's chart never write over each other. See TransitReadings.
+     */
+    static final String SKY_PLACEMENTS_PAGE = "Sky placements";
+    static final String SKY_GLANCE_PAGE = "Sky at a glance";
+    static final String SKY_READING_PAGE = "Sky interpretation";
+    static final java.util.List<String> SKY_PAGES =
+        java.util.List.of(SKY_PLACEMENTS_PAGE, SKY_GLANCE_PAGE, SKY_READING_PAGE);
     /** What kind of chart this is, before any of the detail. */
     public static final String OVERVIEW_PAGE = "Overview";
     public static final String READING_PAGE = "Interpretation";
@@ -162,6 +175,12 @@ public class OuraniaWindow extends JFrame {
      * a composite do not have. Chart B's own placements page belongs to the synastry, where both
      * charts are on the wheel; on a person's own tab the Placements page is theirs. The pair's
      * pages need a pair.
+     *
+     * <b>A person's timing lives on the Transits tab (David, 2026-10-22):</b> "since under
+     * chart a and b there is already a transits tab coming up, yearly and calendar can all be
+     * moved under the new transits tab". Chart A and Chart B read the birth chart; Coming up,
+     * Your year and Calendar read time against it, and the Transits tab is where time is read.
+     * The sky keeps its own Coming up and Calendar, and the pair keeps theirs.
      */
     static final java.util.Map<ChartTab, java.util.List<String>> CHART_TAB_PAGES;
     static {
@@ -170,6 +189,17 @@ public class OuraniaWindow extends JFrame {
         java.util.Map<ChartTab, java.util.List<String>> m = new java.util.EnumMap<>(ChartTab.class);
         for (ChartTab t : ChartTab.values()) {
             java.util.List<String> l = new java.util.ArrayList<>();
+            if (t == ChartTab.TRANSITS) {
+                // The same pages as the rest, each reading the sky on the selected charts.
+                // Coming up is transits already; with two people their shared one joins it.
+                l.addAll(SKY_PAGES);
+                l.add(TRANSITS_PAGE);
+                l.add(PAIR_COMING_PAGE);
+                l.add(YEAR_PAGE);
+                l.add("Calendar");
+                m.put(t, java.util.List.copyOf(l));
+                continue;
+            }
             l.add(CHART_PAGE);
             if (t == ChartTab.SYNASTRY) {
                 l.add(CHART_B_PAGE);
@@ -179,12 +209,13 @@ public class OuraniaWindow extends JFrame {
                 l.add(PAIR_COMING_PAGE);
             } else {
                 l.addAll(reading);
-                l.add(TRANSITS_PAGE);
-                if (t == ChartTab.CHART_A || t == ChartTab.CHART_B) {
-                    l.add(YEAR_PAGE);
-                }
             }
-            l.add("Calendar");
+            if (t != ChartTab.CHART_A && t != ChartTab.CHART_B) {
+                if (t != ChartTab.SYNASTRY) {
+                    l.add(TRANSITS_PAGE);
+                }
+                l.add("Calendar");
+            }
             m.put(t, java.util.List.copyOf(l));
         }
         CHART_TAB_PAGES = java.util.Collections.unmodifiableMap(m);
@@ -482,6 +513,17 @@ public class OuraniaWindow extends JFrame {
         pages.addPageBefore(READING_PAGE, interpretationPanel, MEET_PAGE);
         pages.addPageBefore("Synthesize", readings.get("Synthesize"), MEET_PAGE);
         pages.addPageBefore("Report", readings.get("Report"), MEET_PAGE);
+        for (String[] sky : new String[][] {
+                {SKY_PLACEMENTS_PAGE, PLACEMENTS_LABEL},
+                {SKY_GLANCE_PAGE, "At a glance"},
+                {SKY_READING_PAGE, READING_PAGE}}) {
+            javax.swing.JEditorPane pane = HtmlPanes.chartPane(this);
+            skyPanes.put(sky[0], pane);
+            pages.addPageBefore(sky[0], astrologerPage(pane, "<html>Astrologer view: on, show"
+                + " the placements behind each reading.<br>Off: the plain reading only.</html>"),
+                MEET_PAGE);
+            pages.setPageLabel(sky[0], sky[1]);
+        }
         for (String timed : TIMED_READINGS) {
             pages.addPage(timed, readings.get(timed));
         }
@@ -499,7 +541,20 @@ public class OuraniaWindow extends JFrame {
         // which is now a page about that chart. The chips go through the same door.
         chartRail.setOnSelect(door -> {
             ChartTab tab = ChartTab.ofDoor(door);
-            if (tab != null && chartSetupPanel != null
+            if (tab == ChartTab.TRANSITS && chartSetupPanel != null) {
+                // The people already chosen stay chosen; with nobody chosen, Chart A, or
+                // Chart B when there is no Chart A. The sky goes on over them.
+                boolean hasA = skymapPanel.hasChartA();
+                boolean hasB = skymapPanel.chartBSubject() != null
+                    && skymapPanel.chartBSubject().entered();
+                boolean aIn = hasA && skymapPanel.chartAIn() && skymapPanel.innerIsBirthChart();
+                boolean bIn = hasB && skymapPanel.chartBIn() && skymapPanel.innerIsBirthChart();
+                if (!aIn && !bIn) {
+                    aIn = hasA;
+                    bIn = !hasA && hasB;
+                }
+                chartSetupPanel.showTransits(aIn, bIn);
+            } else if (tab != null && chartSetupPanel != null
                     && tab != ChartTab.of(chartSetupPanel.currentMode(),
                         skymapPanel.innerIsBirthChart(), skymapPanel.chartAIn(),
                         skymapPanel.chartBIn())) {
@@ -1270,6 +1325,42 @@ public class OuraniaWindow extends JFrame {
     void refreshPlainPages() {
         refreshTransitsPane();
         refreshTogetherPanes();
+        refreshSkyPages();
+    }
+
+    /**
+     * Rebuilds the Transits tab's page in front, if one is: the sky on each selected chart.
+     *
+     * Cast here, on the event thread, from the people and the sky as subjects - a handful of
+     * frames and one contact search each, which is what a chip press already costs the wheel.
+     */
+    void refreshSkyPages() {
+        String page = currentPage();
+        if (page == null || !SKY_PAGES.contains(page) || skymapPanel == null) {
+            return;
+        }
+        javax.swing.JEditorPane pane = skyPanes.get(page);
+        com.zodiacomputing.ourania.astro.ChartFrame sky =
+            skymapPanel.frameOf(skymapPanel.skySubject());
+        java.util.List<TransitReadings.Person> people = new java.util.ArrayList<>();
+        if (skymapPanel.chartAIn() && skymapPanel.hasChartA()) {
+            people.add(new TransitReadings.Person(whoseChart(skymapPanel.chartASubject(),
+                WheelRing.Kind.CHART_A, "Chart A"),
+                skymapPanel.frameOf(skymapPanel.chartASubject())));
+        }
+        com.zodiacomputing.ourania.astro.ChartSubject b = skymapPanel.chartBSubject();
+        if (skymapPanel.chartBIn() && b != null && b.entered()) {
+            people.add(new TransitReadings.Person(whoseChart(b, WheelRing.Kind.CHART_B,
+                "Chart B"), skymapPanel.frameOf(b)));
+        }
+        people.removeIf(p -> p.frame() == null);
+        boolean why = Settings.astrologerView();
+        String body = SKY_PLACEMENTS_PAGE.equals(page) ? TransitReadings.placements(people, sky, why)
+            : SKY_GLANCE_PAGE.equals(page) ? TransitReadings.glance(people, sky, why)
+            : TransitReadings.interpretation(people, sky, why);
+        HtmlPanes.setHtml(pane, "<html><body style='font-family: sans-serif; font-size: 13px;"
+            + " margin: 12px; color: #E0E0E0; background-color: #000000;'>" + body
+            + "</body></html>");
     }
 
     /**
@@ -1461,6 +1552,12 @@ public class OuraniaWindow extends JFrame {
         if (chartRail == null || skymapPanel == null || chartSetupPanel == null) {
             return;
         }
+        // <b>The Transits tab stays while it has something to read (2026-10-22):</b> the sky,
+        // and at least one person under it. Choosing who with the chips is what it is for.
+        if (ChartTab.TRANSITS.door.equals(chartRail.selected()) && chartSetupPanel.skyWanted()
+                && skymapPanel.innerIsBirthChart() && !skymapPanel.isRelationshipChart()) {
+            return;
+        }
         ChartTab tab = ChartTab.of(chartSetupPanel.currentMode(),
             skymapPanel.innerIsBirthChart(), skymapPanel.chartAIn(), skymapPanel.chartBIn());
         if (!tab.door.equals(chartRail.selected())) {
@@ -1486,6 +1583,8 @@ public class OuraniaWindow extends JFrame {
         chartRail.setPageEnabled(ChartTab.CHART_A.door, a);
         chartRail.setPageEnabled(ChartTab.CHART_B.door, b);
         chartRail.setPageEnabled(ChartTab.SYNASTRY.door, a && b);
+        // The sky needs someone to be read against.
+        chartRail.setPageEnabled(ChartTab.TRANSITS.door, a || b);
         chartRail.setPageEnabled(ChartTab.COMPOSITE.door, a && b);
     }
 
@@ -2466,6 +2565,10 @@ public class OuraniaWindow extends JFrame {
      *     would replay its reveal for a reading nobody asked for.
      */
     private void rebuildPage(String page, boolean runReadings) {
+        if (SKY_PAGES.contains(page)) {
+            refreshSkyPages();
+            return;
+        }
         if (OVERVIEW_PAGE.equals(page)) {
             if (overviewPanel != null) {
                 overviewPanel.refresh();
