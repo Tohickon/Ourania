@@ -706,7 +706,12 @@ implements WheelSource, GlobeSource {
      */
     boolean arcRingShown() {
         this.assignRingKinds();
-        return this.showSolarArc && this.outerRing.kind != WheelRing.Kind.SOLAR_ARC;
+        // <b>Only around a birth chart (David, 2026-10-22).</b> "its set to sky but there are 2
+        // charts on it when only 1 is selected". A solar arc moves a birth chart forward; with
+        // the sky alone on the inner wheel there is no birth to move, so the band drew the sky
+        // a second time, glyph for glyph, under a single Sky chip.
+        return this.showSolarArc && this.innerIsBirthChart
+            && this.outerRing.kind != WheelRing.Kind.SOLAR_ARC;
     }
 
     /**
@@ -986,6 +991,10 @@ implements WheelSource, GlobeSource {
         this.subjectB = b;
         this.subjectSky = sky;
         this.castRoles();
+        // The directed band follows whether the inner wheel is a birth chart, and castRoles
+        // can change that here: the first Chart A ever entered lands after its mode was set.
+        this.showArcRing = this.arcRingShown();
+        this.arcBloom.set(this.showArcRing);
     }
 
     /** Whether Chart A and Chart B are in the chart at all, as opposed to merely entered. */
