@@ -49,57 +49,6 @@ final class TransitReadings {
             + " the wheel, and this page reads the current sky on them.</p>";
     }
 
-    // ------------------------------------------------------------------ Placements
-
-    /**
-     * Where each of the sky's planets stands in each selected chart: the sign, the part of
-     * life it is passing through there, and what it touches.
-     */
-    static String placements(List<Person> people, ChartFrame sky, boolean showWhy) {
-        if (people.isEmpty() || sky == null) {
-            return nobody();
-        }
-        StringBuilder sb = new StringBuilder();
-        for (Person p : people) {
-            sb.append(SkyOnChart.sectionHeading(SkyOnChart.heading(p.whose())));
-            List<Transits.Hit> hits = shown(hits(p.frame(), sky), showWhy);
-            sb.append("<table width='100%' cellpadding='4' cellspacing='0'>");
-            for (String name : SKY_BODIES) {
-                ChartFrame.Body b = sky.body(name);
-                if (b == null || !b.ok) {
-                    continue;
-                }
-                int house = Zodiac.houseOf(b.lon, p.frame().cusps);
-                String area = LifeAreas.of(house);
-                sb.append("<tr><td valign='top' style='color:#FFFFFF;'><b>").append(name)
-                    .append("</b>").append(b.retrograde ? " <span style='color:#E8A33D;'>Rx</span>" : "")
-                    .append("</td><td valign='top' style='color:#BBBBBB;'>")
-                    .append(Zodiac.format(b.lon)).append("</td><td valign='top'>");
-                if (house > 0) {
-                    sb.append(ordinal(house)).append(" house");
-                    if (area != null) {
-                        sb.append(" <span style='color:#AAAAAA;'>&middot; ").append(area)
-                            .append("</span>");
-                    }
-                }
-                List<String> touches = new ArrayList<>();
-                for (Transits.Hit h : hits) {
-                    if (name.equals(h.transiting)) {
-                        touches.add(h.type.label.toLowerCase() + " natal " + h.natal
-                            + String.format(" (%.1f&deg;)", h.offBy));
-                    }
-                }
-                if (!touches.isEmpty()) {
-                    sb.append("<br><span style='color:#7FA7C9;'>")
-                        .append(String.join(", ", touches)).append("</span>");
-                }
-                sb.append("</td></tr>");
-            }
-            sb.append("</table>");
-        }
-        return sb.toString();
-    }
-
     // ------------------------------------------------------------------ At a glance
 
     /** The strongest contacts now, as plain cards, for each selected chart. */

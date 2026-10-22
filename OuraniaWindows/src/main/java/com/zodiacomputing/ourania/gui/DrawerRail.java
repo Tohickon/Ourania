@@ -75,6 +75,23 @@ public final class DrawerRail extends JPanel {
      */
     private java.util.function.Consumer<String> onSelect;
     private final java.util.Set<String> disabled = new java.util.HashSet<>();
+    /** Tabs that can be clicked but are drawn dim: their chart is not on the wheel. */
+    private final java.util.Set<String> unlit = new java.util.HashSet<>();
+
+    /**
+     * Draws a tab bright or dim without changing whether it can be clicked (2026-10-22). A
+     * person's tab is dim while their chart is off the wheel; see OuraniaWindow.
+     */
+    public void setPageLit(String label, boolean lit) {
+        if (lit ? unlit.remove(label) : unlit.add(label)) {
+            repaintTabs();
+        }
+    }
+
+    /** Whether a tab is drawn lit; for the checks. */
+    public boolean isPageLit(String label) {
+        return !unlit.contains(label);
+    }
 
     public DrawerRail(Drawer.Side side, int openWidth) {
         this.side = side;
@@ -487,7 +504,8 @@ public final class DrawerRail extends JPanel {
             g2.fillRect(edgeX, 0, thick, getHeight());
 
             g2.setFont(Theme.HEADING);
-            g2.setColor(off ? TAB_DISABLED : (on ? Color.WHITE : Theme.TEXT));
+            g2.setColor(off || (!on && unlit.contains(label)) ? TAB_DISABLED
+                : (on ? Color.WHITE : Theme.TEXT));
             FontMetrics fm = g2.getFontMetrics();
             // Triangles, as on Drawer's handle; see Theme.font for why they were once "<".
             String arrow = side == Drawer.Side.LEFT ? (on ? "\u25C2" : "\u25B8") : (on ? "\u25B8" : "\u25C2");

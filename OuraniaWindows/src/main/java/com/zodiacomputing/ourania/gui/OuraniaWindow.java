@@ -1187,6 +1187,8 @@ public class OuraniaWindow extends JFrame {
             HtmlPanes.setHtml(natalPane, natalHtml);
         }
         refreshTransitsPane();
+        refreshSkyPages();
+        lightTheChartTabs();
         // <b>Greyed out on a chart drawn without transits.</b> The wheel still emits a transit
         // section for a single chart - the document wrapper with nothing in it - so the tab
         // opened onto a blank panel, which reads as broken rather than as empty. Measured on
@@ -1355,8 +1357,21 @@ public class OuraniaWindow extends JFrame {
         }
         people.removeIf(p -> p.frame() == null);
         boolean why = Settings.astrologerView();
-        String body = SKY_PLACEMENTS_PAGE.equals(page) ? TransitReadings.placements(people, sky, why)
-            : SKY_GLANCE_PAGE.equals(page) ? TransitReadings.glance(people, sky, why)
+        if (SKY_PLACEMENTS_PAGE.equals(page)) {
+            // <b>The usual Placements list (David, 2026-10-22: "Should be the usual list").</b>
+            // The wheel's own section for the sky ring around the chosen chart, its houses that
+            // chart's, under a heading that says which chart the sky is on.
+            String heading = people.isEmpty() ? "" : SkyOnChart.sectionHeading(
+                SkyOnChart.heading(people.get(0).whose()));
+            String list = hasContent(lastTransitHtml) ? lastTransitHtml : TransitReadings.nobody();
+            java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("<body[^>]*>", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(list);
+            HtmlPanes.setHtml(pane, m.find()
+                ? list.substring(0, m.end()) + heading + list.substring(m.end())
+                : "<html><body>" + heading + list + "</body></html>");
+            return;
+        }
+        String body = SKY_GLANCE_PAGE.equals(page) ? TransitReadings.glance(people, sky, why)
             : TransitReadings.interpretation(people, sky, why);
         HtmlPanes.setHtml(pane, "<html><body style='font-family: sans-serif; font-size: 13px;"
             + " margin: 12px; color: #E0E0E0; background-color: #000000;'>" + body
@@ -1563,6 +1578,22 @@ public class OuraniaWindow extends JFrame {
         if (!tab.door.equals(chartRail.selected())) {
             chartRail.choose(tab.door);
         }
+    }
+
+    /**
+     * A person's tab is lit only while their chart is on the wheel (David, 2026-10-22: "even
+     * when chart a is off its still on in the tabs"). Dimmed, not greyed: it can still be
+     * clicked, and clicking it puts the chart back on.
+     */
+    private void lightTheChartTabs() {
+        if (chartRail == null || skymapPanel == null) {
+            return;
+        }
+        com.zodiacomputing.ourania.astro.ChartSubject b = skymapPanel.chartBSubject();
+        chartRail.setPageLit(ChartTab.CHART_A.door,
+            skymapPanel.hasChartA() && skymapPanel.chartAIn() && !skymapPanel.skyAlone());
+        chartRail.setPageLit(ChartTab.CHART_B.door,
+            b != null && b.entered() && skymapPanel.chartBIn() && !skymapPanel.skyAlone());
     }
 
     /**
@@ -2545,6 +2576,7 @@ public class OuraniaWindow extends JFrame {
             skymapPanel.applyChartMode(mode, transits, chartAIn, chartBIn);
             // A chip or the setup screen chose the chart: the chart tab follows it.
             followTheWheel();
+            lightTheChartTabs();
             // <b>A chip changes who the pages are about, so the page in front must say so now.</b>
             // These pages are built when they are opened, and a chip press does not open one -
             // so Chart B could be selected while the Overview, Life areas and Reading pages

@@ -4666,6 +4666,20 @@ implements WheelSource, GlobeSource {
                 false, 0.0);
     }
 
+    /**
+     * True when the sky is on the wheel by itself (2026-10-22): no birth chart and no pair.
+     * The Sky tab's pages read as a weather report then (SkyWeather).
+     */
+    boolean skyAlone() {
+        return !this.innerIsBirthChart && !this.isRelationshipChart();
+    }
+
+    /** The place the sky is cast for, as the Sky row names it, for the pages' titles. */
+    String skyPlaceName() {
+        com.zodiacomputing.ourania.astro.ChartSubject s = this.subjectSky;
+        return s == null || s.placeName == null ? "" : s.placeName.trim();
+    }
+
     /** The chart as cast, before any harmonic. The house frame the harmonic keeps. */
     public ChartFrame radixChart() {
         boolean composite = this.chartMode == ChartMode.COMPOSITE_MIDPOINT
@@ -4889,6 +4903,7 @@ implements WheelSource, GlobeSource {
         final double[] comingCusps = this.activeCusps.clone();
         // A birth chart's middle card is not "now" (David, 2026-10-22); the sky's is.
         final boolean glanceSky = !this.innerIsBirthChart && !this.isRelationshipChart();
+        final String skyPlace = this.skyPlaceName();
         new SwingWorker<String, Void>(){
 
             /** The headline theme to reveal, when the reader asked and the year has one. */
@@ -4910,7 +4925,10 @@ implements WheelSource, GlobeSource {
                 Themes.Result result2 = Themes.extract(chartFrame, result, list, topics);
                 // Synthesize reads the chart alone, so it needs none of the timing below.
                 if (readingTier == ReadingTier.THEMES) {
-                    return ThemeCards.html(result2, Settings.astrologerView());
+                    // The sky alone is read as weather: the same count of three, the sky's words.
+                    return glanceSky
+                        ? SkyWeather.synthesize(result2, skyPlace, Settings.astrologerView())
+                        : ThemeCards.html(result2, Settings.astrologerView());
                 }
                 ChartFrame chartFrame2 = null;
                 Profection profection = null;
@@ -4950,6 +4968,9 @@ implements WheelSource, GlobeSource {
                 list2 = time.hits;
                 yearScan = time.scan;
                 list3 = time.convergence;
+                if (readingTier == ReadingTier.REPORT && glanceSky) {
+                    return SkyWeather.report(chartFrame, skyPlace);
+                }
                 if (readingTier == ReadingTier.REPORT) {
                     object = Snapshot.report(chartFrame, result, list, result2)
                         + Snapshot.topicLayer(topics);
@@ -4997,6 +5018,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // its headline, with the placements behind it shown only in Astrologer view.
                 // The year's sentence was glued onto the last block; it is its own card now,
                 // because it answers a different question from the paragraph it was stuck to.
+                // <b>The sky alone is a weather report (David, 2026-10-22).</b> Its conditions,
+                // its big story and what to watch for, for everyone at the sky's place.
+                if (glanceSky) {
+                    return SkyOnChart.sectionHeading(SkyWeather.title(skyPlace))
+                        + ReadingCard.html(SkyWeather.glance(chartFrame, skyPlace),
+                            Settings.astrologerView());
+                }
                 List<ReadingCard> cards = new ArrayList<>(
                     PlainSnapshot.cards(chartFrame, result, list, !glanceSky));
                 if (bl) {
@@ -8863,9 +8891,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             double[] outerCusps = outerIsPerson && this.outerRing.cusps != null
                 && this.outerRing.cusps.length >= 13
                 ? this.outerRing.cusps : this.activeCusps;
+            // The place the ring is cast at: a person's own, or the sky's for a transit ring.
             stringBuilder.append(PlacementsPage.ringSection(this.outerRing.kind.heading,
                 this.outerRing.kind.hueHex, stringArray, this.outerRing, "transit_",
-                outerCusps));
+                outerCusps, outerIsPerson ? this.outerRing : this.outerSource()));
         }
         // <b>Whether the sky ring is DRAWN, not whether it is wrapped around two people.</b>
         // This asked showTriWheel, whose own javadoc says it means "the sky is wrapped around

@@ -101,10 +101,20 @@ final class PlacementsPage {
      */
     static String ringSection(String title, String colour, String when, WheelRing ring,
             String prefix, double[] cusps) {
+        return ringSection(title, colour, when, ring, prefix, cusps, ring);
+    }
+
+    /**
+     * As above, with the place taken from another ring (2026-10-22). A transit ring is the sky
+     * moved to the transit moment and is cast at the sky's place, but the Chart B slot it sits
+     * in has no place of its own: on Chart A with the sky the header read "0.00, 0.00".
+     */
+    static String ringSection(String title, String colour, String when, WheelRing ring,
+            String prefix, double[] cusps, WheelRing placeOf) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<br><h2 style='color:").append(colour)
             .append("; margin-bottom: 2px;'>").append(title).append("</h2>");
-        String where = String.format("%.2f, %.2f", ring.latitude, ring.longitude);
+        String where = String.format("%.2f, %.2f", placeOf.latitude, placeOf.longitude);
         stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(when).append("<br>").append(where).append("</div>");
         stringBuilder.append("<h3 style='color:").append(colour).append(";'>Placements</h3>");
         stringBuilder.append(rows(ring, prefix, cusps));

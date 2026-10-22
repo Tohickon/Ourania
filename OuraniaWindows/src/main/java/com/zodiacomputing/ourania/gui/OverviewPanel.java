@@ -345,6 +345,11 @@ final class OverviewPanel extends JPanel {
     // ------------------------------------------------------------------ rendering
 
     String html() {
+        // The sky alone: its climate, as weather (David, 2026-10-22).
+        if (skymap != null && skymap.skyAlone() && skymap.radixChart() != null) {
+            return SkyWeather.overview(skymap.radixChart(), skymap.skyPlaceName(),
+                Settings.astrologerView());
+        }
         StringBuilder sb = new StringBuilder("<html><body>");
         List<Card> cards = cards();
         if (cards.isEmpty()) {

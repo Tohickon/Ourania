@@ -3886,6 +3886,12 @@ public class InterpretationPanel extends JPanel {
 
     public void updateInterpretations() {
         if (skymapPanel == null) return;
+        // The sky alone reads as a weather report (David, 2026-10-22); see SkyWeather.
+        if (skymapPanel.skyAlone()) {
+            setHtml(SkyWeather.interpretation(skymapPanel.radixChart(),
+                skymapPanel.skyPlaceName(), Settings.astrologerView()), false);
+            return;
+        }
         
         java.time.ZonedDateTime time = skymapPanel.getChartTime();
         StringBuilder html = new StringBuilder();

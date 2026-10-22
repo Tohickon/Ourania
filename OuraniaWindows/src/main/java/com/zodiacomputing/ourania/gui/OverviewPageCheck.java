@@ -43,6 +43,19 @@ public final class OverviewPageCheck {
             SkymapPanel sky = (SkymapPanel) CheckReflect.get(w, "skymapPanel");
             waitFor(() -> sky.radixChart() != null, 20000);
 
+            // <b>The sky alone is a weather report, not a chart shape (2026-10-22).</b> A fresh
+            // install has only the sky on the wheel, and this suite read it as a birth chart.
+            // The cards below are a birth chart's, so one is cast before they are asked about.
+            OverviewPanel sky0 = w.overviewPanel();
+            yes("with only the sky on the wheel the page is its weather",
+                sky0 != null && sky.skyAlone() && sky0.html().contains("The sky")
+                    && !sky0.html().contains("Chart shape"));
+            int casts = sky.castsApplied();
+            SwingUtilities.invokeAndWait(() -> sky.applyChartSettings("1990-06-15", "12:00",
+                "51.5074, -0.1278", ChartMode.SINGLE, "", "", "", false));
+            waitFor(() -> sky.castsApplied() > casts && sky.innerIsBirthChart(), 20000);
+            yes("a birth chart is on the wheel for the rest", sky.innerIsBirthChart());
+
             OverviewPanel panel = w.overviewPanel();
             yes("the window has an Overview page", panel != null);
             if (panel == null) {

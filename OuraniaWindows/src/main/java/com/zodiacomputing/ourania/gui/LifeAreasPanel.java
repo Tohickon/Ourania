@@ -50,6 +50,11 @@ final class LifeAreasPanel extends JPanel {
     }
 
     String html() {
+        // The sky alone: the place's collective life, domain by domain (David, 2026-10-22).
+        if (skymap != null && skymap.skyAlone() && skymap.radixChart() != null) {
+            return SkyWeather.lifeAreas(skymap.radixChart(), skymap.skyPlaceName(),
+                Settings.astrologerView());
+        }
         ChartFrame f = skymap == null ? null : skymap.getCurrentChart();
         StringBuilder sb = new StringBuilder("<html><body>");
         if (f == null || f.cusps == null) {
