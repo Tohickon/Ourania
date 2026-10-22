@@ -47,9 +47,13 @@ public final class OverviewPageCheck {
             // install has only the sky on the wheel, and this suite read it as a birth chart.
             // The cards below are a birth chart's, so one is cast before they are asked about.
             OverviewPanel sky0 = w.overviewPanel();
-            yes("with only the sky on the wheel the page is its weather",
-                sky0 != null && sky.skyAlone() && sky0.html().contains("The sky")
-                    && !sky0.html().contains("Chart shape"));
+            // Since the tabs were standardized (2026-10-22) the sky's page is this same page,
+            // said for the sky: no "born", and "the sky" where a person's says "your chart".
+            String skyPage = sky0 == null ? "" : sky0.html();
+            yes("with only the sky on the wheel the page is the sky's chart shape",
+                sky.skyAlone() && skyPage.contains("Chart shape")
+                    && (skyPage.contains("Daytime sky") || skyPage.contains("Night sky"))
+                    && !skyPage.contains("Born in"));
             int casts = sky.castsApplied();
             SwingUtilities.invokeAndWait(() -> sky.applyChartSettings("1990-06-15", "12:00",
                 "51.5074, -0.1278", ChartMode.SINGLE, "", "", "", false));

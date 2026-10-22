@@ -45,10 +45,20 @@ final class PlacementsPage {
      */
     static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
             List<AspectPatterns.Pattern> patterns, double[] cusps) {
+        return natalSection(title, ring, when, patterns, cusps, ring.latitude, ring.longitude);
+    }
+
+    /**
+     * As above, with the place the inner chart is cast at (2026-10-22). With the sky alone on
+     * the inner wheel the ring's own place is the empty Chart A slot's, and the list read
+     * "0.00, 0.00" over a sky cast at Los Angeles.
+     */
+    static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
+            List<AspectPatterns.Pattern> patterns, double[] cusps, double lat, double lon) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(title).append("</h2>");
         String string2 = ring.time != null ? ring.time.format(when) : "";
-        String string3 = String.format("%.2f, %.2f", ring.latitude, ring.longitude);
+        String string3 = String.format("%.2f, %.2f", lat, lon);
         stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(string2).append("<br>").append(string3).append("</div>");
         // <b>The one link that is always on screen.</b> Everything else in the index is
         // reached from a page you have to open first; this panel is up from the moment the

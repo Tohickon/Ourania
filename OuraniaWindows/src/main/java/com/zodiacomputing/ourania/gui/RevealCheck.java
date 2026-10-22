@@ -381,16 +381,13 @@ public final class RevealCheck {
             clicked.contains("SkymapPanel.this.askForPlacement(at.x, at.y)"));
         yes("the hover never asks", !body(s, "public void mouseMoved(MouseEvent").contains("askFor"));
         yes("nor does the rebuild", !refresh.contains("askForPlacement"));
+        // <b>A click plays no reveal (David, 2026-10-22: "just get rid of it then its
+        // redundant and unneccesary").</b> It opens the Selected panel with the same card on
+        // top, at once; the reveal stays for the readings and the transit pop-ups.
         String ask = body(s, "void askForPlacement(int x, int y)");
-        yes("the click's request is cleared on every exit",
-            ask.contains("finally") && ask.contains("this.readingAsked = false;"));
-        String place = body(s, "private boolean revealPlacement(int body, String card)");
-        yes("a placement is gated by shouldPlay",
-            place.contains("ReadingReveal.shouldPlay(asked, plan)"));
-        yes("and forms at its planet, not at the centre",
-            place.contains("this.revealScene(plan, body)"));
-        yes("and lands the very card the click built",
-            place.contains("this.window.showSelection(card, true)"));
+        yes("a click on the wheel asks for no reveal",
+            !ask.contains("readingAsked") && !ask.contains("reveal"));
+        yes("and no placement reveal is left to play", !s.contains("revealPlacement("));
         yes("only the placement exit reads the request",
             !body(s, "private void handleChartClick(int n, int n2)").contains("readingAsked"));
     }

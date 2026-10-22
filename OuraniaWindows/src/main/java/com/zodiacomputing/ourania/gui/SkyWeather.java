@@ -241,8 +241,50 @@ final class SkyWeather {
 
     // ------------------------------------------------------------------ the pages
 
-    /** At a glance: the conditions, the big story, and what to watch for. */
+    /** The three cards of At a glance on every tab, in their order (2026-10-22). */
+    static final String FROM = "WHAT THE SKY IS WORKING FROM";
+    static final String NOW = "WHERE THE WEIGHT SITS NOW";
+    static final String HEADING = "WHERE IT IS HEADING";
+
+    /**
+     * At a glance: the chart's three cards, said as weather (David, 2026-10-22: the same
+     * structure on every tab). What the sky is working from is the slow background - the slow
+     * planets meeting and the ones moving backward; where the weight sits now is today's
+     * conditions; where it is heading is the fast contacts that are building.
+     */
     static List<ReadingCard> glance(ChartFrame f, String place) {
+        List<ReadingCard> parts = glanceParts(f, place);
+        ReadingCard from = null;
+        ReadingCard now = null;
+        ReadingCard heading = null;
+        for (ReadingCard c : parts) {
+            switch (c.label()) {
+                case "THE BIG STORY" -> from = relabel(c, FROM);
+                case "CONDITIONS" -> now = relabel(c, NOW);
+                case "WATCH FOR" -> heading = relabel(c, HEADING);
+                default -> { }
+            }
+        }
+        if (heading == null) {
+            heading = new ReadingCard(HEADING, "Nothing new is building",
+                "No contact between the faster planets is building right now. The weather"
+                    + " holds as it is for the next few days.", List.of());
+        }
+        List<ReadingCard> out = new ArrayList<>();
+        for (ReadingCard c : new ReadingCard[] {from, now, heading}) {
+            if (c != null) {
+                out.add(c);
+            }
+        }
+        return out;
+    }
+
+    private static ReadingCard relabel(ReadingCard c, String label) {
+        return new ReadingCard(label, c.headline(), c.body(), c.why());
+    }
+
+    /** The conditions, the big story, and what to watch for. */
+    private static List<ReadingCard> glanceParts(ChartFrame f, String place) {
         List<ReadingCard> out = new ArrayList<>();
         List<Planet> ps = planets(f);
         Planet sun = find(ps, "Sun");
@@ -337,162 +379,18 @@ final class SkyWeather {
         return out;
     }
 
-    /** Overview: the sky's climate - its element, its pace, and where its planets sit. */
-    static String overview(ChartFrame f, String place, boolean showWhy) {
-        StringBuilder sb = ReadingCard.page(title(place), "The climate of the sky right now:"
-            + " what kind of energy is in the air, and which side of public life is busiest.");
-        List<Planet> ps = planets(f);
-        int[] el = new int[4];
-        int[] mode = new int[3];
-        int above = 0;
-        int counted = 0;
-        for (Planet p : ps) {
-            if ("North Node".equals(p.name()) || "Chiron".equals(p.name())) {
-                continue;
-            }
-            counted++;
-            el[p.sign() % 4]++;
-            mode[p.sign() % 3]++;
-            if (p.house() >= 7) {
-                above++;
-            }
-        }
-        String[] elName = {"fire", "earth", "air", "water"};
-        String[] elSays = {"Energy runs hot and quick. People act first and think later.",
-            "Energy runs practical and slow. People want results they can touch.",
-            "Energy runs light and talkative. Ideas and news travel fast.",
-            "Energy runs emotional and deep. Moods spread easily from person to person."};
-        int top = 0;
-        for (int i = 1; i < 4; i++) {
-            if (el[i] > el[top]) {
-                top = i;
-            }
-        }
-        String[] modeName = {"starting", "holding", "changing"};
-        String[] modeSays = {"Things get started quickly, but not all of them get finished.",
-            "Things hold their course. Change is slow and meets resistance.",
-            "Things shift and adapt. Plans change often."};
-        int topMode = 0;
-        for (int i = 1; i < 3; i++) {
-            if (mode[i] > mode[topMode]) {
-                topMode = i;
-            }
-        }
-        List<ReadingCard> cards = new ArrayList<>();
-        cards.add(new ReadingCard("THE AIR", "Mostly " + elName[top], elSays[top],
-            List.of("Elements: fire " + el[0] + ", earth " + el[1] + ", air " + el[2]
-                + ", water " + el[3])));
-        cards.add(new ReadingCard("THE PACE", "Mostly " + modeName[topMode], modeSays[topMode],
-            List.of("Modes: cardinal " + mode[0] + ", fixed " + mode[1] + ", mutable "
-                + mode[2])));
-        if (counted > 0 && f.cusps != null) {
-            boolean publicSide = above * 2 > counted;
-            cards.add(new ReadingCard("WHERE IT SHOWS",
-                publicSide ? "Public life is busy" : "Private life is busy",
-                publicSide
-                    ? "Most planets are above the horizon here, so the news, leaders and"
-                        + " public events carry the weather."
-                    : "Most planets are below the horizon here, so homes, land and the"
-                        + " everyday carry the weather more than the headlines.",
-                List.of(above + " of " + counted + " planets above the horizon")));
-        }
-        sb.append(ReadingCard.html(cards, showWhy));
-        return sb.append("</body></html>").toString();
-    }
-
-    /** Life areas: the place's collective life, domain by domain, with what is in each. */
-    static String lifeAreas(ChartFrame f, String place, boolean showWhy) {
-        StringBuilder sb = ReadingCard.page("Life areas", "The parts of public life in "
-            + (place == null || place.isBlank() ? "this place" : place.trim())
-            + " that the sky's planets are passing through now.");
-        List<Planet> ps = planets(f);
-        List<ReadingCard> cards = new ArrayList<>();
-        for (int h = 1; h <= 12; h++) {
-            List<Planet> in = new ArrayList<>();
-            for (Planet p : ps) {
-                if (p.house() == h) {
-                    in.add(p);
-                }
-            }
-            if (in.isEmpty()) {
-                continue;
-            }
-            StringBuilder b = new StringBuilder();
-            List<String> why = new ArrayList<>();
-            List<String> names = new ArrayList<>();
-            for (Planet p : in) {
-                b.append(b.length() == 0 ? "" : " ").append(p.tone()).append('.');
-                names.add(p.name());
-                why.add(p.why());
-            }
-            cards.add(new ReadingCard(DOMAIN[h - 1].toUpperCase(Locale.ROOT),
-                list(names) + (in.size() == 1 ? " is" : " are") + " here",
-                b.toString(), why));
-        }
-        sb.append(ReadingCard.html(cards, showWhy));
-        return sb.append("</body></html>").toString();
-    }
-
-    /** Interpretation: each planet as weather, then each meeting between them. */
-    static String interpretation(ChartFrame f, String place, boolean showWhy) {
-        StringBuilder sb = ReadingCard.page(title(place), "Each planet in the sky, and each"
-            + " meeting between them, as the weather they make for everyone.");
-        List<Planet> ps = planets(f);
-        List<ReadingCard> cards = new ArrayList<>();
-        for (Planet p : ps) {
-            String d = domain(p.house());
-            cards.add(new ReadingCard(d == null ? null : d.toUpperCase(Locale.ROOT),
-                p.where(), p.weather(), List.of(p.why())));
-        }
-        sb.append("<h3 style='color:#7FB3FF; margin-top:14px; margin-bottom:6px;'>The planets"
-            + "</h3>").append(ReadingCard.html(cards, showWhy));
-        List<ReadingCard> meets = new ArrayList<>();
-        for (Meeting m : meetings(f, ps, true)) {
-            meets.add(new ReadingCard(slowCount(m) == 2 ? "FOR WEEKS OR MONTHS"
-                : "FOR DAYS", m.headline(), m.weather(), List.of(m.why())));
-        }
-        if (!meets.isEmpty()) {
-            sb.append("<h3 style='color:#7FB3FF; margin-top:14px; margin-bottom:6px;'>Where"
-                + " they meet</h3>").append(ReadingCard.html(meets, showWhy));
-        }
-        return sb.append("</body></html>").toString();
-    }
-
     /**
-     * Report: the sky's technical sheet - positions, houses, aspects and the Moon. Plain text,
-     * because the Report page shows its report as written, in a fixed-width block.
+     * One planet's weather sentence, for the Reading page's card (2026-10-22): the Sky tab's
+     * Reading keeps the chart's structure and says each planet as weather. Null for a point
+     * this report does not read.
      */
-    static String report(ChartFrame f, String place) {
-        StringBuilder sb = new StringBuilder();
-        String t = title(place);
-        sb.append(t).append('\n').append("=".repeat(t.length())).append("\n\n");
-        sb.append("Ascendant  ").append(Zodiac.format(f.asc)).append('\n');
-        sb.append("Midheaven  ").append(Zodiac.format(f.mc)).append('\n');
-        String[] ph = phase(f);
-        if (ph != null) {
-            sb.append("Moon phase ").append(ph[0].replaceFirst("^an? ", "")).append('\n');
-        }
-        sb.append("\nPOSITIONS\n");
+    static String weatherFor(ChartFrame f, String name) {
         for (Planet p : planets(f)) {
-            sb.append(String.format(Locale.ROOT, "  %-11s %-16s %-3s %-9s %s%n", p.name(),
-                Zodiac.format(p.lon()), p.retrograde() ? "Rx" : "",
-                p.house() > 0 ? ordinal(p.house()) + " house" : "",
-                p.house() > 0 ? DOMAIN[p.house() - 1] : ""));
+            if (p.name().equals(name)) {
+                return p.weather();
+            }
         }
-        sb.append("\nASPECTS BETWEEN THE PLANETS (major, within ")
-            .append((int) ORB).append(" degrees)\n");
-        List<Meeting> ms = meetings(f, planets(f), true);
-        if (ms.isEmpty()) {
-            sb.append("  none\n");
-        }
-        for (Meeting m : ms) {
-            sb.append("  ").append(m.why()).append('\n');
-        }
-        sb.append("\nHOUSE CUSPS\n");
-        for (int h = 1; h <= 12 && f.cusps != null; h++) {
-            sb.append(String.format(Locale.ROOT, "  %-5s %s%n", ordinal(h), Zodiac.format(f.cusps[h])));
-        }
-        return sb.toString();
+        return null;
     }
 
     /**

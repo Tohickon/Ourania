@@ -37,6 +37,22 @@ public final class LifeAreasCheck {
             yes("the window has a Life areas page", panel != null);
             yes("it is one of the pages under the chart tabs: " + w.pagesRail().pages(),
                 w.pagesRail().pages().contains(OuraniaWindow.LIFE_AREAS_PAGE));
+            // <b>A birth chart, cast on purpose (2026-10-22).</b> A fresh window holds the sky
+            // alone, whose Life areas are the place's collective life (ReadingVoice.SKY); this
+            // suite pins a person's, so it casts one, and asks the page once so it takes the
+            // person's voice before its cards are read.
+            int casts = sky.castsApplied();
+            SwingUtilities.invokeAndWait(() -> sky.applyChartSettings("1990-06-15", "12:00",
+                "51.5074, -0.1278", ChartMode.SINGLE, "", "", "", false));
+            long cast = System.nanoTime() + 20_000_000_000L;
+            while ((sky.castsApplied() <= casts || !sky.innerIsBirthChart())
+                    && System.nanoTime() < cast) {
+                Thread.sleep(50);
+            }
+            yes("a birth chart is on the wheel", sky.innerIsBirthChart());
+            if (panel != null) {
+                SwingUtilities.invokeAndWait(panel::html);
+            }
             ChartFrame f = sky.getCurrentChart();
             yes("a chart was cast to read", f != null);
             if (panel == null || f == null) {

@@ -4680,6 +4680,35 @@ implements WheelSource, GlobeSource {
         return s == null || s.placeName == null ? "" : s.placeName.trim();
     }
 
+    /**
+     * The current sky in the person's houses, for the Transits tab's pages (2026-10-22): the
+     * sky's planets with the inner chart's cusps and angles. David chose this for the Transits
+     * Chart shape, Life areas and Report: "Sky + the person's houses". With no person on the
+     * wheel it is the sky as cast at its own place.
+     */
+    ChartFrame skyInChartHouses() {
+        ChartFrame sky = this.frameOf(this.subjectSky);
+        ChartFrame person = this.innerIsBirthChart ? this.radixChart() : null;
+        if (sky == null || person == null) {
+            return sky;
+        }
+        System.arraycopy(person.cusps, 0, sky.cusps, 0, sky.cusps.length);
+        sky.asc = person.asc;
+        sky.mc = person.mc;
+        sky.dsc = person.dsc;
+        sky.ic = person.ic;
+        sky.armc = person.armc;
+        sky.vertex = person.vertex;
+        return sky;
+    }
+
+    /** Whose chart is on the inner wheel, by name: "David", or "Chart A" before it has one. */
+    String whoseLabel() {
+        boolean b = this.anchorSubject != null && this.anchorSubject == this.subjectB;
+        return OuraniaWindow.whoseChart(this.anchorSubject,
+            b ? WheelRing.Kind.CHART_B : WheelRing.Kind.CHART_A, b ? "Chart B" : "Chart A");
+    }
+
     /** The chart as cast, before any harmonic. The house frame the harmonic keeps. */
     public ChartFrame radixChart() {
         boolean composite = this.chartMode == ChartMode.COMPOSITE_MIDPOINT
@@ -4904,6 +4933,15 @@ implements WheelSource, GlobeSource {
         // A birth chart's middle card is not "now" (David, 2026-10-22); the sky's is.
         final boolean glanceSky = !this.innerIsBirthChart && !this.isRelationshipChart();
         final String skyPlace = this.skyPlaceName();
+        // <b>The Transits tab reads the sky on the chart (2026-10-22).</b> Its Synthesize and
+        // Full report are the shared pages, in their own layout, read from the sky in the
+        // person's houses; decided here, on the event thread, with the frame cast here too.
+        final boolean onTransits = this.window != null && this.window.readingTransits()
+            && this.innerIsBirthChart;
+        final ChartFrame transitFrame = onTransits ? this.skyInChartHouses() : null;
+        final String whose = this.whoseLabel();
+        final String skyWhen = this.skyRing.time == null ? ""
+            : this.skyRing.time.format(DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm z"));
         new SwingWorker<String, Void>(){
 
             /** The headline theme to reveal, when the reader asked and the year has one. */
@@ -4924,6 +4962,13 @@ implements WheelSource, GlobeSource {
                 List<Topics.Topic> topics = Topics.analyse(chartFrame, list);
                 Themes.Result result2 = Themes.extract(chartFrame, result, list, topics);
                 // Synthesize reads the chart alone, so it needs none of the timing below.
+                if (readingTier == ReadingTier.THEMES && onTransits) {
+                    Chronometry year = Chronometry.at(SkymapPanel.this.sw, chartFrame, d, dNow,
+                        list, bl ? d4 : Double.NaN, d5, d6, d2, d3, c, true, true);
+                    return SkyOnChart.synthesize(whose, NarrativeSynthesizer.yearThemes(chartFrame,
+                        year.profection, year.scan, year.convergence, bl, false),
+                        Settings.astrologerView());
+                }
                 if (readingTier == ReadingTier.THEMES) {
                     // The sky alone is read as weather: the same count of three, the sky's words.
                     return glanceSky
@@ -4968,13 +5013,30 @@ implements WheelSource, GlobeSource {
                 list2 = time.hits;
                 yearScan = time.scan;
                 list3 = time.convergence;
-                if (readingTier == ReadingTier.REPORT && glanceSky) {
-                    return SkyWeather.report(chartFrame, skyPlace);
+                // <b>One report, three charts (2026-10-22).</b> The same sections on every tab:
+                // the person's chart on Chart A or B, with nothing of the sky in it; the sky on
+                // its own; and on Transits the sky in the person's houses, with the timing
+                // section that reads the sky's contacts to the chart.
+                if (readingTier == ReadingTier.REPORT && transitFrame != null) {
+                    Gestalt.Result tg = Gestalt.compute(transitFrame);
+                    List<BodyScore.Vector> tr = BodyScore.rank(transitFrame, tg);
+                    List<Topics.Topic> tt = Topics.analyse(transitFrame, tr);
+                    object = "THE CURRENT SKY ON " + whose.toUpperCase(java.util.Locale.ROOT)
+                        + "\n\n" + Snapshot.report(transitFrame, tg, tr,
+                            Themes.extract(transitFrame, tg, tr, tt))
+                        + Snapshot.topicLayer(tt);
+                    if (bl) {
+                        object = (String)object + Snapshot.timeLayer(profection, list, list2,
+                            yearScan.events, list3, chartFrame, d4);
+                    }
+                    return (String)object;
                 }
                 if (readingTier == ReadingTier.REPORT) {
                     object = Snapshot.report(chartFrame, result, list, result2)
                         + Snapshot.topicLayer(topics);
-                    if (bl) {
+                    // A person's report is their chart alone (David, 2026-10-22: Chart A
+                    // should "read only chart a"); the timing is the Transits tab's.
+                    if (bl && glanceSky) {
                         // The frame and the moment carry the releasing section, which was
                         // computed to four levels and appeared in no reading until 2026-09-02.
                         object = (String)object + Snapshot.timeLayer(profection, list, list2,
@@ -5038,7 +5100,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             protected void done() {
                 try {
                     if (readingTier == ReadingTier.REPORT) {
-                        SkymapPanel.this.window.showReport(string2, string, (String)this.get());
+                        // On Transits the report is the sky's, so its header is too.
+                        SkymapPanel.this.window.showReport(
+                            onTransits ? skyWhen : string2, onTransits ? skyPlace : string,
+                            (String)this.get());
                     } else if (readingTier == ReadingTier.THEMES) {
                         SkymapPanel.this.window.showSynthesis((String)this.get());
                     } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
@@ -5267,47 +5332,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /**
-     * A click on the wheel, as the reader's request for what it opens.
+     * A click on the wheel: open what was clicked in the Selected panel.
      *
-     * <b>The same one-shot flag {@link #askForReading} sets</b>, and cleared on every exit:
-     * handleChartClick has many, and only the natal-placement one reads it. A flag left set by
-     * a click on empty space would make the next transport rebuild play a reveal.
+     * <b>No pop-up (David, 2026-10-22: "just get rid of it then its redundant and
+     * unneccesary").</b> A click on a planet of the inner ring used to form a card at the planet
+     * and fly it to the Selected panel. Its words only appeared once it started to move, and
+     * the panel opening on the left cut the flight short, so what a reader saw was a brief empty
+     * box. The panel shows the same card at its top, at once.
      */
     void askForPlacement(int x, int y) {
-        this.readingAsked = true;
-        try {
-            this.handleChartClick(x, y);
-        } finally {
-            this.readingAsked = false;
-        }
-    }
-
-    /**
-     * Plays a placement's reveal, forming at its planet, and lands {@code card} at the end.
-     *
-     * <b>The factors are the reading's own.</b> The planet, and each body in the aspect list
-     * the reading was written from - {@link #getActiveAspectsFor}, which asks visibleAspect,
-     * the gate glyphWeight lights the wheel by. The words are the reading's heading and its
-     * first sentence under it. No ticks: a placement is not a vote, so nothing is counted.
-     *
-     * <b>The click that asked does not interrupt it.</b> The reveal starts on MOUSE_CLICKED,
-     * after this click's press; only a later press or key lands it.
-     *
-     * @return whether a reveal is playing; false means the caller shows the card at once
-     */
-    private boolean revealPlacement(int body, String card) {
-        boolean asked = this.readingAsked;
-        this.readingAsked = false;
-        RevealPlan plan = asked ? this.selectionPlan : null;
-        RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, plan)
-            ? this.revealScene(plan, body) : null;
-        if (scene == null) {
-            return false;
-        }
-        // From the top, so the card the reveal lands on is the one in view.
-        this.reveal().play(scene, () -> this.window.showSelection(card, true),
-            this.landingFor(plan));
-        return true;
+        this.handleChartClick(x, y);
     }
 
     /** Where a plan's real card is on the page, asked of the window's layered pane. */
@@ -5794,9 +5828,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 String card = this.selectionHtml(this.focusBody, lon[this.focusBody],
                     spd[this.focusBody], this.focusTransit);
                 boolean placement = !this.focusTransit && !Bodies.at(this.focusBody).isAngle();
-                if (!placement || !this.revealPlacement(this.focusBody, card)) {
-                    this.window.showSelection(card);
-                }
+                this.window.showSelection(card, placement);
                 // <b>The natal-body exit, which this method's own list of exits promised and
                 // did not have.</b> Everything below resolves by radius, and the last two
                 // branches are "inside the body ring is a house, outside it is a sign" - so a
@@ -8859,7 +8891,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // wheel's highlight is refreshed from the same call.
             this.refreshPatterns();
             stringBuilder.append(PlacementsPage.natalSection(string, this.natalRing,
-                dateTimeFormatter, this.currentPatterns, this.activeCusps));
+                dateTimeFormatter, this.currentPatterns, this.activeCusps, this.innerLat(),
+                this.innerLon()));
         }
         // <b>Which PAGE the outer ring belongs on is decided by what it is carrying.</b> A
         // second person goes on their own page and a moment goes on the Transits page; this

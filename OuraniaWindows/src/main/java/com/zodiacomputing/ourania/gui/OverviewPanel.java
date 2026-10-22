@@ -49,6 +49,8 @@ final class OverviewPanel extends JPanel {
 
     private final SkymapPanel skymap;
     private final OuraniaWindow window;
+    /** The tab's voice, set each time the cards are built. */
+    private ReadingVoice voice = ReadingVoice.PERSON;
     private final JEditorPane pane;
 
     /** Which cards the reader has opened. Empty is the page's resting state. */
@@ -136,7 +138,9 @@ final class OverviewPanel extends JPanel {
      */
     List<Card> cards() {
         List<Card> cards = new ArrayList<>();
-        ChartFrame f = this.skymap == null ? null : this.skymap.radixChart();
+        // One page on every tab (2026-10-22): the chart the tab reads, in its voice.
+        this.voice = ReadingVoice.of(this.skymap, this.window);
+        ChartFrame f = this.voice.frame(this.skymap);
         if (f == null) {
             return cards;
         }
@@ -170,10 +174,17 @@ final class OverviewPanel extends JPanel {
         String benefic = Sect.beneficOfSect(g.diurnal);
         Card c = new Card("sect", g.diurnal ? "☀" : "☽",
             "Who Has the Easy Run",
-            subtitleOfSect(g.diurnal),
-            "Because you were born " + (g.diurnal ? "in daylight" : "at night") + ", "
-                + g.sectLight + " and " + benefic + " work with the fewest obstacles in your "
-                + "chart, while " + g.outOfSectMalefic + " is the one that needs handling.");
+            voice == ReadingVoice.PERSON ? subtitleOfSect(g.diurnal)
+                : (g.diurnal ? "Daytime sky" : "Night sky"),
+            (voice == ReadingVoice.PERSON
+                ? "Because you were born " + (g.diurnal ? "in daylight" : "at night")
+                : voice == ReadingVoice.SKY
+                    ? "Because it is " + (g.diurnal ? "daytime" : "night-time") + " here"
+                    : "Because the Sun is " + (g.diurnal ? "above" : "below")
+                        + " your horizon now")
+                + ", " + g.sectLight + " and " + benefic + " work with the fewest obstacles in "
+                + voice.chart() + ", while " + g.outOfSectMalefic
+                + " is the one that needs handling.");
         c.detail.add("Classical figure: " + (g.diurnal ? "diurnal" : "nocturnal") + " sect");
         c.detail.add("Light of the sect: " + g.sectLight);
         c.detail.add("Benefic of sect: " + benefic);
@@ -194,9 +205,11 @@ final class OverviewPanel extends JPanel {
             }
         }
         String name = g.shape.name().charAt(0) + g.shape.name().substring(1).toLowerCase();
-        Card c = new Card("shape", "◔", "How Your Chart Is Laid Out",
+        Card c = new Card("shape", "◔", voice == ReadingVoice.PERSON
+                ? "How Your Chart Is Laid Out" : "How the Sky Is Laid Out",
             plainShape(g.shape) + (handle.isEmpty() ? "" : ", led by " + handle + where),
-            "Your planets are " + plainShape(g.shape).toLowerCase()
+            (voice == ReadingVoice.PERSON ? "Your planets are " : "The sky's planets are ")
+                + plainShape(g.shape).toLowerCase()
                 + (handle.isEmpty() ? "." : ", with " + handle + " out in front - the placement "
                     + "that pulls the rest along and the one to read first."));
         c.detail.add("Classical figure: " + name + " pattern");
@@ -260,7 +273,8 @@ final class OverviewPanel extends JPanel {
                 ? "One planet links two others that would not otherwise meet, like a relay "
                     + "runner passing a baton: " + first.mediator + " has just left "
                     + first.from + " and is on its way to " + first.to + "."
-                : "Two parts of your chart that never meet directly both reach the same third "
+                : "Two parts of " + voice.chart() + " that never meet directly both reach the"
+                    + " same third "
                     + "planet, the way two strangers share a friend: "
                     + first.from + " and " + first.to + " both reach " + first.mediator
                     + ".");
@@ -345,11 +359,6 @@ final class OverviewPanel extends JPanel {
     // ------------------------------------------------------------------ rendering
 
     String html() {
-        // The sky alone: its climate, as weather (David, 2026-10-22).
-        if (skymap != null && skymap.skyAlone() && skymap.radixChart() != null) {
-            return SkyWeather.overview(skymap.radixChart(), skymap.skyPlaceName(),
-                Settings.astrologerView());
-        }
         StringBuilder sb = new StringBuilder("<html><body>");
         List<Card> cards = cards();
         if (cards.isEmpty()) {
@@ -357,7 +366,9 @@ final class OverviewPanel extends JPanel {
                 + "what kind of chart it is.</p></body></html>");
             return sb.toString();
         }
-        sb.append("<h2>Chart shape</h2>").append(WhoseChart.html(skymap));
+        sb.append("<h2>Chart shape</h2>").append(voice == ReadingVoice.TRANSIT
+            ? SkyOnChart.sectionHeading(SkyOnChart.heading(skymap.whoseLabel()))
+            : WhoseChart.html(skymap));
         for (Card c : cards) {
             // In Astrologer view every card starts open, and a click closes it instead.
             boolean open = expanded.contains(c.id) != Settings.astrologerView();

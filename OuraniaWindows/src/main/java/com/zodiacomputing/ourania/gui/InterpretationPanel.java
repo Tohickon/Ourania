@@ -301,7 +301,7 @@ public class InterpretationPanel extends JPanel {
             // body|N is the natal ring, body|N|1 the outer one. The two-part form is still
             // accepted because other surfaces emit it for natal placements.
             String[] bits = href.substring(5).split("\\|");
-            openBody(parseInt(bits[0], -1), bits.length > 1 && "1".equals(bits[1]));
+            openBody(parseInt(bits[0], -1), bits.length > 1 ? parseInt(bits[1], 0) : 0);
             return true;
         }
         if (href.startsWith("house|")) {
@@ -2219,10 +2219,17 @@ public class InterpretationPanel extends JPanel {
     // Package-private for the suite: as a private method this could not be reached, and the
     // first version of Part I passed against the very defect it was written for.
     void openBody(int index, boolean outer) {
+        openBody(index, outer ? 1 : 0);
+    }
+
+    /** As above, by ring: 0 the chart, 1 the outer ring, 2 the sky ring (2026-10-22). */
+    void openBody(int index, int ringCode) {
+        boolean outer = ringCode != 0;
         if (skymapPanel == null || index < 0 || index >= SkymapPanel.BODY_COUNT) {
             return;
         }
-        WheelRing ring = outer ? skymapPanel.outerRing : skymapPanel.natalRing;
+        WheelRing ring = ringCode == 2 ? skymapPanel.skyRing
+            : outer ? skymapPanel.outerRing : skymapPanel.natalRing;
         if (!ring.valid[index]) {
             StringBuilder html = new StringBuilder();
             html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding:20px;'>");
@@ -3838,7 +3845,11 @@ public class InterpretationPanel extends JPanel {
         cardRule(html);
 
         InterpretationService svc = InterpretationService.getInstance();
-        String lead = isTransit
+        // The sky alone is read as weather (David, 2026-10-22): the planet's weather sentence,
+        // at the sky's place, where a birth chart has its personal reading.
+        String weather = !isTransit && skymapPanel != null && skymapPanel.skyAlone()
+            ? SkyWeather.weatherFor(skymapPanel.radixChart(), def.name) : null;
+        String lead = weather != null ? weather : isTransit
             ? leadOrNull(svc.getTransit(def.name, signName))
             : leadOrNull(def.isAngle() ? svc.getAngleInterpretation(def.name, signName)
                                        : svc.getPlanetInSign(def.name, signName));
@@ -3872,10 +3883,10 @@ public class InterpretationPanel extends JPanel {
         // and Sky up, a card reading "Sun in Libra" opened the natal Sun in Leo. David, 25 Sep.
         cardLinks(html, plain
             ? new String[][] {
-                {"body|" + index + "|" + (isTransit ? "1" : "0"), "Read in full"},
+                {"body|" + index + "|" + ringCode(isTransit), "Read in full"},
                 {"sign|" + signName, signName}}
             : new String[][] {
-                {"body|" + index + "|" + (isTransit ? "1" : "0"), "Read in full"},
+                {"body|" + index + "|" + ringCode(isTransit), "Read in full"},
                 {"sign|" + signName, signName},
                 {"decan|" + signName + "|" + decanNum, "Decan " + decanNum},
                 {"sabian|" + signName + "|" + degree, "Sabian"}
@@ -3884,23 +3895,57 @@ public class InterpretationPanel extends JPanel {
         return html.toString();
     }
 
+    /**
+     * The Reading page: the chart on the wheel, read on its own.
+     *
+     * <b>Only that chart (David, 2026-10-22).</b> "reading under chart a is in fact reading the
+     * transits it should in keeping the exact same structure read only chart a". Chart A's tab
+     * puts the sky around Chart A, and this read the outer ring whenever one was drawn - so the
+     * page headed by Chart A described the sky's planets. It reads the inner chart now, always;
+     * the transit reading moved whole to the Transits tab ({@link #showTransitReading}). The
+     * sky alone is the inner chart too, so the Sky tab has this same structure.
+     */
     public void updateInterpretations() {
         if (skymapPanel == null) return;
-        // The sky alone reads as a weather report (David, 2026-10-22); see SkyWeather.
-        if (skymapPanel.skyAlone()) {
-            setHtml(SkyWeather.interpretation(skymapPanel.radixChart(),
-                skymapPanel.skyPlaceName(), Settings.astrologerView()), false);
-            return;
-        }
+        setHtml(readingHtml(false), false); // Scroll to top
+    }
+
+    /**
+     * The Transits tab's Reading: the same page, read from the sky's planets over the chart
+     * (2026-10-22). With one person the sky is the wheel's outer ring; with two it is the third.
+     */
+    public void showTransitReading() {
+        if (skymapPanel == null) return;
+        setHtml(readingHtml(true), false);
+    }
+
+    /** The ring the transit reading reads: the outer one, or the sky's around a pair. */
+    private WheelRing transitRing() {
+        return skymapPanel.isSynastryChart() ? skymapPanel.skyRing : skymapPanel.outerRing;
+    }
+
+    /** The ring code a card's "Read in full" link carries: 0 the chart, 1 outer, 2 the sky. */
+    private String ringCode(boolean isTransit) {
+        return !isTransit ? "0" : skymapPanel != null && skymapPanel.isSynastryChart() ? "2" : "1";
+    }
+
+    private String readingHtml(boolean isTransit) {
         
-        java.time.ZonedDateTime time = skymapPanel.getChartTime();
+        // The transit reading is of the sky now, so it is dated by the sky (2026-10-22).
+        java.time.ZonedDateTime time = isTransit && skymapPanel.skyRing.time != null
+            ? skymapPanel.skyRing.time : skymapPanel.getChartTime();
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 14px;'>");
 
         // The masthead. A ZonedDateTime.toString() - "2026-08-25T13:42:07.481-07:00[America/
         // Los_Angeles]" - is a machine's idea of a moment and was the first thing a reader
         // met on this screen. The same instant, formatted for a person, costs one formatter.
-        html.append("<div style='color:#FFFFFF; font-size:17px;'><b>Your Reading</b></div>");
+        // Each tab's page says what it reads (2026-10-22): a person's chart, the sky, or the
+        // sky on the chart.
+        String masthead = isTransit ? "The Sky on the Chart"
+            : skymapPanel.skyAlone() ? "The Sky's Reading" : "Your Reading";
+        html.append("<div style='color:#FFFFFF; font-size:17px;'><b>").append(masthead)
+            .append("</b></div>");
         html.append("<div style='color:").append(CARD_KICKER)
             .append("; font-size:11px;'>")
             .append(escape(time.format(java.time.format.DateTimeFormatter
@@ -3913,9 +3958,8 @@ public class InterpretationPanel extends JPanel {
             + "<a href='index' style='color:" + CARD_LINK + ";'>"
             + "Browse everything the app knows &rarr;</a></div>");
 
-        boolean isTransit = skymapPanel.showTransitChart;
-        double[] lonArray = isTransit ? skymapPanel.outerRing.lon : skymapPanel.natalRing.lon;
-        boolean[] validArray = isTransit ? skymapPanel.outerRing.valid : skymapPanel.natalRing.valid;
+        double[] lonArray = isTransit ? transitRing().lon : skymapPanel.natalRing.lon;
+        boolean[] validArray = isTransit ? transitRing().valid : skymapPanel.natalRing.valid;
         double[] cusps = skymapPanel.activeCusps;
 
         // Macro dynamics come from Gestalt, and the geometries from AspectPatterns.
@@ -4199,6 +4243,6 @@ public class InterpretationPanel extends JPanel {
         }
         
         html.append("</body></html>");
-        setHtml(html.toString(), false); // Scroll to top
+        return html.toString();
     }
 }

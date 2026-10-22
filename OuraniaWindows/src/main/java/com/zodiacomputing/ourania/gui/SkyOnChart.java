@@ -79,6 +79,130 @@ final class SkyOnChart {
             + escape(title) + "</div>";
     }
 
+    /** The three cards of At a glance on every tab, as the Transits tab says them. */
+    static final String FROM = "WHAT YOU ARE WORKING THROUGH";
+    static final String NOW = "WHAT DRIVES YOU NOW";
+    static final String HEADING = "WHERE IT IS HEADING";
+
+    /** The slow planets: their contacts are the season a person is working through. */
+    private static final java.util.Set<String> SLOW = java.util.Set.of("Pluto", "Neptune",
+        "Uranus", "Saturn", "Chiron", "North Node", "South Node", "Jupiter");
+
+    /**
+     * At a glance on the Transits tab: the chart's three cards (David, 2026-10-22: the same
+     * structure on every tab), each one contact in the transit card's words. What you are
+     * working through is the strongest slow contact; what drives you now is the tightest
+     * contact left; where it is heading is a contact still building. No contact is used twice.
+     */
+    static String glance(String whose, ChartFrame natal, ChartFrame sky, List<Transits.Hit> hits,
+            boolean showWhy) {
+        StringBuilder sb = new StringBuilder(sectionHeading(heading(whose)));
+        List<NowCards.TransitHit> pool = new ArrayList<>();
+        if (natal != null && sky != null && hits != null) {
+            List<Transits.Hit> sorted = new ArrayList<>(hits);
+            sorted.sort(Comparator.comparingDouble((Transits.Hit h) -> -slowness(h.transiting))
+                .thenComparingDouble(h -> h.offBy));
+            for (Transits.Hit h : sorted) {
+                if (h == null || h.type == null || "Moon".equals(h.transiting)) {
+                    continue;
+                }
+                NowCards.TransitHit hit = toCardHit(natal, sky, h);
+                if (hit != null && TransitCard.of(hit) != null) {
+                    pool.add(hit);
+                }
+            }
+        }
+        java.util.Set<NowCards.TransitHit> used = new java.util.HashSet<>();
+        NowCards.TransitHit from = pick(pool, used, h -> SLOW.contains(h.transiting()), null);
+        NowCards.TransitHit now = pick(pool, used, h -> true,
+            Comparator.comparingDouble(NowCards.TransitHit::orb));
+        NowCards.TransitHit next = pick(pool, used, NowCards.TransitHit::applying,
+            Comparator.comparingDouble((NowCards.TransitHit h) -> slowness(h.transiting()))
+                .thenComparingDouble(NowCards.TransitHit::orb));
+        List<ReadingCard> cards = new ArrayList<>();
+        cards.add(card(FROM, from, "No slow planet is working on this chart now",
+            "None of the slow planets is in close contact with this chart. The background is"
+                + " quiet, so the faster planets set the pace."));
+        cards.add(card(NOW, now, "No strong contact now",
+            "Today's sky makes no close contact with this chart."));
+        cards.add(card(HEADING, next, "Nothing new is building",
+            "No contact to this chart is building right now. It holds as it is for the next"
+                + " few days."));
+        sb.append(ReadingCard.html(cards, showWhy));
+        return sb.toString();
+    }
+
+    private static NowCards.TransitHit pick(List<NowCards.TransitHit> pool,
+            java.util.Set<NowCards.TransitHit> used,
+            java.util.function.Predicate<NowCards.TransitHit> ok,
+            Comparator<NowCards.TransitHit> order) {
+        List<NowCards.TransitHit> left = new ArrayList<>();
+        for (NowCards.TransitHit h : pool) {
+            if (!used.contains(h) && ok.test(h)) {
+                left.add(h);
+            }
+        }
+        if (order != null) {
+            left.sort(order);
+        }
+        if (left.isEmpty()) {
+            return null;
+        }
+        used.add(left.get(0));
+        return left.get(0);
+    }
+
+    /** One of the three, in the transit card's words; the card's own label goes in its why. */
+    private static ReadingCard card(String label, NowCards.TransitHit hit, String emptyHead,
+            String emptyBody) {
+        ReadingCard c = hit == null ? null : TransitCard.of(hit);
+        if (c == null) {
+            return new ReadingCard(label, emptyHead, emptyBody, List.of());
+        }
+        List<String> why = new ArrayList<>();
+        if (c.label() != null) {
+            why.add(c.label().toLowerCase(java.util.Locale.ROOT));
+        }
+        why.addAll(c.why());
+        return new ReadingCard(label, c.headline(), c.body(), why);
+    }
+
+    /**
+     * Synthesize on the Transits tab, in the Synthesize page's own layout (2026-10-22): only
+     * the themes at least three separate techniques agree on for this person this year - the
+     * same count Your year opens on (ThemeConvergence), each said as the transit card says it.
+     */
+    static String synthesize(String whose,
+            List<com.zodiacomputing.ourania.astro.ThemeConvergence.Result> themes,
+            boolean showWhy) {
+        StringBuilder sb = ReadingCard.page("Synthesize", "Only what at least 3 separate"
+            + " parts of the sky on this chart agree on. One contact alone is a detail; this is"
+            + " the pattern.");
+        sb.append(sectionHeading(heading(whose)));
+        List<ReadingCard> cards = new ArrayList<>();
+        if (themes != null) {
+            for (com.zodiacomputing.ourania.astro.ThemeConvergence.Result th : themes) {
+                if (!th.headline()) {
+                    continue;
+                }
+                ReadingCard c = ReadingCard.forYearTheme(th);
+                List<String> why = new ArrayList<>();
+                why.add(th.families.size() + " independent techniques agree on \""
+                    + th.theme.label + "\"");
+                why.addAll(th.testimonies);
+                cards.add(new ReadingCard("[ " + th.families.size() + " PARTS AGREE ]",
+                    c.headline(), c.body(), why));
+            }
+        }
+        if (cards.isEmpty()) {
+            cards.add(new ReadingCard("NO STRONG PATTERN", "No theme repeats 3 times",
+                "The sky spreads its weight across this chart. At a glance and Reading describe"
+                    + " the parts.", List.of()));
+        }
+        sb.append(ReadingCard.html(cards, showWhy));
+        return sb.append("</body></html>").toString();
+    }
+
     /** The strongest contacts, as plain cards. */
     static List<ReadingCard> cards(ChartFrame natal, ChartFrame sky, List<Transits.Hit> hits) {
         List<ReadingCard> out = new ArrayList<>();

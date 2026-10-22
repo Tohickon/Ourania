@@ -561,11 +561,14 @@ public final class RingIdentityCheck {
             // The pages, on the one strip every chart tab holds, in the order they are read:
             // the chart, the reading, the pair's pages, then the timing.
             eq("the strip holds the pages in reading order",
+                // The Transits tab's own pages sit beside the ones they mirror, so that tab
+                // reads in the same order as the others (2026-10-22).
                 Arrays.asList(OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
-                    OuraniaWindow.OVERVIEW_PAGE, "Snapshot", OuraniaWindow.LIFE_AREAS_PAGE,
-                    OuraniaWindow.READING_PAGE, "Synthesize", "Report",
-                    OuraniaWindow.SKY_PLACEMENTS_PAGE, OuraniaWindow.SKY_GLANCE_PAGE,
-                    OuraniaWindow.SKY_READING_PAGE,
+                    OuraniaWindow.SKY_PLACEMENTS_PAGE,
+                    OuraniaWindow.OVERVIEW_PAGE, "Snapshot", OuraniaWindow.SKY_GLANCE_PAGE,
+                    OuraniaWindow.LIFE_AREAS_PAGE,
+                    OuraniaWindow.READING_PAGE, OuraniaWindow.SKY_READING_PAGE,
+                    "Synthesize", "Report",
                     OuraniaWindow.SYNASTRY_PAGE, OuraniaWindow.CHEMISTRY_PAGE,
                     OuraniaWindow.TRANSITS_PAGE, OuraniaWindow.PAIR_COMING_PAGE,
                     OuraniaWindow.YEAR_PAGE, "Calendar"),

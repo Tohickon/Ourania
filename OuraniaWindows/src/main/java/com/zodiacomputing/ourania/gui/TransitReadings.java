@@ -58,50 +58,8 @@ final class TransitReadings {
         }
         StringBuilder sb = new StringBuilder();
         for (Person p : people) {
-            sb.append(SkyOnChart.html(p.whose(), p.frame(), sky, hits(p.frame(), sky), showWhy));
-        }
-        return sb.toString();
-    }
-
-    // ------------------------------------------------------------------ Interpretation
-
-    /** Every contact in effect now, slowest planet first, each with its written reading. */
-    static String interpretation(List<Person> people, ChartFrame sky, boolean showWhy) {
-        if (people.isEmpty() || sky == null) {
-            return nobody();
-        }
-        InterpretationService svc = InterpretationService.getInstance();
-        StringBuilder sb = new StringBuilder();
-        for (Person p : people) {
-            sb.append(SkyOnChart.sectionHeading(SkyOnChart.heading(p.whose())));
-            List<Transits.Hit> hits = shown(hits(p.frame(), sky), showWhy);
-            if (hits.isEmpty()) {
-                sb.append("<p style='color:#AAAAAA;'>Today's sky makes no strong contact with"
-                    + " this chart.</p>");
-                continue;
-            }
-            for (Transits.Hit h : hits) {
-                String aspect = h.type.label.toLowerCase();
-                sb.append("<h3 style='color:#FFD166; margin-bottom:2px;'>").append(h.transiting)
-                    .append(' ').append(aspect).append(" your ").append(h.natal).append("</h3>");
-                sb.append("<p style='color:#AAAAAA; margin-top:0;'>")
-                    .append(h.applying ? "Building" : "Fading")
-                    .append(String.format(", %.1f&deg; from exact.", h.offBy)).append("</p>");
-                String text = svc.getTransitAspect(h.transiting, h.natal, h.type.label);
-                if (text != null && !text.startsWith("Interpretation not found")) {
-                    sb.append("<p>").append(text).append("</p>");
-                }
-                ChartFrame.Body b = sky.body(h.transiting);
-                int house = b == null || !b.ok ? 0 : Zodiac.houseOf(b.lon, p.frame().cusps);
-                if (showWhy && house > 0) {
-                    String housed = svc.getTransitInHouse(h.transiting, house);
-                    if (housed != null && !housed.startsWith("Interpretation not found")) {
-                        sb.append("<p style='color:#BBBBBB;'><b>").append(h.transiting)
-                            .append(" in your ").append(ordinal(house)).append(" house:</b> ")
-                            .append(housed).append("</p>");
-                    }
-                }
-            }
+            sb.append(SkyOnChart.glance(p.whose(), p.frame(), sky, hits(p.frame(), sky),
+                showWhy));
         }
         return sb.toString();
     }

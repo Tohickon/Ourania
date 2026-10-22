@@ -56,6 +56,11 @@ public class OuraniaWindow extends JFrame {
     private javax.swing.JEditorPane chemistryPane;
     /** Coming up together: the sky over both charts, when there are two (PairTimeline). */
     private javax.swing.JEditorPane pairComingPane;
+    /** True while the Transits tab is in front, so the shared pages read the sky on the chart. */
+    boolean readingTransits() {
+        return chartRail != null && ChartTab.TRANSITS.door.equals(chartRail.selected());
+    }
+
     /** The Transits tab's pages, by key (SKY_PAGES). */
     private final java.util.Map<String, javax.swing.JEditorPane> skyPanes =
         new java.util.LinkedHashMap<>();
@@ -192,7 +197,17 @@ public class OuraniaWindow extends JFrame {
             if (t == ChartTab.TRANSITS) {
                 // The same pages as the rest, each reading the sky on the selected charts.
                 // Coming up is transits already; with two people their shared one joins it.
-                l.addAll(SKY_PAGES);
+                // The same pages in the same order as every other tab (David, 2026-10-22: "make
+                // sure each tab looks the same and has the same structure"). Placements, At a
+                // glance and Reading are its own; the rest are the shared pages, which read the
+                // sky on the chart while this tab is in front (ReadingVoice).
+                l.add(SKY_PLACEMENTS_PAGE);
+                l.add(OVERVIEW_PAGE);
+                l.add(SKY_GLANCE_PAGE);
+                l.add(LIFE_AREAS_PAGE);
+                l.add(SKY_READING_PAGE);
+                l.add("Synthesize");
+                l.add("Report");
                 l.add(TRANSITS_PAGE);
                 l.add(PAIR_COMING_PAGE);
                 l.add(YEAR_PAGE);
@@ -513,15 +528,17 @@ public class OuraniaWindow extends JFrame {
         pages.addPageBefore(READING_PAGE, interpretationPanel, MEET_PAGE);
         pages.addPageBefore("Synthesize", readings.get("Synthesize"), MEET_PAGE);
         pages.addPageBefore("Report", readings.get("Report"), MEET_PAGE);
+        // Each beside the page it mirrors, so the Transits tab lists its pages in the order
+        // every other tab does.
         for (String[] sky : new String[][] {
-                {SKY_PLACEMENTS_PAGE, PLACEMENTS_LABEL},
-                {SKY_GLANCE_PAGE, "At a glance"},
-                {SKY_READING_PAGE, READING_PAGE}}) {
+                {SKY_PLACEMENTS_PAGE, PLACEMENTS_LABEL, OVERVIEW_PAGE},
+                {SKY_GLANCE_PAGE, "At a glance", LIFE_AREAS_PAGE},
+                {SKY_READING_PAGE, PLAIN_LABELS.get(READING_PAGE), "Synthesize"}}) {
             javax.swing.JEditorPane pane = HtmlPanes.chartPane(this);
             skyPanes.put(sky[0], pane);
             pages.addPageBefore(sky[0], astrologerPage(pane, "<html>Astrologer view: on, show"
                 + " the placements behind each reading.<br>Off: the plain reading only.</html>"),
-                MEET_PAGE);
+                sky[2]);
             pages.setPageLabel(sky[0], sky[1]);
         }
         for (String timed : TIMED_READINGS) {
@@ -1371,8 +1388,24 @@ public class OuraniaWindow extends JFrame {
                 : "<html><body>" + heading + list + "</body></html>");
             return;
         }
-        String body = SKY_GLANCE_PAGE.equals(page) ? TransitReadings.glance(people, sky, why)
-            : TransitReadings.interpretation(people, sky, why);
+        if (SKY_READING_PAGE.equals(page)) {
+            // <b>The Reading page's own structure, read from the sky over the chart (David,
+            // 2026-10-22):</b> "what is there right now could just move right over under
+            // transits reading". Under a heading that says which chart the sky is on.
+            String reading = interpretationPanel == null || people.isEmpty()
+                ? "<html><body>" + TransitReadings.nobody() + "</body></html>"
+                : interpretationPanel.capture(interpretationPanel::showTransitReading);
+            String heading = people.isEmpty() ? "" : SkyOnChart.sectionHeading(
+                SkyOnChart.heading(people.get(0).whose()));
+            java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("<body[^>]*>", java.util.regex.Pattern.CASE_INSENSITIVE)
+                .matcher(reading == null ? "" : reading);
+            HtmlPanes.setHtml(pane, reading != null && m.find()
+                ? reading.substring(0, m.end()) + heading + reading.substring(m.end())
+                : "<html><body>" + heading + "</body></html>");
+            return;
+        }
+        String body = TransitReadings.glance(people, sky, why);
         HtmlPanes.setHtml(pane, "<html><body style='font-family: sans-serif; font-size: 13px;"
             + " margin: 12px; color: #E0E0E0; background-color: #000000;'>" + body
             + "</body></html>");
@@ -2291,6 +2324,16 @@ public class OuraniaWindow extends JFrame {
 
     /** The full L9 report tier, from SkymapPanel's Report button. */
     public void showReport(String when, String where, String report) {
+        // <b>When the Full report tab asked, the report goes on that tab (2026-10-22)</b>, as At
+        // a glance's does. It went to the Reading page and moved the rail there, which on the
+        // Transits tab - where the Reading page is the tab's own - put it on a hidden page.
+        if (interpretationPanel != null && pendingReadingPage != null) {
+            String html = interpretationPanel.capture(
+                () -> interpretationPanel.showReport(when, where, report));
+            if (html != null && routeToReadingPage(html)) {
+                return;
+            }
+        }
         if (interpretationPanel != null) {
             interpretationPanel.showReport(when, where, report);
             // <b>Open the rail on the reading, not just fill it.</b> The same fix
