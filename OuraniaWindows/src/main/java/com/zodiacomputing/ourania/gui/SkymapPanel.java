@@ -4871,6 +4871,8 @@ implements WheelSource, GlobeSource {
         final WheelRing comingSky = this.nowRing();
         final WheelRing comingNatal = this.natalRing;
         final double[] comingCusps = this.activeCusps.clone();
+        // A birth chart's middle card is not "now" (David, 2026-10-22); the sky's is.
+        final boolean glanceSky = !this.innerIsBirthChart && !this.isRelationshipChart();
         new SwingWorker<String, Void>(){
 
             /** The headline theme to reveal, when the reader asked and the year has one. */
@@ -4980,7 +4982,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // The year's sentence was glued onto the last block; it is its own card now,
                 // because it answers a different question from the paragraph it was stuck to.
                 List<ReadingCard> cards = new ArrayList<>(
-                    PlainSnapshot.cards(chartFrame, result, list));
+                    PlainSnapshot.cards(chartFrame, result, list, !glanceSky));
                 if (bl) {
                     cards.add(new ReadingCard("THIS YEAR", null,
                         Snapshot.timeSentence(profection, list2), null));
