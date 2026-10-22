@@ -441,7 +441,7 @@ public class OuraniaWindow extends JFrame {
         Accessibility.name(skymapPanel, "Chart wheel",
             "The chart, drawn. Every position it shows is also listed in words on the "
             + "Placements page of the left rail.");
-        // The wheel goes in with the Selected drawer under it (SelectionDrawer).
+        // The wheel goes in with the Selected drawer on its left (SelectionDrawer).
         selectionDrawer = new SelectionDrawer(skymapPanel, HtmlPanes.scroller(selectionPane));
         contentPanel.add(selectionDrawer.withWheel(), "SKYMAP");
 
@@ -1690,14 +1690,14 @@ public class OuraniaWindow extends JFrame {
                 }
             }
         }
-        // <b>Under the wheel, and the rail is left as it was.</b> The reader keeps the page
+        // <b>Left of the wheel, and the rail is left as it was.</b> The reader keeps the page
         // they were reading; what they clicked opens beside it rather than in its place.
         if (selectionDrawer != null) {
             selectionDrawer.open();
         }
     }
 
-    /** Whether the Selected drawer is open under the wheel. */
+    /** Whether the Selected drawer is open beside the wheel. */
     boolean selectionShowing() {
         return selectionDrawer != null && selectionDrawer.isOpen();
     }
