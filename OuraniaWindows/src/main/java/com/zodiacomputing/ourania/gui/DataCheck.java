@@ -57,7 +57,8 @@ public final class DataCheck {
     private static boolean isPartsSection(String section) {
         // The Synthesize cards are parts too (2026-10-20): a headline, a body and a takeaway that
         // ThemeCards puts together, plain text with no bold lead of their own.
-        return "transit_card".equals(section) || "synthesize_card".equals(section);
+        return "transit_card".equals(section) || "synthesize_card".equals(section)
+            || "body_card".equals(section);
     }
 
     /** Sections whose values are the bold-summary placement format. */

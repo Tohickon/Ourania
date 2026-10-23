@@ -205,6 +205,9 @@ public class InterpretationService {
         // The Synthesize page's cards (2026-10-20): a headline, a body and a takeaway per theme
         // word and per tension. See ThemeCards. Its own file and section, like the line above.
         "synthesize_cards.json",
+        // The body and health readings (2026-10-22): David's sign, planet, health-house and
+        // aspect correspondences, as parts. See BodyReading. Its own file and section.
+        "body_cards.json",
         "aspect_prose_v2.json",
         "spirit_prose.json",
         "minor_aspect_prose.json",
@@ -794,6 +797,9 @@ public class InterpretationService {
     /** The parts the plain transit cards are built from, keyed kind.body[.aspect]. */
     private final Map<String, String> transitCardParts = new HashMap<>();
 
+    /** The body readings' parts, keyed sign.x, planet.x.part, house.n.part, sig.a_b.part. */
+    private final Map<String, String> bodyCardParts = new HashMap<>();
+
     /** The Synthesize cards' words, keyed theme.part or a_vs_b.part. */
     private final Map<String, String> synthesizeParts = new HashMap<>();
 
@@ -834,6 +840,7 @@ public class InterpretationService {
         if (line.startsWith("\"arc_picture\"")) return arcPictures;
         if (line.startsWith("\"transit_card\"")) return transitCardParts;
         if (line.startsWith("\"synthesize_card\"")) return synthesizeParts;
+        if (line.startsWith("\"body_card\"")) return bodyCardParts;
         return null;
     }
 
@@ -1322,6 +1329,11 @@ public class InterpretationService {
      */
     public String getTransitCardPart(String key) {
         return key == null ? null : transitCardParts.get(key);
+    }
+
+    /** A part of a body reading, or null: "sign.aries", "planet.mars.stress", "sig.mars_sun.title". */
+    public String getBodyPart(String key) {
+        return key == null ? null : bodyCardParts.get(key);
     }
 
     /** A part of a Synthesize card, or null: "watery.headline", "fiery_vs_watery.body". */

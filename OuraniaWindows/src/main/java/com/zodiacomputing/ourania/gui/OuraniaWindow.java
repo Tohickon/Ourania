@@ -1400,9 +1400,25 @@ public class OuraniaWindow extends JFrame {
             java.util.regex.Matcher m = java.util.regex.Pattern
                 .compile("<body[^>]*>", java.util.regex.Pattern.CASE_INSENSITIVE)
                 .matcher(reading == null ? "" : reading);
-            HtmlPanes.setHtml(pane, reading != null && m.find()
+            // <b>Then the Lots (David's model, 2026-10-22):</b> a planet on a natal Lot, the
+            // sky's Lot on a natal planet, and a planet on the ruler of the Lot's sign, for each
+            // chosen chart under its own heading. See LotTransits.
+            StringBuilder lots = new StringBuilder();
+            for (TransitReadings.Person p : people) {
+                java.util.List<ReadingCard> cards = LotTransits.cards(p.frame(), sky);
+                lots.append(SkyOnChart.sectionHeading("The Lots on "
+                    + SkyOnChart.chartHeading(p.whose())));
+                lots.append(cards.isEmpty()
+                    ? "<p style='color:#AAAAAA;'>Nothing in the sky is reaching a Lot in this"
+                        + " chart right now.</p>"
+                    : ReadingCard.html(cards, why));
+            }
+            String done = reading != null && m.find()
                 ? reading.substring(0, m.end()) + heading + reading.substring(m.end())
-                : "<html><body>" + heading + "</body></html>");
+                : "<html><body>" + heading + "</body></html>";
+            int close = done.toLowerCase(java.util.Locale.ROOT).lastIndexOf("</body>");
+            HtmlPanes.setHtml(pane, close < 0 ? done + lots
+                : done.substring(0, close) + lots + done.substring(close));
             return;
         }
         String body = TransitReadings.glance(people, sky, why);

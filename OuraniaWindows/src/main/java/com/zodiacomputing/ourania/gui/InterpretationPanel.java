@@ -4242,6 +4242,18 @@ public class InterpretationPanel extends JPanel {
                     + "Turn some on in the body settings.</div>");
         }
         
+        // <b>The body (David, 2026-10-22)</b>, at the end of every tab's Reading, in that tab's
+        // voice: the chart's own planets and houses; the sky's at its place; or on Transits the
+        // sky's planets in the person's houses and against the person's planets.
+        ReadingVoice voice = isTransit ? ReadingVoice.TRANSIT
+            : skymapPanel.skyAlone() ? ReadingVoice.SKY : ReadingVoice.PERSON;
+        com.zodiacomputing.ourania.astro.ChartFrame own = skymapPanel.radixChart();
+        if (isTransit) {
+            html.append(BodyReading.html(voice, skymapPanel.frameOf(skymapPanel.skySubject()),
+                skymapPanel.skyInChartHouses(), own, Settings.astrologerView()));
+        } else {
+            html.append(BodyReading.html(voice, own, own, null, Settings.astrologerView()));
+        }
         html.append("</body></html>");
         return html.toString();
     }
