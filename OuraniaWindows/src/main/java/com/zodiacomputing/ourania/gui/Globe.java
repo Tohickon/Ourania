@@ -590,6 +590,49 @@ public final class Globe {
     }
 
     /**
+     * Zooms about a point on the panel, so what is under the cursor stays under it
+     * (2026-10-22), as the flat wheel's zoom does.
+     *
+     * <b>Why.</b> David: the chart "zooms in at the lower part of the window and cuts half of it
+     * off". Zooming toward the middle of a tilted globe pushes its near edge, which perspective
+     * already draws larger, off the bottom of the window, and nothing brought it back. Zooming
+     * by a factor about the cursor moves a point at offset {@code o} from the middle to
+     * {@code o * f}; panning by {@code -(f - 1) * o} puts it back under the cursor. The pan is
+     * the camera's own (see {@link #pan}), so it glides in with the rest of the motion.
+     */
+    public void zoomAt(double x, double y, double ticks, int panelWidth, int panelHeight) {
+        double before = this.distance;
+        this.zoom(ticks);
+        double f = before / this.distance;
+        double ox = x - panelWidth / 2.0;
+        double oy = y - panelHeight / 2.0;
+        this.pan(-(f - 1.0) * ox, -(f - 1.0) * oy, panelWidth, panelHeight);
+    }
+
+    /** True when the camera is anywhere but straight down at the wheel, at rest or not. */
+    boolean awayFromTheWheel() {
+        return !this.atTheWheel();
+    }
+
+    /**
+     * Straight down, at the opening distance, over the centre, with nothing still gliding:
+     * the wheel. The way back from anywhere the globe has been turned, zoomed or moved to.
+     */
+    void reset() {
+        this.yaw = 0.0;
+        this.pitch = -MAX_PITCH;
+        this.distance = DEFAULT_DISTANCE;
+        this.targetX = 0.0;
+        this.targetY = 0.0;
+        this.targetZ = 0.0;
+        this.pendingYaw = 0.0;
+        this.pendingPitch = 0.0;
+        this.pendingPanX = 0.0;
+        this.pendingPanY = 0.0;
+        this.pendingPanZ = 0.0;
+    }
+
+    /**
      * World point to panel point.
      *
      * <b>Yaw then pitch then perspective, in that order.</b> Any other order tilts about an

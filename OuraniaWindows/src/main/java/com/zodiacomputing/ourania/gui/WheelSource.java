@@ -206,6 +206,9 @@ interface WheelSource {
 
     void paintFitChip(Graphics2D g2);
 
+    /** The globe's chip: how to move it and the way back to the wheel (2026-10-22). */
+    void paintGlobeChip(Graphics2D g2);
+
     void paintScrubTag(Graphics2D g2, int w);
 
     String hoverTextAt(int x, int y);

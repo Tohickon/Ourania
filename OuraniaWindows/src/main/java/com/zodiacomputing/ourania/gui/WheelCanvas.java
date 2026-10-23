@@ -162,6 +162,9 @@ final class WheelCanvas extends JPanel {
             panel.paintGlobe(graphics2D, this.getWidth(), this.getHeight());
             SkymapPanel.paintZodiacTag(graphics2D, this.getWidth(), this.getHeight());
             panel.paintScrubTag(graphics2D, this.getWidth());
+            if (this.getClientProperty(ChartExporter.EXPORTING) == null) {
+                panel.paintGlobeChip(graphics2D);
+            }
             return;
         }
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

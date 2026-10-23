@@ -2902,6 +2902,47 @@ implements WheelSource, GlobeSource {
         this.view.paintFitChip(g2);
     }
 
+    /** Where the globe's chip sits: the Fit chip's corner, wide enough for its words. */
+    static java.awt.Rectangle globeChipBounds() {
+        java.awt.Rectangle r = WheelView.fitChipBounds();
+        return new java.awt.Rectangle(r.x, r.y, 270, r.height);
+    }
+
+    /**
+     * The globe's chip (2026-10-22): how to move it, and the way back to the wheel.
+     *
+     * <b>The globe pans with the right button, and nothing said so.</b> David: "i cant move it
+     * beyond turning it to a globe and zooming in to where it cuts off". The flat wheel has its
+     * "Fit" chip; the globe had nothing, so a globe zoomed into a corner could only be undone
+     * by finding the exact distance it would rest back into the wheel at.
+     */
+    public void paintGlobeChip(Graphics2D g2) {
+        java.awt.Rectangle r = globeChipBounds();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(new Color(22, 28, 43, 225));
+        g2.fillRoundRect(r.x, r.y, r.width, r.height, 12, 12);
+        g2.setColor(new Color(56, 132, 190));
+        g2.drawRoundRect(r.x, r.y, r.width, r.height, 12, 12);
+        g2.setFont(Theme.font("Segoe UI", java.awt.Font.BOLD, 12));
+        g2.setColor(Color.WHITE);
+        String label = "Right-drag to move  \u00b7  Back to wheel";
+        java.awt.FontMetrics fm = g2.getFontMetrics();
+        g2.drawString(label, r.x + (r.width - fm.stringWidth(label)) / 2,
+            r.y + (r.height + fm.getAscent() - fm.getDescent()) / 2);
+    }
+
+    /** Lays the globe flat, fitted and centred: the wheel, from wherever the globe was. */
+    void backToTheWheel() {
+        this.globe.reset();
+        this.globeDragging = false;
+        this.globeTurned = false;
+        this.fitView();
+        this.setGlobeMode(false);
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+    }
+
     static final int GLOBE_NONE = 0;
     static final int GLOBE_HOUSE = 2;
     static final int GLOBE_DECAN = 3;
@@ -3711,6 +3752,12 @@ implements WheelSource, GlobeSource {
                     SkymapPanel.this.globeTurned = false;
                     return;
                 }
+                // The globe's chip: back to the flat wheel, fitted (2026-10-22).
+                if (SkymapPanel.this.globeMode
+                        && globeChipBounds().contains(mouseEvent.getPoint())) {
+                    SkymapPanel.this.backToTheWheel();
+                    return;
+                }
                 if (SkymapPanel.this.globeMode) {
                     SkymapPanel.this.handleChartClick(mouseEvent.getX(), mouseEvent.getY());
                     return;
@@ -3962,7 +4009,9 @@ implements WheelSource, GlobeSource {
                 SkymapPanel.this.chartPanel.repaint();
                 return;
             }
-            SkymapPanel.this.globe.zoom(e.getPreciseWheelRotation());
+            SkymapPanel.this.globe.zoomAt(e.getX(), e.getY(), e.getPreciseWheelRotation(),
+                SkymapPanel.this.chartPanel.getWidth(), SkymapPanel.this.chartPanel.getHeight());
+            SkymapPanel.this.startGlobeGlide();
             SkymapPanel.this.chartPanel.repaint();
         });
         // A chart is read by sweeping across it, so the default 750ms feels broken here.
