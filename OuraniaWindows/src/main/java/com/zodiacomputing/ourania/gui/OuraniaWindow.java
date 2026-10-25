@@ -1465,6 +1465,11 @@ public class OuraniaWindow extends JFrame {
 
     /** Every page drawn as plain cards, after Astrologer view changes. */
     void refreshPlainPages() {
+        // The Placements cards show more in Astrologer view, and that page is otherwise written
+        // only when the chart changes.
+        if (skymapPanel != null) {
+            skymapPanel.pushPlacementPages();
+        }
         refreshTransitsPane();
         refreshTogetherPanes();
         refreshSkyPages();

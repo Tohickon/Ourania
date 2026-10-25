@@ -8622,7 +8622,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     /** Writes every placements page to its accordion section. */
-    private void pushPlacementPages() {
+    void pushPlacementPages() {
         if (this.window != null) {
             // Three parts, three accordion sections. One document would mean the
             // sidebar could only show or hide all of it at once, which is what it did before.
@@ -8955,9 +8955,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // Recomputed here because this method already runs once per chart change; the
             // wheel's highlight is refreshed from the same call.
             this.refreshPatterns();
+            // Cards for a chart that belongs to someone (or to a pair); the sky alone keeps its
+            // rows until Phase 2B. The inner wheel is the sky exactly when it is not a birth chart.
             stringBuilder.append(PlacementsPage.natalSection(string, this.natalRing,
                 dateTimeFormatter, this.currentPatterns, this.activeCusps, this.innerLat(),
-                this.innerLon()));
+                this.innerLon(), this.innerIsBirthChart
+                    || this.chartMode == ChartMode.COMPOSITE_MIDPOINT
+                    || this.chartMode == ChartMode.COMPOSITE_DAVISON));
         }
         // <b>Which PAGE the outer ring belongs on is decided by what it is carrying.</b> A
         // second person goes on their own page and a moment goes on the Transits page; this
