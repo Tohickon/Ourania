@@ -53,6 +53,55 @@ final class PlacementCards {
     private PlacementCards() {
     }
 
+    /**
+     * Who the page speaks for (Phase 2B): what sentence sits under a card, and what a house
+     * stands for. A person reads the corpus's body-in-sign line and the parts of a life; the sky
+     * reads David's weather and the parts of a place's public life.
+     */
+    interface Voice {
+        /** The sentence under the card, or null when this voice has none for the body. */
+        String sentence(InterpretationService svc, String name, String sign, boolean astrologer);
+
+        /** What the house stands for in this voice, or null. */
+        String area(int house);
+    }
+
+    /** A person's chart: the corpus's sentence, and the parts of a life. */
+    static final Voice PERSON = new Voice() {
+        @Override
+        public String sentence(InterpretationService svc, String name, String sign,
+                               boolean astrologer) {
+            return sentenceFor(svc, name, sign, astrologer);
+        }
+
+        @Override
+        public String area(int house) {
+            return LifeAreas.of(house);
+        }
+    };
+
+    /**
+     * The sky alone (David, 2026-10-22): each planet's weather sentence, his own words, and what
+     * a house covers in the public life of a place. A point he wrote no weather for gets no
+     * sentence - it is named, not given a person's reading. As for a person, a sentence with a
+     * banned word is left out of plain view and shown in Astrologer view, never reworded.
+     */
+    static Voice sky(com.zodiacomputing.ourania.astro.ChartFrame frame) {
+        return new Voice() {
+            @Override
+            public String sentence(InterpretationService svc, String name, String sign,
+                                   boolean astrologer) {
+                String said = SkyWeather.weatherFor(frame, name);
+                return said != null && (astrologer || PlainWords.isPlain(said)) ? said : null;
+            }
+
+            @Override
+            public String area(int house) {
+                return SkyWeather.domain(house);
+            }
+        };
+    }
+
     /** The group a body is shown under. Any node, true or mean, is a social and evolutionary force. */
     static Group groupOf(int index) {
         Bodies.Def def = Bodies.at(index);
@@ -98,13 +147,19 @@ final class PlacementCards {
      */
     static String html(double[] lon, double[] speed, boolean[] valid, double[] cusps,
                        String prefix, boolean showWhy) {
+        return html(lon, speed, valid, cusps, prefix, showWhy, PERSON);
+    }
+
+    /** As above, in the voice of whoever the page is about. */
+    static String html(double[] lon, double[] speed, boolean[] valid, double[] cusps,
+                       String prefix, boolean showWhy, Voice voice) {
         StringBuilder sb = new StringBuilder();
         InterpretationService svc = InterpretationService.getInstance();
         for (Group g : Group.values()) {
             StringBuilder cards = new StringBuilder();
             for (int n = 0; n < valid.length && n < lon.length; n++) {
                 if (valid[n] && groupOf(n) == g) {
-                    cards.append(card(svc, n, lon[n], speed, cusps, prefix, showWhy));
+                    cards.append(card(svc, n, lon[n], speed, cusps, prefix, showWhy, voice));
                 }
             }
             if (cards.length() > 0) {
@@ -116,7 +171,7 @@ final class PlacementCards {
     }
 
     private static String card(InterpretationService svc, int n, double lon, double[] speed,
-                               double[] cusps, String prefix, boolean showWhy) {
+                               double[] cusps, String prefix, boolean showWhy, Voice voice) {
         Bodies.Def def = Bodies.at(n);
         String sign = Zodiac.signName(lon);
         double inSign = Zodiac.degreeInSign(lon);
@@ -124,10 +179,10 @@ final class PlacementCards {
         int min = (int) Math.floor((inSign - deg) * 60.0);
         boolean angle = def.isAngle();
         int house = angle || cusps == null ? 0 : Zodiac.houseOf(lon, cusps);
-        String area = house > 0 ? LifeAreas.of(house) : null;
+        String area = house > 0 ? voice.area(house) : null;
         boolean retrograde = speed != null && n < speed.length && speed[n] < 0.0
             && PlacementText.showsDirection(n);
-        String sentence = sentenceFor(svc, def.name, sign, showWhy);
+        String sentence = voice.sentence(svc, def.name, sign, showWhy);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<table width='100%' cellpadding='8' cellspacing='0' bgcolor='#1B2230' "

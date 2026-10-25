@@ -54,7 +54,88 @@ public final class PlacementCardsCheck {
 
         System.out.println("=== Part D: a second person's Placements are cards too ===");
         secondPerson();
+
+        System.out.println("=== Part E: the sky's own Placements, in David's voice ===");
+        skyAlone();
         report();
+    }
+
+    // ------------------------------------------------------------------ Part E
+
+    /**
+     * A fresh window holds the sky alone. Its Placements are the same cards, with David's weather
+     * sentence under each planet he wrote one for, and a house named for the public life of a
+     * place - never for a person's. A sentence with a banned word is left out, as for a person.
+     */
+    private static void skyAlone() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        OuraniaWindow w = hold[0];
+        boolean was = Settings.astrologerView();
+        try {
+            Settings.setAstrologerView(false);
+            SkymapPanel sky = (SkymapPanel) CheckReflect.get(w, "skymapPanel");
+            long end = System.nanoTime() + 20_000_000_000L;
+            while (sky.radixChart() == null && System.nanoTime() < end) {
+                Thread.sleep(50);
+            }
+            yes("a fresh window holds the sky alone", sky.skyAlone());
+            SwingUtilities.invokeAndWait(w::refreshPlainPages);
+            JEditorPane pane = w.paneOf(OuraniaWindow.CHART_PAGE);
+            yes("the Placements page has a pane", pane != null);
+            if (pane == null) {
+                return;
+            }
+            String text = text(pane).replaceAll("\\s+", " ");
+            yes("the sky's Placements are in groups",
+                text.contains("Personal drivers") && text.contains("Social and evolutionary"));
+
+            int expected = 0;
+            for (boolean v : sky.natalRing.valid) {
+                expected += v ? 1 : 0;
+            }
+            javax.swing.text.html.HTMLDocument doc =
+                (javax.swing.text.html.HTMLDocument) pane.getDocument();
+            javax.swing.text.html.HTMLDocument.Iterator it =
+                doc.getIterator(javax.swing.text.html.HTML.Tag.A);
+            int named = 0;
+            while (it.isValid()) {
+                Object name = it.getAttributes().getAttribute(
+                    javax.swing.text.html.HTML.Attribute.NAME);
+                if (name != null && String.valueOf(name).startsWith("base_")) {
+                    named++;
+                }
+                it.next();
+            }
+            yes("every body the sky shows is a card (" + named + " of " + expected + ")",
+                expected > 10 && named == expected);
+
+            ChartFrame f = sky.getCurrentChart();
+            int sentences = 0;
+            for (String body : SkyWeather.BODIES) {
+                String said = SkyWeather.weatherFor(f, body);
+                if (said == null) {
+                    continue;
+                }
+                sentences++;
+                String norm = said.replaceAll("\\s+", " ").trim();
+                yes(body + ": David's sentence is on the page exactly when it is plain",
+                    text.contains(norm) == PlainWords.isPlain(said));
+            }
+            yes("David wrote weather for some of the sky's planets (" + sentences + ")",
+                sentences > 3);
+
+            boolean publicLife = false;
+            for (int h = 1; h <= 12; h++) {
+                publicLife |= text.contains("Shows up in: " + SkyWeather.domain(h));
+                yes("a person's part of life is never on the sky's page: house " + h,
+                    !text.contains(LifeAreas.of(h)));
+            }
+            yes("the public life of a place is named", publicLife);
+        } finally {
+            Settings.setAstrologerView(was);
+            SwingUtilities.invokeAndWait(w::dispose);
+        }
     }
 
     // ------------------------------------------------------------------ Part D

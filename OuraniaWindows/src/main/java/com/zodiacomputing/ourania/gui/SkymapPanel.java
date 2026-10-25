@@ -8955,13 +8955,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // Recomputed here because this method already runs once per chart change; the
             // wheel's highlight is refreshed from the same call.
             this.refreshPatterns();
-            // Cards for a chart that belongs to someone (or to a pair); the sky alone keeps its
-            // rows until Phase 2B. The inner wheel is the sky exactly when it is not a birth chart.
+            // Cards in every case (Phase 2B). A chart that belongs to someone, or to a pair, reads
+            // in a person's voice; the inner wheel is the sky exactly when it is not a birth chart,
+            // and then David's weather sentences and the public-life houses speak. Only if there
+            // is no chart frame to read does the page fall back to its rows.
+            boolean ofPerson = this.innerIsBirthChart
+                || this.chartMode == ChartMode.COMPOSITE_MIDPOINT
+                || this.chartMode == ChartMode.COMPOSITE_DAVISON;
+            PlacementCards.Voice voice = ofPerson ? PlacementCards.PERSON
+                : this.getCurrentChart() == null ? null
+                : PlacementCards.sky(this.getCurrentChart());
             stringBuilder.append(PlacementsPage.natalSection(string, this.natalRing,
                 dateTimeFormatter, this.currentPatterns, this.activeCusps, this.innerLat(),
-                this.innerLon(), this.innerIsBirthChart
-                    || this.chartMode == ChartMode.COMPOSITE_MIDPOINT
-                    || this.chartMode == ChartMode.COMPOSITE_DAVISON));
+                this.innerLon(), voice));
         }
         // <b>Which PAGE the outer ring belongs on is decided by what it is carrying.</b> A
         // second person goes on their own page and a moment goes on the Transits page; this

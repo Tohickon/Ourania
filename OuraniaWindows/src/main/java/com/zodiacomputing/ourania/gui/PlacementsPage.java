@@ -55,7 +55,7 @@ final class PlacementsPage {
      */
     static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
             List<AspectPatterns.Pattern> patterns, double[] cusps, double lat, double lon) {
-        return natalSection(title, ring, when, patterns, cusps, lat, lon, false);
+        return natalSection(title, ring, when, patterns, cusps, lat, lon, null);
     }
 
     /**
@@ -68,8 +68,8 @@ final class PlacementsPage {
      */
     static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
             List<AspectPatterns.Pattern> patterns, double[] cusps, double lat, double lon,
-            boolean cards) {
-        if (cards) {
+            PlacementCards.Voice voice) {
+        if (voice != null) {
             StringBuilder sb = new StringBuilder();
             sb.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(title)
               .append("</h2>");
@@ -81,7 +81,7 @@ final class PlacementsPage {
                 + "style='color:#7FB3FF; font-size:11px; text-decoration:none;'>"
                 + "&#9776; Index &middot; browse everything the app knows</a></div>");
             sb.append(PlacementCards.html(ring.lon, ring.speed, ring.valid, cusps,
-                SkymapPanel.BASE_PREFIX, Settings.astrologerView()));
+                SkymapPanel.BASE_PREFIX, Settings.astrologerView(), voice));
             return sb.toString();
         }
         StringBuilder stringBuilder = new StringBuilder();
