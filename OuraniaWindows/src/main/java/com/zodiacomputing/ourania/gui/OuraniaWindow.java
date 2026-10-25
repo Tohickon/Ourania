@@ -1037,6 +1037,66 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForPlanet(String planetName, String signName, int degree, int decanNum, int houseNum, java.util.List<String[]> activeAspects, double lon) {
         if (interpretationPanel != null) {
             selectReading(() -> interpretationPanel.showPlanetInterpretation(planetName, signName, degree, decanNum, houseNum, activeAspects, lon));
+            int body = java.util.Arrays.asList(SkymapPanel.BODY_NAMES).indexOf(planetName);
+            followClick(currentChartTab() == ChartTab.TRANSITS ? SKY_PLACEMENTS_PAGE : CHART_PAGE,
+                body < 0 ? null : "base_" + body, null);
+        }
+    }
+
+    /** The chart tab in front, or null before the rail exists. */
+    private ChartTab currentChartTab() {
+        return chartRail == null ? null : ChartTab.ofDoor(chartRail.selected());
+    }
+
+    /**
+     * The drawer answers a click on the wheel (reading framework spec, section 4): a planet
+     * brings up its entry on the Placements tab, a house its part of life, an aspect the Patterns.
+     *
+     * <b>Only a drawer that is already open, and only to another page.</b> The Selected drawer
+     * under the wheel still opens on every click, as David asked on 2026-10-20 ("a click opens
+     * Selected at once"); this adds to it and never opens the left rail on its own, which would
+     * take width from the wheel the reader is clicking. A click on a link inside the page in
+     * front is not a click on the wheel's answer, so a page that is already in front is left
+     * where the reader put it - the scroll would move the list under their cursor.
+     *
+     * @param anchor the name of a link on the page to scroll to, or null
+     * @param text   text to find and scroll to when there is no anchor, or null
+     */
+    private void followClick(String page, String anchor, String text) {
+        if (chartRail == null || !chartRail.isOpen() || pages == null
+                || !pages.isPageShown(page) || !pages.isPageEnabled(page)
+                || page.equals(currentPage())) {
+            return;
+        }
+        revealPage(page);
+        // A reveal does not rebuild, and some pages are written on open.
+        rebuildPage(page, false);
+        JEditorPane pane = paneOf(page);
+        if (pane == null || (anchor == null && text == null)) {
+            return;
+        }
+        SwingUtilities.invokeLater(() -> {
+            if (anchor != null) {
+                pane.scrollToReference(anchor);
+            } else {
+                scrollToText(pane, text);
+            }
+        });
+    }
+
+    /** Scroll a pane so the first place its text says {@code text} is at the top. */
+    static void scrollToText(JEditorPane pane, String text) {
+        try {
+            javax.swing.text.Document doc = pane.getDocument();
+            int at = doc.getText(0, doc.getLength()).indexOf(text);
+            if (at < 0) {
+                return;
+            }
+            java.awt.Rectangle r = pane.modelToView2D(at).getBounds();
+            pane.scrollRectToVisible(new java.awt.Rectangle(r.x, r.y, 1,
+                Math.max(r.height, pane.getVisibleRect().height)));
+        } catch (javax.swing.text.BadLocationException e) {
+            // no such place; the reader keeps their position
         }
     }
 
@@ -2735,12 +2795,18 @@ public class OuraniaWindow extends JFrame {
     public void showInterpretationForHouse(int houseNum) {
         if (interpretationPanel != null) {
             selectReading(() -> interpretationPanel.showHouseInterpretation(houseNum));
+            // A house is a question about a part of life, so it opens the page of the parts of
+            // life, at the domain that house belongs to.
+            LifeAreaMapper.Domain d = LifeAreaMapper.of(houseNum);
+            followClick(LIFE_AREAS_PAGE, null, d == null ? null : d.label);
         }
     }
 
     public void showInterpretationForAspect(String planet1, String planet2, String aspectType) {
         if (interpretationPanel != null) {
             selectReading(() -> interpretationPanel.showAspectInterpretation(planet1, planet2, aspectType));
+            // An aspect line is a pattern in the making: the Patterns tab is where its figure is.
+            followClick(OVERVIEW_PAGE, null, null);
         }
     }
 

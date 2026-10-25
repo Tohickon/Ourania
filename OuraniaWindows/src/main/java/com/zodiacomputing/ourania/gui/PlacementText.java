@@ -192,7 +192,11 @@ final class PlacementText {
         // tarot. Triplicity rules the decan prose; the Chaldean face rules the Golden Dawn
         // cards and the Sabian decan_ruler field. Zodiac's header carries the full note.
         String decanLine = decanRulers(d);
-        return String.format("<div style='margin-bottom:4px;'><a href='%s%d' style='color:#cccccc; text-decoration:none; font-family:SansSerif; font-size:14px;'><span style='font-size:16px;'>%s</span> %d&deg; %02d'%s <span style='color:%s; font-size:16px;'>%s</span> House %s</a>%s</div>", string, n, SkymapPanel.BODY_GLYPHS[n], n3, n4, string2, string3, SkymapPanel.ZODIAC_SYMBOLS[n2], romanNumeral(n5), decanLine);
+        // <b>The link carries its own name,</b> so a click on the wheel can scroll the drawer to
+        // this planet's entry (reading framework spec, section 4). On the link that is already
+        // here and not on a second, empty one: Swing's anchor search needs an anchor with
+        // content, and a name-only anchor would change how the entry is painted.
+        return String.format("<div style='margin-bottom:4px;'><a name='%s%d' href='%s%d' style='color:#cccccc; text-decoration:none; font-family:SansSerif; font-size:14px;'><span style='font-size:16px;'>%s</span> %d&deg; %02d'%s <span style='color:%s; font-size:16px;'>%s</span> House %s</a>%s</div>", string, n, string, n, SkymapPanel.BODY_GLYPHS[n], n3, n4, string2, string3, SkymapPanel.ZODIAC_SYMBOLS[n2], romanNumeral(n5), decanLine);
     }
 
     /**
