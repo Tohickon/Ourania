@@ -55,6 +55,35 @@ final class PlacementsPage {
      */
     static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
             List<AspectPatterns.Pattern> patterns, double[] cusps, double lat, double lon) {
+        return natalSection(title, ring, when, patterns, cusps, lat, lon, false);
+    }
+
+    /**
+     * As above, as cards (reading framework spec, Phase 2A) when {@code cards} is true: a
+     * person's chart, or a composite, read as Personal drivers, Social and evolutionary forces
+     * and Angles. The sky keeps its rows for Phase 2B.
+     *
+     * <b>The pattern banner is not on this page in card mode.</b> The figures are the Patterns
+     * tab's now, and two tabs listing the same figures is the duplication the spec set out to end.
+     */
+    static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
+            List<AspectPatterns.Pattern> patterns, double[] cusps, double lat, double lon,
+            boolean cards) {
+        if (cards) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(title)
+              .append("</h2>");
+            String at = ring.time != null ? ring.time.format(when) : "";
+            sb.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>")
+              .append(at).append("<br>").append(String.format("%.2f, %.2f", lat, lon))
+              .append("</div>");
+            sb.append("<div style='margin-bottom:6px;'><a href='index' "
+                + "style='color:#7FB3FF; font-size:11px; text-decoration:none;'>"
+                + "&#9776; Index &middot; browse everything the app knows</a></div>");
+            sb.append(PlacementCards.html(ring.lon, ring.speed, ring.valid, cusps,
+                SkymapPanel.BASE_PREFIX, Settings.astrologerView()));
+            return sb.toString();
+        }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(title).append("</h2>");
         String string2 = ring.time != null ? ring.time.format(when) : "";

@@ -77,10 +77,23 @@ final class GlanceBlocks {
         return out;
     }
 
-    /** The day-or-night line, for a person's chart only. */
+    /** The colours of the two badges: warm for a day chart, cool for a night chart. */
+    static final String DAY_BADGE = "#E0A93B";
+    static final String NIGHT_BADGE = "#5B7DB8";
+
+    /**
+     * The day-or-night badge and its sentence, for a person's chart only (Phase 2A: a badge, as
+     * the spec says, and not a bold word in a paragraph).
+     *
+     * <b>A table cell, because the pane is HTML 3.2.</b> It has no rounded corners and no
+     * padding rule, but a coloured cell with cell padding is a badge it can draw.
+     */
     static String sectHtml(Gestalt.Result g) {
-        return "<div style='font-size:13px; margin:2px 0 12px 0;'><b>"
-            + esc(OverviewPanel.subtitleOfSect(g.diurnal)) + ".</b> "
+        return "<table cellspacing='0' cellpadding='4' style='margin:2px 0 4px 0;'><tr>"
+            + "<td bgcolor='" + (g.diurnal ? DAY_BADGE : NIGHT_BADGE)
+            + "'><b><font color='#10151F' size='2'>" + (g.diurnal ? "☀ " : "☽ ")
+            + esc(OverviewPanel.subtitleOfSect(g.diurnal)) + "</font></b></td></tr></table>"
+            + "<div style='font-size:13px; margin:2px 0 12px 0;'>"
             + esc(OverviewPanel.sectSentence(g, ReadingVoice.PERSON)) + "</div>";
     }
 

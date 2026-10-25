@@ -313,6 +313,9 @@ public final class PlainSnapshot {
             return null;
         }
         String sign = Zodiac.signName(b.lon);
+        if (!withHouse) {
+            return signSentence(svc, name, sign);
+        }
         // An angle is read from the angle readings, as the Reading page does; the paragraphs
         // never name one, so this changes nothing for them. The glance's Ascendant card needs it.
         Line signLine = plain(ANGLES.contains(name)
@@ -368,6 +371,22 @@ public final class PlainSnapshot {
     };
 
     /** What it means when several placements land in one element. */
+    /**
+     * "Sun in Libra means ..." for a body in a sign, or null when the corpus has no line for it
+     * (Phase 2A). The sentence the Placements cards and the glance's three cards share; it needs
+     * no chart, only the name and the sign, so a card can be built from a ring's bare numbers.
+     */
+    static String signSentence(InterpretationService svc, String name, String sign) {
+        Line signLine = plain(ANGLES.contains(name)
+            ? svc.getAngleInterpretation(name, sign) : svc.getPlanetInSign(name, sign));
+        if (signLine == null) {
+            return null;
+        }
+        String text = signLine.whole ? signLine.text
+            : name + " in " + capitalise(sign) + " means " + signLine.text;
+        return text + ".";
+    }
+
     private static final Map<String, String> ELEMENT_TOGETHER = new LinkedHashMap<>();
     static {
         ELEMENT_TOGETHER.put("fire",

@@ -187,6 +187,12 @@ public final class GlanceBlocksCheck {
         yes("plain view has no degree sign" + at, !plain.contains("°"));
         yes("a person's page says day or night" + at,
             plain.contains("Born in daylight") || plain.contains("Born at night"));
+        // Phase 2A: a badge, in the colour of the chart's own sect, and only one.
+        yes("the badge is the day colour exactly when it is a day chart" + at,
+            plain.contains("bgcolor='" + GlanceBlocks.DAY_BADGE + "'") == g.diurnal);
+        yes("and the night colour exactly when it is not" + at,
+            plain.contains("bgcolor='" + GlanceBlocks.NIGHT_BADGE + "'") == !g.diurnal);
+        yes("the badge carries its glyph" + at, plain.contains(g.diurnal ? "☀" : "☽"));
         String composite = GlanceBlocks.prefix(f, g, true, false);
         yes("a composite does not claim anyone was born" + at,
             !composite.contains("Born in daylight") && !composite.contains("Born at night"));
