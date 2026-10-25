@@ -7338,18 +7338,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 java.util.List<com.zodiacomputing.ourania.astro.AspectPatterns.Pattern> found =
                     com.zodiacomputing.ourania.astro.AspectPatterns.findPatterns(hits,
                         SkymapPanel::untag);
-                // <b>Only the figures that join Chart A to another chart, and only the tightest
-                // few.</b> Three charts of seventeen bodies make dozens of figures - 46 on the
-                // first chart measured, sixteen of them Grand crosses - and a sheet for each is
-                // a wall of glass. A figure with no natal body is the other charts' own; a
-                // figure of natal bodies only is Chart A's, already drawn. Of the rest, the
-                // CROSS_FIGURES tightest by their widest orb.
+                // <b>Every figure that joins Chart A to another chart.</b> A figure with no
+                // natal body is the other charts' own; a figure of natal bodies only is Chart
+                // A's, already drawn. These were capped at the 4 tightest, because three charts
+                // can make dozens (46 on the first chart measured); David, 2026-10-25: "yeah do
+                // all of the figures". Tightest first, so the list on the Transits page reads
+                // from the strongest down.
                 found.removeIf(p -> p.bodies.stream().allMatch(n -> untag(n).equals(n))
                     || p.bodies.stream().noneMatch(n -> untag(n).equals(n)));
                 found.sort(java.util.Comparator.comparingDouble(p -> p.widestOrb));
-                if (found.size() > CROSS_FIGURES) {
-                    found = new java.util.ArrayList<>(found.subList(0, CROSS_FIGURES));
-                }
                 for (com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p : found) {
                     int[] m = new int[p.bodies.size()];
                     for (int k = 0; k < m.length; k++) {
@@ -7371,9 +7368,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     static String untag(String name) {
         return name.startsWith(OUTER_TAG) || name.startsWith(SKY_TAG) ? name.substring(2) : name;
     }
-
-    /** How many figures between charts get a glass plane: the tightest few. */
-    static final int CROSS_FIGURES = 4;
 
     int[][] crossFigures = new int[0][];
     String[] crossFigureNames = new String[0];
