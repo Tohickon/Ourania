@@ -51,6 +51,8 @@ final class OverviewPanel extends JPanel {
     private final OuraniaWindow window;
     /** The tab's voice, set each time the cards are built. */
     private ReadingVoice voice = ReadingVoice.PERSON;
+    /** The chart's mix and figures as of the last build of {@link #cards()}; see html(). */
+    private Gestalt.Result lastGestalt;
     private final JEditorPane pane;
 
     /** Which cards the reader has opened. Empty is the page's resting state. */
@@ -145,6 +147,7 @@ final class OverviewPanel extends JPanel {
             return cards;
         }
         Gestalt.Result g = Gestalt.compute(f);
+        this.lastGestalt = g;
         List<BodyScore.Vector> ranked = BodyScore.rank(f, g);
 
         cards.add(sectCard(g));
@@ -376,9 +379,13 @@ final class OverviewPanel extends JPanel {
                 + "what kind of chart it is.</p></body></html>");
             return sb.toString();
         }
-        sb.append("<h2>Chart shape</h2>").append(voice == ReadingVoice.TRANSIT
+        // The Patterns tab (reading framework spec, 2026-10-24): the chart's shape first, then
+        // the figures its planets make. The word "Chart shape" stays on the heading over the
+        // shape cards, where the page has always said it.
+        sb.append("<h2>Patterns</h2>").append(voice == ReadingVoice.TRANSIT
             ? SkyOnChart.sectionHeading(SkyOnChart.heading(skymap.whoseLabel()))
             : WhoseChart.html(skymap));
+        sb.append("<h3 style='color:#FFD166; margin-top:6px; margin-bottom:4px;'>Chart shape</h3>");
         for (Card c : cards) {
             // In Astrologer view every card starts open, and a click closes it instead.
             boolean open = expanded.contains(c.id) != Settings.astrologerView();
@@ -395,6 +402,7 @@ final class OverviewPanel extends JPanel {
                 sb.append("</ul>");
             }
         }
+        sb.append(PatternCards.html(lastGestalt, Settings.astrologerView()));
         sb.append("</body></html>");
         return sb.toString();
     }

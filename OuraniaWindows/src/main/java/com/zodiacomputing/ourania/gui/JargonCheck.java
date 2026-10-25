@@ -29,22 +29,11 @@ public final class JargonCheck {
     private static final List<String> failures = new ArrayList<>();
     private static int checks = 0;
 
-    /** David's list. Whole words, any case; the patterns take the plural and other endings. */
-    static final String[] BANNED = {
-        // Astrological mechanics
-        "profections?", "lords? of the year", "time-?lords?", "dispositors?", "sect", "diurnal",
-        "houses?", "cusps?", "decans?", "chaldean faces?", "sabian symbols?", "sabian", "septiles?",
-        // Aspect and transit words
-        "conjunctions?", "conjunct", "squares?", "trines?", "sextiles?", "oppositions?",
-        "inconjuncts?", "orbs?", "applying", "separating", "transit\\w*", "progress(ed|ion\\w*)",
-        "solar arcs?", "solar returns?", "translation of light", "collection of light",
-        // Mystical jargon
-        "karmic", "alchemical", "sacred catalysts?", "vibrational frequenc(y|ies)", "cosmic web",
-        "akashic", "destiny"
-    };
-
-    private static final Pattern WORDS = Pattern.compile(
-        "(?i)\\b(" + String.join("|", BANNED) + ")\\b");
+    /**
+     * David's list, kept in {@link PlainWords} since 2026-10-24: a page now chooses its
+     * sentences by it, and production code cannot depend on a test.
+     */
+    static final String[] BANNED = PlainWords.BANNED;
 
     public static void main(String[] args) throws Exception {
         Settings.useScratchFile();
@@ -67,15 +56,7 @@ public final class JargonCheck {
 
     /** The banned words in a piece of plain text, each once, in the order they appear. */
     static Set<String> banned(String text) {
-        Set<String> out = new LinkedHashSet<>();
-        if (text == null) {
-            return out;
-        }
-        Matcher m = WORDS.matcher(text);
-        while (m.find()) {
-            out.add(m.group(1).toLowerCase(java.util.Locale.ROOT));
-        }
-        return out;
+        return PlainWords.banned(text);
     }
 
     private static void clean(String where, String text) {
