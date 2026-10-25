@@ -48,6 +48,8 @@ public class OuraniaWindow extends JFrame {
     private ModeBadge modeBadge;
     /** The badge over the strip. This, not the strip, is what each chart tab holds. */
     private JPanel readingColumn;
+    /** Copy Markdown, Export HTML, Print / PDF - under the Full report group only. */
+    private ExportBar exportBar;
     /** Each chart tab's body, which holds the strip while that tab is in front. */
     private final java.util.Map<String, JPanel> chartHolders = new java.util.LinkedHashMap<>();
     private LifeAreasPanel lifeAreasPanel;
@@ -475,6 +477,13 @@ public class OuraniaWindow extends JFrame {
         readingColumn.setBackground(Theme.BG);
         readingColumn.add(modeBadge, BorderLayout.NORTH);
         readingColumn.add(pages, BorderLayout.CENTER);
+        // The same three controls on the Full report group in every mode (reading framework
+        // spec, section 7). They act on the view in front, so they are shown by the group.
+        exportBar = new ExportBar(this::copyReadingMarkdown, this::exportReadingHtml,
+            this::printOrSaveReading);
+        exportBar.setVisible(false);
+        readingColumn.add(exportBar, BorderLayout.SOUTH);
+        pages.setOnChange(this::updateExportBar);
         pages.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
         pages.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
         // <b>The pair's pages are built here, before the wheel</b>, whose constructor already
@@ -2215,34 +2224,145 @@ public class OuraniaWindow extends JFrame {
         }
     }
 
-    /** B6. The reading on screen, as markup. */
+    /**
+     * The text page the reader is looking at, or null when the page in front is a picture.
+     *
+     * <b>Export used to read the Reading panel's own pane whatever was in front</b> (reading
+     * framework spec, section 7): the Dossier, the Themes, the Year and Coming up could not be
+     * exported, and the Reading could be exported from any of them. The page asked is the one
+     * {@link #currentPage()} names, and only a component that is itself showing in its card
+     * stack counts - the Calendar holds a month grid and a year list, and only one is in front.
+     */
+    JEditorPane frontPane() {
+        String page = currentPage();
+        if (page == null) {
+            return null;
+        }
+        if (READING_PAGE.equals(page) && interpretationPanel != null) {
+            return interpretationPanel.getEditorPane();
+        }
+        return paneIn(pageComponent(page), true);
+    }
+
+    /** A page's text pane whatever is showing, for the suites; null for a page with none. */
+    JEditorPane paneOf(String page) {
+        if (READING_PAGE.equals(page) && interpretationPanel != null) {
+            return interpretationPanel.getEditorPane();
+        }
+        return paneIn(pageComponent(page), false);
+    }
+
+    private static JEditorPane paneIn(java.awt.Component c, boolean visibleOnly) {
+        if (c == null || (visibleOnly && !c.isVisible())) {
+            return null;
+        }
+        if (c instanceof JEditorPane) {
+            return (JEditorPane) c;
+        }
+        // The month grid is a picture. It carries a small pane for the selected day's note, and
+        // exporting that would save one day while the reader is looking at a month.
+        if (c instanceof TransitCalendarPanel) {
+            return null;
+        }
+        if (c instanceof java.awt.Container) {
+            for (java.awt.Component k : ((java.awt.Container) c).getComponents()) {
+                JEditorPane found = paneIn(k, visibleOnly);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Said when the page in front is the month grid, which has no text to copy or save. */
+    private void noText() {
+        JOptionPane.showMessageDialog(this, "This view is a picture of the month, not text. "
+            + "Open The year's sky for text you can copy or save.", "Ourania",
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /** Show the export bar exactly while the Full report group is in front. */
+    private void updateExportBar() {
+        if (exportBar != null && pages != null) {
+            exportBar.setVisible(REPORT_TAB.equals(pages.selectedGroup()));
+        }
+    }
+
+    /** The export bar, for the suites. */
+    ExportBar exportBar() {
+        return exportBar;
+    }
+
+    /** B6. The page in front, as markup. */
     public void exportReadingHtml() {
-        if (interpretationPanel != null) {
-            ChartExporter.saveText(this, interpretationPanel.currentHtml(),
-                "ourania-reading.html", "HTML document", "html");
+        JEditorPane pane = frontPane();
+        if (pane == null) {
+            noText();
+            return;
         }
+        ChartExporter.saveText(this, pane.getText(),
+            "ourania-reading.html", "HTML document", "html");
     }
 
-    /** B6. The reading on screen, as plain text. */
+    /** B6. The page in front, as plain text. */
     public void exportReadingText() {
-        if (interpretationPanel != null) {
-            ChartExporter.saveText(this,
-                ChartExporter.toPlainText(interpretationPanel.currentHtml()),
-                "ourania-reading.txt", "Text file", "txt");
+        JEditorPane pane = frontPane();
+        if (pane == null) {
+            noText();
+            return;
         }
+        ChartExporter.saveText(this, ChartExporter.toPlainText(pane.getText()),
+            "ourania-reading.txt", "Text file", "txt");
     }
 
-    /** B4. The reading on screen, to the clipboard as plain text. */
+    /** B4. The page in front, to the clipboard as plain text. */
     public void copyReading() {
-        if (interpretationPanel != null) {
-            ChartExporter.copyText(
-                ChartExporter.toPlainText(interpretationPanel.currentHtml()));
+        JEditorPane pane = frontPane();
+        if (pane == null) {
+            noText();
+            return;
+        }
+        ChartExporter.copyText(ChartExporter.toPlainText(pane.getText()));
+    }
+
+    /** The page in front, to the clipboard as Markdown (the Full report's first button). */
+    public void copyReadingMarkdown() {
+        JEditorPane pane = frontPane();
+        if (pane == null) {
+            noText();
+            return;
+        }
+        ChartExporter.copyText(ChartExporter.toMarkdown(pane.getText()));
+    }
+
+    /**
+     * The Full report's third button: save the page as a PDF with the wheel, or print it.
+     * The month grid is a picture, so it can only be printed, and is printed as it looks.
+     */
+    public void printOrSaveReading() {
+        if (frontPane() == null) {
+            if (calendarMonth != null && "Calendar".equals(currentPage())) {
+                ChartExporter.printChart(this, calendarMonth);
+            } else {
+                noText();
+            }
+            return;
+        }
+        Object[] options = {"Save as PDF", "Print", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(this, "What would you like to do with this page?",
+            "Print / PDF", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
+            options[0]);
+        if (choice == 0) {
+            exportReadingPdf();
+        } else if (choice == 1) {
+            printReading();
         }
     }
 
-    /** B3. The reading on screen with the chart wheel, as a PDF document. */
+    /** B3. The page in front with the chart wheel, as a PDF document. */
     public void exportReadingPdf() {
-        if (interpretationPanel != null && skymapPanel != null) {
+        if (frontPane() != null && skymapPanel != null) {
             // <b>Asked of the subject, which is the one thing that knows.</b> label is what
             // the reader called this chart and summary() is the line a control uses to say what
             // it will draw - writing either out again here would be a second copy of a rule this
@@ -2253,16 +2373,16 @@ public class OuraniaWindow extends JFrame {
                 who = skymapPanel.chartASubject();
             }
             ChartExporter.saveReadingPdf(this, skymapPanel.chartComponent(),
-                interpretationPanel.getEditorPane(),
+                frontPane(),
                 who == null ? "" : who.label,
                 who == null ? "" : who.summary());
         }
     }
 
-    /** B3, on paper. Print the reading on screen with the chart wheel. */
+    /** B3, on paper. Print the page in front with the chart wheel. */
     public void printReading() {
-        if (interpretationPanel != null && skymapPanel != null) {
-            ChartExporter.printReading(this, skymapPanel.chartComponent(), interpretationPanel.getEditorPane());
+        if (frontPane() != null && skymapPanel != null) {
+            ChartExporter.printReading(this, skymapPanel.chartComponent(), frontPane());
         }
     }
 

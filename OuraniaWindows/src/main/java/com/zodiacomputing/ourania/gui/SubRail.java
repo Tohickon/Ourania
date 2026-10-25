@@ -55,6 +55,8 @@ final class SubRail extends JPanel {
     private final List<String> order = new ArrayList<>();
     private String selected;
     private Consumer<String> onSelect;
+    /** Told whenever the strip is redrawn, so the window can follow the front group. */
+    private Runnable onChange;
 
     /**
      * Group label to its pages, in the order the group lists them; null for a flat strip.
@@ -436,6 +438,18 @@ final class SubRail extends JPanel {
         this.pageRow.setVisible(this.pageRow.getComponentCount() > 0);
         this.strip.revalidate();
         this.strip.repaint();
+        if (this.onChange != null) {
+            this.onChange.run();
+        }
+    }
+
+    /**
+     * Run something after every redraw of the strip: a page came to the front, or was shown,
+     * hidden, greyed or renamed. For a control that depends on the group in front (the export
+     * bar on Full report) and cannot be told by a click alone, because a reveal does not click.
+     */
+    void setOnChange(Runnable listener) {
+        this.onChange = listener;
     }
 
     String selected() {
