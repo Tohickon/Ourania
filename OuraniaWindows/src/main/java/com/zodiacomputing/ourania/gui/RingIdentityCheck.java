@@ -282,8 +282,10 @@ public final class RingIdentityCheck {
         String bPage = (String) gen.invoke(sp, chartB);
         String tPage = (String) gen.invoke(sp, transits);
 
+        // Since Phase 2B (2026-10-25) the second person's placements are cards in groups, not a
+        // "Placements" list; the planet this fixture places is the Sun, a personal driver.
         ok("a synastry's Chart B page carries their placements",
-            bPage.contains("Placements"));
+            bPage.contains("Personal drivers") && bPage.contains("name='transit_0'"));
         ok("headed by the ring's own name", bPage.contains(WheelRing.Kind.CHART_B.heading));
         // THE SPLIT. Their placements were emitted onto the Transits page whatever the outer
         // ring was carrying, and the tab was renamed to cover for it.
@@ -292,10 +294,20 @@ public final class RingIdentityCheck {
         ok("so the Transits page is empty enough to be greyed out",
             !OuraniaWindow.hasContent(tPage));
 
-        // Whose houses. "House VII" is Chart B's own cusps; "House I" would be Chart A's.
-        ok("Chart B is read in Chart B's houses (House VII)",
-            bPage.contains("House VII</a>"));
-        ok("and not in Chart A's (House I)", !bPage.contains("House I</a>"));
+        // Whose houses. The 7th is Chart B's own cusps; the 1st would be Chart A's. The house is
+        // Astrologer view's alone on a card, so the question is asked there, and plain view is
+        // asked to hold no house at all.
+        ok("plain view names no house on Chart B's page", !bPage.contains(" house"));
+        boolean wasAstrologer = Settings.astrologerView();
+        String astro;
+        try {
+            Settings.setAstrologerView(true);
+            astro = (String) gen.invoke(sp, chartB);
+        } finally {
+            Settings.setAstrologerView(wasAstrologer);
+        }
+        ok("Chart B is read in Chart B's houses (7th house)", astro.contains("7th house"));
+        ok("and not in Chart A's (1st house)", !astro.contains("1st house"));
 
         // A moment goes the other way round: on Transits, and in the houses on screen.
         sp.chartMode = ChartMode.TRANSIT;
