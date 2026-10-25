@@ -3968,13 +3968,12 @@ public final class GlobeCheck {
                 refresh.invoke(p);
             }
 
-            // The figures between charts: some, no more than the cap, each joining Chart A to
-            // another chart, each with a name.
+            // The figures between charts: all of them (no cap since 2026-10-25), tightest
+            // first, each joining Chart A to another chart, each with a name.
             int[][] figures = p.crossFigures();
             yes("a synastry with the sky has figures between its charts: " + figures.length,
                 figures.length > 0);
-            yes("no more than the tightest " + SkymapPanel.CROSS_FIGURES,
-                figures.length <= SkymapPanel.CROSS_FIGURES);
+            yes("all of them, not only the tightest 4: " + figures.length, figures.length > 4);
             boolean joined = true;
             for (int[] f : figures) {
                 boolean natal = false;
