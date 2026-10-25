@@ -30,9 +30,29 @@ final class PatternCards {
     private PatternCards() {
     }
 
+    /** A closed figure's card with the link that opens its whole reading. */
+    private record Figure(ReadingCard card, String href) { }
+
     /** The patterns' cards, in the order the engine found them. */
     static List<ReadingCard> cards(Gestalt.Result g) {
         List<ReadingCard> out = new ArrayList<>();
+        for (Figure f : figures(g)) {
+            out.add(f.card());
+        }
+        return out;
+    }
+
+    /** The link a figure's card carries, one for each card, in the same order. */
+    static List<String> figureLinks(Gestalt.Result g) {
+        List<String> out = new ArrayList<>();
+        for (Figure f : figures(g)) {
+            out.add(f.href());
+        }
+        return out;
+    }
+
+    private static List<Figure> figures(Gestalt.Result g) {
+        List<Figure> out = new ArrayList<>();
         if (g == null) {
             return out;
         }
@@ -57,7 +77,8 @@ final class PatternCards {
                 ? String.join(" ", clean.subList(1, Math.min(clean.size(), 3))) : "";
             why.add("In full: " + prose.replaceAll("(?i)<br\\s*/?>", " ")
                 .replaceAll("(?i)<[^>]+>", "").replaceAll("\\s+", " ").trim());
-            out.add(new ReadingCard(LABEL, headline, body, why));
+            out.add(new Figure(new ReadingCard(LABEL, headline, body, why),
+                InterpretationPanel.patternHref(ap.name, ap.bodies)));
         }
         return out;
     }
@@ -121,7 +142,15 @@ final class PatternCards {
         sb.append("<div style='color:#9AA5B1; font-size:12px; margin-bottom:6px;'>")
           .append(cards.size()).append(cards.size() == 1 ? " group of planets works"
               : " groups of planets work").append(" as one unit.</div>");
-        return sb.append(ReadingCard.html(cards, showWhy)).toString();
+        // Each closed figure is followed by the link to its whole reading. The Placements page
+        // used to carry that link on its banner; the banner moved to this tab with the figures,
+        // and the link had to move with it or the click-through would have been lost.
+        for (Figure f : figures(g)) {
+            sb.append(ReadingCard.html(List.of(f.card()), showWhy))
+              .append("<div style='margin:0 0 10px 4px;'><a href='").append(f.href())
+              .append("' style='color:#7FB3FF; font-size:11px;'>The figure in full</a></div>");
+        }
+        return sb.append(ReadingCard.html(stelliumCards(g), showWhy)).toString();
     }
 
     /** The astrology behind a card: name, members, apex, how loose it is, what releases it. */

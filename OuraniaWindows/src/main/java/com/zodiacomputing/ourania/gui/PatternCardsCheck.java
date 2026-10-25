@@ -91,6 +91,21 @@ public final class PatternCardsCheck {
             yes("the whole reading is kept for Astrologer view" + at,
                 c.why().stream().anyMatch(w -> w.startsWith("In full: ")));
         }
+        // Every closed figure keeps the link to its whole reading, which was on the Placements
+        // page's banner before the banner moved here.
+        List<String> links = PatternCards.figureLinks(g);
+        yes("one link for every figure card" + at, links.size() == cards.size());
+        for (int i = 0; i < Math.min(links.size(), g.aspectPatterns.size()); i++) {
+            AspectPatterns.Pattern ap = g.aspectPatterns.get(i);
+            String[] parsed = InterpretationPanel.parsePatternHref(links.get(i));
+            yes("the link opens the right figure" + at + ": " + ap.name,
+                links.get(i).equals(InterpretationPanel.patternHref(ap.name, ap.bodies))
+                    && parsed != null && parsed[0].equals(ap.name));
+        }
+        String withLinks = PatternCards.html(g, false);
+        yes("every link is on the page, once" + at,
+            links.stream().allMatch(l -> withLinks.contains("href='" + l + "'")));
+        yes("and says what it opens" + at, count(withLinks, "The figure in full") == links.size());
         String plain = PatternCards.html(g, false);
         String astro = PatternCards.html(g, true);
         yes("plain view hides the astrology" + at, !plain.contains("Why &mdash;")
@@ -139,6 +154,14 @@ public final class PatternCardsCheck {
         yes("and no cards", PatternCards.cards(g).isEmpty());
         yes("a missing chart is the same sentence, not a crash",
             PatternCards.html(null, false).contains("No group of planets forms a closed figure"));
+    }
+
+    private static int count(String s, String sub) {
+        int n = 0;
+        for (int at = s.indexOf(sub); at >= 0; at = s.indexOf(sub, at + sub.length())) {
+            n++;
+        }
+        return n;
     }
 
     private static void report() {

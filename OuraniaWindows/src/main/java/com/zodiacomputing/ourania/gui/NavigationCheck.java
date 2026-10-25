@@ -2409,7 +2409,10 @@ public final class NavigationCheck {
                 }
             });
             ok("the Chart page carries the Index link", links.containsKey("index"));
-            ok("and a pattern link", links.keySet().stream().anyMatch(h -> h.startsWith("pattern|")));
+            // The figures are the Patterns tab's since Phase 2A (2026-10-25), with their "The
+            // figure in full" links; PatternCardsCheck and PatternsPageCheck ask for them there.
+            ok("and no pattern banner: the figures are the Patterns tab's",
+                links.keySet().stream().noneMatch(h -> h.startsWith("pattern|")));
             ok("and body links, " + links.size() + " links in all", links.size() >= 3);
 
             for (java.util.Map.Entry<String, java.awt.Point> link : links.entrySet()) {

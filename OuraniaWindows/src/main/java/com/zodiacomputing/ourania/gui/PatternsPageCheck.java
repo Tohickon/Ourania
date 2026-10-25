@@ -68,9 +68,12 @@ public final class PatternsPageCheck {
                 Settings.setAstrologerView(true);
                 String astro = page(w);
                 check(c[0], g, plain, astro);
+                clickThrough(w, c[0], g);
             }
             System.out.println("charts with figures: " + withFigures + ", with stelliums: "
                 + withStelliums);
+            yes("the fixed charts include one with a closed figure, so the click is asked ("
+                + withFigures + ")", withFigures >= 1);
         } finally {
             Settings.setAstrologerView(was);
             SwingUtilities.invokeAndWait(w::dispose);
@@ -116,6 +119,42 @@ public final class PatternsPageCheck {
         yes(at + ": plain view shows no why line",
             !plain.contains("Why &mdash;") && !plain.contains("Classical figure"));
         yes(at + ": Astrologer view shows the classical figure", astro.contains("Classical figure"));
+    }
+
+    /**
+     * "The figure in full" opens the figure's reading in the Selected drawer. The link was on the
+     * Placements page's banner; asked here, in a real window, because the click is what was at
+     * risk when the banner moved.
+     */
+    private static void clickThrough(OuraniaWindow w, String at, Gestalt.Result g)
+            throws Exception {
+        for (String link : PatternCards.figureLinks(g)) {
+            String[] parsed = InterpretationPanel.parsePatternHref(link);
+            yes(at + ": the link parses as a figure", parsed != null);
+            if (parsed == null) {
+                continue;
+            }
+            SwingUtilities.invokeAndWait(() -> w.handlePlacementClick(link));
+            String drawer = selected(w);
+            yes(at + ": clicking " + parsed[0] + " fills the Selected drawer", drawer.length() > 40);
+            yes(at + ": and it is about that figure", drawer.toLowerCase().contains(
+                parsed[0].toLowerCase()));
+        }
+    }
+
+    private static String selected(OuraniaWindow w) throws Exception {
+        javax.swing.JEditorPane pane = (javax.swing.JEditorPane) CheckReflect.get(w,
+            "selectionPane");
+        final String[] out = new String[1];
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                javax.swing.text.Document doc = pane.getDocument();
+                out[0] = doc.getText(0, doc.getLength());
+            } catch (javax.swing.text.BadLocationException e) {
+                out[0] = "";
+            }
+        });
+        return out[0];
     }
 
     private static int count(String s, String sub) {
