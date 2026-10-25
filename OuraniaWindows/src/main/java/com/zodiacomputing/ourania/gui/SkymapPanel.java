@@ -5428,6 +5428,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         this.refreshDebounce = new Timer(400, actionEvent -> {
             this.refreshDebounce.stop();
             if (!this.isPlaying && this.readingTier != ReadingTier.NONE) {
+                // <b>Back onto the page that shows it (2026-10-24).</b> David: with Chart A
+                // changed from David to Erika, Your year "says the exact same thing". This
+                // re-ran the reading without saying which page asked, so the new one went to the
+                // Reading panel and the page in front kept the old chart's. The window now
+                // records the page in front when it is this reading's, and the re-run is still
+                // unasked, so no reveal replays.
+                if (this.window != null) {
+                    this.window.routeRerunToFront(this.readingTier == ReadingTier.PARAGRAPH
+                        ? "SNAPSHOT" : this.readingTier == ReadingTier.THEMES ? "THEMES"
+                        : this.readingTier.name());
+                }
                 this.showReading(this.readingTier);
             }
         });

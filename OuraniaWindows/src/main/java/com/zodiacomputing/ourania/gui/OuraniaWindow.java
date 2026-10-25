@@ -2006,6 +2006,23 @@ public class OuraniaWindow extends JFrame {
     }
 
     /** One reading, from the sidebar's Readings section. See {@code SkymapPanel.runReading}. */
+    /**
+     * When the reading page in front is the one of this kind, records it as the page the next
+     * answer belongs on, as {@link #runReading} does (2026-10-24). The wheel re-runs a reading
+     * after a chart change without asking for it, so no reveal plays; this only routes it.
+     *
+     * @param kind the reading's kind as READINGS names it: "SNAPSHOT", "SYNTHESIZE", ...
+     */
+    void routeRerunToFront(String kind) {
+        String page = currentPage();
+        for (String[] r : READINGS) {
+            if (r[0].equals(page) && r[1].equals(kind)) {
+                pendingReadingPage = page;
+                return;
+            }
+        }
+    }
+
     public void runReading(String name) {
         // Remember which tab asked, so the answer lands there rather than on whichever page
         // the reading panel happens to be showing.
