@@ -120,6 +120,53 @@ public final class LifeAreasCheck {
                 Settings.setAstrologerView(was);
             }
             yes("a new install starts plain", !was);
+
+            System.out.println();
+            System.out.println("=== Part D: seven parts of life ===");
+            // The reading framework spec's seven (2026-10-24), asked by name and in order.
+            String[] spec = {"Love & Relationships", "Career & Public Life", "Home & Family",
+                "Money & Resources", "Mind & Communication", "Health & Body",
+                "Growth & Spirituality"};
+            LifeAreaMapper.Domain[] domains = LifeAreaMapper.Domain.values();
+            yes("seven domains", domains.length == 7);
+            java.util.Set<Integer> placed = new java.util.HashSet<>();
+            for (int i = 0; i < Math.min(spec.length, domains.length); i++) {
+                yes("domain " + (i + 1) + " is '" + spec[i] + "'", spec[i].equals(domains[i].label));
+                yes(spec[i] + " has a house", domains[i].houses().length >= 1);
+                for (int h : domains[i].houses()) {
+                    yes("house " + h + " is in one domain only", placed.add(h));
+                    yes("the mapper agrees house " + h + " is " + spec[i],
+                        LifeAreaMapper.of(h) == domains[i]);
+                }
+            }
+            yes("all twelve houses are placed", placed.size() == 12);
+            yes("outside 1 to 12 there is none",
+                LifeAreaMapper.of(0) == null && LifeAreaMapper.of(13) == null);
+            yes("a person reads under seven headings, the sky alone under its four",
+                LifeAreasPanel.groupsFor(ReadingVoice.PERSON).size() == 7
+                    && LifeAreasPanel.groupsFor(ReadingVoice.SKY).size() == 4);
+
+            // The page: a domain heads it exactly when a card sits in one of its houses, and
+            // the headings keep the spec's order.
+            String page = panel.html();
+            int last = -1;
+            for (LifeAreaMapper.Domain d : domains) {
+                boolean occupied = false;
+                for (int h : d.houses()) {
+                    for (ReadingCard c : cards) {
+                        occupied |= c.headline().equalsIgnoreCase(LifeAreas.of(h));
+                    }
+                }
+                int at = page.indexOf(">" + d.label.replace("&", "&amp;") + "</h3>");
+                yes(d.label + " heads the page exactly when something sits in it",
+                    (at >= 0) == occupied);
+                if (at >= 0) {
+                    yes(d.label + " comes after the heading before it", at > last);
+                    last = at;
+                }
+            }
+            yes("the four old headings are gone from a person's page",
+                !page.contains("Career and work") && !page.contains("Body, mind and soul"));
         } finally {
             SwingUtilities.invokeAndWait(w::dispose);
         }

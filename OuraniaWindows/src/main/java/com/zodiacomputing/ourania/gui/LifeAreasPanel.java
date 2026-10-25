@@ -68,7 +68,7 @@ final class LifeAreasPanel extends JPanel {
         sb.append("<h2>Life areas</h2>").append(voice == ReadingVoice.TRANSIT
             ? SkyOnChart.sectionHeading(SkyOnChart.heading(skymap.whoseLabel()))
             : WhoseChart.html(skymap));
-        for (Group g : GROUPS) {
+        for (Group g : groupsFor(voice)) {
             List<ReadingCard> in = new ArrayList<>();
             for (int house : g.houses()) {
                 ReadingCard c = card(f, house);
@@ -114,6 +114,26 @@ final class LifeAreasPanel extends JPanel {
         new Group("Money and home", "The economy and the land", new int[] {2, 4}),
         new Group("Body, mind and soul", "The public mood, beliefs and hidden matters",
             new int[] {1, 9, 12}));
+
+    /**
+     * The headings a voice reads under: the seven parts of life of the reading framework spec
+     * (2026-10-24) for a person and for the sky on a person, and the four mundane headings for
+     * the sky alone.
+     *
+     * <b>The sky keeps its four.</b> Their wording is David's (every sky line is), and the spec
+     * gives no mundane titles for seven domains; writing them here would put words in his mouth.
+     * A reader of the Sky tab sees the same page in the same order, under the headings he wrote.
+     */
+    static List<Group> groupsFor(ReadingVoice voice) {
+        if (voice == ReadingVoice.SKY) {
+            return GROUPS;
+        }
+        List<Group> out = new ArrayList<>();
+        for (LifeAreaMapper.Domain d : LifeAreaMapper.Domain.values()) {
+            out.add(new Group(d.label, d.label, d.houses()));
+        }
+        return out;
+    }
 
     /** One card per occupied house, in house order. Package-visible for a check. */
     List<ReadingCard> cards(ChartFrame f) {
