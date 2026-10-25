@@ -379,6 +379,11 @@ final class OverviewPanel extends JPanel {
                 + "what kind of chart it is.</p></body></html>");
             return sb.toString();
         }
+        // A person's chart reads as one page of modern cards (Phase 2A). The sky and the sky on a
+        // person keep the page below until Phase 2B.
+        if (voice == ReadingVoice.PERSON) {
+            return modernHtml(cards);
+        }
         // The Patterns tab (reading framework spec, 2026-10-24): the chart's shape first, then
         // the figures its planets make. The word "Chart shape" stays on the heading over the
         // shape cards, where the page has always said it.
@@ -405,6 +410,42 @@ final class OverviewPanel extends JPanel {
         sb.append(PatternCards.html(lastGestalt, Settings.astrologerView()));
         sb.append("</body></html>");
         return sb.toString();
+    }
+
+    /**
+     * A person's Patterns page as one set of modern cards (reading framework spec, Phase 2A).
+     *
+     * <b>The same findings, drawn once.</b> The shape, the loudest voice and the two light cards
+     * are the {@link Card}s the page has always had; each becomes a {@link ReadingCard} - the card
+     * the rest of the app uses - with the old fold-open detail as its why lines, so Astrologer view
+     * opens them all and nothing needs a "Show the detail" link. The figures and stelliums sit
+     * between the shape and the rest, because they are what the shape is made of. The day-or-night
+     * card is not here: it is the badge on At a glance.
+     */
+    private String modernHtml(List<Card> cards) {
+        boolean why = Settings.astrologerView();
+        List<ReadingCard> shape = new ArrayList<>();
+        List<ReadingCard> also = new ArrayList<>();
+        for (Card c : cards) {
+            if ("sect".equals(c.id)) {
+                continue;
+            }
+            ReadingCard rc = new ReadingCard(c.title.toUpperCase(java.util.Locale.ROOT), c.subtitle,
+                c.plain, c.detail);
+            ("shape".equals(c.id) ? shape : also).add(rc);
+        }
+        StringBuilder sb = new StringBuilder("<html><body><h2>Patterns</h2>");
+        sb.append(WhoseChart.html(skymap));
+        if (!shape.isEmpty()) {
+            sb.append("<h3 style='color:#FFD166; margin-top:6px; margin-bottom:4px;'>"
+                + "Chart shape</h3>").append(ReadingCard.html(shape, why));
+        }
+        sb.append(PatternCards.html(lastGestalt, why));
+        if (!also.isEmpty()) {
+            sb.append("<h3 style='color:#FFD166; margin-top:18px; margin-bottom:4px;'>"
+                + "Also in this chart</h3>").append(ReadingCard.html(also, why));
+        }
+        return sb.append("</body></html>").toString();
     }
 
     private static String esc(String s) {

@@ -62,11 +62,58 @@ final class PatternCards {
         return out;
     }
 
+    /** The label on a stellium's card: planets piled into one sign. */
+    static final String STELLIUM_LABEL = "PLANETS PILED INTO ONE SIGN";
+
+    /**
+     * One card for each sign that holds three or more of the planets (a stellium).
+     *
+     * <b>The finder is Gestalt's, not written here,</b> and so is the threshold; the reading is
+     * the corpus's "Stellium" entry, from which the plain card takes its clean sentences, as the
+     * figures do. The sign and the members go in the why lines. With no clean sentence in the
+     * entry, the card says only which planets work as one unit.
+     */
+    static List<ReadingCard> stelliumCards(Gestalt.Result g) {
+        List<ReadingCard> out = new ArrayList<>();
+        if (g == null) {
+            return out;
+        }
+        String prose = InterpretationService.getInstance().getMacroDynamic("Stellium");
+        List<String> clean = PlainWords.plainSentences(prose);
+        for (java.util.Map.Entry<String, List<String>> e : g.stelliumMembers.entrySet()) {
+            List<String> why = new ArrayList<>();
+            why.add("Stellium in " + cap(e.getKey()));
+            why.add("Members: " + String.join(", ", e.getValue()));
+            if (prose != null && !prose.isEmpty()) {
+                why.add("In full: " + prose.replaceAll("(?i)<br\\s*/?>", " ")
+                    .replaceAll("(?i)<[^>]+>", "").replaceAll("\\s+", " ").trim());
+            }
+            String headline = clean.isEmpty()
+                ? TogetherCards.joinAnd(e.getValue()) + " work as one unit."
+                : clean.get(0);
+            String body = clean.size() > 1
+                ? String.join(" ", clean.subList(1, Math.min(clean.size(), 3))) : "";
+            out.add(new ReadingCard(STELLIUM_LABEL, headline, body, why));
+        }
+        return out;
+    }
+
+    /** Every card the Patterns tab holds: the closed figures, then the stelliums. */
+    static List<ReadingCard> allCards(Gestalt.Result g) {
+        List<ReadingCard> out = new ArrayList<>(cards(g));
+        out.addAll(stelliumCards(g));
+        return out;
+    }
+
+    private static String cap(String s) {
+        return s == null || s.isEmpty() ? "" : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
     /** The page's section: a heading, how many figures there are, and the cards. */
     static String html(Gestalt.Result g, boolean showWhy) {
         StringBuilder sb = new StringBuilder("<h3 style='color:#FFD166; margin-top:18px; "
             + "margin-bottom:4px;'>Patterns that tie your chart together</h3>");
-        List<ReadingCard> cards = cards(g);
+        List<ReadingCard> cards = allCards(g);
         if (cards.isEmpty()) {
             return sb.append("<div style='color:#9AA5B1; font-size:12px; margin-bottom:10px;'>"
                 + "No group of planets forms a closed figure in this chart.</div>").toString();

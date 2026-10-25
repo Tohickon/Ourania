@@ -54,6 +54,18 @@ public final class OverviewPageCheck {
                 sky.skyAlone() && skyPage.contains("Chart shape")
                     && (skyPage.contains("Daytime sky") || skyPage.contains("Night sky"))
                     && !skyPage.contains("Born in"));
+            // <b>The fold-open cards are the sky's, since Phase 2A (2026-10-25).</b> A person's
+            // page is a set of modern cards with no fold; the sky and the sky on a person keep
+            // the old cards until Phase 2B, so the old behaviour is asked of the page that still
+            // has it - here, before a birth chart is cast.
+            if (sky0 != null) {
+                System.out.println("=== Part B (the sky): it opens at rest, every card collapsed ===");
+                atRest(sky0);
+                System.out.println();
+                System.out.println("=== Part C (the sky): a tap opens one card, and closes it again ===");
+                oneTapOneCard(sky0);
+                System.out.println();
+            }
             int casts = sky.castsApplied();
             SwingUtilities.invokeAndWait(() -> sky.applyChartSettings("1990-06-15", "12:00",
                 "51.5074, -0.1278", ChartMode.SINGLE, "", "", "", false));
@@ -71,12 +83,12 @@ public final class OverviewPageCheck {
             onTheRail(w, panel);
 
             System.out.println();
-            System.out.println("=== Part B: it opens at rest, every card collapsed ===");
-            atRest(panel);
+            System.out.println("=== Part B (a person): plain view hides every why line ===");
+            personAtRest(panel);
 
             System.out.println();
-            System.out.println("=== Part C: a tap opens one card, and closes it again ===");
-            oneTapOneCard(panel);
+            System.out.println("=== Part C (a person): Astrologer view opens them all ===");
+            personAstrologerOpens(panel);
 
             System.out.println();
             System.out.println("=== Part D: the cards agree with the engines ===");
@@ -167,6 +179,51 @@ public final class OverviewPageCheck {
                 yes("no detail of " + c.id + " is on the page yet: " + shorten(line),
                     !html.contains(escaped(line)));
             }
+        }
+    }
+
+    // ----------------------------------------------- parts B and C, a person's page
+
+    /** A person's page has no fold: in plain view no card shows its why lines. */
+    private static void personAtRest(OverviewPanel panel) {
+        boolean was = Settings.astrologerView();
+        try {
+            Settings.setAstrologerView(false);
+            List<OverviewPanel.Card> cards = panel.cards();
+            yes("the chart produces cards at all: " + cards.size(), !cards.isEmpty());
+            String html = panel.html();
+            yes("a person's page has no fold-open link",
+                !html.contains("toggle:") && !html.contains("Show the detail"));
+            for (OverviewPanel.Card c : cards) {
+                for (String line : c.detail) {
+                    yes("no detail of " + c.id + " is on the plain page: " + shorten(line),
+                        !html.contains(escaped(line)));
+                }
+            }
+        } finally {
+            Settings.setAstrologerView(was);
+        }
+    }
+
+    /** Astrologer view shows every card's detail at once, and there is nothing to close. */
+    private static void personAstrologerOpens(OverviewPanel panel) {
+        boolean was = Settings.astrologerView();
+        try {
+            Settings.setAstrologerView(true);
+            String html = panel.html();
+            for (OverviewPanel.Card c : panel.cards()) {
+                // The day-or-night card is the badge on At a glance, not a card here.
+                if ("sect".equals(c.id)) {
+                    continue;
+                }
+                yes("Astrologer view shows the detail of " + c.id,
+                    c.detail.isEmpty() || html.contains(escaped(c.detail.get(0))));
+            }
+            yes("and no card has anything to close", !html.contains("Hide the detail"));
+            yes("the sect card is not on a person's Patterns page",
+                !html.contains("WHO HAS THE EASY RUN"));
+        } finally {
+            Settings.setAstrologerView(was);
         }
     }
 

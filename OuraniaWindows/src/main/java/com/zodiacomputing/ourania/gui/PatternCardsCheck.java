@@ -34,26 +34,35 @@ public final class PatternCardsCheck {
         SwissEph sw = new SwissEph(Ephemeris.PATH);
         Set<String> kinds = new LinkedHashSet<>();
         int withFigures = 0;
+        int withStelliums = 0;
         int empties = 0;
         double start = new SweDate(1960, 1, 1, 12.0).getJulDay();
         for (int i = 0; i < SCAN; i++) {
             ChartFrame f = ChartFrame.compute(sw, start + 11.0 * i, 40.71, -74.01, 'P', false, 0.0);
             Gestalt.Result g = Gestalt.compute(f);
-            if (g.aspectPatterns.isEmpty()) {
+            // A chart with neither a closed figure nor a stellium has nothing to say here.
+            if (g.aspectPatterns.isEmpty() && g.stelliumMembers.isEmpty()) {
                 empties++;
                 if (empties <= 3) {
                     empty(g);
                 }
                 continue;
             }
-            withFigures++;
+            if (!g.aspectPatterns.isEmpty()) {
+                withFigures++;
+            }
+            if (!g.stelliumMembers.isEmpty()) {
+                withStelliums++;
+                stelliums(g, i);
+            }
             for (AspectPatterns.Pattern ap : g.aspectPatterns) {
                 kinds.add(ap.name);
             }
             figures(g, i);
         }
-        System.out.println("scanned " + SCAN + " charts: " + withFigures + " with figures, kinds "
-            + kinds);
+        System.out.println("scanned " + SCAN + " charts: " + withFigures + " with figures, "
+            + withStelliums + " with stelliums, kinds " + kinds);
+        yes("the scan met charts with stelliums (" + withStelliums + ")", withStelliums >= 10);
         yes("the scan met charts with figures (" + withFigures + ")", withFigures >= 20);
         yes("and more than one kind of figure (" + kinds + ")", kinds.size() >= 3);
         yes("and charts without any (" + empties + ")", empties >= 1);
@@ -87,13 +96,41 @@ public final class PatternCardsCheck {
         yes("plain view hides the astrology" + at, !plain.contains("Why &mdash;")
             && !plain.contains("Members:"));
         yes("Astrologer view shows it" + at, astro.contains("Members:"));
+        int all = PatternCards.allCards(g).size();
         yes("plain view says how many" + at,
-            plain.contains(cards.size() + (cards.size() == 1 ? " group of planets works"
+            plain.contains(all + (all == 1 ? " group of planets works"
                 : " groups of planets work")));
         // The whole plain page, section heading and counts included, against David's list.
         String words = plain.replaceAll("<[^>]+>", " ");
         yes("the plain page has no banned word" + at + ": " + JargonCheck.banned(words),
             JargonCheck.banned(words).isEmpty());
+    }
+
+    /** One card for each sign holding three or more planets, each naming its members. */
+    private static void stelliums(Gestalt.Result g, int n) {
+        String at = " (chart " + n + ")";
+        List<ReadingCard> cards = PatternCards.stelliumCards(g);
+        yes("one stellium card for every sign that holds three" + at + ": " + cards.size() + " of "
+            + g.stelliumMembers.size(), cards.size() == g.stelliumMembers.size());
+        int i = 0;
+        for (java.util.Map.Entry<String, List<String>> e : g.stelliumMembers.entrySet()) {
+            if (i >= cards.size()) {
+                break;
+            }
+            ReadingCard c = cards.get(i++);
+            yes("the card is in the engine's order and sign" + at + ": " + e.getKey(),
+                c.why().get(0).equalsIgnoreCase("Stellium in " + e.getKey()));
+            yes("it names every member" + at + ": " + e.getValue(),
+                c.why().contains("Members: " + String.join(", ", e.getValue())));
+            yes("at least three planets" + at, e.getValue().size() >= 3);
+            yes("the label is the plain one" + at,
+                PatternCards.STELLIUM_LABEL.equals(c.label()));
+            yes("no banned word in the label, headline or body" + at + ": " + c.headline(),
+                JargonCheck.banned(c.label() + " " + c.headline() + " " + c.body()).isEmpty());
+        }
+        String plain = PatternCards.html(g, false).replaceAll("<[^>]+>", " ");
+        yes("the plain section with stelliums has no banned word" + at,
+            JargonCheck.banned(plain).isEmpty());
     }
 
     private static void empty(Gestalt.Result g) {
