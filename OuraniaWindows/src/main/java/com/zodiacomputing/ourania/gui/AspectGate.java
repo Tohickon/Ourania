@@ -41,11 +41,21 @@ public final class AspectGate {
     public static Aspects.Type visible(double sep, int a, int b, Aspects.Profile profile,
             boolean[] shown) {
         Aspects.Type type = Aspects.typeOf(sep, nameOf(a), nameOf(b), profile);
-        if (type == null) {
-            return null;
-        }
-        return shown == null || type.ordinal() >= shown.length
-            || shown[type.ordinal()] ? type : null;
+        return type != null && shown(type, shown) ? type : null;
+    }
+
+    /**
+     * Whether the reader has this aspect type switched on.
+     *
+     * <b>Its own method for the Together page (2026-10-16),</b> which takes its aspects from
+     * {@code Synastry.interAspects} rather than from a separation, and must still hide what
+     * the grid hides. A second copy of the null-and-short-array rule there is the defect this
+     * class exists to prevent.
+     *
+     * @param shown as for {@link #visible}
+     */
+    public static boolean shown(Aspects.Type type, boolean[] shown) {
+        return shown == null || type.ordinal() >= shown.length || shown[type.ordinal()];
     }
 
     /** A registry point's name, or null out of range - the contract Aspects.typeOf expects. */

@@ -61,6 +61,9 @@ public class NarrativeSynthesizer {
     private static final String[] MONTHS = {"January", "February", "March", "April", "May",
         "June", "July", "August", "September", "October", "November", "December"};
 
+    /** The heading everything that is not the answer sits under (2026-10-17). */
+    static final String MECHANICS = "Mechanics";
+
     public static String generateReport(ChartFrame f, Gestalt.Result g, List<BodyScore.Vector> ranked, Themes.Result t, ChartFrame tf, Profection prof, List<Transits.Hit> hits, YearScan scan, List<Convergence.Target> convergence, boolean withTime) {
         return generateReport(f, g, ranked, t, tf, prof, hits, scan, convergence, withTime, false);
     }
@@ -150,11 +153,8 @@ public class NarrativeSynthesizer {
         // three testimonies. Conditions are the ones section 4.9 used to carry: convergence is
         // assembled from the profection year scan and the solar return, so a relationship
         // chart - which has no birthday - gets none of it.
-        List<ThemeConvergence.Result> yearThemes = null;
-        if (!relationship && withTime && scan != null && convergence != null) {
-            yearThemes = ThemeConvergence.themes(f, prof, convergence, scan.moonClock,
-                scan.catalysts);
-        }
+        List<ThemeConvergence.Result> yearThemes =
+            yearThemes(f, prof, scan, convergence, withTime, relationship);
         // K12 stage 2. The mid-term clock reads the same whether or not any theme reaches
         // three, so it is stated whatever the themes do - and stated once, in the summary,
         // because it is a headline-level fact and not a piece of machinery.
@@ -177,7 +177,87 @@ public class NarrativeSynthesizer {
         // one part that answers "what is this year about" - sat at the very bottom, behind two
         // hundred lines of individual triggers. Nothing was missing from the page; the order of
         // it was upside down, and a reader met the engine before they met the reading.
-        sb.append(tier("1. At a glance"));
+        // <b>David, 2026-10-17: the reading opened on its machinery.</b> "1. and 2. are the
+        // mechanics where 4. is where it all makes sense of the placements." So the page opens
+        // on the year's card - what it asks and what to do - then the placements, then where
+        // the dates are, and everything that is working goes under Mechanics. Each section is
+        // the one it was; only the order and the titles changed. The year is the twelve months
+        // from now (Chronometry, yearAhead), not birthday to birthday.
+        sb.append(tier("Your year"));
+        sb.append("<p style='color:#AAAAAA;'>The next twelve months, from today.");
+        if (!relationship && prof != null && !Double.isNaN(prof.yearUntil)) {
+            sb.append(" Its focus moves on at your birthday, ")
+                .append(java.time.Instant.ofEpochMilli(Math.round((prof.yearUntil - 2440587.5)
+                    * 86_400_000.0)).atZone(java.time.ZoneId.systemDefault())
+                    .format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy",
+                        java.util.Locale.ENGLISH)))
+                .append(".");
+        }
+        sb.append("</p>");
+        if (relationship) {
+            sb.append("<p><i>A year is read from a birthday, which a relationship chart does not"
+                + " have.</i></p>");
+        } else if (yearThemes == null) {
+            sb.append("<p><i>Switch on transits to read the year ahead.</i></p>");
+        } else {
+            boolean first = true;
+            for (ThemeConvergence.Result th : yearThemes) {
+                if (!th.headline()) {
+                    continue;
+                }
+                String card = ReadingCard.html(List.of(ReadingCard.forYearTheme(th)), false);
+                // The first is the card a reveal lands on.
+                sb.append(first ? "<div id='" + ReadingCard.REVEAL_ID + "'>" + card + "</div>" : card);
+                first = false;
+            }
+            if (first) {
+                sb.append(ReadingCard.html(List.of(new ReadingCard("THE YEAR AHEAD",
+                    "No one part of life stands out this year.",
+                    "Several things are moving, and none of them is loud enough to lead. Keep"
+                        + " to what you are already building.", List.of())), false));
+            }
+        }
+
+        // <b>The year's biggest moments, not the birth chart (David, 2026-10-22).</b> "should be
+        // only your year and how each point effects natal points throughout the year (i.e.
+        // biggest moments during the year and when they occur and by what and what it means".
+        // This was the natal placements, strongest first: every planet's sign, house and
+        // aspects, none of it about this year, and the longest thing on the page. The
+        // placements have their own page under each chart. See YearMoments.
+        if (!relationship && yearThemes != null) {
+            List<ReadingCard> moments = YearMoments.cards(f, scan, prof == null ? null : prof.lord);
+            sb.append(tier("The year's biggest moments"));
+            if (moments.isEmpty()) {
+                sb.append("<p>No slow planet meets one of your main points this year. It is a"
+                    + " year for steady work, not for big turns.</p>");
+            } else {
+                sb.append("<p style='color:#AAAAAA;'>When each one comes, what makes it, and what"
+                    + " it means, in the order they happen.</p>");
+                sb.append(ReadingCard.html(moments, Settings.astrologerView()));
+            }
+        }
+
+        // ------------------------------------------------------------------ Tier 4
+        //
+        // <b>Named even when it is withheld.</b> A reading that simply ended after the dates
+        // would look like a reading that had run out, and a reader who had forgotten the
+        // checkbox would have no way to tell the difference.
+
+        if (!mechanics) {
+            sb.append(tier(MECHANICS));
+            sb.append("<p style='color:#AAAAAA;'><i>Not shown. How the year was worked out"
+                + " &mdash; the themes and their testimonies, the dates in detail, the chart's"
+                + " architecture, the patterns, the houses, the rankings and the current transits"
+                + " &mdash; is here when you tick <b>Show the mechanics</b> at the top of this"
+                + " page.</i></p>");
+            sb.append("</body></html>");
+            return sb.toString();
+        }
+        sb.append(tier(MECHANICS));
+        sb.append("<p style='font-style: italic; color: #AAAAAA;'>How the year above was worked"
+            + " out, in the engine's own order. Nothing here is a summary &mdash; this is the"
+            + " audit trail.</p>");
+        sb.append(tier("The year at a glance"));
         sb.append("<ul>");
         sb.append("<li><b>The chart</b> &mdash; ").append(sectName).append(", shaped as a <b>")
             .append(shapeName).append("</b> led by <b>").append(leadBody);
@@ -241,7 +321,7 @@ public class NarrativeSynthesizer {
         sb.append("</ul>");
 
         // ------------------------------------------------------------------ Tier 2
-        sb.append(tier("2. The year by theme (the Rule of Three)"));
+        sb.append(tier("The year by theme (the Rule of Three)"));
         if (relationship) {
             sb.append("<p><i>Convergence is scanned across a profection year, which a composite"
                 + " does not have. See 4.4 below.</i></p>");
@@ -289,7 +369,7 @@ public class NarrativeSynthesizer {
         // lists and merge them in their head - and a fortnight where two themes peak together
         // looked like two unrelated entries. Merging them is also the honest shape: the Sun and
         // Mars do not visit one theme at a time.
-        sb.append(tier("3. Dates to watch"));
+        sb.append(tier("Dates, in detail"));
         if (yearThemes == null) {
             sb.append("<p><i>").append(relationship
                     ? "Dating follows the year scan, which a composite does not have."
@@ -318,27 +398,7 @@ public class NarrativeSynthesizer {
             }
         }
 
-        // ------------------------------------------------------------------ Tier 4
-        //
-        // <b>Named even when it is withheld.</b> A reading that simply ended after the dates
-        // would look like a reading that had run out, and a reader who had forgotten the
-        // checkbox would have no way to tell the difference.
-        if (!mechanics) {
-            sb.append(tier("4. The mechanics"));
-            sb.append("<p style='color:#AAAAAA;'><i>Not shown. The architecture, every"
-                + " placement, the patterns, the houses, the full convergence rankings and the"
-                + " current transits are what the three tiers above are drawn from &mdash; tick"
-                + " <b>Show the mechanics</b> at the top of this page to read them.</i></p>");
-            sb.append("</body></html>");
-            return sb.toString();
-        }
-        sb.append(tier("4. The mechanics"));
-        sb.append("<p style='font-style: italic; color: #AAAAAA;'>Everything the three tiers"
-            + " above are drawn from, in the engine's own order: the chart's architecture, every"
-            + " placement ranked, the patterns, the houses, the full convergence rankings and"
-            + " the current transits. Nothing here is a summary &mdash; this is the audit"
-            + " trail.</p>");
-
+        sb.append(tier("The chart's working"));
         // 4.1 Core Architecture
         sb.append("<h2 style='color: #FFD700;'>4.1 Core Architecture: The Chart's Signature</h2>");
         sb.append("<p>This is a <b>").append(sectName).append("</b> chart, meaning the <b>").append(g.sectLight).append("</b> is the master of the sect, <b>").append(Sect.beneficOfSect(isDiurnal)).append("</b> is " + (relationship ? "the relationship's" : "your") + " greatest ally (the benefic of sect), and <b>").append(g.outOfSectMalefic).append("</b> is " + (relationship ? "its" : "your") + " primary friction point (the malefic contrary to sect).</p>");
@@ -347,146 +407,6 @@ public class NarrativeSynthesizer {
 
         if (!g.dominantElements.isEmpty()) {
             sb.append("<p>The dominant element is <b>").append(String.join(", ", g.dominantElements)).append("</b>, emphasizing that baseline operating system.</p>");
-        }
-
-        // 4.2 Planetary Placements
-        sb.append("<h2 style='color: #FFD700;'>4.2 Planetary Placements (Ranked by Prominence)</h2>");
-        sb.append("<p>The following details the structural function and narrative interpretation of all placements in the chart, in order of their strength:</p>");
-        for (BodyScore.Vector v : ranked) {
-            ChartFrame.Body b = f.body(v.body);
-            Dignity.Result dr = Dignity.evaluate(v.body, b.lon, isDiurnal);
-            sb.append("<div style='margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px dotted #333;'>");
-            sb.append("<h3 style='color: #FFFFFF; margin-bottom: 5px;'>").append(v.body).append(" (").append(String.format("%.1f%%", v.prominence * 100)).append(" Prominence)</h3>");
-            
-            sb.append("<p style='font-size: 13px; color: #BBBBBB;'>");
-            if (dr.score >= Dignity.PTS_EXALTATION) sb.append("<b>Highly Dignified.</b> ");
-            if (dr.domicile) sb.append("<b>In Domicile.</b> ");
-            if (v.house > 0) sb.append("Residing in House ").append(v.house).append(". ");
-            sb.append("</p>");
-            
-            String core = svc.getBodyCore(v.body);
-            if (core != null && !core.isEmpty()) {
-                sb.append("<p><b>Core function:</b> ").append(core).append("</p>");
-            }
-            
-            String sign = Zodiac.signName(b.lon);
-            // Composite prose for a composite chart. The natal entry describes a person; the
-            // composite entry describes what the pairing does with that placement.
-            String signText = relationship ? svc.getCompositePlanetSign(v.body, sign) : null;
-            if (signText == null) {
-                signText = svc.getPlanetInSign(v.body, sign);
-            }
-            if (!signText.startsWith("Interpretation not found")) {
-                sb.append("<p><b>In ").append(Character.toUpperCase(sign.charAt(0))).append(sign.substring(1)).append(":</b> ").append(signText).append("</p>");
-            }
-            
-            if (v.house > 0) {
-                String houseText = relationship
-                    ? svc.getCompositePlanetHouse(v.body, v.house) : null;
-                if (houseText == null) {
-                    houseText = svc.getPlanetInHouse(v.body, v.house);
-                }
-                if (!houseText.startsWith("Interpretation not found")) {
-                    sb.append("<p><b>In House ").append(v.house).append(":</b> ").append(houseText).append("</p>");
-                }
-            }
-
-            // Angles
-            if (v.nearestAngle != null && v.angularity > 0.5) {
-                String angleText = relationship
-                    ? svc.getCompositeAngle(v.nearestAngle, sign) : null;
-                if (angleText == null) {
-                    angleText = svc.getAngleInterpretation(v.nearestAngle, sign);
-                }
-                if (angleText != null && !angleText.isEmpty() && !angleText.startsWith("Interpretation not found")) {
-                    sb.append("<p><b>On the ").append(v.nearestAngle).append(":</b> ").append(angleText).append("</p>");
-                }
-            }
-            
-            // Major Aspects
-            if (v.aspects != null && !v.aspects.isEmpty()) {
-                // <b>Both ends minor means there is no actor to express the contact</b>, so it
-                // is listed as background rather than under a heading that calls it major. The
-                // K4 decision asked for these sixty asteroid-to-asteroid cells to be left
-                // unwritten; measured 2026-09-03 all sixty are written, so the prose stays and
-                // the claim above it is the thing that changes. A Pallas square Juno that
-                // arrives titled "Major Contacts" is the app asserting something false about
-                // its own weight - which is precisely Tompkins' clutter and Cunningham's
-                // alarm fatigue, reached through wording rather than through line-drawing.
-                StringBuilder major = new StringBuilder();
-                StringBuilder background = new StringBuilder();
-                for (int i = 0; i < Math.min(3, v.aspects.size()); i++) {
-                    Aspects.Hit h = v.aspects.get(i);
-                    String other = v.body.equals(h.a) ? h.b : h.a;
-                    String aspectText = relationship
-                        ? svc.getCompositeAspect(v.body, other, h.type.label) : null;
-                    // <b>With no composite reading for the pair this borrows the NATAL one</b>
-                    // - and the natal corpus describes two drives inside one person. The
-                    // geometry is right and the voice is wrong: nothing in that sentence knows
-                    // both ends belong to a relationship. As of 2026-08-31 that is 1,404 of
-                    // 3,300 cells, every one of them a minor aspect.
-                    //
-                    // The frame is the one sentence the natal dataset cannot say, and it has
-                    // sat in composite_aspects.json since that file was written - eleven
-                    // entries, one per aspect type. <b>InterpretationPanel has shown it all
-                    // along; this surface never called it.</b> Same data, same getter, one
-                    // reader taught and its neighbour left behind.
-                    //
-                    // <b>Deliberately narrower here than on the panel</b>, which frames every
-                    // relationship aspect it renders. That page carries one aspect; this report
-                    // carries three per body across every body, so an unconditional frame would
-                    // repeat one of eleven sentences dozens of times. It appears only where it
-                    // does work - in front of borrowed natal wording. A difference driven by
-                    // the surface, not by drift.
-                    String frame = null;
-                    if (aspectText == null) {
-                        aspectText = svc.getAspect(v.body, other, h.type.label);
-                        if (relationship) {
-                            frame = svc.getCompositeAspectFrame(h.type.label);
-                            // <b>When the natal fallback is ITSELF only the aspect general</b>,
-                            // the frame already says that in the relationship's voice, so it
-                            // replaces the text rather than sitting on top of it. Printed as a
-                            // pair they said the same thing twice - "half a square and it
-                            // behaves like one" in both paragraphs - and the second one closed
-                            // by apologising for prose that is not written, which is a note to
-                            // the authors, not a reading for the couple.
-                            //
-                            // A natal reading written for the actual PAIR is different and is
-                            // kept: the geometry it describes is real, and the frame in front
-                            // of it supplies the one thing it cannot know.
-                            if (frame != null && aspectText != null
-                                    && aspectText.contains("is not written yet.")) {
-                                aspectText = frame;
-                                frame = null;
-                            }
-                        }
-                    }
-                    // Mutual: both bodies belong to the same person, so either end can
-                    // carry the contact. Same rule the returns table asks directionally.
-                    StringBuilder into = Bodies.hasPrimaryActor(v.body, other, false)
-                        ? major : background;
-                    if (!aspectText.startsWith("Interpretation not found") && !aspectText.startsWith("General ")) {
-                        into.append("<li><b>").append(h.type.label).append(" to ").append(other)
-                            .append(":</b> ");
-                        if (frame != null) {
-                            into.append(frame).append("<br><br>");
-                        }
-                        into.append(aspectText).append("</li>");
-                    } else {
-                        into.append("<li><b>").append(h.type.label).append(" to ").append(other).append("</b> (").append(String.format("%.1f&deg;", h.offBy)).append(").</li>");
-                    }
-                }
-                if (major.length() > 0) {
-                    sb.append("<p><b>Major Contacts:</b></p><ul>").append(major).append("</ul>");
-                }
-                if (background.length() > 0) {
-                    sb.append("<p><b>Background Resonance:</b> <span style='font-size:11px;")
-                      .append(" color:#B9B2D6;'>minor bodies at both ends - texture beneath the")
-                      .append(" planetary signatures, not beside them.</span></p><ul>")
-                      .append(background).append("</ul>");
-                }
-            }
-            sb.append("</div>");
         }
 
         // 4.3 Structural Tensions
@@ -859,8 +779,22 @@ public class NarrativeSynthesizer {
                 + " point, so it does not count as a testimony)</span>");
     }
 
+    /**
+     * The year's themes as the synthesis reads them, or null when there are none to read.
+     *
+     * <b>One method for the page and for the reveal that introduces it,</b> so the card that
+     * forms on the wheel and the tier 2 it lands on can never be about different themes.
+     */
+    static List<ThemeConvergence.Result> yearThemes(ChartFrame f, Profection prof, YearScan scan,
+            List<Convergence.Target> convergence, boolean withTime, boolean relationship) {
+        if (relationship || !withTime || scan == null || convergence == null) {
+            return null;
+        }
+        return ThemeConvergence.themes(f, prof, convergence, scan.moonClock, scan.catalysts);
+    }
+
     /** A technique family as a reader's name for it rather than as its enum constant. */
-    private static String familyLabel(String family) {
+    static String familyLabel(String family) {
         switch (family) {
             case "PROFECTION": return "Profection";
             case "TRANSIT": return "Transit";

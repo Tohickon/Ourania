@@ -549,7 +549,9 @@ final class WheelView extends View {
         int decanOuter = r[WheelLayout.RING_DECAN_OUTER];
         int signOuter = r[WheelLayout.RING_SIGN_OUTER];
         int signInner = r[WheelLayout.RING_SIGN_INNER];
+        // The bounds sit outside the decans since 2026-10-18, as on the desktop and the globe.
         int termInner = r[WheelLayout.RING_TERM_INNER];
+        int termOuter = r[WheelLayout.RING_TERM_OUTER];
         int degreeInner = r[WheelLayout.RING_DEGREE_INNER];
         float glyphs = ringGlyphAlpha();
 
@@ -582,7 +584,7 @@ final class WheelView extends View {
         }
 
         // The Egyptian bounds: sixty segments in their rulers' colours.
-        this.text.setTextSize((signInner - termInner) * 0.72f);
+        this.text.setTextSize((termOuter - termInner) * 0.72f);
         for (int sign = 0; sign < 12; sign++) {
             double[] edges = Dignity.boundEdges(sign);
             for (int i = 0; i < edges.length - 1; i++) {
@@ -594,12 +596,12 @@ final class WheelView extends View {
                     continue;                           // unresolvable ruler: left blank
                 }
                 int[] rgb = rgb(PhonePalette.body(bi));
-                sector(c, w, from, to, termInner, signInner,
+                sector(c, w, from, to, termInner, termOuter,
                     Color.argb(i % 2 == 0 ? 62 : 40, rgb[0], rgb[1], rgb[2]));
                 if (i > 0) {
-                    spoke(c, w, from, termInner, signInner, Color.argb(120, 150, 150, 160), 0.8f);
+                    spoke(c, w, from, termInner, termOuter, Color.argb(120, 150, 150, 160), 0.8f);
                 }
-                ringGlyph(c, w, Bodies.at(bi).glyph, mid, (signInner + termInner) / 2f, rgb,
+                ringGlyph(c, w, Bodies.at(bi).glyph, mid, (termOuter + termInner) / 2f, rgb,
                     glyphs);
             }
         }
@@ -608,7 +610,7 @@ final class WheelView extends View {
         // the whole depth of the zodiac so each sign reads as one wedge of all its rings.
         this.line.setColor(Color.rgb(90, 96, 112));
         this.line.setStrokeWidth(1.2f * this.density);
-        for (int edge : new int[] {outer, decanOuter, signOuter, signInner, termInner, degreeInner}) {
+        for (int edge : new int[] {outer, termOuter, decanOuter, signOuter, signInner, degreeInner}) {
             c.drawCircle(w.cx, w.cy, edge, this.line);
         }
         if (w.mansions) {
@@ -634,13 +636,13 @@ final class WheelView extends View {
         // Two degree scales framing the zodiac: one hanging from the rim, one standing on the
         // planets, each marking every degree, the fives longer and the tens longest.
         degreeTicks(c, w, rimTop, rimTop - decanOuter);
-        degreeTicks(c, w, termInner, termInner - degreeInner);
+        degreeTicks(c, w, signInner, signInner - degreeInner);
         // The degree within its sign at every ten, on the inner scale, between the tens.
         if (glyphs > 0) {
-            this.text.setTextSize((termInner - degreeInner) * 0.5f);
+            this.text.setTextSize((signInner - degreeInner) * 0.5f);
             this.text.setColor(Color.argb((int) (255 * glyphs), 150, 158, 170));
             for (int d = 0; d < 360; d += 10) {
-                float[] g = w.point(d + 5.0, termInner - (termInner - degreeInner) * 0.68);
+                float[] g = w.point(d + 5.0, signInner - (signInner - degreeInner) * 0.68);
                 c.drawText(String.valueOf(d % 30), g[0], g[1] + this.text.getTextSize() * 0.35f,
                     this.text);
             }

@@ -137,6 +137,19 @@ public final class PlainSnapshot {
      */
     public static List<ReadingCard> cards(ChartFrame f, Gestalt.Result g,
                                           List<BodyScore.Vector> ranked) {
+        return cards(f, g, ranked, true);
+    }
+
+    /**
+     * As above, saying whether the chart is a birth chart or a moment.
+     *
+     * <b>"Now" only for a moment (David, 2026-10-22).</b> "it says where the weight sits now
+     * implying current but its a natal chart". For a birth chart the middle card is the middle
+     * of a life story, between where it comes from and where it is heading - not this week.
+     * What the sky is doing to the chart this week is its own section ({@link SkyOnChart}).
+     */
+    public static List<ReadingCard> cards(ChartFrame f, Gestalt.Result g,
+                                          List<BodyScore.Vector> ranked, boolean birthChart) {
         InterpretationService svc = InterpretationService.getInstance();
         Set<String> used = new LinkedHashSet<>();
         List<String> past = pickNamed(f, PAST, used);
@@ -144,7 +157,8 @@ public final class PlainSnapshot {
         List<String> ahead = pickNamed(f, FUTURE, used);
         return List.of(
             card(svc, f, "WHAT YOU ARE WORKING FROM", past, openerPast(g), null),
-            card(svc, f, "WHERE THE WEIGHT SITS NOW", now, "", tail(g)),
+            card(svc, f, birthChart ? "WHAT DRIVES YOU" : "WHERE THE WEIGHT SITS NOW", now, "",
+                tail(g)),
             card(svc, f, "WHERE IT IS HEADING", ahead, "", null));
     }
 
@@ -292,14 +306,20 @@ public final class PlainSnapshot {
      *
      * @param withHouse whether to add the house clause - the paragraph's lead only
      */
-    private static String sentenceFor(InterpretationService svc, ChartFrame f,
-                                      String name, boolean withHouse) {
+    static String sentenceFor(InterpretationService svc, ChartFrame f,
+                              String name, boolean withHouse) {
         ChartFrame.Body b = bodyOf(f, name);
         if (b == null || !b.ok) {
             return null;
         }
         String sign = Zodiac.signName(b.lon);
-        Line signLine = plain(svc.getPlanetInSign(name, sign));
+        if (!withHouse) {
+            return signSentence(svc, name, sign);
+        }
+        // An angle is read from the angle readings, as the Reading page does; the paragraphs
+        // never name one, so this changes nothing for them. The glance's Ascendant card needs it.
+        Line signLine = plain(ANGLES.contains(name)
+            ? svc.getAngleInterpretation(name, sign) : svc.getPlanetInSign(name, sign));
         if (signLine == null) {
             return null;
         }
@@ -351,6 +371,22 @@ public final class PlainSnapshot {
     };
 
     /** What it means when several placements land in one element. */
+    /**
+     * "Sun in Libra means ..." for a body in a sign, or null when the corpus has no line for it
+     * (Phase 2A). The sentence the Placements cards and the glance's three cards share; it needs
+     * no chart, only the name and the sign, so a card can be built from a ring's bare numbers.
+     */
+    static String signSentence(InterpretationService svc, String name, String sign) {
+        Line signLine = plain(ANGLES.contains(name)
+            ? svc.getAngleInterpretation(name, sign) : svc.getPlanetInSign(name, sign));
+        if (signLine == null) {
+            return null;
+        }
+        String text = signLine.whole ? signLine.text
+            : name + " in " + capitalise(sign) + " means " + signLine.text;
+        return text + ".";
+    }
+
     private static final Map<String, String> ELEMENT_TOGETHER = new LinkedHashMap<>();
     static {
         ELEMENT_TOGETHER.put("fire",

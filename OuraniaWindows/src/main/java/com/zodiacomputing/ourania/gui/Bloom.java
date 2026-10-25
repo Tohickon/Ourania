@@ -31,6 +31,11 @@ public final class Bloom {
     private final Timer timer;
     private final int durationMs;
     private final Runnable onFrame;
+    /** A timeline rather than a ring: constant speed, and a fold of its own length. */
+    private final boolean linear;
+    private final int reverseMs;
+    /** How long the current trip takes, which a timeline scales by the distance left. */
+    private int tripMs;
 
     private double value;
     private double from;
@@ -46,7 +51,29 @@ public final class Bloom {
     }
 
     public Bloom(boolean openAtStart, int durationMs, Runnable onFrame) {
+        this(openAtStart, durationMs, durationMs, false, onFrame);
+    }
+
+    /**
+     * A bloom that is a timeline: closed at the start, read as "how far through the sequence".
+     *
+     * <b>Linear, and timed by the distance it has to go.</b> A sequence whose stages have their
+     * own budgets - 200 ms of this, then 400 of that - needs its value to mean time, which the
+     * sine curve would bend. And a sequence interrupted near its start should not take as long
+     * to fold back as one interrupted near its end, so a trip of half the way takes half its
+     * duration. The fold has its own, shorter duration: a reader who interrupts wants it gone.
+     * Still the same primitive, so a reversal still starts from wherever the value is.
+     */
+    public static Bloom timeline(int forwardMs, int reverseMs, Runnable onFrame) {
+        return new Bloom(false, forwardMs, reverseMs, true, onFrame);
+    }
+
+    private Bloom(boolean openAtStart, int durationMs, int reverseMs, boolean linear,
+            Runnable onFrame) {
         this.durationMs = Math.max(1, durationMs);
+        this.reverseMs = Math.max(1, reverseMs);
+        this.linear = linear;
+        this.tripMs = this.durationMs;
         this.onFrame = onFrame;
         this.value = openAtStart ? 1.0 : 0.0;
         this.from = this.value;
@@ -82,6 +109,9 @@ public final class Bloom {
             finish();
             return;
         }
+        this.tripMs = !linear ? durationMs
+            : Math.max(1, (int) Math.round((to > from ? durationMs : reverseMs)
+                * Math.abs(to - from)));
         this.startedAt = System.currentTimeMillis();
         timer.restart();
     }
@@ -94,14 +124,19 @@ public final class Bloom {
         this.target = this.value;
     }
 
+    /** True while the value is still moving. */
+    public boolean running() {
+        return timer.isRunning();
+    }
+
     public void toggle() {
         set(!opening());
     }
 
     private void step() {
         double p = Math.min(1.0, (System.currentTimeMillis() - startedAt)
-            / (double) durationMs);
-        value = from + (target - from) * ease(p);
+            / (double) tripMs);
+        value = from + (target - from) * (linear ? p : ease(p));
         if (p >= 1.0) {
             finish();
             return;

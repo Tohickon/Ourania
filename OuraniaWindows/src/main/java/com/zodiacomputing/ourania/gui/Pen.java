@@ -24,6 +24,14 @@ public interface Pen {
     /** The plain sans-serif font, at this many points, for the following text. */
     void font(int points);
 
+    /**
+     * The bold sans-serif font, for the house numbers (2026-10-18: David, "bolden the house
+     * numbers"). A pen with no bold face may fall back to the plain one.
+     */
+    default void fontBold(int points) {
+        font(points);
+    }
+
     /** How wide {@code text} is in the plain font at {@code points}, in pixels. */
     int textWidth(String text, int points);
 

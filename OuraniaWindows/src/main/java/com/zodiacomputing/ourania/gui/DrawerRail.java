@@ -75,6 +75,23 @@ public final class DrawerRail extends JPanel {
      */
     private java.util.function.Consumer<String> onSelect;
     private final java.util.Set<String> disabled = new java.util.HashSet<>();
+    /** Tabs that can be clicked but are drawn dim: their chart is not on the wheel. */
+    private final java.util.Set<String> unlit = new java.util.HashSet<>();
+
+    /**
+     * Draws a tab bright or dim without changing whether it can be clicked (2026-10-22). A
+     * person's tab is dim while their chart is off the wheel; see OuraniaWindow.
+     */
+    public void setPageLit(String label, boolean lit) {
+        if (lit ? unlit.remove(label) : unlit.add(label)) {
+            repaintTabs();
+        }
+    }
+
+    /** Whether a tab is drawn lit; for the checks. */
+    public boolean isPageLit(String label) {
+        return !unlit.contains(label);
+    }
 
     public DrawerRail(Drawer.Side side, int openWidth) {
         this.side = side;
@@ -186,7 +203,7 @@ public final class DrawerRail extends JPanel {
             return;
         }
         selected = label;
-        cards.show(pages, label);
+        show(label);
         setOpen(true);
         repaintTabs();
         if (onSelect != null) {
@@ -197,6 +214,37 @@ public final class DrawerRail extends JPanel {
     /** Called with a page name each time that page is opened by a click. */
     public void setOnSelect(java.util.function.Consumer<String> listener) {
         this.onSelect = listener;
+    }
+
+    private java.util.function.Consumer<String> onShow;
+
+    /**
+     * Called with a page name each time that page comes to the front, by a click or not.
+     *
+     * <b>For tabs that share one body (2026-10-20).</b> The chart tabs all hold the same strip
+     * of pages, and a component has one parent, so the strip has to move into whichever tab is
+     * in front - on a reveal or a prepare as much as on a click, or a programmatic reveal would
+     * show an empty tab.
+     */
+    public void setOnShow(java.util.function.Consumer<String> listener) {
+        this.onShow = listener;
+    }
+
+    private void show(String label) {
+        if (onShow != null) {
+            onShow.accept(label);
+        }
+        cards.show(pages, label);
+    }
+
+    /**
+     * Puts a page in front without opening or closing the rail and without telling the
+     * click listener: for the chart tabs following a chart chosen some other way.
+     */
+    public void choose(String label) {
+        selected = label;
+        show(label);
+        repaintTabs();
     }
 
     /**
@@ -259,7 +307,7 @@ public final class DrawerRail extends JPanel {
     /** Shows a page without the toggle, for a caller that needs it visible either way. */
     public void reveal(String label) {
         selected = label;
-        cards.show(pages, label);
+        show(label);
         setOpen(true);
         repaintTabs();
     }
@@ -323,7 +371,7 @@ public final class DrawerRail extends JPanel {
      */
     public void prepare(String label) {
         selected = label;
-        cards.show(pages, label);
+        show(label);
         targetWidth = 0;
         applyWidth(0);
         repaintTabs();
@@ -332,7 +380,7 @@ public final class DrawerRail extends JPanel {
     /** Opens without animating, for a caller that wants it open from the first frame. */
     public void revealImmediately(String label) {
         selected = label;
-        cards.show(pages, label);
+        show(label);
         targetWidth = widthFor(label);
         applyWidth(targetWidth);
         repaintTabs();
@@ -456,7 +504,8 @@ public final class DrawerRail extends JPanel {
             g2.fillRect(edgeX, 0, thick, getHeight());
 
             g2.setFont(Theme.HEADING);
-            g2.setColor(off ? TAB_DISABLED : (on ? Color.WHITE : Theme.TEXT));
+            g2.setColor(off || (!on && unlit.contains(label)) ? TAB_DISABLED
+                : (on ? Color.WHITE : Theme.TEXT));
             FontMetrics fm = g2.getFontMetrics();
             // Triangles, as on Drawer's handle; see Theme.font for why they were once "<".
             String arrow = side == Drawer.Side.LEFT ? (on ? "\u25C2" : "\u25B8") : (on ? "\u25B8" : "\u25C2");

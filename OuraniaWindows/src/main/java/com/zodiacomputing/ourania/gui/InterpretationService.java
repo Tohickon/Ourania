@@ -197,6 +197,17 @@ public class InterpretationService {
         // NOT stored - ArcMidpointReading composes the rest from the pair's own conjunction
         // prose, which already exists for all 78 pairs. See that class for why.
         "solar_arc_midpoints.json",
+        // The plain transit cards on the Now page (2026-10-17): short parts that a card is
+        // built from - what the sky planet does, how the contact feels, which need it
+        // touches - and one "what to do now" line for each sky planet and major aspect.
+        // See TransitCard. Its own file and section, so nothing else can overwrite it.
+        "transit_cards.json",
+        // The Synthesize page's cards (2026-10-20): a headline, a body and a takeaway per theme
+        // word and per tension. See ThemeCards. Its own file and section, like the line above.
+        "synthesize_cards.json",
+        // The body and health readings (2026-10-22): David's sign, planet, health-house and
+        // aspect correspondences, as parts. See BodyReading. Its own file and section.
+        "body_cards.json",
         "aspect_prose_v2.json",
         "spirit_prose.json",
         "minor_aspect_prose.json",
@@ -232,6 +243,7 @@ public class InterpretationService {
         "composite_minor_aspects.json",
         "synastry_overlays.json",
         "synastry_angle_contacts.json",
+        "synastry_bodies.json",
         "composite_angles.json",
         "composite_sabian.json",
         "composite_transits_ptolemaic_t.json",
@@ -669,6 +681,8 @@ public class InterpretationService {
     private final Map<String, String> compositeHouses = new HashMap<>();
     private final Map<String, String> overlayHouses = new HashMap<>();
     private final Map<String, String> angleContacts = new HashMap<>();
+    /** What each body does to a household when it comes from the other chart, keyed by body id. */
+    private final Map<String, String> overlayBodies = new HashMap<>();
     private final Map<String, String> synastryAspects = new HashMap<>();
 
     /**
@@ -780,6 +794,15 @@ public class InterpretationService {
     /** What each directed body does when it arrives on a midpoint; thirteen entries. */
     private final Map<String, String> arcCatalysts = new HashMap<>();
 
+    /** The parts the plain transit cards are built from, keyed kind.body[.aspect]. */
+    private final Map<String, String> transitCardParts = new HashMap<>();
+
+    /** The body readings' parts, keyed sign.x, planet.x.part, house.n.part, sig.a_b.part. */
+    private final Map<String, String> bodyCardParts = new HashMap<>();
+
+    /** The Synthesize cards' words, keyed theme.part or a_vs_b.part. */
+    private final Map<String, String> synthesizeParts = new HashMap<>();
+
     /** The pictures with a specific reading of their own, keyed directed_a_b. */
     private final Map<String, String> arcPictures = new HashMap<>();
 
@@ -797,6 +820,7 @@ public class InterpretationService {
         if (line.startsWith("\"overlay_planet_house\"")) return overlayPlanetHouses;
         if (line.startsWith("\"overlay_planet_angle\"")) return overlayPlanetAngles;
         if (line.startsWith("\"angle_contact\""))   return angleContacts;
+        if (line.startsWith("\"overlay_body\""))    return overlayBodies;
         if (line.startsWith("\"synastry_interaspect\"")) return synastryInteraspects;
         if (line.startsWith("\"composite_planet_house\"")) return compositePlanetHouses;
         if (line.startsWith("\"composite_planet_sign\"")) return compositePlanetSigns;
@@ -814,6 +838,9 @@ public class InterpretationService {
         if (line.startsWith("\"synastry_aspect\"")) return synastryAspects;
         if (line.startsWith("\"arc_catalyst\"")) return arcCatalysts;
         if (line.startsWith("\"arc_picture\"")) return arcPictures;
+        if (line.startsWith("\"transit_card\"")) return transitCardParts;
+        if (line.startsWith("\"synthesize_card\"")) return synthesizeParts;
+        if (line.startsWith("\"body_card\"")) return bodyCardParts;
         return null;
     }
 
@@ -1101,6 +1128,11 @@ public class InterpretationService {
         return overlayPlanetAngles.get(bodyKey(bodyName) + "_" + bodyKey(angle));
     }
 
+    /** The plain-language reading of one body arriving from the other chart, or null. */
+    public String getOverlayBody(String bodyName) {
+        return bodyName == null ? null : overlayBodies.get(bodyKey(bodyName));
+    }
+
     public String getOverlayHouse(int house) {
         return house < 1 || house > 12 ? null : overlayHouses.get(String.valueOf(house));
     }
@@ -1291,6 +1323,24 @@ public class InterpretationService {
      * One sentence per body, which is the whole of what this layer needs from the catalyst
      * half of a picture - the other half is the pair's own fusion, and that already exists.
      */
+    /**
+     * One part of a plain transit card, or null when none is written. The key is the part's
+     * kind and the body's id, and the aspect for a "todo": {@code "todo.saturn.square"}.
+     */
+    public String getTransitCardPart(String key) {
+        return key == null ? null : transitCardParts.get(key);
+    }
+
+    /** A part of a body reading, or null: "sign.aries", "planet.mars.stress", "sig.mars_sun.title". */
+    public String getBodyPart(String key) {
+        return key == null ? null : bodyCardParts.get(key);
+    }
+
+    /** A part of a Synthesize card, or null: "watery.headline", "fiery_vs_watery.body". */
+    public String getSynthesizePart(String key) {
+        return key == null ? null : synthesizeParts.get(key);
+    }
+
     public String getArcCatalyst(String bodyName) {
         return arcCatalysts.getOrDefault(bodyKey(bodyName), "");
     }

@@ -49,12 +49,16 @@ final class OverviewPanel extends JPanel {
 
     private final SkymapPanel skymap;
     private final OuraniaWindow window;
+    /** The tab's voice, set each time the cards are built. */
+    private ReadingVoice voice = ReadingVoice.PERSON;
+    /** The chart's mix and figures as of the last build of {@link #cards()}; see html(). */
+    private Gestalt.Result lastGestalt;
     private final JEditorPane pane;
 
-    /** Which cards the reader has opened. Empty is the page's resting state. */
-    private final Set<String> expanded = new LinkedHashSet<>();
-
-    /** One card, built once so the collapsed and expanded views cannot disagree. */
+    /**
+     * One finding, built once. Its title, subtitle and plain sentence are the card the reader
+     * sees; its detail lines are the astrology behind it, shown in Astrologer view.
+     */
     static final class Card {
         final String id;
         final String icon;
@@ -102,27 +106,15 @@ final class OverviewPanel extends JPanel {
         this.pane.setCaretPosition(0);
     }
 
-    /** A link on this page. Cards toggle here; anything else is the app's ordinary click. */
+    /**
+     * A link on this page: a figure's "The figure in full", or the index. The page has no
+     * fold-open cards since Phase 2B - Astrologer view opens every why line - so there is no
+     * "toggle:" link to handle any more.
+     */
     void follow(String href) {
-        if (href == null) {
-            return;
-        }
-        if (href.startsWith("toggle:")) {
-            String id = href.substring("toggle:".length());
-            if (!expanded.remove(id)) {
-                expanded.add(id);
-            }
-            refresh();
-            return;
-        }
-        if (this.window != null) {
+        if (href != null && this.window != null) {
             this.window.handlePlacementClick(href);
         }
-    }
-
-    /** Whether a card is open, for the check and for the rendering. */
-    boolean isExpanded(String id) {
-        return expanded.contains(id);
     }
 
     // ------------------------------------------------------------------ the cards
@@ -136,11 +128,14 @@ final class OverviewPanel extends JPanel {
      */
     List<Card> cards() {
         List<Card> cards = new ArrayList<>();
-        ChartFrame f = this.skymap == null ? null : this.skymap.radixChart();
+        // One page on every tab (2026-10-22): the chart the tab reads, in its voice.
+        this.voice = ReadingVoice.of(this.skymap, this.window);
+        ChartFrame f = this.voice.frame(this.skymap);
         if (f == null) {
             return cards;
         }
         Gestalt.Result g = Gestalt.compute(f);
+        this.lastGestalt = g;
         List<BodyScore.Vector> ranked = BodyScore.rank(f, g);
 
         cards.add(sectCard(g));
@@ -166,14 +161,31 @@ final class OverviewPanel extends JPanel {
         return cards;
     }
 
+    /**
+     * The plain sentence for day or night, in the voice the page speaks. One home for it: the
+     * Chart shape card and the At a glance page (GlanceBlocks) both say it, and two copies of
+     * the wording would drift.
+     */
+    static String sectSentence(Gestalt.Result g, ReadingVoice voice) {
+        String benefic = Sect.beneficOfSect(g.diurnal);
+        return (voice == ReadingVoice.PERSON
+            ? "Because you were born " + (g.diurnal ? "in daylight" : "at night")
+            : voice == ReadingVoice.SKY
+                ? "Because it is " + (g.diurnal ? "daytime" : "night-time") + " here"
+                : "Because the Sun is " + (g.diurnal ? "above" : "below")
+                    + " your horizon now")
+            + ", " + g.sectLight + " and " + benefic + " work with the fewest obstacles in "
+            + voice.chart() + ", while " + g.outOfSectMalefic
+            + " is the one that needs handling.";
+    }
+
     private Card sectCard(Gestalt.Result g) {
         String benefic = Sect.beneficOfSect(g.diurnal);
         Card c = new Card("sect", g.diurnal ? "☀" : "☽",
             "Who Has the Easy Run",
-            subtitleOfSect(g.diurnal),
-            "Because you were born " + (g.diurnal ? "in daylight" : "at night") + ", "
-                + g.sectLight + " and " + benefic + " work with the fewest obstacles in your "
-                + "chart, while " + g.outOfSectMalefic + " is the one that needs handling.");
+            voice == ReadingVoice.PERSON ? subtitleOfSect(g.diurnal)
+                : (g.diurnal ? "Daytime sky" : "Night sky"),
+            sectSentence(g, voice));
         c.detail.add("Classical figure: " + (g.diurnal ? "diurnal" : "nocturnal") + " sect");
         c.detail.add("Light of the sect: " + g.sectLight);
         c.detail.add("Benefic of sect: " + benefic);
@@ -194,9 +206,11 @@ final class OverviewPanel extends JPanel {
             }
         }
         String name = g.shape.name().charAt(0) + g.shape.name().substring(1).toLowerCase();
-        Card c = new Card("shape", "◔", "How Your Chart Is Laid Out",
+        Card c = new Card("shape", "◔", voice == ReadingVoice.PERSON
+                ? "How Your Chart Is Laid Out" : "How the Sky Is Laid Out",
             plainShape(g.shape) + (handle.isEmpty() ? "" : ", led by " + handle + where),
-            "Your planets are " + plainShape(g.shape).toLowerCase()
+            (voice == ReadingVoice.PERSON ? "Your planets are " : "The sky's planets are ")
+                + plainShape(g.shape).toLowerCase()
                 + (handle.isEmpty() ? "." : ", with " + handle + " out in front - the placement "
                     + "that pulls the rest along and the one to read first."));
         c.detail.add("Classical figure: " + name + " pattern");
@@ -260,7 +274,8 @@ final class OverviewPanel extends JPanel {
                 ? "One planet links two others that would not otherwise meet, like a relay "
                     + "runner passing a baton: " + first.mediator + " has just left "
                     + first.from + " and is on its way to " + first.to + "."
-                : "Two parts of your chart that never meet directly both reach the same third "
+                : "Two parts of " + voice.chart() + " that never meet directly both reach the"
+                    + " same third "
                     + "planet, the way two strangers share a friend: "
                     + first.from + " and " + first.to + " both reach " + first.mediator
                     + ".");
@@ -352,25 +367,51 @@ final class OverviewPanel extends JPanel {
                 + "what kind of chart it is.</p></body></html>");
             return sb.toString();
         }
-        sb.append("<h2>Chart shape</h2>");
+        // One page of modern cards in every voice (Phase 2B): a person's, the sky's, and the sky
+        // on a person. The Patterns tab (reading framework spec): the chart's shape, the figures
+        // its planets make, then the rest.
+        return modernHtml(cards);
+    }
+
+    /**
+     * The Patterns page as one set of modern cards, for every voice (reading framework spec,
+     * Phase 2A for a person, Phase 2B for the sky and the sky on a person).
+     *
+     * <b>The same findings, drawn once.</b> The shape, the loudest voice and the two light cards
+     * are the {@link Card}s the page has always had; each becomes a {@link ReadingCard} - the card
+     * the rest of the app uses - with the old fold-open detail as its why lines, so Astrologer view
+     * opens them all and nothing needs a "Show the detail" link. The figures and stelliums sit
+     * between the shape and the rest, because they are what the shape is made of. The day-or-night
+     * card is not here: it is the badge on At a glance.
+     */
+    private String modernHtml(List<Card> cards) {
+        boolean why = Settings.astrologerView();
+        List<ReadingCard> shape = new ArrayList<>();
+        List<ReadingCard> also = new ArrayList<>();
         for (Card c : cards) {
-            // In Astrologer view every card starts open, and a click closes it instead.
-            boolean open = expanded.contains(c.id) != Settings.astrologerView();
-            sb.append("<p><b>").append(c.icon).append(' ').append(esc(c.title))
-              .append("</b><br>").append(esc(c.subtitle)).append("<br>")
-              .append(esc(c.plain)).append("<br>")
-              .append("<a href='toggle:").append(c.id).append("'>")
-              .append(open ? "Hide the detail" : "Show the detail").append("</a></p>");
-            if (open) {
-                sb.append("<ul>");
-                for (String line : c.detail) {
-                    sb.append("<li>").append(esc(line)).append("</li>");
-                }
-                sb.append("</ul>");
+            // A person's day-or-night is the badge on At a glance. The sky and the sky on a
+            // person have no such badge, so their card stays here (and leads the "also" cards).
+            if ("sect".equals(c.id) && voice == ReadingVoice.PERSON) {
+                continue;
             }
+            ReadingCard rc = new ReadingCard(c.title.toUpperCase(java.util.Locale.ROOT), c.subtitle,
+                c.plain, c.detail);
+            ("shape".equals(c.id) ? shape : also).add(rc);
         }
-        sb.append("</body></html>");
-        return sb.toString();
+        StringBuilder sb = new StringBuilder("<html><body><h2>Patterns</h2>");
+        sb.append(voice == ReadingVoice.TRANSIT
+            ? SkyOnChart.sectionHeading(SkyOnChart.heading(skymap.whoseLabel()))
+            : WhoseChart.html(skymap));
+        if (!shape.isEmpty()) {
+            sb.append("<h3 style='color:#FFD166; margin-top:6px; margin-bottom:4px;'>"
+                + "Chart shape</h3>").append(ReadingCard.html(shape, why));
+        }
+        sb.append(PatternCards.html(lastGestalt, why));
+        if (!also.isEmpty()) {
+            sb.append("<h3 style='color:#FFD166; margin-top:18px; margin-bottom:4px;'>"
+                + "Also in this chart</h3>").append(ReadingCard.html(also, why));
+        }
+        return sb.append("</body></html>").toString();
     }
 
     private static String esc(String s) {

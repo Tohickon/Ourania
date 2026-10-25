@@ -597,6 +597,11 @@ implements WheelSource, GlobeSource {
             this.globeGlide = new javax.swing.Timer(16, e -> {
                 if (!this.globe.settle()) {
                     this.globeGlide.stop();
+                    // <b>At rest straight down, the globe is the wheel</b> (2026-10-18): the
+                    // view hands back to the flat painter, which draws the same picture.
+                    if (this.globeMode && !this.globeDragging && this.globe.atTheWheel()) {
+                        this.setGlobeMode(false);
+                    }
                 }
                 this.chartPanel.repaint();
             });
@@ -701,7 +706,12 @@ implements WheelSource, GlobeSource {
      */
     boolean arcRingShown() {
         this.assignRingKinds();
-        return this.showSolarArc && this.outerRing.kind != WheelRing.Kind.SOLAR_ARC;
+        // <b>Only around a birth chart (David, 2026-10-22).</b> "its set to sky but there are 2
+        // charts on it when only 1 is selected". A solar arc moves a birth chart forward; with
+        // the sky alone on the inner wheel there is no birth to move, so the band drew the sky
+        // a second time, glyph for glyph, under a single Sky chip.
+        return this.showSolarArc && this.innerIsBirthChart
+            && this.outerRing.kind != WheelRing.Kind.SOLAR_ARC;
     }
 
     /**
@@ -981,6 +991,10 @@ implements WheelSource, GlobeSource {
         this.subjectB = b;
         this.subjectSky = sky;
         this.castRoles();
+        // The directed band follows whether the inner wheel is a birth chart, and castRoles
+        // can change that here: the first Chart A ever entered lands after its mode was set.
+        this.showArcRing = this.arcRingShown();
+        this.arcBloom.set(this.showArcRing);
     }
 
     /** Whether Chart A and Chart B are in the chart at all, as opposed to merely entered. */
@@ -1066,9 +1080,50 @@ implements WheelSource, GlobeSource {
         return this.ringAOn;
     }
 
+    /** Whether a Snapshot, Report or Synthesis is the reading on screen. */
+    boolean readingOpen() {
+        return this.readingTier != ReadingTier.NONE;
+    }
+
     /** Whether Chart B is in the chart. */
     boolean chartBIn() {
         return this.ringBOn;
+    }
+
+    /**
+     * The chart the You pages describe: whoever sits on the inner wheel, or null for the sky.
+     *
+     * <b>Derived from the chips, not remembered.</b> {@code castRoles} already picks this
+     * subject from the ring state, and every page reads the frame cast from it. This only
+     * names it, so a page can say whose chart it is without keeping a second answer.
+     */
+    public com.zodiacomputing.ourania.astro.ChartSubject describedSubject() {
+        return this.anchorSubject;
+    }
+
+    /**
+     * One short plain sentence that says which chart the You pages describe.
+     *
+     * Chart A on its own, Chart B on its own, both (the inner one is read; the other is named
+     * and the way to read it is given), a composite, or the sky when neither person is in.
+     */
+    public String whoseChart() {
+        if (this.isRelationshipChart()) {
+            return "These pages describe the composite of Chart A and Chart B.";
+        }
+        com.zodiacomputing.ourania.astro.ChartSubject who = this.anchorSubject;
+        if (who == null) {
+            return "These pages describe the sky: " + this.subjectSky.summary() + ".";
+        }
+        boolean isA = who == this.subjectA;
+        String slot = isA ? "Chart A" : "Chart B";
+        String name = who.label == null || who.label.isEmpty() || who.label.equals(slot)
+            ? slot : slot + " (" + who.label + ")";
+        String s = "These pages describe " + name + ": " + who.summary() + ".";
+        if (isA && this.ringBOn && this.subjectB.entered()) {
+            s += " Chart B is on the wheel too. Turn Chart A off to read Chart B here.";
+        }
+        return s;
     }
 
     /**
@@ -1745,7 +1800,8 @@ implements WheelSource, GlobeSource {
         if (this.focusBody < 0) {
             return Double.NaN;
         }
-        double[] lon = this.focusTransit ? this.outerRing.lon : this.natalRing.lon;
+        // From the focused ring, so a sky body lights the sky body's sign (2026-10-18).
+        double[] lon = this.wheelLon(this.focusRing);
         return this.focusBody < lon.length ? lon[this.focusBody] : Double.NaN;
     }
 
@@ -1853,7 +1909,9 @@ implements WheelSource, GlobeSource {
             int hit = GlobeRenderer.bodyAt(this.globe, this.chartPanel.getWidth(),
                 this.chartPanel.getHeight(), this, x, y);
             if (hit < 0) {
-                return null;
+                // No body: a figure's plane says what it is.
+                return this.figureHoverHtml(GlobeRenderer.figureAt(this.globe,
+                    this.chartPanel.getWidth(), this.chartPanel.getHeight(), this, x, y));
             }
             int ring = hitRing(hit);
             int i = hitBody(hit);
@@ -1886,7 +1944,11 @@ implements WheelSource, GlobeSource {
         }
         int i = this.nearestPoint(x, y, g.cx, g.cy, g.pin, this.natalRing.lon, this.natalRing.valid,
             g.natalRadii(), false);
-        return i >= 0 ? this.hoverHtml(i, this.natalRing.lon[i], this.natalRing.speed[i], WHEEL_NATAL) : null;
+        if (i >= 0) {
+            return this.hoverHtml(i, this.natalRing.lon[i], this.natalRing.speed[i], WHEEL_NATAL);
+        }
+        // No body: a figure's plane says what it is (2026-10-18).
+        return this.figureHoverHtml(this.figureAtWheel(x, y));
     }
 
     /**
@@ -2023,6 +2085,24 @@ implements WheelSource, GlobeSource {
             return this.arc;
         }
 
+        /**
+         * Where an aspect line ends: at the body itself.
+         *
+         * <p><b>Body to body since 2026-10-18.</b> David: "Aspects i want standard default to be
+         * lines from body to body concerned with the aspect not as they are in the wheel not
+         * connected to any body just in the center". The lines used to end at each body's
+         * longitude on one of three nested discs in the middle (aspectDisc), which kept them out
+         * of the glyphs and left them joined to nothing. The painter, the hover test and the
+         * chord hit test all read this, so a line is pointed at where it is drawn.
+         *
+         * @param wheel which ring the body is on, WheelLayout.WHEEL_NATAL / _OUTER / _SKY
+         */
+        int chordEnd(int wheel, int body) {
+            int[] r = wheel == WheelLayout.WHEEL_NATAL ? natalRadii()
+                : (wheel == WheelLayout.WHEEL_OUTER ? transitRadii() : triRadii());
+            return r[body];
+        }
+
         int[] triRadii() {
             if (this.tri == null) {
                 this.tri = WheelLayout.bloomed(
@@ -2142,6 +2222,88 @@ implements WheelSource, GlobeSource {
      * context that makes one body's web mean anything, and removing it would leave a reader
      * looking at five lines in an empty circle.
      */
+    /**
+     * Whether a line is one of the focused body's own: it ends on that body.
+     *
+     * <p>David, 2026-10-18, the focus rays: tapping or hovering a planet "isolates its immediate
+     * aspect network into intense glowing gold and orange vector rays, while all non-connected
+     * background planets and lines fade". The fading was already here (focusWeight, glyphWeight
+     * at FOCUS_DIM); this says which lines get the glow. Both views ask it.
+     *
+     * @param a the body on the line's own ring
+     * @param b the body on the natal ring, where every line lands
+     * @param wheel the ring {@code a} is on, WheelLayout.WHEEL_NATAL / _OUTER / _SKY
+     */
+    public boolean focusTouches(int a, int b, int wheel) {
+        if (this.aspectLit()) {
+            return this.isLitAspect(a, b, wheel);
+        }
+        if (this.figureLit()) {
+            return this.isFigureLine(a, b, wheel);
+        }
+        if (this.noFocus()) {
+            return false;
+        }
+        if (this.focusRing != WheelLayout.WHEEL_NATAL) {
+            // Between charts and transits too (2026-10-18), and by ring: a Chart B body and a
+            // sky body of the same index are two different bodies.
+            return wheel == this.focusRing && a == this.focusBody;
+        }
+        return b == this.focusBody || (wheel == WheelLayout.WHEEL_NATAL && a == this.focusBody);
+    }
+
+    /**
+     * Which ring the focused body is on - WHEEL_NATAL, _OUTER or _SKY. focusTransit could not
+     * tell the partner ring from the sky (2026-10-18), so the rays read this.
+     */
+    int focusRing = WheelLayout.WHEEL_NATAL;
+
+    /**
+     * As below, by ring (2026-10-18): a line between charts or a transit fades or holds by
+     * whether it is the focused body's own, on the ring it is actually on.
+     */
+    @Override
+    public double focusWeight(int a, int b, int wheel) {
+        if (this.aspectLit()) {
+            return this.isLitAspect(a, b, wheel) ? 1.0 : FOCUS_DIM;
+        }
+        if (this.figureLit()) {
+            return this.isFigureLine(a, b, wheel) ? 1.0 : FOCUS_DIM;
+        }
+        if (this.noFocus()) {
+            return 1.0;
+        }
+        return this.focusTouches(a, b, wheel) ? 1.0 : FOCUS_DIM;
+    }
+
+    /**
+     * How strongly to draw a body on any ring under the focus: full for the focused body and
+     * the bodies it aspects, faded for the rest - by ring, so the sky is not read as Chart B.
+     */
+    @Override
+    public double glyphWeight(int i, int ring) {
+        if (this.aspectLit()) {
+            return this.inLitAspect(i, ring) ? 1.0 : FOCUS_DIM;
+        }
+        if (this.figureLit()) {
+            return this.inFigure(i, ring) ? 1.0 : FOCUS_DIM;
+        }
+        if (this.noFocus()) {
+            return 1.0;
+        }
+        if (i == this.focusBody && ring == this.focusRing) {
+            return 1.0;
+        }
+        double[] mine = this.wheelLon(ring);
+        double[] theirs = this.wheelLon(this.focusRing);
+        if (this.focusBody >= theirs.length || i >= mine.length) {
+            return FOCUS_DIM;
+        }
+        Aspects.Profile profile = this.profileForPair(ring != this.focusRing);
+        double sep = Aspects.separation(mine[i], theirs[this.focusBody]);
+        return this.visibleAspect(sep, i, this.focusBody, profile) != null ? 1.0 : FOCUS_DIM;
+    }
+
     public double focusWeight(int a, int b, boolean transitPair) {
         if (this.noFocus()) {
             return 1.0;
@@ -2190,6 +2352,71 @@ implements WheelSource, GlobeSource {
         boolean changed = this.setFocus(packed);
         this.focusPinned = packed >= 0;
         return changed || !this.focusPinned;
+    }
+
+    /**
+     * A click on the background outside the chart: lets go of everything selected and puts the
+     * side drawers away. David, 2026-10-18: "selecting the background outside the chart should
+     * automatically deselect any element that is selected and close any side drawers as well".
+     */
+    void clickedBackground() {
+        boolean changed = this.pinFocus(-1);
+        changed |= this.setHighlightedChord(null);
+        changed |= this.setLitFigure(null, null);
+        changed |= this.setHover(-1, -1);
+        changed |= this.setFocusDegree(-1);
+        changed |= this.setFocusHouse(-1);
+        changed |= this.setFocusMansion(-1);
+        if (changed && this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+        if (this.window != null) {
+            this.window.closeSideDrawers();
+        }
+    }
+
+    /**
+     * Opens what a figure means on the Selection page: its name, whose bodies hold it, and its
+     * reading. David, 2026-10-18: "when i hover over grand cross, kite, grand trine there is no
+     * information about what any of those mean when clicked on".
+     *
+     * @param k the figure, in allFigures order
+     */
+    void showFigure(int k) {
+        int[][] figures = this.allFigures();
+        String[] names = this.allFigureNames();
+        if (k < 0 || k >= figures.length || this.window == null) {
+            return;
+        }
+        this.window.showSelection(InterpretationPanel.figureMeaningHtml(names[k],
+            this.figureMembers(figures[k]), this.figureBetween(figures[k])), true);
+    }
+
+    /** Whether a figure joins Chart A to another chart. */
+    private boolean figureBetween(int[] figure) {
+        for (int m : figure) {
+            if (WheelLayout.hitRing(m) != WheelLayout.WHEEL_NATAL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** A figure's bodies, each with its chart, for a card or a page. */
+    private String figureMembers(int[] figure) {
+        StringBuilder who = new StringBuilder();
+        for (int m : figure) {
+            int ring = WheelLayout.hitRing(m);
+            if (who.length() > 0) {
+                who.append(" &middot; ");
+            }
+            who.append(Bodies.at(WheelLayout.hitBody(m)).name).append(" <span style='color:#9AA5B1;'>(")
+                .append(ring == WheelLayout.WHEEL_NATAL ? "Chart A"
+                    : ring == WheelLayout.WHEEL_SKY ? "sky"
+                    : (this.isSynastryChart() ? "Chart B" : "transits"))
+                .append(")</span>");
+        }
+        return who.toString();
     }
 
     // ---------------------------------------------------------------- hover swell
@@ -2242,12 +2469,368 @@ implements WheelSource, GlobeSource {
 
     /** Sets the drawing transform to base, swollen about (x, y) when on. */
     static void bulge(Graphics2D g2, java.awt.geom.AffineTransform base, int x, int y, boolean on) {
+        bulge(g2, base, x, y, on ? HOVER_SCALE : 1.0);
+    }
+
+    /** As above, by a scale - the partners of a hovered body swell as the sparks reach them. */
+    static void bulge(Graphics2D g2, java.awt.geom.AffineTransform base, int x, int y,
+                      double scale) {
         g2.setTransform(base);
-        if (on) {
+        if (scale != 1.0) {
             g2.translate(x, y);
-            g2.scale(HOVER_SCALE, HOVER_SCALE);
+            g2.scale(scale, scale);
             g2.translate(-x, -y);
         }
+    }
+
+    // ------------------------------------------------------------------ the hover pulse
+    //
+    // David, 2026-10-18: "when hovering over a point it bulge magnifies the point while sending
+    // off an animated sparks of electricity down the aspect lines to the bodies its aspecting if
+    // the point has any and also bulge magnifies the bodies it is aspecting with while dimming
+    // everything else". A short animation started when the focus lands on a body: the sparks
+    // run from it along its own lines (focusTouches) to the far ends, and each body at a far end
+    // swells as they arrive. The dimming is the focus's own (FOCUS_DIM). Both views read the
+    // pulse; with the ring animations switched off in Settings there are no sparks and the
+    // partners swell at once.
+
+    /** How long the natal lines' slow current takes to run the length of a line, in ms. */
+    static final long CURRENT_MS = 4200L;
+
+    private javax.swing.Timer currentTimer;
+
+    /**
+     * Where the natal lines' slow current is in its cycle, 0 to 1, or -1 when it is off.
+     *
+     * <p>David, 2026-10-18: "Natal aspect lines should have a slow electric pulse on their
+     * lines". It runs while the chart is on screen and the ring animations are on in Settings;
+     * a chart painted off screen (a check, an export) has none, so it paints the same each time.
+     * The first paint that asks starts a slow timer (20 frames a second) that repaints the wheel
+     * and stops itself when the chart is hidden or the animations are switched off.
+     */
+    @Override
+    public double current() {
+        if (!Settings.animateRings() || this.chartPanel == null || !this.chartPanel.isShowing()) {
+            return -1.0;
+        }
+        if (this.currentTimer == null) {
+            this.currentTimer = new javax.swing.Timer(50, e -> {
+                if (!Settings.animateRings() || this.chartPanel == null
+                        || !this.chartPanel.isShowing()) {
+                    ((javax.swing.Timer) e.getSource()).stop();
+                    return;
+                }
+                this.repaintWheel();
+            });
+        }
+        if (!this.currentTimer.isRunning()) {
+            this.currentTimer.start();
+        }
+        long ms = System.nanoTime() / 1_000_000L;
+        return (ms % CURRENT_MS) / (double) CURRENT_MS;
+    }
+
+    /** How long one round of sparks takes, in milliseconds; they repeat while the hover lasts. */
+    static final long PULSE_MS = 900L;
+
+    /** When the pulse began, or -1 with none running. */
+    private long pulseStart = -1L;
+
+    private javax.swing.Timer pulseTimer;
+
+    private void startPulse() {
+        if (!Settings.animateRings()) {
+            this.pulseStart = -1L;
+            return;
+        }
+        this.pulseStart = System.nanoTime();
+        if (this.pulseTimer == null) {
+            this.pulseTimer = new javax.swing.Timer(16, e -> {
+                if (this.pulse() < 0.0) {
+                    ((javax.swing.Timer) e.getSource()).stop();
+                }
+                this.repaintWheel();
+            });
+        }
+        this.pulseTimer.restart();
+    }
+
+    /**
+     * How long the sparks have been running, in pulses (PULSE_MS each), or -1 when none are.
+     *
+     * <p><b>They run until the hover ends.</b> David, 2026-10-18: "can you have them continue
+     * until its hover offed?" So this keeps counting while a body is focused - the sparks'
+     * positions cycle (GlobeRenderer.sparkPositions) and the partners, once reached, stay
+     * swollen - and the timer stops the moment the focus goes.
+     */
+    @Override
+    public double pulse() {
+        if (this.pulseStart < 0L || this.noFocus() && !this.aspectLit() && !this.figureLit()) {
+            return -1.0;
+        }
+        return (System.nanoTime() - this.pulseStart) / 1e6 / PULSE_MS;
+    }
+
+    /**
+     * How much a body swells under the hover: the hovered body by HOVER_SCALE, a body it aspects
+     * by as much once the sparks have reached it, everything else not at all.
+     */
+    @Override
+    public double swell(int body, int ring) {
+        if (this.aspectLit()) {
+            return this.inLitAspect(body, ring) ? HOVER_SCALE : 1.0;
+        }
+        if (this.figureLit()) {
+            return this.inFigure(body, ring) ? HOVER_SCALE : 1.0;
+        }
+        if (this.noFocus() || body < 0) {
+            return 1.0;
+        }
+        if (body == this.focusBody && ring == this.focusRing) {
+            return HOVER_SCALE;
+        }
+        if (this.glyphWeight(body, ring) < 1.0) {
+            return 1.0;
+        }
+        double p = this.pulse();
+        double arrived = p < 0.0 ? 1.0 : Math.max(0.0, Math.min(1.0, (p - 0.45) / 0.35));
+        double eased = arrived * arrived * (3.0 - 2.0 * arrived);
+        return 1.0 + (HOVER_SCALE - 1.0) * 0.85 * eased;
+    }
+
+    /** True when the focused body is the first end of this line, where its sparks set off. */
+    @Override
+    public boolean focusAtFirstEnd(int a, int wheel) {
+        if (this.aspectLit()) {
+            return a == this.highlightA && wheel == this.highlightWheel;
+        }
+        return !this.noFocus() && a == this.focusBody && wheel == this.focusRing;
+    }
+
+    /**
+     * Whether one aspect is lit - a row of a body's Active Aspects or a cell of the aspect grid
+     * under the cursor. David, 2026-10-18: "under selected and then in active aspects for each
+     * one can we make that same magnify bulge hover over electric animate effect for each aspect
+     * when hovered over also". While it is, the hover effects follow it rather than a body: its
+     * two bodies swell, the sparks run along its line, and the rest dims.
+     */
+    boolean aspectLit() {
+        return this.highlightA >= 0 && this.highlightB >= 0;
+    }
+
+    /** True for the lit aspect's own line: its ring's body to its natal body, either way round. */
+    private boolean isLitAspect(int a, int b, int wheel) {
+        if (wheel != this.highlightWheel) {
+            return false;
+        }
+        return (a == this.highlightA && b == this.highlightB)
+            || (wheel == WheelLayout.WHEEL_NATAL && a == this.highlightB && b == this.highlightA);
+    }
+
+    // ------------------------------------------------------------------ the lit figure
+    //
+    // David, 2026-10-18: "in my chart i believe there is a red triangle in the middle and that
+    // is highlighting a grand cross but when i hover over grand cross nothing happens and then
+    // i switch on a transit chart to my natal and a blue square appears but no info to what
+    // that is or any hover effect either". So an aspect figure lights as an aspect does - its
+    // bodies swell, the sparks run along its lines, the rest fades - from its entry in a page
+    // (a pattern link under the cursor) or from its glass plane on the chart, which also says
+    // what it is in the hover card.
+
+    /** The lit figure's members, each packed with its ring (WheelLayout.packHit), or null. */
+    private int[] litFigure;
+    private String litFigureName;
+
+    boolean figureLit() {
+        return this.litFigure != null && this.litFigure.length > 0;
+    }
+
+    /** Lights a figure, or clears it with null. True when anything changed. */
+    boolean setLitFigure(int[] packed, String name) {
+        int[] next = packed == null || packed.length == 0 ? null : packed;
+        if (java.util.Arrays.equals(next, this.litFigure)) {
+            return false;
+        }
+        this.litFigure = next;
+        this.litFigureName = next == null ? null : name;
+        if (next != null) {
+            startPulse();
+        } else if (this.noFocus() && !this.aspectLit()) {
+            this.pulseStart = -1L;
+        }
+        this.repaintWheel();
+        return true;
+    }
+
+    /** True for one of the lit figure's bodies, on the ring it is on. */
+    private boolean inFigure(int body, int ring) {
+        if (this.litFigure == null) {
+            return false;
+        }
+        int packed = WheelLayout.packHit(body, ring);
+        for (int m : this.litFigure) {
+            if (m == packed) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** True for a line between two of the lit figure's bodies. */
+    private boolean isFigureLine(int a, int b, int wheel) {
+        return this.inFigure(a, wheel) && this.inFigure(b, WheelLayout.WHEEL_NATAL)
+            && !(wheel == WheelLayout.WHEEL_NATAL && a == b);
+    }
+
+    /** Every figure with a plane: Chart A's own, then those between charts, packed. */
+    int[][] allFigures() {
+        int[][] natal = this.autoPatterns;
+        int[][] cross = this.crossFigures;
+        int[][] all = new int[natal.length + cross.length][];
+        System.arraycopy(natal, 0, all, 0, natal.length);
+        System.arraycopy(cross, 0, all, natal.length, cross.length);
+        return all;
+    }
+
+    /** Their names, in the same order. */
+    String[] allFigureNames() {
+        String[] natal = this.patternNames();
+        String[] cross = this.crossFigureNames;
+        String[] all = new String[this.autoPatterns.length + cross.length];
+        for (int i = 0; i < this.autoPatterns.length; i++) {
+            all[i] = i < natal.length ? natal[i] : "";
+        }
+        System.arraycopy(cross, 0, all, this.autoPatterns.length, cross.length);
+        return all;
+    }
+
+    /**
+     * The figure whose glass plane is under a point of the flat wheel, in the wheel's own
+     * coordinates, or -1: its corners where the painter puts them (chordEnd), and of two
+     * planes over one point the smaller, which is the one drawn on top of the other.
+     */
+    int figureAtWheel(int px, int py) {
+        Geometry g = this.geometry();
+        if (g == null || !this.layerShown(Layer.ASPECTS)) {
+            return -1;
+        }
+        int[][] figures = this.allFigures();
+        double[][] lons = {this.natalRing.lon, this.outerRing.lon, this.skyRing.lon};
+        int best = -1;
+        double bestArea = Double.MAX_VALUE;
+        for (int k = 0; k < figures.length; k++) {
+            int[] members = GlobeRenderer.aroundTheZodiacPacked(figures[k], lons);
+            if (members.length < 3) {
+                continue;
+            }
+            java.awt.Polygon poly = new java.awt.Polygon();
+            for (int m : members) {
+                int ring = WheelLayout.hitRing(m);
+                int body = WheelLayout.hitBody(m);
+                double a = Math.toRadians(180.0 + g.pin - lons[ring][body]);
+                int r = g.chordEnd(ring, body);
+                poly.addPoint(g.cx + (int) Math.round(r * Math.cos(a)),
+                    g.cy + (int) Math.round(r * Math.sin(a)));
+            }
+            if (poly.contains(px, py)) {
+                double area = GlobeRenderer.polygonArea(poly.xpoints, poly.ypoints, poly.npoints);
+                if (area < bestArea) {
+                    bestArea = area;
+                    best = k;
+                }
+            }
+        }
+        return best;
+    }
+
+    /** The hover card for a figure's plane: what it is, and whose bodies hold it. */
+    String figureHoverHtml(int k) {
+        int[][] figures = this.allFigures();
+        String[] names = this.allFigureNames();
+        if (k < 0 || k >= figures.length) {
+            return null;
+        }
+        boolean between = this.figureBetween(figures[k]);
+        String who = this.figureMembers(figures[k]);
+        // What it means, in a line, and where the rest is (2026-10-18).
+        String gist = InterpretationPanel.figureGist(names[k]);
+        // The body card's own ground and ink (PlacementText.hoverCard), so it reads on any
+        // tooltip - the first version had neither and came out light grey on white.
+        return "<html><body style='width:250px; font-family:SansSerif; font-size:11px;"
+            + " background:#12151A; color:#E0E0E0;'>"
+            + "<div style='font-size:13px;'><b>" + names[k] + "</b></div>"
+            + "<div style='color:#9AA5B1;'>"
+            + (between ? "A figure between the charts" : "A figure in Chart A") + "</div>"
+            + "<div style='margin-top:4px;'>" + who + "</div>"
+            + (gist.isEmpty() ? "" : "<div style='margin-top:6px;'>" + gist + "</div>")
+            + "<div style='margin-top:6px; color:#FFD166;'>Click to read what it means.</div>"
+            + "</body></html>";
+    }
+
+    /**
+     * The figures between the charts, as a section for the top of the Transits page (or Chart
+     * B's): what each glass plane is, and whose bodies hold it. David, 2026-10-18: "there is
+     * still no info at the top of transits letting me know what that blue square is". Each
+     * entry is a link a hover lights on the chart, as a pattern's entry is.
+     */
+    String crossFiguresSection() {
+        this.refreshCrossFigures();
+        if (this.crossFigures.length == 0) {
+            return "";
+        }
+        int natal = this.autoPatterns.length;
+        StringBuilder sb = new StringBuilder();
+        sb.append("<h2 style='color:#E0E0E0; margin-top:10px;'><b>Figures between the charts</b></h2>");
+        sb.append("<p style='color:#9AA5B1; font-size:11px;'>The coloured glass planes on the"
+            + " chart: patterns your chart makes with the other one. Hover one to light it.</p>");
+        for (int k = 0; k < this.crossFigures.length; k++) {
+            // A colon, not a bar: the grid's aspect hrefs end in "|<ring>'", and AspectGridCheck
+            // counts those to tell which rings the grid carries - "figure|2'" read as a sky cell.
+            String href = "figure:" + (natal + k);
+            sb.append("<div style='margin-bottom:4px;'><a href='").append(href)
+                .append("' style='color:#FFD166; text-decoration:none;'><b>")
+                .append(this.crossFigureNames[k]).append("</b></a>");
+            StringBuilder who = new StringBuilder();
+            for (int m : this.crossFigures[k]) {
+                int ring = WheelLayout.hitRing(m);
+                if (who.length() > 0) {
+                    who.append(", ");
+                }
+                who.append(Bodies.at(WheelLayout.hitBody(m)).name).append(" (")
+                    .append(ring == WheelLayout.WHEEL_NATAL ? "Chart A"
+                        : ring == WheelLayout.WHEEL_SKY ? "sky"
+                        : (this.isSynastryChart() ? "Chart B" : "transits"))
+                    .append(")");
+            }
+            sb.append("<div style='font-size:11px;'><a href='").append(href)
+                .append("' style='color:#dddddd; text-decoration:none;'>").append(who)
+                .append("</a></div></div>");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * How strongly a figure's glass plane is drawn: full with nothing hovered, full for the lit
+     * figure itself, and faded behind anything else under the cursor - a body, an aspect or
+     * another figure. David, 2026-10-18: "When an aspect is hovered over even the triangle and
+     * square should fade into the back unless its the thing being hovered over".
+     *
+     * @param k the figure, in allFigures order
+     */
+    @Override
+    public double planeWeight(int k) {
+        if (this.figureLit()) {
+            int[][] all = this.allFigures();
+            return k >= 0 && k < all.length && java.util.Arrays.equals(all[k], this.litFigure)
+                ? 1.0 : FOCUS_DIM;
+        }
+        return this.aspectLit() || !this.noFocus() ? FOCUS_DIM : 1.0;
+    }
+
+    /** True for one of the lit aspect's two bodies, on the ring it is on. */
+    private boolean inLitAspect(int body, int ring) {
+        return (ring == this.highlightWheel && body == this.highlightA)
+            || (ring == WheelLayout.WHEEL_NATAL && body == this.highlightB);
     }
 
     // ------------------------------------------------------------------ zoom and pan
@@ -2319,6 +2902,47 @@ implements WheelSource, GlobeSource {
         this.view.paintFitChip(g2);
     }
 
+    /** Where the globe's chip sits: the Fit chip's corner, wide enough for its words. */
+    static java.awt.Rectangle globeChipBounds() {
+        java.awt.Rectangle r = WheelView.fitChipBounds();
+        return new java.awt.Rectangle(r.x, r.y, 270, r.height);
+    }
+
+    /**
+     * The globe's chip (2026-10-22): how to move it, and the way back to the wheel.
+     *
+     * <b>The globe pans with the right button, and nothing said so.</b> David: "i cant move it
+     * beyond turning it to a globe and zooming in to where it cuts off". The flat wheel has its
+     * "Fit" chip; the globe had nothing, so a globe zoomed into a corner could only be undone
+     * by finding the exact distance it would rest back into the wheel at.
+     */
+    public void paintGlobeChip(Graphics2D g2) {
+        java.awt.Rectangle r = globeChipBounds();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(new Color(22, 28, 43, 225));
+        g2.fillRoundRect(r.x, r.y, r.width, r.height, 12, 12);
+        g2.setColor(new Color(56, 132, 190));
+        g2.drawRoundRect(r.x, r.y, r.width, r.height, 12, 12);
+        g2.setFont(Theme.font("Segoe UI", java.awt.Font.BOLD, 12));
+        g2.setColor(Color.WHITE);
+        String label = "Right-drag to move  \u00b7  Back to wheel";
+        java.awt.FontMetrics fm = g2.getFontMetrics();
+        g2.drawString(label, r.x + (r.width - fm.stringWidth(label)) / 2,
+            r.y + (r.height + fm.getAscent() - fm.getDescent()) / 2);
+    }
+
+    /** Lays the globe flat, fitted and centred: the wheel, from wherever the globe was. */
+    void backToTheWheel() {
+        this.globe.reset();
+        this.globeDragging = false;
+        this.globeTurned = false;
+        this.fitView();
+        this.setGlobeMode(false);
+        if (this.chartPanel != null) {
+            this.chartPanel.repaint();
+        }
+    }
+
     static final int GLOBE_NONE = 0;
     static final int GLOBE_HOUSE = 2;
     static final int GLOBE_DECAN = 3;
@@ -2331,9 +2955,9 @@ implements WheelSource, GlobeSource {
      * What a point on the globe opens, other than a body: {kind, value}, kind GLOBE_NONE when
      * nothing. The one order for the globe's click and its hover, so what lights is what opens.
      *
-     * House numbers first (a label the reader aimed at), then the decan band before the degree
-     * ticks that crowd it, the mansions, the signs, the bounds, and last the house wedges of the
-     * plane, which lie under everything else.
+     * House numbers first (a label the reader aimed at), then the decan band and the bounds
+     * outside it before the degree ticks that crowd them both, the mansions, the signs, and
+     * last the house wedges of the plane, which lie under everything else.
      */
     int[] globeTargetAt(int x, int y) {
         int w = this.chartPanel.getWidth();
@@ -2346,6 +2970,13 @@ implements WheelSource, GlobeSource {
         if (v >= 0) {
             return new int[]{GLOBE_DECAN, v};
         }
+        // <b>The bounds before the ticks, as the decans are.</b> Since 2026-10-18 the bounds
+        // ride just outside the decans, where the degree ticks also run, and a glyph is what
+        // the reader means when they are on one - the same reason the decans come first.
+        v = GlobeRenderer.boundAt(this.globe, w, h, this, x, y);
+        if (v >= 0) {
+            return new int[]{GLOBE_BOUND, v};
+        }
         v = GlobeRenderer.degreeAt(this.globe, w, h, this, x, y);
         if (v >= 0) {
             return new int[]{GLOBE_DEGREE, v};
@@ -2357,10 +2988,6 @@ implements WheelSource, GlobeSource {
         v = GlobeRenderer.signAt(this.globe, w, h, this, x, y);
         if (v >= 0) {
             return new int[]{GLOBE_SIGN, v};
-        }
-        v = GlobeRenderer.boundAt(this.globe, w, h, this, x, y);
-        if (v >= 0) {
-            return new int[]{GLOBE_BOUND, v};
         }
         v = GlobeRenderer.houseAreaAt(this.globe, w, h, this, x, y);
         if (v >= 1) {
@@ -2454,7 +3081,7 @@ implements WheelSource, GlobeSource {
     }
 
     /** An annular wedge between two radii and two longitudes, in screen coordinates. */
-    private static java.awt.Shape wedge(Geometry g, double r0, double r1, double lonFrom,
+    static java.awt.Shape wedge(Geometry g, double r0, double r1, double lonFrom,
                                         double lonTo) {
         java.awt.geom.Path2D.Double p = new java.awt.geom.Path2D.Double();
         int steps = Math.max(2, (int) Math.ceil(Math.abs(lonTo - lonFrom) / 2.0));
@@ -2529,15 +3156,15 @@ implements WheelSource, GlobeSource {
             }
             case HOVER_DEGREE: {
                 g2.setColor(wash);
-                g2.fill(wedge(g, rings[RING_DEGREE_INNER], rings[RING_TERM_INNER] + 2, idx - 0.5,
+                g2.fill(wedge(g, rings[RING_DEGREE_INNER], rings[RING_SIGN_INNER] + 2, idx - 0.5,
                     idx + 0.5));
                 double a = Math.toRadians(180.0 + g.pin - idx);
                 g2.setColor(new Color(255, 255, 255, 220));
                 g2.setStroke(new BasicStroke(2.5f));
                 g2.drawLine(g.cx + (int) (rings[RING_DEGREE_INNER] * Math.cos(a)),
                     g.cy + (int) (rings[RING_DEGREE_INNER] * Math.sin(a)),
-                    g.cx + (int) ((rings[RING_TERM_INNER] + 4) * Math.cos(a)),
-                    g.cy + (int) ((rings[RING_TERM_INNER] + 4) * Math.sin(a)));
+                    g.cx + (int) ((rings[RING_SIGN_INNER] + 4) * Math.cos(a)),
+                    g.cy + (int) ((rings[RING_SIGN_INNER] + 4) * Math.sin(a)));
                 break;
             }
             case HOVER_HOUSE: {
@@ -2583,7 +3210,7 @@ implements WheelSource, GlobeSource {
                         double from = sign * 30.0 + edges[e];
                         double to = sign * 30.0 + edges[e + 1];
                         g2.setColor(wash);
-                        g2.fill(wedge(g, rings[RING_TERM_INNER], rings[RING_SIGN_INNER], from, to));
+                        g2.fill(wedge(g, rings[RING_TERM_INNER], rings[RING_TERM_OUTER], from, to));
                         int bi = Bodies.indexOfName(
                             com.zodiacomputing.ourania.astro.Dignity.boundRulerOf((from + to) / 2.0));
                         if (bi >= 0 && bi < BODY_GLYPHS.length) {
@@ -2591,7 +3218,7 @@ implements WheelSource, GlobeSource {
                                 (int) Math.round(11 * HOVER_SCALE * 1.2)));
                             g2.setColor(this.bodyColor(bi));
                             centred(g2, g, BODY_GLYPHS[bi], (from + to) / 2.0,
-                                (rings[RING_TERM_INNER] + rings[RING_SIGN_INNER]) / 2.0);
+                                (rings[RING_TERM_INNER] + rings[RING_TERM_OUTER]) / 2.0);
                         }
                     }
                 }
@@ -2610,11 +3237,18 @@ implements WheelSource, GlobeSource {
         }
         int body = packed < 0 ? -1 : (packed & (TRANSIT_BIT - 1));
         boolean transit = packed >= 0 && (packed & TRANSIT_BIT) != 0;
-        if (body == this.focusBody && transit == this.focusTransit) {
+        int ring = packed < 0 ? WheelLayout.WHEEL_NATAL : WheelLayout.hitRing(packed);
+        if (body == this.focusBody && transit == this.focusTransit && ring == this.focusRing) {
             return false;
         }
         this.focusBody = body;
         this.focusTransit = transit;
+        this.focusRing = ring;
+        if (body >= 0) {
+            startPulse();
+        } else {
+            this.pulseStart = -1L;
+        }
         return true;
     }
 
@@ -2640,6 +3274,10 @@ implements WheelSource, GlobeSource {
     private double selectionLon;
     private double selectionSpeed;
     private boolean selectionTransit;
+    /** The reading the card on screen was cut from, which a placement's reveal takes its words from. */
+    private String selectionReading = "";
+    /** The placement card the card on screen opens on, or null for a transit or an angle. */
+    private RevealPlan selectionPlan;
 
     /** Which sections of the selection card the reader has opened. Survives re-selection. */
     private final java.util.Set<String> selectionOpen = new java.util.LinkedHashSet<>();
@@ -2680,6 +3318,18 @@ implements WheelSource, GlobeSource {
         String reading = this.window == null ? "" : this.window.planetReadingHtml(
             BODY_NAMES[n], SIGN_NAMES[signIdx], degree, decan, house,
             this.getActiveAspectsFor(n, transit), lon);
+        this.selectionReading = reading;
+        // A natal placement opens on its card, which a click's reveal lands on.
+        this.selectionPlan = !transit && !Bodies.at(n).isAngle()
+            ? RevealPlan.forPlacement(BODY_NAMES[n], this.getActiveAspectsFor(n, false), reading)
+            : null;
+        if (this.selectionPlan != null) {
+            sb = new StringBuilder(this.selectionPlan.onTop(sb.toString()));
+            close = sb.lastIndexOf("</body>");
+            if (close < 0) {
+                close = sb.length();
+            }
+        }
 
         StringBuilder extra = new StringBuilder();
         String lead = leadParagraph(reading);
@@ -2799,7 +3449,7 @@ implements WheelSource, GlobeSource {
      * appears here, and neither can quietly fall behind the other. Index-keyed, so the open
      * set survives moving between bodies with the same shape of reading.
      */
-    private static java.util.List<String[]> readingSections(String html) {
+    static java.util.List<String[]> readingSections(String html) {
         java.util.List<String[]> out = new java.util.ArrayList<String[]>();
         if (html == null || html.isEmpty()) {
             return out;
@@ -3102,6 +3752,12 @@ implements WheelSource, GlobeSource {
                     SkymapPanel.this.globeTurned = false;
                     return;
                 }
+                // The globe's chip: back to the flat wheel, fitted (2026-10-22).
+                if (SkymapPanel.this.globeMode
+                        && globeChipBounds().contains(mouseEvent.getPoint())) {
+                    SkymapPanel.this.backToTheWheel();
+                    return;
+                }
                 if (SkymapPanel.this.globeMode) {
                     SkymapPanel.this.handleChartClick(mouseEvent.getX(), mouseEvent.getY());
                     return;
@@ -3124,7 +3780,13 @@ implements WheelSource, GlobeSource {
                     return;
                 }
                 java.awt.Point at = SkymapPanel.this.toWheel(mouseEvent.getX(), mouseEvent.getY());
-                SkymapPanel.this.handleChartClick(at.x, at.y);
+                // A single click asks for what it opens, so a placement may form at its planet.
+                // The second click of a double has already been answered by the first.
+                if (mouseEvent.getClickCount() == 1) {
+                    SkymapPanel.this.askForPlacement(at.x, at.y);
+                } else {
+                    SkymapPanel.this.handleChartClick(at.x, at.y);
+                }
             }
 
             @Override
@@ -3185,10 +3847,33 @@ implements WheelSource, GlobeSource {
                     SkymapPanel.this.chartPanel.repaint();
                     return;
                 }
-                // <b>The flat wheel pans when it is zoomed in.</b> At fit there is nowhere to go,
-                // so a drag stays a click with a shaky hand, as it always was.
+                // <b>The flat wheel pans when it is zoomed in, and tilts at fit.</b> David,
+                // 2026-10-18: "we can finally merge wheel and globe together and get rid of the
+                // globe wheel button". The wheel is the globe straight down, so an up-or-down drag
+                // at fit hands the drag to the globe's camera, opened straight down; dragging up
+                // tilts it away from the top, and letting it come back to rest there returns the
+                // wheel (startGlobeGlide).
                 if (!SkymapPanel.this.globeMode) {
                     if (SkymapPanel.this.viewIsFit()) {
+                        int tdx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
+                        int tdy = mouseEvent.getY() - SkymapPanel.this.dragFrom.y;
+                        if (tdx * tdx + tdy * tdy < 9 || Math.abs(tdy) < Math.abs(tdx)) {
+                            return;
+                        }
+                        Globe top = SkymapPanel.this.globe;
+                        top.yaw = 0.0;
+                        top.pitch = -Globe.MAX_PITCH;
+                        top.distance = Globe.DEFAULT_DISTANCE;
+                        top.targetX = 0.0;
+                        top.targetY = 0.0;
+                        top.targetZ = 0.0;
+                        SkymapPanel.this.setGlobeMode(true);
+                        SkymapPanel.this.globeTurned = true;
+                        SkymapPanel.this.globeDragging = true;
+                        top.drag(tdx, tdy, SkymapPanel.this.chartPanel.getHeight());
+                        SkymapPanel.this.dragFrom = mouseEvent.getPoint();
+                        SkymapPanel.this.startGlobeGlide();
+                        SkymapPanel.this.chartPanel.repaint();
                         return;
                     }
                     int pdx = mouseEvent.getX() - SkymapPanel.this.dragFrom.x;
@@ -3242,9 +3927,16 @@ implements WheelSource, GlobeSource {
                     int w2 = SkymapPanel.this.chartPanel.getWidth();
                     int h2 = SkymapPanel.this.chartPanel.getHeight();
                     int over = SkymapPanel.this.bodyAt(x, y);
+                    // A figure's plane, when no body is under the cursor (2026-10-18). Ahead of
+                    // the house area, which covers the whole middle the planes lie in.
+                    int fig = over >= 0 ? -1 : GlobeRenderer.figureAt(SkymapPanel.this.globe,
+                        w2, h2, SkymapPanel.this, x, y);
+                    boolean figMoved = SkymapPanel.this.setLitFigure(
+                        fig >= 0 ? SkymapPanel.this.allFigures()[fig] : null,
+                        fig >= 0 ? SkymapPanel.this.allFigureNames()[fig] : null);
                     // The click's own resolver, so whatever lights under the cursor is what
                     // opens when it is clicked.
-                    int[] t = over >= 0 ? new int[]{GLOBE_NONE, -1}
+                    int[] t = over >= 0 || fig >= 0 ? new int[]{GLOBE_NONE, -1}
                         : SkymapPanel.this.globeTargetAt(x, y);
                     int house = t[0] == GLOBE_HOUSE ? t[1] : -1;
                     int deg = t[0] == GLOBE_DEGREE ? t[1] : -1;
@@ -3253,9 +3945,10 @@ implements WheelSource, GlobeSource {
                     moved |= SkymapPanel.this.setFocusHouse(house);
                     moved |= SkymapPanel.this.setFocusMansion(station);
                     // The hand over anything the globe answers.
-                    boolean clickable = over >= 0 || t[0] != GLOBE_NONE;
+                    boolean clickable = over >= 0 || fig >= 0 || t[0] != GLOBE_NONE;
                     SkymapPanel.this.chartPanel.setCursor(java.awt.Cursor.getPredefinedCursor(
                         clickable ? java.awt.Cursor.HAND_CURSOR : java.awt.Cursor.DEFAULT_CURSOR));
+                    moved |= figMoved;
                     moved |= SkymapPanel.this.setHover(over, -1);
                     if (SkymapPanel.this.setFocus(over) || moved) {
                         SkymapPanel.this.chartPanel.repaint();
@@ -3292,11 +3985,17 @@ implements WheelSource, GlobeSource {
                 // resting on a body means.
                 int[] chord = over >= 0 ? null : SkymapPanel.this.chordAt(px, py);
                 moved |= SkymapPanel.this.setHighlightedChord(chord);
+                // A figure's plane, when no body or line is under the cursor (2026-10-18).
+                int fig = over >= 0 || chord != null ? -1 : SkymapPanel.this.figureAtWheel(px, py);
+                moved |= SkymapPanel.this.setLitFigure(
+                    fig >= 0 ? SkymapPanel.this.allFigures()[fig] : null,
+                    fig >= 0 ? SkymapPanel.this.allFigureNames()[fig] : null);
                 // The swell: whatever this point would open, shown before the click.
-                int ring = over >= 0 || chord != null ? -1 : SkymapPanel.this.ringTargetAt(px, py);
+                int ring = over >= 0 || chord != null || fig >= 0 ? -1
+                    : SkymapPanel.this.ringTargetAt(px, py);
                 moved |= SkymapPanel.this.setHover(over, ring);
                 SkymapPanel.this.chartPanel.setCursor(java.awt.Cursor.getPredefinedCursor(
-                    over >= 0 || chord != null || ring >= 0
+                    over >= 0 || chord != null || fig >= 0 || ring >= 0
                         ? java.awt.Cursor.HAND_CURSOR : java.awt.Cursor.DEFAULT_CURSOR));
                 if (moved) {
                     SkymapPanel.this.chartPanel.repaint();
@@ -3310,7 +4009,9 @@ implements WheelSource, GlobeSource {
                 SkymapPanel.this.chartPanel.repaint();
                 return;
             }
-            SkymapPanel.this.globe.zoom(e.getPreciseWheelRotation());
+            SkymapPanel.this.globe.zoomAt(e.getX(), e.getY(), e.getPreciseWheelRotation(),
+                SkymapPanel.this.chartPanel.getWidth(), SkymapPanel.this.chartPanel.getHeight());
+            SkymapPanel.this.startGlobeGlide();
             SkymapPanel.this.chartPanel.repaint();
         });
         // A chart is read by sweeping across it, so the default 750ms feels broken here.
@@ -3589,10 +4290,16 @@ implements WheelSource, GlobeSource {
     }
 
     private void showAnnualCalendar() {
-        if (this.sw == null || this.natalRing.time == null || this.window == null) {
+        if (this.sw == null || this.window == null) {
             return;
         }
-        final int n = this.natalRing.time.getYear();
+        // <b>The year of the moment being read, not of the birth (2026-10-20).</b> This read
+        // natalRing.time, which is the inner wheel's moment - the birth - so a 1982 chart got
+        // the 1982 sky on a tab behind Now. skyRing carries the reading's moment in every mode
+        // and follows the transport buttons; the profection is read at it too. The
+        // calendar is the sky's own events, so it needs no chart at all.
+        final int n = this.skyRing.time != null ? this.skyRing.time.getYear()
+            : java.time.Year.now().getValue();
         this.readingTier = ReadingTier.NONE;
         this.window.showCalendar(n, "Scanning the ephemeris for " + n + "...");
         new SwingWorker<String, Void>(){
@@ -3647,7 +4354,7 @@ implements WheelSource, GlobeSource {
      * same place, same house system, same ephemeris - so this is a second view of chart B,
      * not a second opinion about it.
      */
-    private ChartFrame synastryChartB() {
+    ChartFrame synastryChartB() {
         if (this.sw == null || this.outerRing.sd == null) {
             return null;
         }
@@ -3709,8 +4416,7 @@ implements WheelSource, GlobeSource {
                 || this.sw == null || this.natalRing.sd == null || this.outerRing.sd == null) {
             return null;
         }
-        ChartFrame host = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
-            this.innerLat(), this.innerLon(), this.houseSystem);
+        ChartFrame host = this.synastryChartA();
         ChartFrame visitor = this.synastryChartB();
         if (host == null || visitor == null) {
             return null;
@@ -3724,12 +4430,30 @@ implements WheelSource, GlobeSource {
         return null;
     }
 
-    private String generateSynastryCrossHtml() {
+    /**
+     * Chart A's frame as a synastry reads it, or null when there is no pair to read.
+     *
+     * <b>The one construction of chart A for every cross-chart question</b> - the hover's
+     * angle contact, the cross-contact section and the Together page. Until 2026-10-16 the
+     * hover cast it from {@link #innerLat} and the section from the natal ring's own place,
+     * which agree only while the inner wheel is a birth chart. The inner wheel's place is the
+     * right one: it is the chart being drawn.
+     */
+    ChartFrame synastryChartA() {
         if (this.sw == null || this.natalRing.sd == null || this.outerRing.sd == null) {
-            return "";
+            return null;
         }
-        ChartFrame chartFrame = this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
-            this.natalRing.latitude, this.natalRing.longitude, this.houseSystem);
+        return this.frameForCurrentChart(this.natalRing.sd.getJulDay(),
+            this.innerLat(), this.innerLon(), this.houseSystem);
+    }
+
+    /** The reader's aspect switches, by {@link Aspects.Type} ordinal; a copy, for the Together page. */
+    boolean[] aspectSelection() {
+        return this.aspectShown == null ? null : this.aspectShown.clone();
+    }
+
+    private String generateSynastryCrossHtml() {
+        ChartFrame chartFrame = this.synastryChartA();
         ChartFrame chartFrame2 = this.synastryChartB();
         if (chartFrame == null || chartFrame2 == null) {
             return "";
@@ -3975,6 +4699,65 @@ implements WheelSource, GlobeSource {
         return this.radixChart();
     }
 
+    /**
+     * A person's chart cast on its own, for a reading of the sky against someone who is not
+     * on the wheel (2026-10-22). Null for a chart with no moment.
+     */
+    ChartFrame frameOf(com.zodiacomputing.ourania.astro.ChartSubject who) {
+        if (who == null || who.moment == null) {
+            return null;
+        }
+        double jd = who.moment.toInstant().toEpochMilli() / 86400000.0 + 2440587.5;
+        return who.timeUnknown
+            ? ChartFrame.computeTimeUnknown(this.sw, jd, who.latitude, who.longitude,
+                this.houseSystem, false, 0.0)
+            : ChartFrame.compute(this.sw, jd, who.latitude, who.longitude, this.houseSystem,
+                false, 0.0);
+    }
+
+    /**
+     * True when the sky is on the wheel by itself (2026-10-22): no birth chart and no pair.
+     * The Sky tab's pages read as a weather report then (SkyWeather).
+     */
+    boolean skyAlone() {
+        return !this.innerIsBirthChart && !this.isRelationshipChart();
+    }
+
+    /** The place the sky is cast for, as the Sky row names it, for the pages' titles. */
+    String skyPlaceName() {
+        com.zodiacomputing.ourania.astro.ChartSubject s = this.subjectSky;
+        return s == null || s.placeName == null ? "" : s.placeName.trim();
+    }
+
+    /**
+     * The current sky in the person's houses, for the Transits tab's pages (2026-10-22): the
+     * sky's planets with the inner chart's cusps and angles. David chose this for the Transits
+     * Chart shape, Life areas and Report: "Sky + the person's houses". With no person on the
+     * wheel it is the sky as cast at its own place.
+     */
+    ChartFrame skyInChartHouses() {
+        ChartFrame sky = this.frameOf(this.subjectSky);
+        ChartFrame person = this.innerIsBirthChart ? this.radixChart() : null;
+        if (sky == null || person == null) {
+            return sky;
+        }
+        System.arraycopy(person.cusps, 0, sky.cusps, 0, sky.cusps.length);
+        sky.asc = person.asc;
+        sky.mc = person.mc;
+        sky.dsc = person.dsc;
+        sky.ic = person.ic;
+        sky.armc = person.armc;
+        sky.vertex = person.vertex;
+        return sky;
+    }
+
+    /** Whose chart is on the inner wheel, by name: "David", or "Chart A" before it has one. */
+    String whoseLabel() {
+        boolean b = this.anchorSubject != null && this.anchorSubject == this.subjectB;
+        return OuraniaWindow.whoseChart(this.anchorSubject,
+            b ? WheelRing.Kind.CHART_B : WheelRing.Kind.CHART_A, b ? "Chart B" : "Chart A");
+    }
+
     /** The chart as cast, before any harmonic. The house frame the harmonic keeps. */
     public ChartFrame radixChart() {
         boolean composite = this.chartMode == ChartMode.COMPOSITE_MIDPOINT
@@ -4034,13 +4817,15 @@ implements WheelSource, GlobeSource {
             return;
         }
         if ("SNAPSHOT".equals(name)) {
-            this.showReading(ReadingTier.PARAGRAPH);
+            this.askForReading(ReadingTier.PARAGRAPH);
         } else if ("REPORT".equals(name)) {
-            this.showReading(ReadingTier.REPORT);
+            this.askForReading(ReadingTier.REPORT);
         } else if ("SYNTHESIZE".equals(name)) {
-            this.showReading(ReadingTier.SYNTHESIZE);
+            this.askForReading(ReadingTier.SYNTHESIZE);
         } else if ("TIMELINE".equals(name)) {
-            this.showReading(ReadingTier.TIMELINE);
+            this.askForReading(ReadingTier.TIMELINE);
+        } else if ("THEMES".equals(name)) {
+            this.askForReading(ReadingTier.THEMES);
         }
     }
 
@@ -4131,8 +4916,33 @@ implements WheelSource, GlobeSource {
         }.execute();
     }
 
+    /**
+     * True for the one showReading that the reader asked for; read and cleared at its start.
+     *
+     * <b>The reveal plays only for a request, never for a rebuild.</b> refreshReadingIfShown
+     * calls showReading on every chart change, which the transport makes several times a
+     * second; a reading forming on the wheel each time would turn a demonstration into noise.
+     * So the buttons and the sidebar come through {@link #askForReading}, and nothing else does.
+     */
+    private boolean readingAsked;
+
+    /** The reveal that shows a reading forming from its chart factors; made on first use. */
+    private ReadingReveal reveal;
+
+    /** A reading the reader asked for, which may be revealed rather than simply shown. */
+    void askForReading(ReadingTier tier) {
+        this.readingAsked = true;
+        this.showReading(tier);
+    }
+
     /** Package-private since B8, so a batch can ask for the same reading a reader would. */
     void showReading(final ReadingTier readingTier) {
+        final boolean asked = this.readingAsked;
+        this.readingAsked = false;
+        // Whatever is still forming lands now, so it cannot land later over this reading.
+        if (this.reveal != null) {
+            this.reveal.interrupt();
+        }
         if (this.sw == null || this.natalRing.sd == null || this.window == null || readingTier == ReadingTier.NONE) {
             return;
         }
@@ -4165,7 +4975,26 @@ implements WheelSource, GlobeSource {
         // chronometry below needs this and not the transit wheel's.
         final double dNow = this.skyRing.sd != null
             ? this.skyRing.sd.getJulDay() : Double.NaN;
+        // Coming up reads the pair the Now page reads, by the same rule, so the two agree.
+        final WheelRing comingSky = this.nowRing();
+        final WheelRing comingNatal = this.natalRing;
+        final double[] comingCusps = this.activeCusps.clone();
+        // A birth chart's middle card is not "now" (David, 2026-10-22); the sky's is.
+        final boolean glanceSky = !this.innerIsBirthChart && !this.isRelationshipChart();
+        final String skyPlace = this.skyPlaceName();
+        // <b>The Transits tab reads the sky on the chart (2026-10-22).</b> Its Synthesize and
+        // Full report are the shared pages, in their own layout, read from the sky in the
+        // person's houses; decided here, on the event thread, with the frame cast here too.
+        final boolean onTransits = this.window != null && this.window.readingTransits()
+            && this.innerIsBirthChart;
+        final ChartFrame transitFrame = onTransits ? this.skyInChartHouses() : null;
+        final String whose = this.whoseLabel();
+        final String skyWhen = this.skyRing.time == null ? ""
+            : this.skyRing.time.format(DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm z"));
         new SwingWorker<String, Void>(){
+
+            /** The headline theme to reveal, when the reader asked and the year has one. */
+            private RevealPlan revealPlan;
 
             @Override
             protected String doInBackground() {
@@ -4181,6 +5010,20 @@ implements WheelSource, GlobeSource {
                 // whether a house holds together across its three witnesses.
                 List<Topics.Topic> topics = Topics.analyse(chartFrame, list);
                 Themes.Result result2 = Themes.extract(chartFrame, result, list, topics);
+                // Synthesize reads the chart alone, so it needs none of the timing below.
+                if (readingTier == ReadingTier.THEMES && onTransits) {
+                    Chronometry year = Chronometry.at(SkymapPanel.this.sw, chartFrame, d, dNow,
+                        list, bl ? d4 : Double.NaN, d5, d6, d2, d3, c, true, true);
+                    return SkyOnChart.synthesize(whose, NarrativeSynthesizer.yearThemes(chartFrame,
+                        year.profection, year.scan, year.convergence, bl, false),
+                        Settings.astrologerView());
+                }
+                if (readingTier == ReadingTier.THEMES) {
+                    // The sky alone is read as weather: the same count of three, the sky's words.
+                    return glanceSky
+                        ? SkyWeather.synthesize(result2, skyPlace, Settings.astrologerView())
+                        : ThemeCards.html(result2, Settings.astrologerView());
+                }
                 ChartFrame chartFrame2 = null;
                 Profection profection = null;
                 List<Transits.Hit> list2 = null;
@@ -4209,17 +5052,40 @@ implements WheelSource, GlobeSource {
                 // phone both call it. The comments that explained each step moved with them.
                 Chronometry time = Chronometry.at(SkymapPanel.this.sw, chartFrame, d, dNow, list,
                     bl ? d4 : Double.NaN, d5, d6, d2, d3, c,
-                    readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE
-                        || readingTier == ReadingTier.TIMELINE);
+                    // Not Coming up: it walks its own timeline and reads no year scan.
+                    readingTier == ReadingTier.REPORT || readingTier == ReadingTier.SYNTHESIZE,
+                    // Your year is the twelve months from now (David, 2026-10-17); the report
+                    // keeps the birthday year.
+                    readingTier == ReadingTier.SYNTHESIZE);
                 profection = time.profection;
                 chartFrame2 = time.transit;
                 list2 = time.hits;
                 yearScan = time.scan;
                 list3 = time.convergence;
+                // <b>One report, three charts (2026-10-22).</b> The same sections on every tab:
+                // the person's chart on Chart A or B, with nothing of the sky in it; the sky on
+                // its own; and on Transits the sky in the person's houses, with the timing
+                // section that reads the sky's contacts to the chart.
+                if (readingTier == ReadingTier.REPORT && transitFrame != null) {
+                    Gestalt.Result tg = Gestalt.compute(transitFrame);
+                    List<BodyScore.Vector> tr = BodyScore.rank(transitFrame, tg);
+                    List<Topics.Topic> tt = Topics.analyse(transitFrame, tr);
+                    object = "THE CURRENT SKY ON " + whose.toUpperCase(java.util.Locale.ROOT)
+                        + "\n\n" + Snapshot.report(transitFrame, tg, tr,
+                            Themes.extract(transitFrame, tg, tr, tt))
+                        + Snapshot.topicLayer(tt);
+                    if (bl) {
+                        object = (String)object + Snapshot.timeLayer(profection, list, list2,
+                            yearScan.events, list3, chartFrame, d4);
+                    }
+                    return (String)object;
+                }
                 if (readingTier == ReadingTier.REPORT) {
                     object = Snapshot.report(chartFrame, result, list, result2)
                         + Snapshot.topicLayer(topics);
-                    if (bl) {
+                    // A person's report is their chart alone (David, 2026-10-22: Chart A
+                    // should "read only chart a"); the timing is the Transits tab's.
+                    if (bl && glanceSky) {
                         // The frame and the moment carry the releasing section, which was
                         // computed to four levels and appeared in no reading until 2026-09-02.
                         object = (String)object + Snapshot.timeLayer(profection, list, list2,
@@ -4230,9 +5096,18 @@ implements WheelSource, GlobeSource {
                     return (String)object;
                 }
                 
-if (readingTier == ReadingTier.TIMELINE) {
-    return com.zodiacomputing.ourania.gui.TimelinePredictor.generate(chartFrame, chartFrame2);
-}
+                // <b>Coming up is transits to the chart, by date (2026-10-20).</b> It was
+                // TimelinePredictor, which read the sky alone - see NowCards.comingUpHtml.
+                // Its own ephemeris: the panel's is the EDT's, and this is a worker.
+                if (readingTier == ReadingTier.TIMELINE) {
+                    if (comingSky == null || comingSky.sd == null) {
+                        return NowCards.comingUpHtml(java.util.List.of(), Double.NaN);
+                    }
+                    return NowCards.comingUpHtml(
+                        NowTimeline.build(new SwissEph(SkymapPanel.EPHE_PATH), comingSky,
+                            comingNatal, comingCusps),
+                        comingSky.sd.getJulDay());
+                }
 if (readingTier == ReadingTier.SYNTHESIZE) {
                     // The mode decides which prose the reading speaks. Captured from the
                     // panel rather than sniffed from the frame: syntheticMoment is true for
@@ -4241,6 +5116,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // remembered by the checkbox that sets it: this tab regenerates on every
                     // open, so a state held in the widget would be lost the first time the
                     // reader looked at another page.
+                    // Asked or not: the page opens on the headline's card either way, so a
+                    // rebuild does not take away the card a reveal landed on.
+                    this.revealPlan = RevealPlan.firstHeadline(
+                        NarrativeSynthesizer.yearThemes(chartFrame, profection, yearScan, list3,
+                            bl, SkymapPanel.this.isRelationshipChart()),
+                        Settings.astrologerView());
                     return NarrativeSynthesizer.generateReport(chartFrame, result, list, result2, chartFrame2, profection, list2, yearScan, list3, bl,
                         SkymapPanel.this.isRelationshipChart(), Settings.readingMechanics());
                 }
@@ -4248,22 +5129,50 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // its headline, with the placements behind it shown only in Astrologer view.
                 // The year's sentence was glued onto the last block; it is its own card now,
                 // because it answers a different question from the paragraph it was stuck to.
+                // <b>The sky alone is a weather report (David, 2026-10-22).</b> Its conditions,
+                // its big story and what to watch for, for everyone at the sky's place.
+                if (glanceSky) {
+                    return SkyOnChart.sectionHeading(SkyWeather.title(skyPlace))
+                        + ReadingCard.html(SkyWeather.glance(chartFrame, skyPlace),
+                            Settings.astrologerView());
+                }
                 List<ReadingCard> cards = new ArrayList<>(
-                    PlainSnapshot.cards(chartFrame, result, list));
+                    PlainSnapshot.cards(chartFrame, result, list, !glanceSky));
                 if (bl) {
                     cards.add(new ReadingCard("THIS YEAR", null,
                         Snapshot.timeSentence(profection, list2), null));
                 }
-                return ReadingCard.html(cards, Settings.astrologerView());
+                // <b>The page opens with who this is (reading framework spec, 2026-10-24):</b>
+                // the Sun, the Moon and the Ascendant, day or night, and the mix of elements and
+                // ways of acting - then the chart's own themes below.
+                return GlanceBlocks.prefix(chartFrame, result,
+                        SkymapPanel.this.isRelationshipChart(), Settings.astrologerView())
+                    + ReadingCard.html(cards, Settings.astrologerView());
             }
 
             @Override
             protected void done() {
                 try {
                     if (readingTier == ReadingTier.REPORT) {
-                        SkymapPanel.this.window.showReport(string2, string, (String)this.get());
-                    } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
+                        // On Transits the report is the sky's, so its header is too.
+                        SkymapPanel.this.window.showReport(
+                            onTransits ? skyWhen : string2, onTransits ? skyPlace : string,
+                            (String)this.get());
+                    } else if (readingTier == ReadingTier.THEMES) {
                         SkymapPanel.this.window.showSynthesis((String)this.get());
+                    } else if (readingTier == ReadingTier.SYNTHESIZE || readingTier == ReadingTier.TIMELINE) {
+                        // The page draws its own year card, with the id the reveal lands on.
+                        RevealPlan plan = this.revealPlan;
+                        String html = (String)this.get();
+                        RevealPainter.Scene scene = ReadingReveal.shouldPlay(asked, plan)
+                            ? SkymapPanel.this.revealScene(plan, REVEAL_AT_CENTRE) : null;
+                        if (scene != null) {
+                            SkymapPanel.this.reveal().play(scene,
+                                () -> SkymapPanel.this.window.showSynthesis(html),
+                                SkymapPanel.this.landingFor(plan));
+                        } else {
+                            SkymapPanel.this.window.showSynthesis(html);
+                        }
                     } else {
                         SkymapPanel.this.window.showSnapshotCards(string2, string, (String)this.get());
                     }
@@ -4275,7 +5184,245 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }.execute();
     }
 
+    /** The focal point a headline theme forms at: the chart's centre, not any one body. */
+    static final int REVEAL_AT_CENTRE = -1;
+
+    /**
+     * Where a reveal is drawn: the wheel's centre and radius, the chart factors' glyphs, and the
+     * reading pane, all in the window's layered pane. Null when the wheel cannot show it - the
+     * globe is up, the wheel is not on screen, or none of the factors is drawn - in which case
+     * the reading is simply shown.
+     *
+     * @param focalBody the natal body the card forms at, or {@link #REVEAL_AT_CENTRE}
+     */
+    RevealPainter.Scene revealScene(RevealPlan plan, int focalBody) {
+        if (plan == null || this.chartPanel == null || !this.chartPanel.isShowing()
+                || this.isGlobeMode() || this.window == null) {
+            return null;
+        }
+        javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(this.chartPanel);
+        return root == null ? null : this.sceneOn(plan, focalBody, root.getLayeredPane());
+    }
+
+    /**
+     * The scene itself, on a given layered pane. Split from {@link #revealScene} so a check can
+     * ask where a reveal would be drawn without putting a window on the screen.
+     *
+     * <b>Positions are the painter's own</b>: {@link Geometry#natalRadii} and the canonical
+     * screenX/screenY, the same chain the hit test uses, so a thread ends on the glyph it names
+     * and a placement's card forms on the glyph that was clicked.
+     */
+    RevealPainter.Scene sceneOn(RevealPlan plan, int focalBody, javax.swing.JLayeredPane lp) {
+        Geometry g = this.geometry();
+        if (plan == null || g == null || this.window == null) {
+            return null;
+        }
+        List<java.awt.Point> points = new ArrayList<>();
+        for (String name : plan.points()) {
+            java.awt.Point p = this.pointOn(g, name, lp);
+            if (p != null) {
+                points.add(p);
+            }
+        }
+        if (points.isEmpty()) {
+            return null;
+        }
+        java.awt.Point centre = this.onScreen(g.cx, g.cy, lp);
+        java.awt.Point focal = focalBody == REVEAL_AT_CENTRE ? centre
+            : focalBody == REVEAL_AT_FIRST ? this.pointOn(g, plan.points().get(0), lp)
+            : this.glyphOn(g, this.natalRing, g.natalRadii(), focalBody, lp);
+        if (focal == null) {
+            return null;
+        }
+        int radius = (int) Math.round(this.view.zoom()
+            * Math.min(this.chartPanel.getWidth(), this.chartPanel.getHeight()) / 2.0);
+        return new RevealPainter.Scene(centre, radius, points, focal,
+            this.window.readingLanding(lp), plan, Color.BLACK);
+    }
+
+    /** The focal point of a transit's card: its first factor, the planet in the sky. */
+    static final int REVEAL_AT_FIRST = -2;
+
+    /**
+     * A plan's point on screen: a natal body by name, or {@link RevealPlan#SKY} + a name for
+     * a body on the ring the Now page reads ({@link #nowRing}), when that ring is drawn.
+     */
+    private java.awt.Point pointOn(Geometry g, String name, javax.swing.JLayeredPane lp) {
+        boolean sky = name.startsWith(RevealPlan.SKY);
+        String bare = sky ? name.substring(RevealPlan.SKY.length()) : name;
+        int i = Bodies.indexOfName(bare);
+        if (i < 0) {
+            i = Bodies.indexOf(bare.toLowerCase(java.util.Locale.ROOT));
+        }
+        if (!sky) {
+            return this.glyphOn(g, this.natalRing, g.natalRadii(), i, lp);
+        }
+        WheelRing now = this.nowRing();
+        if (now == this.outerRing && this.outerRingDrawn()) {
+            return this.glyphOn(g, now, g.transitRadii(), i, lp);
+        }
+        if (now == this.skyRing && this.triRingDrawn()) {
+            return this.glyphOn(g, now, g.triRadii(), i, lp);
+        }
+        return null;
+    }
+
+    /** A body's glyph on one ring, in the layered pane, or null when it is not drawn. */
+    private java.awt.Point glyphOn(Geometry g, WheelRing ring, int[] radii, int i,
+            javax.swing.JLayeredPane lp) {
+        if (i < 0 || i >= ring.lon.length || !ring.valid[i]) {
+            return null;
+        }
+        return this.onScreen(SkymapPanel.screenX(g.cx, g.pin, ring.lon[i], radii[i]),
+            SkymapPanel.screenY(g.cy, g.pin, ring.lon[i], radii[i]), lp);
+    }
+
+    /**
+     * The ring the Now page reads its transits from: the outer ring when it holds a moment,
+     * else the sky ring when it has one. One rule, asked by the page and by its pop-ups, so a
+     * card cannot form at a planet on a different ring from the one its card describes.
+     */
+    WheelRing nowRing() {
+        return this.outerRing.kind.readsAsEvent() ? this.outerRing
+            : (this.skyRing.time != null ? this.skyRing : this.outerRing);
+    }
+
+    /**
+     * Time has stopped on a moment the reader chose: Pause, the end of a scrub, or Now.
+     *
+     * <b>Never a tick of Play</b>, which moves time several times a second; pop-ups on every
+     * tick would be noise, the reason the reading's rebuild never reveals either. Queued, so
+     * the chart and the Now page are rebuilt for this moment before anything is read.
+     */
+    private void timeSettled() {
+        if (this.window == null) {
+            return;
+        }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            // The whole timeline, which the page leaves out while time is running.
+            this.window.refreshTransitsPane();
+            if (ReadingReveal.allowed()) {
+                this.popTransits();
+            }
+        });
+    }
+
+    /**
+     * The transits of this moment as pop-ups: the three nearest their exact moment, in that
+     * order, each forming at its planet in the sky with a thread to the natal point it touches,
+     * and landing on its own card on the Now page. A click or a key ends the chain.
+     */
+    void popTransits() {
+        // Not with the sky alone: a pop-up is a contact to a birth chart, and the sky's own
+        // Coming up (SkyTimeline) has no chart for one to reach.
+        if (this.isPlaying || this.isScrubbing() || this.sw == null || this.natalRing.sd == null
+                || this.window == null || !this.innerIsBirthChart) {
+            return;
+        }
+        // <b>The page first, then the wheel is measured.</b> Opening the rail moves the wheel and
+        // the pages lay out as it opens, so a chain that opened the page at its first landing
+        // measured a card 150 px wide, and its threads pointed at where the glyphs had been.
+        this.window.revealPage(OuraniaWindow.TRANSITS_PAGE);
+        javax.swing.Timer settle = new javax.swing.Timer(RAIL_SETTLE_MS, e -> this.playTransits());
+        settle.setRepeats(false);
+        settle.start();
+    }
+
+    /** How long the rail takes to open, so the wheel is measured where it comes to rest. */
+    static final int RAIL_SETTLE_MS = 450;
+
+    private void playTransits() {
+        if (this.isPlaying || this.isScrubbing()) {
+            return;
+        }
+        WheelRing now = this.nowRing();
+        if (now == null || now.sd == null) {
+            return;
+        }
+        List<Object[]> chain = new ArrayList<>();
+        // The first cards of the timeline, in its order - right now, then today, and on -
+        // which is the order they occur. One timeline in both views since 2026-10-20, so each
+        // pop-up has its card on the page whichever view is on.
+        List<NowTimeline.Entry> page = NowCards.visible(
+            NowTimeline.build(this.sw, now, this.natalRing, this.activeCusps));
+        for (NowTimeline.Entry e : page.subList(0, Math.min(TransitCard.POP_COUNT, page.size()))) {
+            this.chainUp(chain, e.hit(), e.card());
+        }
+        this.popNext(chain, 0);
+    }
+
+    /** One pop-up in a chain: the card, the scene it forms in, and its card's id on the page. */
+    private void chainUp(List<Object[]> chain, NowCards.TransitHit h, ReadingCard card) {
+        RevealPlan plan = RevealPlan.forTransit(h, card);
+        RevealPainter.Scene scene = this.revealScene(plan, REVEAL_AT_FIRST);
+        if (scene != null) {
+            chain.add(new Object[] {scene, TransitCard.id(h), plan});
+        }
+    }
+
+    private void popNext(List<Object[]> chain, int k) {
+        if (k >= chain.size() || this.window == null) {
+            return;
+        }
+        Object[] item = chain.get(k);
+        RevealPlan plan = (RevealPlan) item[2];
+        // The page is already open. Astrologer view shows the corpus card for the contact, so
+        // there the card is found by its id alone.
+        this.reveal().play((RevealPainter.Scene) item[0], null,
+            this.landingFor((String) item[1], Settings.astrologerView() ? null : plan.title()),
+            TransitCard.POP_MS, () -> this.popNext(chain, k + 1));
+    }
+
+    /**
+     * A wheel point where the reader sees it, in the layered pane. Through the view's own
+     * transform, the one the painter draws with, so a zoomed or panned wheel's card still forms
+     * on the glyph that was clicked.
+     */
+    private java.awt.Point onScreen(int x, int y, javax.swing.JLayeredPane lp) {
+        java.awt.geom.Point2D p = this.viewTransform(this.viewW(), this.viewH())
+            .transform(new java.awt.geom.Point2D.Double(x, y), null);
+        return javax.swing.SwingUtilities.convertPoint(this.chartPanel,
+            (int) Math.round(p.getX()), (int) Math.round(p.getY()), lp);
+    }
+
+    /**
+     * A click on the wheel: open what was clicked in the Selected panel.
+     *
+     * <b>No pop-up (David, 2026-10-22: "just get rid of it then its redundant and
+     * unneccesary").</b> A click on a planet of the inner ring used to form a card at the planet
+     * and fly it to the Selected panel. Its words only appeared once it started to move, and
+     * the panel opening on the left cut the flight short, so what a reader saw was a brief empty
+     * box. The panel shows the same card at its top, at once.
+     */
+    void askForPlacement(int x, int y) {
+        this.handleChartClick(x, y);
+    }
+
+    /** Where a plan's real card is on the page, asked of the window's layered pane. */
+    private java.util.function.Supplier<java.awt.Rectangle> landingFor(RevealPlan plan) {
+        return this.landingFor(RevealPlan.CARD_ID, plan.title());
+    }
+
+    /** Where the card with this id, and this heading if one is given, is on the page. */
+    private java.util.function.Supplier<java.awt.Rectangle> landingFor(String id, String headline) {
+        javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(this.chartPanel);
+        return root == null ? null
+            : () -> ReadingReveal.cardOnPage(root.getLayeredPane(), id, headline, true);
+    }
+
+    private ReadingReveal reveal() {
+        if (this.reveal == null) {
+            this.reveal = new ReadingReveal(
+                javax.swing.SwingUtilities.getRootPane(this.chartPanel).getLayeredPane());
+        }
+        return this.reveal;
+    }
+
     private void refreshReadingIfShown() {
+        // The chart moved, so a reveal's threads would point at where the glyphs were.
+        if (this.reveal != null) {
+            this.reveal.interrupt();
+        }
         if (this.readingTier == ReadingTier.NONE || this.isPlaying) {
             return;
         }
@@ -4286,6 +5433,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         this.refreshDebounce = new Timer(400, actionEvent -> {
             this.refreshDebounce.stop();
             if (!this.isPlaying && this.readingTier != ReadingTier.NONE) {
+                // <b>Back onto the page that shows it (2026-10-24).</b> David: with Chart A
+                // changed from David to Erika, Your year "says the exact same thing". This
+                // re-ran the reading without saying which page asked, so the new one went to the
+                // Reading panel and the page in front kept the old chart's. The window now
+                // records the page in front when it is this reading's, and the re-run is still
+                // unasked, so no reveal replays.
+                if (this.window != null) {
+                    this.window.routeRerunToFront(this.readingTier == ReadingTier.PARAGRAPH
+                        ? "SNAPSHOT" : this.readingTier == ReadingTier.THEMES ? "THEMES"
+                        : this.readingTier.name());
+                }
                 this.showReading(this.readingTier);
             }
         });
@@ -4408,16 +5566,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         jButton6.addActionListener(actionEvent -> jumpToNow());
         JButton jButton7 = new JButton("Snapshot");
         jButton7.setToolTipText("Read the natal chart as it currently stands");
-        jButton7.addActionListener(actionEvent -> this.showReading(ReadingTier.PARAGRAPH));
+        jButton7.addActionListener(actionEvent -> this.askForReading(ReadingTier.PARAGRAPH));
         JButton jButton8 = new JButton("Report");
         jButton8.setToolTipText("The full reading: shape, weights, repeated themes, tensions");
-        jButton8.addActionListener(actionEvent -> this.showReading(ReadingTier.REPORT));
+        jButton8.addActionListener(actionEvent -> this.askForReading(ReadingTier.REPORT));
         JButton jButton9 = new JButton("Synthesize");
         jButton9.setToolTipText("Generate a narrative reading based on the chart");
-        jButton9.addActionListener(actionEvent -> this.showReading(ReadingTier.SYNTHESIZE));
+        jButton9.addActionListener(actionEvent -> this.askForReading(ReadingTier.SYNTHESIZE));
         JButton jButton9_2 = new JButton("Predict");
         jButton9_2.setToolTipText("Generate a timeline prediction based on the chart");
-        jButton9_2.addActionListener(actionEvent -> this.showReading(ReadingTier.TIMELINE));
+        jButton9_2.addActionListener(actionEvent -> this.askForReading(ReadingTier.TIMELINE));
         JButton jButton10 = new JButton("Calendar");
         jButton10.setToolTipText("Ingresses, stations, lunations and mundane aspects for the year");
         jButton10.addActionListener(actionEvent -> this.showAnnualCalendar());
@@ -4651,7 +5809,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // Nothing under the cursor but the scaffolding: a house number opens its
                 // house, a tick opens its degree. Same order the hover uses, so what lights
                 // under the cursor is what opens when it is clicked.
+                int fig = GlobeRenderer.figureAt(this.globe, this.chartPanel.getWidth(),
+                    this.chartPanel.getHeight(), this, n, n2);
+                if (fig >= 0) {
+                    this.showFigure(fig);
+                    return;
+                }
                 int[] target = this.globeTargetAt(n, n2);
+                if (target[0] == GLOBE_NONE) {
+                    this.clickedBackground();
+                    return;
+                }
                 if (this.window == null) {
                     return;
                 }
@@ -4720,10 +5888,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             double[] spd = this.focusTransit ? this.outerRing.speed : this.natalRing.speed;
             if (this.focusBody < lon.length) {
                 // The same card the tooltip builds - one description of a body, shown in two
-                // places rather than written twice.
-                this.window.showSelection(
-                    this.selectionHtml(this.focusBody, lon[this.focusBody], spd[this.focusBody],
-                        this.focusTransit));
+                // places rather than written twice. A natal placement the reader asked for
+                // forms at its planet first, and this same card lands at the end.
+                String card = this.selectionHtml(this.focusBody, lon[this.focusBody],
+                    spd[this.focusBody], this.focusTransit);
+                boolean placement = !this.focusTransit && !Bodies.at(this.focusBody).isAngle();
+                this.window.showSelection(card, placement);
                 // <b>The natal-body exit, which this method's own list of exits promised and
                 // did not have.</b> Everything below resolves by radius, and the last two
                 // branches are "inside the body ring is a house, outside it is a sign" - so a
@@ -4738,7 +5908,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 // angles, which showAngleAt reads in full, and anything on the transit or sky
                 // ring, whose branches list its contacts back to Chart A and Chart B. Guarding
                 // only on isAngle cost exactly those two sky assertions in AspectGridCheck.
-                if (!this.focusTransit && !Bodies.at(this.focusBody).isAngle()) {
+                if (placement) {
                     // <b>And the full reading, not just the card.</b> The card is a summary -
                     // degree, house, decan, one line of Sabian - and reaching the placement's
                     // actual meaning took four more steps: Interpretations, then the index,
@@ -4751,6 +5921,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     // redundancy this replaced.
                     return;
                 }
+            }
+        }
+        // A figure's glass plane, when no body was hit: what the figure means. Ahead of the
+        // house underneath, as the hover is (2026-10-18).
+        if (this.focusBody < 0 && this.window != null) {
+            int fig = this.figureAtWheel(n, n2);
+            if (fig >= 0) {
+                this.showFigure(fig);
+                return;
             }
         }
         double d;
@@ -4781,6 +5960,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // until 2026-08-23 - the hit test computing the rings independently of the code that
         // draws them, which is how a glyph you can see becomes a glyph you cannot click.
         int[] rings = g.rings;
+        // Outside the mansions, the outermost band: the background (2026-10-18).
+        if (d6 > rings[RING_OUTER] + 18) {
+            this.clickedBackground();
+            return;
+        }
         int n9 = n4 = rings[RING_OUTER];
         int nTri = rings[RING_TRI];
         int n10 = rings[RING_TRANSIT];
@@ -4981,7 +6165,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
                     if (!WheelLayout.aspecting(n18, this.natalRing.valid)) continue;
                     for (int i = n18 + 1; i < BODY_COUNT; ++i) {
-                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(0), g.aspectDisc(0), this.natalRing.lon[n18], this.natalRing.lon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
+                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || Bodies.isOppositePair(n18, i) || !this.checkAspectHit(n, n2, n7, n8, d8, g.chordEnd(WHEEL_NATAL, n18), g.chordEnd(WHEEL_NATAL, i), this.natalRing.lon[n18], this.natalRing.lon[i], BODY_NAMES[n18], BODY_NAMES[i])) continue;
                         return;
                     }
                 }
@@ -4990,7 +6174,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 for (n18 = 0; n18 < BODY_COUNT; ++n18) {
                     if (!WheelLayout.aspecting(n18, this.outerRing.valid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
-                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(1), g.aspectDisc(1), this.outerRing.lon[n18], this.natalRing.lon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
+                        if (!WheelLayout.aspecting(i, this.natalRing.valid) || !this.checkAspectHit(n, n2, n7, n8, d8, g.chordEnd(WHEEL_OUTER, n18), g.chordEnd(WHEEL_NATAL, i), this.outerRing.lon[n18], this.natalRing.lon[i], "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) continue;
                         return;
                     }
                 }
@@ -5003,8 +6187,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     if (!WheelLayout.aspecting(n18, this.skyRing.valid)) continue;
                     for (int i = 0; i < BODY_COUNT; ++i) {
                         if (!WheelLayout.aspecting(i, this.natalRing.valid)
-                            || !this.checkAspectHit(n, n2, n7, n8, d8, g.aspectDisc(2),
-                                g.aspectDisc(2), this.skyRing.lon[n18], this.natalRing.lon[i],
+                            || !this.checkAspectHit(n, n2, n7, n8, d8, g.chordEnd(WHEEL_SKY, n18),
+                                g.chordEnd(WHEEL_NATAL, i), this.skyRing.lon[n18], this.natalRing.lon[i],
                                 "transit_" + BODY_NAMES[n18].toLowerCase(), BODY_NAMES[i])) {
                             continue;
                         }
@@ -5882,12 +7066,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * the fourth caller rather than copied into it.
      */
     static String boldLead(String prose) {
-        if (prose == null) {
-            return null;
-        }
-        int open = prose.indexOf("<b>");
-        int close = prose.indexOf("</b>", open + 3);
-        return open >= 0 && close > open ? prose.substring(open + 3, close) : null;
+        // Lives on ReadingCard since 2026-10-16, beside the code that splits a reading into a
+        // card; kept here as one line so the panel's own callers did not all have to move.
+        return ReadingCard.boldLead(prose);
     }
 
     /** The bold lead of the interpretation - the one-sentence finding - or null. */
@@ -5931,6 +7112,29 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * caller can repaint only when something actually moved - this runs from mouseMoved.
      */
     public boolean setHighlightedAspect(String href) {
+        // A pattern's entry under the cursor lights its figure (2026-10-18).
+        String[] figure = InterpretationPanel.parsePatternHref(href);
+        int figureIndex = -1;
+        if (figure == null && href != null && href.startsWith("figure:")) {
+            try {
+                figureIndex = Integer.parseInt(href.substring("figure:".length()));
+            } catch (NumberFormatException e) {
+                figureIndex = -1;
+            }
+        }
+        int[][] all = figureIndex >= 0 ? this.allFigures() : null;
+        boolean figureMoved;
+        if (all != null && figureIndex < all.length) {
+            figureMoved = this.setLitFigure(all[figureIndex], this.allFigureNames()[figureIndex]);
+            href = null;
+        } else {
+            figureMoved = this.setLitFigure(figure == null ? null
+                : patternIndices(java.util.Arrays.asList(figure[1].split(","))),
+                figure == null ? null : figure[0]);
+        }
+        if (figure != null || figureIndex >= 0) {
+            href = null;
+        }
         String[] parsed = parseAspectHref(href);
         int a = -1;
         int b = -1;
@@ -5945,11 +7149,16 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             }
         }
         if (a == this.highlightA && b == this.highlightB && wheel == this.highlightWheel) {
-            return false;
+            return figureMoved;
         }
         this.highlightA = a;
         this.highlightB = b;
         this.highlightWheel = wheel;
+        if (a >= 0 && b >= 0) {
+            startPulse();
+        } else if (this.noFocus() && !this.figureLit()) {
+            this.pulseStart = -1L;
+        }
         if (this.chartPanel != null) {
             this.chartPanel.repaint();
         }
@@ -6068,7 +7277,112 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             members[i] = patternIndices(found.get(i).bodies);
         }
         this.autoPatterns = members;
+        refreshCrossFigures();
     }
+
+    /** The prefix that marks a name as the outer ring's body, and the sky's. */
+    private static final String OUTER_TAG = "B|";
+    private static final String SKY_TAG = "S|";
+
+    /**
+     * The aspect figures that run between charts: at least one body on the outer ring or the
+     * sky, the rest anywhere. David, 2026-10-18: "these new rules will apply to aspects between
+     * charts and transits also" - so a transit that completes a T-square gets its glass plane.
+     * Each member is a packed hit (body and ring), so a plane can find its corners on the ring
+     * each one is drawn on.
+     */
+    private void refreshCrossFigures() {
+        java.util.List<int[]> figures = new java.util.ArrayList<>();
+        java.util.List<String> names = new java.util.ArrayList<>();
+        try {
+            java.util.List<String> tag = new java.util.ArrayList<>();
+            java.util.List<Double> lon = new java.util.ArrayList<>();
+            java.util.List<Integer> packed = new java.util.ArrayList<>();
+            int[] rings = {WHEEL_NATAL, WHEEL_OUTER, WHEEL_SKY};
+            for (int ring : rings) {
+                // The rings the chart is meant to show, not how far their blooms have opened:
+                // this runs once per chart change, often while a ring is still unfolding.
+                if (ring == WHEEL_OUTER && !this.showTransitChart
+                        || ring == WHEEL_SKY && !this.showTriWheel) {
+                    continue;
+                }
+                double[] l = this.wheelLon(ring);
+                boolean[] v = this.wheelValid(ring);
+                for (int i = 0; i < BODY_COUNT && i < l.length; i++) {
+                    if (!v[i]) {
+                        continue;
+                    }
+                    String prefix = ring == WHEEL_OUTER ? OUTER_TAG : (ring == WHEEL_SKY ? SKY_TAG : "");
+                    tag.add(prefix + Bodies.at(i).name);
+                    lon.add(l[i]);
+                    packed.add(WheelLayout.packHit(i, ring));
+                }
+            }
+            if (tag.size() == packed.size() && packed.stream().anyMatch(p -> WheelLayout.hitRing(p) != WHEEL_NATAL)) {
+                java.util.List<com.zodiacomputing.ourania.astro.Aspects.Hit> hits =
+                    new java.util.ArrayList<>();
+                for (int i = 0; i < tag.size(); i++) {
+                    for (int j = i + 1; j < tag.size(); j++) {
+                        // Judged under the bodies' own names - the orbs are looked up by
+                        // name - and then given the names that tell the charts apart.
+                        com.zodiacomputing.ourania.astro.Aspects.Hit h =
+                            com.zodiacomputing.ourania.astro.Aspects.hitBetween(
+                                untag(tag.get(i)), lon.get(i), untag(tag.get(j)), lon.get(j));
+                        if (h != null) {
+                            h.a = tag.get(i);
+                            h.b = tag.get(j);
+                            hits.add(h);
+                        }
+                    }
+                }
+                java.util.List<com.zodiacomputing.ourania.astro.AspectPatterns.Pattern> found =
+                    com.zodiacomputing.ourania.astro.AspectPatterns.findPatterns(hits,
+                        SkymapPanel::untag);
+                // <b>Only the figures that join Chart A to another chart, and only the tightest
+                // few.</b> Three charts of seventeen bodies make dozens of figures - 46 on the
+                // first chart measured, sixteen of them Grand crosses - and a sheet for each is
+                // a wall of glass. A figure with no natal body is the other charts' own; a
+                // figure of natal bodies only is Chart A's, already drawn. Of the rest, the
+                // CROSS_FIGURES tightest by their widest orb.
+                found.removeIf(p -> p.bodies.stream().allMatch(n -> untag(n).equals(n))
+                    || p.bodies.stream().noneMatch(n -> untag(n).equals(n)));
+                found.sort(java.util.Comparator.comparingDouble(p -> p.widestOrb));
+                if (found.size() > CROSS_FIGURES) {
+                    found = new java.util.ArrayList<>(found.subList(0, CROSS_FIGURES));
+                }
+                for (com.zodiacomputing.ourania.astro.AspectPatterns.Pattern p : found) {
+                    int[] m = new int[p.bodies.size()];
+                    for (int k = 0; k < m.length; k++) {
+                        m[k] = packed.get(tag.indexOf(p.bodies.get(k)));
+                    }
+                    figures.add(m);
+                    names.add(p.name);
+                }
+            }
+        } catch (Exception e) {
+            figures.clear();
+            names.clear();
+        }
+        this.crossFigures = figures.toArray(new int[0][]);
+        this.crossFigureNames = names.toArray(new String[0]);
+    }
+
+    /** A body's own name, from a name that may carry its chart's tag. */
+    static String untag(String name) {
+        return name.startsWith(OUTER_TAG) || name.startsWith(SKY_TAG) ? name.substring(2) : name;
+    }
+
+    /** How many figures between charts get a glass plane: the tightest few. */
+    static final int CROSS_FIGURES = 4;
+
+    int[][] crossFigures = new int[0][];
+    String[] crossFigureNames = new String[0];
+
+    /** The figures that run between charts, each member a packed hit (body and ring). */
+    @Override public int[][] crossFigures() { return this.crossFigures; }
+
+    /** Their names, in the same order. */
+    @Override public String[] crossFigureNames() { return this.crossFigureNames; }
 
     /** True when this line is the one the grid is hovering, or part of the lit pattern. */
     public boolean isHighlighted(int a, int b, int wheel) {
@@ -6339,7 +7653,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     static final int BAND_DEGREE = 3;
     /** The bounds ring and the open middle, which name the sign the wedge belongs to. */
     static final int BAND_OPEN = 4;
-    /** The Egyptian bounds ring, between the degree scale and the signs. */
+    /** The Egyptian bounds ring, between the decans and the rim (since 2026-10-18). */
     static final int BAND_BOUND = 5;
 
     /**
@@ -6362,6 +7676,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
      * @param bodyBase the floor of the natal band, where the open middle starts
      */
     static int bandAt(double r, int[] rings, int bodyBase) {
+        // The bounds ring answers for its own bound. It named the sign until 2026-09-14, for
+        // want of a reading - which made a click on a bound open something else. Outside the
+        // decans since 2026-10-18, as on the globe.
+        if (r >= rings[RING_TERM_INNER] && r < rings[RING_TERM_OUTER]) {
+            return BAND_BOUND;
+        }
         if (r >= rings[RING_SIGN_OUTER] && r < rings[RING_DECAN_OUTER]) {
             return BAND_DECAN;
         }
@@ -6370,13 +7690,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         // Before the open middle, because it lies inside it: the degree scale is a drawn ring
         // and the middle is the space around it.
-        if (r >= rings[RING_DEGREE_INNER] && r < rings[RING_TERM_INNER]) {
+        if (r >= rings[RING_DEGREE_INNER] && r < rings[RING_SIGN_INNER]) {
             return BAND_DEGREE;
-        }
-        // The bounds ring answers for its own bound. It named the sign until 2026-09-14, for
-        // want of a reading - which made a click on a bound open something else.
-        if (r >= rings[RING_TERM_INNER] && r < rings[RING_SIGN_INNER]) {
-            return BAND_BOUND;
         }
         if (r >= bodyBase && r < rings[RING_SIGN_INNER]) {
             return BAND_OPEN;
@@ -6406,14 +7721,13 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         }
         // Outside the widest field there is nothing to test, which is most of the wheel and
         // most of the mouse moves.
-        if (Math.hypot(x - g.cx, y - g.cy) > g.aspectDisc(2) + CHORD_GRAB) {
+        if (Math.hypot(x - g.cx, y - g.cy) > g.rings[RING_SIGN_INNER] + CHORD_GRAB) {
             return null;
         }
         double pin = g.pin;
         double near = CHORD_GRAB;
         int[] found = null;
         if (this.drawsNatalAspects()) {
-            int disc = g.aspectDisc(0);
             for (int a = 0; a < BODY_COUNT; a++) {
                 if (!WheelLayout.aspecting(a, this.natalRing.valid)) {
                     continue;
@@ -6424,7 +7738,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                         || this.aspectInkFor(this.natalRing.lon[a], this.natalRing.lon[b], a, b, false) == null) {
                         continue;
                     }
-                    double d = chordDistance(x, y, g.cx, g.cy, pin, disc, disc,
+                    double d = chordDistance(x, y, g.cx, g.cy, pin,
+                        g.chordEnd(WHEEL_NATAL, a), g.chordEnd(WHEEL_NATAL, b),
                         this.natalRing.lon[a], this.natalRing.lon[b]);
                     if (d < near) {
                         near = d;
@@ -6438,7 +7753,6 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 if (wheel == WHEEL_OUTER ? !this.outerRingDrawn() : !this.triRingDrawn()) {
                     continue;
                 }
-                int disc = g.aspectDisc(wheel);
                 double[] lon = this.wheelLon(wheel);
                 boolean[] valid = this.wheelValid(wheel);
                 for (int a = 0; a < BODY_COUNT; a++) {
@@ -6451,7 +7765,8 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                                 wheel == WHEEL_OUTER) == null) {
                             continue;
                         }
-                        double d = chordDistance(x, y, g.cx, g.cy, pin, disc, disc,
+                        double d = chordDistance(x, y, g.cx, g.cy, pin,
+                            g.chordEnd(wheel, a), g.chordEnd(WHEEL_NATAL, b),
                             lon[a], this.natalRing.lon[b]);
                         if (d < near) {
                             near = d;
@@ -6480,6 +7795,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         this.highlightA = a;
         this.highlightB = b;
         this.highlightWheel = wheel;
+        // A chord under the cursor is a lit aspect too: its sparks run (2026-10-18).
+        if (a >= 0 && b >= 0) {
+            startPulse();
+        } else if (this.noFocus()) {
+            this.pulseStart = -1L;
+        }
         return true;
     }
 
@@ -6658,6 +7979,17 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     @Override public int highlightWheel() { return this.highlightWheel; }
     @Override public int[] highlightPattern() { return this.highlightPattern; }
     @Override public int[][] autoPatterns() { return this.autoPatterns; }
+
+    /** The name of each figure in {@link #autoPatterns}, in the same order. */
+    @Override public String[] patternNames() {
+        java.util.List<com.zodiacomputing.ourania.astro.AspectPatterns.Pattern> found =
+            this.currentPatterns;
+        String[] names = new String[found == null ? 0 : found.size()];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = found.get(i).name;
+        }
+        return names;
+    }
     @Override public int focusBody() { return this.focusBody; }
     @Override public boolean focusTransit() { return this.focusTransit; }
     @Override public int hoverBody() { return this.hoverBody; }
@@ -6735,7 +8067,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     }
 
     void endScrub() {
+        boolean was = this.scrub.isScrubbing();
         this.scrub.end();
+        if (was) {
+            this.timeSettled();
+        }
     }
 
     /**
@@ -6819,6 +8155,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
     /** Starts or stops time, leaving the direction and rate alone. */
     void playPause() {
         this.isPlaying = !this.isPlaying;
+        if (!this.isPlaying) {
+            this.timeSettled();
+        }
     }
 
     /** True while time is running, so a check can see what the control did. */
@@ -6856,6 +8195,7 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         if (this.chartPanel != null) {
             this.chartPanel.repaint();
         }
+        this.timeSettled();
     }
 
     /**
@@ -7274,6 +8614,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             System.arraycopy(this.natalRing.cusps, 0, this.activeCusps, 0, this.activeCusps.length);
             this.activeAscendant = this.natalRing.ascendant;
         }
+        this.pushPlacementPages();
+        this.refreshTimeReadout();
+        this.refreshReadingIfShown();
+        // Which charts are on the wheel decides which scrub bars there are.
+        this.refreshScrubBars();
+    }
+
+    /** Writes every placements page to its accordion section. */
+    void pushPlacementPages() {
         if (this.window != null) {
             // Three parts, three accordion sections. One document would mean the
             // sidebar could only show or hide all of it at once, which is what it did before.
@@ -7284,10 +8633,15 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 this.generatePlanetPlacementsHtml(PlacementPart.SYNASTRY),
                 this.generatePlanetPlacementsHtml(PlacementPart.CHART_B));
         }
-        this.refreshTimeReadout();
-        this.refreshReadingIfShown();
-        // Which charts are on the wheel decides which scrub bars there are.
-        this.refreshScrubBars();
+    }
+
+    /**
+     * Opens or closes the body paragraphs on the Together page, and redraws the pages.
+     * The open/closed state lives in {@link SynastryPage}, which draws the links.
+     */
+    public void toggleSynastryDetail(String key) {
+        SynastryPage.toggleDetail(key);
+        this.pushPlacementPages();
     }
 
     /**
@@ -7601,8 +8955,19 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             // Recomputed here because this method already runs once per chart change; the
             // wheel's highlight is refreshed from the same call.
             this.refreshPatterns();
+            // Cards in every case (Phase 2B). A chart that belongs to someone, or to a pair, reads
+            // in a person's voice; the inner wheel is the sky exactly when it is not a birth chart,
+            // and then David's weather sentences and the public-life houses speak. Only if there
+            // is no chart frame to read does the page fall back to its rows.
+            boolean ofPerson = this.innerIsBirthChart
+                || this.chartMode == ChartMode.COMPOSITE_MIDPOINT
+                || this.chartMode == ChartMode.COMPOSITE_DAVISON;
+            PlacementCards.Voice voice = ofPerson ? PlacementCards.PERSON
+                : this.getCurrentChart() == null ? null
+                : PlacementCards.sky(this.getCurrentChart());
             stringBuilder.append(PlacementsPage.natalSection(string, this.natalRing,
-                dateTimeFormatter, this.currentPatterns, this.activeCusps));
+                dateTimeFormatter, this.currentPatterns, this.activeCusps, this.innerLat(),
+                this.innerLon(), voice));
         }
         // <b>Which PAGE the outer ring belongs on is decided by what it is carrying.</b> A
         // second person goes on their own page and a moment goes on the Transits page; this
@@ -7615,6 +8980,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         // be mislabelled by this method.
         this.assignRingKinds();
         final boolean outerIsPerson = this.outerRing.kind.isPerson;
+        // What the glass planes between the charts are, before the placements (2026-10-18).
+        if ((this.showTransitChart && (outerIsPerson ? wantChartB : wantTransits))
+                || (wantTransits && this.triRingDrawn())) {
+            stringBuilder.append(this.crossFiguresSection());
+        }
         if (this.showTransitChart && (outerIsPerson ? wantChartB : wantTransits)) {
             stringArray = this.outerCastLabel();
             if (stringArray.isEmpty() && this.outerRing.time != null) {
@@ -7629,9 +8999,11 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
             double[] outerCusps = outerIsPerson && this.outerRing.cusps != null
                 && this.outerRing.cusps.length >= 13
                 ? this.outerRing.cusps : this.activeCusps;
+            // The place the ring is cast at: a person's own, or the sky's for a transit ring.
+            // Cards for a second person, on their own page (Phase 2B); the moment keeps its rows.
             stringBuilder.append(PlacementsPage.ringSection(this.outerRing.kind.heading,
                 this.outerRing.kind.hueHex, stringArray, this.outerRing, "transit_",
-                outerCusps));
+                outerCusps, outerIsPerson ? this.outerRing : this.outerSource(), outerIsPerson));
         }
         // <b>Whether the sky ring is DRAWN, not whether it is wrapped around two people.</b>
         // This asked showTriWheel, whose own javadoc says it means "the sky is wrapped around
@@ -7772,7 +9144,9 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
         PARAGRAPH,
         REPORT,
         SYNTHESIZE,
-        TIMELINE;
+        TIMELINE,
+        /** The chart's own themes, three witnesses each: the Synthesize page (2026-10-20). */
+        THEMES;
 
     }
 }

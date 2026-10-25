@@ -1069,6 +1069,50 @@ public class ChartSetupPanel extends JPanel {
         }
     }
 
+    /**
+     * Puts a chart tab's chart on the wheel (2026-10-20): the left rail's one door into the
+     * wheel, as {@link #applyRings} is the chips'.
+     *
+     * A person's tab is that person with the sky over them, so Coming up has a sky to read;
+     * the Sky tab is the sky alone; Synastry is both people and the sky; Composite is the
+     * midpoint chart of the two. Leaving a composite first goes back to a synastry, because
+     * applyRings leaves a composite alone by design.
+     */
+    void showChart(ChartTab tab) {
+        if (tab == ChartTab.COMPOSITE) {
+            setSubject(Subject.PARTNERSHIP);
+            setMode(ChartMode.COMPOSITE_MIDPOINT);
+            transitsCheck.setSelected(true);
+            syncTransitsCheck();
+            if (parentWindow != null) {
+                parentWindow.applyChartMode(selectedMode, transitsCheck.isSelected(), true, true);
+            }
+            return;
+        }
+        if (selectedMode == ChartMode.COMPOSITE_MIDPOINT
+                || selectedMode == ChartMode.COMPOSITE_DAVISON) {
+            setMode(ChartMode.SYNASTRY);
+        }
+        switch (tab) {
+            case CHART_A -> applyRings(true, false, true);
+            case CHART_B -> applyRings(false, true, true);
+            case SYNASTRY -> applyRings(true, true, true);
+            default -> applyRings(false, false, true);
+        }
+    }
+
+    /**
+     * The Transits tab's wheel (2026-10-22): the people chosen, with the sky over them. A
+     * composite is left first, as {@link #showChart} does, because applyRings leaves one alone.
+     */
+    void showTransits(boolean chartA, boolean chartB) {
+        if (selectedMode == ChartMode.COMPOSITE_MIDPOINT
+                || selectedMode == ChartMode.COMPOSITE_DAVISON) {
+            setMode(ChartMode.SYNASTRY);
+        }
+        applyRings(chartA, chartB, true);
+    }
+
     /** True when Chart B has enough entered to draw a ring from. */
     boolean hasPartnerData() {
         return transitDateField != null

@@ -48,13 +48,19 @@ public final class EngineIsolationCheck {
      * stage 4), and the globe renderer itself with the two enums it asks its questions in
      * terms of - the foldable layers and an angle's role - which is what M11 stage 4
      * finished: the renderer had seventy references into {@code SkymapPanel} and one AWT
-     * import, and has neither now.
+     * import, and has neither now. And the table of zodiac bands the renderer draws from as the
+     * globe turns into the wheel (2026-10-18), which reads the wheel's layout to do it.
      */
     static final Set<String> SHARED = new TreeSet<>(List.of(
         "Settings", "SavedCharts", "InterpretationService", "ErrorLog", "Json",
         "NarrativeSynthesizer", "Atlas", "WheelLayout", "Globe", "Glossary",
-        "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer",
-        "AspectGate", "ChartPalette"));
+        "Pen", "Ink", "Layer", "AngleRole", "GlobeSource", "GlobeRenderer", "GlobeBands",
+        "AspectGate", "ChartPalette",
+        // The plain card and the life areas it names (2026-10-17): the reading opens on the
+        // year's card, and the phone's reading is the same page.
+        "ReadingCard", "LifeAreas",
+        // The year's biggest moments (2026-10-22), which the year's page is built from.
+        "YearMoments"));
 
     /** The Java level Android builds accept. */
     static final String RELEASE = "17";
@@ -88,13 +94,24 @@ public final class EngineIsolationCheck {
         for (String name : SHARED) {
             yes(name + " is a class in the desktop package", desktop.contains(name));
         }
+        // <b>A name the engine declares is the engine's own.</b> ThemeConvergence has an enum
+        // called Theme, which is not the desktop's colour theme. In the file that declares it the
+        // bare name is fine; in any other engine file it is fine qualified, as
+        // ThemeConvergence.Theme, because a dot in front means a member of an engine class.
+        // A bare Theme there is still flagged. A fully qualified gui.Theme would slip past this
+        // part, and Part C, which compiles the engine with no desktop classes, catches it.
+        Pattern declares = Pattern.compile("\\b(?:class|enum|interface|record)\\s+(\\w+)");
+        Set<String> engineDeclared = new TreeSet<>();
+        for (File f : engine) {
+            java.util.regex.Matcher decl = declares.matcher(JavaSource.codeOnly(read(f)));
+            while (decl.find()) {
+                engineDeclared.add(decl.group(1));
+            }
+        }
         for (File f : engine) {
             String code = JavaSource.codeOnly(read(f));
-            // A name the file declares itself is its own: ThemeConvergence has an enum called
-            // Theme, which is not the desktop's colour theme.
             Set<String> own = new TreeSet<>();
-            java.util.regex.Matcher decl = Pattern.compile(
-                "\\b(?:class|enum|interface|record)\\s+(\\w+)").matcher(code);
+            java.util.regex.Matcher decl = declares.matcher(code);
             while (decl.find()) {
                 own.add(decl.group(1));
             }
@@ -102,7 +119,8 @@ public final class EngineIsolationCheck {
                 if (own.contains(name) || SHARED.contains(name)) {
                     continue;
                 }
-                if (Pattern.compile("\\b" + name + "\\b").matcher(code).find()) {
+                String unqualified = engineDeclared.contains(name) ? "(?<!\\.)" : "";
+                if (Pattern.compile(unqualified + "\\b" + name + "\\b").matcher(code).find()) {
                     yes(f.getName() + " names desktop class " + name
                         + ", which is not one of the engine's shared classes", false);
                 }

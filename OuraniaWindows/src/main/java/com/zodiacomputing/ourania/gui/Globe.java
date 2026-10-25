@@ -72,23 +72,36 @@ public final class Globe {
      */
     public static final double SHELL_SKY = SHELL_CHART;
     public static final double SHELL_HOUSE = 1.92;
-    /** Egyptian bounds, just inside the signs - the flat wheel's order, kept. */
-    public static final double SHELL_BOUND = 1.99;
     public static final double SHELL_SIGN_INNER = 2.08;
     public static final double SHELL_SIGN_OUTER = 2.30;
     /** Decans, just outside the signs, as on the flat wheel. */
     public static final double SHELL_DECAN = 2.38;
+    /**
+     * Egyptian bounds, just outside the decans.
+     *
+     * <b>Moved out from inside the signs on 2026-10-18,</b> at 1.99 until then. David: "the only
+     * thing i would change in globe is to move the bounds to be next to the decans under the
+     * signs" - under as the globe is seen at its normal tilt, where the outer rings sit below
+     * the sign band on screen. The wheel moved its bounds the same way, so the two read
+     * signs, decans, bounds outward. As far beyond the decans as the decans are beyond the
+     * signs, which is what keeps the two rings of glyphs from touching.
+     *
+     * <p>The degree ticks run out through this ring as they run through the decans; see
+     * {@link SkymapPanel#globeTargetAt} for which answers a click where they cross.
+     */
+    public static final double SHELL_BOUND = SHELL_DECAN + (SHELL_DECAN - SHELL_SIGN_OUTER);
     public static final double SHELL_TICK = 2.42;
 
     /**
-     * How far a hovered degree tick stands out of the scale.
+     * How far a hovered degree tick stands out of the outer scale.
      *
-     * <b>Named because the mansion band is placed against it.</b> It was 0.34, which put the
-     * reach of the ticks at 2.67 and left no room outside them for another ring that the panel
-     * could still hold. At 0.21 the lit tick is still the longest on the scale - a sign
-     * boundary reaches 0.20 - and it stops a hair short of the band rather than crossing it.
+     * <b>Short since 2026-10-18, because the scale moved to the rim.</b> It was 0.21, on a scale
+     * that grew outward from just beyond the signs and so had room to reach; now the scale
+     * hangs inward from the mansion band, as the wheel's rim scale does, into the strip between
+     * the mansions and the bounds. The lit tick is still the longest on the scale - a sign
+     * boundary reaches 0.06 - and it stops short of the bound glyphs at {@link #SHELL_BOUND}.
      */
-    public static final double TICK_HOVER_REACH = 0.21;
+    public static final double TICK_HOVER_REACH = 0.08;
 
     /**
      * The lunar mansion band, outside everything else.
@@ -106,6 +119,26 @@ public final class Globe {
 
     /** The outside of that band. */
     public static final double SHELL_MANSION_OUTER = 2.70;
+
+    /**
+     * The line the outer degree scale hangs from: the mansion band's inner edge.
+     *
+     * <p>David, 2026-10-18: "on the globe match the outer degree ring just inside the mansions
+     * as is on the wheel". The wheel's rim scale hangs from {@code RING_MANSION_INNER} inward;
+     * this is the same edge on the globe, and the ticks run inward from it. Until that day the
+     * scale grew outward from just beyond the signs, through the decans.
+     */
+    public static final double SHELL_RIM_SCALE = SHELL_MANSION_INNER;
+
+    /**
+     * The inner degree scale's inner edge: it runs from the houses' shell up to the signs.
+     *
+     * <p>David, the same message: "add the inner ring that goes 0/10/20 under the signs as it
+     * has the same in the wheel". The wheel's inner scale sits directly under the sign band,
+     * between {@code RING_DEGREE_INNER} and {@code RING_SIGN_INNER}; on the globe that is the
+     * strip the bounds left when they moved out past the decans.
+     */
+    public static final double SHELL_INNER_SCALE = SHELL_HOUSE;
 
     /**
      * How far above and below the equator a filled shell reaches, in radians of latitude.
@@ -219,12 +252,46 @@ public final class Globe {
         }
     }
 
+    /**
+     * The pitch, in radians above the chart's plane, at which the globe starts to become the
+     * wheel; see {@link #flatness}. Here since 2026-10-18, when the projection began to read it
+     * (the turn eases away near the top); GlobeRenderer.FLAT_FROM is this.
+     */
+    static final double FLAT_FROM = 0.9;
+
+    /**
+     * How far the globe has become the wheel at this pitch: 0 at every ordinary tilt, 1 looking
+     * straight down on Chart A, a smoothstep between. Only from above.
+     */
+    static double flatness(double pitch) {
+        double over = -pitch;
+        double t = (over - FLAT_FROM) / (MAX_PITCH - FLAT_FROM);
+        if (t <= 0.0) {
+            return 0.0;
+        }
+        if (t >= 1.0) {
+            return 1.0;
+        }
+        return t * t * (3.0 - 2.0 * t);
+    }
+
+    /** True when the camera is at rest straight down at its opening distance and centre. */
+    boolean atTheWheel() {
+        return this.pitch <= -MAX_PITCH + 1e-3
+            && Math.abs(this.distance - DEFAULT_DISTANCE) < 0.05
+            && Math.abs(this.targetX) < 1e-3 && Math.abs(this.targetY) < 1e-3
+            && Math.abs(this.targetZ) < 1e-3 && !this.coasting();
+    }
+
     /** Rotation about the vertical axis, radians. The reader drags this. */
     public double yaw;
     /** Tilt toward the reader, radians. Clamped so the globe never turns inside out. */
     public double pitch;
     /** Camera distance in world units. The reader scrolls this. */
-    public double distance = 5.6;
+    public double distance = DEFAULT_DISTANCE;
+
+    /** Where the camera opens, and the distance at which straight down is the wheel at fit. */
+    public static final double DEFAULT_DISTANCE = 5.6;
 
     /**
      * Focal length as a multiple of the panel's smaller side.
@@ -235,6 +302,14 @@ public final class Globe {
      * scale outside the decans, further out than the old sky ring, so this came down with it.
      */
     private static final double ZOOM = 0.82;
+
+    /**
+     * Pixels per world unit, at unit depth, on a panel this size - the projection's own scale.
+     * Read by {@link GlobeBands} so the globe straight down lands on the wheel's pixels.
+     */
+    static double focal(int width, int height) {
+        return Math.min(width, height) * ZOOM;
+    }
 
     /**
      * The far end of the tilt: overhead, looking straight down at the chart.
@@ -515,6 +590,49 @@ public final class Globe {
     }
 
     /**
+     * Zooms about a point on the panel, so what is under the cursor stays under it
+     * (2026-10-22), as the flat wheel's zoom does.
+     *
+     * <b>Why.</b> David: the chart "zooms in at the lower part of the window and cuts half of it
+     * off". Zooming toward the middle of a tilted globe pushes its near edge, which perspective
+     * already draws larger, off the bottom of the window, and nothing brought it back. Zooming
+     * by a factor about the cursor moves a point at offset {@code o} from the middle to
+     * {@code o * f}; panning by {@code -(f - 1) * o} puts it back under the cursor. The pan is
+     * the camera's own (see {@link #pan}), so it glides in with the rest of the motion.
+     */
+    public void zoomAt(double x, double y, double ticks, int panelWidth, int panelHeight) {
+        double before = this.distance;
+        this.zoom(ticks);
+        double f = before / this.distance;
+        double ox = x - panelWidth / 2.0;
+        double oy = y - panelHeight / 2.0;
+        this.pan(-(f - 1.0) * ox, -(f - 1.0) * oy, panelWidth, panelHeight);
+    }
+
+    /** True when the camera is anywhere but straight down at the wheel, at rest or not. */
+    boolean awayFromTheWheel() {
+        return !this.atTheWheel();
+    }
+
+    /**
+     * Straight down, at the opening distance, over the centre, with nothing still gliding:
+     * the wheel. The way back from anywhere the globe has been turned, zoomed or moved to.
+     */
+    void reset() {
+        this.yaw = 0.0;
+        this.pitch = -MAX_PITCH;
+        this.distance = DEFAULT_DISTANCE;
+        this.targetX = 0.0;
+        this.targetY = 0.0;
+        this.targetZ = 0.0;
+        this.pendingYaw = 0.0;
+        this.pendingPitch = 0.0;
+        this.pendingPanX = 0.0;
+        this.pendingPanY = 0.0;
+        this.pendingPanZ = 0.0;
+    }
+
+    /**
      * World point to panel point.
      *
      * <b>Yaw then pitch then perspective, in that order.</b> Any other order tilts about an
@@ -531,8 +649,13 @@ public final class Globe {
         double x = worldX - this.targetX;
         double y = worldY - this.targetY;
         double z = worldZ - this.targetZ;
-        double cy = Math.cos(this.yaw);
-        double sy = Math.sin(this.yaw);
+        // <b>Near the top the turn eases away</b> (2026-10-18), so straight down the globe is the
+        // wheel the right way round - Ascendant on the left - whatever it was turned to on the
+        // way up; and since the turn is folded into (-PI, PI] first, it eases the short way.
+        double turn = Math.IEEEremainder(this.yaw, 2.0 * Math.PI);
+        double shown = turn * (1.0 - flatness(this.pitch));
+        double cy = Math.cos(shown);
+        double sy = Math.sin(shown);
         double xr = x * cy + z * sy;
         double zr = -x * sy + z * cy;
 

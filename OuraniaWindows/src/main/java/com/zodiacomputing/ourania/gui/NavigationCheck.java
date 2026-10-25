@@ -299,11 +299,12 @@ public final class NavigationCheck {
             java.util.List<String> boxes = facts.readingControls
                 .getOrDefault(r[0], java.util.Collections.emptyList());
             if ("SYNTHESIZE".equals(r[1])) {
-                ok("the Synthesize page carries the mechanics checkbox",
+                ok("the Your year page carries the mechanics checkbox",
                     boxes.contains("Show the mechanics"));
-            } else if ("SNAPSHOT".equals(r[1])) {
-                // The plain cards' "why" boxes (2026-10-13), behind Astrologer view.
-                ok("the Snapshot page carries the astrology checkbox",
+            } else if ("SNAPSHOT".equals(r[1]) || "THEMES".equals(r[1])) {
+                // The plain cards' "why" boxes (2026-10-13), behind Astrologer view; Synthesize's
+                // cards carry their witnesses in the same box (2026-10-20).
+                ok("the " + r[0] + " page carries the astrology checkbox",
                     boxes.equals(java.util.List.of("Show the astrology")));
             } else {
                 ok("the reading " + r[0] + " carries no checkbox of its own", boxes.isEmpty());
@@ -311,7 +312,6 @@ public final class NavigationCheck {
         }
         for (String p : new String[] {OuraniaWindow.CHART_PAGE, OuraniaWindow.TRANSITS_PAGE,
                                       OuraniaWindow.SYNASTRY_PAGE,
-                                      OuraniaWindow.SELECTION_PAGE,
                                       OuraniaWindow.READING_PAGE}) {
             ok("the rail has a page for " + p, pages.contains(p));
         }
@@ -1239,22 +1239,17 @@ public final class NavigationCheck {
             ok("the wheel and the form agree about whether there is a Chart A",
                 formA == sky.hasChartA());
 
-            // And when there is one, the wheel is drawing it rather than this moment.
-            if (formA) {
-                java.lang.reflect.Field fd = setup.getClass()
-                    .getDeclaredField("baseDateField");
-                fd.setAccessible(true);
-                String formDate =
-                    ((javax.swing.text.JTextComponent) fd.get(setup)).getText().trim();
-                Object drawn = sky.natalRing.time;
-                ok("the wheel has a moment to draw", drawn != null);
-                String drawnDate = drawn == null ? "" : drawn.toString().substring(0, 10);
-                System.out.println("  the form says " + formDate
-                    + ", the wheel is drawing " + drawnDate);
-                eq("the wheel draws the date the form holds", formDate, drawnDate);
-                ok("and it is not simply today",
-                    !drawnDate.equals(java.time.LocalDate.now().toString()));
-            }
+            // <b>The wheel opens on the sky, with Chart A loaded behind its chip (2026-10-20).</b>
+            // David: "the chart default should always open up to the current sky", and "keep it
+            // loaded for now". So the chart is the form's, and what is drawn is this moment.
+            ok("the wheel opens on the sky, not on a birth chart", !sky.innerIsBirthChart());
+            ok("with Chart A out of the chart", !sky.chartAIn());
+            Object drawn = sky.natalRing.time;
+            ok("the wheel has a moment to draw", drawn != null);
+            String drawnDate = drawn == null ? "" : drawn.toString().substring(0, 10);
+            // Today where the sky is, not where this machine is: the two differ near midnight.
+            eq("and it is today", drawn == null ? "" : java.time.LocalDate.now(
+                ((java.time.ZonedDateTime) drawn).getZone()).toString(), drawnDate);
 
             // The chips carry the names the form and the readout use.
             java.lang.reflect.Field fr = SkymapPanel.class.getDeclaredField("ringBar");
@@ -1263,7 +1258,12 @@ public final class NavigationCheck {
             ok("the wheel has a ring bar", bar != null);
             java.util.List<String> labels = chipLabels(bar);
             System.out.println("  chips: " + labels);
-            for (String want : new String[] {"Chart A", "Chart B", "Sky"}) {
+            // A chip wears its person's name once the chart has one (2026-10-20), and its slot's
+            // name until then - the same rule the chart tabs use.
+            for (String want : new String[] {
+                    OuraniaWindow.whoseChart(sky.chartASubject(), WheelRing.Kind.CHART_A, "Chart A"),
+                    OuraniaWindow.whoseChart(sky.chartBSubject(), WheelRing.Kind.CHART_B, "Chart B"),
+                    "Sky"}) {
                 ok("a chip is named " + want, labels.contains(want));
             }
             for (String gone : new String[] {"Natal", "Partner"}) {
@@ -1992,12 +1992,14 @@ public final class NavigationCheck {
             int signOuter = rings[WheelLayout.RING_SIGN_OUTER];
             int signInner = rings[WheelLayout.RING_SIGN_INNER];
             int termInner = rings[WheelLayout.RING_TERM_INNER];
+            int termOuter = rings[WheelLayout.RING_TERM_OUTER];
             int degreeInner = rings[WheelLayout.RING_DEGREE_INNER];
             int bodyBase = 226;
 
-            // The chain has to be in this order, or the bands below describe nothing.
-            ok("the ring chain runs outward", degreeInner < termInner
-                && termInner <= signInner && signInner < signOuter && signOuter < decanOuter);
+            // The chain has to be in this order, or the bands below describe nothing. Since
+            // 2026-10-18 the bounds are outside the decans, as on the globe.
+            ok("the ring chain runs outward", degreeInner < signInner && signInner < signOuter
+                && signOuter < decanOuter && decanOuter <= termInner && termInner < termOuter);
             ok("the open middle starts inside the degree scale", bodyBase < degreeInner);
 
             eq("the decan ring reads a decan", SkymapPanel.BAND_DECAN,
@@ -2005,15 +2007,15 @@ public final class NavigationCheck {
             eq("the sign ring reads a sign", SkymapPanel.BAND_SIGN,
                 SkymapPanel.bandAt((signInner + signOuter) / 2.0, rings, bodyBase));
             eq("the inner degree scale reads a degree", SkymapPanel.BAND_DEGREE,
-                SkymapPanel.bandAt((degreeInner + termInner) / 2.0, rings, bodyBase));
+                SkymapPanel.bandAt((degreeInner + signInner) / 2.0, rings, bodyBase));
             // The bounds ring has its own reading since 2026-09-14; naming the sign was a click on
             // one item opening another.
             eq("the bounds ring reads a bound", SkymapPanel.BAND_BOUND,
-                SkymapPanel.bandAt((termInner + signInner) / 2.0, rings, bodyBase));
+                SkymapPanel.bandAt((termInner + termOuter) / 2.0, rings, bodyBase));
             eq("the open middle names its sign", SkymapPanel.BAND_OPEN,
                 SkymapPanel.bandAt((bodyBase + degreeInner) / 2.0, rings, bodyBase));
-            eq("outside the decan ring is nothing", SkymapPanel.BAND_NONE,
-                SkymapPanel.bandAt(decanOuter + 2.0, rings, bodyBase));
+            eq("outside the bound ring is nothing", SkymapPanel.BAND_NONE,
+                SkymapPanel.bandAt(termOuter + 2.0, rings, bodyBase));
             eq("inside the natal band is nothing", SkymapPanel.BAND_NONE,
                 SkymapPanel.bandAt(bodyBase - 2.0, rings, bodyBase));
 
@@ -2021,7 +2023,7 @@ public final class NavigationCheck {
             // enough to answer for four rings. Walking every pixel is what catches it, where
             // five sample points in the middle of each band would not.
             java.util.Map<Integer, Integer> width = new java.util.TreeMap<>();
-            for (int r = 0; r <= decanOuter + 20; r++) {
+            for (int r = 0; r <= termOuter + 20; r++) {
                 width.merge(SkymapPanel.bandAt(r, rings, bodyBase), 1, Integer::sum);
             }
             ok("the decan ring is as deep as it is drawn",
@@ -2029,13 +2031,13 @@ public final class NavigationCheck {
             ok("the sign ring is as deep as it is drawn",
                 width.getOrDefault(SkymapPanel.BAND_SIGN, 0) == signOuter - signInner);
             ok("the degree scale is as deep as it is drawn",
-                width.getOrDefault(SkymapPanel.BAND_DEGREE, 0) == termInner - degreeInner);
+                width.getOrDefault(SkymapPanel.BAND_DEGREE, 0) == signInner - degreeInner);
             ok("the bounds ring is as deep as it is drawn",
-                width.getOrDefault(SkymapPanel.BAND_BOUND, 0) == signInner - termInner);
-            // Less the bounds ring as well as the degree scale, now that it is a band of its own.
+                width.getOrDefault(SkymapPanel.BAND_BOUND, 0) == termOuter - termInner);
+            // Less the degree scale; the bounds no longer lie inside the signs.
             ok("the open middle is what is left",
                 width.getOrDefault(SkymapPanel.BAND_OPEN, 0)
-                    == (signInner - bodyBase) - (termInner - degreeInner) - (signInner - termInner));
+                    == (signInner - bodyBase) - (signInner - degreeInner));
 
             // ---- half two: the chords, on a real tri-wheel ----
             boolean[] every = new boolean[com.zodiacomputing.ourania.astro.Bodies.ALL.length];
@@ -2341,14 +2343,32 @@ public final class NavigationCheck {
             final javax.swing.JEditorPane selectionPane =
                 (javax.swing.JEditorPane) fieldOf(w[0], "selectionPane");
 
-            final String[] html = new String[1];
-            SwingUtilities.invokeAndWait(() -> html[0] = natal.getText());
-            if (!html[0].contains("pattern|")) {
-                String banner = PlacementText.patternEntryHtml(figure("Grand trine",
-                    java.util.List.of("Moon", "Sun", "Venus"), null, "air", null));
-                SwingUtilities.invokeAndWait(() -> natal.setText(
-                    html[0].replaceFirst("(?i)<body[^>]*>", "$0" + banner)));
-            }
+            final SkymapPanel sky = (SkymapPanel) fieldOf(w[0], "skymapPanel");
+            com.zodiacomputing.ourania.astro.ChartSubject skyNow =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Sky",
+                    java.time.ZonedDateTime.of(2026, 3, 1, 12, 0, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            com.zodiacomputing.ourania.astro.ChartSubject person =
+                com.zodiacomputing.ourania.astro.ChartSubject.of("Chart A",
+                    java.time.ZonedDateTime.of(1982, 8, 10, 15, 1, 0, 0,
+                        java.time.ZoneId.of("America/New_York")),
+                    "Philadelphia", 39.95, -75.16, "America/New_York", false);
+            java.lang.reflect.Method install = SkymapPanel.class.getDeclaredMethod(
+                "installSubjects",
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class,
+                com.zodiacomputing.ourania.astro.ChartSubject.class);
+            install.setAccessible(true);
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    install.invoke(sky, person,
+                        com.zodiacomputing.ourania.astro.ChartSubject.empty("Chart B"), skyNow);
+                    sky.updateChartData();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
             final java.util.Map<String, java.awt.Point> links = new java.util.LinkedHashMap<>();
             SwingUtilities.invokeAndWait(() -> {
@@ -2389,13 +2409,18 @@ public final class NavigationCheck {
                 }
             });
             ok("the Chart page carries the Index link", links.containsKey("index"));
-            ok("and a pattern link", links.keySet().stream().anyMatch(h -> h.startsWith("pattern|")));
+            // The figures are the Patterns tab's since Phase 2A (2026-10-25), with their "The
+            // figure in full" links; PatternCardsCheck and PatternsPageCheck ask for them there.
+            ok("and no pattern banner: the figures are the Patterns tab's",
+                links.keySet().stream().noneMatch(h -> h.startsWith("pattern|")));
             ok("and body links, " + links.size() + " links in all", links.size() >= 3);
 
             for (java.util.Map.Entry<String, java.awt.Point> link : links.entrySet()) {
                 final boolean isPattern = link.getKey().startsWith("pattern|");
                 SwingUtilities.invokeAndWait(() -> {
-                    rail.reveal(OuraniaWindow.CHART_PAGE);
+                    w[0].revealPage(OuraniaWindow.CHART_PAGE);
+                    // Shut, so each click has to open it for itself.
+                    w[0].closeSelection();
                     if (isPattern) {
                         // Filler, scrolled well down a real-sized viewport, so a page that
                         // neither changes nor returns to its heading is seen doing neither.
@@ -2420,9 +2445,19 @@ public final class NavigationCheck {
                 String h = link.getKey();
                 String kind = h.equals("index") ? "the Index link"
                     : h.startsWith("pattern|") ? "a pattern link" : "the body link " + h;
-                ok(kind + " leaves the Chart page for the page it wrote to, showing "
-                    + w[0].currentPage(),
-                    !OuraniaWindow.CHART_PAGE.equals(w[0].currentPage()) && rail.isOpen());
+                // <b>A selection opens under the wheel and leaves the page alone (2026-10-20).</b>
+                // A body or a pattern goes to the Selected drawer, so the reader keeps the
+                // Chart page they clicked on; the index link still goes to the whole reading.
+                if (h.equals("index")) {
+                    ok(kind + " leaves the Chart page for the reading, showing "
+                        + w[0].currentPage(),
+                        !OuraniaWindow.CHART_PAGE.equals(w[0].currentPage()) && rail.isOpen());
+                } else {
+                    ok(kind + " opens the Selected drawer and keeps the Chart page, showing "
+                        + w[0].currentPage(),
+                        w[0].selectionShowing()
+                            && OuraniaWindow.CHART_PAGE.equals(w[0].currentPage()));
+                }
                 if (!h.equals("index") && !h.startsWith("pattern|")) {
                     continue;
                 }
@@ -2434,8 +2469,8 @@ public final class NavigationCheck {
                 // <b>A figure is a selection.</b> David: "interpretation was meant to be a tab
                 // to interpret the entire chart, selection was meant to define and show what
                 // was selected" - and it should bloom out whole, not stop short.
-                ok(kind + " opens on the Selection page, not " + w[0].currentPage(),
-                    OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage()));
+                // The Selected drawer under the wheel since 2026-10-20, not a rail page.
+                ok(kind + " opens the Selected drawer", w[0].selectionShowing());
                 // Two turns of the queue: setHtml restores the old position later, and the
                 // return to the top is queued behind that.
                 SwingUtilities.invokeAndWait(() -> { });
@@ -2510,7 +2545,7 @@ public final class NavigationCheck {
             for (int i = 0; i < points.size(); i++) {
                 final java.awt.Point pt = points.get(i);
                 SwingUtilities.invokeAndWait(() -> {
-                    rail.reveal(OuraniaWindow.CHART_PAGE);
+                    w[0].revealPage(OuraniaWindow.CHART_PAGE);
                     selectionPane.setText("<html><body></body></html>");
                     long t = System.currentTimeMillis();
                     for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
@@ -2521,8 +2556,9 @@ public final class NavigationCheck {
                     }
                 });
                 SwingUtilities.invokeAndWait(() -> { });
-                boolean opened = OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage())
-                    && selectionPane.getText().toLowerCase().contains(owners.get(i).toLowerCase());
+                boolean opened = w[0].selectionShowing()
+                    && selectionPane.getText().replaceAll("<[^>]+>", "").toLowerCase()
+                        .contains(owners.get(i).toLowerCase());
                 if (!opened) {
                     dead.computeIfAbsent(owners.get(i), k -> new StringBuilder()).append(glyphs.get(i));
                 }
@@ -2594,8 +2630,7 @@ public final class NavigationCheck {
                 // interpretation panel painted over whichever page was chosen. That panel is
                 // a card in Blueprint's own stack now, so a claim about the rail's three
                 // cards cannot reach it - the guard would still pass while the bug returned.
-                for (SubRail strip : new SubRail[] {w[0].blueprintRail(),
-                                                    w[0].chronometryRail()}) {
+                for (SubRail strip : new SubRail[] {w[0].pagesRail()}) {
                     java.util.List<String> inside = visibleCards(strip.cards(), strip.pages());
                     ok("after the " + route + " route one card is visible inside the strip, "
                         + "the selected " + strip.selected() + ", not " + inside,
@@ -2608,8 +2643,9 @@ public final class NavigationCheck {
                     // <b>A clicked thing is a selection.</b> David: "interpretation was meant to
                     // be a tab to interpret the entire chart, selection was meant to define and
                     // show what was selected". Every one of these wrote over Interpretation.
-                    ok("the " + route + " route opens on Selection, showing " + w[0].currentPage(),
-                        OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage()) && rail.isOpen());
+                    // In the drawer under the wheel; the rail keeps the page the reader had.
+                    ok("the " + route + " route opens the Selected drawer",
+                        w[0].selectionShowing());
                     String sel = selection.getText();
                     ok("the " + route + " route put its reading there, " + sel.length() + " chars",
                         sel.length() > 400 && !sel.equals(lastSelection[0]));
@@ -2632,14 +2668,15 @@ public final class NavigationCheck {
                     // whether opening Chart B shows Chart B on a chart with no second person
                     // is asking the wrong question. That it CANNOT be opened is asserted in
                     // SubRailCheck Part D, where it belongs.
-                    if (!w[0].isPageEnabled(page)) {
+                    // And only the pages the chart in front shows: a page another chart tab
+                    // holds is not reached by naming it (revealPage keeps the chart).
+                    if (!w[0].isPageEnabled(page) || (w[0].pagesRail().pages().contains(page)
+                            && !w[0].pagesRail().isPageShown(page))) {
                         continue;
                     }
                     SwingUtilities.invokeAndWait(() -> w[0].revealPage(page));
-                    SubRail home = w[0].blueprintRail().pages().contains(page)
-                        ? w[0].blueprintRail()
-                        : w[0].chronometryRail().pages().contains(page)
-                            ? w[0].chronometryRail() : null;
+                    SubRail home = w[0].pagesRail().pages().contains(page)
+                        ? w[0].pagesRail() : null;
                     java.util.List<String> shown = home == null
                         ? visibleCards(cards, pages)
                         : visibleCards(home.cards(), home.pages());
@@ -2655,10 +2692,8 @@ public final class NavigationCheck {
                 w[0].handlePlacementClick("sign|Aquarius");
             });
             SwingUtilities.invokeAndWait(() -> { });
-            ok("a sign linked inside a Selection reading opens on Selection, showing "
-                + w[0].currentPage(),
-                OuraniaWindow.SELECTION_PAGE.equals(w[0].currentPage())
-                    && selection.getText().contains("Aquarius"));
+            ok("a sign linked inside a Selection reading stays in the Selected drawer",
+                w[0].selectionShowing() && selection.getText().contains("Aquarius"));
             SwingUtilities.invokeAndWait(() -> w[0].handlePlacementClick("back"));
             SwingUtilities.invokeAndWait(() -> { });
             ok("\"back\" goes to the whole chart on Interpretation, showing "
@@ -2683,9 +2718,9 @@ public final class NavigationCheck {
             // is on screen, which it always is.
             ok("and the Interpretation page still opens onto its panel, rail showing "
                 + visibleCards(cards, pages),
-                visibleCards(cards, pages).equals(java.util.List.of(OuraniaWindow.BLUEPRINT_PAGE)));
-            ok("with the interpretation panel the one card visible inside Blueprint",
-                visibleCards(w[0].blueprintRail().cards(), w[0].blueprintRail().pages())
+                visibleCards(cards, pages).equals(java.util.List.of(rail.selected())));
+            ok("with the interpretation panel the one card visible on the strip",
+                visibleCards(w[0].pagesRail().cards(), w[0].pagesRail().pages())
                     .equals(java.util.List.of(OuraniaWindow.READING_PAGE)));
 
             // <b>Every reading door opens the rail, not just the one that was noticed.</b>

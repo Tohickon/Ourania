@@ -43,6 +43,35 @@ public final class OverviewPageCheck {
             SkymapPanel sky = (SkymapPanel) CheckReflect.get(w, "skymapPanel");
             waitFor(() -> sky.radixChart() != null, 20000);
 
+            // <b>The sky alone is a weather report, not a chart shape (2026-10-22).</b> A fresh
+            // install has only the sky on the wheel, and this suite read it as a birth chart.
+            // The cards below are a birth chart's, so one is cast before they are asked about.
+            OverviewPanel sky0 = w.overviewPanel();
+            // Since the tabs were standardized (2026-10-22) the sky's page is this same page,
+            // said for the sky: no "born", and "the sky" where a person's says "your chart".
+            String skyPage = sky0 == null ? "" : sky0.html();
+            yes("with only the sky on the wheel the page is the sky's chart shape",
+                sky.skyAlone() && skyPage.contains("Chart shape")
+                    && (skyPage.contains("Daytime sky") || skyPage.contains("Night sky"))
+                    && !skyPage.contains("Born in"));
+            // <b>The fold-open cards are the sky's, since Phase 2A (2026-10-25).</b> A person's
+            // page is a set of modern cards with no fold; the sky and the sky on a person keep
+            // the old cards until Phase 2B, so the old behaviour is asked of the page that still
+            // has it - here, before a birth chart is cast.
+            if (sky0 != null) {
+                System.out.println("=== Part B (the sky): plain view hides every why line ===");
+                noFoldAtRest(sky0);
+                System.out.println();
+                System.out.println("=== Part C (the sky): Astrologer view opens them all ===");
+                astrologerOpensAll(sky0, false);
+                System.out.println();
+            }
+            int casts = sky.castsApplied();
+            SwingUtilities.invokeAndWait(() -> sky.applyChartSettings("1990-06-15", "12:00",
+                "51.5074, -0.1278", ChartMode.SINGLE, "", "", "", false));
+            waitFor(() -> sky.castsApplied() > casts && sky.innerIsBirthChart(), 20000);
+            yes("a birth chart is on the wheel for the rest", sky.innerIsBirthChart());
+
             OverviewPanel panel = w.overviewPanel();
             yes("the window has an Overview page", panel != null);
             if (panel == null) {
@@ -54,12 +83,12 @@ public final class OverviewPageCheck {
             onTheRail(w, panel);
 
             System.out.println();
-            System.out.println("=== Part B: it opens at rest, every card collapsed ===");
-            atRest(panel);
+            System.out.println("=== Part B (a person): plain view hides every why line ===");
+            noFoldAtRest(panel);
 
             System.out.println();
-            System.out.println("=== Part C: a tap opens one card, and closes it again ===");
-            oneTapOneCard(panel);
+            System.out.println("=== Part C (a person): Astrologer view opens them all ===");
+            astrologerOpensAll(panel, true);
 
             System.out.println();
             System.out.println("=== Part D: the cards agree with the engines ===");
@@ -108,10 +137,10 @@ public final class OverviewPageCheck {
         // "reachable" needs the tab AND the page - a page on a strip nobody can open is as
         // unreachable as no page at all.
         List<String> pages = pagesOf(rail);
-        yes("Blueprint is one of the rail's three tabs: " + pages,
-            pages.contains(OuraniaWindow.BLUEPRINT_PAGE));
-        yes("Overview is one of Blueprint's pages: " + w.blueprintRail().pages(),
-            w.blueprintRail().pages().contains(OuraniaWindow.OVERVIEW_PAGE));
+        yes("the Sky is one of the rail's chart tabs: " + pages,
+            pages.contains(ChartTab.SKY.door));
+        yes("Chart shape is one of the pages under them: " + w.pagesRail().pages(),
+            w.pagesRail().pages().contains(OuraniaWindow.OVERVIEW_PAGE));
 
         SwingUtilities.invokeAndWait(() -> rail.select(OuraniaWindow.OVERVIEW_PAGE));
         SwingUtilities.invokeAndWait(() -> { });
@@ -135,47 +164,56 @@ public final class OverviewPageCheck {
         return out;
     }
 
-    // ---------------------------------------------------------------- part B
+    // ------------------------------------------------ parts B and C, every voice's page
 
-    private static void atRest(OverviewPanel panel) {
-        List<OverviewPanel.Card> cards = panel.cards();
-        yes("the chart produces cards at all: " + cards.size(), !cards.isEmpty());
-        String html = panel.html();
-        for (OverviewPanel.Card c : cards) {
-            yes("the " + c.id + " card is closed to begin with", !panel.isExpanded(c.id));
-            yes("and offers to open: " + c.id, html.contains("toggle:" + c.id));
-            for (String line : c.detail) {
-                // The detail is the point of the tap. If it is already on the page, the card
-                // is not disclosing anything, it is just drawing a link.
-                yes("no detail of " + c.id + " is on the page yet: " + shorten(line),
-                    !html.contains(escaped(line)));
+    /**
+     * No page folds since Phase 2B (2026-10-25): in plain view no card shows its why lines, and
+     * there is no link to open one. Asked of a person's page and of the sky's.
+     */
+    private static void noFoldAtRest(OverviewPanel panel) {
+        boolean was = Settings.astrologerView();
+        try {
+            Settings.setAstrologerView(false);
+            List<OverviewPanel.Card> cards = panel.cards();
+            yes("the chart produces cards at all: " + cards.size(), !cards.isEmpty());
+            String html = panel.html();
+            yes("the page has no fold-open link",
+                !html.contains("toggle:") && !html.contains("Show the detail"));
+            for (OverviewPanel.Card c : cards) {
+                for (String line : c.detail) {
+                    yes("no detail of " + c.id + " is on the plain page: " + shorten(line),
+                        !html.contains(escaped(line)));
+                }
             }
+        } finally {
+            Settings.setAstrologerView(was);
         }
     }
 
-    // ---------------------------------------------------------------- part C
-
-    private static void oneTapOneCard(OverviewPanel panel) {
-        List<OverviewPanel.Card> cards = panel.cards();
-        if (cards.isEmpty()) {
-            return;
-        }
-        OverviewPanel.Card first = cards.get(0);
-        panel.follow("toggle:" + first.id);
-        yes("the tapped card is open", panel.isExpanded(first.id));
-        String html = panel.html();
-        yes("its detail is on the page now",
-            first.detail.isEmpty() || html.contains(escaped(first.detail.get(0))));
-        yes("and it offers to close", html.contains("Hide the detail"));
-        for (OverviewPanel.Card other : cards) {
-            if (!other.id.equals(first.id)) {
-                yes("the " + other.id + " card stayed closed", !panel.isExpanded(other.id));
+    /**
+     * Astrologer view shows every card's detail at once, and there is nothing to close. A
+     * person's day-or-night is the badge on At a glance, so their page has no such card; the sky
+     * has no badge, so its card stays on the page.
+     */
+    private static void astrologerOpensAll(OverviewPanel panel, boolean person) {
+        boolean was = Settings.astrologerView();
+        try {
+            Settings.setAstrologerView(true);
+            String html = panel.html();
+            for (OverviewPanel.Card c : panel.cards()) {
+                if ("sect".equals(c.id) && person) {
+                    continue;
+                }
+                yes("Astrologer view shows the detail of " + c.id,
+                    c.detail.isEmpty() || html.contains(escaped(c.detail.get(0))));
             }
+            yes("and no card has anything to close", !html.contains("Hide the detail"));
+            yes(person ? "the sect card is not on a person's Patterns page"
+                    : "the sect card is on the sky's Patterns page",
+                html.contains("WHO HAS THE EASY RUN") == !person);
+        } finally {
+            Settings.setAstrologerView(was);
         }
-        panel.follow("toggle:" + first.id);
-        yes("a second tap closes it", !panel.isExpanded(first.id));
-        yes("and its detail leaves the page again",
-            first.detail.isEmpty() || !panel.html().contains(escaped(first.detail.get(0))));
     }
 
     // ---------------------------------------------------------------- part D

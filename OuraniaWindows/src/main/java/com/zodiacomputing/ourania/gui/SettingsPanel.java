@@ -283,6 +283,49 @@ public class SettingsPanel extends JPanel {
         body.add(textScaleRow());
         body.add(Box.createRigidArea(new Dimension(0, 18)));
 
+        body.add(heading("Readings & Plain Views"));
+        body.add(note("How reading cards present the chart. Plain view leads with ordinary-week "
+            + "meaning and keeps technical terms out of headlines. Astrologer view opens the 'Why' "
+            + "drawer under every card by default."));
+        JCheckBox astrologerView = new JCheckBox("Astrologer view (show the astrology drawer by default)",
+            Settings.astrologerView());
+        astrologerView.setForeground(TEXT);
+        astrologerView.setBackground(Color.BLACK);
+        astrologerView.setFont(Theme.BODY);
+        astrologerView.setFocusPainted(false);
+        astrologerView.setAlignmentX(Component.LEFT_ALIGNMENT);
+        astrologerView.setToolTipText("<html><b>On:</b> every reading card shows its 'Why &mdash; the astrology' "
+            + "drawer with degrees, signs, houses, essential dignities and aspects open by default.<br>"
+            + "<b>Off:</b> plain reading only; technical details stay collapsed.</html>");
+        astrologerView.addItemListener(e -> {
+            if (!constructing && !seeding) {
+                Settings.setAstrologerView(astrologerView.isSelected());
+                status.setText("Saved");
+                if (window != null) {
+                    window.refreshPlainPages();
+                }
+            }
+        });
+        body.add(astrologerView);
+        JCheckBox revealReadings = new JCheckBox("Show where a reading comes from (animated)",
+            Settings.animateReadings());
+        revealReadings.setForeground(TEXT);
+        revealReadings.setBackground(Color.BLACK);
+        revealReadings.setFont(Theme.BODY);
+        revealReadings.setFocusPainted(false);
+        revealReadings.setAlignmentX(Component.LEFT_ALIGNMENT);
+        revealReadings.setToolTipText("<html><b>On:</b> when you ask for a reading, the parts of "
+            + "the chart that produced it light up and the card forms from them.<br>"
+            + "<b>Off:</b> the reading appears at once, with no motion.</html>");
+        revealReadings.addItemListener(e -> {
+            if (!constructing && !seeding) {
+                Settings.setAnimateReadings(revealReadings.isSelected());
+                status.setText("Saved");
+            }
+        });
+        body.add(revealReadings);
+        body.add(Box.createRigidArea(new Dimension(0, 18)));
+
         body.add(heading("Colour Template"));
         body.add(note("A template sets the whole chart at once - every aspect, the four "
             + "elements, the mansion ring and the wheel's own background. Choosing one clears "

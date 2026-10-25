@@ -455,17 +455,20 @@ public final class InterpretationHierarchyCheck {
         // meant a deliberate renumbering did not merely fail here: it took two live guards
         // dark and reported one red instead of three. A section heading can be renumbered
         // again; it cannot stop being called what it is called.
-        int a = syn.indexOf("Planetary Placements");
-        int b = syn.indexOf("Structural Tensions");
-        ok("H2: the placements section is still before the tensions section", a > 0 && b > a);
+        // 2026-10-17: the placements left the mechanics and became the reader's own section,
+        // "Your placements, strongest first".
+        // 2026-10-22: David took them off the year's page altogether - it is "only your year",
+        // and each chart has its own Placements page. So the guard is now the other way round:
+        // the part a reader sees, from Your year to the Mechanics, reads no natal placement
+        // prose at all.
+        int a = syn.indexOf("tier(\"Your year\")");
+        int b = syn.indexOf("tier(MECHANICS)");
+        ok("H2: the year's page is found, and ends where the Mechanics begin", a > 0 && b > a);
         if (a > 0 && b > a) {
             String block = syn.substring(a, b);
-            int sign = block.indexOf("getPlanetInSign");
-            int house = block.indexOf("getPlanetInHouse");
-            int aspect = block.indexOf("getAspect(");
-            ok("H2: each body reads sign, then house, then aspects (" + sign + ", " + house
-                + ", " + aspect + ")", sign > 0 && house > sign && aspect > house);
-            ok("H3: nothing from Level 4 inside a body's block",
+            ok("H2: the year's page reads no natal sign, house or aspect prose",
+                !block.matches("(?s).*\\b(getPlanetInSign|getPlanetInHouse|getAspect)\\(.*"));
+            ok("H3: nothing from Level 4 on the year's page",
                 !block.matches("(?s).*\\b(getSabian|getBodySabian|getBodyMansion|getDegree)\\w*\\(.*"));
         }
     }

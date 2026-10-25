@@ -140,20 +140,13 @@ public final class RingBar extends JPanel {
             + "</html>");
         add(directed);
 
-        // <b>A view, not a ring - which is why it is last and reads differently.</b> The three
-        // chips before it say what is in the chart; this one says how the chart is drawn, and
-        // sits on the same strip because that is where a reader looking at the wheel already
-        // is. It carries no ring state and never calls setRings.
-        globe = new Chip("Globe", () -> {
-            if (window != null) {
-                window.setGlobeView(!globeOpen);
-            }
-        });
-        globe.setToolTipText("<html><b>The same chart as nested shells.</b><br>"
-            + "Every ring becomes a sphere - natal inside, a partner around it, the sky "
-            + "around both - with the zodiac wrapped around all three.<br>"
-            + "<i>Drag to turn, scroll to zoom.</i></html>");
-        add(globe);
+        // <b>No Globe chip since 2026-10-18.</b> The wheel is the globe seen straight down, and
+        // tilting is the way between them: drag the wheel up or down to tilt it into the globe,
+        // let the globe come to rest straight down to have the wheel back. David: "we can
+        // finally merge wheel and globe together and get rid of the globe wheel button". The
+        // chip is kept as an object, never added to the strip, so syncView has something to
+        // write to and nothing else needs to change.
+        globe = new Chip("Globe", () -> { });
 
         // The scaffolding layers. These change nothing about the chart, only what is drawn of
         // it, so they never touch the mode - see the note on Layer.
@@ -280,7 +273,14 @@ public final class RingBar extends JPanel {
         boolean composite = mode == ChartMode.COMPOSITE_MIDPOINT
             || mode == ChartMode.COMPOSITE_DAVISON;
         partner.enabled = !composite;
-        partner.label = composite ? "In composite" : "Chart B";
+        // <b>A chip wears its person's name (David, 2026-10-20): Chart A and B "should take
+        // the names of the person the chart is for".</b> The same rule as the chart tabs and
+        // the Placements page (OuraniaWindow.whoseChart), so the three cannot disagree.
+        chartA.label = OuraniaWindow.whoseChart(subjectA, WheelRing.Kind.CHART_A, "Chart A");
+        partner.label = composite ? "In composite"
+            : OuraniaWindow.whoseChart(subjectB, WheelRing.Kind.CHART_B, "Chart B");
+        // A name is wider than "Chart A", and a chip's width is its label's.
+        revalidate();
         repaintChips();
     }
 

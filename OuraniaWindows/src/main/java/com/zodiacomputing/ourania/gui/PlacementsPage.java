@@ -45,10 +45,49 @@ final class PlacementsPage {
      */
     static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
             List<AspectPatterns.Pattern> patterns, double[] cusps) {
+        return natalSection(title, ring, when, patterns, cusps, ring.latitude, ring.longitude);
+    }
+
+    /**
+     * As above, with the place the inner chart is cast at (2026-10-22). With the sky alone on
+     * the inner wheel the ring's own place is the empty Chart A slot's, and the list read
+     * "0.00, 0.00" over a sky cast at Los Angeles.
+     */
+    static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
+            List<AspectPatterns.Pattern> patterns, double[] cusps, double lat, double lon) {
+        return natalSection(title, ring, when, patterns, cusps, lat, lon, null);
+    }
+
+    /**
+     * As above, as cards (reading framework spec, Phase 2A) when {@code cards} is true: a
+     * person's chart, or a composite, read as Personal drivers, Social and evolutionary forces
+     * and Angles. The sky keeps its rows for Phase 2B.
+     *
+     * <b>The pattern banner is not on this page in card mode.</b> The figures are the Patterns
+     * tab's now, and two tabs listing the same figures is the duplication the spec set out to end.
+     */
+    static String natalSection(String title, WheelRing ring, DateTimeFormatter when,
+            List<AspectPatterns.Pattern> patterns, double[] cusps, double lat, double lon,
+            PlacementCards.Voice voice) {
+        if (voice != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(title)
+              .append("</h2>");
+            String at = ring.time != null ? ring.time.format(when) : "";
+            sb.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>")
+              .append(at).append("<br>").append(String.format("%.2f, %.2f", lat, lon))
+              .append("</div>");
+            sb.append("<div style='margin-bottom:6px;'><a href='index' "
+                + "style='color:#7FB3FF; font-size:11px; text-decoration:none;'>"
+                + "&#9776; Index &middot; browse everything the app knows</a></div>");
+            sb.append(PlacementCards.html(ring.lon, ring.speed, ring.valid, cusps,
+                SkymapPanel.BASE_PREFIX, Settings.astrologerView(), voice));
+            return sb.toString();
+        }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<h2 style='color:#ffa500; margin-bottom: 2px;'>").append(title).append("</h2>");
         String string2 = ring.time != null ? ring.time.format(when) : "";
-        String string3 = String.format("%.2f, %.2f", ring.latitude, ring.longitude);
+        String string3 = String.format("%.2f, %.2f", lat, lon);
         stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(string2).append("<br>").append(string3).append("</div>");
         // <b>The one link that is always on screen.</b> Everything else in the index is
         // reached from a page you have to open first; this panel is up from the moment the
@@ -101,11 +140,37 @@ final class PlacementsPage {
      */
     static String ringSection(String title, String colour, String when, WheelRing ring,
             String prefix, double[] cusps) {
+        return ringSection(title, colour, when, ring, prefix, cusps, ring);
+    }
+
+    /**
+     * As above, with the place taken from another ring (2026-10-22). A transit ring is the sky
+     * moved to the transit moment and is cast at the sky's place, but the Chart B slot it sits
+     * in has no place of its own: on Chart A with the sky the header read "0.00, 0.00".
+     */
+    static String ringSection(String title, String colour, String when, WheelRing ring,
+            String prefix, double[] cusps, WheelRing placeOf) {
+        return ringSection(title, colour, when, ring, prefix, cusps, placeOf, false);
+    }
+
+    /**
+     * As above, as cards when {@code cards} is true (reading framework spec, Phase 2B): a second
+     * person's chart on their own page reads as Personal drivers, Social and evolutionary forces
+     * and Angles, the same cards as the first person's. A transit ring and the sky keep their
+     * rows.
+     */
+    static String ringSection(String title, String colour, String when, WheelRing ring,
+            String prefix, double[] cusps, WheelRing placeOf, boolean cards) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<br><h2 style='color:").append(colour)
             .append("; margin-bottom: 2px;'>").append(title).append("</h2>");
-        String where = String.format("%.2f, %.2f", ring.latitude, ring.longitude);
+        String where = String.format("%.2f, %.2f", placeOf.latitude, placeOf.longitude);
         stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(when).append("<br>").append(where).append("</div>");
+        if (cards) {
+            stringBuilder.append(PlacementCards.html(ring.lon, ring.speed, ring.valid, cusps,
+                prefix, Settings.astrologerView()));
+            return stringBuilder.toString();
+        }
         stringBuilder.append("<h3 style='color:").append(colour).append(";'>Placements</h3>");
         stringBuilder.append(rows(ring, prefix, cusps));
         return stringBuilder.toString();

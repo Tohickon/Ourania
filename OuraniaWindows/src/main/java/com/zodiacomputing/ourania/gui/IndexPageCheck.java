@@ -172,8 +172,8 @@ public final class IndexPageCheck {
         // truthfully, and uselessly: the claim is about which PAGE the link opened, and the
         // page is a level down. currentPage reports the deepest selection, which is what a
         // reader is actually looking at.
-        eq("a reading link opens where a single reading belongs",
-            OuraniaWindow.SELECTION_PAGE, w.currentPage());
+        eq("a reading link opens where a single reading belongs: the Selected drawer",
+            true, w.selectionShowing());
         eq("and the index tab is still showing the section it was on",
             "bodies", w.indexPanel.category());
     }

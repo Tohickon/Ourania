@@ -108,7 +108,98 @@ public final class Synastry {
         }
     }
 
+    /**
+     * One of the visitor's bodies in aspect to one of the host's.
+     *
+     * The fields say {@code body} because they hold bodies; {@code visitor} and {@code host}
+     * alone are the charts, in {@link #interAspects} and everywhere else in this class.
+     */
+    public static final class InterAspect {
+        /** The visiting body's display name - "their" body, when the host is "you". */
+        public final String visitorBody;
+        /** Registry index, on the same terms as {@link Overlay#bodyIndex}. */
+        public final int visitorBodyIndex;
+        public final double visitorBodyLon;
+        /** The host's body. */
+        public final String hostBody;
+        public final int hostBodyIndex;
+        public final double hostBodyLon;
+        public final Aspects.Type type;
+        /** Degrees from exact, always positive. */
+        public final double orb;
+        /** The orb this aspect was judged against, as {@link AngleContact#maxOrb} carries. */
+        public final double maxOrb;
+
+        InterAspect(String visitorBody, int visitorBodyIndex, double visitorBodyLon,
+                    String hostBody, int hostBodyIndex, double hostBodyLon,
+                    Aspects.Type type, double orb, double maxOrb) {
+            this.visitorBody = visitorBody;
+            this.visitorBodyIndex = visitorBodyIndex;
+            this.visitorBodyLon = visitorBodyLon;
+            this.hostBody = hostBody;
+            this.hostBodyIndex = hostBodyIndex;
+            this.hostBodyLon = hostBodyLon;
+            this.type = type;
+            this.orb = orb;
+            this.maxOrb = maxOrb;
+        }
+    }
+
     private Synastry() { }
+
+    /**
+     * Every aspect between the visitor's bodies and the host's, tightest first.
+     *
+     * <b>The same judgement as the grid's partner rows:</b> {@link Aspects#typeOf} at
+     * {@link Aspects.Profile#SYNASTRY}, the halved orb. A second rule here would let the
+     * Together page and the grid disagree about whether two people share an aspect.
+     *
+     * <b>The angles are left to {@link #angleContacts}.</b> A body on the other person's
+     * Ascendant is that method's finding, at the same orb; listing it here as well would state
+     * one fact twice, on two pages, in two voices.
+     *
+     * <b>Definitional points are skipped on both sides</b> ({@link Bodies#oppositeOf}). Their
+     * Mars conjunct your South Node is, necessarily and at the same orb, their Mars opposite
+     * your North Node - one fact, so it is stated once, from the end that is not defined by
+     * the other.
+     *
+     * Like the rest of this class, nothing is filtered by importance and nothing is cut off:
+     * how many to show is the page's decision, not the engine's.
+     */
+    public static List<InterAspect> interAspects(ChartFrame visitor, ChartFrame host) {
+        List<InterAspect> out = new ArrayList<>();
+        if (visitor == null || host == null) {
+            return out;
+        }
+        for (int v = 0; v < visitor.bodies.length; v++) {
+            ChartFrame.Body a = visitor.bodies[v];
+            if (!aspectable(a, v)) {
+                continue;
+            }
+            for (int h = 0; h < host.bodies.length; h++) {
+                ChartFrame.Body b = host.bodies[h];
+                if (!aspectable(b, h)) {
+                    continue;
+                }
+                double sep = Aspects.separation(a.lon, b.lon);
+                Aspects.Type t = Aspects.typeOf(sep, a.name, b.name, Aspects.Profile.SYNASTRY);
+                if (t == null) {
+                    continue;
+                }
+                out.add(new InterAspect(a.name, v, a.lon, b.name, h, b.lon, t,
+                    Math.abs(sep - t.exactAngle),
+                    Aspects.effectiveOrb(a.name, b.name, t, Aspects.Profile.SYNASTRY)));
+            }
+        }
+        // Stable, so equal orbs keep registry order and the list is the same on every run.
+        Collections.sort(out, (x, y) -> Double.compare(x.orb, y.orb));
+        return out;
+    }
+
+    /** A computed body that is neither an angle nor defined as another point's opposite. */
+    private static boolean aspectable(ChartFrame.Body b, int index) {
+        return b != null && b.ok && !Bodies.at(index).isAngle() && Bodies.oppositeOf(index) < 0;
+    }
 
     /**
      * Every body of the visitor's chart, placed in the host's houses.
@@ -237,6 +328,26 @@ public final class Synastry {
         // which is registry order, so the list is stable across runs.
         Collections.sort(out, (x, y) -> Double.compare(x.orb, y.orb));
         return out;
+    }
+
+    /**
+     * The house an angle opens - the Ascendant the 1st, the IC the 4th, the Descendant the
+     * 7th, the MC the 10th.
+     *
+     * <b>Next to {@link #ANGLES}, not in the page that wanted it,</b> for the reason that
+     * array's note gives: a second list of angle names elsewhere is how the two would drift.
+     *
+     * @throws IllegalArgumentException for anything that is not one of {@link #ANGLES}, so a
+     *         renamed angle fails loudly rather than reading as "house 0"
+     */
+    public static int angleHouse(String angle) {
+        switch (String.valueOf(angle)) {
+            case "Ascendant":  return 1;
+            case "IC":         return 4;
+            case "Descendant": return 7;
+            case "MC":         return 10;
+            default: throw new IllegalArgumentException("Not an angle: " + angle);
+        }
     }
 
     /**

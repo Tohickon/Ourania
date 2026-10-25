@@ -1071,17 +1071,31 @@ public final class AspectGridCheck {
                 // behind two hundred lines of triggers. Asserted as four positions in order
                 // rather than four contains(), because the failure this guards against is not a
                 // missing tier, it is a tier sliding back below the mechanics.
-                int glance = html.indexOf("1. At a glance");
-                int byTheme = html.indexOf("2. The year by theme");
-                int dates = html.indexOf("3. Dates to watch");
-                int mech = html.indexOf("4. The mechanics");
-                ok("Part Q: " + label + " carries all four tiers",
-                    glance >= 0 && byTheme >= 0 && dates >= 0 && mech >= 0);
-                ok("Part Q: " + label + " puts the summary before the machinery",
-                    glance >= 0 && glance < byTheme && byTheme < dates && dates < mech);
-                ok("Part Q: " + label + " summarises the chart's shape at the top",
-                    glance >= 0 && mech > glance
-                        && html.substring(glance, mech).contains("The chart</b>"));
+                // <b>2026-10-17, David moved the line:</b> the summary and the Rule of Three
+                // are machinery too, and the placements are where the reading makes sense. So
+                // the order is the year's card, the placements, where the dates are, and then
+                // everything that is working under one Mechanics heading.
+                // <b>2026-10-22, David again:</b> the page is only the year - "biggest moments
+                // during the year and when they occur and by what and what it means". The
+                // placements and the When pointer left; the moments, when the year scan ran,
+                // sit between the year's card and the Mechanics.
+                int year = html.indexOf(">Your year<");
+                int moments = html.indexOf(">The year's biggest moments<");
+                int mech = html.indexOf(">" + NarrativeSynthesizer.MECHANICS + "<");
+                int glance = html.indexOf(">The year at a glance<");
+                int byTheme = html.indexOf(">The year by theme (the Rule of Three)<");
+                int dates = html.indexOf(">Dates, in detail<");
+                ok("Part Q: " + label + " carries every section",
+                    year >= 0 && mech >= 0 && glance >= 0 && byTheme >= 0 && dates >= 0);
+                ok("Part Q: " + label + " puts the answer before the machinery",
+                    year >= 0 && year < mech && (moments < 0 || (year < moments && moments < mech)));
+                ok("Part Q: " + label + " no longer lists the natal placements",
+                    !html.contains(">Your placements, strongest first<")
+                        && !html.contains(">When<"));
+                ok("Part Q: " + label + " keeps the summary, themes and dates under Mechanics",
+                    mech >= 0 && mech < glance && glance < byTheme && byTheme < dates);
+                ok("Part Q: " + label + " still summarises the chart's shape",
+                    glance >= 0 && html.substring(glance).contains("The chart</b>"));
 
                 // <b>The mechanics tier is optional, and the choice must not reach the
                 // answers.</b> A reader turning the audit trail off is asking not to be handed
@@ -1091,19 +1105,21 @@ public final class AspectGridCheck {
                 // pass by accident - four contains() would survive a reworded summary.
                 String lean = NarrativeSynthesizer.generateReport(
                     f, g, ranked, themes, tf, prof, hits, null, null, withTime, rel, false);
-                int leanMech = lean.indexOf("4. The mechanics");
+                int leanMech = lean.indexOf(">" + NarrativeSynthesizer.MECHANICS + "<");
                 ok("Part Q: " + label + " names the mechanics tier even when it is withheld",
                     leanMech >= 0);
                 ok("Part Q: " + label + " says where the mechanics went",
                     lean.contains("Show the mechanics"));
-                ok("Part Q: " + label + " withholding the mechanics leaves tiers 1 to 3 untouched",
+                ok("Part Q: " + label + " withholding the mechanics leaves the answer untouched",
                     mech >= 0 && leanMech >= 0
                         && lean.substring(0, leanMech).equals(html.substring(0, mech)));
                 ok("Part Q: " + label + " without the mechanics is the shorter reading",
                     lean.length() < html.length());
-                ok("Part Q: " + label + " without the mechanics drops the placements and transits",
-                    !lean.contains("4.2 Planetary Placements")
+                ok("Part Q: " + label + " without the mechanics drops the working and the transits",
+                    !lean.contains(">The year at a glance<")
                         && !lean.contains("4.10 Current Transits"));
+                ok("Part Q: " + label + " but keeps the year, which is the answer",
+                    lean.contains(">Your year<"));
 
                 // <b>A named pattern must carry its reading.</b> Section 5 used to print one
                 // bare line per pattern and no prose, so a T-square - the loudest thing in a
@@ -2266,11 +2282,16 @@ public final class AspectGridCheck {
                 int depth = Math.max(22, Math.min(2 * 20 + 2 * 13, outer / 6));
                 // The zodiac is fixed just inside the rim and no longer moves when a body
                 // ring opens - that is what the 2026-09-06 reorder was for.
-                int decanOuter = outer - 20;
+                // Since 2026-10-18 the bounds sit outside the decans, as on the globe: inward
+                // from the rim, the bounds, the decans, the signs, the inner degree scale. The
+                // same five depths in a new order, so degreeInner - and every body band under
+                // it - is where it always was.
+                int termOuter = outer - 20;
+                int termInner = termOuter - 18;
+                int decanOuter = termInner;
                 int signOuter = decanOuter - 20;
                 int signInner = signOuter - 35;
-                int termInner = signInner - 18;
-                int degreeInner = termInner - 16;
+                int degreeInner = signInner - 16;
                 String at = " (" + w + "x" + h + ")";
 
                 for (boolean partner : new boolean[] {false, true}) {
@@ -2293,7 +2314,9 @@ public final class AspectGridCheck {
                         // length alone would pass on an appended band that quietly took depth
                         // from the wheel, which is the thing that would actually move the
                         // bodies - so both appended radii are pinned to what they must equal.
-                        ok("ring chain returns eleven radii" + tag, got.length == 11);
+                        ok("ring chain returns twelve radii" + tag, got.length == 12);
+                        ok("the bound band's ceiling is the rim's floor" + tag,
+                            got[WheelLayout.RING_TERM_OUTER] == termOuter);
                         ok("a folded mansion band leaves the rim where it was" + tag,
                             got[WheelLayout.RING_MANSION_INNER] == got[WheelLayout.RING_OUTER]);
                         ok("a shut directed band takes no room" + tag,
@@ -2303,9 +2326,11 @@ public final class AspectGridCheck {
                         ok("outer matches" + tag, got[WheelLayout.RING_OUTER] == outer);
                         ok("decan outer matches" + tag,
                             got[WheelLayout.RING_DECAN_OUTER] == decanOuter);
-                        ok("the bound band hangs under the signs" + tag,
-                            got[WheelLayout.RING_TERM_INNER] == termInner);
-                        ok("the inner degree scale hangs under the bounds" + tag,
+                        ok("the bound band sits outside the decans" + tag,
+                            got[WheelLayout.RING_TERM_INNER] == termInner
+                                && got[WheelLayout.RING_TERM_INNER]
+                                    == got[WheelLayout.RING_DECAN_OUTER]);
+                        ok("the inner degree scale hangs under the signs" + tag,
                             got[WheelLayout.RING_DEGREE_INNER] == degreeInner);
                         ok("sign outer matches" + tag,
                             got[WheelLayout.RING_SIGN_OUTER] == signOuter);
@@ -2338,14 +2363,14 @@ public final class AspectGridCheck {
                         // Everything nests, outermost first, at any size the window can be.
                         if (outer > 120) {
                             ok("rings nest outward-in" + tag,
-                                got[WheelLayout.RING_OUTER] > got[WheelLayout.RING_DECAN_OUTER]
-                                    && got[WheelLayout.RING_DECAN_OUTER]
+                                got[WheelLayout.RING_OUTER] > got[WheelLayout.RING_TERM_OUTER]
+                                    && got[WheelLayout.RING_TERM_OUTER]
+                                        > got[WheelLayout.RING_TERM_INNER]
+                                    && got[WheelLayout.RING_TERM_INNER]
                                         > got[WheelLayout.RING_SIGN_OUTER]
                                     && got[WheelLayout.RING_SIGN_OUTER]
                                         > got[WheelLayout.RING_SIGN_INNER]
                                     && got[WheelLayout.RING_SIGN_INNER]
-                                        > got[WheelLayout.RING_TERM_INNER]
-                                    && got[WheelLayout.RING_TERM_INNER]
                                         > got[WheelLayout.RING_DEGREE_INNER]
                                     && got[WheelLayout.RING_DEGREE_INNER]
                                         >= got[WheelLayout.RING_TRI]
@@ -2442,21 +2467,25 @@ public final class AspectGridCheck {
         ok("28 mansions tile the circle exactly",
             Math.abs(com.zodiacomputing.ourania.astro.LunarMansions.WIDTH * 28 - 360.0) < 1e-9);
 
-        // <b>The whole rim is the mansion target, from the decan ring out.</b> It used to split
+        // <b>The whole rim is the mansion target, from the bound ring out.</b> (From the decan
+        // ring out until 2026-10-18, when the bounds moved outside the decans.) It used to split
         // into a mansion band, an undrawn Sabian strip and a dead strip; a click map of the
         // wheel (2026-09-14) showed the inner half of the visible rim opening a Sabian nothing
         // pointed at, or nothing. The Sabian symbols are read from the inner degree scale.
         int[] r = WheelLayout.ringRadii(900, 900, false);
         int outer = r[WheelLayout.RING_OUTER];
-        int decanOuter = r[WheelLayout.RING_DECAN_OUTER];
+        int termOuter = r[WheelLayout.RING_TERM_OUTER];
         boolean wholeRim = true;
-        for (int radius = decanOuter; radius <= outer; radius++) {
+        for (int radius = termOuter; radius <= outer; radius++) {
             wholeRim &= SkymapPanel.inMansionBand(radius, outer);
         }
-        ok("every radius from the decan ring to the rim is a mansion target", wholeRim);
-        ok("and the decan ring itself is not",
-            !SkymapPanel.inMansionBand(decanOuter - 1, outer));
-        eq("the decan ring's last pixel still reads a decan", SkymapPanel.BAND_DECAN,
+        ok("every radius from the bound ring to the rim is a mansion target", wholeRim);
+        ok("and the bound ring itself is not",
+            !SkymapPanel.inMansionBand(termOuter - 1, outer));
+        eq("the bound ring's last pixel still reads a bound", SkymapPanel.BAND_BOUND,
+            SkymapPanel.bandAt(termOuter - 1, r, 200));
+        int decanOuter = r[WheelLayout.RING_DECAN_OUTER];
+        eq("and the decan ring's last pixel still reads a decan", SkymapPanel.BAND_DECAN,
             SkymapPanel.bandAt(decanOuter - 1, r, 200));
         ok("every longitude on the ring resolves to a mansion", mansionAtEveryDegree());
     }

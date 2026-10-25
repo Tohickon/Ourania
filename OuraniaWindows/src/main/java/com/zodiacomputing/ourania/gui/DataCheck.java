@@ -49,6 +49,18 @@ public final class DataCheck {
      */
     private static final String[] EXTRA = InterpretationService.extraFilePaths();
 
+    /**
+     * Sections whose values are parts a card is built from, not prose entries: "fuses with",
+     * "your need to feel safe". The house style (a bold lead, a minimum length) is a rule for
+     * prose and would fail every one of them; the corruption checks still run on them.
+     */
+    private static boolean isPartsSection(String section) {
+        // The Synthesize cards are parts too (2026-10-20): a headline, a body and a takeaway that
+        // ThemeCards puts together, plain text with no bold lead of their own.
+        return "transit_card".equals(section) || "synthesize_card".equals(section)
+            || "body_card".equals(section);
+    }
+
     /** Sections whose values are the bold-summary placement format. */
     private static boolean isPlacementSection(String section) {
         return "planet_sign".equals(section) || "planet_house".equals(section);
@@ -292,6 +304,11 @@ public final class DataCheck {
                     ok("no raw double quote in the value" + where, !value.contains("\""));
                     ok("no over-escaped quote" + where, !value.contains("\\\""));
                     ok("no control characters" + where, !value.matches(".*[\\x00-\\x1f].*"));
+                    if (isPartsSection(section)) {
+                        ok("card part is not empty" + where, !value.isBlank());
+                        ok("card part has no markup" + where, !value.contains("<"));
+                        continue;
+                    }
                     ok("value is not empty" + where, value.length() > 40);
                     ok("value opens with a bold lead" + where, value.startsWith("<b>"));
                     ok("bold lead is closed" + where, value.contains("</b>"));

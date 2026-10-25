@@ -28,6 +28,9 @@ public final class Chronometry {
     /** What converges in that year; null with the scan. */
     public List<Convergence.Target> convergence;
 
+    /** Twelve months, in days: the year ahead's length. */
+    public static final double YEAR_DAYS = 365.25;
+
     private Chronometry() { }
 
     /**
@@ -48,6 +51,26 @@ public final class Chronometry {
             List<BodyScore.Vector> ranked, double transitJd, double transitLat,
             double transitLon, double natalLat, double natalLon, char houseSystem,
             boolean scanYear) {
+        return at(sw, natal, birthJd, nowJd, ranked, transitJd, transitLat, transitLon,
+            natalLat, natalLon, houseSystem, scanYear, false);
+    }
+
+    /**
+     * As above, with the year scanned from the transit moment for twelve months rather than
+     * from birthday to birthday.
+     *
+     * <b>David, 2026-10-17: Your year "should be for the year ahead of the current date",</b>
+     * because "Dates to watch" listed dates that had passed: the profection year began at his
+     * August birthday and it was October. The profection itself, its lord and its months, is
+     * unchanged; only the window the year's events are gathered from moves. The phone and every
+     * other caller keep the birthday year.
+     *
+     * @param yearAhead scan the twelve months from {@code transitJd}
+     */
+    public static Chronometry at(SwissEph sw, ChartFrame natal, double birthJd, double nowJd,
+            List<BodyScore.Vector> ranked, double transitJd, double transitLat,
+            double transitLon, double natalLat, double natalLon, char houseSystem,
+            boolean scanYear, boolean yearAhead) {
         Chronometry out = new Chronometry();
         if (!Double.isNaN(nowJd)) {
             out.profection = Profection.at(birthJd, nowJd, natal.asc);
@@ -69,7 +92,7 @@ public final class Chronometry {
             out.hits = Transits.toNatal(natal, out.transit, ranked, out.profection.lord);
             if (scanYear) {
                 out.scan = scanYear(natal, birthJd, transitJd, out.profection, ranked,
-                    natalLat, natalLon, houseSystem);
+                    natalLat, natalLon, houseSystem, yearAhead);
                 // Releasing gates the ranking rather than voting in it, which is what finally
                 // puts it inside a reading. The chart carries the lots already, so the gate
                 // costs one release walk and no ephemeris.
@@ -91,6 +114,13 @@ public final class Chronometry {
      */
     public static YearScan scanYear(ChartFrame chartFrame, double d, double d2,
             Profection profection, List<BodyScore.Vector> list, double d3, double d4, int n) {
+        return scanYear(chartFrame, d, d2, profection, list, d3, d4, n, false);
+    }
+
+    /** As above; {@code yearAhead} scans the twelve months from {@code d2} instead. */
+    public static YearScan scanYear(ChartFrame chartFrame, double d, double d2,
+            Profection profection, List<BodyScore.Vector> list, double d3, double d4, int n,
+            boolean yearAhead) {
         Returns.Return return_;
         SwissEph swissEph = new SwissEph(Ephemeris.PATH);
         double d5 = Double.NaN;
@@ -103,6 +133,10 @@ public final class Chronometry {
         if (Double.isNaN(d5) || Double.isNaN(d6) || d6 <= d5) {
             d5 = d2 - 182.6;
             d6 = d2 + 182.6;
+        }
+        if (yearAhead) {
+            d5 = d2;
+            d6 = d2 + YEAR_DAYS;
         }
         YearScan yearScan = new YearScan();
         yearScan.events = Transits.eventsToNatal(Almanac.datedMoments(swissEph, d5, d6), chartFrame, list, profection.lord);

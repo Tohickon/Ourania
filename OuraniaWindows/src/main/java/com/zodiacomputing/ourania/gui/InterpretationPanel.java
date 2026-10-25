@@ -301,7 +301,7 @@ public class InterpretationPanel extends JPanel {
             // body|N is the natal ring, body|N|1 the outer one. The two-part form is still
             // accepted because other surfaces emit it for natal placements.
             String[] bits = href.substring(5).split("\\|");
-            openBody(parseInt(bits[0], -1), bits.length > 1 && "1".equals(bits[1]));
+            openBody(parseInt(bits[0], -1), bits.length > 1 ? parseInt(bits[1], 0) : 0);
             return true;
         }
         if (href.startsWith("house|")) {
@@ -521,9 +521,16 @@ public class InterpretationPanel extends JPanel {
                     String whoseChart = (aspectData.length > 3 && aspectData[3] != null
                         && !aspectData[3].isEmpty()) ? aspectData[3]
                         : (partner ? "your" : "Natal");
-                    html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect)
-                        .append("</i> to ").append(whoseChart).append(" ").append(otherPlanet)
-                        .append("</h3>");
+                    // <b>A link, so hovering the row lights the aspect</b> (2026-10-18), as the
+                    // natal rows do: both bodies swell, its line sparkles, the rest fades. The
+                    // href has no ring field, so the transit_ prefix puts its first body on the
+                    // outer ring - the ring this card's body was picked from.
+                    html.append("<h3 style='color:#E0E0E0;'><a href='aspect|transit_")
+                        .append(displayPlanetName).append("|").append(otherPlanet).append("|")
+                        .append(aspectType)
+                        .append("' style='color:#E0E0E0; text-decoration:none;'><i>")
+                        .append(displayAspect).append("</i> to ").append(whoseChart).append(" ")
+                        .append(otherPlanet).append("</a></h3>");
                     // Between two people this is an interaspect, not a transit hit.
                     String prose = partner
                         ? svc.getSynastryInteraspect(displayPlanetName, otherPlanet, aspectType)
@@ -724,7 +731,15 @@ public class InterpretationPanel extends JPanel {
                 String aspectType = aspectData[1];
                 String applyState = (aspectData.length > 2) ? aspectData[2] : "";
                 String displayAspect = applyState.isEmpty() ? aspectType : applyState + " " + aspectType;
-                html.append("<h3 style='color:#E0E0E0;'><i>").append(displayAspect).append("</i> ").append(otherPlanet).append("</h3>");
+                // <b>A link, so hovering the row lights the aspect on the chart</b> (2026-10-18):
+                // both bodies swell, sparks of light run along its line and the rest dims - the
+                // same effect a hovered body has. The href is the aspect grid's, which the
+                // selection pane's hover already sends to the wheel; styled as the heading it was.
+                html.append("<h3 style='color:#E0E0E0;'><a href='aspect|").append(planetName)
+                    .append("|").append(otherPlanet).append("|").append(aspectType)
+                    .append("|0' style='color:#E0E0E0; text-decoration:none;'><i>")
+                    .append(displayAspect).append("</i> ").append(otherPlanet)
+                    .append("</a></h3>");
                 html.append("<p>").append(InterpretationService.getInstance().getAspect(planetName, otherPlanet, aspectType)).append("</p>");
             }
         }
@@ -1171,6 +1186,7 @@ public class InterpretationPanel extends JPanel {
             }
             html.append("</p>");
         }
+        html.append(WhoseChart.html(skymapPanel));
         html.append(cardsHtml).append("</body></html>");
         setHtml(html.toString(), false);
     }
@@ -1197,6 +1213,7 @@ public class InterpretationPanel extends JPanel {
             }
             html.append("</p>");
         }
+        html.append(WhoseChart.html(skymapPanel));
         html.append("<pre style='font-family:Consolas,monospace; font-size:10px; color:#E0E0E0;'>")
             .append(escape(report))
             .append("</pre>");
@@ -1209,7 +1226,7 @@ public class InterpretationPanel extends JPanel {
      * Uses normal flow layout (preformatted=false) since it is regular markup, not a table.
      */
     public void showSynthesis(String html) {
-        setHtml(html, false);
+        setHtml(WhoseChart.into(html, skymapPanel), false);
     }
 
     /**
@@ -1798,7 +1815,9 @@ public class InterpretationPanel extends JPanel {
         if (found == null) {
             highlightOnWheel(null);
             html.append("<h2 style='color:#FFD166;'>").append(name).append("</h2>");
-            html.append("<p>This figure is not in the chart as currently cast.</p>");
+            html.append("<p style='color:#9AA5B1;'>This figure is not in the chart as currently"
+                + " cast. What the figure means:</p>");
+            appendFigureMeaning(html, name);
             if (withBack) {
                 appendBack(html);
             }
@@ -2200,10 +2219,17 @@ public class InterpretationPanel extends JPanel {
     // Package-private for the suite: as a private method this could not be reached, and the
     // first version of Part I passed against the very defect it was written for.
     void openBody(int index, boolean outer) {
+        openBody(index, outer ? 1 : 0);
+    }
+
+    /** As above, by ring: 0 the chart, 1 the outer ring, 2 the sky ring (2026-10-22). */
+    void openBody(int index, int ringCode) {
+        boolean outer = ringCode != 0;
         if (skymapPanel == null || index < 0 || index >= SkymapPanel.BODY_COUNT) {
             return;
         }
-        WheelRing ring = outer ? skymapPanel.outerRing : skymapPanel.natalRing;
+        WheelRing ring = ringCode == 2 ? skymapPanel.skyRing
+            : outer ? skymapPanel.outerRing : skymapPanel.natalRing;
         if (!ring.valid[index]) {
             StringBuilder html = new StringBuilder();
             html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding:20px;'>");
@@ -3305,6 +3331,55 @@ public class InterpretationPanel extends JPanel {
         html.append("</table>");
     }
 
+    /**
+     * What a figure means, as a page for the Selection pane: its name, whose bodies hold it, and
+     * its reading. For a figure clicked on the chart or on the Transits page, which may join
+     * Chart A to another chart - so it is not looked up in Chart A's own patterns, as the
+     * pattern page is, and needs nothing but the figure's name.
+     *
+     * @param members the bodies, each with its chart, as HTML
+     */
+    static String figureMeaningHtml(String name, String members, boolean between) {
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 20px;'>");
+        html.append("<h2 style='color:#FFD166;'>").append(name).append("</h2>");
+        html.append("<p style='color:#9AA5B1;'>")
+            .append(between ? "A figure between the charts" : "A figure in Chart A")
+            .append("</p>");
+        html.append("<p>").append(members).append("</p>");
+        appendFigureMeaning(html, name);
+        return style(Prose.decorate(html.append("</body></html>").toString()));
+    }
+
+    /** The reading key for a figure by name: AspectPatterns.Pattern.detailKey's rule. */
+    static String figureKey(String name) {
+        return "pattern_" + name.toLowerCase().replace("-", "").replace(" ", "");
+    }
+
+    /** What a figure means in one sentence, for its hover card, or "" when none is written. */
+    static String figureGist(String name) {
+        String text = InterpretationService.getInstance().getMacroDynamic(figureKey(name));
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        int stop = text.indexOf(". ");
+        return stop > 0 && stop < 220 ? text.substring(0, stop + 1)
+            : text.length() <= 220 ? text : text.substring(0, 217) + "...";
+    }
+
+    /** Appends a figure's reading by name, or says plainly that none is written. */
+    private static void appendFigureMeaning(StringBuilder html, String name) {
+        int before = html.length();
+        appendMacro(html, figureKey(name));
+        String theirs = InterpretationService.getInstance().getMacroDynamic(name);
+        if (theirs != null && !theirs.isEmpty()) {
+            html.append("<p><i>").append(theirs).append("</i></p>");
+        }
+        if (html.length() == before) {
+            html.append("<p>No reading is written for this figure yet.</p>");
+        }
+    }
+
     /** Appends a macro-dynamics paragraph if the key is non-null and the data has it. */
     private static void appendMacro(StringBuilder html, String key) {
         if (key == null) {
@@ -3770,7 +3845,11 @@ public class InterpretationPanel extends JPanel {
         cardRule(html);
 
         InterpretationService svc = InterpretationService.getInstance();
-        String lead = isTransit
+        // The sky alone is read as weather (David, 2026-10-22): the planet's weather sentence,
+        // at the sky's place, where a birth chart has its personal reading.
+        String weather = !isTransit && skymapPanel != null && skymapPanel.skyAlone()
+            ? SkyWeather.weatherFor(skymapPanel.radixChart(), def.name) : null;
+        String lead = weather != null ? weather : isTransit
             ? leadOrNull(svc.getTransit(def.name, signName))
             : leadOrNull(def.isAngle() ? svc.getAngleInterpretation(def.name, signName)
                                        : svc.getPlanetInSign(def.name, signName));
@@ -3804,10 +3883,10 @@ public class InterpretationPanel extends JPanel {
         // and Sky up, a card reading "Sun in Libra" opened the natal Sun in Leo. David, 25 Sep.
         cardLinks(html, plain
             ? new String[][] {
-                {"body|" + index + "|" + (isTransit ? "1" : "0"), "Read in full"},
+                {"body|" + index + "|" + ringCode(isTransit), "Read in full"},
                 {"sign|" + signName, signName}}
             : new String[][] {
-                {"body|" + index + "|" + (isTransit ? "1" : "0"), "Read in full"},
+                {"body|" + index + "|" + ringCode(isTransit), "Read in full"},
                 {"sign|" + signName, signName},
                 {"decan|" + signName + "|" + decanNum, "Decan " + decanNum},
                 {"sabian|" + signName + "|" + degree, "Sabian"}
@@ -3816,17 +3895,57 @@ public class InterpretationPanel extends JPanel {
         return html.toString();
     }
 
+    /**
+     * The Reading page: the chart on the wheel, read on its own.
+     *
+     * <b>Only that chart (David, 2026-10-22).</b> "reading under chart a is in fact reading the
+     * transits it should in keeping the exact same structure read only chart a". Chart A's tab
+     * puts the sky around Chart A, and this read the outer ring whenever one was drawn - so the
+     * page headed by Chart A described the sky's planets. It reads the inner chart now, always;
+     * the transit reading moved whole to the Transits tab ({@link #showTransitReading}). The
+     * sky alone is the inner chart too, so the Sky tab has this same structure.
+     */
     public void updateInterpretations() {
         if (skymapPanel == null) return;
+        setHtml(readingHtml(false), false); // Scroll to top
+    }
+
+    /**
+     * The Transits tab's Reading: the same page, read from the sky's planets over the chart
+     * (2026-10-22). With one person the sky is the wheel's outer ring; with two it is the third.
+     */
+    public void showTransitReading() {
+        if (skymapPanel == null) return;
+        setHtml(readingHtml(true), false);
+    }
+
+    /** The ring the transit reading reads: the outer one, or the sky's around a pair. */
+    private WheelRing transitRing() {
+        return skymapPanel.isSynastryChart() ? skymapPanel.skyRing : skymapPanel.outerRing;
+    }
+
+    /** The ring code a card's "Read in full" link carries: 0 the chart, 1 outer, 2 the sky. */
+    private String ringCode(boolean isTransit) {
+        return !isTransit ? "0" : skymapPanel != null && skymapPanel.isSynastryChart() ? "2" : "1";
+    }
+
+    private String readingHtml(boolean isTransit) {
         
-        java.time.ZonedDateTime time = skymapPanel.getChartTime();
+        // The transit reading is of the sky now, so it is dated by the sky (2026-10-22).
+        java.time.ZonedDateTime time = isTransit && skymapPanel.skyRing.time != null
+            ? skymapPanel.skyRing.time : skymapPanel.getChartTime();
         StringBuilder html = new StringBuilder();
         html.append("<html><body style='color:#E0E0E0; font-family:Arial; padding: 14px;'>");
 
         // The masthead. A ZonedDateTime.toString() - "2026-08-25T13:42:07.481-07:00[America/
         // Los_Angeles]" - is a machine's idea of a moment and was the first thing a reader
         // met on this screen. The same instant, formatted for a person, costs one formatter.
-        html.append("<div style='color:#FFFFFF; font-size:17px;'><b>Your Reading</b></div>");
+        // Each tab's page says what it reads (2026-10-22): a person's chart, the sky, or the
+        // sky on the chart.
+        String masthead = isTransit ? "The Sky on the Chart"
+            : skymapPanel.skyAlone() ? "The Sky's Reading" : "Your Reading";
+        html.append("<div style='color:#FFFFFF; font-size:17px;'><b>").append(masthead)
+            .append("</b></div>");
         html.append("<div style='color:").append(CARD_KICKER)
             .append("; font-size:11px;'>")
             .append(escape(time.format(java.time.format.DateTimeFormatter
@@ -3834,13 +3953,13 @@ public class InterpretationPanel extends JPanel {
             .append(" &middot; ")
             .append(escape(time.getZone().getId().replace('_', ' ')))
             .append("</div>");
+        html.append(WhoseChart.html(skymapPanel));
         html.append("<div style='font-size:11px; margin:8px 0 14px 0;'>"
             + "<a href='index' style='color:" + CARD_LINK + ";'>"
             + "Browse everything the app knows &rarr;</a></div>");
 
-        boolean isTransit = skymapPanel.showTransitChart;
-        double[] lonArray = isTransit ? skymapPanel.outerRing.lon : skymapPanel.natalRing.lon;
-        boolean[] validArray = isTransit ? skymapPanel.outerRing.valid : skymapPanel.natalRing.valid;
+        double[] lonArray = isTransit ? transitRing().lon : skymapPanel.natalRing.lon;
+        boolean[] validArray = isTransit ? transitRing().valid : skymapPanel.natalRing.valid;
         double[] cusps = skymapPanel.activeCusps;
 
         // Macro dynamics come from Gestalt, and the geometries from AspectPatterns.
@@ -4123,7 +4242,19 @@ public class InterpretationPanel extends JPanel {
                     + "Turn some on in the body settings.</div>");
         }
         
+        // <b>The body (David, 2026-10-22)</b>, at the end of every tab's Reading, in that tab's
+        // voice: the chart's own planets and houses; the sky's at its place; or on Transits the
+        // sky's planets in the person's houses and against the person's planets.
+        ReadingVoice voice = isTransit ? ReadingVoice.TRANSIT
+            : skymapPanel.skyAlone() ? ReadingVoice.SKY : ReadingVoice.PERSON;
+        com.zodiacomputing.ourania.astro.ChartFrame own = skymapPanel.radixChart();
+        if (isTransit) {
+            html.append(BodyReading.html(voice, skymapPanel.frameOf(skymapPanel.skySubject()),
+                skymapPanel.skyInChartHouses(), own, Settings.astrologerView()));
+        } else {
+            html.append(BodyReading.html(voice, own, own, null, Settings.astrologerView()));
+        }
         html.append("</body></html>");
-        setHtml(html.toString(), false); // Scroll to top
+        return html.toString();
     }
 }

@@ -548,6 +548,41 @@ public final class ChartExporter {
             .replaceAll("[ \t]+\n", "\n").replaceAll("\n{3,}", "\n\n").trim();
     }
 
+    /**
+     * A page's markup as Markdown, for the Full report's Copy Markdown button (reading framework
+     * spec, section 7).
+     *
+     * <b>Headings, bold, italic, lists and line breaks; nothing else is kept.</b> Like
+     * {@link #toPlainText}, not a general HTML parser: the pages are written by this app, which
+     * emits h1 to h3, b, i, p, br, ul and li, and tables for the bars. Table cells become
+     * "a | b" lines. The result reads as text when pasted anywhere and as Markdown where
+     * Markdown is understood.
+     */
+    static String toMarkdown(String html) {
+        if (html == null) {
+            return "";
+        }
+        String s = html.replaceAll("(?is)<(head|style|script)[^>]*>.*?</\\1>", "")
+            .replaceAll("(?i)<h1[^>]*>", "\n\n# ").replaceAll("(?i)<h2[^>]*>", "\n\n## ")
+            .replaceAll("(?i)<h3[^>]*>", "\n\n### ")
+            .replaceAll("(?i)</h[1-3]>", "\n\n")
+            .replaceAll("(?i)</?(b|strong)(\\s[^>]*)?>", "**")
+            .replaceAll("(?i)</?(i|em)(\\s[^>]*)?>", "_")
+            .replaceAll("(?i)<li[^>]*>", "\n- ").replaceAll("(?i)</li>", "")
+            .replaceAll("(?i)</?(ul|ol)[^>]*>", "\n")
+            .replaceAll("(?i)<br\\s*/?>", "\n")
+            .replaceAll("(?i)</(p|div|tr|table)>", "\n\n")
+            .replaceAll("(?i)</t[dh]>", " | ")
+            .replaceAll("(?s)<[^>]+>", "");
+        s = s.replace("&nbsp;", " ").replace("&middot;", "·").replace("&deg;", "°")
+            .replace("&mdash;", "—").replace("&ndash;", "–").replace("&rarr;", "→")
+            .replace("&ldquo;", "\"").replace("&rdquo;", "\"").replace("&#9776;", "")
+            .replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&");
+        return s.replaceAll("\\*\\*\\s*\\*\\*", "").replaceAll("_\\s*_", "")
+            .replaceAll("\\s*\\|\\s*\n", "\n").replaceAll("[ \t]+\n", "\n")
+            .replaceAll("[ \t]{2,}", " ").replaceAll("\n{3,}", "\n\n").trim();
+    }
+
     // ------------------------------------------------------------------ shared
 
     private static File chooseSaveFile(Component parent, String suggested,
