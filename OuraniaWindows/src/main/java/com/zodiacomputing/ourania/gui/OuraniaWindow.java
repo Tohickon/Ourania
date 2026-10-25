@@ -1549,10 +1549,34 @@ public class OuraniaWindow extends JFrame {
                 : done.substring(0, close) + lots + done.substring(close));
             return;
         }
-        String body = TransitReadings.glance(people, sky, why);
+        // The soonest contacts first (reading framework spec, Mode 3): what turns exact in the
+        // next two weeks, for the first chart chosen, above the contacts that are strong now.
+        String body = comingUpNext(people) + TransitReadings.glance(people, sky, why);
         HtmlPanes.setHtml(pane, "<html><body style='font-family: sans-serif; font-size: 13px;"
             + " margin: 12px; color: #E0E0E0; background-color: #000000;'>" + body
             + "</body></html>");
+    }
+
+    /**
+     * "Coming up next" for the first chart chosen, or nothing when there is no one to read or no
+     * ephemeris. The timeline is the one the Coming up page walks ({@link NowTimeline}), read
+     * from the same rings as {@link #refreshPairComing}: Chart A is the inner ring, and Chart B,
+     * chosen alone, is the outer ring in its own houses.
+     */
+    private String comingUpNext(java.util.List<TransitReadings.Person> people) {
+        if (people.isEmpty() || skymapPanel == null || skymapPanel.sw == null) {
+            return "";
+        }
+        WheelRing sky = skymapPanel.nowRing();
+        if (sky == null || sky.sd == null) {
+            return "";
+        }
+        boolean chartA = skymapPanel.chartAIn() && skymapPanel.hasChartA();
+        WheelRing natal = chartA ? skymapPanel.natalRing : skymapPanel.outerRing;
+        double[] cusps = chartA ? skymapPanel.activeCusps : skymapPanel.outerRing.cusps;
+        return ComingUpNext.html(people.get(0).whose(),
+            ComingUpNext.cards(NowTimeline.build(skymapPanel.sw, sky, natal, cusps),
+                sky.sd.getJulDay()), Settings.astrologerView());
     }
 
     /**
