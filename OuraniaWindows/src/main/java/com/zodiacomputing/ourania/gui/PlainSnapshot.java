@@ -306,14 +306,17 @@ public final class PlainSnapshot {
      *
      * @param withHouse whether to add the house clause - the paragraph's lead only
      */
-    private static String sentenceFor(InterpretationService svc, ChartFrame f,
-                                      String name, boolean withHouse) {
+    static String sentenceFor(InterpretationService svc, ChartFrame f,
+                              String name, boolean withHouse) {
         ChartFrame.Body b = bodyOf(f, name);
         if (b == null || !b.ok) {
             return null;
         }
         String sign = Zodiac.signName(b.lon);
-        Line signLine = plain(svc.getPlanetInSign(name, sign));
+        // An angle is read from the angle readings, as the Reading page does; the paragraphs
+        // never name one, so this changes nothing for them. The glance's Ascendant card needs it.
+        Line signLine = plain(ANGLES.contains(name)
+            ? svc.getAngleInterpretation(name, sign) : svc.getPlanetInSign(name, sign));
         if (signLine == null) {
             return null;
         }

@@ -170,21 +170,31 @@ final class OverviewPanel extends JPanel {
         return cards;
     }
 
+    /**
+     * The plain sentence for day or night, in the voice the page speaks. One home for it: the
+     * Chart shape card and the At a glance page (GlanceBlocks) both say it, and two copies of
+     * the wording would drift.
+     */
+    static String sectSentence(Gestalt.Result g, ReadingVoice voice) {
+        String benefic = Sect.beneficOfSect(g.diurnal);
+        return (voice == ReadingVoice.PERSON
+            ? "Because you were born " + (g.diurnal ? "in daylight" : "at night")
+            : voice == ReadingVoice.SKY
+                ? "Because it is " + (g.diurnal ? "daytime" : "night-time") + " here"
+                : "Because the Sun is " + (g.diurnal ? "above" : "below")
+                    + " your horizon now")
+            + ", " + g.sectLight + " and " + benefic + " work with the fewest obstacles in "
+            + voice.chart() + ", while " + g.outOfSectMalefic
+            + " is the one that needs handling.";
+    }
+
     private Card sectCard(Gestalt.Result g) {
         String benefic = Sect.beneficOfSect(g.diurnal);
         Card c = new Card("sect", g.diurnal ? "☀" : "☽",
             "Who Has the Easy Run",
             voice == ReadingVoice.PERSON ? subtitleOfSect(g.diurnal)
                 : (g.diurnal ? "Daytime sky" : "Night sky"),
-            (voice == ReadingVoice.PERSON
-                ? "Because you were born " + (g.diurnal ? "in daylight" : "at night")
-                : voice == ReadingVoice.SKY
-                    ? "Because it is " + (g.diurnal ? "daytime" : "night-time") + " here"
-                    : "Because the Sun is " + (g.diurnal ? "above" : "below")
-                        + " your horizon now")
-                + ", " + g.sectLight + " and " + benefic + " work with the fewest obstacles in "
-                + voice.chart() + ", while " + g.outOfSectMalefic
-                + " is the one that needs handling.");
+            sectSentence(g, voice));
         c.detail.add("Classical figure: " + (g.diurnal ? "diurnal" : "nocturnal") + " sect");
         c.detail.add("Light of the sect: " + g.sectLight);
         c.detail.add("Benefic of sect: " + benefic);

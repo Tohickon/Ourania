@@ -5142,7 +5142,12 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                     cards.add(new ReadingCard("THIS YEAR", null,
                         Snapshot.timeSentence(profection, list2), null));
                 }
-                return ReadingCard.html(cards, Settings.astrologerView());
+                // <b>The page opens with who this is (reading framework spec, 2026-10-24):</b>
+                // the Sun, the Moon and the Ascendant, day or night, and the mix of elements and
+                // ways of acting - then the chart's own themes below.
+                return GlanceBlocks.prefix(chartFrame, result,
+                        SkymapPanel.this.isRelationshipChart(), Settings.astrologerView())
+                    + ReadingCard.html(cards, Settings.astrologerView());
             }
 
             @Override
