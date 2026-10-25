@@ -1465,6 +1465,7 @@ public class OuraniaWindow extends JFrame {
 
     /** Every page drawn as plain cards, after Astrologer view changes. */
     void refreshPlainPages() {
+        syncAstrologerChecks();
         // The Placements cards show more in Astrologer view, and that page is otherwise written
         // only when the chart changes.
         if (skymapPanel != null) {
@@ -1605,6 +1606,11 @@ public class OuraniaWindow extends JFrame {
         for (javax.swing.JCheckBox box : astrologerChecks) {
             if (box.isSelected() != Settings.astrologerView()) {
                 box.setSelected(Settings.astrologerView());
+            }
+        }
+        for (java.awt.Component c : contentPanel.getComponents()) {
+            if (c instanceof SettingsPanel) {
+                ((SettingsPanel) c).syncAstrologerView();
             }
         }
     }

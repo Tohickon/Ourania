@@ -54,6 +54,8 @@ public class SettingsPanel extends JPanel {
      * attached in - an order any later edit could reverse without noticing.
      */
     private boolean seeding;
+    /** The Astrologer view box, kept so a page's own box can move it (see syncAstrologerView). */
+    private JCheckBox astrologerBox;
 
     /**
      * True until the constructor has finished.
@@ -289,6 +291,7 @@ public class SettingsPanel extends JPanel {
             + "drawer under every card by default."));
         JCheckBox astrologerView = new JCheckBox("Astrologer view (show the astrology drawer by default)",
             Settings.astrologerView());
+        astrologerBox = astrologerView;
         astrologerView.setForeground(TEXT);
         astrologerView.setBackground(Color.BLACK);
         astrologerView.setFont(Theme.BODY);
@@ -1025,6 +1028,25 @@ public class SettingsPanel extends JPanel {
         }
         searchList.setSelectedIndex(at);
         searchList.ensureIndexIsVisible(at);
+    }
+
+    /**
+     * Ticks the Astrologer view box to match the setting, without writing it back.
+     *
+     * A page's own "Show the astrology" box changes the setting, and this screen was built
+     * before that. The {@code seeding} guard keeps the box's listener from saving and from
+     * redrawing every page a second time.
+     */
+    void syncAstrologerView() {
+        if (astrologerBox == null || astrologerBox.isSelected() == Settings.astrologerView()) {
+            return;
+        }
+        seeding = true;
+        try {
+            astrologerBox.setSelected(Settings.astrologerView());
+        } finally {
+            seeding = false;
+        }
     }
 
     private void refreshSearch() {
