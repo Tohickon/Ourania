@@ -237,6 +237,36 @@ public class OuraniaWindow extends JFrame {
     }
 
     /**
+     * The four pages every chart tab has (the reading framework spec, 2026-10-24): At a glance,
+     * Placements, Patterns, Full report. David: "this document should supersede" the 3-tab
+     * spec of 2026-10-20. The structure never changes between modes; what a group holds does.
+     *
+     * <b>A group is a set of views, not a new page.</b> Every old page keeps its key, its card and
+     * its builder; {@link CHART_TAB_PAGES} still says which of them a chart can answer, and the
+     * strip draws the groups on top and, below, the views of the group in front when there is
+     * more than one. So "By planet" and "By life area" are the Placements and Life areas pages,
+     * and the report's views are the old Report, Reading, Themes, Year, Coming up and Calendar.
+     *
+     * <b>Every page is in exactly one group</b> - SubRail.setGroups refuses anything else, so a
+     * page added later cannot end up on the card stack and nowhere on the strip.
+     */
+    static final String GLANCE_TAB = "At a glance";
+    static final String PLACEMENTS_TAB = "Placements";
+    static final String PATTERNS_TAB = "Patterns";
+    static final String REPORT_TAB = "Full report";
+    static final java.util.Map<String, java.util.List<String>> READING_GROUPS;
+    static {
+        java.util.Map<String, java.util.List<String>> g = new java.util.LinkedHashMap<>();
+        g.put(GLANCE_TAB, java.util.List.of("Snapshot", SKY_GLANCE_PAGE));
+        g.put(PLACEMENTS_TAB, java.util.List.of(CHART_PAGE, CHART_B_PAGE, SKY_PLACEMENTS_PAGE,
+            CHEMISTRY_PAGE, LIFE_AREAS_PAGE));
+        g.put(PATTERNS_TAB, java.util.List.of(OVERVIEW_PAGE, MEET_PAGE));
+        g.put(REPORT_TAB, java.util.List.of("Report", READING_PAGE, SKY_READING_PAGE,
+            "Synthesize", YEAR_PAGE, TRANSITS_PAGE, PAIR_COMING_PAGE, "Calendar"));
+        READING_GROUPS = java.util.Collections.unmodifiableMap(g);
+    }
+
+    /**
      * The five readings, each its own tab rather than rows inside a Readings section.
      *
      * <b>The wrapper is gone for the same reason the Menu section went.</b> A section whose
@@ -466,7 +496,7 @@ public class OuraniaWindow extends JFrame {
         // these from the ring headings - returns early while skymapPanel is still being
         // built. So the strip opened reading "Chart > Chart" on a cold start: the key leaking
         // through as a label, in the one state a new reader sees first.
-        pages.setPageLabel(CHART_PAGE, PLACEMENTS_LABEL);
+        pages.setPageLabel(CHART_PAGE, BY_PLANET_LABEL);
         pages.setPageLabel(TRANSITS_PAGE, COMING_UP_LABEL);
         // The app opens on the sky (drawSavedChart), so its tab is the one in front.
         chartRail.prepare(ChartTab.SKY.door);
@@ -531,7 +561,7 @@ public class OuraniaWindow extends JFrame {
         // Each beside the page it mirrors, so the Transits tab lists its pages in the order
         // every other tab does.
         for (String[] sky : new String[][] {
-                {SKY_PLACEMENTS_PAGE, PLACEMENTS_LABEL, OVERVIEW_PAGE},
+                {SKY_PLACEMENTS_PAGE, BY_PLANET_LABEL, OVERVIEW_PAGE},
                 {SKY_GLANCE_PAGE, "At a glance", LIFE_AREAS_PAGE},
                 {SKY_READING_PAGE, PLAIN_LABELS.get(READING_PAGE), "Synthesize"}}) {
             javax.swing.JEditorPane pane = HtmlPanes.chartPane(this);
@@ -544,6 +574,7 @@ public class OuraniaWindow extends JFrame {
         for (String timed : TIMED_READINGS) {
             pages.addPage(timed, readings.get(timed));
         }
+        pages.setGroups(READING_GROUPS);
         PLAIN_LABELS.forEach(this::setPageLabel);
         showChartTab(ChartTab.SKY.door);
         // The wheel's first chart update arrives while it is still being built, before this
@@ -1104,6 +1135,8 @@ public class OuraniaWindow extends JFrame {
      * are different things.
      */
     static final String PLACEMENTS_LABEL = "Placements";
+    /** The first view of the Placements tab; the second is "By life area" (LIFE_AREAS_PAGE). */
+    static final String BY_PLANET_LABEL = "By planet";
 
     /**
      * The pages, as a reader who is not an astrologer would name them (2026-10-13, plan:
@@ -1115,10 +1148,11 @@ public class OuraniaWindow extends JFrame {
     static final String COMING_UP_LABEL = "Coming up";
     static final java.util.Map<String, String> PLAIN_LABELS = java.util.Map.of(
         "Snapshot", "At a glance",
-        "Report", "Full report",
-        "Synthesize", "Synthesize",
+        "Report", "Dossier",
+        "Synthesize", "Themes",
         YEAR_PAGE, "Your year",
         OVERVIEW_PAGE, "Chart shape",
+        LIFE_AREAS_PAGE, "By life area",
         READING_PAGE, "Reading");
 
     /**
@@ -1604,7 +1638,7 @@ public class OuraniaWindow extends JFrame {
             pages.setPageLabel(CHART_B_PAGE, whoseChart(skymapPanel.chartBSubject(),
                 WheelRing.Kind.CHART_B, CHART_B_PAGE));
         } else {
-            pages.setPageLabel(CHART_PAGE, PLACEMENTS_LABEL);
+            pages.setPageLabel(CHART_PAGE, BY_PLANET_LABEL);
         }
     }
 

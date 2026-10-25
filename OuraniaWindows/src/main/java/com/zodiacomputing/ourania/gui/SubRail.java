@@ -56,6 +56,22 @@ final class SubRail extends JPanel {
     private String selected;
     private Consumer<String> onSelect;
 
+    /**
+     * Group label to its pages, in the order the group lists them; null for a flat strip.
+     *
+     * <b>Added 2026-10-24 for the reading framework spec: four fixed tabs, whatever the chart.</b>
+     * The pages stay what they were - same keys, same cards, same shown and enabled flags - and
+     * the strip draws two rows instead of one: the groups on top, and below them the pages of
+     * the group in front, when it has more than one to show. Nothing that addresses a page by
+     * its key can tell the difference, which is why the suites that pin pages did not change.
+     */
+    private Map<String, List<String>> groups;
+    private final Map<String, GroupTab> groupTabs = new LinkedHashMap<>();
+    private final JPanel groupRow = new JPanel(new WrapRow());
+    private final JPanel pageRow = new JPanel(new WrapRow());
+    /** The page last in front in each group, so coming back to a group finds the same view. */
+    private final Map<String, String> lastInGroup = new java.util.HashMap<>();
+
     SubRail() {
         super(new BorderLayout());
         this.setBackground(Theme.BG);
@@ -86,10 +102,13 @@ final class SubRail extends JPanel {
             at = this.order.size();
         }
         this.order.add(at, name);
-        this.strip.add(tab, at);
+        if (this.groups == null) {
+            this.strip.add(tab, at);
+        }
         // The card at the same index as its tab: a suite reads the stack in strip order.
         this.body.add(page, name, at);
         this.bodies.put(name, page);
+        this.refreshStrip();
         if (this.selected == null) {
             this.selected = name;
         }
@@ -117,6 +136,8 @@ final class SubRail extends JPanel {
         }
         this.selected = name;
         this.cards.show(this.body, name);
+        this.rememberGroup(name);
+        this.refreshStrip();
         this.strip.repaint();
     }
 
@@ -154,6 +175,8 @@ final class SubRail extends JPanel {
         }
         this.selected = name;
         this.cards.show(this.body, name);
+        this.rememberGroup(name);
+        this.refreshStrip();
         this.strip.repaint();
     }
 
@@ -175,8 +198,9 @@ final class SubRail extends JPanel {
         }
         tab.enabled = on;
         tab.repaint();
+        this.refreshStrip();
         if (!on && name.equals(this.selected)) {
-            for (String other : this.order) {
+            for (String other : this.fallbackOrder(name)) {
                 if (this.tabs.get(other).enabled) {
                     // Silently: the reader did not choose this page, the app moved them off a
                     // page that stopped being available. Firing here would regenerate a
@@ -199,10 +223,11 @@ final class SubRail extends JPanel {
             return;
         }
         tab.setVisible(on);
+        this.refreshStrip();
         this.strip.revalidate();
         this.strip.repaint();
         if (!on && name.equals(this.selected)) {
-            for (String other : this.order) {
+            for (String other : this.fallbackOrder(name)) {
                 Tab t = this.tabs.get(other);
                 if (t.enabled && t.isVisible()) {
                     this.reveal(other);
@@ -248,6 +273,7 @@ final class SubRail extends JPanel {
         }
         tab.shown = shown;
         tab.resize();
+        this.refreshStrip();
         this.strip.revalidate();
         this.strip.repaint();
     }
@@ -255,6 +281,161 @@ final class SubRail extends JPanel {
     String pageLabel(String name) {
         Tab tab = this.tabs.get(name);
         return tab == null ? null : tab.shown;
+    }
+
+    /**
+     * Group the pages into the strip's top row. Every page must be in exactly one group: a
+     * page in none would be on the card stack and nowhere on the strip, which is a page nobody
+     * can open, and failing here at start-up is better than finding it by eye.
+     */
+    void setGroups(Map<String, List<String>> grouped) {
+        List<String> seen = new ArrayList<>();
+        for (List<String> members : grouped.values()) {
+            for (String page : members) {
+                if (!this.tabs.containsKey(page) || seen.contains(page)) {
+                    throw new IllegalArgumentException("page not added, or in two groups: " + page);
+                }
+                seen.add(page);
+            }
+        }
+        List<String> orphans = new ArrayList<>(this.order);
+        orphans.removeAll(seen);
+        if (!orphans.isEmpty()) {
+            throw new IllegalArgumentException("pages in no group: " + orphans);
+        }
+        Map<String, List<String>> copy = new LinkedHashMap<>();
+        grouped.forEach((label, members) -> copy.put(label, List.copyOf(members)));
+        this.groups = copy;
+        this.strip.removeAll();
+        this.strip.setLayout(new BorderLayout());
+        this.groupRow.setBackground(STRIP_BG);
+        this.pageRow.setBackground(STRIP_BG);
+        this.strip.add(this.groupRow, BorderLayout.NORTH);
+        this.strip.add(this.pageRow, BorderLayout.CENTER);
+        for (String label : copy.keySet()) {
+            this.groupTabs.put(label, new GroupTab(label));
+        }
+        this.refreshStrip();
+    }
+
+    /** The group a page belongs to, or null on a flat strip. */
+    String groupOf(String page) {
+        if (this.groups == null || page == null) {
+            return null;
+        }
+        for (Map.Entry<String, List<String>> g : this.groups.entrySet()) {
+            if (g.getValue().contains(page)) {
+                return g.getKey();
+            }
+        }
+        return null;
+    }
+
+    /** The group in front, or null. */
+    String selectedGroup() {
+        return this.groupOf(this.selected);
+    }
+
+    /** The groups the top row draws now, in order: a group with no page to show is left out. */
+    List<String> groupLabels() {
+        List<String> out = new ArrayList<>();
+        if (this.groups != null) {
+            for (Map.Entry<String, List<String>> g : this.groups.entrySet()) {
+                if (!this.shownIn(g.getValue()).isEmpty()) {
+                    out.add(g.getKey());
+                }
+            }
+        }
+        return out;
+    }
+
+    /** The pages the second row draws now: the front group's, when it has more than one. */
+    List<String> drawnPages() {
+        List<String> out = new ArrayList<>();
+        String front = this.selectedGroup();
+        if (front != null) {
+            List<String> shown = this.shownIn(this.groups.get(front));
+            if (shown.size() > 1) {
+                out.addAll(shown);
+            }
+        }
+        return out;
+    }
+
+    /** The pages of a group that are shown for this chart, in the group's order. */
+    private List<String> shownIn(List<String> members) {
+        List<String> out = new ArrayList<>();
+        for (String page : members) {
+            Tab tab = this.tabs.get(page);
+            if (tab != null && tab.isVisible()) {
+                out.add(page);
+            }
+        }
+        return out;
+    }
+
+    private void rememberGroup(String page) {
+        String g = this.groupOf(page);
+        if (g != null) {
+            this.lastInGroup.put(g, page);
+        }
+    }
+
+    /** Open a group: the view it had in front last, or else its first page that can open. */
+    private void openGroup(String label) {
+        List<String> members = this.groups.get(label);
+        String last = this.lastInGroup.get(label);
+        if (last != null && this.usable(last)) {
+            this.select(last);
+            return;
+        }
+        for (String page : members) {
+            if (this.usable(page)) {
+                this.select(page);
+                return;
+            }
+        }
+    }
+
+    private boolean usable(String page) {
+        Tab tab = this.tabs.get(page);
+        return tab != null && tab.enabled && tab.isVisible();
+    }
+
+    /**
+     * Where to land when the page in front goes away: the same group first, so a reader who
+     * changes chart tab stays on the same kind of page, then anywhere.
+     */
+    private List<String> fallbackOrder(String name) {
+        List<String> out = new ArrayList<>();
+        String g = this.groupOf(name);
+        if (g != null) {
+            out.addAll(this.groups.get(g));
+        }
+        for (String page : this.order) {
+            if (!out.contains(page)) {
+                out.add(page);
+            }
+        }
+        return out;
+    }
+
+    /** Redraws both rows from the pages' flags. A no-op on a flat strip. */
+    private void refreshStrip() {
+        if (this.groups == null) {
+            return;
+        }
+        this.groupRow.removeAll();
+        for (String label : this.groupLabels()) {
+            this.groupRow.add(this.groupTabs.get(label));
+        }
+        this.pageRow.removeAll();
+        for (String page : this.drawnPages()) {
+            this.pageRow.add(this.tabs.get(page));
+        }
+        this.pageRow.setVisible(this.pageRow.getComponentCount() > 0);
+        this.strip.revalidate();
+        this.strip.repaint();
     }
 
     String selected() {
@@ -357,6 +538,58 @@ final class SubRail extends JPanel {
             }
             return new Dimension(Math.min(widest, avail == Integer.MAX_VALUE ? widest : avail),
                 y + rowHeight + VGAP + in.bottom);
+        }
+    }
+
+    /** A tab in the top row: a group of pages, lit while one of its pages is in front. */
+    private final class GroupTab extends JComponent {
+        private final String label;
+        private boolean hover;
+
+        GroupTab(String label) {
+            this.label = label;
+            this.setFont(Theme.BODY);
+            int w = this.getFontMetrics(Theme.BODY.deriveFont(java.awt.Font.BOLD))
+                .stringWidth(label) + 26;
+            this.setPreferredSize(new Dimension(w, 26));
+            this.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    GroupTab.this.hover = true;
+                    GroupTab.this.repaint();
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    GroupTab.this.hover = false;
+                    GroupTab.this.repaint();
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    SubRail.this.openGroup(GroupTab.this.label);
+                }
+            });
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+            boolean on = this.label.equals(SubRail.this.selectedGroup());
+            g2.setColor(on ? TAB_ON : (this.hover ? TAB_HOVER : STRIP_BG));
+            g2.fillRoundRect(0, 0, this.getWidth(), this.getHeight(), 7, 7);
+            if (on) {
+                g2.setColor(Theme.ACCENT);
+                g2.fillRect(3, this.getHeight() - 2, this.getWidth() - 6, 2);
+            }
+            g2.setColor(on ? Color.WHITE : Theme.TEXT);
+            g2.setFont(Theme.BODY.deriveFont(java.awt.Font.BOLD));
+            int tw = g2.getFontMetrics().stringWidth(this.label);
+            g2.drawString(this.label, (this.getWidth() - tw) / 2,
+                this.getHeight() / 2 + g2.getFontMetrics().getAscent() / 2 - 2);
+            g2.dispose();
         }
     }
 
