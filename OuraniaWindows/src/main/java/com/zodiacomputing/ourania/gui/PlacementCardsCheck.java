@@ -51,7 +51,82 @@ public final class PlacementCardsCheck {
 
         System.out.println("=== Part C: the sentence on a plain card is plain ===");
         sentences();
+
+        System.out.println("=== Part D: a second person's Placements are cards too ===");
+        secondPerson();
         report();
+    }
+
+    // ------------------------------------------------------------------ Part D
+
+    /**
+     * Chart B's own page (reading framework spec, Phase 2B): a synastry with two people on the
+     * wheel, and the second person's Placements read as the same three groups, each card a link
+     * named for the outer ring, and none of it in the first person's page.
+     */
+    private static void secondPerson() throws Exception {
+        final OuraniaWindow[] hold = new OuraniaWindow[1];
+        SwingUtilities.invokeAndWait(() -> hold[0] = new OuraniaWindow());
+        OuraniaWindow w = hold[0];
+        try {
+            SkymapPanel sky = (SkymapPanel) CheckReflect.get(w, "skymapPanel");
+            long end = System.nanoTime() + 20_000_000_000L;
+            while (sky.radixChart() == null && System.nanoTime() < end) {
+                Thread.sleep(50);
+            }
+            int casts = sky.castsApplied();
+            SwingUtilities.invokeAndWait(() -> sky.applyChartSettings("1990-06-15", "12:00",
+                "51.5074, -0.1278", ChartMode.SYNASTRY, "1985-03-02", "08:30", "48.85, 2.35",
+                false));
+            long cast = System.nanoTime() + 25_000_000_000L;
+            while ((sky.castsApplied() <= casts || !sky.innerIsBirthChart())
+                    && System.nanoTime() < cast) {
+                Thread.sleep(50);
+            }
+            SwingUtilities.invokeAndWait(w::refreshPlainPages);
+            JEditorPane pane = w.paneOf(OuraniaWindow.CHART_B_PAGE);
+            yes("Chart B's page has a pane", pane != null);
+            if (pane == null) {
+                return;
+            }
+            String text = text(pane);
+            yes("the second person's page has the groups", text.contains("Personal drivers")
+                && text.contains("Social and evolutionary forces") && text.contains("Angles"));
+            int expected = 0;
+            for (boolean v : sky.outerRing.valid) {
+                expected += v ? 1 : 0;
+            }
+            javax.swing.text.html.HTMLDocument doc =
+                (javax.swing.text.html.HTMLDocument) pane.getDocument();
+            javax.swing.text.html.HTMLDocument.Iterator it =
+                doc.getIterator(javax.swing.text.html.HTML.Tag.A);
+            int named = 0;
+            while (it.isValid()) {
+                Object name = it.getAttributes().getAttribute(
+                    javax.swing.text.html.HTML.Attribute.NAME);
+                Object href = it.getAttributes().getAttribute(
+                    javax.swing.text.html.HTML.Attribute.HREF);
+                if (name != null && String.valueOf(name).startsWith("transit_")
+                        && name.equals(href)) {
+                    named++;
+                }
+                it.next();
+            }
+            yes("every body the outer ring shows is a card named for it (" + named + " of "
+                + expected + ")", expected > 10 && named == expected);
+            yes("plain view has no house on the second person's page", !text.contains(" house"));
+            JEditorPane first = w.paneOf(OuraniaWindow.CHART_PAGE);
+            yes("the first person's page has no transit_ link: the two are not mixed",
+                first != null && !html(first).contains("name=\"transit_"));
+        } finally {
+            SwingUtilities.invokeAndWait(w::dispose);
+        }
+    }
+
+    private static String html(JEditorPane pane) throws Exception {
+        final String[] out = new String[1];
+        SwingUtilities.invokeAndWait(() -> out[0] = pane.getText());
+        return out[0];
     }
 
     // ------------------------------------------------------------------ Part C

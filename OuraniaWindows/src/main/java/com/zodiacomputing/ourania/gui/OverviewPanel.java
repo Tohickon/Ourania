@@ -55,10 +55,10 @@ final class OverviewPanel extends JPanel {
     private Gestalt.Result lastGestalt;
     private final JEditorPane pane;
 
-    /** Which cards the reader has opened. Empty is the page's resting state. */
-    private final Set<String> expanded = new LinkedHashSet<>();
-
-    /** One card, built once so the collapsed and expanded views cannot disagree. */
+    /**
+     * One finding, built once. Its title, subtitle and plain sentence are the card the reader
+     * sees; its detail lines are the astrology behind it, shown in Astrologer view.
+     */
     static final class Card {
         final String id;
         final String icon;
@@ -106,27 +106,15 @@ final class OverviewPanel extends JPanel {
         this.pane.setCaretPosition(0);
     }
 
-    /** A link on this page. Cards toggle here; anything else is the app's ordinary click. */
+    /**
+     * A link on this page: a figure's "The figure in full", or the index. The page has no
+     * fold-open cards since Phase 2B - Astrologer view opens every why line - so there is no
+     * "toggle:" link to handle any more.
+     */
     void follow(String href) {
-        if (href == null) {
-            return;
-        }
-        if (href.startsWith("toggle:")) {
-            String id = href.substring("toggle:".length());
-            if (!expanded.remove(id)) {
-                expanded.add(id);
-            }
-            refresh();
-            return;
-        }
-        if (this.window != null) {
+        if (href != null && this.window != null) {
             this.window.handlePlacementClick(href);
         }
-    }
-
-    /** Whether a card is open, for the check and for the rendering. */
-    boolean isExpanded(String id) {
-        return expanded.contains(id);
     }
 
     // ------------------------------------------------------------------ the cards
@@ -379,41 +367,15 @@ final class OverviewPanel extends JPanel {
                 + "what kind of chart it is.</p></body></html>");
             return sb.toString();
         }
-        // A person's chart reads as one page of modern cards (Phase 2A). The sky and the sky on a
-        // person keep the page below until Phase 2B.
-        if (voice == ReadingVoice.PERSON) {
-            return modernHtml(cards);
-        }
-        // The Patterns tab (reading framework spec, 2026-10-24): the chart's shape first, then
-        // the figures its planets make. The word "Chart shape" stays on the heading over the
-        // shape cards, where the page has always said it.
-        sb.append("<h2>Patterns</h2>").append(voice == ReadingVoice.TRANSIT
-            ? SkyOnChart.sectionHeading(SkyOnChart.heading(skymap.whoseLabel()))
-            : WhoseChart.html(skymap));
-        sb.append("<h3 style='color:#FFD166; margin-top:6px; margin-bottom:4px;'>Chart shape</h3>");
-        for (Card c : cards) {
-            // In Astrologer view every card starts open, and a click closes it instead.
-            boolean open = expanded.contains(c.id) != Settings.astrologerView();
-            sb.append("<p><b>").append(c.icon).append(' ').append(esc(c.title))
-              .append("</b><br>").append(esc(c.subtitle)).append("<br>")
-              .append(esc(c.plain)).append("<br>")
-              .append("<a href='toggle:").append(c.id).append("'>")
-              .append(open ? "Hide the detail" : "Show the detail").append("</a></p>");
-            if (open) {
-                sb.append("<ul>");
-                for (String line : c.detail) {
-                    sb.append("<li>").append(esc(line)).append("</li>");
-                }
-                sb.append("</ul>");
-            }
-        }
-        sb.append(PatternCards.html(lastGestalt, Settings.astrologerView()));
-        sb.append("</body></html>");
-        return sb.toString();
+        // One page of modern cards in every voice (Phase 2B): a person's, the sky's, and the sky
+        // on a person. The Patterns tab (reading framework spec): the chart's shape, the figures
+        // its planets make, then the rest.
+        return modernHtml(cards);
     }
 
     /**
-     * A person's Patterns page as one set of modern cards (reading framework spec, Phase 2A).
+     * The Patterns page as one set of modern cards, for every voice (reading framework spec,
+     * Phase 2A for a person, Phase 2B for the sky and the sky on a person).
      *
      * <b>The same findings, drawn once.</b> The shape, the loudest voice and the two light cards
      * are the {@link Card}s the page has always had; each becomes a {@link ReadingCard} - the card
@@ -427,7 +389,9 @@ final class OverviewPanel extends JPanel {
         List<ReadingCard> shape = new ArrayList<>();
         List<ReadingCard> also = new ArrayList<>();
         for (Card c : cards) {
-            if ("sect".equals(c.id)) {
+            // A person's day-or-night is the badge on At a glance. The sky and the sky on a
+            // person have no such badge, so their card stays here (and leads the "also" cards).
+            if ("sect".equals(c.id) && voice == ReadingVoice.PERSON) {
                 continue;
             }
             ReadingCard rc = new ReadingCard(c.title.toUpperCase(java.util.Locale.ROOT), c.subtitle,
@@ -435,7 +399,9 @@ final class OverviewPanel extends JPanel {
             ("shape".equals(c.id) ? shape : also).add(rc);
         }
         StringBuilder sb = new StringBuilder("<html><body><h2>Patterns</h2>");
-        sb.append(WhoseChart.html(skymap));
+        sb.append(voice == ReadingVoice.TRANSIT
+            ? SkyOnChart.sectionHeading(SkyOnChart.heading(skymap.whoseLabel()))
+            : WhoseChart.html(skymap));
         if (!shape.isEmpty()) {
             sb.append("<h3 style='color:#FFD166; margin-top:6px; margin-bottom:4px;'>"
                 + "Chart shape</h3>").append(ReadingCard.html(shape, why));

@@ -59,11 +59,11 @@ public final class OverviewPageCheck {
             // the old cards until Phase 2B, so the old behaviour is asked of the page that still
             // has it - here, before a birth chart is cast.
             if (sky0 != null) {
-                System.out.println("=== Part B (the sky): it opens at rest, every card collapsed ===");
-                atRest(sky0);
+                System.out.println("=== Part B (the sky): plain view hides every why line ===");
+                noFoldAtRest(sky0);
                 System.out.println();
-                System.out.println("=== Part C (the sky): a tap opens one card, and closes it again ===");
-                oneTapOneCard(sky0);
+                System.out.println("=== Part C (the sky): Astrologer view opens them all ===");
+                astrologerOpensAll(sky0, false);
                 System.out.println();
             }
             int casts = sky.castsApplied();
@@ -84,11 +84,11 @@ public final class OverviewPageCheck {
 
             System.out.println();
             System.out.println("=== Part B (a person): plain view hides every why line ===");
-            personAtRest(panel);
+            noFoldAtRest(panel);
 
             System.out.println();
             System.out.println("=== Part C (a person): Astrologer view opens them all ===");
-            personAstrologerOpens(panel);
+            astrologerOpensAll(panel, true);
 
             System.out.println();
             System.out.println("=== Part D: the cards agree with the engines ===");
@@ -164,35 +164,20 @@ public final class OverviewPageCheck {
         return out;
     }
 
-    // ---------------------------------------------------------------- part B
+    // ------------------------------------------------ parts B and C, every voice's page
 
-    private static void atRest(OverviewPanel panel) {
-        List<OverviewPanel.Card> cards = panel.cards();
-        yes("the chart produces cards at all: " + cards.size(), !cards.isEmpty());
-        String html = panel.html();
-        for (OverviewPanel.Card c : cards) {
-            yes("the " + c.id + " card is closed to begin with", !panel.isExpanded(c.id));
-            yes("and offers to open: " + c.id, html.contains("toggle:" + c.id));
-            for (String line : c.detail) {
-                // The detail is the point of the tap. If it is already on the page, the card
-                // is not disclosing anything, it is just drawing a link.
-                yes("no detail of " + c.id + " is on the page yet: " + shorten(line),
-                    !html.contains(escaped(line)));
-            }
-        }
-    }
-
-    // ----------------------------------------------- parts B and C, a person's page
-
-    /** A person's page has no fold: in plain view no card shows its why lines. */
-    private static void personAtRest(OverviewPanel panel) {
+    /**
+     * No page folds since Phase 2B (2026-10-25): in plain view no card shows its why lines, and
+     * there is no link to open one. Asked of a person's page and of the sky's.
+     */
+    private static void noFoldAtRest(OverviewPanel panel) {
         boolean was = Settings.astrologerView();
         try {
             Settings.setAstrologerView(false);
             List<OverviewPanel.Card> cards = panel.cards();
             yes("the chart produces cards at all: " + cards.size(), !cards.isEmpty());
             String html = panel.html();
-            yes("a person's page has no fold-open link",
+            yes("the page has no fold-open link",
                 !html.contains("toggle:") && !html.contains("Show the detail"));
             for (OverviewPanel.Card c : cards) {
                 for (String line : c.detail) {
@@ -205,51 +190,30 @@ public final class OverviewPageCheck {
         }
     }
 
-    /** Astrologer view shows every card's detail at once, and there is nothing to close. */
-    private static void personAstrologerOpens(OverviewPanel panel) {
+    /**
+     * Astrologer view shows every card's detail at once, and there is nothing to close. A
+     * person's day-or-night is the badge on At a glance, so their page has no such card; the sky
+     * has no badge, so its card stays on the page.
+     */
+    private static void astrologerOpensAll(OverviewPanel panel, boolean person) {
         boolean was = Settings.astrologerView();
         try {
             Settings.setAstrologerView(true);
             String html = panel.html();
             for (OverviewPanel.Card c : panel.cards()) {
-                // The day-or-night card is the badge on At a glance, not a card here.
-                if ("sect".equals(c.id)) {
+                if ("sect".equals(c.id) && person) {
                     continue;
                 }
                 yes("Astrologer view shows the detail of " + c.id,
                     c.detail.isEmpty() || html.contains(escaped(c.detail.get(0))));
             }
             yes("and no card has anything to close", !html.contains("Hide the detail"));
-            yes("the sect card is not on a person's Patterns page",
-                !html.contains("WHO HAS THE EASY RUN"));
+            yes(person ? "the sect card is not on a person's Patterns page"
+                    : "the sect card is on the sky's Patterns page",
+                html.contains("WHO HAS THE EASY RUN") == !person);
         } finally {
             Settings.setAstrologerView(was);
         }
-    }
-
-    // ---------------------------------------------------------------- part C
-
-    private static void oneTapOneCard(OverviewPanel panel) {
-        List<OverviewPanel.Card> cards = panel.cards();
-        if (cards.isEmpty()) {
-            return;
-        }
-        OverviewPanel.Card first = cards.get(0);
-        panel.follow("toggle:" + first.id);
-        yes("the tapped card is open", panel.isExpanded(first.id));
-        String html = panel.html();
-        yes("its detail is on the page now",
-            first.detail.isEmpty() || html.contains(escaped(first.detail.get(0))));
-        yes("and it offers to close", html.contains("Hide the detail"));
-        for (OverviewPanel.Card other : cards) {
-            if (!other.id.equals(first.id)) {
-                yes("the " + other.id + " card stayed closed", !panel.isExpanded(other.id));
-            }
-        }
-        panel.follow("toggle:" + first.id);
-        yes("a second tap closes it", !panel.isExpanded(first.id));
-        yes("and its detail leaves the page again",
-            first.detail.isEmpty() || !panel.html().contains(escaped(first.detail.get(0))));
     }
 
     // ---------------------------------------------------------------- part D

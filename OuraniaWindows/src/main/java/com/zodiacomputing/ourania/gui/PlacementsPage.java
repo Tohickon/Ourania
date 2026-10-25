@@ -150,11 +150,27 @@ final class PlacementsPage {
      */
     static String ringSection(String title, String colour, String when, WheelRing ring,
             String prefix, double[] cusps, WheelRing placeOf) {
+        return ringSection(title, colour, when, ring, prefix, cusps, placeOf, false);
+    }
+
+    /**
+     * As above, as cards when {@code cards} is true (reading framework spec, Phase 2B): a second
+     * person's chart on their own page reads as Personal drivers, Social and evolutionary forces
+     * and Angles, the same cards as the first person's. A transit ring and the sky keep their
+     * rows.
+     */
+    static String ringSection(String title, String colour, String when, WheelRing ring,
+            String prefix, double[] cusps, WheelRing placeOf, boolean cards) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<br><h2 style='color:").append(colour)
             .append("; margin-bottom: 2px;'>").append(title).append("</h2>");
         String where = String.format("%.2f, %.2f", placeOf.latitude, placeOf.longitude);
         stringBuilder.append("<div style='color:#dddddd; font-size:11px; margin-bottom: 10px;'>").append(when).append("<br>").append(where).append("</div>");
+        if (cards) {
+            stringBuilder.append(PlacementCards.html(ring.lon, ring.speed, ring.valid, cusps,
+                prefix, Settings.astrologerView()));
+            return stringBuilder.toString();
+        }
         stringBuilder.append("<h3 style='color:").append(colour).append(";'>Placements</h3>");
         stringBuilder.append(rows(ring, prefix, cusps));
         return stringBuilder.toString();

@@ -8994,9 +8994,10 @@ if (readingTier == ReadingTier.SYNTHESIZE) {
                 && this.outerRing.cusps.length >= 13
                 ? this.outerRing.cusps : this.activeCusps;
             // The place the ring is cast at: a person's own, or the sky's for a transit ring.
+            // Cards for a second person, on their own page (Phase 2B); the moment keeps its rows.
             stringBuilder.append(PlacementsPage.ringSection(this.outerRing.kind.heading,
                 this.outerRing.kind.hueHex, stringArray, this.outerRing, "transit_",
-                outerCusps, outerIsPerson ? this.outerRing : this.outerSource()));
+                outerCusps, outerIsPerson ? this.outerRing : this.outerSource(), outerIsPerson));
         }
         // <b>Whether the sky ring is DRAWN, not whether it is wrapped around two people.</b>
         // This asked showTriWheel, whose own javadoc says it means "the sky is wrapped around
