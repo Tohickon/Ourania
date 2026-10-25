@@ -67,6 +67,12 @@ public final class SubRailCheck {
         report("Part D", before);
 
         System.out.println();
+        System.out.println("=== Part E: groups - four tabs on top, views below ===");
+        before = failures.size();
+        SwingUtilities.invokeAndWait(SubRailCheck::theGroups);
+        report("Part E", before);
+
+        System.out.println();
         if (failures.isEmpty()) {
             System.out.println("ALL CLEAR - " + checks + " checks, 0 failures.");
             System.exit(0);
@@ -76,6 +82,91 @@ public final class SubRailCheck {
             System.out.println("  " + f);
         }
         System.exit(1);
+    }
+
+    /**
+     * The grouped strip (reading framework spec, 2026-10-24): the top row is the groups that
+     * have a page to show, the second row is the front group's pages when it has more than one,
+     * and a page in no group is refused.
+     */
+    private static void theGroups() {
+        SubRail rail = strip("Glance", "Planet", "Life", "Shape", "Report", "Year");
+        java.util.Map<String, List<String>> g = new java.util.LinkedHashMap<>();
+        g.put("At a glance", List.of("Glance"));
+        g.put("Placements", List.of("Planet", "Life"));
+        g.put("Patterns", List.of("Shape"));
+        g.put("Full report", List.of("Report", "Year"));
+        rail.setGroups(g);
+
+        eq("every group with a page is on the top row",
+            List.of("At a glance", "Placements", "Patterns", "Full report"), rail.groupLabels());
+        eq("the first page is in front, so its group is", "At a glance", rail.selectedGroup());
+        eq("a group of one page draws no second row", List.of(), rail.drawnPages());
+
+        rail.select("Planet");
+        eq("choosing a page moves the group", "Placements", rail.selectedGroup());
+        eq("the second row is the group's pages, in the group's order",
+            List.of("Planet", "Life"), rail.drawnPages());
+
+        rail.select("Life");
+        rail.select("Shape");
+        rail.select("Glance");
+        // The group's own tab, as the mouse reaches it: coming back finds the view last used.
+        callOpenGroup(rail, "Placements");
+        eq("coming back to a group finds the view it had", "Life", rail.selected());
+
+        rail.setPageShown("Year", false);
+        rail.select("Report");
+        eq("a group left with one view draws no second row", List.of(), rail.drawnPages());
+
+        rail.setPageShown("Shape", false);
+        eq("a group with nothing to show leaves the top row",
+            List.of("At a glance", "Placements", "Full report"), rail.groupLabels());
+        rail.setPageShown("Shape", true);
+
+        rail.select("Planet");
+        rail.setPageShown("Planet", false);
+        eq("hiding the page in front lands in the same group", "Life", rail.selected());
+        eq("and that group is still the one in front", "Placements", rail.selectedGroup());
+
+        rail.setPageEnabled("Life", false);
+        rail.select("Planet");
+        ok("a hidden page cannot be selected", !"Planet".equals(rail.selected()));
+
+        ok("the pages are still all on the card stack, hidden or not",
+            rail.pages().containsAll(List.of("Glance", "Planet", "Life", "Shape", "Report", "Year")));
+
+        SubRail missing = strip("One", "Two");
+        boolean refused = false;
+        try {
+            missing.setGroups(java.util.Map.of("Only", List.of("One")));
+        } catch (IllegalArgumentException e) {
+            refused = true;
+        }
+        ok("a page in no group is refused", refused);
+
+        SubRail twice = strip("One", "Two");
+        java.util.Map<String, List<String>> both = new java.util.LinkedHashMap<>();
+        both.put("A", List.of("One", "Two"));
+        both.put("B", List.of("Two"));
+        refused = false;
+        try {
+            twice.setGroups(both);
+        } catch (IllegalArgumentException e) {
+            refused = true;
+        }
+        ok("a page in two groups is refused", refused);
+    }
+
+    /** The top row's click, through the private method the tab calls. */
+    private static void callOpenGroup(SubRail rail, String label) {
+        try {
+            java.lang.reflect.Method m = SubRail.class.getDeclaredMethod("openGroup", String.class);
+            m.setAccessible(true);
+            m.invoke(rail, label);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static SubRail strip(String... names) {

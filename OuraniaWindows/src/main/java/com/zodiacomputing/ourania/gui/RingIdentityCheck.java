@@ -563,7 +563,10 @@ public final class RingIdentityCheck {
             eq("the strip holds the pages in reading order",
                 // The Transits tab's own pages sit beside the ones they mirror, so that tab
                 // reads in the same order as the others (2026-10-22).
+                // The pair's At a glance page joined the strip on 2026-10-24, so that the
+                // Synastry tab has the same four tabs as the rest.
                 Arrays.asList(OuraniaWindow.CHART_PAGE, OuraniaWindow.CHART_B_PAGE,
+                    OuraniaWindow.SYNASTRY_GLANCE_PAGE,
                     OuraniaWindow.SKY_PLACEMENTS_PAGE,
                     OuraniaWindow.OVERVIEW_PAGE, "Snapshot", OuraniaWindow.SKY_GLANCE_PAGE,
                     OuraniaWindow.LIFE_AREAS_PAGE,
@@ -574,7 +577,7 @@ public final class RingIdentityCheck {
                     OuraniaWindow.YEAR_PAGE, "Calendar"),
                 w[0].pagesRail().pages());
             List<String> every = new ArrayList<>(w[0].pagesRail().pages());
-            eq("seventeen pages, none twice", 17, new java.util.HashSet<>(every).size());
+            eq("eighteen pages, none twice", 18, new java.util.HashSet<>(every).size());
             eq("and the window lists each once", every, w[0].allPages());
 
             // <b>What each chart tab shows.</b> Since 2026-10-22 a person's timing is read on

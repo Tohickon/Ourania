@@ -44,6 +44,10 @@ public class OuraniaWindow extends JFrame {
     private DrawerRail chartRail;
     /** The pages, one strip shared by every chart tab: it moves into the tab in front. */
     private SubRail pages;
+    /** The mode pill and the charts line above the four tabs; see {@link ModeBadge}. */
+    private ModeBadge modeBadge;
+    /** The badge over the strip. This, not the strip, is what each chart tab holds. */
+    private JPanel readingColumn;
     /** Each chart tab's body, which holds the strip while that tab is in front. */
     private final java.util.Map<String, JPanel> chartHolders = new java.util.LinkedHashMap<>();
     private LifeAreasPanel lifeAreasPanel;
@@ -54,6 +58,7 @@ public class OuraniaWindow extends JFrame {
     /** Where you meet. Kept under its old name; it is the pane the Synastry page always was. */
     private javax.swing.JEditorPane synastryPane;
     private javax.swing.JEditorPane chemistryPane;
+    private javax.swing.JEditorPane synastryGlancePane;
     /** Coming up together: the sky over both charts, when there are two (PairTimeline). */
     private javax.swing.JEditorPane pairComingPane;
     /** True while the Transits tab is in front, so the shared pages read the sky on the chart. */
@@ -125,6 +130,8 @@ public class OuraniaWindow extends JFrame {
     static final String MEET_LABEL = "Where you meet";
     /** The second page behind Together: the aspects between two charts (2026-10-16). */
     public static final String CHEMISTRY_PAGE = "Chemistry";
+    /** The pair's first page (reading framework spec, 2026-10-24): the tone of the whole. */
+    public static final String SYNASTRY_GLANCE_PAGE = "Synastry at a glance";
     /** What the sky does to both charts and to each, behind Prediction (2026-10-20). */
     public static final String PAIR_COMING_PAGE = "Coming up together";
     /**
@@ -218,6 +225,7 @@ public class OuraniaWindow extends JFrame {
             l.add(CHART_PAGE);
             if (t == ChartTab.SYNASTRY) {
                 l.add(CHART_B_PAGE);
+                l.add(SYNASTRY_GLANCE_PAGE);
                 l.add(MEET_PAGE);
                 l.add(CHEMISTRY_PAGE);
                 l.add(TRANSITS_PAGE);
@@ -257,7 +265,8 @@ public class OuraniaWindow extends JFrame {
     static final java.util.Map<String, java.util.List<String>> READING_GROUPS;
     static {
         java.util.Map<String, java.util.List<String>> g = new java.util.LinkedHashMap<>();
-        g.put(GLANCE_TAB, java.util.List.of("Snapshot", SKY_GLANCE_PAGE));
+        g.put(GLANCE_TAB, java.util.List.of("Snapshot", SKY_GLANCE_PAGE,
+            SYNASTRY_GLANCE_PAGE));
         g.put(PLACEMENTS_TAB, java.util.List.of(CHART_PAGE, CHART_B_PAGE, SKY_PLACEMENTS_PAGE,
             CHEMISTRY_PAGE, LIFE_AREAS_PAGE));
         g.put(PATTERNS_TAB, java.util.List.of(OVERVIEW_PAGE, MEET_PAGE));
@@ -461,6 +470,11 @@ public class OuraniaWindow extends JFrame {
         // about it. There is one strip, and it moves into whichever tab is in front, because
         // each page is one component and a component has one parent (DrawerRail.setOnShow).
         pages = new SubRail();
+        modeBadge = new ModeBadge();
+        readingColumn = new JPanel(new BorderLayout());
+        readingColumn.setBackground(Theme.BG);
+        readingColumn.add(modeBadge, BorderLayout.NORTH);
+        readingColumn.add(pages, BorderLayout.CENTER);
         pages.addPage(CHART_PAGE, HtmlPanes.scroller(natalPane));
         pages.addPage(CHART_B_PAGE, HtmlPanes.scroller(chartBPane));
         // <b>The pair's pages are built here, before the wheel</b>, whose constructor already
@@ -469,6 +483,9 @@ public class OuraniaWindow extends JFrame {
         chemistryPane = HtmlPanes.chartPane(this);
         String pairTip = "<html>Astrologer view: on, show the houses, signs, angles and orbs "
             + "behind each card.<br>Off: the plain reading only.</html>";
+        synastryGlancePane = HtmlPanes.chartPane(this);
+        pages.addPage(SYNASTRY_GLANCE_PAGE, astrologerPage(synastryGlancePane, pairTip));
+        pages.setPageLabel(SYNASTRY_GLANCE_PAGE, GLANCE_TAB);
         pages.addPage(MEET_PAGE, astrologerPage(synastryPane, pairTip));
         pages.addPage(CHEMISTRY_PAGE, astrologerPage(chemistryPane, pairTip));
         pages.setPageLabel(MEET_PAGE, MEET_LABEL);
@@ -1230,6 +1247,7 @@ public class OuraniaWindow extends JFrame {
             // without transits: a tab that opens onto nothing reads as broken rather than empty.
             // Both pages, so the door greys too - setPageEnabled greys a tab only when
             // everything behind it is greyed.
+            setPageEnabled(SYNASTRY_GLANCE_PAGE, hasContent(synastryHtml));
             setPageEnabled(MEET_PAGE, hasContent(synastryHtml));
             setPageEnabled(CHEMISTRY_PAGE, hasContent(synastryHtml));
             setPageEnabled(PAIR_COMING_PAGE, hasContent(synastryHtml));
@@ -1337,16 +1355,18 @@ public class OuraniaWindow extends JFrame {
      */
     private void refreshTogetherPanes() {
         syncAstrologerChecks();
-        if (synastryPane == null || chemistryPane == null) {
+        if (synastryPane == null || chemistryPane == null || synastryGlancePane == null) {
             return;
         }
         TogetherCards.Pair pair = synastryPair();
         if (pair == null || !hasContent(lastSynastryHtml)) {
             HtmlPanes.setHtml(synastryPane, lastSynastryHtml);
             HtmlPanes.setHtml(chemistryPane, lastSynastryHtml);
+            HtmlPanes.setHtml(synastryGlancePane, lastSynastryHtml);
             return;
         }
         boolean why = Settings.astrologerView();
+        HtmlPanes.setHtml(synastryGlancePane, TogetherCards.glanceHtml(pair, why));
         HtmlPanes.setHtml(synastryPane, TogetherCards.meetHtml(pair, why));
         HtmlPanes.setHtml(chemistryPane, TogetherCards.chemistryHtml(pair, why));
         refreshPairComing(why);
@@ -1622,8 +1642,8 @@ public class OuraniaWindow extends JFrame {
         if (tab == null || holder == null || pages == null) {
             return;
         }
-        if (pages.getParent() != holder) {
-            holder.add(pages, BorderLayout.CENTER);
+        if (readingColumn.getParent() != holder) {
+            holder.add(readingColumn, BorderLayout.CENTER);
             holder.revalidate();
             holder.repaint();
         }
@@ -1640,6 +1660,42 @@ public class OuraniaWindow extends JFrame {
         } else {
             pages.setPageLabel(CHART_PAGE, BY_PLANET_LABEL);
         }
+        updateModeBadge(tab);
+    }
+
+    /**
+     * Says which kind of reading the tab in front is and of which charts (reading framework
+     * spec, 2026-10-24). Called whenever the tab changes and whenever the charts do, because the
+     * line carries names and the pill depends on whether the sky is on the wheel.
+     */
+    private void updateModeBadge(ChartTab tab) {
+        if (modeBadge == null || tab == null || skymapPanel == null) {
+            return;
+        }
+        com.zodiacomputing.ourania.astro.ChartSubject sa = skymapPanel.chartASubject();
+        com.zodiacomputing.ourania.astro.ChartSubject sb = skymapPanel.chartBSubject();
+        boolean aIn = skymapPanel.hasChartA() && skymapPanel.chartAIn();
+        boolean bIn = sb != null && sb.entered() && skymapPanel.chartBIn();
+        boolean skyOn = chartSetupPanel != null && chartSetupPanel.skyWanted();
+        String a = whoseChart(sa, WheelRing.Kind.CHART_A, CHART_A_LABEL);
+        String b = whoseChart(sb, WheelRing.Kind.CHART_B, ChartTab.CHART_B.label);
+        // On the Transits tab the line names the people under the sky, and no one who is off.
+        String lineA = a;
+        String lineB = b;
+        if (tab == ChartTab.TRANSITS && !(aIn && bIn)) {
+            lineA = bIn ? b : a;
+            lineB = null;
+        }
+        modeBadge.show(ModeBadge.modeOf(tab, skyOn, aIn, bIn),
+            ModeBadge.contextOf(tab, lineA, sa == null ? null : sa.placeName, lineB,
+                sb == null ? null : sb.placeName,
+                chartSetupPanel == null ? null : chartSetupPanel.currentMode(),
+                skymapPanel.nowRing() == null ? null : skymapPanel.nowRing().time));
+    }
+
+    /** The badge over the tabs, for the suites. */
+    ModeBadge modeBadge() {
+        return modeBadge;
     }
 
     /**
@@ -1700,6 +1756,7 @@ public class OuraniaWindow extends JFrame {
         // The sky needs someone to be read against.
         chartRail.setPageEnabled(ChartTab.TRANSITS.door, a || b);
         chartRail.setPageEnabled(ChartTab.COMPOSITE.door, a && b);
+        updateModeBadge(ChartTab.ofDoor(chartRail.selected()));
     }
 
     /**
@@ -2735,6 +2792,7 @@ public class OuraniaWindow extends JFrame {
             return;
         }
         if (MEET_PAGE.equals(page) || CHEMISTRY_PAGE.equals(page)
+                || SYNASTRY_GLANCE_PAGE.equals(page)
                 || PAIR_COMING_PAGE.equals(page)) {
             refreshTogetherPanes();
             return;

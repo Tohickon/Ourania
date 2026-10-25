@@ -83,9 +83,78 @@ public final class TogetherCardsCheck {
         }
         smallPieces();
 
+        System.out.println("=== Part G: the glance counts what the Chemistry page draws from ===");
+        for (TogetherCards.Pair p : pairs) {
+            glance(p);
+        }
+
         System.out.println("=== Part F: the door ===");
         door();
         report();
+    }
+
+    // ------------------------------------------------------------------ Part G
+
+    /**
+     * The pair's At a glance page (reading framework spec, 2026-10-24).
+     *
+     * <b>The count is asked of the engine,</b> not of the page's own list: the contacts are
+     * rebuilt here from Synastry.interAspects with the three tests the Chemistry page applies,
+     * so a glance that counted a different set from the page below it fails.
+     */
+    private static void glance(TogetherCards.Pair p) {
+        int expected = 0;
+        for (Synastry.InterAspect a : Synastry.interAspects(p.them(), p.you())) {
+            if (a.type.isPtolemaic() && AspectGate.shown(a.type, p.aspectShown())
+                    && !Bodies.at(a.visitorBodyIndex).isAngle()
+                    && !Bodies.at(a.hostBodyIndex).isAngle()
+                    && p.shown().test(a.visitorBodyIndex) && p.shown().test(a.hostBodyIndex)) {
+                expected++;
+            }
+        }
+        List<Synastry.InterAspect> contacts = TogetherCards.contacts(p);
+        yes("the glance's contacts are the engine's Ptolemaic ones (" + expected + ")",
+            contacts.size() == expected);
+        int[] n = TogetherCards.balance(contacts);
+        yes("every contact is counted once", n[0] + n[1] + n[2] + n[3] == contacts.size());
+        // Counted again by the angle, not by the page's own tone words, so swapping the two
+        // columns in the page would fail here rather than agree with itself.
+        int trinesAndSextiles = 0;
+        int squaresAndOppositions = 0;
+        int conjunctions = 0;
+        for (Synastry.InterAspect a : contacts) {
+            int h = a.type.harmonic;
+            if (h == 3 || h == 6) {
+                trinesAndSextiles++;
+            } else if (h == 2 || h == 4) {
+                squaresAndOppositions++;
+            } else if (h == 1) {
+                conjunctions++;
+            }
+        }
+        yes("easy flow is the trines and sextiles (" + trinesAndSextiles + ")",
+            n[0] == trinesAndSextiles);
+        yes("friction is the squares and oppositions (" + squaresAndOppositions + ")",
+            n[1] == squaresAndOppositions);
+        yes("blended is the conjunctions (" + conjunctions + ")", n[2] == conjunctions);
+        // Tightest first is the Chemistry page's order, and the core links rely on it.
+        for (int i = 1; i < contacts.size(); i++) {
+            yes("contacts stay tightest first", contacts.get(i - 1).orb <= contacts.get(i).orb);
+        }
+        String html = TogetherCards.glanceHtml(p, false);
+        yes("the page states the counts", html.contains(TogetherCards.balanceSentence(n)));
+        yes("plain view hides the why lines", !html.contains("Why &mdash;"));
+        yes("plain view has no degree sign", !html.contains("°"));
+        yes("the bar appears exactly when something flows or grinds",
+            html.contains("bgcolor='#3FA66A'") == (n[0] > 0)
+                && html.contains("bgcolor='#D9534F'") == (n[1] > 0));
+        for (String body : new String[] {"Sun", "Moon"}) {
+            yes("a " + body + " link is a card, or the page names it as missing",
+                html.contains(body.toUpperCase() + " AND " + body.toUpperCase())
+                    || html.matches("(?s).*Not closely linked: [^<]*" + body + ".*"));
+        }
+        yes("Astrologer view adds the placements behind a card",
+            TogetherCards.glanceHtml(p, true).length() >= html.length());
     }
 
     // ------------------------------------------------------------------ Part A
@@ -377,6 +446,24 @@ public final class TogetherCardsCheck {
                 w.allPages().contains(OuraniaWindow.SYNASTRY_PAGE)
                     && w.allPages().contains(OuraniaWindow.CHEMISTRY_PAGE));
 
+            // The reading framework spec (2026-10-24): four fixed tabs on every chart tab. Asked
+            // of the page tables, so a tab that loses a whole group fails here by name, and of
+            // the strip itself for the one tab the window is on.
+            for (ChartTab tab : ChartTab.values()) {
+                for (java.util.Map.Entry<String, List<String>> group
+                        : OuraniaWindow.READING_GROUPS.entrySet()) {
+                    boolean has = false;
+                    for (String page : group.getValue()) {
+                        has |= OuraniaWindow.CHART_TAB_PAGES.get(tab).contains(page);
+                    }
+                    yes(tab.label + " has a '" + group.getKey() + "' tab", has);
+                }
+            }
+            yes("the Synastry tab draws the four fixed tabs: " + together.groupLabels(),
+                together.groupLabels().equals(List.of(OuraniaWindow.GLANCE_TAB,
+                    OuraniaWindow.PLACEMENTS_TAB, OuraniaWindow.PATTERNS_TAB,
+                    OuraniaWindow.REPORT_TAB)));
+
             // One setting, every box: ticking Astrologer view on one page shows on the others.
             @SuppressWarnings("unchecked")
             List<javax.swing.JCheckBox> boxes =
@@ -384,8 +471,9 @@ public final class TogetherCardsCheck {
             // Coming up, Where you meet, Chemistry, Coming up together, and since 2026-10-20 the
             // boxes on At a glance and Synthesize, which had been left out of the list; since
             // 2026-10-22 the Transits tab's three pages.
+            // Ten since the pair's At a glance page (2026-10-24).
             yes("every page with the astrology box is in the one list (" + boxes.size() + ")",
-                boxes.size() == 9);
+                boxes.size() == 10);
             boolean was = Settings.astrologerView();
             try {
                 SwingUtilities.invokeAndWait(() -> boxes.get(0).setSelected(!was));

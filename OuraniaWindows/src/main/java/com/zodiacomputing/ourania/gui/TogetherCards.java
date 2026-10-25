@@ -243,13 +243,9 @@ final class TogetherCards {
     static List<ReadingCard> chemistryCards(Pair p, int limit) {
         InterpretationService svc = InterpretationService.getInstance();
         List<ReadingCard> out = new ArrayList<>();
-        for (Synastry.InterAspect a : Synastry.interAspects(p.them(), p.you())) {
+        for (Synastry.InterAspect a : contacts(p)) {
             if (out.size() >= limit) {
                 break;
-            }
-            if (!a.type.isPtolemaic() || !listed(p, a.visitorBodyIndex)
-                    || !listed(p, a.hostBodyIndex) || !AspectGate.shown(a.type, p.aspectShown())) {
-                continue;
             }
             String prose = svc.getSynastryInteraspect(a.visitorBody, a.hostBody, a.type.label);
             if (prose == null) {
@@ -290,6 +286,138 @@ final class TogetherCards {
             case 12: return "TAKES ADJUSTING";
             default: return "A SUBTLE THREAD";
         }
+    }
+
+    // ------------------------------------------------------------------ At a glance
+
+    /**
+     * The contacts both pair pages draw from: Ptolemaic, between bodies the wheel shows, and
+     * switched on in the aspect settings. Tightest first.
+     *
+     * <b>One filter for the Chemistry page and the glance (2026-10-24).</b> The glance counts
+     * what the Chemistry page lists; a second copy of this test would let the count say eight
+     * links while the page below it listed five.
+     */
+    static List<Synastry.InterAspect> contacts(Pair p) {
+        List<Synastry.InterAspect> out = new ArrayList<>();
+        for (Synastry.InterAspect a : Synastry.interAspects(p.them(), p.you())) {
+            if (a.type.isPtolemaic() && listed(p, a.visitorBodyIndex)
+                    && listed(p, a.hostBodyIndex) && AspectGate.shown(a.type, p.aspectShown())) {
+                out.add(a);
+            }
+        }
+        return out;
+    }
+
+    /**
+     * How the contacts divide, by the tone words {@link #tone} already gives them:
+     * {easy flow, spark and friction, blended, the rest}.
+     */
+    static int[] balance(List<Synastry.InterAspect> contacts) {
+        int[] n = new int[4];
+        for (Synastry.InterAspect a : contacts) {
+            String t = tone(a.type);
+            if (t.equals("EASY FLOW")) {
+                n[0]++;
+            } else if (t.equals("SPARK AND FRICTION")) {
+                n[1]++;
+            } else if (t.equals("BLENDED")) {
+                n[2]++;
+            } else {
+                n[3]++;
+            }
+        }
+        return n;
+    }
+
+    /** The one sentence over the bar. Counts only: it claims nothing the counts do not. */
+    static String balanceSentence(int[] n) {
+        int total = n[0] + n[1] + n[2] + n[3];
+        if (total == 0) {
+            return "No close links between the two charts.";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(n[0]).append(n[0] == 1 ? " link flows easily, " : " links flow easily, ")
+          .append(n[1]).append(n[1] == 1 ? " brings friction that takes work, "
+              : " bring friction that takes work, ")
+          .append(n[2]).append(n[2] == 1 ? " blends the two charts together"
+              : " blend the two charts together");
+        if (n[3] > 0) {
+            sb.append(", and ").append(n[3]).append(n[3] == 1 ? " is a quieter thread"
+                : " are quieter threads");
+        }
+        return sb.append(".").toString();
+    }
+
+    /** The At a glance page for a pair, a whole document (reading framework spec). */
+    static String glanceHtml(Pair p, boolean showWhy) {
+        StringBuilder sb = ReadingCard.page("Your chemistry at a glance",
+            "How the two charts meet, before any detail: the core links, and how much comes "
+                + "easily against how much takes work.");
+        List<Synastry.InterAspect> all = contacts(p);
+        int[] n = balance(all);
+        sb.append("<h3 style='color:#FFD166; margin-top:14px; margin-bottom:6px;'>"
+            + "Easy and hard</h3>");
+        sb.append("<div style='font-size:13px; margin-bottom:6px;'>")
+          .append(balanceSentence(n)).append("</div>");
+        int ends = n[0] + n[1];
+        if (ends > 0) {
+            int easyPct = Math.max(1, Math.min(99, Math.round(100f * n[0] / ends)));
+            sb.append("<table width='100%' cellspacing='0' cellpadding='0'><tr>");
+            if (n[0] > 0) {
+                sb.append("<td width='").append(n[1] == 0 ? 100 : easyPct)
+                  .append("%' height='10' bgcolor='#3FA66A'></td>");
+            }
+            if (n[1] > 0) {
+                sb.append("<td width='").append(n[0] == 0 ? 100 : 100 - easyPct)
+                  .append("%' height='10' bgcolor='#D9534F'></td>");
+            }
+            sb.append("</tr></table>");
+            sb.append("<div style='color:#9AA5B1; font-size:11px; margin-top:3px;'>"
+                + "Green: what flows easily. Red: what takes work.</div>");
+        }
+
+        sb.append("<h3 style='color:#7FB3FF; margin-top:18px; margin-bottom:6px;'>"
+            + "The core links</h3>");
+        InterpretationService svc = InterpretationService.getInstance();
+        List<String> unlinked = new ArrayList<>();
+        for (String body : new String[] {"Sun", "Moon"}) {
+            Synastry.InterAspect found = null;
+            for (Synastry.InterAspect a : all) {
+                if (a.visitorBody.equals(body) && a.hostBody.equals(body)) {
+                    found = a;
+                    break;
+                }
+            }
+            ReadingCard card = null;
+            if (found != null) {
+                String prose = svc.getSynastryInteraspect(body, body, found.type.label);
+                if (prose != null) {
+                    prose = prose.replaceAll("(?i)<i>\\s*Dynamic:[^<]*</i>", "");
+                    card = ReadingCard.fromFirstSentence(
+                        tone(found.type) + " · " + body.toUpperCase(Locale.ROOT) + " AND "
+                            + body.toUpperCase(Locale.ROOT),
+                        prose,
+                        List.of("Their " + body + " in " + sign(found.visitorBodyLon) + " "
+                            + found.type.label.toLowerCase(Locale.ROOT) + " your " + body
+                            + " in " + sign(found.hostBodyLon), orb(found.orb, found.maxOrb)));
+                }
+            }
+            if (card == null) {
+                unlinked.add(body);
+            } else {
+                sb.append(ReadingCard.html(List.of(card), showWhy));
+            }
+        }
+        List<ReadingCard> pulls = pullCards(p);
+        if (!pulls.isEmpty()) {
+            sb.append(ReadingCard.html(List.of(pulls.get(0)), showWhy));
+        }
+        if (!unlinked.isEmpty()) {
+            sb.append("<div style='color:#9AA5B1; font-size:12px; margin-top:6px;'>"
+                + "Not closely linked: ").append(joinAnd(unlinked)).append(".</div>");
+        }
+        return sb.append("</body></html>").toString();
     }
 
     // ------------------------------------------------------------------ Pages
